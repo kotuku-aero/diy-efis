@@ -1,2 +1,2 @@
 # diy-efis
-EFIS Display based on CAN Aerospace
+Experimental Aircraft Avionicsbased on CAN Aerospace
