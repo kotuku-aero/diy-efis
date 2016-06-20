@@ -1,2 +1,2 @@
 # diy-efis
-Experimental Aircraft Avionicsbased on CAN Aerospace
+Experimental Aircraft Avionics based on CAN Aerospace
