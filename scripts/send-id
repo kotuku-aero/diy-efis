@@ -1,0 +1,4 @@
+#!/bin/bash
+
+hexdbl=$(canasend $1 $2 $3)
+cansend can0 $hexdbl

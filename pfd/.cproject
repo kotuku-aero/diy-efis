@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="cdt.managedbuild.config.gnu.exe.debug.1196030404">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.exe.debug.1196030404" moduleId="org.eclipse.cdt.core.settings" name="Debug">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.exe.debug.1196030404" name="Debug" parent="cdt.managedbuild.config.gnu.exe.debug">
+					<folderInfo id="cdt.managedbuild.config.gnu.exe.debug.1196030404." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.exe.debug.200890695" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.debug">
+							<targetPlatform id="cdt.managedbuild.target.gnu.platform.exe.debug.63144508" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.exe.debug"/>
+							<builder buildPath="${workspace_loc:/pfd}/Debug" id="cdt.managedbuild.target.gnu.builder.exe.debug.2007826441" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.exe.debug"/>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1239200977" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1245519079" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug">
+								<option id="gnu.cpp.compiler.exe.debug.option.optimization.level.921767767" name="Optimization Level" superClass="gnu.cpp.compiler.exe.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.exe.debug.option.debugging.level.1376702362" name="Debug Level" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.include.paths.1837605422" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths"/>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.49647488" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.813839695" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug">
+								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.exe.debug.option.optimization.level.1567998861" name="Optimization Level" superClass="gnu.c.compiler.exe.debug.option.optimization.level" valueType="enumerated"/>
+								<option id="gnu.c.compiler.exe.debug.option.debugging.level.2092498283" name="Debug Level" superClass="gnu.c.compiler.exe.debug.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.include.paths.1913436617" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths"/>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1945671358" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1906028588" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.42013542" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
+								<option id="gnu.cpp.link.option.paths.950992625" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/widgets/debug}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/linux-hal/Debug}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/gdi-lib/debug}&quot;"/>
+								</option>
+								<option id="gnu.cpp.link.option.libs.1128623044" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="linux-hal"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="widgets"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gdi-lib"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="pthread"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.852443864" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.debug.1548268631" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.debug">
+								<option id="gnu.both.asm.option.include.paths.1951167629" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths"/>
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.23967674" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings">
+				<externalSettings containerId="gdi-lib;org.buildroot.projects.tiny6410.buildroot.output.exe.debug.1179455453" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/gdi-lib"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/gdi-lib/debug"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="gdi-lib" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+				<externalSettings containerId="linux-hal;cdt.managedbuild.config.gnu.lib.debug.1496698681" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/linux-hal"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/linux-hal/Debug"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="linux-hal" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+				<externalSettings containerId="widgets;org.buildroot.projects.tiny6410.buildroot.output.exe.debug.688229859" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/widgets"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/widgets/debug"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="widgets" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+			</storageModule>
+		</cconfiguration>
+		<cconfiguration id="cdt.managedbuild.config.gnu.exe.release.891504151">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.exe.release.891504151" moduleId="org.eclipse.cdt.core.settings" name="Release">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.exe.release.891504151" name="Release" parent="cdt.managedbuild.config.gnu.exe.release">
+					<folderInfo id="cdt.managedbuild.config.gnu.exe.release.891504151." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.exe.release.882132303" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.release">
+							<targetPlatform id="cdt.managedbuild.target.gnu.platform.exe.release.1876463954" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.exe.release"/>
+							<builder buildPath="${workspace_loc:/pfd}/Release" id="cdt.managedbuild.target.gnu.builder.exe.release.912157423" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.exe.release"/>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1733754335" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.81627381" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release">
+								<option id="gnu.cpp.compiler.exe.release.option.optimization.level.1376093990" name="Optimization Level" superClass="gnu.cpp.compiler.exe.release.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.exe.release.option.debugging.level.487328106" name="Debug Level" superClass="gnu.cpp.compiler.exe.release.option.debugging.level" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1548900760" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.release.282455695" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.release">
+								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.exe.release.option.optimization.level.693718806" name="Optimization Level" superClass="gnu.c.compiler.exe.release.option.optimization.level" valueType="enumerated"/>
+								<option id="gnu.c.compiler.exe.release.option.debugging.level.562880559" name="Debug Level" superClass="gnu.c.compiler.exe.release.option.debugging.level" value="gnu.c.debugging.level.none" valueType="enumerated"/>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1354282961" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.release.1745779812" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.release"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.781505853" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.release">
+								<option id="gnu.cpp.link.option.libs.946721482" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="pthread"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.18436964" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.release.1730836518" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.release">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.51874114" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="cdt.managedbuild.config.gnu.exe.release.891504151.2028549078">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.exe.release.891504151.2028549078" moduleId="org.eclipse.cdt.core.settings" name="release-arm">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.exe.release.891504151.2028549078" name="release-arm" parent="cdt.managedbuild.config.gnu.exe.release">
+					<folderInfo id="cdt.managedbuild.config.gnu.exe.release.891504151.2028549078." name="/" resourcePath="">
+						<toolChain id="org.buildroot.projects.tiny6410.buildroot.output..toolchain.base.1020111815" name="Buildroot ARM (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output..toolchain.base">
+							<option id="org.buildroot.projects.tiny6410.buildroot.output..toolchain.base.option.path.1023667887" name="Path" superClass="org.buildroot.projects.tiny6410.buildroot.output..toolchain.base.option.path"/>
+							<option id="org.buildroot.projects.tiny6410.buildroot.output..toolchain.base.option.prefix.1489667406" name="Prefix" superClass="org.buildroot.projects.tiny6410.buildroot.output..toolchain.base.option.prefix"/>
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.GNU_ELF" id="org.buildroot.projects.tiny6410.buildroot.output.platform.base.586830601" isAbstract="false" name="Buildroot ARM Platform (/projects/tiny6410/buildroot/output)" osList="linux" superClass="org.buildroot.projects.tiny6410.buildroot.output.platform.base"/>
+							<builder buildPath="${workspace_loc:/pfd}/release-arm" id="org.buildroot.projects.tiny6410.buildroot.output.builder.327212414" keepEnvironmentInBuildfile="false" name="Buildroot ARM builder (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.builder"/>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.assembler.965184820" name="Buildroot ARM Assembler (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.assembler">
+								<option id="gnu.both.asm.option.include.paths.1773043048" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath"/>
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1419437805" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.c.compiler.1445240536" name="Buildroot ARM C Compiler (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.c.compiler">
+								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.option.optimization.level.1689226327" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.debugging.level.839256149" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" value="gnu.c.debugging.level.none" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.include.paths.1200446686" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath"/>
+								<inputType id="org.buildroot.projects.tiny6410.buildroot.output.c.input.1421865926" superClass="org.buildroot.projects.tiny6410.buildroot.output.c.input"/>
+							</tool>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.archiver.483534159" name="Buildroot ARM Archiver (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.archiver"/>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.c.linker.1127530238" name="Buildroot ARM C Linker (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.c.linker"/>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.cc.compiler.959192236" name="Buildroot ARM C++ Compiler (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.cc.compiler">
+								<option id="gnu.cpp.compiler.option.optimization.level.1692555778" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.debugging.level.517120638" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.include.paths.1353237241" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath"/>
+								<inputType id="org.buildroot.projects.tiny6410.buildroot.output.cpp.input.59728090" superClass="org.buildroot.projects.tiny6410.buildroot.output.cpp.input"/>
+							</tool>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.cc.linker.2120103017" name="Buildroot ARM CC Linker (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.cc.linker">
+								<option id="gnu.cpp.link.option.libs.2049091709" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="widgets"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="linux-hal"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gdi-lib"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="pthread"/>
+								</option>
+								<option id="gnu.cpp.link.option.paths.1858807826" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/widgets/release-arm}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/linux-hal/release-arm}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/gdi-lib/release-arm}&quot;"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1887707121" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.pkgconfig.898442700" name="Buildroot ARM Pkg config (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.pkgconfig"/>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings">
+				<externalSettings containerId="gdi-lib;org.buildroot.projects.tiny6410.buildroot.output.exe.release.645354816.1755414875" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/gdi-lib"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/gdi-lib/release-arm"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="gdi-lib" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+				<externalSettings containerId="linux-hal;cdt.managedbuild.config.gnu.lib.release.1724617786.365708617" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/linux-hal"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/linux-hal/release-arm"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="linux-hal" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+				<externalSettings containerId="widgets;org.buildroot.projects.tiny6410.buildroot.output.exe.release.2112673939.1861690639" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/widgets"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/widgets/release-arm"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="widgets" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+			</storageModule>
+			<storageModule moduleId="packages"/>
+		</cconfiguration>
+		<cconfiguration id="cdt.managedbuild.config.gnu.exe.debug.1196030404.1648503227">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.exe.debug.1196030404.1648503227" moduleId="org.eclipse.cdt.core.settings" name="Debug-ARM">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.exe.debug.1196030404.1648503227" name="Debug-ARM" parent="cdt.managedbuild.config.gnu.exe.debug">
+					<folderInfo id="cdt.managedbuild.config.gnu.exe.debug.1196030404.1648503227." name="/" resourcePath="">
+						<toolChain id="org.buildroot.projects.tiny6410.buildroot.output..toolchain.base.701715944" name="Buildroot ARM (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output..toolchain.base" unusedChildren="org.buildroot.projects.tiny6410.buildroot.output.archiver">
+							<option id="org.buildroot.projects.tiny6410.buildroot.output..toolchain.base.option.path.300767493" name="Path" superClass="org.buildroot.projects.tiny6410.buildroot.output..toolchain.base.option.path"/>
+							<option id="org.buildroot.projects.tiny6410.buildroot.output..toolchain.base.option.prefix.1332998399" name="Prefix" superClass="org.buildroot.projects.tiny6410.buildroot.output..toolchain.base.option.prefix"/>
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.GNU_ELF" id="org.buildroot.projects.tiny6410.buildroot.output.platform.base.1353653070" isAbstract="false" name="Buildroot ARM Platform (/projects/tiny6410/buildroot/output)" osList="linux" superClass="org.buildroot.projects.tiny6410.buildroot.output.platform.base"/>
+							<builder buildPath="${workspace_loc:/pfd}/Debug-ARM" id="org.eclipse.cdt.build.core.internal.builder.829797048" keepEnvironmentInBuildfile="false" name="CDT Internal Builder" superClass="org.eclipse.cdt.build.core.internal.builder"/>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.cc.linker.1215544738" name="Buildroot ARM CC Linker (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.cc.linker">
+								<option id="gnu.cpp.link.option.libs.202639994" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="linux-hal"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="widgets"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gdi-lib"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="pthread"/>
+								</option>
+								<option id="gnu.cpp.link.option.paths.263681327" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/widgets/debug-arm}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/linux-hal/debug-arm}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/gdi-lib/debug-arm}&quot;"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.2006484018" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.assembler.2093605528" name="Buildroot ARM Assembler (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.assembler">
+								<option id="gnu.both.asm.option.include.paths.1921311001" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/widgets}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/linux-hal}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/gdi-lib}&quot;"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.428019542" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.c.linker.727820888" name="Buildroot ARM C Linker (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.c.linker"/>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.pkgconfig.2139636114" name="Buildroot ARM Pkg config (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.pkgconfig"/>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.cc.compiler.53531805" name="Buildroot ARM C++ Compiler (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.cc.compiler">
+								<option id="gnu.cpp.compiler.option.optimization.level.56827896" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.debugging.level.247322334" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
+								<inputType id="org.buildroot.projects.tiny6410.buildroot.output.cpp.input.1361101322" superClass="org.buildroot.projects.tiny6410.buildroot.output.cpp.input"/>
+							</tool>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.c.compiler.960099642" name="Buildroot ARM C Compiler (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.c.compiler">
+								<option id="gnu.c.compiler.option.include.paths.1422944650" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/widgets}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/linux-hal}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/gdi-lib}&quot;"/>
+								</option>
+								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.1176871539" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.debugging.level.1743254512" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
+								<inputType id="org.buildroot.projects.tiny6410.buildroot.output.c.input.439446322" superClass="org.buildroot.projects.tiny6410.buildroot.output.c.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings">
+				<externalSettings containerId="gdi-lib;org.buildroot.projects.tiny6410.buildroot.output.exe.debug.1179455453.1396015571" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/gdi-lib"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/gdi-lib/debug-arm"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="gdi-lib" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+				<externalSettings containerId="linux-hal;cdt.managedbuild.config.gnu.lib.debug.1496698681.1913491049" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/linux-hal"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/linux-hal/debug-arm"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="linux-hal" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+				<externalSettings containerId="widgets;org.buildroot.projects.tiny6410.buildroot.output.exe.debug.688229859.488411412" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/widgets"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/widgets/debug-arm"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="widgets" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+			</storageModule>
+			<storageModule moduleId="packages"/>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="pfd.cdt.managedbuild.target.gnu.exe.369965275" name="Executable" projectType="cdt.managedbuild.target.gnu.exe"/>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="refreshScope"/>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1196030404.1648503227;cdt.managedbuild.config.gnu.exe.debug.1196030404.1648503227.;cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.439081254;cdt.managedbuild.tool.gnu.cpp.compiler.input.698179335">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1196030404.14422814;cdt.managedbuild.config.gnu.exe.debug.1196030404.14422814.;org.buildroot.projects.tiny6410.buildroot.output.cc.compiler.628759671;org.buildroot.projects.tiny6410.buildroot.output.cpp.input.279792579">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.buildroot.projects.tiny6410.buildroot.output.ARM_ManagedMakePerProjectProfileCPP"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1196030404;cdt.managedbuild.config.gnu.exe.debug.1196030404.;cdt.managedbuild.tool.gnu.c.compiler.exe.debug.813839695;cdt.managedbuild.tool.gnu.c.compiler.input.1945671358">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1196030404.14422814;cdt.managedbuild.config.gnu.exe.debug.1196030404.14422814.;org.buildroot.projects.tiny6410.buildroot.output.c.compiler.1923101619;org.buildroot.projects.tiny6410.buildroot.output.c.input.809167939">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.buildroot.projects.tiny6410.buildroot.output.ARM_ManagedMakePerProjectProfileC"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1196030404.1648503227;cdt.managedbuild.config.gnu.exe.debug.1196030404.1648503227.;cdt.managedbuild.tool.gnu.cross.cpp.compiler.824163390;cdt.managedbuild.tool.gnu.cpp.compiler.input.778575751">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.release.891504151.2028549078;cdt.managedbuild.config.gnu.exe.release.891504151.2028549078.;org.buildroot.projects.tiny6410.buildroot.output.cc.compiler.959192236;org.buildroot.projects.tiny6410.buildroot.output.cpp.input.59728090">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.buildroot.projects.tiny6410.buildroot.output.ARM_ManagedMakePerProjectProfileCPP"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.release.891504151;cdt.managedbuild.config.gnu.exe.release.891504151.;cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.81627381;cdt.managedbuild.tool.gnu.cpp.compiler.input.1548900760">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.release.891504151;cdt.managedbuild.config.gnu.exe.release.891504151.;cdt.managedbuild.tool.gnu.c.compiler.exe.release.282455695;cdt.managedbuild.tool.gnu.c.compiler.input.1354282961">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1196030404.14422814;cdt.managedbuild.config.gnu.exe.debug.1196030404.14422814.;cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1555553330;cdt.managedbuild.tool.gnu.cpp.compiler.input.521344867">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1196030404.14422814;cdt.managedbuild.config.gnu.exe.debug.1196030404.14422814.;cdt.managedbuild.tool.gnu.c.compiler.exe.debug.294502523;cdt.managedbuild.tool.gnu.c.compiler.input.740050018">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1196030404;cdt.managedbuild.config.gnu.exe.debug.1196030404.;cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1245519079;cdt.managedbuild.tool.gnu.cpp.compiler.input.49647488">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1196030404.1648503227;cdt.managedbuild.config.gnu.exe.debug.1196030404.1648503227.;org.buildroot.projects.tiny6410.buildroot.output.cc.compiler.53531805;org.buildroot.projects.tiny6410.buildroot.output.cpp.input.1361101322">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.buildroot.projects.tiny6410.buildroot.output.ARM_ManagedMakePerProjectProfileCPP"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1196030404.1648503227;cdt.managedbuild.config.gnu.exe.debug.1196030404.1648503227.;cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1926141908;cdt.managedbuild.tool.gnu.c.compiler.input.810616903">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.release.891504151.2028549078;cdt.managedbuild.config.gnu.exe.release.891504151.2028549078.;org.buildroot.projects.tiny6410.buildroot.output.c.compiler.1445240536;org.buildroot.projects.tiny6410.buildroot.output.c.input.1421865926">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.buildroot.projects.tiny6410.buildroot.output.ARM_ManagedMakePerProjectProfileC"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1196030404.1648503227;cdt.managedbuild.config.gnu.exe.debug.1196030404.1648503227.;cdt.managedbuild.tool.gnu.cross.c.compiler.1440808020;cdt.managedbuild.tool.gnu.c.compiler.input.652139490">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1196030404.1648503227;cdt.managedbuild.config.gnu.exe.debug.1196030404.1648503227.;org.buildroot.projects.tiny6410.buildroot.output.c.compiler.960099642;org.buildroot.projects.tiny6410.buildroot.output.c.input.439446322">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.buildroot.projects.tiny6410.buildroot.output.ARM_ManagedMakePerProjectProfileC"/>
+		</scannerConfigBuildInfo>
+	</storageModule>
+</cproject>

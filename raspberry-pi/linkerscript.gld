@@ -1,0 +1,16 @@
+/* This is a boilerplate script that sets up
+   search paths relative to the source file
+   directory, and includes a standard set
+   of libraries for these examples.
+   
+   This approach avoids absolute paths and
+   allows the examples to build properly
+   no matter where MPLAB C30 is installed. */
+   
+SEARCH_DIR("C:\Program Files (x86)\Microchip\xc16\v1.10\lib")
+SEARCH_DIR("C:\Program Files (x86)\Microchip\xc16\v1.10\support\dsPIC30F\gld") 
+INPUT(-ldsp)
+INPUT(-lpic30)
+INPUT(-lm)
+INPUT(-lc)
+INCLUDE p30F4011.gld

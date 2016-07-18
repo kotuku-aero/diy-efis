@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="org.buildroot.projects.tiny6410.buildroot.output.exe.debug.688229859">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="org.buildroot.projects.tiny6410.buildroot.output.exe.debug.688229859" moduleId="org.eclipse.cdt.core.settings" name="debug">
+				<externalSettings>
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/widgets"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/widgets/debug"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="widgets" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="a" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.staticLib" cleanCommand="rm -rf" description="" id="org.buildroot.projects.tiny6410.buildroot.output.exe.debug.688229859" name="debug" parent="org.buildroot.projects.tiny6410.buildroot.output.exe.debug">
+					<folderInfo id="org.buildroot.projects.tiny6410.buildroot.output.exe.debug.688229859." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.base.1352493515" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.1465741098" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
+							<builder buildPath="${workspace_loc:/widgets}/debug" id="cdt.managedbuild.target.gnu.builder.base.1210077562" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.61921580" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.1732817251" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
+								<option id="gnu.cpp.compiler.option.optimization.level.1407368162" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.debugging.level.2127996205" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.253970537" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.base.821613159" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
+								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.1471765176" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.debugging.level.371910266" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.257455074" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.685847575" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.1439231780" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.base.1804685631" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1902041671" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings">
+				<externalSettings containerId="gdi-lib;org.buildroot.projects.tiny6410.buildroot.output.exe.debug.1179455453" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/gdi-lib"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/gdi-lib/debug"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="gdi-lib" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+			</storageModule>
+			<storageModule moduleId="packages"/>
+		</cconfiguration>
+		<cconfiguration id="org.buildroot.projects.tiny6410.buildroot.output.exe.release.2112673939">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="org.buildroot.projects.tiny6410.buildroot.output.exe.release.2112673939" moduleId="org.eclipse.cdt.core.settings" name="release">
+				<externalSettings>
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/widgets"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/widgets/release"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="widgets" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="a" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.staticLib,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="" id="org.buildroot.projects.tiny6410.buildroot.output.exe.release.2112673939" name="release" parent="org.buildroot.projects.tiny6410.buildroot.output.exe.release">
+					<folderInfo id="org.buildroot.projects.tiny6410.buildroot.output.exe.release.2112673939." name="/" resourcePath="">
+						<toolChain id="org.buildroot.projects.tiny6410.buildroot.output.exe.release.334046837" name="Buildroot ARM (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.exe.release">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.GNU_ELF" id="org.buildroot.projects.tiny6410.buildroot.output.platform.base.2891211" isAbstract="false" name="Buildroot ARM Platform (/projects/tiny6410/buildroot/output)" osList="linux" superClass="org.buildroot.projects.tiny6410.buildroot.output.platform.base"/>
+							<builder buildPath="${workspace_loc:/widgets}/release" id="org.buildroot.projects.tiny6410.buildroot.output.builder.709391407" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Buildroot ARM builder (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.builder"/>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.assembler.1695187982" name="Buildroot ARM Assembler (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.assembler">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1860202853" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.c.compiler.2142967141" name="Buildroot ARM C Compiler (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.c.compiler">
+								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.option.optimization.level.1383547875" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.debugging.level.1683617109" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" value="gnu.c.debugging.level.none" valueType="enumerated"/>
+								<inputType id="org.buildroot.projects.tiny6410.buildroot.output.c.input.2095962952" superClass="org.buildroot.projects.tiny6410.buildroot.output.c.input"/>
+							</tool>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.archiver.275843080" name="Buildroot ARM Archiver (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.archiver"/>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.c.linker.115546685" name="Buildroot ARM C Linker (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.c.linker"/>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.cc.compiler.263780750" name="Buildroot ARM C++ Compiler (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.cc.compiler">
+								<option id="gnu.cpp.compiler.option.optimization.level.1643630102" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.debugging.level.1515241362" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
+								<inputType id="org.buildroot.projects.tiny6410.buildroot.output.cpp.input.1887761836" superClass="org.buildroot.projects.tiny6410.buildroot.output.cpp.input"/>
+							</tool>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.cc.linker.838505821" name="Buildroot ARM CC Linker (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.cc.linker">
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.2091655436" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.pkgconfig.1366256498" name="Buildroot ARM Pkg config (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.pkgconfig"/>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings">
+				<externalSettings containerId="gdi-lib;org.buildroot.projects.tiny6410.buildroot.output.exe.release.645354816" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier"/>
+			</storageModule>
+		</cconfiguration>
+		<cconfiguration id="org.buildroot.projects.tiny6410.buildroot.output.exe.debug.688229859.488411412">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="org.buildroot.projects.tiny6410.buildroot.output.exe.debug.688229859.488411412" moduleId="org.eclipse.cdt.core.settings" name="debug-arm">
+				<externalSettings>
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/widgets"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/widgets/debug-arm"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="widgets" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="a" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.staticLib" cleanCommand="rm -rf" description="" id="org.buildroot.projects.tiny6410.buildroot.output.exe.debug.688229859.488411412" name="debug-arm" parent="org.buildroot.projects.tiny6410.buildroot.output.exe.debug">
+					<folderInfo id="org.buildroot.projects.tiny6410.buildroot.output.exe.debug.688229859.488411412." name="/" resourcePath="">
+						<toolChain id="org.buildroot.projects.tiny6410.buildroot.output..toolchain.base.535368900" name="Buildroot ARM (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output..toolchain.base">
+							<option id="org.buildroot.projects.tiny6410.buildroot.output..toolchain.base.option.path.1368539237" name="Path" superClass="org.buildroot.projects.tiny6410.buildroot.output..toolchain.base.option.path"/>
+							<option id="org.buildroot.projects.tiny6410.buildroot.output..toolchain.base.option.prefix.240667807" name="Prefix" superClass="org.buildroot.projects.tiny6410.buildroot.output..toolchain.base.option.prefix"/>
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.GNU_ELF" id="org.buildroot.projects.tiny6410.buildroot.output.platform.base.28100592" isAbstract="false" name="Buildroot ARM Platform (/projects/tiny6410/buildroot/output)" osList="linux" superClass="org.buildroot.projects.tiny6410.buildroot.output.platform.base"/>
+							<builder buildPath="${workspace_loc:/widgets}/debug-arm" id="org.eclipse.cdt.build.core.internal.builder.1337890478" keepEnvironmentInBuildfile="false" name="CDT Internal Builder" superClass="org.eclipse.cdt.build.core.internal.builder"/>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.assembler.1290097469" name="Buildroot ARM Assembler (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.assembler">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.413537009" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.c.compiler.1044665074" name="Buildroot ARM C Compiler (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.c.compiler">
+								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.93046133" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.debugging.level.1720848041" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
+								<inputType id="org.buildroot.projects.tiny6410.buildroot.output.c.input.1855222400" superClass="org.buildroot.projects.tiny6410.buildroot.output.c.input"/>
+							</tool>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.archiver.486130928" name="Buildroot ARM Archiver (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.archiver"/>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.c.linker.1303450788" name="Buildroot ARM C Linker (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.c.linker"/>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.cc.compiler.599773274" name="Buildroot ARM C++ Compiler (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.cc.compiler">
+								<option id="gnu.cpp.compiler.option.optimization.level.1068593845" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.debugging.level.705797735" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
+								<inputType id="org.buildroot.projects.tiny6410.buildroot.output.cpp.input.1825809053" superClass="org.buildroot.projects.tiny6410.buildroot.output.cpp.input"/>
+							</tool>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.cc.linker.670564748" name="Buildroot ARM CC Linker (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.cc.linker">
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.546861245" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.pkgconfig.1375815838" name="Buildroot ARM Pkg config (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.pkgconfig"/>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings">
+				<externalSettings containerId="gdi-lib;org.buildroot.projects.tiny6410.buildroot.output.exe.debug.1179455453" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/gdi-lib"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/gdi-lib/debug"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="gdi-lib" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+			</storageModule>
+			<storageModule moduleId="packages"/>
+		</cconfiguration>
+		<cconfiguration id="org.buildroot.projects.tiny6410.buildroot.output.exe.release.2112673939.1861690639">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="org.buildroot.projects.tiny6410.buildroot.output.exe.release.2112673939.1861690639" moduleId="org.eclipse.cdt.core.settings" name="release-arm">
+				<externalSettings>
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/widgets"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/widgets/release-arm"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="widgets" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="a" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.staticLib,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="" id="org.buildroot.projects.tiny6410.buildroot.output.exe.release.2112673939.1861690639" name="release-arm" parent="org.buildroot.projects.tiny6410.buildroot.output.exe.release">
+					<folderInfo id="org.buildroot.projects.tiny6410.buildroot.output.exe.release.2112673939.1861690639." name="/" resourcePath="">
+						<toolChain id="org.buildroot.projects.tiny6410.buildroot.output.exe.release.230466115" name="Buildroot ARM (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.exe.release">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.GNU_ELF" id="org.buildroot.projects.tiny6410.buildroot.output.platform.base.693616335" isAbstract="false" name="Buildroot ARM Platform (/projects/tiny6410/buildroot/output)" osList="linux" superClass="org.buildroot.projects.tiny6410.buildroot.output.platform.base"/>
+							<builder buildPath="${workspace_loc:/widgets}/release" id="org.buildroot.projects.tiny6410.buildroot.output.builder.1099990597" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Buildroot ARM builder (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.builder"/>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.assembler.1672736525" name="Buildroot ARM Assembler (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.assembler">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.795823133" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.c.compiler.1842924938" name="Buildroot ARM C Compiler (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.c.compiler">
+								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.option.optimization.level.28452412" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.debugging.level.698352008" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" value="gnu.c.debugging.level.none" valueType="enumerated"/>
+								<inputType id="org.buildroot.projects.tiny6410.buildroot.output.c.input.1539732530" superClass="org.buildroot.projects.tiny6410.buildroot.output.c.input"/>
+							</tool>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.archiver.958537440" name="Buildroot ARM Archiver (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.archiver"/>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.c.linker.1273700066" name="Buildroot ARM C Linker (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.c.linker"/>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.cc.compiler.1116592061" name="Buildroot ARM C++ Compiler (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.cc.compiler">
+								<option id="gnu.cpp.compiler.option.optimization.level.991639796" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.debugging.level.360522543" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
+								<inputType id="org.buildroot.projects.tiny6410.buildroot.output.cpp.input.168950169" superClass="org.buildroot.projects.tiny6410.buildroot.output.cpp.input"/>
+							</tool>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.cc.linker.1185815286" name="Buildroot ARM CC Linker (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.cc.linker">
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1952663370" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="org.buildroot.projects.tiny6410.buildroot.output.pkgconfig.1388020822" name="Buildroot ARM Pkg config (/projects/tiny6410/buildroot/output)" superClass="org.buildroot.projects.tiny6410.buildroot.output.pkgconfig"/>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings">
+				<externalSettings containerId="gdi-lib;org.buildroot.projects.tiny6410.buildroot.output.exe.release.645354816" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier"/>
+			</storageModule>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="widgets.org.buildroot.projects.tiny6410.buildroot.output.exe.1973940427" name="Executable"/>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="refreshScope"/>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="org.buildroot.projects.tiny6410.buildroot.output.exe.release.2112673939;org.buildroot.projects.tiny6410.buildroot.output.exe.release.2112673939.;org.buildroot.projects.tiny6410.buildroot.output.c.compiler.2142967141;org.buildroot.projects.tiny6410.buildroot.output.c.input.2095962952">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.buildroot.projects.tiny6410.buildroot.output.ARM_ManagedMakePerProjectProfileC"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="org.buildroot.projects.tiny6410.buildroot.output.exe.debug.688229859;org.buildroot.projects.tiny6410.buildroot.output.exe.debug.688229859.;org.buildroot.projects.tiny6410.buildroot.output.c.compiler.775267330;org.buildroot.projects.tiny6410.buildroot.output.c.input.1701371387">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.buildroot.projects.tiny6410.buildroot.output.ARM_ManagedMakePerProjectProfileC"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="org.buildroot.projects.tiny6410.buildroot.output.exe.debug.688229859;org.buildroot.projects.tiny6410.buildroot.output.exe.debug.688229859.;org.buildroot.projects.tiny6410.buildroot.output.cc.compiler.289651868;org.buildroot.projects.tiny6410.buildroot.output.cpp.input.606250893">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.buildroot.projects.tiny6410.buildroot.output.ARM_ManagedMakePerProjectProfileCPP"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="org.buildroot.projects.tiny6410.buildroot.output.exe.release.2112673939;org.buildroot.projects.tiny6410.buildroot.output.exe.release.2112673939.;org.buildroot.projects.tiny6410.buildroot.output.cc.compiler.263780750;org.buildroot.projects.tiny6410.buildroot.output.cpp.input.1887761836">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.buildroot.projects.tiny6410.buildroot.output.ARM_ManagedMakePerProjectProfileCPP"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="org.buildroot.projects.tiny6410.buildroot.output.exe.debug.688229859;org.buildroot.projects.tiny6410.buildroot.output.exe.debug.688229859.;cdt.managedbuild.tool.gnu.cpp.compiler.base.1732817251;cdt.managedbuild.tool.gnu.cpp.compiler.input.253970537">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="org.buildroot.projects.tiny6410.buildroot.output.exe.debug.688229859;org.buildroot.projects.tiny6410.buildroot.output.exe.debug.688229859.;cdt.managedbuild.tool.gnu.c.compiler.base.821613159;cdt.managedbuild.tool.gnu.c.compiler.input.257455074">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+	</storageModule>
+</cproject>

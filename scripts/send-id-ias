@@ -1,0 +1,4 @@
+#!/bin/bash
+mps=$(echo "$1*0.514444" | bc -l)
+hexdbl=$(canasend 315 FLOAT $mps)
+cansend can0 $hexdbl

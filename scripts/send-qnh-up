@@ -1,0 +1,4 @@
+#!/bin/bash
+hexdbl=$(canasend 1202 SHORT 1)
+cansend can0 $hexdbl
+
