@@ -50,6 +50,5 @@ extern const bitmap_t battery_on_bitmap;
 extern const bitmap_t edu_fail_bitmap;
 extern const bitmap_t edu_fail_dim_bitmap;
 extern const bitmap_t edu_ok_bitmap;
-extern const bitmap_t mfd_background_bitmap;
 
 #endif

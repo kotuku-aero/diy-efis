@@ -120,9 +120,6 @@
     <ClCompile Include="..\..\widgets\watchdog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\widgets\mfd_background.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\widgets\nav_window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

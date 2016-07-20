@@ -15,45 +15,45 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\diyefis6410\efis\comm_device.cpp">
+    <ClCompile Include="comm_device.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\diyefis6410\efis\gdi_screen.cpp">
+    <ClCompile Include="gdi_screen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\diyefis6410\efis\main.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\diyefis6410\efis\serial_can_device.cpp">
+    <ClCompile Include="serial_can_device.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\diyefis6410\efis\win32_hal.cpp">
+    <ClCompile Include="win32_hal.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\diyefis6410\efis\windows_screen.cpp">
+    <ClCompile Include="windows_screen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\diyefis6410\efis\comm_device.h">
+    <ClInclude Include="comm_device.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\diyefis6410\efis\gdi_screen.h">
+    <ClInclude Include="gdi_screen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\diyefis6410\efis\serial_can_device.h">
+    <ClInclude Include="serial_can_device.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\diyefis6410\efis\stdint.h">
+    <ClInclude Include="stdint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\diyefis6410\efis\win32_hal.h">
+    <ClInclude Include="win32_hal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\diyefis6410\efis\win32_hal_device.h">
+    <ClInclude Include="win32_hal_device.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\diyefis6410\efis\windows_screen.h">
+    <ClInclude Include="windows_screen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

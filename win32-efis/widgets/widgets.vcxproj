@@ -38,7 +38,6 @@
     <ClCompile Include="..\..\widgets\imu_ok.cpp" />
     <ClCompile Include="..\..\widgets\layout_window.cpp" />
     <ClCompile Include="..\..\widgets\menu_window.cpp" />
-    <ClCompile Include="..\..\widgets\mfd_background.cpp" />
     <ClCompile Include="..\..\widgets\navigation_window_arial_12.cpp" />
     <ClCompile Include="..\..\widgets\nav_fail.cpp" />
     <ClCompile Include="..\..\widgets\nav_fail_dim.cpp" />
