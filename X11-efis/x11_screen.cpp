@@ -62,10 +62,6 @@ const kotuku::screen_metrics_t *kotuku::x11_screen_t::screen_metrics() const
   return this;
   }
 
-inline unsigned long to_color(kotuku::color_t c)
-  {
-  return (unsigned long) c;
-  }
 // canvas implementation routines.
 kotuku::screen_t *kotuku::x11_screen_t::create_canvas(screen_t *, const extent_t &ex)
   {
@@ -79,8 +75,8 @@ kotuku::screen_t *kotuku::x11_screen_t::create_canvas(screen_t *, const bitmap_t
   {
   Pixmap pixmap = XCreatePixmapFromBitmapData(_display, _drawable,
       reinterpret_cast<char *>(const_cast<color_t *>(bm.pixels)),
-      bm.bitmap_width, bm.bitmap_height, to_color(color_hollow),
-      to_color(color_hollow), bm.bpp);
+      bm.bitmap_width, bm.bitmap_height, color_hollow,
+      color_hollow, bm.bpp);
 
   return new x11_screen_t(_display, pixmap,
       rect_t(0, 0, bm.bitmap_width, bm.bitmap_height), bm.bpp);
@@ -112,10 +108,7 @@ void kotuku::x11_screen_t::z_order(int)
 void kotuku::x11_screen_t::paint()
   {
   // called to render the off-screen bitmap to the display
-  linux_hal_t *hal = reinterpret_cast<linux_hal_t *>(the_hal());
-  x11_screen_t *root_screen = reinterpret_cast<x11_screen_t *>(hal->screen());
-
-  XCopyArea(_display, _drawable, root_screen->_drawable, root_screen->_gc, 0, 0,
+  XCopyArea(_display, _drawable, _drawable, _gc, 0, 0,
       screen_x, screen_y, _origin.x, _origin.y);
   }
 
@@ -445,7 +438,7 @@ void kotuku::x11_screen_t::rotate_blt(const rect_t &clip_rect,
     if(((yp * yp) + (xp * xp)) > r2)
     continue;
 
-    color_t cr = to_color(XGetPixel(p_image, x, y));
+    color_t cr = XGetPixel(p_image, x, y);
 
     if(cr != color_t(-1) && (operation != rop_srcpaint || cr != 0))
       {
@@ -473,23 +466,23 @@ void kotuku::x11_screen_t::invalidate_rect(const rect_t &)
   }
 
 inline void set_pixel(Display *display, Drawable drawable, GC gc,
-    const kotuku::point_t &p, kotuku::color_t c)
+    const kotuku::point_t &p, color_t c)
   {
-  XSetForeground(display, gc, to_color(c));
+  XSetForeground(display, gc, c);
   XDrawPoint(display, drawable, gc, p.x, p.y);
   }
 
-inline kotuku::color_t get_pixel(Display *display, Drawable drawable, GC gc,
+inline color_t get_pixel(Display *display, Drawable drawable, GC gc,
     const kotuku::point_t &p)
   {
   XImage *p_image = XGetImage(display, drawable, p.x, p.y, 1, 1, AllPlanes,
       XYPixmap);
-  kotuku::color_t c = to_color(XGetPixel(p_image, 0, 0));
+  color_t c = XGetPixel(p_image, 0, 0);
   XDestroyImage(p_image);
   return c;
   }
 
-kotuku::color_t kotuku::x11_screen_t::get_pixel(const rect_t &clip_rect,
+color_t kotuku::x11_screen_t::get_pixel(const rect_t &clip_rect,
     const point_t &p) const
   {
   xset_clip_rect(clip_rect);
@@ -497,7 +490,7 @@ kotuku::color_t kotuku::x11_screen_t::get_pixel(const rect_t &clip_rect,
   return ::get_pixel(_display, _drawable, _gc, p);
   }
 
-kotuku::color_t kotuku::x11_screen_t::set_pixel(const rect_t &clip_rect,
+color_t kotuku::x11_screen_t::set_pixel(const rect_t &clip_rect,
     const point_t &p, color_t c)
   {
   xset_clip_rect(clip_rect);
@@ -631,11 +624,6 @@ void kotuku::x11_screen_t::scroll(const rect_t &clip_rect,
     const rect_t &clipping_rectangle, rect_t *rect_update)
   {
 
-  }
-
-inline kotuku::color_t from_color(unsigned long pixel)
-  {
-  return kotuku::color_t(pixel);
   }
 
 void kotuku::x11_screen_t::background_mode(int)

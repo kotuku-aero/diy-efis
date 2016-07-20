@@ -38,39 +38,20 @@ it must be removed as soon as possible after the code fragment is identified.
 #include "../widgets/layout_window.h"
 #include "../linux-hal/linux_hal.h"
 #include "../widgets/layout_window.h"
+#include "../widgets/menu_window.h"
+#include "../widgets/notification_window.h"
 #include "x11_screen.h"
 
-static kotuku::layout_window_t *root_window;
 static kotuku::watchdog_t *watchdog;
 static kotuku::pfd_application_t *_the_app = 0;
 static kotuku::linux_hal_t *hal_impl = 0;
 
-namespace kotuku
-  {
-  class x11_root_screen_t: public x11_screen_t
-    {
-  public:
-    x11_root_screen_t(Display *display, Drawable d, size_t x, size_t y, size_t bpp);
-    ~x11_root_screen_t();
-
-    layout_window_t *root_window() const
-      {
-      return _root_window;
-      }
-    void root_window(window_t *window)
-      {
-      _root_window = reinterpret_cast<layout_window_t *>(window);
-      }
-  private:
-    layout_window_t *_root_window;
-    };
-  }
-
-// this class holds the handles
-inline kotuku::x11_root_screen_t *as_screen_handle(kotuku::screen_t *h)
-  {
-  return reinterpret_cast<kotuku::x11_root_screen_t *>(h);
-  }
+static Display *display;
+static int screen_id;
+static Colormap colormap;
+static Window root_window;
+static Window diy_efis_window;
+static int depth;
 
 /* handler for XGetImage BadMatch errors */
 static int x11_error_handler(Display *dpy, XErrorEvent *event)
@@ -81,48 +62,29 @@ static int x11_error_handler(Display *dpy, XErrorEvent *event)
 
 namespace kotuku
   {
-  result_t do_create_root_screen(hal_t *hal, screen_type_t screen_type, window_t **root_window)
+  x11_screen_t *create_window(hal_t *hal, Window parent, const rect_t &rect)
     {
-    int screen_x;
-    int screen_y;
-
-    if(failed(hal->get_config_value("linux-hal", "screen-x", screen_x)))
-      screen_x = 640;
-
-    if(failed(hal->get_config_value("linux-hal", "screen-y", screen_y)))
-      screen_y = 480;
-
-    char *host;
-    if((host = (char *) getenv("DISPLAY")) == NULL)
-    return 0;
-
-    Display *display;
-    if((display = XOpenDisplay(host)) == NULL)
-    return 0;
-
-    int screen_id = DefaultScreen(display);
-    Colormap colormap = DefaultColormap(display, screen_id);
-    Window root = RootWindow(display, screen_id);
-    int depth = DefaultDepth(display, screen_id);
-
-    XSelectInput(display, root, SubstructureNotifyMask);
-
     XSetWindowAttributes attr;
     attr.event_mask = ExposureMask | KeyPressMask | VisibilityChangeMask;
     attr.background_pixel = BlackPixel(display, screen_id);
 
-    Window window = XCreateWindow(display, root, 0, 0, screen_x, screen_y, 0,
+    Window x_window = XCreateWindow(display, parent, rect.left, rect.top, rect.width(), rect.height(), 0,
         depth, InputOutput, DefaultVisual(display, screen_id),
         CWEventMask | CWBackPixel, &attr);
 
-    char name[80];
-    sprintf(name, "diy-efis: %d * %d * %d bpp", screen_x, screen_y, depth);
+    if(parent == root_window)
+      {
+      diy_efis_window = x_window;
 
-    XChangeProperty(display, window,
-        XA_WM_NAME, XA_STRING, 8,
-        PropModeReplace, reinterpret_cast<unsigned char *>(name), strlen(name));
+      char name[80];
+      sprintf(name, "diy-efis: %d * %d * %d bpp", rect.width(), rect.height(), depth);
 
-    XMapWindow(display, window);
+      XChangeProperty(display, x_window,
+          XA_WM_NAME, XA_STRING, 8,
+          PropModeReplace, reinterpret_cast<unsigned char *>(name), strlen(name));
+      }
+
+    XMapWindow(display, x_window);
 
     Pixmap iconPixmap;
     XWMHints xwmhints;
@@ -131,19 +93,64 @@ namespace kotuku
     xwmhints.initial_state = NormalState;
     xwmhints.flags = IconPixmapHint | StateHint;
 
-    XSetWMHints(display, window, &xwmhints);
-    XClearWindow(display, window);
+    XSetWMHints(display, x_window, &xwmhints);
+    XClearWindow(display, x_window);
     XSync(display, 0);
 
-    XSetErrorHandler(x11_error_handler);
-
-    x11_root_screen_t *x11root_screen = new kotuku::x11_root_screen_t(display, window, screen_x, screen_y, depth);
-    *screen = x11root_screen;
-
-    *root_window = new kotuku::layout_window_t(*screen);
-    x11root_screen->root_window(*root_window);
+    return new x11_screen_t(display, parent, rect, depth);
     }
+
+  result_t do_create_root_screen(hal_t *hal, screen_type_t screen_type, window_t **window)
+    {
+    int window_width;
+    int window_height;
+    int pos_x;
+    int pos_y;
+
+    switch(screen_type)
+      {
+    case st_root :
+      if(failed(hal->get_config_value("linux-hal", "screen-x", window_width)))
+        window_width = 480;
+
+      if(failed(hal->get_config_value("linux-hal", "screen-y", window_height)))
+        window_height = 640;
+
+      *window = new layout_window_t(create_window(hal, root_window, rect_t(0, 0, window_width, window_height)));
+      break;
+    case st_menu :
+      if(failed(hal->get_config_value("linux-hal", "menu-width", window_width)))
+        window_width = 480;
+
+      if(failed(hal->get_config_value("linux-hal", "menu-height", window_height)))
+        window_height = 320;
+
+      if(failed(hal->get_config_value("linux-hal", "menu-pos-x", window_height)))
+        pos_x = 0;
+
+      if(failed(hal->get_config_value("linux-hal", "menu-pos-y", window_height)))
+        pos_y = 320;
+
+      *window = new menu_window_t(create_window(hal, root_window, rect_t(pos_x, pos_y, window_width, window_height)), "root-menu");
+      break;
+    case st_notifications :
+      if(failed(hal->get_config_value("linux-hal", "menu-width", window_width)))
+        window_width = 480;
+
+      if(failed(hal->get_config_value("linux-hal", "menu-height", window_height)))
+        window_height = 320;
+
+      if(failed(hal->get_config_value("linux-hal", "menu-pos-x", window_height)))
+        pos_x = 0;
+
+      if(failed(hal->get_config_value("linux-hal", "menu-pos-y", window_height)))
+        pos_y = 320;
+
+      *window = new notification_window_t(create_window(hal, root_window, rect_t(pos_x, pos_y, window_width, window_height)), "alerts");
+      break;
+      }
   }
+  };
 
 kotuku::application_t *kotuku::the_app()
   {
@@ -160,10 +167,27 @@ kotuku::hal_t *kotuku::the_hal()
 
 int main(int argc, char **argv)
   {
+  char *host;
+  if((host = (char *) getenv("DISPLAY")) == NULL)
+    return 0;
+
+
+  if((display = XOpenDisplay(host)) == NULL)
+    return 0;
+
+  screen_id = DefaultScreen(display);
+  colormap = DefaultColormap(display, screen_id);
+  root_window = RootWindow(display, screen_id);
+  depth = DefaultDepth(display, screen_id);
+
+  XSelectInput(display, root_window, SubstructureNotifyMask);
+
+  XSetErrorHandler(x11_error_handler);
+
   kotuku::the_hal()->initialize("efis.ini");
   _the_app = new kotuku::pfd_application_t(kotuku::the_hal()->root_window());
 
-  watchdog = new kotuku::watchdog_t(root_window, _the_app);
+  watchdog = new kotuku::watchdog_t(kotuku::the_hal()->root_window(), _the_app);
 
   // start the application
   kotuku::application_t *app = kotuku::the_app();
@@ -171,35 +195,22 @@ int main(int argc, char **argv)
   XEvent e;
   while(1)
     {
-    if(kotuku::the_hal()->screen() != 0)
-      {
-      XNextEvent(reinterpret_cast<kotuku::x11_screen_t *>(kotuku::the_hal()->screen())->display(), &e);
+      XNextEvent(display, &e);
 
       switch (e.type)
         {
         case VisibilityNotify :
         case Expose:
           reinterpret_cast<kotuku::layout_window_t *>(kotuku::the_hal()->root_window())->repaint(true);
-          XSync(reinterpret_cast<kotuku::x11_screen_t *>(kotuku::the_hal()->screen())->display(), False);
-          XFlush(reinterpret_cast<kotuku::x11_screen_t *>(kotuku::the_hal()->screen())->display());
+          XSync(display, False);
+          XFlush(display);
           break;
         }
       // Handle Windows Close Event
 //       if(e.type==ClientMessage)
 //         break;
-      }
+
     }
 
   return 0;
   }
-
-kotuku::x11_root_screen_t::x11_root_screen_t(Display *display, Drawable d, size_t x, size_t y,
-    size_t bpp) :
-x11_screen_t(display, d, rect_t(0, 0, x, y), bpp)
-  {
-  }
-
-kotuku::x11_root_screen_t::~x11_root_screen_t()
-  {
-  }
-
