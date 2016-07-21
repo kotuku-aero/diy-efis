@@ -292,3 +292,13 @@ kotuku::rect_t kotuku::window_t::get_window_rect(const char *section_name)
 
   return result;
   }
+
+kotuku::window_t *kotuku::window_t::as_window()
+  {
+  return this;
+  }
+
+const kotuku::window_t *kotuku::window_t::as_window() const
+  {
+  return this;
+  }

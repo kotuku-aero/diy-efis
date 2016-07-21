@@ -137,6 +137,9 @@ public:
    * @return  true if the windows performed the operation.
    */
   virtual bool paint(bool force_redraw);
+
+  virtual window_t *as_window();
+  virtual const window_t *as_window() const;
 protected:
   // used to create the root window
   window_t(screen_t *);

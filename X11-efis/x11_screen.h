@@ -64,53 +64,53 @@ namespace kotuku
     // drawing functions.
     // most are the same as the canvas functions but they
     // have the clipping and drawing tools added
-    virtual void polyline(const rect_t &clip_rect, const pen_t *,
+    virtual void polyline(canvas_t *canvas, const rect_t &clip_rect, const pen_t *,
         const point_t *points, size_t count);
-    virtual void fill_rect(const rect_t &clip_rect, const rect_t &, color_t);
-    virtual void ellipse(const rect_t &clip_rect, const pen_t *, color_t,
+    virtual void fill_rect(canvas_t *canvas, const rect_t &clip_rect, const rect_t &, color_t);
+    virtual void ellipse(canvas_t *canvas, const rect_t &clip_rect, const pen_t *, color_t,
         const rect_t &);
-    virtual void polygon(const rect_t &clip_rect, const pen_t *, color_t,
+    virtual void polygon(canvas_t *canvas, const rect_t &clip_rect, const pen_t *, color_t,
         const point_t *, size_t count, bool interior_fill);
-    virtual void rectangle(const rect_t &clip_rect, const pen_t *, color_t,
+    virtual void rectangle(canvas_t *canvas, const rect_t &clip_rect, const pen_t *, color_t,
         const rect_t &);
-    virtual void round_rect(const rect_t &clip_rect, const pen_t *, color_t,
+    virtual void round_rect(canvas_t *canvas, const rect_t &clip_rect, const pen_t *, color_t,
         const rect_t &, const extent_t &);
-    virtual void pattern_blt(const rect_t &clip_rect, const bitmap_t *,
+    virtual void pattern_blt(canvas_t *canvas, const rect_t &clip_rect, const bitmap_t *,
         const rect_t &, raster_operation mode);
-    virtual void bit_blt(const rect_t &clip_rect, const rect_t &dest_rect,
+    virtual void bit_blt(canvas_t *canvas, const rect_t &clip_rect, const rect_t &dest_rect,
         const screen_t *src_screen, const rect_t &src_clip_rect,
         const point_t &src_pt, raster_operation operation);
-    virtual void mask_blt(const rect_t &clip_rect, const rect_t &dest_rect,
+    virtual void mask_blt(canvas_t *canvas, const rect_t &clip_rect, const rect_t &dest_rect,
         const screen_t *src_screen, const rect_t &src_clip_rect,
         const point_t &src_point, const bitmap_t &mask_bitmap,
         const point_t &mask_point, raster_operation operation);
-    virtual void rotate_blt(const rect_t &clip_rect, const point_t &dest_center,
+    virtual void rotate_blt(canvas_t *canvas, const rect_t &clip_rect, const point_t &dest_center,
         const screen_t *src, const rect_t &src_clip_rect,
         const point_t &src_point, size_t radius, double angle,
         raster_operation operation);
-    virtual color_t get_pixel(const rect_t &clip_rect, const point_t &) const;
-    virtual color_t set_pixel(const rect_t &clip_rect, const point_t &,
+    virtual color_t get_pixel(const canvas_t *canvas, const rect_t &clip_rect, const point_t &) const;
+    virtual color_t set_pixel(canvas_t *canvas, const rect_t &clip_rect, const point_t &,
         color_t c);
-    virtual void angle_arc(const rect_t &clip_rect, const pen_t *,
+    virtual void angle_arc(canvas_t *canvas, const rect_t &clip_rect, const pen_t *,
         const point_t &, gdi_dim_t radius, double start, double end);
-    virtual void pie(const rect_t &clip_rect, const pen_t *, color_t,
+    virtual void pie(canvas_t *canvas, const rect_t &clip_rect, const pen_t *, color_t,
         const point_t &, double start, double end, gdi_dim_t radii, gdi_dim_t inner);
-    virtual void draw_text(const rect_t &clip_rect, const font_t *, color_t fg,
+    virtual void draw_text(canvas_t *canvas, const rect_t &clip_rect, const font_t *, color_t fg,
         color_t bg, const char *str, size_t count, const point_t &src_pt,
         const rect_t &txt_clip_rect, text_flags format, size_t *char_widths);
-    virtual extent_t text_extent(const font_t *, const char *str,
+    virtual extent_t text_extent(const canvas_t *canvas, const font_t *, const char *str,
         size_t count) const;
-    virtual void scroll(const rect_t &clip_rect, const extent_t &offsets,
+    virtual void scroll(canvas_t *canvas, const rect_t &clip_rect, const extent_t &offsets,
         const rect_t &area_to_scroll, const rect_t &clipping_rectangle,
         rect_t *rect_update);
-    virtual void background_mode(int);
-    virtual void update_window();
-    virtual int z_order() const;
-    virtual void z_order(int);
+    virtual void background_mode(canvas_t *canvas, int);
+    virtual void invalidate_rect(canvas_t *canvas, const rect_t &rect);
+    /**
+     * This will copy the screen to the display.
+     */
     virtual void paint();
 
     Display *display();
-    void invalidate_rect(const rect_t &rect);
   protected:
     void xset_clip_rect(const rect_t &) const;
     void xset_pen(const pen_t &) const;
@@ -123,7 +123,7 @@ namespace kotuku
 
     point_t _origin;
     // angles are in degrees
-    void angle_arc(const rect_t &clip_rect, const pen_t *,
+    void angle_arc(canvas_t *canvas, const rect_t &clip_rect, const pen_t *,
         const point_t &, gdi_dim_t radius, int start, int end);
 
     };

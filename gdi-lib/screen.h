@@ -44,6 +44,7 @@ it must be removed as soon as possible after the code fragment is identified.
 #include "pen.h"
 #include "font.h"
 #include "thread.h"
+#include "canvas.h"
 
 namespace kotuku {
 class canvas_t;
@@ -51,12 +52,10 @@ class window_t;
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// this is the top level window that is a screen. There is only ever one
-// of these. Virtually any type of window can be created by over-ridding
-// the base class members, however the standard screen can support
-// a canvas and screen using a memory mapped display.
-//
-//  Note that if none is provided then a default screen buffer can be used.
+// This encapsulates an interface to a physical drawing surface.
+// The GDI uses a canvas as a wrapper around this interface.  It allows
+// a memory mapped canvas as used by a bitmap and a window to use the same
+// operations.
 
 struct screen_metrics_t
   {
@@ -118,24 +117,24 @@ public:
   // drawing functions.
   // most are the same as the canvas functions but they
   // have the clipping and drawing tools added
-  virtual void polyline(const rect_t &clip_rect, const pen_t *, const point_t *points, size_t count) = 0;
-  virtual void fill_rect(const rect_t &clip_rect, const rect_t &, color_t) = 0;
-  virtual void ellipse(const rect_t &clip_rect, const pen_t *, color_t, const rect_t &) = 0;
-  virtual void polygon(const rect_t &clip_rect, const pen_t *, color_t, const point_t *, size_t count, bool interior_fill) = 0;
-  virtual void rectangle(const rect_t &clip_rect, const pen_t *, color_t, const rect_t &) = 0;
-  virtual void round_rect(const rect_t &clip_rect, const pen_t *, color_t, const rect_t &, const extent_t &) = 0;
-  virtual void bit_blt(const rect_t &clip_rect, const rect_t &dest_rect, const screen_t *src_screen, const rect_t &src_clip_rect, const point_t &src_pt, raster_operation operation) = 0;
-  virtual void mask_blt(const rect_t &clip_rect, const rect_t &dest_rect, const screen_t *src_screen, const rect_t &src_clip_rect, const point_t &src_point, const bitmap_t &mask_bitmap, const point_t &mask_point, raster_operation operation) = 0;
-  virtual void rotate_blt(const rect_t &clip_rect, const point_t &dest_center, const screen_t *src, const rect_t &src_clip_rect, const point_t &src_point, size_t radius, double angle, raster_operation operation) = 0;
-  virtual color_t get_pixel(const rect_t &clip_rect, const point_t &) const = 0;
-  virtual color_t set_pixel(const rect_t &clip_rect, const point_t &, color_t c) = 0;
-  virtual void angle_arc(const rect_t &clip_rect, const pen_t *, const point_t &, gdi_dim_t radius, double start, double end) = 0;
-  virtual void pie(const rect_t &clip_rect, const pen_t *, color_t, const point_t &, double start, double end, gdi_dim_t radii, gdi_dim_t inner) = 0;
-  virtual void draw_text(const rect_t &clip_rect, const font_t *, color_t fg, color_t bg, const char *str, size_t count, const point_t &src_pt, const rect_t &txt_clip_rect, text_flags format, size_t *char_widths) = 0;
-  virtual extent_t text_extent(const font_t *, const char *str, size_t count) const = 0;
-  virtual void scroll(const rect_t &clip_rect, const extent_t &offsets, const rect_t &area_to_scroll, const rect_t &clipping_rectangle, rect_t *rect_update) = 0;
-  virtual void background_mode(int m) = 0;
-  virtual void invalidate_rect(const rect_t &rect) = 0;
+  virtual void polyline(canvas_t *canvas, const rect_t &clip_rect, const pen_t *, const point_t *points, size_t count) = 0;
+  virtual void fill_rect(canvas_t *canvas, const rect_t &clip_rect, const rect_t &, color_t) = 0;
+  virtual void ellipse(canvas_t *canvas, const rect_t &clip_rect, const pen_t *, color_t, const rect_t &) = 0;
+  virtual void polygon(canvas_t *canvas, const rect_t &clip_rect, const pen_t *, color_t, const point_t *, size_t count, bool interior_fill) = 0;
+  virtual void rectangle(canvas_t *canvas, const rect_t &clip_rect, const pen_t *, color_t, const rect_t &) = 0;
+  virtual void round_rect(canvas_t *canvas, const rect_t &clip_rect, const pen_t *, color_t, const rect_t &, const extent_t &) = 0;
+  virtual void bit_blt(canvas_t *canvas, const rect_t &clip_rect, const rect_t &dest_rect, const screen_t *src_screen, const rect_t &src_clip_rect, const point_t &src_pt, raster_operation operation) = 0;
+  virtual void mask_blt(canvas_t *canvas, const rect_t &clip_rect, const rect_t &dest_rect, const screen_t *src_screen, const rect_t &src_clip_rect, const point_t &src_point, const bitmap_t &mask_bitmap, const point_t &mask_point, raster_operation operation) = 0;
+  virtual void rotate_blt(canvas_t *canvas, const rect_t &clip_rect, const point_t &dest_center, const screen_t *src, const rect_t &src_clip_rect, const point_t &src_point, size_t radius, double angle, raster_operation operation) = 0;
+  virtual color_t get_pixel(const canvas_t *canvas, const rect_t &clip_rect, const point_t &) const = 0;
+  virtual color_t set_pixel(canvas_t *canvas, const rect_t &clip_rect, const point_t &, color_t c) = 0;
+  virtual void angle_arc(canvas_t *canvas, const rect_t &clip_rect, const pen_t *, const point_t &, gdi_dim_t radius, double start, double end) = 0;
+  virtual void pie(canvas_t *canvas, const rect_t &clip_rect, const pen_t *, color_t, const point_t &, double start, double end, gdi_dim_t radii, gdi_dim_t inner) = 0;
+  virtual void draw_text(canvas_t *canvas, const rect_t &clip_rect, const font_t *, color_t fg, color_t bg, const char *str, size_t count, const point_t &src_pt, const rect_t &txt_clip_rect, text_flags format, size_t *char_widths) = 0;
+  virtual extent_t text_extent(const canvas_t *canvas, const font_t *, const char *str, size_t count) const = 0;
+  virtual void scroll(canvas_t *canvas, const rect_t &clip_rect, const extent_t &offsets, const rect_t &area_to_scroll, const rect_t &clipping_rectangle, rect_t *rect_update) = 0;
+  virtual void background_mode(canvas_t *canvas, int m) = 0;
+  virtual void invalidate_rect(canvas_t *canvas, const rect_t &rect) = 0;
   };
   };
   

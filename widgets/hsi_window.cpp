@@ -68,6 +68,8 @@ kotuku::hsi_window_t::hsi_window_t(widget_t &parent, const char *section)
 
   _background_canvas.pen(&light_gray_pen);
 
+  _background_canvas.fill_rect(_background_canvas.window_rect(), color_black);
+
   if(draw_border())
     _background_canvas.round_rect(_background_canvas.window_rect(), extent_t(12, 12));
 

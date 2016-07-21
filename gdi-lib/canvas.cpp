@@ -151,7 +151,7 @@ kotuku::canvas_t::e_background_mode kotuku::canvas_t::background_mode() const
 
 kotuku::canvas_t::e_background_mode kotuku::canvas_t::background_mode(e_background_mode m)
   {
-  _screen->background_mode(m);
+  _screen->background_mode(this, m);
   return swap_gdi_object(_background_mode, m);
   }
 
@@ -195,20 +195,20 @@ void kotuku::canvas_t::polyline(const point_t *points,
       pts.get()[n].y = points[n].y + _window_rect.top;
       }
 
-    _screen->polyline(_clipping_rect, _pen, pts.get(), count);
+    _screen->polyline(this, _clipping_rect, _pen, pts.get(), count);
     }
   else
-    _screen->polyline(_clipping_rect, _pen, points, count);
+    _screen->polyline(this, _clipping_rect, _pen, points, count);
   }
 
 void kotuku::canvas_t::fill_rect(const rect_t &r, color_t c)
   {
-  _screen->fill_rect(_clipping_rect, r + _window_rect.top_left(), c);
+  _screen->fill_rect(this, _clipping_rect, r + _window_rect.top_left(), c);
   }
 
 void kotuku::canvas_t::ellipse(const rect_t &r)
   {
-  _screen->ellipse(_clipping_rect,
+  _screen->ellipse(this, _clipping_rect,
     _pen,
     _background_color,
     r + _window_rect.top_left());
@@ -240,7 +240,7 @@ void kotuku::canvas_t::polygon(const point_t *points,
       count++;
       }
 
-    _screen->polygon(_clipping_rect,
+    _screen->polygon(this, _clipping_rect,
       _pen,
       _background_color,
       pts.get(),
@@ -248,7 +248,7 @@ void kotuku::canvas_t::polygon(const point_t *points,
       interior_fill);
     }
   else
-    _screen->polygon(_clipping_rect,
+    _screen->polygon(this, _clipping_rect,
     _pen,
     _background_color,
     points,
@@ -258,7 +258,7 @@ void kotuku::canvas_t::polygon(const point_t *points,
 
 void kotuku::canvas_t::rectangle(const rect_t &r)
   {
-  _screen->rectangle(_clipping_rect,
+  _screen->rectangle(this, _clipping_rect,
     _pen,
     _background_color,
     r + _window_rect.top_left());
@@ -267,7 +267,7 @@ void kotuku::canvas_t::rectangle(const rect_t &r)
 void kotuku::canvas_t::round_rect(const rect_t &r,
                                  const extent_t &e)
   {
-  _screen->round_rect(_clipping_rect,
+  _screen->round_rect(this, _clipping_rect,
     _pen,
     _background_color,
     r + _window_rect.top_left(),
@@ -279,7 +279,7 @@ void kotuku::canvas_t::bit_blt(const rect_t &dest_rect,
                               const point_t &src_pt,
                               raster_operation operation)
   {
-  _screen->bit_blt(_clipping_rect,
+  _screen->bit_blt(this, _clipping_rect,
     dest_rect + _window_rect.top_left(),
     src_canvas._screen,
     src_canvas._clipping_rect,
@@ -295,7 +295,7 @@ void kotuku::canvas_t::mask_blt(const rect_t &dest_rect,
                                const point_t &mask_point,
                                raster_operation operation)
   {
-  _screen->mask_blt(_clipping_rect,
+  _screen->mask_blt(this, _clipping_rect,
     dest_rect + _window_rect.top_left(),
     src_canvas._screen,
     src_canvas._clipping_rect,
@@ -313,7 +313,7 @@ void kotuku::canvas_t::rotate_blt(const point_t &dest_center,
                                  double angle,
                                  raster_operation operation)
   {
-  _screen->rotate_blt(_clipping_rect,
+  _screen->rotate_blt(this, _clipping_rect,
     point_t(dest_center.x + _window_rect.top_left().x,
     dest_center.y + _window_rect.top_left().y),
     src_canvas._screen,
@@ -327,7 +327,7 @@ void kotuku::canvas_t::rotate_blt(const point_t &dest_center,
 
 color_t kotuku::canvas_t::get_pixel(const point_t &p) const
   {
-  return _screen->get_pixel(_clipping_rect,
+  return _screen->get_pixel(this, _clipping_rect,
     point_t(p.x + _window_rect.top_left().x,
     p.y + _window_rect.top_left().y));
   }
@@ -335,7 +335,7 @@ color_t kotuku::canvas_t::get_pixel(const point_t &p) const
 color_t kotuku::canvas_t::set_pixel(const point_t &p,
                                    color_t c)
   {
-  return _screen->set_pixel(_clipping_rect,
+  return _screen->set_pixel(this, _clipping_rect,
     point_t(p.x + _window_rect.top_left().x,
     p.y + _window_rect.top_left().y),
     c);
@@ -346,7 +346,7 @@ void kotuku::canvas_t::angle_arc(const point_t &pt,
                                 double start,
                                 double end)
   {
-  _screen->angle_arc(_clipping_rect, _pen,
+  _screen->angle_arc(this, _clipping_rect, _pen,
     point_t(pt.x + _window_rect.top_left().x,
     pt.y + _window_rect.top_left().y), radius, start, end);
   }
@@ -357,7 +357,7 @@ void kotuku::canvas_t::pie(const point_t &pt,
                           gdi_dim_t radii,
                           gdi_dim_t inner)
   {
-  _screen->pie(_clipping_rect,
+  _screen->pie(this, _clipping_rect,
     _pen,
     _background_color,
     point_t(pt.x + _window_rect.top_left().x,
@@ -376,7 +376,7 @@ void kotuku::canvas_t::draw_text(const char *str,
  if(count == -1)
   count = strlen(str);
 
-  _screen->draw_text(_clipping_rect,
+  _screen->draw_text(this, _clipping_rect,
     _font, _text_color,
     _background_color,
     str, count,
@@ -392,7 +392,7 @@ void kotuku::canvas_t::draw_text(const char *str,
                                 text_flags format,
                                 size_t *char_widths)
   {
-  _screen->draw_text(_clipping_rect,
+  _screen->draw_text(this, _clipping_rect,
     _font,
     _text_color,
     _background_color,
@@ -404,7 +404,7 @@ void kotuku::canvas_t::draw_text(const char *str,
 
 kotuku::extent_t kotuku::canvas_t::text_extent(const char *str, size_t count) const
   {
-  return _screen->text_extent(_font, str, count);
+  return _screen->text_extent(this, _font, str, count);
   }
 
 void kotuku::canvas_t::scroll(const extent_t &offsets,
@@ -412,7 +412,7 @@ void kotuku::canvas_t::scroll(const extent_t &offsets,
                              const rect_t &clipping_rectangle,
                              rect_t *rect_update)
   {
-  _screen->scroll(_clipping_rect, offsets, area_to_scroll, clipping_rectangle, rect_update);
+  _screen->scroll(this, _clipping_rect, offsets, area_to_scroll, clipping_rectangle, rect_update);
   }
 
 const kotuku::rect_t &kotuku::canvas_t::window_rect() const
@@ -438,5 +438,15 @@ void kotuku::canvas_t::invalidate()
   {
   _invalid = true;
 
-  _screen->invalidate_rect(_window_rect);
+  _screen->invalidate_rect(this, _window_rect);
+  }
+
+kotuku::window_t *kotuku::canvas_t::as_window()
+  {
+  return 0;
+  }
+
+const kotuku::window_t *kotuku::canvas_t::as_window() const
+  {
+  return 0;
   }

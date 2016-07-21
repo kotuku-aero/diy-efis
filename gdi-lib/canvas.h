@@ -218,6 +218,7 @@ public:
     {
     _invalid = false;
     }
+
   canvas_t(canvas_t &, const rect_t &);
   /**
    * Construct canvas given a screen buffer and screen rectangle
@@ -238,6 +239,18 @@ public:
     {
     return _screen;
     }
+
+  /**
+   * If this canvas is a window, return the pointer to the window
+   * @return canvas cast as a window
+   */
+  virtual window_t *as_window();
+
+  /**
+   * If this canvas is a window, return the pointer to the window
+   * @return canvas cast as a window
+   */
+  virtual const window_t *as_window() const;
 private:
 
   template<typename _Ty>

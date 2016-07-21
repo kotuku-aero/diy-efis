@@ -247,9 +247,7 @@ typedef struct _font_t
 //
 //  Canvas operations
 //
-typedef uint32_t raster_operation;
-
-enum {
+typedef enum _raster_operation {
   rop_r2_black = 1, // 0
   rop_r2_notmergepen = 2, // dpon
   rop_r2_masknotpen = 3, // dpna
@@ -282,7 +280,7 @@ enum {
   rop_dstinvert = 0x00550009, // dest = (not dest)
   rop_blackness = 0x00000042, // dest = black
   rop_whiteness = 0x00ff0062 // dest = white
-  };
+  } raster_operation;
   
 ////////////////////////////////////////////////////////////////////////////
 typedef uint32_t text_flags;

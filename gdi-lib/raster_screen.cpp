@@ -435,12 +435,12 @@ const kotuku::screen_metrics_t *kotuku::raster_screen_t::screen_metrics() const
   return this;
   }
 
-void kotuku::raster_screen_t::invalidate_rect(const rect_t &rect)
+void kotuku::raster_screen_t::invalidate_rect(canvas_t *canvas, const rect_t &rect)
   {
   // do nothing on a framebuffer as it is always redrawn
   }
 
-void kotuku::raster_screen_t::polyline(const rect_t &clip_rect,
+void kotuku::raster_screen_t::polyline(canvas_t *canvas, const rect_t &clip_rect,
     const pen_t *pen, const point_t *points, size_t count)
   {
   gdi_dim_t half_width = pen->width >> 1;
@@ -663,7 +663,7 @@ void kotuku::raster_screen_t::polyline(const rect_t &clip_rect,
     }
   }
 
-void kotuku::raster_screen_t::fill_rect(const rect_t &clip_rect,
+void kotuku::raster_screen_t::fill_rect(canvas_t *canvas, const rect_t &clip_rect,
     const rect_t &rect, color_t color)
   {
 // calculate how large the actual rectangle is
@@ -685,7 +685,7 @@ void kotuku::raster_screen_t::fill_rect(const rect_t &clip_rect,
     }
   }
 
-void kotuku::raster_screen_t::ellipse(const rect_t &clip_rect,
+void kotuku::raster_screen_t::ellipse(canvas_t *canvas, const rect_t &clip_rect,
     const pen_t *pen, color_t fill, const rect_t &points)
   {
   gdi_dim_t w = points.width() >> 1;
@@ -881,14 +881,14 @@ inline bool edge_cmp(const edge_t &lp, const edge_t &rp)
   return false;
   }
 
-void kotuku::raster_screen_t::polygon(const rect_t &clip_rect,
+void kotuku::raster_screen_t::polygon(canvas_t *canvas, const rect_t &clip_rect,
     const pen_t *outline, color_t fill, const point_t *pts,
     size_t count, bool interior_fill)
   {
 // if the interior color is hollow then just a line draw
   if(fill == color_hollow)
     {
-    polyline(clip_rect, outline, pts, count);
+    polyline(canvas, clip_rect, outline, pts, count);
     return;
     }
 
@@ -1004,15 +1004,15 @@ void kotuku::raster_screen_t::polygon(const rect_t &clip_rect,
 
   // now outline the polygon using the pen
   if(outline != 0 && outline->color != color_hollow)
-    polyline(clip_rect, outline, pts, count);
+    polyline(canvas, clip_rect, outline, pts, count);
 //tracer.measure("Polygon outline drawn");
   }
 
-void kotuku::raster_screen_t::rectangle(const rect_t &clip_rect,
+void kotuku::raster_screen_t::rectangle(canvas_t *canvas, const rect_t &clip_rect,
     const pen_t *outline, color_t fill, const rect_t &rect)
   {
 // the we fill the inside
-  fill_rect(clip_rect,
+  fill_rect(canvas, clip_rect,
       rect_t(rect.left + 1, rect.top - 1, rect.right - 1,
           rect.bottom + 1), fill);
 // draw the outline
@@ -1025,10 +1025,10 @@ void kotuku::raster_screen_t::rectangle(const rect_t &clip_rect,
         rect.top_left()
     };
 
-  polyline(clip_rect, outline, pts, 5);
+  polyline(canvas, clip_rect, outline, pts, 5);
   }
 
-void kotuku::raster_screen_t::round_rect(const rect_t &clip_rect,
+void kotuku::raster_screen_t::round_rect(canvas_t *canvas, const rect_t &clip_rect,
     const pen_t *pen, color_t fill, const rect_t &rect,
     const extent_t &dim)
   {
@@ -1049,19 +1049,19 @@ void kotuku::raster_screen_t::round_rect(const rect_t &clip_rect,
     tmp.left = draw_rect.left + dim.dx;
     tmp.bottom = draw_rect.top + dim.dy + 1;
     tmp.right = draw_rect.right - dim.dx - 1;
-    fill_rect(clip_rect, tmp, fill);
+    fill_rect(canvas, clip_rect, tmp, fill);
 
     tmp.top = draw_rect.bottom - dim.dy;
     tmp.left = draw_rect.left + dim.dx + 1;
     tmp.right = draw_rect.right + dim.dy;
     tmp.bottom = draw_rect.bottom - dim.dy - 1;
-    fill_rect(clip_rect, tmp, fill);
+    fill_rect(canvas, clip_rect, tmp, fill);
 
     tmp.top = draw_rect.top + dim.dy + 1;
     tmp.left = draw_rect.left + 1;
     tmp.right = draw_rect.right - 1;
     tmp.bottom = draw_rect.bottom - dim.dy - 1;
-    fill_rect(clip_rect, tmp, fill);
+    fill_rect(canvas, clip_rect, tmp, fill);
     }
   // lines
   point_t pts[2];
@@ -1070,25 +1070,25 @@ void kotuku::raster_screen_t::round_rect(const rect_t &clip_rect,
   pts[1] = draw_rect.top_right();
   pts[0].x += dim.dx;
   pts[1].x -= dim.dx;
-  polyline(clip_rect, pen, pts, 2);   // top
+  polyline(canvas, clip_rect, pen, pts, 2);   // top
 
   pts[0] = draw_rect.top_right();
   pts[1] = draw_rect.bottom_right();
   pts[0].y += dim.dy;
   pts[1].y -= dim.dy;
-  polyline(clip_rect, pen, pts, 2);   // right
+  polyline(canvas, clip_rect, pen, pts, 2);   // right
 
   pts[0] = draw_rect.top_left();
   pts[1] = draw_rect.bottom_left();
   pts[0].y += dim.dy;
   pts[1].y -= dim.dy;
-  polyline(clip_rect, pen, pts, 2);   // left
+  polyline(canvas, clip_rect, pen, pts, 2);   // left
 
   pts[0] = draw_rect.bottom_left();
   pts[1] = draw_rect.bottom_right();
   pts[0].x += dim.dx;
   pts[1].x -= dim.dx;
-  polyline(clip_rect, pen, pts, 2);   // bottom
+  polyline(canvas, clip_rect, pen, pts, 2);   // bottom
 
   // Arcs
 
@@ -1107,7 +1107,7 @@ void kotuku::raster_screen_t::round_rect(const rect_t &clip_rect,
   ellrect.right = draw_rect.left + (dim.dx << 1);
   ellrect.bottom = draw_rect.top + (dim.dy << 1);
 
-  ellipse(tmp, pen, fill, ellrect);
+  ellipse(canvas, tmp, pen, fill, ellrect);
 
   // bottom left
   tmp.left = draw_rect.left;
@@ -1122,7 +1122,7 @@ void kotuku::raster_screen_t::round_rect(const rect_t &clip_rect,
   ellrect.right = draw_rect.left + (dim.dx << 1);
   ellrect.bottom = draw_rect.bottom;
 
-  ellipse(tmp, pen, fill, ellrect);
+  ellipse(canvas, tmp, pen, fill, ellrect);
 
   // top right
   tmp.left = draw_rect.right - dim.dx - 1;
@@ -1137,7 +1137,7 @@ void kotuku::raster_screen_t::round_rect(const rect_t &clip_rect,
   ellrect.right = draw_rect.right;
   ellrect.bottom = draw_rect.top + (dim.dy << 1);
 
-  ellipse(tmp, pen, fill, ellrect);
+  ellipse(canvas, tmp, pen, fill, ellrect);
 
   // bottom right
   tmp.left = draw_rect.right - dim.dx - 1;
@@ -1152,10 +1152,10 @@ void kotuku::raster_screen_t::round_rect(const rect_t &clip_rect,
   ellrect.right = draw_rect.right;
   ellrect.bottom = draw_rect.bottom;
 
-  ellipse(tmp, pen, fill, ellrect);
+  ellipse(canvas, tmp, pen, fill, ellrect);
   }
 
-void kotuku::raster_screen_t::pattern_blt(const rect_t &clip_rect,
+void kotuku::raster_screen_t::pattern_blt(canvas_t *canvas, const rect_t &clip_rect,
     const bitmap_t *src, const rect_t &dest, raster_operation mode)
   {
   // copy the bitmap to the screen
@@ -1174,7 +1174,7 @@ void kotuku::raster_screen_t::pattern_blt(const rect_t &clip_rect,
     }
   }
 
-void kotuku::raster_screen_t::bit_blt(const rect_t &clip_rect,
+void kotuku::raster_screen_t::bit_blt(canvas_t *canvas, const rect_t &clip_rect,
     const rect_t &dest_rect, const screen_t *src_screen,
     const rect_t &src_clip_rect, const point_t &src_pt,
     raster_operation operation)
@@ -1251,7 +1251,7 @@ void kotuku::raster_screen_t::bit_blt(const rect_t &clip_rect,
 // we must now fill the left, top, right and bottom areas with blackness
   }
 
-void kotuku::raster_screen_t::mask_blt(const rect_t &clip_rect,
+void kotuku::raster_screen_t::mask_blt(canvas_t *canvas, const rect_t &clip_rect,
     const rect_t &dest_rect, const screen_t *src_screen,
     const rect_t &src_clip_rect, const point_t &src_point,
     const bitmap_t &mask_bitmap, const point_t &mask_point,
@@ -1259,7 +1259,7 @@ void kotuku::raster_screen_t::mask_blt(const rect_t &clip_rect,
   {
   }
 
-color_t kotuku::raster_screen_t::get_pixel(const rect_t &clip_rect, const point_t &pt) const
+color_t kotuku::raster_screen_t::get_pixel(const canvas_t *canvas, const rect_t &clip_rect, const point_t &pt) const
   {
   if(!(clip_rect && pt))
     return color_black;
@@ -1270,7 +1270,7 @@ color_t kotuku::raster_screen_t::get_pixel(const rect_t &clip_rect, const point_
   return get_pixel(point_to_address(src_pt));
   }
 
-color_t kotuku::raster_screen_t::set_pixel(
+color_t kotuku::raster_screen_t::set_pixel(canvas_t *canvas,
     const rect_t &clip_rect, const point_t &pt,
     color_t c)
   {
@@ -1310,7 +1310,7 @@ inline double adjust_radians_to_windows(double angle)
  If the sweep angle is greater than 360 degrees the arc is swept multiple
  times. The figure is not filled.
  */
-void kotuku::raster_screen_t::angle_arc(const rect_t &clip_rect,
+void kotuku::raster_screen_t::angle_arc(canvas_t *canvas, const rect_t &clip_rect,
     const pen_t *pen, const point_t &p, gdi_dim_t radius,
     double start_angle, double end_angle)
   {
@@ -1339,58 +1339,58 @@ void kotuku::raster_screen_t::angle_arc(const rect_t &clip_rect,
       {
       // forward angles first
       if(angle >= start_angle && angle <= end_angle)
-        set_pixel(clip_rect, point_t(pt.x + p.x, pt.y + p.y), pen->color); // octant 1
+        set_pixel(canvas, clip_rect, point_t(pt.x + p.x, pt.y + p.y), pen->color); // octant 1
 
       angle += rad_90;
       if(angle >= start_angle && angle <= end_angle)
-        set_pixel(clip_rect, point_t(-pt.y + p.x, pt.x + p.y), pen->color); // octant 3
+        set_pixel(canvas, clip_rect, point_t(-pt.y + p.x, pt.x + p.y), pen->color); // octant 3
 
       angle += rad_90;
       if(angle >= start_angle && angle <= end_angle)
-        set_pixel(clip_rect, point_t(-pt.x + p.x, -pt.y + p.y), pen->color); // octant 5
+        set_pixel(canvas, clip_rect, point_t(-pt.x + p.x, -pt.y + p.y), pen->color); // octant 5
 
       angle += rad_90;
       if(angle >= start_angle && angle <= end_angle)
-        set_pixel(clip_rect, point_t(pt.y + p.x, -pt.x + p.y), pen->color); // octant 7
+        set_pixel(canvas, clip_rect, point_t(pt.y + p.x, -pt.x + p.y), pen->color); // octant 7
 
       angle -= rad_270;
       angle *= -1;
       angle += rad_90;
 
       if(angle >= start_angle && angle <= end_angle)
-        set_pixel(clip_rect, point_t(pt.y + p.x, pt.x + p.y), pen->color); // octant 2
+        set_pixel(canvas, clip_rect, point_t(pt.y + p.x, pt.x + p.y), pen->color); // octant 2
 
       angle += rad_90;
       if(angle >= start_angle && angle <= end_angle)
-        set_pixel(clip_rect, point_t(-pt.x + p.x, pt.y + p.y), pen->color); // octant 4
+        set_pixel(canvas, clip_rect, point_t(-pt.x + p.x, pt.y + p.y), pen->color); // octant 4
 
       angle += rad_90;
       if(angle >= start_angle && angle <= end_angle)
-        set_pixel(clip_rect, point_t(-pt.y + p.x, -pt.x + p.y), pen->color); // octant 6
+        set_pixel(canvas, clip_rect, point_t(-pt.y + p.x, -pt.x + p.y), pen->color); // octant 6
 
       angle += rad_90;
       if(angle >= start_angle && angle <= end_angle)
-        set_pixel(clip_rect, point_t(pt.x + p.x, -pt.y + p.y), pen->color); // octant 8
+        set_pixel(canvas, clip_rect, point_t(pt.x + p.x, -pt.y + p.y), pen->color); // octant 8
       }
     else
       {
       if(angle >= start_angle && angle <= end_angle)
-        ellipse(clip_rect, pen, pen->color,
+        ellipse(canvas, clip_rect, pen, pen->color,
             rect_t(point_t(pt.x + p.x, pt.y + p.y), wide_pen) + rect_offset); // octant 1
 
       angle += rad_90;
       if(angle >= start_angle && angle <= end_angle)
-        ellipse(clip_rect, pen, pen->color,
+        ellipse(canvas, clip_rect, pen, pen->color,
             rect_t(point_t(-pt.y + p.x, pt.x + p.y), wide_pen) + rect_offset); // octant 3
 
       angle += rad_90;
       if(angle >= start_angle && angle <= end_angle)
-        ellipse(clip_rect, pen, pen->color,
+        ellipse(canvas, clip_rect, pen, pen->color,
             rect_t(point_t(-pt.x + p.x, -pt.y + p.y), wide_pen) + rect_offset); // octant 5
 
       angle += rad_90;
       if(angle >= start_angle && angle <= end_angle)
-        ellipse(clip_rect, pen, pen->color,
+        ellipse(canvas, clip_rect, pen, pen->color,
             rect_t(point_t(pt.y + p.x, -pt.x + p.y), wide_pen) + rect_offset); // octant 7
 
       angle -= rad_270;
@@ -1398,22 +1398,22 @@ void kotuku::raster_screen_t::angle_arc(const rect_t &clip_rect,
       angle += rad_90;
 
       if(angle >= start_angle && angle <= end_angle)
-        ellipse(clip_rect, pen, pen->color,
+        ellipse(canvas, clip_rect, pen, pen->color,
             rect_t(point_t(pt.y + p.x, pt.x + p.y), wide_pen) + rect_offset); // octant 2
 
       angle += rad_90;
       if(angle >= start_angle && angle <= end_angle)
-        ellipse(clip_rect, pen, pen->color,
+        ellipse(canvas, clip_rect, pen, pen->color,
             rect_t(point_t(-pt.x + p.x, pt.y + p.y), wide_pen) + rect_offset); // octant 4
 
       angle += rad_90;
       if(angle >= start_angle && angle <= end_angle)
-        ellipse(clip_rect, pen, pen->color,
+        ellipse(canvas, clip_rect, pen, pen->color,
             rect_t(point_t(-pt.y + p.x, -pt.x + p.y), wide_pen) + rect_offset); // octant 6
 
       angle += rad_90;
       if(angle >= start_angle && angle <= end_angle)
-        ellipse(clip_rect, pen, pen->color,
+        ellipse(canvas, clip_rect, pen, pen->color,
             rect_t(point_t(pt.x + p.x, -pt.y + p.y), wide_pen) + rect_offset); // octant 8
       }
 
@@ -1428,7 +1428,7 @@ void kotuku::raster_screen_t::angle_arc(const rect_t &clip_rect,
     }
   }
 
-void kotuku::raster_screen_t::pie(const rect_t &clip_rect,
+void kotuku::raster_screen_t::pie(canvas_t *canvas, const rect_t &clip_rect,
     const pen_t *pen, color_t c, const point_t &p, double start,
     double end, gdi_dim_t radii, gdi_dim_t inner)
   {
@@ -1446,7 +1446,7 @@ void kotuku::raster_screen_t::pie(const rect_t &clip_rect,
     rotate_point(p, pts[0], start);
     rotate_point(p, pts[1], start);
 
-    polyline(clip_rect, pen, pts, 2);
+    polyline(canvas, clip_rect, pen, pts, 2);
     return;
     }
 // we draw a polygon using the current pen
@@ -1497,10 +1497,10 @@ void kotuku::raster_screen_t::pie(const rect_t &clip_rect,
   else
     pts.get()[pt] = p;
 
-  polygon(clip_rect, pen, c, pts.get(), segs + 1, false);
+  polygon(canvas, clip_rect, pen, c, pts.get(), segs + 1, false);
   }
 
-void kotuku::raster_screen_t::draw_text(const rect_t &clip_rect,
+void kotuku::raster_screen_t::draw_text(canvas_t *canvas, const rect_t &clip_rect,
     const font_t *font, color_t fg, color_t bg, const char *str,
     size_t count, const point_t &pt,
     const rect_t &txt_clip_rect, text_flags format, size_t *char_widths)
@@ -1564,7 +1564,7 @@ void kotuku::raster_screen_t::draw_text(const rect_t &clip_rect,
     }
   }
 
-kotuku::extent_t kotuku::raster_screen_t::text_extent(const font_t *font,
+kotuku::extent_t kotuku::raster_screen_t::text_extent(const canvas_t *canvas, const font_t *font,
     const char *str, size_t count) const
   {
   extent_t ex(0, gdi_dim_t(font->bitmap_height));
@@ -1588,13 +1588,13 @@ kotuku::extent_t kotuku::raster_screen_t::text_extent(const font_t *font,
   return ex;
   }
 
-void kotuku::raster_screen_t::scroll(const rect_t &clip_rect,
+void kotuku::raster_screen_t::scroll(canvas_t *canvas, const rect_t &clip_rect,
     const extent_t &offsets, const rect_t &area_to_scroll,
     const rect_t &clipping_rectangle, rect_t *rect_update)
   {
   }
 
-void kotuku::raster_screen_t::rotate_blt(const rect_t &clip_rect,
+void kotuku::raster_screen_t::rotate_blt(canvas_t *canvas, const rect_t &clip_rect,
     const point_t &dest_center, const screen_t *src,
     const rect_t &src_clip_rect, const point_t &src_point,
     size_t radius, double angle, raster_operation operation)
@@ -1800,7 +1800,7 @@ color_t kotuku::raster_screen_t::execute_rop(color_t src,
   return 0;
   }
 
-void kotuku::raster_screen_t::background_mode(int m)
+void kotuku::raster_screen_t::background_mode(canvas_t *canvas, int m)
   {
   _background_mode = m;
   }

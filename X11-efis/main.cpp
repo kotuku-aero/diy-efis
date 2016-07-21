@@ -97,7 +97,7 @@ namespace kotuku
     XClearWindow(display, x_window);
     XSync(display, 0);
 
-    return new x11_screen_t(display, parent, rect, depth);
+    return new x11_screen_t(display, x_window, rect, depth);
     }
 
   result_t do_create_root_screen(hal_t *hal, screen_type_t screen_type, window_t **window)
@@ -201,7 +201,7 @@ int main(int argc, char **argv)
         {
         case VisibilityNotify :
         case Expose:
-          reinterpret_cast<kotuku::layout_window_t *>(kotuku::the_hal()->root_window())->repaint(true);
+          kotuku::the_hal()->root_window()->repaint(true);
           XSync(display, False);
           XFlush(display);
           break;

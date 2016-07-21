@@ -63,6 +63,8 @@ kotuku::alert_window_t::alert_window_t(widget_t &parent, const char *section)
   _nav_on_dim_bitmap(parent, nav_fail_dim_bitmap),
   _nav_off_bitmap(parent, nav_ok_bitmap)
   {
+  _background_canvas.clipping_rectangle(_background_canvas.window_rect());
+  _background_canvas.fill_rect(_background_canvas.window_rect(), color_black);
   if(draw_border())
     _background_canvas.round_rect(window_rect(), extent_t(12, 12));
 

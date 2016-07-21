@@ -53,6 +53,11 @@ kotuku::airspeed_window_t::airspeed_window_t(widget_t &parent, const char *secti
   the_app()->get_config_value(section_name, "vx", _vx);
   the_app()->get_config_value(section_name, "vy", _vy);
 
+  _background_canvas.clipping_rectangle(_background_canvas.window_rect());
+  _background_canvas.fill_rect(rect_t(0, 0, 80, 8), color_black);
+  _background_canvas.fill_rect(rect_t(0, 8, 8, 240), color_black);
+  _background_canvas.fill_rect(rect_t(0, 232, 80, 240), color_black);
+  _background_canvas.fill_rect(rect_t(71, 8, 80, 232), color_black);
   _background_canvas.fill_rect(rect_t(8, 8, 71, 232), color_gray);
 
   // get our data feed running

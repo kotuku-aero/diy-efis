@@ -58,9 +58,12 @@ kotuku::annunciator_window_t::annunciator_window_t(widget_t &parent, const char 
   _qnh(1013)
   {
 	rect_t r(_background_canvas.window_rect());
+  _background_canvas.clipping_rectangle(r);
+
+  _background_canvas.fill_rect(r, color_black);
 
 	if(draw_border())
-	  _background_canvas.round_rect(_background_canvas.window_rect(), extent_t(12, 12));
+	  _background_canvas.round_rect(r, extent_t(12, 12));
 
   draw_annunciator_background(clock_pt, "UTC");
   draw_annunciator_background(hrs_pt, "Hrs");

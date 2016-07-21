@@ -44,10 +44,11 @@ it must be removed as soon as possible after the code fragment is identified.
 
 #include "../widgets/layout_window.h"
 
-kotuku::x11_screen_t::x11_screen_t(Display *display, Drawable d,
-    const rect_t &dimensions, size_t bpp) :
-screen_metrics_t(dimensions.width(), dimensions.height(), bpp), _display(
-    display), _drawable(d), _origin(dimensions.top_left())
+kotuku::x11_screen_t::x11_screen_t(Display *display, Drawable d, const rect_t &dimensions, size_t bpp)
+: screen_metrics_t(dimensions.width(), dimensions.height(), bpp),
+  _display(display),
+  _drawable(d),
+  _origin(dimensions.top_left())
   {
   _gc = XCreateGC(display, d, 0, NULL);
   }
@@ -65,10 +66,8 @@ const kotuku::screen_metrics_t *kotuku::x11_screen_t::screen_metrics() const
 // canvas implementation routines.
 kotuku::screen_t *kotuku::x11_screen_t::create_canvas(screen_t *, const extent_t &ex)
   {
-  Pixmap pixmap = XCreatePixmap(_display, _drawable, ex.dx, ex.dy,
-      bits_per_pixel);
-  return new x11_screen_t(_display, pixmap, rect_t(point_t(0, 0), ex),
-      bits_per_pixel);
+  Pixmap pixmap = XCreatePixmap(_display, _drawable, ex.dx, ex.dy, bits_per_pixel);
+  return new x11_screen_t(_display, pixmap, rect_t(point_t(0, 0), ex), bits_per_pixel);
   }
 
 kotuku::screen_t *kotuku::x11_screen_t::create_canvas(screen_t *, const bitmap_t &bm)
@@ -82,27 +81,11 @@ kotuku::screen_t *kotuku::x11_screen_t::create_canvas(screen_t *, const bitmap_t
       rect_t(0, 0, bm.bitmap_width, bm.bitmap_height), bm.bpp);
   }
 
-kotuku::screen_t *kotuku::x11_screen_t::create_canvas(screen_t *,
-    const rect_t &dimensions)
+kotuku::screen_t *kotuku::x11_screen_t::create_canvas(screen_t *, const rect_t &dimensions)
   {
   Pixmap pixmap = XCreatePixmap(_display, _drawable, dimensions.width(),
       dimensions.height(), bits_per_pixel);
   return new x11_screen_t(_display, pixmap, dimensions, bits_per_pixel);
-  }
-
-void kotuku::x11_screen_t::update_window()
-  {
-
-  }
-
-int kotuku::x11_screen_t::z_order() const
-  {
-  return 0;
-  }
-
-void kotuku::x11_screen_t::z_order(int)
-  {
-
   }
 
 void kotuku::x11_screen_t::paint()
@@ -219,7 +202,7 @@ void kotuku::x11_screen_t::xset_raster_operation(raster_operation rop) const
 // drawing functions.
 // most are the same as the canvas functions but they
 // have the clipping and drawing tools added
-void kotuku::x11_screen_t::polyline(const rect_t &clip_rect, const pen_t *p,
+void kotuku::x11_screen_t::polyline(canvas_t *canvas, const rect_t &clip_rect, const pen_t *p,
     const point_t *points, size_t count)
   {
   xset_clip_rect(clip_rect);
@@ -236,7 +219,7 @@ void kotuku::x11_screen_t::polyline(const rect_t &clip_rect, const pen_t *p,
   XDrawLines(_display, _drawable, _gc, xpoints, count, CoordModeOrigin);
   }
 
-void kotuku::x11_screen_t::fill_rect(const rect_t &clip_rect, const rect_t &r,
+void kotuku::x11_screen_t::fill_rect(canvas_t *canvas, const rect_t &clip_rect, const rect_t &r,
     color_t c)
   {
   xset_clip_rect(clip_rect);
@@ -246,7 +229,7 @@ void kotuku::x11_screen_t::fill_rect(const rect_t &clip_rect, const rect_t &r,
       r.height());
   }
 
-void kotuku::x11_screen_t::ellipse(const rect_t &clip_rect, const pen_t *p,
+void kotuku::x11_screen_t::ellipse(canvas_t *canvas, const rect_t &clip_rect, const pen_t *p,
     color_t c, const rect_t &r)
   {
   // draw filled arc first
@@ -265,7 +248,7 @@ void kotuku::x11_screen_t::ellipse(const rect_t &clip_rect, const pen_t *p,
     }
   }
 
-void kotuku::x11_screen_t::polygon(const rect_t &clip_rect, const pen_t *p,
+void kotuku::x11_screen_t::polygon(canvas_t *canvas, const rect_t &clip_rect, const pen_t *p,
     color_t c, const point_t *points, size_t count,
     bool interior_fill)
   {
@@ -287,7 +270,7 @@ void kotuku::x11_screen_t::polygon(const rect_t &clip_rect, const pen_t *p,
   XDrawLines(_display, _drawable, _gc, xpoints, count, CoordModeOrigin);
   }
 
-void kotuku::x11_screen_t::rectangle(const rect_t &clip_rect, const pen_t *pen,
+void kotuku::x11_screen_t::rectangle(canvas_t *canvas, const rect_t &clip_rect, const pen_t *pen,
     color_t c, const rect_t &r)
   {
   // draw filled arc first
@@ -313,7 +296,7 @@ void kotuku::x11_screen_t::rectangle(const rect_t &clip_rect, const pen_t *pen,
     }
   }
 
-void kotuku::x11_screen_t::round_rect(const rect_t &clip_rect, const pen_t *pen,
+void kotuku::x11_screen_t::round_rect(canvas_t *canvas, const rect_t &clip_rect, const pen_t *pen,
     color_t c, const rect_t &r, const extent_t &e)
   {
   // draw filled arc first
@@ -323,10 +306,10 @@ void kotuku::x11_screen_t::round_rect(const rect_t &clip_rect, const pen_t *pen,
   xset_pen(*pen);
   if(e.dx == e.dy)
     {
-    angle_arc(clip_rect, pen, r.top_left()+ e, e.dx, 270, 360);
-    angle_arc(clip_rect, pen, point_t(r.top_right().x- e.dx -1, r.top_right().y + e.dx), e.dx, 0, 90);
-    angle_arc(clip_rect, pen, point_t(r.bottom_left().x + e.dx, r.bottom_left().y - e.dx -1), e.dx, 180, 270);
-    angle_arc(clip_rect, pen, point_t(r.bottom_right().x-e.dx -1, r.bottom_right().y - e.dx -1), e.dx, 90, 180);
+    angle_arc(canvas, clip_rect, pen, r.top_left()+ e, e.dx, 270, 360);
+    angle_arc(canvas, clip_rect, pen, point_t(r.top_right().x- e.dx -1, r.top_right().y + e.dx), e.dx, 0, 90);
+    angle_arc(canvas, clip_rect, pen, point_t(r.bottom_left().x + e.dx, r.bottom_left().y - e.dx -1), e.dx, 180, 270);
+    angle_arc(canvas, clip_rect, pen, point_t(r.bottom_right().x-e.dx -1, r.bottom_right().y - e.dx -1), e.dx, 90, 180);
     }
   else
     {
@@ -338,31 +321,31 @@ void kotuku::x11_screen_t::round_rect(const rect_t &clip_rect, const pen_t *pen,
   // left line
   line_seg[0].x = r.left; line_seg[0].y = r.top + e.dy;
   line_seg[1].x = r.left; line_seg[1].y = r.bottom - e.dy -1;
-  polyline(clip_rect, pen, line_seg, 2);
+  polyline(canvas, clip_rect, pen, line_seg, 2);
 
   // top line
   line_seg[0].x = r.left + e.dx; line_seg[0].y = r.top;
   line_seg[1].x = r.right - e.dx -1; line_seg[1].y = r.top;
-  polyline(clip_rect, pen, line_seg, 2);
+  polyline(canvas, clip_rect, pen, line_seg, 2);
 
   // bottom line
   line_seg[0].x = r.left + e.dx; line_seg[0].y = r.bottom -1;
   line_seg[1].x = r.right - e.dx -1; line_seg[1].y = r.bottom -1;
-  polyline(clip_rect, pen, line_seg, 2);
+  polyline(canvas, clip_rect, pen, line_seg, 2);
 
   // right line
   line_seg[0].x = r.right-1; line_seg[0].y = r.top + e.dy;
   line_seg[1].x = r.right-1; line_seg[1].y = r.bottom - e.dy -1;
-  polyline(clip_rect, pen, line_seg, 2);
+  polyline(canvas, clip_rect, pen, line_seg, 2);
   }
 
-void kotuku::x11_screen_t::pattern_blt(const rect_t &clip_rect,
+void kotuku::x11_screen_t::pattern_blt(canvas_t *canvas, const rect_t &clip_rect,
     const bitmap_t *, const rect_t &, raster_operation mode)
   {
 
   }
 
-void kotuku::x11_screen_t::bit_blt(const rect_t &clip_rect,
+void kotuku::x11_screen_t::bit_blt(canvas_t *canvas, const rect_t &clip_rect,
     const rect_t &dest_rect, const screen_t *src_screen,
     const rect_t &src_clip_rect, const point_t &src_pt,
     raster_operation operation)
@@ -378,7 +361,7 @@ void kotuku::x11_screen_t::bit_blt(const rect_t &clip_rect,
   xset_raster_operation(rop_srccopy);
   }
 
-void kotuku::x11_screen_t::mask_blt(const rect_t &clip_rect,
+void kotuku::x11_screen_t::mask_blt(canvas_t *canvas, const rect_t &clip_rect,
     const rect_t &dest_rect, const screen_t *src_screen,
     const rect_t &src_clip_rect, const point_t &src_point,
     const bitmap_t &mask_bitmap, const point_t &mask_point,
@@ -387,7 +370,7 @@ void kotuku::x11_screen_t::mask_blt(const rect_t &clip_rect,
 
   }
 
-void kotuku::x11_screen_t::rotate_blt(const rect_t &clip_rect,
+void kotuku::x11_screen_t::rotate_blt(canvas_t *canvas, const rect_t &clip_rect,
     const point_t &dest_center, const screen_t *src,
     const rect_t &src_clip_rect, const point_t &src_point, size_t radius,
     double angle, raster_operation operation)
@@ -449,7 +432,7 @@ void kotuku::x11_screen_t::rotate_blt(const rect_t &clip_rect,
       yp = pt.y - src_point.y;
       xp = pt.x - src_point.x;
 
-      set_pixel(clip_rect, point_t(dest_center.x + xp, dest_center.y + yp),
+      set_pixel(canvas, clip_rect, point_t(dest_center.x + xp, dest_center.y + yp),
           cr);
       }
     }
@@ -457,12 +440,13 @@ void kotuku::x11_screen_t::rotate_blt(const rect_t &clip_rect,
   XDestroyImage(p_image);
   }
 
-void kotuku::x11_screen_t::invalidate_rect(const rect_t &)
+void kotuku::x11_screen_t::invalidate_rect(canvas_t *canvas, const rect_t &)
   {
   // no real concept of an invalid rectangle.  We just update the window
-  // TODO: implement
-  // window_t *invalid_window = find_window(rect);
-  reinterpret_cast<linux_hal_t *>(the_hal())->root_window()->paint(false);
+
+  window_t *the_window = canvas->as_window();
+  if(the_window != 0)
+    the_window->paint(true);
   }
 
 inline void set_pixel(Display *display, Drawable drawable, GC gc,
@@ -482,7 +466,7 @@ inline color_t get_pixel(Display *display, Drawable drawable, GC gc,
   return c;
   }
 
-color_t kotuku::x11_screen_t::get_pixel(const rect_t &clip_rect,
+color_t kotuku::x11_screen_t::get_pixel(const canvas_t *canvas, const rect_t &clip_rect,
     const point_t &p) const
   {
   xset_clip_rect(clip_rect);
@@ -490,7 +474,7 @@ color_t kotuku::x11_screen_t::get_pixel(const rect_t &clip_rect,
   return ::get_pixel(_display, _drawable, _gc, p);
   }
 
-color_t kotuku::x11_screen_t::set_pixel(const rect_t &clip_rect,
+color_t kotuku::x11_screen_t::set_pixel(canvas_t *canvas, const rect_t &clip_rect,
     const point_t &p, color_t c)
   {
   xset_clip_rect(clip_rect);
@@ -501,13 +485,13 @@ color_t kotuku::x11_screen_t::set_pixel(const rect_t &clip_rect,
   return c;
   }
 
-void kotuku::x11_screen_t::angle_arc(const rect_t &clip_rect, const pen_t *pen,
+void kotuku::x11_screen_t::angle_arc(canvas_t *canvas, const rect_t &clip_rect, const pen_t *pen,
     const point_t &p, gdi_dim_t radius, double start, double end)
   {
-  angle_arc(clip_rect, pen, p, radius, (int)radians_to_degrees(start), (int)radians_to_degrees(end));
+  angle_arc(canvas, clip_rect, pen, p, radius, (int)radians_to_degrees(start), (int)radians_to_degrees(end));
   }
 
-void kotuku::x11_screen_t::angle_arc(const rect_t &clip_rect, const pen_t *pen,
+void kotuku::x11_screen_t::angle_arc(canvas_t *canvas, const rect_t &clip_rect, const pen_t *pen,
     const point_t &p, gdi_dim_t radius, gdi_dim_t start_degrees, gdi_dim_t end_degrees)
   {
   xset_clip_rect(clip_rect);
@@ -526,13 +510,13 @@ void kotuku::x11_screen_t::angle_arc(const rect_t &clip_rect, const pen_t *pen,
       diameter, -start_degrees, -sweep);
   }
 
-void kotuku::x11_screen_t::pie(const rect_t &clip_rect, const pen_t *pen,
+void kotuku::x11_screen_t::pie(canvas_t *canvas, const rect_t &clip_rect, const pen_t *pen,
     color_t c, const point_t &p, double start, double end, gdi_dim_t radii,
     gdi_dim_t inner)
   {
   }
 
-void kotuku::x11_screen_t::draw_text(const rect_t &clip_rect,
+void kotuku::x11_screen_t::draw_text(canvas_t *canvas, const rect_t &clip_rect,
     const font_t *font, color_t fg, color_t bg, const char *str, size_t count,
     const point_t &src_pt, const rect_t &txt_clip_rect, text_flags format,
     size_t *char_widths)
@@ -595,7 +579,7 @@ void kotuku::x11_screen_t::draw_text(const rect_t &clip_rect,
     }
   }
 
-kotuku::extent_t kotuku::x11_screen_t::text_extent(const font_t *font,
+kotuku::extent_t kotuku::x11_screen_t::text_extent(const canvas_t *canvas, const font_t *font,
     const char *str, size_t count) const
   {
   extent_t ex(0, long(font->bitmap_height));
@@ -619,14 +603,14 @@ kotuku::extent_t kotuku::x11_screen_t::text_extent(const font_t *font,
   return ex;
   }
 
-void kotuku::x11_screen_t::scroll(const rect_t &clip_rect,
+void kotuku::x11_screen_t::scroll(canvas_t *canvas, const rect_t &clip_rect,
     const extent_t &offsets, const rect_t &area_to_scroll,
     const rect_t &clipping_rectangle, rect_t *rect_update)
   {
 
   }
 
-void kotuku::x11_screen_t::background_mode(int)
+void kotuku::x11_screen_t::background_mode(canvas_t *canvas, int)
   {
 
   }
