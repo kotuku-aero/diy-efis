@@ -8,8 +8,6 @@
       <itemPath>../can-aerospace/can_aerospace.h</itemPath>
       <itemPath>../can-aerospace/can_msg.h</itemPath>
       <itemPath>../can-aerospace/data_types.h</itemPath>
-      <itemPath>can_app_cfg.h</itemPath>
-      <itemPath>can_queue.h</itemPath>
       <itemPath>../can-aerospace/parameter_definitions.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -22,7 +20,6 @@
       <itemPath>../can-aerospace/can_msg.c</itemPath>
       <itemPath>../can-aerospace/data_types.c</itemPath>
       <itemPath>publisher.c</itemPath>
-      <itemPath>can_queue.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

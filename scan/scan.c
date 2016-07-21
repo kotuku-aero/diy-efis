@@ -203,8 +203,13 @@ typedef enum _can_state_t
   can_loopback,
   can_listen,
   } can_state_t;
-  
-static can_state_t can_state;
+
+#ifdef DEBUG
+  // HACK: so we don't have to restart slcan all the time, remove in release
+static can_state_t can_state = can_open;
+#else
+static can_state_t can_state = can_closed;
+#endif
 
 typedef enum _config_state {
   config_can,
@@ -816,7 +821,6 @@ static void process_can(const can_msg_t *msg)
     return;
     }
   else
-
   
   write_uart(&uart_config, 't');
   send_nibble(&uart_config, msg->id >> 8);  // upper 3 bits

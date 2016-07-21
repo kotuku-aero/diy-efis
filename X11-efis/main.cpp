@@ -167,6 +167,8 @@ kotuku::hal_t *kotuku::the_hal()
 
 int main(int argc, char **argv)
   {
+  XInitThreads();
+
   char *host;
   if((host = (char *) getenv("DISPLAY")) == NULL)
     return 0;
@@ -184,7 +186,13 @@ int main(int argc, char **argv)
 
   XSetErrorHandler(x11_error_handler);
 
-  kotuku::the_hal()->initialize("efis.ini");
+  const char *ini_path;
+  if(argc > 1)
+    ini_path = argv[1];
+  else
+    ini_path = "efis.ini";
+
+  kotuku::the_hal()->initialize(ini_path);
   _the_app = new kotuku::pfd_application_t(kotuku::the_hal()->root_window());
 
   watchdog = new kotuku::watchdog_t(kotuku::the_hal()->root_window(), _the_app);
@@ -192,6 +200,8 @@ int main(int argc, char **argv)
   // start the application
   kotuku::application_t *app = kotuku::the_app();
   kotuku::the_hal()->root_window()->repaint(true);
+
+  _the_app->publishing_enabled(true);
   XEvent e;
   while(1)
     {

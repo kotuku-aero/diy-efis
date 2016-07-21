@@ -168,7 +168,7 @@ static uint8_t tx_queue[TX_QUEUE_LENGTH];
 
 static uart_config_t uart_config = {
   .uart_number = 1,
-  .rate = BAUD57600,
+  .rate = 57600,
   .eol_char = '\n',
   .rx_buffer = rx_buffer,
   .rx_worker_buffer = rx_worker_buffer,
@@ -457,6 +457,8 @@ static message_listener_t listener =
 #define I_FIN 10000000
 #define I_PLLDIV 54 // ((I_OSC/I_FIN)*(I_PLLPRE+2)*(2*(I_PLLPOST+1)))-2
 
+static semaphore_t worker_semp;
+
 int main(void)
   {
   int8_t idle_task_id;
@@ -627,6 +629,9 @@ static void send_hex(uart_config_t *config, uint8_t value)
  */
 static bool transmit_can(uart_config_t *config, uint8_t *line)
   {
+  if(can_state == can_closed)
+    return true;
+  
   unsigned long temp;
   uint8_t idlen;
   uint8_t *ptr;
@@ -746,27 +751,31 @@ static uint8_t set_state(uart_config_t *config, uint8_t cmd, uint8_t *buffer, ui
 // Read status flags
 static uint8_t read_status_flags(uart_config_t *config, uint8_t cmd, uint8_t *buffer, uint8_t len)
   {
-      uint8_t status = 0;
-      
-      if(overflow_warning)
-        status |= 0x08;
+  uint8_t status = 0;
+
+  if(overflow_warning)
+    status |= 0x08;
 /*
-      if (flags & 0x01) status |= 0x04; // error warning
-      if (flags & 0xC0) status |= 0x08; // data overrun
-      if (flags & 0x18) status |= 0x20; // passive error
-      if (flags & 0x20) status |= 0x80; // bus error
+  if (flags & 0x01) status |= 0x04; // error warning
+  if (flags & 0xC0) status |= 0x08; // data overrun
+  if (flags & 0x18) status |= 0x20; // passive error
+  if (flags & 0x20) status |= 0x80; // bus error
 */
-      write_uart(config, 'F');
-      send_hex(config, status);
-      
-      overflow_warning = false;
-      
-      return CR;
+  write_uart(config, 'F');
+  send_hex(config, status);
+
+  overflow_warning = false;
+
+  return CR;
   }
 
 
 static uint8_t process_transmit_command(uart_config_t *config, uint8_t cmd, uint8_t *buffer, uint8_t len)
   {
+  if(can_state != can_open &&
+     can_state != can_loopback)
+    return BELL;
+  
   // r -> transmit rtr 11 bits
   // t -> transmit 11 bit id
   // R -> transmit RTR 29 bits
@@ -1024,28 +1033,19 @@ static void test_encoder(uint16_t portb, uint16_t a_mask, uint16_t b_mask, uint1
     }
   }
 
-/*  Function
- *   Key0       PORT A bit 10
- *   Key1       PORT A bit 7
- *   Key2       PORT C Bit 2
- *   Key3       PORT C Bit 1
- *   DeckA A
- *   DeckA B
- *   DeckB A
- *   DeckB B
- *   Key4       PORT C Bit 0
- */
-
 static void keys_worker(void *parg)
   {
-  uint16_t port_b = PORTB;
-  
-  test_key(PORTA, 1 << 10, get_parameter_type_1(memid_key0_id)->value.SHORT);
-  test_key(PORTA, 1 << 7, get_parameter_type_1(memid_key1_id)->value.SHORT);
-  test_key(PORTC, 1 << 2, get_parameter_type_1(memid_key2_id)->value.SHORT);
-  test_key(PORTC, 1 << 1, get_parameter_type_1(memid_key3_id)->value.SHORT);
-  test_key(PORTC, 1 << 0, get_parameter_type_1(memid_key4_id)->value.SHORT);
-  test_encoder(PORTA, 1 << 0, 1 << 1, get_parameter_type_1(memid_decka_id)->value.SHORT);
-  test_encoder(PORTB, 1 << 0, 1 << 1, get_parameter_type_1(memid_deckb_id)->value.SHORT);
-  
+  while(true)
+    {
+    // the worker tests the keys every 100msec
+    wait(&worker_semp, 100);
+    
+    test_key(PORTA, 1 << 10, get_parameter_type_1(memid_key0_id)->value.SHORT);
+    test_key(PORTA, 1 << 7, get_parameter_type_1(memid_key1_id)->value.SHORT);
+    test_key(PORTC, 1 << 2, get_parameter_type_1(memid_key2_id)->value.SHORT);
+    test_key(PORTC, 1 << 1, get_parameter_type_1(memid_key3_id)->value.SHORT);
+    test_key(PORTC, 1 << 0, get_parameter_type_1(memid_key4_id)->value.SHORT);
+    test_encoder(PORTA, 1 << 0, 1 << 1, get_parameter_type_1(memid_decka_id)->value.SHORT);
+    test_encoder(PORTB, 1 << 0, 1 << 1, get_parameter_type_1(memid_deckb_id)->value.SHORT);
+    }  
   }

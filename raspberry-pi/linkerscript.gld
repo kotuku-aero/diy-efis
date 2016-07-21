@@ -7,10 +7,11 @@
    allows the examples to build properly
    no matter where MPLAB C30 is installed. */
    
-SEARCH_DIR("C:\Program Files (x86)\Microchip\xc16\v1.10\lib")
-SEARCH_DIR("C:\Program Files (x86)\Microchip\xc16\v1.10\support\dsPIC30F\gld") 
+SEARCH_DIR("/opt/microchip/xc16/v1.25/lib")
+SEARCH_DIR("/opt/microchip/xc16/v1.25/support/dsPIC33E/gld")
 INPUT(-ldsp)
 INPUT(-lpic30)
 INPUT(-lm)
 INPUT(-lc)
-INCLUDE p30F4011.gld
+
+INCLUDE p33EP512GP504.gld

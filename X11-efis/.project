@@ -4,9 +4,8 @@
 	<comment></comment>
 	<projects>
 		<project>gdi-lib</project>
-		<project>widgets</project>
-		<project>pfd</project>
 		<project>linux-hal</project>
+		<project>widgets</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

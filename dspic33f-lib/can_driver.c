@@ -576,7 +576,7 @@ void can_init(uint8_t hardware_revision,
   C1CFG2bits.SEG2PH = SEG2PH_VAL;
   C1CFG2bits.SEG2PHTS = 1; // use PS2 for calcs
 
-  C1FCTRLbits.DMABS = 6; // 32 buffers in device ra,
+  C1FCTRLbits.DMABS = 4; // test only 8 buffers... 6; // 32 buffers in device ram starting
   C1FCTRLbits.FSA = 8; // fifo starts at buffer 8
   
   C1TR01CONbits.TXEN0 = 1;
@@ -590,10 +590,6 @@ void can_init(uint8_t hardware_revision,
  
   
   IEC2bits.C1IE = 1;
-  
-  // set up a 24 word fifo
-  C1FCTRLbits.DMABS = 5;        // 24 buffers in ram
-  C1FCTRLbits.FSA = 8;          // 0..7 are tx buffers
   
   // select the buffer bits
   C1CTRL1bits.WIN = 1;
@@ -697,7 +693,7 @@ void __attribute__((interrupt, no_auto_psv)) _C1Interrupt(void)
       if(index < 16)
         C1RXFUL1 &= ~(1 << index);
       else
-        C1RXFUL2 &= ~(1 << (index -8));
+        C1RXFUL2 &= ~(1 << (index -16));
 
       push_back_from_isr(&can_rx_queue, &frame);
 
