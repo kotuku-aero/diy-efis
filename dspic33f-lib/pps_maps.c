@@ -49,6 +49,17 @@ void map_rpo(rpo_pin pin, rpo_function value)
   *reg_ptr = value;
   }
 
+void hw_init()
+  {
+  // just disable all analog pins for now
+  ANSELA = 0x0000;
+  ANSELB = 0x0000;
+  ANSELC = 0x0000;
+#ifdef __dsPIC33EP512GP506__
+  ANSELE = 0x0000;
+#endif
+  }
+
 void map_rpi(rpi_pin pin, rpi_function value)
   {
   uint8_t *port_base = ((uint8_t *)0x06A0);

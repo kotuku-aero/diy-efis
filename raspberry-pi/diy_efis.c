@@ -463,6 +463,8 @@ int main(void)
   {
   int8_t idle_task_id;
   
+  // set up the ports....
+  hw_init();
   // allow input to settle while clock switch in progress
   TRISBbits.TRISB15 = 1;     // input port
   CNPUBbits.CNPUB15 = 1;     // with a pull-up
@@ -507,7 +509,7 @@ int main(void)
   TRISCbits.TRISC1 = 1;
   TRISCbits.TRISC2 = 1;
   
-  ee_params.init_mode = PORTBbits.RB15 = 0;
+  ee_params.init_mode = PORTBbits.RB15 == 0;
   // set up uart data early
   init_deque(&uart_config.rx_queue, RX_BUFFER_LENGTH, rx_queue, NUM_RX_BUFFERS);
   init_deque(&uart_config.tx_queue, TX_BUFFER_LENGTH, tx_queue, NUM_TX_BUFFERS);

@@ -350,6 +350,8 @@ int main(void)
   {
   int8_t idle_task_id;
   
+  // set up the hardware.  Library dependent.
+  hw_init();
   // allow input to settle while clock switch in progress
   TRISCbits.TRISC5 = 1;     // input port
   CNPUCbits.CNPUC5 = 1;     // with a pull-up
@@ -388,8 +390,6 @@ int main(void)
   idle_task_id = scheduler_init(tasks, NUM_TASKS, idle_task, idle_stack, numelements(idle_stack));
   resume(idle_task_id);
   
-  ee_params.init_mode = PORTCbits.RC5 == 0;
-  
   // create the canbus task
   can_init(HARDWARE_REVISION, SOFTWARE_REVISION,
            can_tx_buffer, CAN_TX_LENGTH,
@@ -400,6 +400,7 @@ int main(void)
   
   subscribe(&listener);
 
+  ee_params.init_mode = PORTCbits.RC5 == 0;
   // initialize the eeprom as we need our settings first
   eeprom_init(&ee_params);
   // run with an idle task

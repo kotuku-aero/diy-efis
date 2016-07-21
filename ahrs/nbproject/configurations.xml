@@ -20,7 +20,6 @@
       <itemPath>autopilot_task.c</itemPath>
       <itemPath>gps.c</itemPath>
       <itemPath>navigation.c</itemPath>
-      <itemPath>coordinate_conversions.c</itemPath>
       <itemPath>getErrLoc.s</itemPath>
       <itemPath>world_mag_model.c</itemPath>
       <itemPath>filter.c</itemPath>

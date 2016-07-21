@@ -239,7 +239,7 @@ static uart_config_t pmag2_config = {
   .rx_buffer = pmag2_rx_buffer,
   .rx_worker_buffer = pmag2_rx_worker_buffer,
   .rx_length = RX_BUFFER_LENGTH,
-  .rx_pin = rpi_rpi19,
+  .rx_pin = rpi_rpi119,
   .tx_pin = RP42R,
   .callback.uart_callback = process_line
   };
@@ -563,19 +563,14 @@ static analog_channel_definition_t channel_definitions[] = {
   { 0x05, &oil_pressure_defn, 0 },   // Oil Pressure
   };
 
-static uint8_t select_sub_channel(uint8_t channel)
-  {
-  return channel & 0x0f;        // remove selector bits
-  }
-
 static analog_channels_t channels = 
   {
-  channel_definitions, 
-  numelements(channel_definitions), 
-  select_sub_channel,
-  0, 
-  5000 / numelements(channel_definitions), /* set for 4khz samples */ 
-  0.000244140625                 // 12 bit ADC
+  .channel_definition = channel_definitions,
+  .num_channels = numelements(channel_definitions),             // number of channels
+  .selector = 0,                 // no selector
+  .prescaler = 3,                // prescaler = / 256 = 273 khz
+  .divisor = 273 / numelements(channel_definitions), // sample rate is 1khz
+  .analog_factor = 0.000244140625 // 12 bit ADC
   };
 
 static parameter_definition_t parameters[memid_last] = {
@@ -937,7 +932,14 @@ static eeprom_params_t ee_params =
 int main(void)
   {
   int8_t idle_task_id;
-  // set up the PLL for 70Mips
+  
+  // set up ports
+  hw_init();
+  // allow input to settle while clock switch in progress
+  TRISCbits.TRISC5 = 1;     // input port
+  CNPUCbits.CNPUC5 = 1;     // with a pull-up
+  
+   // set up the PLL for 70Mips
   // FOSC = 10mHz
   // FPLLI = 5Mhz
   // FSYS = 280Mhz
@@ -961,8 +963,8 @@ int main(void)
   // unlock the PPS functions
   __builtin_write_OSCCONL(OSCCON & 0xbf);
     // map pins
-  map_rpo(RP43R, rpo_c1tx);
-  map_rpi(rpi_rpi44, rpi_c1rx);
+  map_rpo(RP97R, rpo_c1tx);
+  map_rpi(rpi_rpi96, rpi_c1rx);
 
   
   idle_task_id = scheduler_init(tasks, NUM_TASKS, idle_task, idle_stack, numelements(idle_stack));
@@ -976,7 +978,11 @@ int main(void)
            can_rx_stack, numelements(can_rx_stack), 0,
            publisher_stack, numelements(publisher_stack), 0);
 
-  // initialize the eeprom as we need our settings first
+  
+  // see if the init setting is made on the board
+  ee_params.init_mode = PORTCbits.RC5 == 0;
+  
+   // initialize the eeprom as we need our settings first
   eeprom_init(&ee_params);
   // run with an idle task
   run(idle_task_id);

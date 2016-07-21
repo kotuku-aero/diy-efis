@@ -199,6 +199,13 @@ extern void map_rpo(rpo_pin pin, rpo_function value);
  */
 extern void map_rpi(rpi_pin pin, rpi_function value);
 
+/**
+ * Initialize the I/O ports.  Will disable analog functions on all pins
+ * as the analog init will re-enable only those needed.
+ * 
+ */
+extern void hw_init();
+
 #ifdef	__cplusplus
   }
 #endif

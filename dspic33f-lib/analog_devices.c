@@ -113,8 +113,16 @@ static void conversion_complete_callback(void *parg)
       if(config->offset != 0.0)
         channel_definition->result += config->offset;
 
-      // publish the result
-      result = channel_definition->result_proc(channel_definition, channel_definition->result);
+      if(channel_definition->result_proc == 0)
+        {
+        // publish the value as defined
+        if(channel_definition->definition->hdr.data_type == CANAS_DATATYPE_SHORT)
+          publish_short((short)channel_definition->result, channel_definition->definition->can_id);
+        else if(channel_definition->definition->hdr.data_type == CANAS_DATATYPE_FLOAT)
+          publish_float(channel_definition->result, channel_definition->definition->can_id);
+        }
+      else
+        result = channel_definition->result_proc(channel_definition, channel_definition->result);
 
       channel_definition->result = 0;
       channel_definition->publish_count = 0;
@@ -128,23 +136,30 @@ static void conversion_complete_callback(void *parg)
 typedef struct _tris_t
   {
   uint8_t channel;
-  volatile unsigned int *port;
+  volatile unsigned int *ansel;
+  volatile unsigned int *tris;
   uint16_t mask;
   } tris_t;
 
 // size is dependent on the device...
 #define NUMCHANNELS 10
 static const tris_t tristate[NUMCHANNELS] = {
-  { 0, &TRISA, 0x0001},
-  { 1, &TRISA, 0x0002},
-  { 2, &TRISB, 0x0001},
-  { 3, &TRISB, 0x0002},
-  { 4, &TRISB, 0x0004},
-  { 5, &TRISB, 0x0008},
-  { 24, &TRISA, 0x0010},
-  { 25, &TRISB, 0x0008},
-  { 26, &TRISB, 0x0010},
-  { 27, &TRISB, 0x0020},
+  { 0, &ANSELA, &TRISA, 0x0001 },
+  { 1, &ANSELA, &TRISA, 0x0002 },
+  { 2, &ANSELB, &TRISB, 0x0001 },
+  { 3, &ANSELB, &TRISB, 0x0002 },
+  { 4, &ANSELB, &TRISB, 0x0004 },
+  { 5, &ANSELB, &TRISB, 0x0008 },
+  { 6, &ANSELC, &TRISC, 0x0001 },
+  { 7, &ANSELC, &TRISC, 0x0002 },
+  { 8, &ANSELC, &TRISC, 0x0004 },
+#ifdef __dsPIC33EP512GP506__
+  { 11, &ANSELC, &TRISC, 0x0800 },
+  { 12, &ANSELE, &TRISE, 0x1000 },
+  { 13, &ANSELE, &TRISE, 0x2000 },  
+  { 14, &ANSELE, &TRISE, 0x4000 },
+  { 15, &ANSELE, &TRISE, 0x8000 },
+#endif
   };
 
 int8_t analog_init(analog_channels_t *init_channels, uint16_t *stack, uint16_t stack_length)
@@ -166,13 +181,12 @@ int8_t analog_init(analog_channels_t *init_channels, uint16_t *stack, uint16_t s
     else
       ch_num = channel_definition->channel_num;
 
-    //ADPCFG &= ~(1 << ch_num);
-    //TRISB |= 1 << ch_num;
     for(i = 0; i < NUMCHANNELS; i++)
       {
       if(tristate[i].channel == ch_num)
         {
-        *(tristate[i].port) |= tristate[i].mask;
+        *(tristate[i].ansel) |= tristate[i].mask;
+        *(tristate[i].tris) |= tristate[i].mask;
         break;
         }
       }

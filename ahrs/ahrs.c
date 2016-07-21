@@ -558,6 +558,13 @@ static eeprom_params_t ee_params =
 int main(void)
   {
   int8_t idle_task_id;
+  
+  // set up ports
+  hw_init();
+  // allow input to settle while clock switch in progress
+  TRISCbits.TRISC5 = 1;     // input port
+  CNPUCbits.CNPUC5 = 1;     // with a pull-up
+  
   // set up the PLL for 70Mips
   // FOSC = 10mHz
   // FPLLI = 5Mhz
@@ -590,10 +597,6 @@ int main(void)
   //map_rpi(rpi_rpi25, rpi_u1rx);
   
   map_rpi(rpi_rpi45, rpi_int1);
-  
-  CNPUBbits.CNPUB13 = 1;
-  
-  TRISCbits.TRISC5 = 1;
    
   // lock the preripherals.
   //__builtin_write_OSCCONL(OSCCON | (1<<6));
@@ -611,7 +614,8 @@ int main(void)
 
   config_state = config_can;
   
-  ee_params.init_mode = PORTCbits.RC5 = 1;
+  // see if the init setting is made on the board
+  ee_params.init_mode = PORTCbits.RC5 == 0;
   
   // create a deque that the worker task can use to get notifications of
   // updates from the can upload handler.
