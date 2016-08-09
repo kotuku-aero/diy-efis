@@ -14,7 +14,7 @@
 // Windows version
 
 typedef int ptrdiff_t;
-typedef int mbstate_t;
+//typedef int mbstate_t;
 #define snprintf _snprintf
 #define strcasecmp _stricmp
 #include "../can-aerospace/can_msg.h"

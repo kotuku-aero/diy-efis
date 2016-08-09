@@ -132,7 +132,7 @@ int kotuku::gdi_screen_t::_metric = 0;
 // drawing functions.
 // most are the same as the canvas functions but they
 // have the clipping and drawing tools added
-void kotuku::gdi_screen_t::polyline(const rect_t &clip_rect,
+void kotuku::gdi_screen_t::polyline(canvas_t *, const rect_t &clip_rect,
                             const pen_t *p,
                             const point_t *points,
                             size_t count)
@@ -158,7 +158,7 @@ void kotuku::gdi_screen_t::polyline(const rect_t &clip_rect,
   DeleteObject(clipRgn);
   }
 
-void kotuku::gdi_screen_t::fill_rect(const rect_t &clip_rect,
+void kotuku::gdi_screen_t::fill_rect(canvas_t *, const rect_t &clip_rect,
                              const rect_t &r,
                              color_t c)
   {
@@ -176,7 +176,7 @@ void kotuku::gdi_screen_t::fill_rect(const rect_t &clip_rect,
   DeleteObject(clipRgn);
   }
 
-void kotuku::gdi_screen_t::ellipse(const rect_t &clip_rect,
+void kotuku::gdi_screen_t::ellipse(canvas_t *, const rect_t &clip_rect,
                            const pen_t *p,
                            color_t c,
                            const rect_t &r)
@@ -196,7 +196,7 @@ void kotuku::gdi_screen_t::ellipse(const rect_t &clip_rect,
   DeleteObject(clipRgn);
   }
 
-void kotuku::gdi_screen_t::polygon(const rect_t &clip_rect,
+void kotuku::gdi_screen_t::polygon(canvas_t *, const rect_t &clip_rect,
                            const pen_t *p,
                            color_t c,
                            const point_t *points,
@@ -225,7 +225,7 @@ void kotuku::gdi_screen_t::polygon(const rect_t &clip_rect,
   DeleteObject(clipRgn);
   }
 
-void kotuku::gdi_screen_t::rectangle(const rect_t &clip_rect,
+void kotuku::gdi_screen_t::rectangle(canvas_t *, const rect_t &clip_rect,
                              const pen_t *pen,
                              color_t c,
                              const rect_t &r)
@@ -244,7 +244,7 @@ void kotuku::gdi_screen_t::rectangle(const rect_t &clip_rect,
   DeleteObject(clipRgn);
   }
 
-void kotuku::gdi_screen_t::round_rect(const rect_t &clip_rect,
+void kotuku::gdi_screen_t::round_rect(canvas_t *, const rect_t &clip_rect,
                               const pen_t *pen,
                               color_t c,
                               const rect_t &r,
@@ -264,7 +264,7 @@ void kotuku::gdi_screen_t::round_rect(const rect_t &clip_rect,
   DeleteObject(clipRgn);
   }
 
-void kotuku::gdi_screen_t::bit_blt(const rect_t &clip_rect,
+void kotuku::gdi_screen_t::bit_blt(canvas_t *, const rect_t &clip_rect,
                            const rect_t &dest_rect,
                            const screen_t *src_screen,
                            const rect_t &src_clip_rect,
@@ -282,7 +282,7 @@ void kotuku::gdi_screen_t::bit_blt(const rect_t &clip_rect,
   DeleteObject(clipRgn);
   }
 
-void kotuku::gdi_screen_t::mask_blt(const rect_t &clip_rect,
+void kotuku::gdi_screen_t::mask_blt(canvas_t *, const rect_t &clip_rect,
                             const rect_t &dest_rect,
                             const screen_t *src_screen,
                             const rect_t &src_clip_rect,
@@ -294,7 +294,7 @@ void kotuku::gdi_screen_t::mask_blt(const rect_t &clip_rect,
   gdi_opn();
   }
 
-void kotuku::gdi_screen_t::rotate_blt(const rect_t &clip_rect,
+void kotuku::gdi_screen_t::rotate_blt(canvas_t *canvas, const rect_t &clip_rect,
                               const point_t &dest_center,
                               const screen_t *src,
                               const rect_t &src_clip_rect,
@@ -343,7 +343,7 @@ void kotuku::gdi_screen_t::rotate_blt(const rect_t &clip_rect,
       if(((yp * yp) + (xp * xp)) > r2)
         continue;
 
-      color_t cr = src->get_pixel(src_clip_rect, point_t(x, y));
+      color_t cr = src->get_pixel(canvas, src_clip_rect, point_t(x, y));
 
       if(cr != color_t(-1) && (operation != rop_srcpaint || cr != 0))
         {
@@ -354,12 +354,12 @@ void kotuku::gdi_screen_t::rotate_blt(const rect_t &clip_rect,
         yp = pt.y - src_point.y;
         xp = pt.x - src_point.x; 
 
-        set_pixel(clip_rect, point_t(dest_center.x + xp, dest_center.y + yp), cr);
+        set_pixel(canvas, clip_rect, point_t(dest_center.x + xp, dest_center.y + yp), cr);
         }
       }
   }
 
-color_t kotuku::gdi_screen_t::get_pixel(const rect_t &clip_rect, const point_t &p) const
+color_t kotuku::gdi_screen_t::get_pixel(const canvas_t *canvas, const rect_t &clip_rect, const point_t &p) const
   {
   HRGN clipRgn = CreateRectRgn(clip_rect.left, clip_rect.top, clip_rect.right, clip_rect.bottom);
   SelectClipRgn(_dc, clipRgn);
@@ -370,7 +370,7 @@ color_t kotuku::gdi_screen_t::get_pixel(const rect_t &clip_rect, const point_t &
   return from_color(c);
   }
 
-color_t kotuku::gdi_screen_t::set_pixel(const rect_t &clip_rect,
+color_t kotuku::gdi_screen_t::set_pixel(canvas_t *canvas, const rect_t &clip_rect,
                                 const point_t &p,
                                 color_t c)
   {
@@ -406,7 +406,7 @@ number of degrees in the sweep angle.
 If the sweep angle is greater than 360 degrees the arc is swept multiple
 times. The figure is not filled.
 */
-void kotuku::gdi_screen_t::angle_arc(const rect_t &clip_rect,
+void kotuku::gdi_screen_t::angle_arc(canvas_t *canvas, const rect_t &clip_rect,
                              const pen_t *pen,
                              const point_t &p,
                              gdi_dim_t radius,
@@ -441,74 +441,74 @@ void kotuku::gdi_screen_t::angle_arc(const rect_t &clip_rect,
       {
       // forward angles first
       if(angle >= start_angle && angle <= end_angle)
-        set_pixel(clip_rect, point_t(pt.x + p.x, pt.y + p.y), pen->color);  // octant 1
+        set_pixel(canvas, clip_rect, point_t(pt.x + p.x, pt.y + p.y), pen->color);  // octant 1
 
       angle += rad_90;
       if(angle >= start_angle && angle <= end_angle)
-        set_pixel(clip_rect, point_t(-pt.y + p.x, pt.x + p.y), pen->color);  // octant 3
+        set_pixel(canvas, clip_rect, point_t(-pt.y + p.x, pt.x + p.y), pen->color);  // octant 3
 
       angle += rad_90;
       if(angle >= start_angle && angle <= end_angle)
-        set_pixel(clip_rect, point_t(-pt.x + p.x, -pt.y + p.y), pen->color);   // octant 5
+        set_pixel(canvas, clip_rect, point_t(-pt.x + p.x, -pt.y + p.y), pen->color);   // octant 5
   
       angle += rad_90;
       if(angle >= start_angle && angle <= end_angle)
-        set_pixel(clip_rect, point_t(pt.y + p.x, -pt.x + p.y), pen->color);    // octant 7
+        set_pixel(canvas, clip_rect, point_t(pt.y + p.x, -pt.x + p.y), pen->color);    // octant 7
 
       angle -= rad_270;
       angle *= -1;
       angle += rad_90;
 
       if(angle >= start_angle && angle <= end_angle)
-        set_pixel(clip_rect, point_t(pt.y + p.x, pt.x + p.y), pen->color); // octant 2
+        set_pixel(canvas, clip_rect, point_t(pt.y + p.x, pt.x + p.y), pen->color); // octant 2
 
       angle += rad_90;
       if(angle >= start_angle && angle <= end_angle)
-        set_pixel(clip_rect, point_t(-pt.x + p.x, pt.y + p.y), pen->color);  // octant 4
+        set_pixel(canvas, clip_rect, point_t(-pt.x + p.x, pt.y + p.y), pen->color);  // octant 4
 
       angle += rad_90;
       if(angle >= start_angle && angle <= end_angle)
-        set_pixel(clip_rect, point_t(-pt.y + p.x, -pt.x + p.y), pen->color);   // octant 6
+        set_pixel(canvas, clip_rect, point_t(-pt.y + p.x, -pt.x + p.y), pen->color);   // octant 6
 
       angle += rad_90;
       if(angle >= start_angle && angle <= end_angle)
-        set_pixel(clip_rect, point_t(pt.x + p.x, -pt.y + p.y), pen->color);  // octant 8
+        set_pixel(canvas, clip_rect, point_t(pt.x + p.x, -pt.y + p.y), pen->color);  // octant 8
       }
     else
       {
       if(angle >= start_angle && angle <= end_angle)
-        ellipse(clip_rect, pen, pen->color, rect_t(point_t(pt.x + p.x, pt.y + p.y), wide_pen) + rect_offset);  // octant 1
+        ellipse(canvas, clip_rect, pen, pen->color, rect_t(point_t(pt.x + p.x, pt.y + p.y), wide_pen) + rect_offset);  // octant 1
 
       angle += rad_90;
       if(angle >= start_angle && angle <= end_angle)
-        ellipse(clip_rect, pen, pen->color, rect_t(point_t(-pt.y + p.x, pt.x + p.y), wide_pen) + rect_offset); // octant 3
+        ellipse(canvas, clip_rect, pen, pen->color, rect_t(point_t(-pt.y + p.x, pt.x + p.y), wide_pen) + rect_offset); // octant 3
 
       angle += rad_90;
       if(angle >= start_angle && angle <= end_angle)  
-        ellipse(clip_rect, pen, pen->color, rect_t(point_t(-pt.x + p.x, -pt.y + p.y), wide_pen) + rect_offset);  // octant 5
+        ellipse(canvas, clip_rect, pen, pen->color, rect_t(point_t(-pt.x + p.x, -pt.y + p.y), wide_pen) + rect_offset);  // octant 5
 
       angle += rad_90;
       if(angle >= start_angle && angle <= end_angle)
-        ellipse(clip_rect, pen, pen->color, rect_t(point_t(pt.y + p.x, -pt.x + p.y), wide_pen) + rect_offset);   // octant 7
+        ellipse(canvas, clip_rect, pen, pen->color, rect_t(point_t(pt.y + p.x, -pt.x + p.y), wide_pen) + rect_offset);   // octant 7
 
       angle -= rad_270;
       angle *= -1;
       angle += rad_90;
 
       if(angle >= start_angle && angle <= end_angle)
-        ellipse(clip_rect, pen, pen->color, rect_t(point_t(pt.y + p.x, pt.x + p.y), wide_pen) + rect_offset);  // octant 2
+        ellipse(canvas, clip_rect, pen, pen->color, rect_t(point_t(pt.y + p.x, pt.x + p.y), wide_pen) + rect_offset);  // octant 2
 
       angle += rad_90;
       if(angle >= start_angle && angle <= end_angle)
-        ellipse(clip_rect, pen, pen->color, rect_t(point_t(-pt.x + p.x, pt.y + p.y), wide_pen) + rect_offset); // octant 4
+        ellipse(canvas, clip_rect, pen, pen->color, rect_t(point_t(-pt.x + p.x, pt.y + p.y), wide_pen) + rect_offset); // octant 4
 
       angle += rad_90;
       if(angle >= start_angle && angle <= end_angle)
-        ellipse(clip_rect, pen, pen->color, rect_t(point_t(-pt.y + p.x, -pt.x + p.y), wide_pen) + rect_offset);  // octant 6
+        ellipse(canvas, clip_rect, pen, pen->color, rect_t(point_t(-pt.y + p.x, -pt.x + p.y), wide_pen) + rect_offset);  // octant 6
 
       angle += rad_90;
       if(angle >= start_angle && angle <= end_angle)
-        ellipse(clip_rect, pen, pen->color, rect_t(point_t(pt.x + p.x, -pt.y + p.y), wide_pen) + rect_offset);   // octant 8
+        ellipse(canvas, clip_rect, pen, pen->color, rect_t(point_t(pt.x + p.x, -pt.y + p.y), wide_pen) + rect_offset);   // octant 8
       }
 
     pt.y++;
@@ -522,7 +522,7 @@ void kotuku::gdi_screen_t::angle_arc(const rect_t &clip_rect,
     }
   }
 
-void kotuku::gdi_screen_t::pie(const rect_t &clip_rect,
+void kotuku::gdi_screen_t::pie(canvas_t *canvas, const rect_t &clip_rect,
                        const pen_t *pen,
                        color_t c,
                        const point_t &p,
@@ -546,7 +546,7 @@ void kotuku::gdi_screen_t::pie(const rect_t &clip_rect,
     rotate_point(p, pts[0], start);
     rotate_point(p, pts[1], start);
 
-    polyline(clip_rect, pen, pts, 2);
+    polyline(canvas, clip_rect, pen, pts, 2);
     return;
     }
   // we draw a polygon using the current pen
@@ -595,10 +595,10 @@ void kotuku::gdi_screen_t::pie(const rect_t &clip_rect,
   else
     pts.get()[pt] = p;
 
-  polygon(clip_rect, pen, c, pts.get(), segs+1, false);
+  polygon(canvas, clip_rect, pen, c, pts.get(), segs+1, false);
   }
 
-void kotuku::gdi_screen_t::draw_text(const rect_t &clip_rect,
+void kotuku::gdi_screen_t::draw_text(canvas_t *canvas, const rect_t &clip_rect,
                              const font_t *font,
                              color_t fg,
                              color_t bg,
@@ -658,9 +658,9 @@ void kotuku::gdi_screen_t::draw_text(const rect_t &clip_rect,
           if(clip_rect && pos)
             {
             if(is_fg)
-              set_pixel(clip_rect, pos, fgc);
+              set_pixel(canvas, clip_rect, pos, fgc);
             else if(format & eto_opaque)
-              set_pixel(clip_rect, pos, bgc);
+              set_pixel(canvas, clip_rect, pos, bgc);
             }
           }
 
@@ -673,7 +673,7 @@ void kotuku::gdi_screen_t::draw_text(const rect_t &clip_rect,
     }
   }
 
-kotuku::extent_t kotuku::gdi_screen_t::text_extent(const font_t *font,
+kotuku::extent_t kotuku::gdi_screen_t::text_extent(const canvas_t *canvas, const font_t *font,
                                    const char *str,
                                    size_t count) const
   {
@@ -698,7 +698,7 @@ kotuku::extent_t kotuku::gdi_screen_t::text_extent(const font_t *font,
   return ex;
   }
 
-void kotuku::gdi_screen_t::scroll(const rect_t &clip_rect,
+void kotuku::gdi_screen_t::scroll(canvas_t *canvas, const rect_t &clip_rect,
                           const extent_t &offsets,
                           const rect_t &area_to_scroll,
                           const rect_t &clipping_rectangle,
@@ -707,12 +707,12 @@ void kotuku::gdi_screen_t::scroll(const rect_t &clip_rect,
 
   }
 
-void kotuku::gdi_screen_t::background_mode(int m)
+void kotuku::gdi_screen_t::background_mode(canvas_t *canvas, int m)
   {
   ::SetBkMode(_dc, m);
   }
 
-void kotuku::gdi_screen_t::invalidate_rect(const rect_t &rect)
+void kotuku::gdi_screen_t::invalidate_rect(canvas_t *canvas, const rect_t &rect)
   {
 
   }
