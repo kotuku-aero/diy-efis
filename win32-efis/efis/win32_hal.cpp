@@ -9,9 +9,9 @@
 #endif
 #include "serial_can_device.h"
 
-#include "../../gdi-lib/can_aerospace.h"
+#include "../../widgets/can_aerospace.h"
 #include "../../widgets/layout_window.h"
-#include "../../widgets/pfd_application.h"
+#include "../../widgets/application.h"
 #include "../../widgets/menu_window.h"
 #include "../../widgets/notification_window.h"
 
@@ -101,20 +101,15 @@ enum trace_levels
 kotuku::win32_hal_t::win32_hal_t()
   {
   _root_window = 0;
-  _menu_window = 0;
-  _alert_window = 0;
   _cs = 0;
 
   _node_id = 0x60;      // first node
   }
 
-result_t kotuku::win32_hal_t::initialize(const char *config_key)
+result_t kotuku::win32_hal_t::initialize(const char *ini)
   {
-  if(config_key != 0)
-    _root_key = config_key;
-
   result_t result;
-  if(failed(result = hal_t::initialize(config_key)))
+  if(failed(result = hal_t::initialize(ini)))
     return result;
 
   std::string device;
@@ -432,8 +427,6 @@ result_t kotuku::win32_hal_t::get_last_error()
   }
 
 static const wchar_t *class_name = L"EFIS_Screen";
-static const wchar_t *alert_window_class = L"EFIS_Alert";
-static const wchar_t *menu_window_class = L"EFIS_Menu";
 const wchar_t *screen_name = L"diy-efis";
 const wchar_t *child_window_class = L"EFIS_Canvas";
 
@@ -484,116 +477,25 @@ kotuku::layout_window_t * kotuku::win32_hal_t::root_window()
   return _root_window;
   }
 
-kotuku::menu_window_t *kotuku::win32_hal_t::menu_window()
+kotuku::screen_t *kotuku::win32_hal_t::screen_create(const rect_t &r)
   {
-  if(_menu_window = 0)
-    {
-    int window_x;
-    int window_y;
-    int width;
-    int height;
-    if(failed(get_config_value(hal_section, "menu-width", width)))
-      width = 480;
+  // create a child window
 
-    if(failed(get_config_value(hal_section, "menu-height", height)))
-      height = 320;
+  HWND hwnd = CreateWindowExW(0, child_window_class, screen_name, WS_VISIBLE | WS_POPUP | WS_CAPTION,
+    r.left, r.top, r.width(), r.height() + GetSystemMetrics(SM_CYCAPTION) + (GetSystemMetrics(SM_CYBORDER) << 1),
+    _screen->handle(), NULL, NULL, NULL);
 
-    if(failed(get_config_value(hal_section, "menu-x", window_x)))
-      window_x = 0;
-
-    if(failed(get_config_value(hal_section, "menu-y", window_y)))
-      window_y = 0;
-
-    // we create the screen with a caption and a border
-
-    WNDCLASSW wndclass;
-    memset(&wndclass, 0, sizeof(WNDCLASS));
-    wndclass.lpfnWndProc = ScreenProc;
-    wndclass.lpszClassName = menu_window_class;
-    wndclass.style = CS_PARENTDC;
-
-    RegisterClassW(&wndclass);
-
-    HWND hwnd = CreateWindowExW(0, class_name, screen_name, WS_VISIBLE | WS_POPUP | WS_CAPTION,
-      window_x, window_y, width, height,
-      _screen->handle(), NULL, NULL, NULL);
-
-    size_t bpp = (size_t) GetDeviceCaps(GetDC(hwnd), BITSPIXEL);
-
-    windows_screen_t *screen = new windows_screen_t(hwnd, width, height, bpp);
-
-    _menu_window =  new kotuku::menu_window_t(screen, "menu-window");
-    screen->owner(_menu_window);
-    }
-  return _menu_window;
+  return new windows_screen_t(hwnd, r.width(), r.height(), 32);
   }
 
-kotuku::notification_window_t *kotuku::win32_hal_t::alert_window()
+kotuku::screen_t *kotuku::win32_hal_t::screen_create(const extent_t &e)
   {
-  if(_menu_window = 0)
-    {
-    int window_x;
-    int window_y;
-    int width;
-    int height;
-    if(failed(get_config_value(hal_section, "alert-width", width)))
-      width = 480;
-
-    if(failed(get_config_value(hal_section, "alert-height", height)))
-      height = 320;
-
-    if(failed(get_config_value(hal_section, "alert-x", window_x)))
-      window_x = 0;
-
-    if(failed(get_config_value(hal_section, "alert-y", window_y)))
-      window_y = 0;
-
-    // we create the screen with a caption and a border
-
-    WNDCLASSW wndclass;
-    memset(&wndclass, 0, sizeof(WNDCLASS));
-    wndclass.lpfnWndProc = ScreenProc;
-    wndclass.lpszClassName = alert_window_class;
-    wndclass.style = CS_PARENTDC;
-
-    RegisterClassW(&wndclass);
-
-    HWND hwnd = CreateWindowExW(0, class_name, screen_name, WS_VISIBLE | WS_POPUP | WS_CAPTION,
-      window_x, window_y, width, height,
-      _screen->handle(), NULL, NULL, NULL);
-
-    size_t bpp = (size_t) GetDeviceCaps(GetDC(hwnd), BITSPIXEL);
-
-    windows_screen_t *screen = new windows_screen_t(hwnd, width, height, bpp);
-
-    _alert_window =  new notification_window_t(screen, "alert-window");
-    screen->owner(_alert_window);
-    }
-
-  return _alert_window;
+  return _screen->create_canvas(e);
   }
 
-kotuku::screen_t * kotuku::win32_hal_t::screen_create(screen_t *h, const rect_t &rect)
+kotuku::screen_t *kotuku::win32_hal_t::screen_create(const bitmap_t &b)
   {
-  windows_screen_t *handle = as_screen_handle(h);
-  return handle->create_canvas(h, rect);
-  }
-
-kotuku::screen_t * kotuku::win32_hal_t::screen_create(screen_t *h, const extent_t &sz)
-  {
-  windows_screen_t *handle = as_screen_handle(h);
-  return handle->create_canvas(h, sz);
-  }
-
-kotuku::screen_t * kotuku::win32_hal_t::screen_create(screen_t *h, const bitmap_t &bm)
-  {
-  windows_screen_t *handle = as_screen_handle(h);
-  return handle->create_canvas(h, bm);
-  }
-
-void  kotuku::win32_hal_t::screen_close(window_t *h)
-  {
-  delete h;
+  return _screen->create_canvas(b);
   }
 
 result_t kotuku::win32_hal_t::publish(const can_msg_t &msg)

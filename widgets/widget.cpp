@@ -34,7 +34,7 @@ If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
 #include "widget.h"
-#include "../gdi-lib/application.h"
+#include "application.h"
 
 #include "fonts.h"
 #include "colors.h"
@@ -44,13 +44,13 @@ kotuku::widget_t::widget_t(widget_t &parent, const char *section)
    _can_provider(parent.can_provider()),
    _section(section)
   {
-  the_app()->get_config_value(section, "name", _name);
+  application_t::instance->hal()->get_config_value(section, "name", _name);
 
-  if(failed(the_app()->get_config_value(section, "draw-border", _draw_border)))
+  if(failed(application_t::instance->hal()->get_config_value(section, "draw-border", _draw_border)))
     _draw_border = false;
 
   int value;
-  if(succeeded(the_app()->get_config_value(section, "z-order", value)))
+  if(succeeded(application_t::instance->hal()->get_config_value(section, "z-order", value)))
     z_order(value);
   }
 
@@ -114,7 +114,7 @@ int kotuku::widget_t::lookup_enum_setting(const char *section, const char *name,
     const char **values, int max_values)
   {
   std::string value;
-  if(failed(the_hal()->get_config_value(section, name, value)))
+  if(failed(application_t::instance->hal()->get_config_value(section, name, value)))
     return -1;
 
   for(int i = 0; i < max_values; i++)
@@ -202,7 +202,7 @@ color_t kotuku::widget_t::lookup_color(const char *section,
   const char *name)
   {
   std::string value;
-  if(failed(the_hal()->get_config_value(section, name, value)))
+  if(failed(application_t::instance->hal()->get_config_value(section, name, value)))
     return color_black;
 
   return lookup_color(value.c_str());

@@ -36,7 +36,7 @@ it must be removed as soon as possible after the code fragment is identified.
 #include "widget.h"
 #include "gauge_window.h"
 
-#include "../gdi-lib/spatial.h"
+#include "spatial.h"
 
 static const char *gauge_style_values[] =
   {
@@ -81,15 +81,15 @@ static result_t split_param(const std::string &str,
 
 kotuku::gauge_window_t::gauge_window_t(widget_t &parent, const char *section)
 : widget_t(parent, section),
-  _background_canvas(*this, window_rect().extents())
+  _background_canvas(window_rect().extents())
   {
   char temp_name[32];
   int value;
 
-  if(failed(the_app()->get_config_value(section, "scale", _scale)))
+  if(failed(application_t::instance->hal()->get_config_value(section, "scale", _scale)))
     _scale = 1.0;
 
-  if(failed(the_app()->get_config_value(section, "offset", _offset)))
+  if(failed(application_t::instance->hal()->get_config_value(section, "offset", _offset)))
     _offset = 0.0;
 
   value = lookup_enum_setting(section, "style", gauge_style_values,
@@ -99,32 +99,32 @@ kotuku::gauge_window_t::gauge_window_t(widget_t &parent, const char *section)
   else
     _style = gs_pointer;
 
-  if(failed(the_app()->get_config_value(section, "reset-id", value)))
+  if(failed(application_t::instance->hal()->get_config_value(section, "reset-id", value)))
     value = 0;
 
   _reset_label = value;
 
-  if(failed(the_app()->get_config_value(section, "reset-value", _reset_value)))
+  if(failed(application_t::instance->hal()->get_config_value(section, "reset-value", _reset_value)))
     _reset_value = 0.0;
 
   _font = lookup_font(section, "font");
   if(_font == 0)
     _font = &arial_9_font;
 
-  if(failed(the_app()->get_config_value(section, "arc-begin", _arc_begin)))
+  if(failed(application_t::instance->hal()->get_config_value(section, "arc-begin", _arc_begin)))
     _arc_begin = 120;
 
-  if(failed(the_app()->get_config_value(section, "arc-range", _arc_range)))
+  if(failed(application_t::instance->hal()->get_config_value(section, "arc-range", _arc_range)))
     _arc_range = 270;
 
-  if(failed(the_app()->get_config_value(section, "can-id", value)))
+  if(failed(application_t::instance->hal()->get_config_value(section, "can-id", value)))
     {
     // could be can value 0..3
     for(int id = 0; id < 4; id++)
       {
       snprintf(temp_name, 32, "can-id-%d", id);
 
-      if(failed(the_app()->get_config_value(section, temp_name, value)))
+      if(failed(application_t::instance->hal()->get_config_value(section, temp_name, value)))
         break;
 
       _labels.push_back((uint16_t) value);
@@ -141,17 +141,17 @@ kotuku::gauge_window_t::gauge_window_t(widget_t &parent, const char *section)
     _max_values.push_back(_reset_value);
     }
 
-  if(failed(the_app()->get_config_value(section, "center-x", value)))
+  if(failed(application_t::instance->hal()->get_config_value(section, "center-x", value)))
     _center.x = window_rect().width() >> 1;
   else
     _center.x = (gdi_dim_t)value;
 
-  if(failed(the_app()->get_config_value(section, "center-y", value)))
+  if(failed(application_t::instance->hal()->get_config_value(section, "center-y", value)))
     _center.y = window_rect().height() >> 1;
   else
     _center.y = (gdi_dim_t)value;
 
-  if(failed(the_app()->get_config_value(section, "radii", value)))
+  if(failed(application_t::instance->hal()->get_config_value(section, "radii", value)))
     value = (window_rect().width() >> 1) - 5;
 
   _gauge_radii = (gdi_dim_t)value;
@@ -163,7 +163,7 @@ kotuku::gauge_window_t::gauge_window_t(widget_t &parent, const char *section)
     {
     snprintf(temp_name, 32, "step-%d", i);
 
-    if(failed(the_app()->get_config_value(section, temp_name, value_str)))
+    if(failed(application_t::instance->hal()->get_config_value(section, temp_name, value_str)))
       break;
 
     // the step is a series of settings in the form:
@@ -202,7 +202,7 @@ kotuku::gauge_window_t::gauge_window_t(widget_t &parent, const char *section)
     {
     snprintf(temp_name, 32, "tick-%d", i);
 
-    if(failed(the_app()->get_config_value(section, temp_name, value_str)))
+    if(failed(application_t::instance->hal()->get_config_value(section, temp_name, value_str)))
       break;
 
     // the step is a series of settings in the form:
@@ -232,7 +232,7 @@ kotuku::gauge_window_t::gauge_window_t(widget_t &parent, const char *section)
     }
 
   std::string color;
-  if(failed(the_app()->get_config_value(section, "background-color", color)))
+  if(failed(application_t::instance->hal()->get_config_value(section, "background-color", color)))
     _background_color = color_black;
   else
     _background_color = lookup_color(color.c_str());
@@ -292,8 +292,8 @@ kotuku::gauge_window_t::gauge_window_t(widget_t &parent, const char *section)
     point_t pt(r.bottom_right());
 
     pt.x -= 4;
-    pt.x -= sz.dx;
-    pt.y -= sz.dy;
+    pt.x -= sz.cx;
+    pt.y -= sz.cy;
 
     _background_canvas.draw_text(name().c_str(), name().length(), pt);
 
@@ -315,7 +315,7 @@ kotuku::gauge_window_t::gauge_window_t(widget_t &parent, const char *section)
       double relative_value = value - _steps.begin()->value;
       double pixels = relative_value * pixels_per_unit;
       point_t pt(graph.left + 2,
-          (graph.bottom - gdi_dim_t(pixels)) - 7 - (sz.dy >> 1));
+          (graph.bottom - gdi_dim_t(pixels)) - 7 - (sz.cy >> 1));
 
       _background_canvas.draw_text(_ticks[i].text.c_str(),
           _ticks[i].text.length(), pt);
@@ -334,8 +334,8 @@ kotuku::gauge_window_t::gauge_window_t(widget_t &parent, const char *section)
       point_t pt(r.bottom_right());
 
       pt.x -= 4;
-      pt.x -= sz.dx;
-      pt.y -= sz.dy;
+      pt.x -= sz.cx;
+      pt.y -= sz.cy;
 
       _background_canvas.draw_text(name().c_str(), name().length(), pt);
       }
@@ -410,8 +410,8 @@ kotuku::gauge_window_t::gauge_window_t(widget_t &parent, const char *section)
         // write the text at the point
         extent_t size = text_extent(_ticks[i].text.c_str(), len);
         rect_t text_rect(
-            point_t(center().x - (size.dx >> 1),
-                center().y - (gauge_radii() + 5 + size.dy)), size);
+            point_t(center().x - (size.cx >> 1),
+                center().y - (gauge_radii() + 5 + size.cy)), size);
 
         text_rect &= clip_rect;
         clipping_rectangle(text_rect);
@@ -420,7 +420,7 @@ kotuku::gauge_window_t::gauge_window_t(widget_t &parent, const char *section)
 
         // we now rotate and merge the text
         _background_canvas.rotate_blt(center(), *this, center(), center().y,
-            degrees_to_radians(arc_start), rop_srcpaint);
+            degrees_to_radians(arc_start));
         }
       }
 
@@ -458,8 +458,8 @@ bool kotuku::gauge_window_t::ev_msg(const msg_t &data)
         value += _offset;
 
         changed |= assign_msg(value, _values[i]);
-        _min_values[i] = std::min(_min_values[i], _values[i]);
-        _max_values[i] = std::max(_max_values[i], _values[i]);
+        _min_values[i] = min(_min_values[i], _values[i]);
+        _max_values[i] = max(_max_values[i], _values[i]);
         break;
         }
       }
@@ -480,7 +480,7 @@ void kotuku::gauge_window_t::update_window()
   rect_t window_size(0, 0, window_rect().width(), window_rect().height());
 
   clipping_rectangle(window_size);
-  bit_blt(window_size, _background_canvas, point_t(0, 0), rop_srccopy);
+  bit_blt(window_size, _background_canvas, point_t(0, 0));
  
   if(is_bar_style())
     {
@@ -547,12 +547,12 @@ void kotuku::gauge_window_t::update_window()
 
       rect_text.left = center().x + 2;
       rect_text.top = center().y + 6;
-      rect_text.bottom = rect_text.top + size.dy + 4;
+      rect_text.bottom = rect_text.top + size.cy + 4;
       rect_text.right = window_size.width() - 1;
 
       rectangle(rect_text);
 
-      point_t pt(rect_text.right - (size.dx + 2), rect_text.top + 2);
+      point_t pt(rect_text.right - (size.cx + 2), rect_text.top + 2);
 
       draw_text(str, len, point_t(pt.x, pt.y), rect_text, eto_clipped);
       }
@@ -617,7 +617,7 @@ double kotuku::gauge_window_t::calculate_rotation(double value)
 
   // get the percent that the gauge is displaying
   double percent = double(
-      std::max(std::min(value, max_range), min_range) - min_range)
+      max(min(value, max_range), min_range) - min_range)
       / (max_range - min_range);
 
   double rotation;
@@ -839,14 +839,14 @@ void kotuku::gauge_window_t::draw_point(const pen_t *outline_pen, size_t index, 
   double min_range = _steps.begin()->value;
 
   double value = _values[index];
-  value = std::max(value, min_range);
-  value = std::min(value, min_range + double(range));
+  value = max(value, min_range);
+  value = min(value, min_range + double(range));
 
   double relative_value = double(value - min_range);
   gdi_dim_t position = window_rect().height()
       - (gdi_dim_t) (relative_value * pixels_per_unit) - 8;
 
-  position = std::max(position, (gdi_dim_t)5);
+  position = max(position, (gdi_dim_t)5);
 
   point_t pts[4] =
     {
@@ -869,7 +869,7 @@ void kotuku::gauge_window_t::draw_point(const pen_t *outline_pen, size_t index, 
       {
       position = window_rect().height()
           - (gdi_dim_t) (relative_value * pixels_per_unit) - 8;
-      position = std::max(position, (gdi_dim_t)5);
+      position = max(position, (gdi_dim_t)5);
 
       pts[0] = point_t(offset, position + 5);
       pts[1] = point_t(offset + 5, position);
@@ -887,7 +887,7 @@ void kotuku::gauge_window_t::draw_point(const pen_t *outline_pen, size_t index, 
       {
       position = window_rect().height()
           - (gdi_dim_t) (relative_value * pixels_per_unit) - 8;
-      position = std::max(position, (gdi_dim_t)5);
+      position = max(position, (gdi_dim_t)5);
 
       pts[0] = point_t(offset, position + 5);
       pts[1] = point_t(offset + 5, position);

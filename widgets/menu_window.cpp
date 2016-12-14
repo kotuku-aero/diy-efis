@@ -33,14 +33,17 @@ then the origional copyright notice is to be respected.
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
-#include "pfd_application.h"
+#include "application.h"
 #include "menu_window.h"
 #include "autopilot.h"
 #include "layout_window.h"
-#include "../gdi-lib/can_aerospace.h"
+#include "can_aerospace.h"
 #include <stdio.h>
 #include <sys/types.h>
 #include "regex.h"
+#include "pens.h"
+#include "fonts.h"
+#include "spatial.h"
 
 struct datatype_lookup_t {
   const char *name;
@@ -173,22 +176,22 @@ void kotuku::menu_window_t::init(const char *section)
   _popup_menu_index = 0;
 
   int value;
-  if(failed(the_hal()->get_config_value(section, "menu-rect-x", value)))
+  if(failed(application_t::instance->hal()->get_config_value(section, "menu-rect-x", value)))
     _menu_rect_x = 88;
   else
     _menu_rect_x = value;
 
-  if(failed(the_hal()->get_config_value(section, "menu-rect-y", value)))
+  if(failed(application_t::instance->hal()->get_config_value(section, "menu-rect-y", value)))
     _menu_rect_y = 32;
   else
     _menu_rect_y = value;
 
-  if(failed(the_hal()->get_config_value(section, "menu-start-x", value)))
+  if(failed(application_t::instance->hal()->get_config_value(section, "menu-start-x", value)))
     _menu_start_x = 0;
   else
     _menu_start_x = value;
 
-  if(failed(the_hal()->get_config_value(section, "menu-start-y", value)))
+  if(failed(application_t::instance->hal()->get_config_value(section, "menu-start-y", value)))
     _menu_start_y = window_rect().height() - _menu_rect_y;
   else
     _menu_start_y = value;
@@ -569,7 +572,7 @@ void kotuku::menu_window_t::load_menus()
   {
   // we get the root menu
   std::string menu_name;
-  if(failed(the_hal()->get_config_value(_section.c_str(), "root-menu", menu_name)))
+  if(failed(application_t::instance->hal()->get_config_value(_section.c_str(), "root-menu", menu_name)))
     menu_name = "root-menu";
 
   // set the root menu
@@ -694,31 +697,31 @@ kotuku::root_menu_t::root_menu_t(menu_window_t *parent, const std::string &name)
   std::string value;
   std::string expr;
 
-  if(succeeded(the_hal()->get_config_value(name.c_str(), "key0", value)))
+  if(succeeded(application_t::instance->hal()->get_config_value(name.c_str(), "key0", value)))
     _key0 = parse_item(parent, value);
 
-  if(succeeded(the_hal()->get_config_value(name.c_str(), "key1", value)))
+  if(succeeded(application_t::instance->hal()->get_config_value(name.c_str(), "key1", value)))
     _key1 = parse_item(parent, value);
 
-  if(succeeded(the_hal()->get_config_value(name.c_str(), "key2", value)))
+  if(succeeded(application_t::instance->hal()->get_config_value(name.c_str(), "key2", value)))
     _key2 = parse_item(parent, value);
 
-  if(succeeded(the_hal()->get_config_value(name.c_str(), "key3", value)))
+  if(succeeded(application_t::instance->hal()->get_config_value(name.c_str(), "key3", value)))
     _key3 = parse_item(parent, value);
 
-  if(succeeded(the_hal()->get_config_value(name.c_str(), "key4", value)))
+  if(succeeded(application_t::instance->hal()->get_config_value(name.c_str(), "key4", value)))
     _key4 = parse_item(parent, value);
 
-  if(succeeded(the_hal()->get_config_value(name.c_str(), "decka-up", value)))
+  if(succeeded(application_t::instance->hal()->get_config_value(name.c_str(), "decka-up", value)))
     _decka_up = parse_item(parent, value);
 
-  if(succeeded(the_hal()->get_config_value(name.c_str(), "decka-dn", value)))
+  if(succeeded(application_t::instance->hal()->get_config_value(name.c_str(), "decka-dn", value)))
     _decka_dn = parse_item(parent, value);
 
-  if(succeeded(the_hal()->get_config_value(name.c_str(), "deckb-up", value)))
+  if(succeeded(application_t::instance->hal()->get_config_value(name.c_str(), "deckb-up", value)))
     _deckb_up = parse_item(parent, value);
 
-  if(succeeded(the_hal()->get_config_value(name.c_str(), "deckb-dn", value)))
+  if(succeeded(application_t::instance->hal()->get_config_value(name.c_str(), "deckb-dn", value)))
     _deckb_dn = parse_item(parent, value);
   }
 
@@ -774,7 +777,7 @@ kotuku::popup_menu_t::popup_menu_t(menu_window_t *parent, const std::string &nam
   for(int i = 0; i < 128; i++)
     {
     sprintf(buffer, "item%d", i);
-    if(succeeded(the_hal()->get_config_value(name.c_str(), buffer, value)))
+    if(succeeded(application_t::instance->hal()->get_config_value(name.c_str(), buffer, value)))
       {
       menu_item_t *item =  parse_item(parent, value);
       if(item != 0)
@@ -906,7 +909,7 @@ void kotuku::menu_item_t::paint(const rect_t &area, bool is_selected) const
     center_pt.x -= _bitmap->bitmap_width >> 1;
     center_pt.y -= _bitmap->bitmap_height >> 1;
 
-    parent()->pattern_blt(rect_t(center_pt, extent_t(_bitmap->bitmap_width, _bitmap->bitmap_height)), *_bitmap, rop_srccopy);
+    parent()->pattern_blt(rect_t(center_pt, extent_t(_bitmap->bitmap_width, _bitmap->bitmap_height)), *_bitmap);
     */
     }
   else
@@ -919,8 +922,8 @@ void kotuku::menu_item_t::paint(const rect_t &area, bool is_selected) const
     // calculate the text extents
     extent_t ex = parent()->text_extent(_caption.c_str(), _caption.length());
 
-    center_pt.x -= ex.dx >> 1;
-    center_pt.y -= ex.dy >> 1;
+    center_pt.x -= ex.cx >> 1;
+    center_pt.y -= ex.cy >> 1;
 
     if(is_selected)
       parent()->text_color(color_magenta);
@@ -1070,7 +1073,7 @@ kotuku::menu_item_action_result kotuku::menu_item_cancel_t::evaluate_action(cons
   msg_t cancel_msg(id_menu_cancel);
   cancel_msg.flags |= LOOPBACK_MESSAGE;
 
-  reinterpret_cast<pfd_application_t *>(the_app())->publish(cancel_msg);
+  reinterpret_cast<application_t *>(application_t::instance)->publish(cancel_msg);
 
   return mia_cancel;
   }
@@ -1106,7 +1109,7 @@ kotuku::menu_item_action_result kotuku::menu_item_enter_t::evaluate_action(const
   msg_t enter_msg(id_menu_ok);
   enter_msg.flags |= LOOPBACK_MESSAGE;
 
-  reinterpret_cast<pfd_application_t *>(the_app())->publish(enter_msg);
+  reinterpret_cast<application_t *>(application_t::instance)->publish(enter_msg);
   return mia_nothing;
   }
 
@@ -1158,7 +1161,7 @@ kotuku::menu_item_type kotuku::menu_item_event_t::item_type() const
 kotuku::menu_item_action_result kotuku::menu_item_event_t::evaluate_action(const msg_t &msg) const
   {
   for(size_t i = 0; i < _events.size(); i++)
-    reinterpret_cast<pfd_application_t *>(the_app())->publish(_events[i]);
+    reinterpret_cast<application_t *>(application_t::instance)->publish(_events[i]);
 
   return mia_nothing;
   }

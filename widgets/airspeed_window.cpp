@@ -34,24 +34,24 @@ If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
 #include "airspeed_window.h"
-#include "pfd_application.h"
+#include "application.h"
 #include "fonts.h"
 #include "pens.h"
 
 kotuku::airspeed_window_t::airspeed_window_t(widget_t &parent, const char *section_name)
 : widget_t(parent, section_name),
-  _background_canvas(*this, window_rect().extents()),
+  _background_canvas(window_rect().extents()),
   _airspeed(0)
   {
 
-  the_app()->get_config_value(section_name, "vs0", _vs0);
-  the_app()->get_config_value(section_name, "vs1", _vs1);
-  the_app()->get_config_value(section_name, "vfe", _vfe);
-  the_app()->get_config_value(section_name, "vno", _vno);
-  the_app()->get_config_value(section_name, "vne", _vne);
-  the_app()->get_config_value(section_name, "va", _va);
-  the_app()->get_config_value(section_name, "vx", _vx);
-  the_app()->get_config_value(section_name, "vy", _vy);
+  application_t::instance->hal()->get_config_value(section_name, "vs0", _vs0);
+  application_t::instance->hal()->get_config_value(section_name, "vs1", _vs1);
+  application_t::instance->hal()->get_config_value(section_name, "vfe", _vfe);
+  application_t::instance->hal()->get_config_value(section_name, "vno", _vno);
+  application_t::instance->hal()->get_config_value(section_name, "vne", _vne);
+  application_t::instance->hal()->get_config_value(section_name, "va", _va);
+  application_t::instance->hal()->get_config_value(section_name, "vx", _vx);
+  application_t::instance->hal()->get_config_value(section_name, "vy", _vy);
 
   _background_canvas.clipping_rectangle(_background_canvas.window_rect());
   _background_canvas.fill_rect(rect_t(0, 0, 80, 8), color_black);
@@ -91,7 +91,7 @@ void kotuku::airspeed_window_t::update_window()
 	rect_t window_size(0, 0, window_rect().width(), window_rect().height());
   clipping_rectangle(window_size);
 
-  bit_blt(window_size, _background_canvas, point_t(0, 0), rop_srccopy);
+  bit_blt(window_size, _background_canvas, point_t(0, 0));
   // create the background bitmap
   pen(&white_pen);
   background_color(color_gray);
@@ -128,7 +128,7 @@ void kotuku::airspeed_window_t::update_window()
       size_t len = strlen(str);
       extent_t size = text_extent(str, len);
 
-      draw_text(str, len, point_t(47 - size.dx, marker_line -(size.dy >> 1)));
+      draw_text(str, len, point_t(47 - size.cx, marker_line -(size.cy >> 1)));
       }
 
     asi_line -= 25;
@@ -172,22 +172,22 @@ void kotuku::airspeed_window_t::update_window()
 
   // draw vne exceeded
   if(vne_pixels >= 8)
-    fill_rect(rect_t(75, 8, 79, std::min((gdi_dim_t)232, vne_pixels)), color_red);
+    fill_rect(rect_t(75, 8, 79, min((gdi_dim_t)232, vne_pixels)), color_red);
 
   // draw vne->vno
   if(vno_pixels >= (gdi_dim_t)8 && vne_pixels < (gdi_dim_t)232)
-    fill_rect(rect_t(75, std::max((gdi_dim_t)8, vne_pixels), 79, std::min((gdi_dim_t)232, vno_pixels)), color_yellow);
+    fill_rect(rect_t(75, max((gdi_dim_t)8, vne_pixels), 79, min((gdi_dim_t)232, vno_pixels)), color_yellow);
 
   // draw vno->vs1
   if(vs1_pixels >= 8 && vno_pixels < 232)
-    fill_rect(rect_t(75, std::max((gdi_dim_t)8, vno_pixels), 79, std::min((gdi_dim_t)232, vs1_pixels)), color_green);
+    fill_rect(rect_t(75, max((gdi_dim_t)8, vno_pixels), 79, min((gdi_dim_t)232, vs1_pixels)), color_green);
 
   // draw vfe->vs0
   if(vs0_pixels >= 8 && vfe_pixels < 232)
-    fill_rect(rect_t(71, std::max((gdi_dim_t)8, vfe_pixels), 75, std::min((gdi_dim_t)232, vs0_pixels)), color_white);
+    fill_rect(rect_t(71, max((gdi_dim_t)8, vfe_pixels), 75, min((gdi_dim_t)232, vs0_pixels)), color_white);
 
   // draw vy -> vx
   if(vx_pixels >= 8 && vy_pixels < 232)
-    fill_rect(rect_t(67, std::max((gdi_dim_t)8, vy_pixels), 71, std::min((gdi_dim_t)232, vx_pixels)), color_blue);
+    fill_rect(rect_t(67, max((gdi_dim_t)8, vy_pixels), 71, min((gdi_dim_t)232, vx_pixels)), color_blue);
   }
 

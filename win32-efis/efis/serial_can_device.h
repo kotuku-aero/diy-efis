@@ -2,7 +2,7 @@
 #define __ftdi_can_device_h__
 
 #include "win32_hal_device.h"
-#include "../../gdi-lib/can_driver.h"
+#include "../../widgets/can_driver.h"
 
 #include <deque>
 #include <vector>

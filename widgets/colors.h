@@ -36,8 +36,5 @@ it must be removed as soon as possible after the code fragment is identified.
 #ifndef __colors_h__
 #define __colors_h__
 
-#include "../gdi-lib/color.h"
-
-
 #endif
 

@@ -34,10 +34,10 @@ If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
 #include "annunciator_window.h"
-#include "pfd_application.h"
+#include "application.h"
 #include "fonts.h"
 #include "pens.h"
-#include "pfd_application.h"
+#include "application.h"
 
 static const kotuku::point_t clock_pt(1, 10);
 static const kotuku::point_t hrs_pt(1, 55);
@@ -50,7 +50,7 @@ static const char *qnh_value = "QNH";
 
 kotuku::annunciator_window_t::annunciator_window_t(widget_t &parent, const char *section)
 : widget_t(parent, section),
-  _background_canvas(*this, window_rect().extents()),
+  _background_canvas(window_rect().extents()),
   _oat(0),
   _cas(0),
   _clock(720),
@@ -127,7 +127,7 @@ void kotuku::annunciator_window_t::update_window()
 	rect_t window_size(0, 0, window_rect().width(), window_rect().height());
 	clipping_rectangle(window_size);
 
-  bit_blt(window_size, _background_canvas, point_t(0, 0), rop_srccopy);
+  bit_blt(window_size, _background_canvas, point_t(0, 0));
 
   char msg[10];
 
@@ -160,8 +160,8 @@ void kotuku::annunciator_window_t::draw_annunciator_background(const point_t &pt
 
   _background_canvas.background_color(color_gray);
 
-  int width = display_area.dx;
-  int text_start = pt.x + width -(label_size.dx + 3);
+  int width = display_area.cx;
+  int text_start = pt.x + width -(label_size.cx + 3);
   int right = pt.x + width;
 
   _background_canvas.fill_rect(rect_t(pt.x, pt.y+1, right, pt.y + 4), color_gray);
@@ -189,7 +189,7 @@ void kotuku::annunciator_window_t::draw_annunciator_detail(const point_t &pt, co
   extent_t text_size = text_extent(value, len);
 
   // center of the text is 37, 16
-  point_t origin(pt.x + 37 -(text_size.dx >> 1), pt.y + 16 -(text_size.dy >> 1));
+  point_t origin(pt.x + 37 -(text_size.cx >> 1), pt.y + 16 -(text_size.cy >> 1));
 
   draw_text(value, len, origin);
   }

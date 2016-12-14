@@ -34,7 +34,10 @@ If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
 #include "altitude_window.h"
-#include "pfd_application.h"
+#include "application.h"
+#include "pens.h"
+#include "fonts.h"
+#include "spatial.h"
 
 struct vsi_markers {
 	const char *text;
@@ -44,7 +47,7 @@ struct vsi_markers {
 
 kotuku::altitude_window_t::altitude_window_t(widget_t &parent, const char *section)
 : widget_t(parent, section),
-  _background_canvas(*this, window_rect().extents()),
+  _background_canvas(window_rect().extents()),
 	_altitude(0),
 	_vertical_speed(0)
 	{
@@ -117,7 +120,7 @@ kotuku::altitude_window_t::altitude_window_t(widget_t &parent, const char *secti
 		{
 		extent_t size = _background_canvas.text_extent(marks[i].text, marks[i].length);
 		_background_canvas.draw_text(marks[i].text, marks[i].length,
-																 point_t(116 - size.dx, marks[i].pos -(size.dy >> 1)));
+																 point_t(116 - size.cx, marks[i].pos -(size.cy >> 1)));
 		}
 	}
 
@@ -147,7 +150,7 @@ void kotuku::altitude_window_t::update_window()
 	rect_t window_size(0, 0, window_rect().width(), window_rect().height());
   clipping_rectangle(window_size);
 
-  bit_blt(window_size, _background_canvas, point_t(0, 0), rop_srccopy);
+  bit_blt(window_size, _background_canvas, point_t(0, 0));
 
   static const size_t buf_size = 64;
   char str[buf_size];
@@ -195,7 +198,7 @@ void kotuku::altitude_window_t::update_window()
 			size_t len = strlen(str);
 			extent_t size = text_extent(str, len);
 
-			draw_text(str, len, point_t(23, marker_line -(size.dy >> 1)));
+			draw_text(str, len, point_t(23, marker_line -(size.cy >> 1)));
 			}
 
 		line_altitude -= 250;
@@ -235,7 +238,7 @@ void kotuku::altitude_window_t::update_window()
 		vs = 120 - gdi_dim_t(double(_vertical_speed) *(48.0 / 1000.0));
 	else
 		{
-    vs = std::min((short)3000, std::max((short)-3000, _vertical_speed));
+    vs = min((short)3000, max((short)-3000, _vertical_speed));
 
     // make absolute
     vs = abs(vs);
@@ -284,5 +287,5 @@ void kotuku::altitude_window_t::update_window()
 	size_t len = strlen(str);
 	extent_t size = text_extent(str, len);
 
-	draw_text(str, len, point_t(107 - (size.dx >> 1), vsi_rect.top));
+	draw_text(str, len, point_t(107 - (size.cx >> 1), vsi_rect.top));
 	}

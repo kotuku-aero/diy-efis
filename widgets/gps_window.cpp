@@ -33,8 +33,11 @@ then the origional copyright notice is to be respected.
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
-#include "pfd_application.h"
+#include "application.h"
 #include "gps_window.h"
+#include "fonts.h"
+#include "pens.h"
+#include "spatial.h"
 
 static const kotuku::rect_t waypoint(kotuku::point_t(4, 10), kotuku::extent_t(122, 45));
 static const kotuku::rect_t waypoint_text(kotuku::point_t(7, 15), kotuku::extent_t(114, 23));
@@ -53,7 +56,7 @@ static const kotuku::rect_t next_waypoint_text_2(kotuku::point_t(7, 198), kotuku
 
 kotuku::gps_window_t::gps_window_t(widget_t &parent, const char *section)
 : widget_t(parent, section),
-  _background_canvas(*this, window_rect().extents()),
+  _background_canvas(window_rect().extents()),
   _dist_to_waypoint(0),
   _time_to_next(-1)
   {
@@ -106,7 +109,7 @@ bool kotuku::gps_window_t::ev_msg(const msg_t &msg)
   //  case 	id_new_route :
   //    // read the route
   //    {
-  //    aio_application_t *aio_app = reinterpret_cast<aio_application_t *>(the_app());
+  //    aio_application_t *aio_app = reinterpret_cast<aio_application_t *>(application_t::instance);
 
   //    const base_gps_device_t *gps = aio_app->gps_device();
 
@@ -144,7 +147,7 @@ void kotuku::gps_window_t::update_window()
   {
   rect_t r(point_t(0, 0), window_rect().extents());
   clipping_rectangle(r);
-  bit_blt(r, _background_canvas, point_t(0, 0), rop_srccopy);
+  bit_blt(r, _background_canvas, point_t(0, 0));
 
   // display the waypoint
   draw_detail(waypoint_text, _waypoints[0], color_magenta);
@@ -184,7 +187,7 @@ void kotuku::gps_window_t::draw_background(const rect_t &pt, const char *label)
 
   int width = pt.width();
   int text_start = pt.left + 3;
-  int text_end = text_start + label_size.dx;
+  int text_end = text_start + label_size.cx;
   int right = pt.left + width;
 
   _background_canvas.fill_rect(rect_t(pt.left, pt.top+1, right, pt.top + 4), color_gray);
@@ -220,7 +223,7 @@ void kotuku::gps_window_t::draw_detail(const rect_t &rect,
   // center the string
   point_t pt = rect.top_left();
 
-  gdi_dim_t cell_width = _size_large_font_cell.dx;
+  gdi_dim_t cell_width = _size_large_font_cell.cx;
 
   size_t len = strlen(txt);
 
@@ -228,7 +231,7 @@ void kotuku::gps_window_t::draw_detail(const rect_t &rect,
   pt.x -= gdi_dim_t((cell_width * len) >> 1);
 
   pt.y += rect.height() >> 1;
-  pt.y -= _size_large_font_cell.dy >> 1;
+  pt.y -= _size_large_font_cell.cy >> 1;
 
   color_t old_bk_color = background_color(bg);
   color_t old_text_color = text_color();
@@ -241,7 +244,7 @@ void kotuku::gps_window_t::draw_detail(const rect_t &rect,
 
     point_t cp = pt;
     cp.x += cell_width >> 1;
-    cp.x -= cell_size.dx >> 1;
+    cp.x -= cell_size.cx >> 1;
 
     draw_text(txt + c, 1, cp, rect, eto_clipped);
 

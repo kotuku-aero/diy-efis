@@ -36,7 +36,7 @@ it must be removed as soon as possible after the code fragment is identified.
 #ifndef __altitude_window_h__
 #define __altitude_window_h__
 
-#include "../gdi-lib/window.h"
+#include "window.h"
 #include "widget.h"
 
 namespace kotuku {

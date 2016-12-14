@@ -34,7 +34,7 @@ If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
 #include "autopilot.h"
-#include "../gdi-lib/can_aerospace.h"
+#include "can_aerospace.h"
 
 kotuku::autopilot_t::autopilot_t(canaerospace_provider_t *can_provider)
 : thread_t(4096, this, do_run),

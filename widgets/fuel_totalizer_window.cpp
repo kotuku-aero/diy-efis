@@ -33,12 +33,14 @@ then the origional copyright notice is to be respected.
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
-#include "pfd_application.h"
+#include "application.h"
 #include "fuel_totalizer_window.h"
+#include "pens.h"
+#include "fonts.h"
 
 kotuku::fuel_totalizer_window_t::fuel_totalizer_window_t(widget_t &parent, const char *section)
 : widget_t(parent, section),
-  _background_canvas(*this, window_rect().extents())
+  _background_canvas(window_rect().extents())
   {
 	rect_t r(_background_canvas.window_rect());
 
@@ -70,7 +72,7 @@ kotuku::fuel_totalizer_window_t::fuel_totalizer_window_t(widget_t &parent, const
 	point_t pt(r.bottom_left());
 
   pt.x += 2;
-	pt.y -= sz.dy + 2;
+	pt.y -= sz.cy + 2;
 
 	_background_canvas.draw_text(endurance_txt, size_t(-1), pt);
 
@@ -101,5 +103,5 @@ void kotuku::fuel_totalizer_window_t::update_window()
 	rect_t window_size(0, 0, window_rect().width(), window_rect().height());
   clipping_rectangle(window_size);
 
-  bit_blt(window_size, _background_canvas, point_t(0, 0), rop_srccopy);
+  bit_blt(window_size, _background_canvas, point_t(0, 0));
   }

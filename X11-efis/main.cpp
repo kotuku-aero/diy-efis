@@ -36,10 +36,10 @@ it must be removed as soon as possible after the code fragment is identified.
 #include "../widgets/watchdog.h"
 #include "../widgets/pfd_application.h"
 #include "../widgets/layout_window.h"
-#include "../linux-hal/linux_hal.h"
 #include "../widgets/layout_window.h"
 #include "../widgets/menu_window.h"
 #include "../widgets/notification_window.h"
+#include "linux_hal.h"
 #include "x11_screen.h"
 
 static kotuku::watchdog_t *watchdog;

@@ -40,3 +40,6 @@
 /dspic33f-lib/dist/release-pic33EPXXXGP504/
 /dspic33f-lib/build/release-pic33EPXXXGP504/
 /dspic-lib/dist/release-pic33EPXXXGP504/
+/widgets/errors.h
+/widgets/raster_screen.h
+/widgets/raster_screen.cpp

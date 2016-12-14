@@ -103,7 +103,7 @@ void kotuku::layout_window_t::set_layout(canaerospace_provider_t *can_provider)
 
   std::vector<std::string> section_names;
 
-  if(failed(the_hal()->get_section_names(0, section_names)))
+  if(failed(application_t::instance->hal()->get_section_names(0, section_names)))
     {
     trace_error("Cannot enumerate the section names");
     return;
@@ -120,7 +120,7 @@ void kotuku::layout_window_t::set_layout(canaerospace_provider_t *can_provider)
     std::string widget_type;
     if(strncmp(section.c_str(), "widget-", 7)== 0)
       {
-      if(failed(the_hal()->get_config_value(section.c_str(), "type", widget_type)))
+      if(failed(application_t::instance->hal()->get_config_value(section.c_str(), "type", widget_type)))
         {
         trace_warning("Widget section %s does not have a type=value, ignoring\n", section.c_str());
         continue;

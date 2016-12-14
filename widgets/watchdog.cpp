@@ -34,7 +34,7 @@ If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
 #include "watchdog.h"
-#include "pfd_application.h"
+#include "application.h"
 #include "layout_window.h"
 
 // the canbus implements the nss service to identify which nodes are alive.

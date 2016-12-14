@@ -1,6 +1,6 @@
 #include "win32_hal.h"
-#include "../../gdi-lib/can_driver.h"
-#include "../../gdi-lib/can_aerospace.h"
+#include "../../widgets/can_driver.h"
+#include "../../widgets/can_aerospace.h"
 #include "comm_device.h"
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -166,7 +166,7 @@ char *can_worker_t::ensure_buffer(size_t len)
   if(_rcv_buffer == 0 || len > _rcv_buffer_len)
     {
     delete[] _rcv_buffer;
-    _rcv_buffer_len = std::max(size_t(32), size_t(((len -1)| 0x1f)+1));
+    _rcv_buffer_len = max(size_t(32), size_t(((len -1)| 0x1f)+1));
     _rcv_buffer = new char[_rcv_buffer_len];
     }
 

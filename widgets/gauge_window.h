@@ -36,10 +36,10 @@ it must be removed as soon as possible after the code fragment is identified.
 #ifndef __gauge_window_h__
 #define __gauge_window_h__
 
-#include "../gdi-lib/application.h"
-#include "../gdi-lib/window.h"
-#include "../gdi-lib/bitmap.h"
-#include "../gdi-lib/can_aerospace.h"
+#include "application.h"
+#include "window.h"
+#include "bitmap.h"
+#include "can_aerospace.h"
 #include "fonts.h"
 #include "widget.h"
 #include "pens.h"

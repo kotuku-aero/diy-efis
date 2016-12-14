@@ -380,4 +380,4 @@ static const color_t bitmap_bits[] = {
 	0x00040404, 0x00040404, 0x00040404, 0x00040404,
 	};
 
-const bitmap_t battery_off_bitmap = { sizeof(bitmap_t), 32, 0, 24, 57, bitmap_bits };
+const bitmap_t battery_off_bitmap = { sizeof(bitmap_t), 24, 57, bitmap_bits };

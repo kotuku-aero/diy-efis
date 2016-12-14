@@ -1,9 +1,8 @@
 #ifndef __win32_hal_device_h__
 #define __win32_hal_device_h__
 
-#include "../../gdi-lib/errors.h"
-#include "../../gdi-lib/device.h"
-#include "../../gdi-lib/hal.h"
+#include "../../widgets/device.h"
+#include "../../widgets/hal.h"
 #include <string>
 
 namespace kotuku {

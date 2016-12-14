@@ -36,7 +36,7 @@ it must be removed as soon as possible after the code fragment is identified.
 #ifndef __fonts_h__
 #define __fonts_h__
 
-#include "../gdi-lib/font.h"
+#include "font.h"
 
 extern const font_t arial_9_font;
 extern const font_t arial_12_font;

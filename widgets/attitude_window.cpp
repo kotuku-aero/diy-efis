@@ -34,7 +34,10 @@ If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
 #include "attitude_window.h"
-#include "pfd_application.h"
+#include "application.h"
+#include "pens.h"
+#include "fonts.h"
+#include "spatial.h"
 
 static const gdi_dim_t median_x = 120;
 static const gdi_dim_t median_y = 120;
@@ -56,9 +59,9 @@ kotuku::attitude_window_t::attitude_window_t(widget_t &parent, const char *secti
   _glideslope(0),
   _glideslope_aquired(false),
 	_localizer_aquired(false),
-	_image_canvas(*this, window_rect().extents()),
-	_temp_canvas(*this, window_rect().extents()),
-	_mask_canvas(*this, window_rect().extents())
+	_image_canvas(window_rect().extents()),
+	_temp_canvas(window_rect().extents()),
+	_mask_canvas(window_rect().extents())
 	{
 	// we create a mask bitmap at this point.
 	_mask_canvas.fill_rect(rect_t(0, 0, window_x, window_y), color_black);
@@ -67,37 +70,37 @@ kotuku::attitude_window_t::attitude_window_t(widget_t &parent, const char *secti
 	_mask_canvas.ellipse(rect_t(border, border, window_x - border, window_y - border));
 
   int value;
-  if(failed(the_app()->get_config_value(section, "critical-aoa", value)))
+  if(failed(application_t::instance->hal()->get_config_value(section, "critical-aoa", value)))
     _critical_aoa = 0;
     else
       _critical_aoa = (short) value;
 
-  if(failed(the_app()->get_config_value(section, "approach-aoa", value)))
+  if(failed(application_t::instance->hal()->get_config_value(section, "approach-aoa", value)))
     _approach_aoa = 0;
   else
     _approach_aoa = (short) value;
 
-  if(failed(the_app()->get_config_value(section, "climb-aoa", value)))
+  if(failed(application_t::instance->hal()->get_config_value(section, "climb-aoa", value)))
       _climb_aoa = 0;
     else
       _climb_aoa = (short) value;
 
-  if(failed(the_app()->get_config_value(section, "cruise-aoa", value)))
+  if(failed(application_t::instance->hal()->get_config_value(section, "cruise-aoa", value)))
       _cruise_aoa = 0;
     else
       _cruise_aoa = (short) value;
 
-  if(failed(the_app()->get_config_value(section, "yaw-max", value)))
+  if(failed(application_t::instance->hal()->get_config_value(section, "yaw-max", value)))
       _yaw_max = 45;
     else
       _yaw_max = (short) value;
 
-  if(failed(the_app()->get_config_value(section, "show-aoa", value)))
+  if(failed(application_t::instance->hal()->get_config_value(section, "show-aoa", value)))
       _show_aoa = false;
     else
       _show_aoa = value != 0;
 
-  if(failed(the_app()->get_config_value(section, "show-glideslope", value)))
+  if(failed(application_t::instance->hal()->get_config_value(section, "show-glideslope", value)))
       _show_glideslope = false;
     else
       _show_glideslope = value != 0;
@@ -149,7 +152,7 @@ bool kotuku::attitude_window_t::ev_msg(const msg_t &data)
       while(abs_roll < -180)
         abs_roll += 360;
 
-      abs_roll = std::min((short)90, std::max((short)-90, abs_roll));
+      abs_roll = min((short)90, max((short)-90, abs_roll));
       _abs_roll = degrees_to_radians(abs_roll);
       }
 		  break;
@@ -212,7 +215,7 @@ void kotuku::attitude_window_t::update_window()
 
   // pitch is now +/- 90
   // limit to 25 degrees as we don't need any more than that
-  pitch = std::min((short)25, std::max((short)-25, pitch));
+  pitch = min((short)25, max((short)-25, pitch));
 
   // make this == pixels that is the azimuth line
   pitch *= 10;
@@ -395,9 +398,9 @@ void kotuku::attitude_window_t::update_window()
 
 	// mask the image before the transfer
 	_temp_canvas.bit_blt(rect_t(0, 0, window_x, window_y),
-														 _mask_canvas, point_t(0, 0), rop_srcand);
+														 _mask_canvas, point_t(0, 0));
 	_image_canvas.bit_blt(rect_t(border, border, window_x - border, window_y - border),
-												_temp_canvas, point_t(border, border), rop_srcpaint);
+												_temp_canvas, point_t(border, border));
 
   /////////////////////////////////////////////////////////////////////////////
   // Draw the angle-of-attack indicator
@@ -407,7 +410,7 @@ void kotuku::attitude_window_t::update_window()
   if(_show_aoa)
     {
     // calc the effective AOA
-    short aoa = std::min(_critical_aoa, std::max(_cruise_aoa, _aoa_degrees));
+    short aoa = min(_critical_aoa, max(_cruise_aoa, _aoa_degrees));
     aoa -= _cruise_aoa;
     short pixels = short(double(aoa) * _aoa_pixels_per_degree);
 
@@ -484,7 +487,7 @@ void kotuku::attitude_window_t::update_window()
 		{
 		// draw the marker, 0.7 degrees = 59 pixels
 
-		double deviation = std::max(-1.2, std::min(1.2, _glideslope / 100.0));
+		double deviation = max(-1.2, min(1.2, _glideslope / 100.0));
 
 		gdi_dim_t pixels = gdi_dim_t(deviation /(1.0 / pixels_per_degree));
 
@@ -523,7 +526,7 @@ void kotuku::attitude_window_t::update_window()
 		{
 		// draw the marker, 1.0 degrees = 74 pixels
 
-		double deviation = std::max(-1.2, std::min(1.2, _localizer / 100.0));
+		double deviation = max(-1.2, min(1.2, _localizer / 100.0));
 
 		gdi_dim_t pixels = gdi_dim_t(deviation /(1.0 / pixels_per_degree));
 
@@ -571,8 +574,8 @@ void kotuku::attitude_window_t::update_window()
 		};
 
   // the roll indicator is shifted left/right by the yaw angle,  1degree = 2pix
-  short offset = std::min(_yaw_max,
-      std::max(short(-_yaw_max), short(_yaw_degrees << 1)));
+  short offset = min(_yaw_max,
+      max(short(-_yaw_max), short(_yaw_degrees << 1)));
 
   extent_t offset_pt(offset, 0);
   roll_points[0] += offset_pt;
@@ -615,8 +618,8 @@ void kotuku::attitude_window_t::update_window()
 	_temp_canvas.fill_rect(rect_t(230, 10, 240, 230), color_white);
 
 	_image_canvas.bit_blt(rect_t(0, 0, 240, 240), _temp_canvas, 
-												point_t(0, 0), rop_srcand);
+												point_t(0, 0));
 
   rect_t rect(point_t(0, 0), window_rect().extents());
-  bit_blt(rect, _image_canvas, rect.top_left(), rop_srccopy);
+  bit_blt(rect, _image_canvas, rect.top_left());
 	}

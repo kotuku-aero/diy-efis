@@ -36,7 +36,7 @@ it must be removed as soon as possible after the code fragment is identified.
 #ifndef __bitmaps_h__
 #define __bitmaps_h__
 
-#include "../gdi-lib/bitmap.h"
+#include "bitmap.h"
 
 extern const bitmap_t nav_fail_bitmap;
 extern const bitmap_t nav_fail_dim_bitmap;

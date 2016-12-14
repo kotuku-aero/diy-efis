@@ -100,9 +100,6 @@
     <ClInclude Include="windows_screen.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\vfc\vfc.vcxproj">
-      <Project>{da2a99b1-6b82-4f12-b27f-396dcdef285f}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\widgets\widgets.vcxproj">
       <Project>{1046de3d-4d9a-412b-9515-133a8ddfa260}</Project>
     </ProjectReference>

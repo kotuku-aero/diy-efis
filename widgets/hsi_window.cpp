@@ -34,7 +34,10 @@ If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
 #include "hsi_window.h"
-#include "pfd_application.h"
+#include "application.h"
+#include "fonts.h"
+#include "pens.h"
+#include "spatial.h"
 
 static const gdi_dim_t mark_start = 12;
 static const gdi_dim_t center_x = 120;
@@ -53,7 +56,7 @@ enum {
 
 kotuku::hsi_window_t::hsi_window_t(widget_t &parent, const char *section)
 : widget_t(parent, section),
-  _background_canvas(*this, window_rect().extents()),
+  _background_canvas(window_rect().extents()),
   _direction(15),
   _course(30),
   _deviation(5),
@@ -149,7 +152,7 @@ void kotuku::hsi_window_t::update_window()
 	rect_t window_size(0, 0, window_rect().width(), window_rect().height());
 
   clipping_rectangle(window_size);
-  bit_blt(window_size, _background_canvas, point_t(0, 0), rop_srccopy);
+  bit_blt(window_size, _background_canvas, point_t(0, 0));
 
   /////////////////////////////////////////////////////////////////////////////
   //
@@ -229,7 +232,6 @@ void kotuku::hsi_window_t::update_window()
   polygon(track_marker, 4);
 
   pen(&track_pen);
-  e_background_mode old_mode = background_mode(transparent);
 
   point_t track_line[2] = {
     point_t(center_x, center_y - 88),
@@ -239,8 +241,6 @@ void kotuku::hsi_window_t::update_window()
   rotate_point(median, track_line[0], rotation);
 
   polyline(track_line, 2);
-
-  background_mode(old_mode);
 
   ///////////////////////////////////////////////////////////////////////////
   // Draw the CDI
@@ -282,7 +282,7 @@ void kotuku::hsi_window_t::update_window()
   // 1 degree = 24 pixels
   double cdi_var = pixels_per_nm_cdi *((double)_deviation/10);
 
-  gdi_dim_t cdi = std::max(gdi_dim_t(-66), std::min(gdi_dim_t(66), gdi_dim_t(round(cdi_var))));
+  gdi_dim_t cdi = max(gdi_dim_t(-66), min(gdi_dim_t(66), gdi_dim_t(round(cdi_var))));
 
   point_t pts[4];
   pts[0].x = center_x; pts[0].y = center_y - 98;
@@ -381,12 +381,12 @@ void kotuku::hsi_window_t::update_window()
   size_t length = strlen(msg);
 
   extent_t pixels = text_extent(msg, length);
-  draw_text(msg, length, point_t(25 - (pixels.dx >> 1), 2));
+  draw_text(msg, length, point_t(25 - (pixels.cx >> 1), 2));
 
   sprintf(msg, "%d", _wind_speed);
   length = strlen(msg);
   pixels = text_extent(msg, length);
-  draw_text(msg, length, point_t(25 - (pixels.dx >> 1), 13));
+  draw_text(msg, length, point_t(25 - (pixels.cx >> 1), 13));
 
   /////////////////////////////////////////////////////////////////////////////
   // Draw the estimated time to waypoint.
@@ -394,15 +394,15 @@ void kotuku::hsi_window_t::update_window()
   sprintf(msg, "%d", _distance_to_waypoint);
   length = strlen(msg);
   pixels = text_extent(msg, length);
-  draw_text(msg, length, point_t(window_size.width() - 25 - (pixels.dx >> 1), 2));
+  draw_text(msg, length, point_t(window_size.width() - 25 - (pixels.cx >> 1), 2));
 
   sprintf(msg, "%02.2d:%02.2d", _time_to_waypoint / 60, _time_to_waypoint % 60);
   length = strlen(msg);
   pixels = text_extent(msg, length);
-  draw_text(msg, length, point_t(window_size.width() - 25 - (pixels.dx >> 1), 13));
+  draw_text(msg, length, point_t(window_size.width() - 25 - (pixels.cx >> 1), 13));
 
   sprintf(msg, "%s", _waypoint_name);
   length = strlen(msg);
   pixels = text_extent(msg, length);
-  draw_text(msg, length, point_t(window_size.width() - 25 - (pixels.dx >> 1), 24));
+  draw_text(msg, length, point_t(window_size.width() - 25 - (pixels.cx >> 1), 24));
   }

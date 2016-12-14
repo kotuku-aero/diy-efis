@@ -38,7 +38,7 @@ it must be removed as soon as possible after the code fragment is identified.
 
 kotuku::nav_window_t::nav_window_t(widget_t &parent, const char *section)
 : widget_t("ATT", parent, get_window_rect(section)),
-  _background_canvas(*this, rect_t(0, 0, 480, 640))
+  _background_canvas(extent_t(480, 640))
   {
   }
 

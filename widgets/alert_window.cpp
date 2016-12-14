@@ -33,7 +33,7 @@ then the origional copyright notice is to be respected.
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
-#include "pfd_application.h"
+#include "application.h"
 #include "alert_window.h"
 #include "bitmaps.h"
 
@@ -44,24 +44,24 @@ static const kotuku::rect_t gps_rect(2, 182, 26, 239);
 
 kotuku::alert_window_t::alert_window_t(widget_t &parent, const char *section)
 : widget_t(parent, section),
-  _background_canvas(*this, window_rect().extents()),
+  _background_canvas(window_rect().extents()),
   _battery_alert(alert_off),
   _edu_alert(alert_on),
   _imu_alert(alert_on),
   _nav_alert(alert_on),
   _timer(0),
-  _battery_on_bitmap(parent, battery_on_bitmap),
-  _battery_on_dim_bitmap(parent, battery_on_dim_bitmap),
-  _battery_off_bitmap(parent, battery_off_bitmap),
-  _edu_on_bitmap(parent, edu_fail_bitmap),
-  _edu_on_dim_bitmap(parent, edu_fail_dim_bitmap),
-  _edu_off_bitmap(parent, edu_ok_bitmap),
-  _imu_on_bitmap(parent, imu_fail_bitmap),
-  _imu_on_dim_bitmap(parent, imu_fail_dim_bitmap),
-  _imu_off_bitmap(parent, imu_ok_bitmap),
-  _nav_on_bitmap(parent, nav_fail_bitmap),
-  _nav_on_dim_bitmap(parent, nav_fail_dim_bitmap),
-  _nav_off_bitmap(parent, nav_ok_bitmap)
+  _battery_on_bitmap(battery_on_bitmap),
+  _battery_on_dim_bitmap(battery_on_dim_bitmap),
+  _battery_off_bitmap(battery_off_bitmap),
+  _edu_on_bitmap(edu_fail_bitmap),
+  _edu_on_dim_bitmap(edu_fail_dim_bitmap),
+  _edu_off_bitmap(edu_ok_bitmap),
+  _imu_on_bitmap(imu_fail_bitmap),
+  _imu_on_dim_bitmap(imu_fail_dim_bitmap),
+  _imu_off_bitmap(imu_ok_bitmap),
+  _nav_on_bitmap(nav_fail_bitmap),
+  _nav_on_dim_bitmap(nav_fail_dim_bitmap),
+  _nav_off_bitmap(nav_ok_bitmap)
   {
   _background_canvas.clipping_rectangle(_background_canvas.window_rect());
   _background_canvas.fill_rect(_background_canvas.window_rect(), color_black);
@@ -185,61 +185,61 @@ void kotuku::alert_window_t::update_window()
 	rect_t window_size(0, 0, window_rect().width(), window_rect().height());
   clipping_rectangle(window_size);
 
-  bit_blt(window_size, _background_canvas, point_t(0, 0), rop_srccopy);
+  bit_blt(window_size, _background_canvas, point_t(0, 0));
 
   switch(_battery_alert)
     {
     case alert_off :
-      bit_blt(battery_rect, _battery_off_bitmap, point_t(0, 0), rop_srccopy);
+      bit_blt(battery_rect, _battery_off_bitmap, point_t(0, 0));
       break;
     case alert_acknowledged :
     case alert_on :
-      bit_blt(battery_rect, _battery_on_bitmap, point_t(0, 0), rop_srccopy);
+      bit_blt(battery_rect, _battery_on_bitmap, point_t(0, 0));
       break;
     case alert_on_dim :
-      bit_blt(battery_rect, _battery_on_dim_bitmap, point_t(0, 0), rop_srccopy);
+      bit_blt(battery_rect, _battery_on_dim_bitmap, point_t(0, 0));
       break;
     }
 
   switch(_edu_alert)
     {
     case alert_off :
-      bit_blt(edu_rect, _edu_off_bitmap, point_t(0, 0), rop_srccopy);
+      bit_blt(edu_rect, _edu_off_bitmap, point_t(0, 0));
       break;
     case alert_acknowledged :
     case alert_on :
-      bit_blt(edu_rect, _edu_on_bitmap, point_t(0, 0), rop_srccopy);
+      bit_blt(edu_rect, _edu_on_bitmap, point_t(0, 0));
       break;
     case alert_on_dim :
-      bit_blt(edu_rect, _edu_on_dim_bitmap, point_t(0, 0), rop_srccopy);
+      bit_blt(edu_rect, _edu_on_dim_bitmap, point_t(0, 0));
       break;
     }
 
   switch(_imu_alert)
     {
     case alert_off :
-      bit_blt(ahrs_rect, _imu_off_bitmap, point_t(0, 0), rop_srccopy);
+      bit_blt(ahrs_rect, _imu_off_bitmap, point_t(0, 0));
       break;
     case alert_acknowledged :
     case alert_on :
-      bit_blt(ahrs_rect, _imu_on_bitmap, point_t(0, 0), rop_srccopy);
+      bit_blt(ahrs_rect, _imu_on_bitmap, point_t(0, 0));
       break;
     case alert_on_dim :
-      bit_blt(ahrs_rect, _imu_on_dim_bitmap, point_t(0, 0), rop_srccopy);
+      bit_blt(ahrs_rect, _imu_on_dim_bitmap, point_t(0, 0));
       break;
     }
 
   switch(_nav_alert)
     {
     case alert_off :
-      bit_blt(gps_rect, _nav_off_bitmap, point_t(0, 0), rop_srccopy);
+      bit_blt(gps_rect, _nav_off_bitmap, point_t(0, 0));
       break;
     case alert_acknowledged :
     case alert_on :
-      bit_blt(gps_rect, _nav_on_bitmap, point_t(0, 0), rop_srccopy);
+      bit_blt(gps_rect, _nav_on_bitmap, point_t(0, 0));
       break;
     case alert_on_dim :
-      bit_blt(gps_rect, _nav_on_dim_bitmap, point_t(0, 0), rop_srccopy);
+      bit_blt(gps_rect, _nav_on_dim_bitmap, point_t(0, 0));
       break;
     }
   }

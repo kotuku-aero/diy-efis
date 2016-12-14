@@ -380,4 +380,4 @@ static const color_t bitmap_bits[] = {
 	0x00080808, 0x00080808, 0x00080808, 0x00080808,
 	};
 
-const bitmap_t nav_ok_bitmap = { sizeof(bitmap_t), 32, 0, 24, 57, bitmap_bits };
+const bitmap_t nav_ok_bitmap = { sizeof(bitmap_t), 24, 57, bitmap_bits };

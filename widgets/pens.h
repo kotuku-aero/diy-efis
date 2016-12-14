@@ -36,7 +36,7 @@ it must be removed as soon as possible after the code fragment is identified.
 #ifndef __pens_h__
 #define __pens_h__
 
-#include "../gdi-lib/pen.h"
+#include "pen.h"
 
 extern const pen_t white_pen;
 extern const pen_t black_pen;

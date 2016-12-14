@@ -36,8 +36,8 @@ it must be removed as soon as possible after the code fragment is identified.
 #ifndef __autopilot_h__
 #define __autopilot_h__
 
-#include "../gdi-lib/thread.h"
-#include "../gdi-lib/can_aerospace.h"
+#include "thread.h"
+#include "can_aerospace.h"
 
 namespace kotuku {
 /*

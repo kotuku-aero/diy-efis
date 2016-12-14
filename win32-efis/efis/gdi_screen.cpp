@@ -64,7 +64,7 @@ public:
 	}
 
 kotuku::mem_screen_t::mem_screen_t(HDC dc, const extent_t &ex, size_t bpp)
-: gdi_screen_t(dc, ex.dx, ex.dy, bpp)
+: gdi_screen_t(dc, ex.cx, ex.cy, bpp)
   {
 
   }
@@ -75,10 +75,10 @@ kotuku::mem_screen_t::~mem_screen_t()
   }
 
 // canvas implementation routines.
-kotuku::screen_t *kotuku::gdi_screen_t::create_canvas(screen_t *parent, const extent_t &ex)
+kotuku::screen_t *kotuku::gdi_screen_t::create_canvas(const extent_t &ex)
   {
   HDC newDC = CreateCompatibleDC(_dc);
-  HBITMAP hBitmap = CreateCompatibleBitmap(_dc, ex.dx, ex.dy);
+  HBITMAP hBitmap = CreateCompatibleBitmap(_dc, ex.cx, ex.cy);
   SelectObject(newDC, hBitmap);
 
   size_t bpp = (size_t) GetDeviceCaps(newDC, BITSPIXEL);
@@ -86,21 +86,7 @@ kotuku::screen_t *kotuku::gdi_screen_t::create_canvas(screen_t *parent, const ex
   return new mem_screen_t(newDC, ex, bpp);
   }
 
-kotuku::screen_t *kotuku::gdi_screen_t::create_canvas(screen_t *c, const rect_t &rect)
-  {
-  windows_screen_t *parent_wnd = as_screen_handle(c);
-  HWND hwnd = CreateWindowExW(0, child_window_class, screen_name, WS_CHILD | WS_VISIBLE,
-    rect.left, rect.top, int(rect.width()), int(rect.height()), parent_wnd->handle(), NULL, NULL, NULL);
-
-  size_t bpp = (size_t) GetDeviceCaps(GetDC(hwnd), BITSPIXEL);
-
-  windows_screen_t *screen = new windows_screen_t(hwnd, rect.width(), rect.height(), parent_wnd->bits_per_pixel);
-  SetWindowLongW(hwnd, GWL_USERDATA, LONG(screen));
-
-  return screen;
-  }
-
-kotuku::screen_t *kotuku::gdi_screen_t::create_canvas(screen_t *parent, const bitmap_t &bm)
+kotuku::screen_t *kotuku::gdi_screen_t::create_canvas(const bitmap_t &bm)
   {
   HDC newDC = CreateCompatibleDC(_dc);
 
@@ -108,7 +94,7 @@ kotuku::screen_t *kotuku::gdi_screen_t::create_canvas(screen_t *parent, const bi
   memset(&bmi, 0, sizeof(BITMAPINFO));
   bmi.bmiHeader.biPlanes = 1;
   bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-  bmi.bmiHeader.biBitCount = bm.bpp;
+  bmi.bmiHeader.biBitCount = 32;
   bmi.bmiHeader.biWidth = bm.bitmap_width;
   bmi.bmiHeader.biHeight = -((int)bm.bitmap_height);
   bmi.bmiHeader.biCompression = BI_RGB;
@@ -257,7 +243,7 @@ void kotuku::gdi_screen_t::round_rect(canvas_t *, const rect_t &clip_rect,
   HPEN oldPen = (HPEN) SelectObject(_dc, as_pen(pen));
   HBRUSH oldBrush = (HBRUSH) SelectObject(_dc, create_brush(c));
 
-  RoundRect(_dc, r.left, r.top, r.right, r.bottom, e.dx, e.dy);
+  RoundRect(_dc, r.left, r.top, r.right, r.bottom, e.cx, e.cy);
 
   DeleteObject(SelectObject(_dc, oldBrush));
   DeleteObject(SelectObject(_dc, oldPen));
@@ -268,8 +254,7 @@ void kotuku::gdi_screen_t::bit_blt(canvas_t *, const rect_t &clip_rect,
                            const rect_t &dest_rect,
                            const screen_t *src_screen,
                            const rect_t &src_clip_rect,
-                           const point_t &src_pt,
-                           raster_operation operation)
+                           const point_t &src_pt)
   {
   gdi_opn();
   HRGN clipRgn = CreateRectRgn(clip_rect.left, clip_rect.top, clip_rect.right, clip_rect.bottom);
@@ -278,20 +263,8 @@ void kotuku::gdi_screen_t::bit_blt(canvas_t *, const rect_t &clip_rect,
   const gdi_screen_t *src_gdi = reinterpret_cast<const gdi_screen_t *>(src_screen);
 
   BitBlt(_dc, dest_rect.left, dest_rect.top, dest_rect.width(), dest_rect.height(),
-    src_gdi->DC(), src_pt.x, src_pt.y, (DWORD) operation);
+    src_gdi->DC(), src_pt.x, src_pt.y, SRCCOPY);
   DeleteObject(clipRgn);
-  }
-
-void kotuku::gdi_screen_t::mask_blt(canvas_t *, const rect_t &clip_rect,
-                            const rect_t &dest_rect,
-                            const screen_t *src_screen,
-                            const rect_t &src_clip_rect,
-                            const point_t &src_point,
-                            const bitmap_t &mask_bitmap,
-                            const point_t &mask_point,
-                            raster_operation operation)
-  {
-  gdi_opn();
   }
 
 void kotuku::gdi_screen_t::rotate_blt(canvas_t *canvas, const rect_t &clip_rect,
@@ -300,8 +273,7 @@ void kotuku::gdi_screen_t::rotate_blt(canvas_t *canvas, const rect_t &clip_rect,
                               const rect_t &src_clip_rect,
                               const point_t &src_point,
                               size_t radius,
-                              double angle,
-                              raster_operation operation)
+                              double angle)
   {
   gdi_opn();
   // we perform this operation only on the circle bounded however for
@@ -345,7 +317,7 @@ void kotuku::gdi_screen_t::rotate_blt(canvas_t *canvas, const rect_t &clip_rect,
 
       color_t cr = src->get_pixel(canvas, src_clip_rect, point_t(x, y));
 
-      if(cr != color_t(-1) && (operation != rop_srcpaint || cr != 0))
+      if(cr != color_t(-1))
         {
         point_t pt(x, y);
 
@@ -692,24 +664,10 @@ kotuku::extent_t kotuku::gdi_screen_t::text_extent(const canvas_t *canvas, const
 
     c -= font->first_char;
 
-    ex.dx += font->char_table[c << 1];
+    ex.cx += font->char_table[c << 1];
     }
 
   return ex;
-  }
-
-void kotuku::gdi_screen_t::scroll(canvas_t *canvas, const rect_t &clip_rect,
-                          const extent_t &offsets,
-                          const rect_t &area_to_scroll,
-                          const rect_t &clipping_rectangle,
-                          rect_t *rect_update)
-  {
-
-  }
-
-void kotuku::gdi_screen_t::background_mode(canvas_t *canvas, int m)
-  {
-  ::SetBkMode(_dc, m);
   }
 
 void kotuku::gdi_screen_t::invalidate_rect(canvas_t *canvas, const rect_t &rect)
