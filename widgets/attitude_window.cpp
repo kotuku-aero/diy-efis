@@ -59,48 +59,40 @@ kotuku::attitude_window_t::attitude_window_t(widget_t &parent, const char *secti
   _glideslope(0),
   _glideslope_aquired(false),
 	_localizer_aquired(false),
-	_image_canvas(window_rect().extents()),
-	_temp_canvas(window_rect().extents()),
-	_mask_canvas(window_rect().extents())
+	_image_canvas(window_rect().extents())
 	{
-	// we create a mask bitmap at this point.
-	_mask_canvas.fill_rect(rect_t(0, 0, window_x, window_y), color_black);
-	_mask_canvas.background_color(color_white);
-	_mask_canvas.pen(&white_pen);
-	_mask_canvas.ellipse(rect_t(border, border, window_x - border, window_y - border));
-
   int value;
-  if(failed(application_t::instance->hal()->get_config_value(section, "critical-aoa", value)))
+  if(failed(application_t::hal->get_config_value(section, "critical-aoa", value)))
     _critical_aoa = 0;
     else
       _critical_aoa = (short) value;
 
-  if(failed(application_t::instance->hal()->get_config_value(section, "approach-aoa", value)))
+  if(failed(application_t::hal->get_config_value(section, "approach-aoa", value)))
     _approach_aoa = 0;
   else
     _approach_aoa = (short) value;
 
-  if(failed(application_t::instance->hal()->get_config_value(section, "climb-aoa", value)))
+  if(failed(application_t::hal->get_config_value(section, "climb-aoa", value)))
       _climb_aoa = 0;
     else
       _climb_aoa = (short) value;
 
-  if(failed(application_t::instance->hal()->get_config_value(section, "cruise-aoa", value)))
+  if(failed(application_t::hal->get_config_value(section, "cruise-aoa", value)))
       _cruise_aoa = 0;
     else
       _cruise_aoa = (short) value;
 
-  if(failed(application_t::instance->hal()->get_config_value(section, "yaw-max", value)))
+  if(failed(application_t::hal->get_config_value(section, "yaw-max", value)))
       _yaw_max = 45;
     else
       _yaw_max = (short) value;
 
-  if(failed(application_t::instance->hal()->get_config_value(section, "show-aoa", value)))
+  if(failed(application_t::hal->get_config_value(section, "show-aoa", value)))
       _show_aoa = false;
     else
       _show_aoa = value != 0;
 
-  if(failed(application_t::instance->hal()->get_config_value(section, "show-glideslope", value)))
+  if(failed(application_t::hal->get_config_value(section, "show-glideslope", value)))
       _show_glideslope = false;
     else
       _show_glideslope = value != 0;
@@ -298,12 +290,9 @@ void kotuku::attitude_window_t::update_window()
 	gdi_dim_t line = 0;
 
 	// we draw on the background DC so we can rotate blt it later
-	_temp_canvas.pen(&white_pen);
-	_temp_canvas.background_color(color_black);
-	_temp_canvas.text_color(color_white);
-
-	// fill with black
-	_temp_canvas.fill_rect(rect_t(0, 0, window_x, window_y), color_black);
+	_image_canvas.pen(&white_pen);
+	_image_canvas.background_color(color_hollow);
+	_image_canvas.text_color(color_white);
 
 	// now we draw the pitch line(s)
 	if(pitch_angle % 25)
@@ -331,7 +320,7 @@ void kotuku::attitude_window_t::update_window()
 			rotate_point(median, pts[0], _roll);
 			rotate_point(median, pts[1], _roll);
 
-			_temp_canvas.polyline(pts, 2);
+			_image_canvas.polyline(pts, 2);
 
 			// we have a bitmap which is the text to draw.  We then select the bitmap
 			// from the text angle and the rotation angle.
@@ -355,9 +344,9 @@ void kotuku::attitude_window_t::update_window()
 				pt_left.x -= 9; pt_left.y -= 9;
 				pt_right.x -= 9; pt_right.y -= 9;
 
-				_temp_canvas.font(attitude_window_fonts[_roll_degrees < 0 ? _roll_degrees + 360 : _roll_degrees]);
-				_temp_canvas.draw_text(text_angle, 1, pt_left);
-				_temp_canvas.draw_text(text_angle, 1, pt_right);
+				_image_canvas.font(attitude_window_fonts[_roll_degrees < 0 ? _roll_degrees + 360 : _roll_degrees]);
+				_image_canvas.draw_text(text_angle, 1, pt_left);
+				_image_canvas.draw_text(text_angle, 1, pt_right);
 				}
 			pitch_angle -= 25;
 			line += 20;
@@ -373,7 +362,7 @@ void kotuku::attitude_window_t::update_window()
 			rotate_point(median, pts[0], _roll);
 			rotate_point(median, pts[1], _roll);
 
-			_temp_canvas.polyline(pts, 2);
+			_image_canvas.polyline(pts, 2);
 
 			pitch_angle -= 25;
 			line += 20;
@@ -389,18 +378,12 @@ void kotuku::attitude_window_t::update_window()
 			rotate_point(median, pts[0], _roll);
 			rotate_point(median, pts[1], _roll);
 
-			_temp_canvas.polyline(pts, 2);
+			_image_canvas.polyline(pts, 2);
 
 			pitch_angle -= 25;
 			line += 20;
 			}
 		}
-
-	// mask the image before the transfer
-	_temp_canvas.bit_blt(rect_t(0, 0, window_x, window_y),
-														 _mask_canvas, point_t(0, 0));
-	_image_canvas.bit_blt(rect_t(border, border, window_x - border, window_y - border),
-												_temp_canvas, point_t(border, border));
 
   /////////////////////////////////////////////////////////////////////////////
   // Draw the angle-of-attack indicator
@@ -596,29 +579,6 @@ void kotuku::attitude_window_t::update_window()
   _image_canvas.background_color(color_white);
 
 	_image_canvas.polygon(roll_points_base, 5);
-
-	/////////////////////////////////////////////////////////////////////////////
-	// finally we fill the corners of the indicator with black
-	// radii.
-	_temp_canvas.fill_rect(rect_t(0, 0, 20, 20), color_black);
-	_temp_canvas.fill_rect(rect_t(0, 220, 20, 240), color_black);
-	_temp_canvas.fill_rect(rect_t(220, 0, 240, 20), color_black);
-	_temp_canvas.fill_rect(rect_t(220, 220, 240, 240), color_black);
-
-	_temp_canvas.pen(&white_pen);
-	_temp_canvas.background_color(color_white);
-
-	_temp_canvas.ellipse(rect_t(0, 0, 20, 20));
-	_temp_canvas.ellipse(rect_t(0, 200, 20, 240));
-	_temp_canvas.ellipse(rect_t(220, 0, 240, 20));
-	_temp_canvas.ellipse(rect_t(220, 220, 240, 240));
-
-	_temp_canvas.fill_rect(rect_t(0, 10, 20, 230), color_white);
-	_temp_canvas.fill_rect(rect_t(10, 0, 230, 240), color_white);
-	_temp_canvas.fill_rect(rect_t(230, 10, 240, 230), color_white);
-
-	_image_canvas.bit_blt(rect_t(0, 0, 240, 240), _temp_canvas, 
-												point_t(0, 0));
 
   rect_t rect(point_t(0, 0), window_rect().extents());
   bit_blt(rect, _image_canvas, rect.top_left());

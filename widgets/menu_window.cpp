@@ -176,22 +176,22 @@ void kotuku::menu_window_t::init(const char *section)
   _popup_menu_index = 0;
 
   int value;
-  if(failed(application_t::instance->hal()->get_config_value(section, "menu-rect-x", value)))
+  if(failed(application_t::hal->get_config_value(section, "menu-rect-x", value)))
     _menu_rect_x = 88;
   else
     _menu_rect_x = value;
 
-  if(failed(application_t::instance->hal()->get_config_value(section, "menu-rect-y", value)))
+  if(failed(application_t::hal->get_config_value(section, "menu-rect-y", value)))
     _menu_rect_y = 32;
   else
     _menu_rect_y = value;
 
-  if(failed(application_t::instance->hal()->get_config_value(section, "menu-start-x", value)))
+  if(failed(application_t::hal->get_config_value(section, "menu-start-x", value)))
     _menu_start_x = 0;
   else
     _menu_start_x = value;
 
-  if(failed(application_t::instance->hal()->get_config_value(section, "menu-start-y", value)))
+  if(failed(application_t::hal->get_config_value(section, "menu-start-y", value)))
     _menu_start_y = window_rect().height() - _menu_rect_y;
   else
     _menu_start_y = value;
@@ -572,7 +572,7 @@ void kotuku::menu_window_t::load_menus()
   {
   // we get the root menu
   std::string menu_name;
-  if(failed(application_t::instance->hal()->get_config_value(_section.c_str(), "root-menu", menu_name)))
+  if(failed(application_t::hal->get_config_value(_section.c_str(), "root-menu", menu_name)))
     menu_name = "root-menu";
 
   // set the root menu
@@ -697,31 +697,31 @@ kotuku::root_menu_t::root_menu_t(menu_window_t *parent, const std::string &name)
   std::string value;
   std::string expr;
 
-  if(succeeded(application_t::instance->hal()->get_config_value(name.c_str(), "key0", value)))
+  if(succeeded(application_t::hal->get_config_value(name.c_str(), "key0", value)))
     _key0 = parse_item(parent, value);
 
-  if(succeeded(application_t::instance->hal()->get_config_value(name.c_str(), "key1", value)))
+  if(succeeded(application_t::hal->get_config_value(name.c_str(), "key1", value)))
     _key1 = parse_item(parent, value);
 
-  if(succeeded(application_t::instance->hal()->get_config_value(name.c_str(), "key2", value)))
+  if(succeeded(application_t::hal->get_config_value(name.c_str(), "key2", value)))
     _key2 = parse_item(parent, value);
 
-  if(succeeded(application_t::instance->hal()->get_config_value(name.c_str(), "key3", value)))
+  if(succeeded(application_t::hal->get_config_value(name.c_str(), "key3", value)))
     _key3 = parse_item(parent, value);
 
-  if(succeeded(application_t::instance->hal()->get_config_value(name.c_str(), "key4", value)))
+  if(succeeded(application_t::hal->get_config_value(name.c_str(), "key4", value)))
     _key4 = parse_item(parent, value);
 
-  if(succeeded(application_t::instance->hal()->get_config_value(name.c_str(), "decka-up", value)))
+  if(succeeded(application_t::hal->get_config_value(name.c_str(), "decka-up", value)))
     _decka_up = parse_item(parent, value);
 
-  if(succeeded(application_t::instance->hal()->get_config_value(name.c_str(), "decka-dn", value)))
+  if(succeeded(application_t::hal->get_config_value(name.c_str(), "decka-dn", value)))
     _decka_dn = parse_item(parent, value);
 
-  if(succeeded(application_t::instance->hal()->get_config_value(name.c_str(), "deckb-up", value)))
+  if(succeeded(application_t::hal->get_config_value(name.c_str(), "deckb-up", value)))
     _deckb_up = parse_item(parent, value);
 
-  if(succeeded(application_t::instance->hal()->get_config_value(name.c_str(), "deckb-dn", value)))
+  if(succeeded(application_t::hal->get_config_value(name.c_str(), "deckb-dn", value)))
     _deckb_dn = parse_item(parent, value);
   }
 
@@ -777,7 +777,7 @@ kotuku::popup_menu_t::popup_menu_t(menu_window_t *parent, const std::string &nam
   for(int i = 0; i < 128; i++)
     {
     sprintf(buffer, "item%d", i);
-    if(succeeded(application_t::instance->hal()->get_config_value(name.c_str(), buffer, value)))
+    if(succeeded(application_t::hal->get_config_value(name.c_str(), buffer, value)))
       {
       menu_item_t *item =  parse_item(parent, value);
       if(item != 0)

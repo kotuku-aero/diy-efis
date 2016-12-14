@@ -50,13 +50,11 @@ namespace kotuku {
 
 class application_t : public canaerospace_provider_t {
 public:
-  application_t(hal_t *hal);
+  application_t();
 
   // the main program must define this
   static application_t *instance;
-
-  // initialize the application.
-  result_t initialize(const char *config);
+  static hal_t *hal;
 
   virtual ~application_t();
 
@@ -72,11 +70,8 @@ public:
   * @return Window that is used as the drawing surface
   */
   layout_window_t *root_window() { return _root_window; }
-
-  hal_t *hal() { return _hal; }
 private:
   uint8_t _node_id;
-  hal_t *_hal;
   canaerospace_provider_t *_provider;
   layout_window_t *_root_window;
   };

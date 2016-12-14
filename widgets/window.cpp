@@ -281,13 +281,13 @@ kotuku::rect_t kotuku::window_t::get_window_rect(const char *section_name)
   {
   rect_t result;
   int value;
-  application_t::instance->hal()->get_config_value(section_name, "origin-x", value);
+  application_t::hal->get_config_value(section_name, "origin-x", value);
   result.left = value;
-  application_t::instance->hal()->get_config_value(section_name, "origin-y", value);
+  application_t::hal->get_config_value(section_name, "origin-y", value);
   result.top = value;
-  application_t::instance->hal()->get_config_value(section_name, "extent-x", value);
+  application_t::hal->get_config_value(section_name, "extent-x", value);
   result.right = result.left + value;
-  application_t::instance->hal()->get_config_value(section_name, "extent-y", value);
+  application_t::hal->get_config_value(section_name, "extent-y", value);
   result.bottom = result.top + value;
 
   return result;

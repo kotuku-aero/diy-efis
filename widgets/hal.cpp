@@ -244,12 +244,12 @@ void kotuku::hal_t::gmtime(kotuku::hal_t::time_base_t when,
 
 long interlocked_decrement(volatile long &value)
   {
-  return kotuku::application_t::instance->hal()->interlocked_decrement(value);
+  return kotuku::application_t::hal->interlocked_decrement(value);
   }
 
 long interlocked_increment(volatile long &value)
   {
-  return kotuku::application_t::instance->hal()->interlocked_increment(value);
+  return kotuku::application_t::hal->interlocked_increment(value);
   }
 
 result_t kotuku::hal_t::initialize(const char *ini_file)

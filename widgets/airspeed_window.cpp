@@ -44,14 +44,14 @@ kotuku::airspeed_window_t::airspeed_window_t(widget_t &parent, const char *secti
   _airspeed(0)
   {
 
-  application_t::instance->hal()->get_config_value(section_name, "vs0", _vs0);
-  application_t::instance->hal()->get_config_value(section_name, "vs1", _vs1);
-  application_t::instance->hal()->get_config_value(section_name, "vfe", _vfe);
-  application_t::instance->hal()->get_config_value(section_name, "vno", _vno);
-  application_t::instance->hal()->get_config_value(section_name, "vne", _vne);
-  application_t::instance->hal()->get_config_value(section_name, "va", _va);
-  application_t::instance->hal()->get_config_value(section_name, "vx", _vx);
-  application_t::instance->hal()->get_config_value(section_name, "vy", _vy);
+  application_t::hal->get_config_value(section_name, "vs0", _vs0);
+  application_t::hal->get_config_value(section_name, "vs1", _vs1);
+  application_t::hal->get_config_value(section_name, "vfe", _vfe);
+  application_t::hal->get_config_value(section_name, "vno", _vno);
+  application_t::hal->get_config_value(section_name, "vne", _vne);
+  application_t::hal->get_config_value(section_name, "va", _va);
+  application_t::hal->get_config_value(section_name, "vx", _vx);
+  application_t::hal->get_config_value(section_name, "vy", _vy);
 
   _background_canvas.clipping_rectangle(_background_canvas.window_rect());
   _background_canvas.fill_rect(rect_t(0, 0, 80, 8), color_black);

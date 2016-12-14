@@ -86,10 +86,6 @@ int ini_parse(const char* ini_file,
         i++;
       }
 
-    // skip to end of line or file
-    while(*ini_file != '\n' && *ini_file != 0)
-      ini_file++;
-
     // skip end of line marker
     if(*ini_file == '\n')
       ini_file++;

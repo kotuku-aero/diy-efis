@@ -109,7 +109,7 @@ kotuku::canaerospace_provider_t::canaerospace_provider_t()
   : _publishing_enabled(false),
     thread_t(4096, this, do_run)
   {
-  application_t::instance->hal()->set_can_provider(this);
+  application_t::hal->set_can_provider(this);
   }
 
 bool kotuku::canaerospace_provider_t::publishing_enabled(bool is_it)
@@ -235,7 +235,7 @@ uint32_t kotuku::canaerospace_provider_t::run()
         }
 
       if(do_publish)
-        application_t::instance->hal()->publish(msg);
+        application_t::hal->publish(msg);
       }
     }
 
@@ -270,7 +270,7 @@ static kotuku::canaerospace_provider_t *provider = 0;
 static uint8_t node_id()
   {
   if(provider == 0)
-    kotuku::application_t::instance->hal()->get_can_provider(&provider);
+    kotuku::application_t::hal->get_can_provider(&provider);
 
   if(provider == 0)
     return 0;

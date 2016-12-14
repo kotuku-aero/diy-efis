@@ -49,7 +49,7 @@ void __assert(const char *file, int line, bool check)
                  "You may continue after this assertion by pressing the OK button\n"
                  "Press Cancel to abort", file, line);
     trace_emergency(msg);
-    kotuku::application_t::instance->hal()->assert_failed();
+    kotuku::application_t::hal->assert_failed();
     }
   }
 
@@ -59,36 +59,36 @@ void __trace(int level, const char *fmt_msg, va_list va)
 
   vsprintf(msg, fmt_msg, va);
 
-  kotuku::application_t::instance->hal()->debug_output(level, msg);
+  kotuku::application_t::hal->debug_output(level, msg);
   }
 
 result_t __is_bad_read_pointer(const void *ptr, size_t size)
   {
-  return kotuku::application_t::instance->hal()->is_bad_read_pointer(ptr, size);
+  return kotuku::application_t::hal->is_bad_read_pointer(ptr, size);
   }
 
 result_t __is_bad_write_pointer(void *ptr, size_t size)
   {
-  return kotuku::application_t::instance->hal()->is_bad_write_pointer(ptr, size);
+  return kotuku::application_t::hal->is_bad_write_pointer(ptr, size);
   }
 
 result_t get_last_error()
   {
-  return kotuku::application_t::instance->hal()->get_last_error();
+  return kotuku::application_t::hal->get_last_error();
   }
 
 result_t set_last_error(result_t r)
   {
-  kotuku::application_t::instance->hal()->set_last_error(r);
+  kotuku::application_t::hal->set_last_error(r);
   return r;
   }
 
 long __interlocked_increment(volatile long &l)
   {
-  return kotuku::application_t::instance->hal()->interlocked_increment(l);
+  return kotuku::application_t::hal->interlocked_increment(l);
   }
 
 long __interlocked_decrement(volatile long &l)
   {
-  return kotuku::application_t::instance->hal()->interlocked_decrement(l);
+  return kotuku::application_t::hal->interlocked_decrement(l);
   }

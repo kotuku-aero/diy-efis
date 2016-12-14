@@ -86,10 +86,10 @@ kotuku::gauge_window_t::gauge_window_t(widget_t &parent, const char *section)
   char temp_name[32];
   int value;
 
-  if(failed(application_t::instance->hal()->get_config_value(section, "scale", _scale)))
+  if(failed(application_t::hal->get_config_value(section, "scale", _scale)))
     _scale = 1.0;
 
-  if(failed(application_t::instance->hal()->get_config_value(section, "offset", _offset)))
+  if(failed(application_t::hal->get_config_value(section, "offset", _offset)))
     _offset = 0.0;
 
   value = lookup_enum_setting(section, "style", gauge_style_values,
@@ -99,32 +99,32 @@ kotuku::gauge_window_t::gauge_window_t(widget_t &parent, const char *section)
   else
     _style = gs_pointer;
 
-  if(failed(application_t::instance->hal()->get_config_value(section, "reset-id", value)))
+  if(failed(application_t::hal->get_config_value(section, "reset-id", value)))
     value = 0;
 
   _reset_label = value;
 
-  if(failed(application_t::instance->hal()->get_config_value(section, "reset-value", _reset_value)))
+  if(failed(application_t::hal->get_config_value(section, "reset-value", _reset_value)))
     _reset_value = 0.0;
 
   _font = lookup_font(section, "font");
   if(_font == 0)
     _font = &arial_9_font;
 
-  if(failed(application_t::instance->hal()->get_config_value(section, "arc-begin", _arc_begin)))
+  if(failed(application_t::hal->get_config_value(section, "arc-begin", _arc_begin)))
     _arc_begin = 120;
 
-  if(failed(application_t::instance->hal()->get_config_value(section, "arc-range", _arc_range)))
+  if(failed(application_t::hal->get_config_value(section, "arc-range", _arc_range)))
     _arc_range = 270;
 
-  if(failed(application_t::instance->hal()->get_config_value(section, "can-id", value)))
+  if(failed(application_t::hal->get_config_value(section, "can-id", value)))
     {
     // could be can value 0..3
     for(int id = 0; id < 4; id++)
       {
       snprintf(temp_name, 32, "can-id-%d", id);
 
-      if(failed(application_t::instance->hal()->get_config_value(section, temp_name, value)))
+      if(failed(application_t::hal->get_config_value(section, temp_name, value)))
         break;
 
       _labels.push_back((uint16_t) value);
@@ -141,17 +141,17 @@ kotuku::gauge_window_t::gauge_window_t(widget_t &parent, const char *section)
     _max_values.push_back(_reset_value);
     }
 
-  if(failed(application_t::instance->hal()->get_config_value(section, "center-x", value)))
+  if(failed(application_t::hal->get_config_value(section, "center-x", value)))
     _center.x = window_rect().width() >> 1;
   else
     _center.x = (gdi_dim_t)value;
 
-  if(failed(application_t::instance->hal()->get_config_value(section, "center-y", value)))
+  if(failed(application_t::hal->get_config_value(section, "center-y", value)))
     _center.y = window_rect().height() >> 1;
   else
     _center.y = (gdi_dim_t)value;
 
-  if(failed(application_t::instance->hal()->get_config_value(section, "radii", value)))
+  if(failed(application_t::hal->get_config_value(section, "radii", value)))
     value = (window_rect().width() >> 1) - 5;
 
   _gauge_radii = (gdi_dim_t)value;
@@ -163,7 +163,7 @@ kotuku::gauge_window_t::gauge_window_t(widget_t &parent, const char *section)
     {
     snprintf(temp_name, 32, "step-%d", i);
 
-    if(failed(application_t::instance->hal()->get_config_value(section, temp_name, value_str)))
+    if(failed(application_t::hal->get_config_value(section, temp_name, value_str)))
       break;
 
     // the step is a series of settings in the form:
@@ -202,7 +202,7 @@ kotuku::gauge_window_t::gauge_window_t(widget_t &parent, const char *section)
     {
     snprintf(temp_name, 32, "tick-%d", i);
 
-    if(failed(application_t::instance->hal()->get_config_value(section, temp_name, value_str)))
+    if(failed(application_t::hal->get_config_value(section, temp_name, value_str)))
       break;
 
     // the step is a series of settings in the form:
@@ -232,7 +232,7 @@ kotuku::gauge_window_t::gauge_window_t(widget_t &parent, const char *section)
     }
 
   std::string color;
-  if(failed(application_t::instance->hal()->get_config_value(section, "background-color", color)))
+  if(failed(application_t::hal->get_config_value(section, "background-color", color)))
     _background_color = color_black;
   else
     _background_color = lookup_color(color.c_str());

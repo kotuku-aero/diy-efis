@@ -481,8 +481,8 @@ kotuku::screen_t *kotuku::win32_hal_t::screen_create(const rect_t &r)
   {
   // create a child window
 
-  HWND hwnd = CreateWindowExW(0, child_window_class, screen_name, WS_VISIBLE | WS_POPUP | WS_CAPTION,
-    r.left, r.top, r.width(), r.height() + GetSystemMetrics(SM_CYCAPTION) + (GetSystemMetrics(SM_CYBORDER) << 1),
+  HWND hwnd = CreateWindowExW(0, child_window_class, screen_name, WS_CHILD | WS_VISIBLE,
+    r.left, r.top, r.width(), r.height(),
     _screen->handle(), NULL, NULL, NULL);
 
   return new windows_screen_t(hwnd, r.width(), r.height(), 32);

@@ -39,7 +39,7 @@ it must be removed as soon as possible after the code fragment is identified.
 
 kotuku::date_time_t::date_time_t()
   {
-  _t = application_t::instance->hal()->now();
+  _t = application_t::hal->now();
   }
 
 kotuku::date_time_t::date_time_t(uint16_t year,
@@ -51,7 +51,7 @@ kotuku::date_time_t::date_time_t(uint16_t year,
                        uint16_t milliseconds,
                        uint32_t nanoseconds)
   {
-  _t = application_t::instance->hal()->mktime(year, month, day, hour, minute, second, milliseconds, nanoseconds);
+  _t = application_t::hal->mktime(year, month, day, hour, minute, second, milliseconds, nanoseconds);
   }
 
 uint16_t kotuku::date_time_t::day_of_year() const
@@ -106,6 +106,6 @@ void kotuku::date_time_t::gmtime(uint16_t *year,
   if(month != 0)
     *month = (month_type)0;
 
-  application_t::instance->hal()->gmtime(_t, year, reinterpret_cast<uint8_t *>(month), day, hour, minute, second, milliseconds, nanoseconds);
+  application_t::hal->gmtime(_t, year, reinterpret_cast<uint8_t *>(month), day, hour, minute, second, milliseconds, nanoseconds);
   }
 

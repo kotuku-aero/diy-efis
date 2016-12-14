@@ -37,34 +37,23 @@ it must be removed as soon as possible after the code fragment is identified.
 #include "hal.h"
 #include "fonts.h"
 
-kotuku::application_t::application_t(hal_t *the_hal)
-: _hal(the_hal)
+kotuku::application_t::application_t()
   {
-  the_hal->set_can_provider(this);
+  int node_id = 1;
+
+  if(succeeded(hal->get_config_value("diy-efis", "node-id", node_id)))
+    _node_id = (uint8_t)node_id;
+
+  hal->set_can_provider(this);
   }
 
 kotuku::application_t::~application_t()
   {
-
-  }
-
-result_t kotuku::application_t::initialize(const char *ini_file)
-  {
-  result_t result;
-  if(failed(result = _hal->initialize(ini_file)))
-    return result;
-
-  int node_id = 1;
-
-  if(succeeded(_hal->get_config_value("diy-efis", "node-id", node_id)))
-    _node_id = (uint8_t)node_id;
-
-  return s_ok;
   }
 // can driver functions
 result_t kotuku::application_t::publish(const can_msg_t &msg)
   {
-  return _hal->publish(msg);
+  return hal->publish(msg);
   }
 
 

@@ -64,7 +64,7 @@ kotuku::canvas_t::canvas_t(screen_t *screen,
 
 kotuku::canvas_t::canvas_t(const rect_t &rect)
   {
-  _screen = application_t::instance->hal()->screen_create(rect);
+  _screen = application_t::hal->screen_create(rect);
   _window_rect = rect_t(point_t(0, 0), rect.extents());
   _clipping_rect = _window_rect;
   _pen = &white_pen;
@@ -76,7 +76,7 @@ kotuku::canvas_t::canvas_t(const rect_t &rect)
 
 kotuku::canvas_t::canvas_t(const extent_t &e)
   {
-  _screen = application_t::instance->hal()->screen_create(e);
+  _screen = application_t::hal->screen_create(e);
   _window_rect = rect_t(point_t(0, 0), e);
   _clipping_rect = _window_rect;
   _pen = &white_pen;
@@ -88,7 +88,7 @@ kotuku::canvas_t::canvas_t(const extent_t &e)
 
 kotuku::canvas_t::canvas_t(const bitmap_t &b)
   {
-  _screen = application_t::instance->hal()->screen_create(b);
+  _screen = application_t::hal->screen_create(b);
   _window_rect = rect_t(point_t(0, 0), extent_t(long(b.bitmap_width), long(b.bitmap_height)));
   _clipping_rect = _window_rect;
   _pen = &white_pen;

@@ -11,40 +11,51 @@
 
 #include "win32_hal.h"
 
-#include <windows.h>
+#include <stdio.h>
 
 kotuku::application_t *kotuku::application_t::instance;
-
+kotuku::hal_t *kotuku::application_t::hal;
 
 static kotuku::watchdog_t *watchdog;
-#ifdef _WIN32_WCE
-int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow )
-#else
+
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
-#endif
   {
   const char *config = 0;
-  if(lpCmdLine != NULL)
+  if(lpCmdLine != NULL && strlen(lpCmdLine) > 0)
     config = (char *)lpCmdLine;
   else
     config = "..\\..\\configs\\efis.ini";
 
-  FILE *fd = fopen(config, "r");
+  FILE *fd = 0;
+  
+  errno_t err = fopen_s(&fd, config, "r");
+  if(err != 0)
+    {
+    printf("Error cannot open config file : %d", err);
+    return -1;
+    }
 
+  fseek(fd, 0, SEEK_END);
   long len = ftell(fd);
+  fseek(fd, 0, SEEK_SET);
+
   char *buffer = new char[len + 1];
   size_t chars = fread(buffer, 1, len, fd);
   buffer[chars] = 0;
 
-  kotuku::application_t::instance = new kotuku::application_t(new kotuku::win32_hal_t());
+  fclose(fd);
+  kotuku::application_t::hal = new kotuku::win32_hal_t();
+  kotuku::application_t::hal->initialize(buffer);
 
-  kotuku::application_t::instance->initialize(buffer);
+  delete buffer;
 
-  watchdog = new kotuku::watchdog_t(kotuku::application_t::instance->hal()->root_window(), kotuku::application_t::instance);
+  kotuku::application_t::instance = new kotuku::application_t();
+
+  watchdog = new kotuku::watchdog_t(kotuku::application_t::hal->root_window(), kotuku::application_t::instance);
 
   // turn on all events
   kotuku::application_t::instance->publishing_enabled(true);
-  kotuku::application_t::instance->hal()->root_window()->paint(true);
+  kotuku::application_t::hal->root_window()->paint(true);
   int metric;
 
   SetTimer(NULL, NULL, 200, NULL);
@@ -58,7 +69,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
       case WM_TIMER :
         kotuku::gdi_screen_t::gdi_metric(0);
 
-        kotuku::application_t::instance->hal()->root_window()->paint(false);
+        kotuku::application_t::hal->root_window()->paint(false);
 
         metric = kotuku::gdi_screen_t::gdi_metric();
         break;

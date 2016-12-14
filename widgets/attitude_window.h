@@ -58,9 +58,7 @@ public:
 private:
   virtual bool ev_msg(const msg_t &);
   canvas_t _image_canvas;
-  canvas_t _mask_canvas;
 
-  void update_background(canvas_t &background_canvas);
   void update_window();
 
   double _pitch;
@@ -87,8 +85,6 @@ private:
   short _yaw_max;
   bool _show_aoa;
   bool _show_glideslope;
-
-  canvas_t _temp_canvas;
   };
 
 inline short attitude_window_t::critical_aoa() const

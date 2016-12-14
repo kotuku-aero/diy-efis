@@ -81,7 +81,6 @@
     <ClInclude Include="..\..\widgets\color.h" />
     <ClInclude Include="..\..\widgets\colors.h" />
     <ClInclude Include="..\..\widgets\device.h" />
-    <ClInclude Include="..\..\widgets\errors.h" />
     <ClInclude Include="..\..\widgets\extent.h" />
     <ClInclude Include="..\..\widgets\font.h" />
     <ClInclude Include="..\..\widgets\fonts.h" />
