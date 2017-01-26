@@ -104,11 +104,6 @@ typedef enum
   CANAS_DATATYPE_ALL_END_    = 255
   } canaerospace_data_type;
   
-#define REPLY_MSG           0x80
-#define EXTENDED_ADDRESS    0x40
-#define LOOPBACK_MESSAGE    0x20
-#define DLC_MASK            0x0F
-  
 typedef struct _canas_msg_t
   {
   uint8_t node_id;
@@ -120,14 +115,25 @@ typedef struct _canas_msg_t
 
 typedef struct
 {
-  uint16_t id;
-  uint8_t flags;
+  union {
+    union {
+      length : 3;
+      reply : 1;
+      loopback : 1;
+      id: 11;
+      };
+    uint16_t flags;
+    };
+  
   // following is 8 bytes
   union {
     canas_msg_t canas;
     uint8_t raw[8];
-    } msg;
+    };
 } can_msg_t;
+
+#define loopback_msg(id) (id | 0x0800)
+#define reply_msg(id) (id | 0x1000)
 
 // function to build a message.
 extern can_msg_t *create_can_msg_short(can_msg_t *, uint16_t message_id, uint8_t service_code, short data);

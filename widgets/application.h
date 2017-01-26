@@ -103,24 +103,4 @@ inline point_t center_of(const rect_t &r)
   }
   };
 
-// aliases for the serial adapter
-#define id_key0 (id_user_defined_start)
-#define id_key1 (id_user_defined_start + 1)
-#define id_key2 (id_user_defined_start + 2)
-#define id_key3 (id_user_defined_start + 3)
-#define id_key4 (id_user_defined_start + 4)
-#define id_decka (id_user_defined_start + 5)
-#define id_deckb (id_user_defined_start + 6)
-#define id_menu_up (id_user_defined_start + 7)
-#define id_menu_dn (id_user_defined_start + 8)
-#define id_menu_left (id_user_defined_start + 9)
-#define id_menu_right (id_user_defined_start + 10)
-#define id_menu_ok  (id_user_defined_start + 11)
-#define id_menu_cancel (id_user_defined_start + 12)
-#define id_menu_edit (id_user_defined_start + 13)
-#define id_menu_back (id_user_defined_start + 14)
-#define id_menu_select (id_user_defined_start + 15)
-#define id_timer (id_user_defined_start + 16)
-#define id_buttonpress (id_user_defined_start + 17)
-
 #endif
