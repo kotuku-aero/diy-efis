@@ -5484,17 +5484,31 @@ Standard DB9 (D-Sub 9) serial connector. Can be used for CAN bus as well as RS48
 <part name="P+9" library="SparkFun" deviceset="3.3V" device=""/>
 <part name="SUPPLY8" library="supply2" deviceset="GND" device=""/>
 <part name="SUPPLY11" library="supply2" deviceset="GND" device=""/>
-<part name="U$2" library="con-hirose-df13" deviceset="DF13-8P-1.25" device="H"/>
+<part name="U$2" library="con-hirose-df13" deviceset="DF13-8P-1.25" device="H">
+<attribute name="PARTNO" value="DF13-8P-1.25H(50)"/>
+</part>
 <part name="SUPPLY14" library="supply2" deviceset="GND" device=""/>
-<part name="C10" library="SparkFun" deviceset="CAP_POL" device="7343" value="220mf"/>
-<part name="C9" library="SparkFun" deviceset="CAP_POL" device="7343" value="220mf 50v"/>
+<part name="C10" library="SparkFun" deviceset="CAP_POL" device="7343" value="220mf">
+<attribute name="PARTNO" value="T545X227M016ATE035"/>
+</part>
+<part name="C9" library="SparkFun" deviceset="CAP_POL" device="7343" value="220mf 50v">
+<attribute name="PARTNO" value="T545X227M016ATE035"/>
+</part>
 <part name="SUPPLY18" library="supply2" deviceset="GND" device=""/>
 <part name="SUPPLY21" library="supply2" deviceset="GND" device=""/>
-<part name="L2" library="SparkFun" deviceset="INDUCTOR" device="" value="33uh"/>
-<part name="D2" library="diode2" deviceset="DIODE-SCHOTTKY-" device="SMA" value="B140-13-F"/>
-<part name="U2" library="NSC_By_element14_Batch_1.1" deviceset="LM2592HVS-5.0" device=""/>
+<part name="L2" library="SparkFun" deviceset="INDUCTOR" device="" value="33uh">
+<attribute name="PARTNO" value="B78108S1333K"/>
+</part>
+<part name="D2" library="diode2" deviceset="DIODE-SCHOTTKY-" device="SMA" value="B140-13-F">
+<attribute name="PARTNO" value="B140-13-F"/>
+</part>
+<part name="U2" library="NSC_By_element14_Batch_1.1" deviceset="LM2592HVS-5.0" device="">
+<attribute name="PARTNO" value="LM2592HVSX-5.0/NOPB"/>
+</part>
 <part name="SUPPLY12" library="SparkFun-Aesthetics" deviceset="5V" device=""/>
-<part name="JP1" library="15pinD" deviceset="DB9" device="MALE"/>
+<part name="JP1" library="15pinD" deviceset="DB9" device="MALE">
+<attribute name="PARTNO" value="5747840-3"/>
+</part>
 <part name="M1" library="tdk" deviceset="MOUNT-HOLE" device="2.8"/>
 <part name="M2" library="tdk" deviceset="MOUNT-HOLE" device="2.8"/>
 <part name="M3" library="tdk" deviceset="MOUNT-HOLE" device="2.8"/>
@@ -5666,23 +5680,34 @@ Standard DB9 (D-Sub 9) serial connector. Can be used for CAN bus as well as RS48
 <instance part="U$2" gate="G$1" x="50.8" y="193.04" smashed="yes" rot="R90">
 <attribute name="NAME" x="40.64" y="191.135" size="1.778" layer="95" rot="R90"/>
 <attribute name="VALUE" x="43.815" y="196.5325" size="1.778" layer="96"/>
+<attribute name="PARTNO" x="50.8" y="193.04" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="SUPPLY14" gate="GND" x="254" y="147.32"/>
-<instance part="C10" gate="G$1" x="233.68" y="190.5"/>
-<instance part="C9" gate="G$1" x="149.86" y="203.2"/>
+<instance part="C10" gate="G$1" x="233.68" y="190.5">
+<attribute name="PARTNO" x="233.68" y="190.5" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="C9" gate="G$1" x="149.86" y="203.2">
+<attribute name="PARTNO" x="149.86" y="203.2" size="1.778" layer="96" display="off"/>
+</instance>
 <instance part="SUPPLY18" gate="GND" x="160.02" y="182.88" rot="MR0"/>
 <instance part="SUPPLY21" gate="GND" x="233.68" y="182.88" rot="MR0"/>
 <instance part="L2" gate="G$1" x="223.52" y="195.58" smashed="yes" rot="R90">
 <attribute name="NAME" x="215.9" y="198.12" size="1.778" layer="95"/>
 <attribute name="VALUE" x="226.06" y="198.12" size="1.778" layer="96"/>
+<attribute name="PARTNO" x="223.52" y="195.58" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="D2" gate="G$1" x="210.82" y="190.5" smashed="yes" rot="R90">
 <attribute name="NAME" x="208.685" y="188.636" size="1.524" layer="95" rot="R90"/>
 <attribute name="VALUE" x="213.901" y="189.77" size="1.524" layer="96"/>
+<attribute name="PARTNO" x="210.82" y="190.5" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="U2" gate="A" x="185.42" y="198.12"/>
+<instance part="U2" gate="A" x="185.42" y="198.12">
+<attribute name="PARTNO" x="185.42" y="198.12" size="1.778" layer="96" display="off"/>
+</instance>
 <instance part="SUPPLY12" gate="G$1" x="233.68" y="210.82"/>
-<instance part="JP1" gate="G$1" x="264.16" y="162.56"/>
+<instance part="JP1" gate="G$1" x="264.16" y="162.56">
+<attribute name="PARTNO" x="264.16" y="162.56" size="1.778" layer="96" display="off"/>
+</instance>
 <instance part="M1" gate="G$1" x="193.04" y="60.96" smashed="yes">
 <attribute name="NAME" x="196.85" y="60.96" size="1.27" layer="95"/>
 </instance>

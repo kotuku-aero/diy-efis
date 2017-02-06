@@ -1215,20 +1215,26 @@ design rules under a new name.</description>
 <attribute name="OC_FARNELL" value="unknown" x="32.5" y="52.5" size="1.778" layer="27" display="off"/>
 <attribute name="OC_NEWARK" value="unknown" x="32.5" y="52.5" size="1.778" layer="27" display="off"/>
 </element>
-<element name="U$2" library="con-hirose-df13" package="DF13A-8P-1.25H" value="DF13-8P-1.25H" x="49.8475" y="5.3975" rot="R180"/>
+<element name="U$2" library="con-hirose-df13" package="DF13A-8P-1.25H" value="DF13-8P-1.25H" x="49.8475" y="5.3975" rot="R180">
+<attribute name="PARTNO" value="DF13-8P-1.25H(50)" x="49.8475" y="5.3975" size="1.778" layer="27" rot="R180" display="off"/>
+</element>
 <element name="C10" library="SparkFun" package="EIA7343" value="220mf" x="26.035" y="26.67" smashed="yes" rot="R180">
 <attribute name="NAME" x="27.305" y="25.4" size="0.4064" layer="25" rot="R180"/>
 <attribute name="VALUE" x="27.305" y="27.94" size="0.4064" layer="27" rot="R180"/>
+<attribute name="PARTNO" value="T545X227M016ATE035" x="26.035" y="26.67" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
 <element name="C9" library="SparkFun" package="EIA7343" value="220mf 50v" x="26.035" y="43.18" smashed="yes" rot="R180">
 <attribute name="NAME" x="27.305" y="41.91" size="0.4064" layer="25" rot="R180"/>
 <attribute name="VALUE" x="27.305" y="44.45" size="0.4064" layer="27" rot="R180"/>
+<attribute name="PARTNO" value="T545X227M016ATE035" x="26.035" y="43.18" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
 <element name="L2" library="SparkFun" package="1812" value="33uh" x="17.4625" y="38.735" smashed="yes" rot="R90">
 <attribute name="NAME" x="14.9225" y="36.83" size="1.27" layer="25" rot="R90"/>
+<attribute name="PARTNO" value="B78108S1333K" x="17.4625" y="38.735" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="D2" library="diode2" package="SMA" value="B140-13-F" x="17.4625" y="31.115" smashed="yes" rot="R270">
 <attribute name="NAME" x="19.3675" y="33.655" size="1.016" layer="25" ratio="18" rot="R270"/>
+<attribute name="PARTNO" value="B140-13-F" x="17.4625" y="31.115" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="U2" library="NSC_By_element14_Batch_1.1" package="TO170P1435X457-5N" value="LM2592HVS-5.0" x="32.0675" y="34.925" smashed="yes" rot="R270">
 <attribute name="OC_FARNELL" value="-" x="32.0675" y="34.925" size="1.778" layer="27" rot="R270" display="off"/>
@@ -1237,9 +1243,11 @@ design rules under a new name.</description>
 <attribute name="PACKAGE" value="TO-263-5" x="32.0675" y="34.925" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="OC_NEWARK" value="41K3791" x="32.0675" y="34.925" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="NAME" x="37.0967" y="39.4462" size="2.0828" layer="25" ratio="10" rot="SR270"/>
+<attribute name="PARTNO" value="LM2592HVSX-5.0/NOPB" x="32.0675" y="34.925" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="JP1" library="15pinD" package="DB9_MALE" value="" x="9.525" y="30.48" rot="R90">
 <attribute name="PROD_ID" value="CONN-09904" x="9.525" y="30.48" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="PARTNO" value="5747840-3" x="9.525" y="30.48" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="M1" library="tdk" package="2,8" value="MOUNT-HOLE2.8" x="3.5" y="3.5"/>
 <element name="M2" library="tdk" package="2,8" value="MOUNT-HOLE2.8" x="3.5" y="52.5"/>
