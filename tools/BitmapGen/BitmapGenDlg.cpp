@@ -252,7 +252,7 @@ void CBitmapGenDlg::OnOK()
 	dc.SelectObject(&bm);
 
 	// emit the header
-	data.WriteString("#include \"../gdi-lib/bitmap.h\"\n\n"
+	data.WriteString("#include \"photon.h\"\n\n"
 									 "static const color_t bitmap_bits[] = {\n");
 
 	CString str;
@@ -283,7 +283,7 @@ void CBitmapGenDlg::OnOK()
 
 	data.WriteString("\t};\n\n");
 
-	str.Format("const bitmap_t  %s_bitmap = { sizeof(bitmap_t ), 32, 0, %d, %d, bitmap_bits };\n",
+	str.Format("const bitmap_t  %s_bitmap = { sizeof(bitmap_t ), %d, %d, bitmap_bits };\n",
 						 fname, bmi.bmWidth, bmi.bmHeight);
 
 	data.WriteString(str);
