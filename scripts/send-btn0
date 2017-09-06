@@ -1,4 +1,0 @@
-#!/bin/bash
-hexdbl=$(canasend 1800 SHORT 1)
-cansend can0 $hexdbl
-

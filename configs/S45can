@@ -1,7 +1,0 @@
-#!/bin/sh
-setserial /dev/ttySAC2 baud_base 961200 divisor 15 spd_cust
-slcan_attach -o -s4 /dev/ttySAC2
-slcand -o -c -f -S38400 -s4 /dev/ttySAC2 can0
-sleep 1
-ifconfig can0 up
-
