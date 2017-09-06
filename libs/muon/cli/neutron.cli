@@ -1,0 +1,53 @@
+uint16 <STRING:name> <UINT16:value>
+int16 <STRING:name> <INT16:value>
+uint32 <STRING:name> <UINT32:value>
+int32 <STRING:name> <INT32:value>
+xyz <STRING:name> <XYZ:value>
+matrix <STRING:name> <MATRIX:value>
+string <STRING:name> <STRING:value>
+bool <STRING:name> <ENUM:booleans:value>
+float <STRING:name> <FLOAT:value>
+edit <STRING:name>
+cat <STRING:name>
+rm <STRING:name>
+mkdir <STRING:path>
+rmdir <STRING:path>
+cd <STRING:path>
+ls <STRING:path> { recursive }
+
+neutron
+#submode publisher
+	ls { <ENUM:can_ids:id> }
+	rm <ENUM:can_ids:id>
+  publish <ENUM:can_ids:id>
+	#submode publish
+		rate <UINT16:rate>
+		type <ENUM:publish_types:type>
+		sample <ENUM:sample_types:sample>
+		publish <BOOL:is_published>
+		loopback <BOOL:loopback>
+
+		filter <ENUM:filter_types:filter_type>
+		#submode filter
+			length <UINT16:value>
+			coeff <UINT16:index> <FLOAT:value>
+			gain <FLOAT:value>
+			exit
+		#endsubmode
+		
+		alarm <UINT16:alarm_id>
+		#submode alarm
+			type <ENUM:alarm_types:alarm_type>
+			period <UINT16:length>
+			max <FLOAT:max_value>
+			min <FLOAT:min_value>
+			reset <ENUM:can_ids:reset_id>
+			exit
+		#endsubmode
+		exit
+	#endsubmode
+	exit
+#endsubmode
+
+send_can <ENUM:can_ids:id> <ENUM:can_types:type> <UINT16:session> { <STRING:val1> { <STRING:val2> { <STRING:val3> { <STRING:val4> } } } }
+exit
