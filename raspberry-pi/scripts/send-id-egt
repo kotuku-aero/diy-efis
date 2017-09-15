@@ -1,0 +1,5 @@
+#!/bin/bash
+cht=$((273+$2))
+id=$((519+$1))
+hexdbl=$(canasend $id SHORT $cht)
+cansend can0 $hexdbl

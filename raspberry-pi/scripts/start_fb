@@ -1,0 +1,3 @@
+#!/bin/sh
+
+../fb_emulator/Release/fb_emulator /tmp/fb0 &

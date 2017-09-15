@@ -1,0 +1,3 @@
+#!/bin/bash
+hexdbl=$(canasend 302 FLOAT $1)
+cansend can0 $hexdbl
