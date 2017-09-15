@@ -1,0 +1,948 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="62">
+  <logicalFolder name="root" displayName="root" projectFiles="true">
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+      <itemPath>afangles.h</itemPath>
+      <itemPath>afblue.h</itemPath>
+      <itemPath>afcjk.h</itemPath>
+      <itemPath>afcover.h</itemPath>
+      <itemPath>afdummy.h</itemPath>
+      <itemPath>aferrors.h</itemPath>
+      <itemPath>afglobal.h</itemPath>
+      <itemPath>afhints.h</itemPath>
+      <itemPath>afindic.h</itemPath>
+      <itemPath>aflatin.h</itemPath>
+      <itemPath>aflatin2.h</itemPath>
+      <itemPath>afloader.h</itemPath>
+      <itemPath>afmodule.h</itemPath>
+      <itemPath>afmparse.h</itemPath>
+      <itemPath>afpic.h</itemPath>
+      <itemPath>afranges.h</itemPath>
+      <itemPath>afscript.h</itemPath>
+      <itemPath>afshaper.h</itemPath>
+      <itemPath>afstyles.h</itemPath>
+      <itemPath>aftypes.h</itemPath>
+      <itemPath>afwarp.h</itemPath>
+      <itemPath>afwrtsys.h</itemPath>
+      <itemPath>autohint.h</itemPath>
+      <itemPath>basepic.h</itemPath>
+      <itemPath>bdf.h</itemPath>
+      <itemPath>bdfdrivr.h</itemPath>
+      <itemPath>bdferror.h</itemPath>
+      <itemPath>cf2arrst.h</itemPath>
+      <itemPath>cf2blues.h</itemPath>
+      <itemPath>cf2error.h</itemPath>
+      <itemPath>cf2fixed.h</itemPath>
+      <itemPath>cf2font.h</itemPath>
+      <itemPath>cf2ft.h</itemPath>
+      <itemPath>cf2glue.h</itemPath>
+      <itemPath>cf2hints.h</itemPath>
+      <itemPath>cf2intrp.h</itemPath>
+      <itemPath>cf2read.h</itemPath>
+      <itemPath>cf2stack.h</itemPath>
+      <itemPath>cf2types.h</itemPath>
+      <itemPath>cffcmap.h</itemPath>
+      <itemPath>cffdrivr.h</itemPath>
+      <itemPath>cfferrs.h</itemPath>
+      <itemPath>cffgload.h</itemPath>
+      <itemPath>cffload.h</itemPath>
+      <itemPath>cffobjs.h</itemPath>
+      <itemPath>cffparse.h</itemPath>
+      <itemPath>cffpic.h</itemPath>
+      <itemPath>cfftoken.h</itemPath>
+      <itemPath>cfftypes.h</itemPath>
+      <itemPath>ciderrs.h</itemPath>
+      <itemPath>cidgload.h</itemPath>
+      <itemPath>cidload.h</itemPath>
+      <itemPath>cidobjs.h</itemPath>
+      <itemPath>cidparse.h</itemPath>
+      <itemPath>cidriver.h</itemPath>
+      <itemPath>cidtoken.h</itemPath>
+      <itemPath>fnterrs.h</itemPath>
+      <itemPath>freetype.h</itemPath>
+      <itemPath>ft2build.h</itemPath>
+      <itemPath>ftadvanc.h</itemPath>
+      <itemPath>ftautoh.h</itemPath>
+      <itemPath>ftbase.h</itemPath>
+      <itemPath>ftbbox.h</itemPath>
+      <itemPath>ftbdf.h</itemPath>
+      <itemPath>ftbitmap.h</itemPath>
+      <itemPath>ftbzip2.h</itemPath>
+      <itemPath>ftcache.h</itemPath>
+      <itemPath>ftcalc.h</itemPath>
+      <itemPath>ftccache.h</itemPath>
+      <itemPath>ftccback.h</itemPath>
+      <itemPath>ftcerror.h</itemPath>
+      <itemPath>ftcffdrv.h</itemPath>
+      <itemPath>ftcglyph.h</itemPath>
+      <itemPath>ftchapters.h</itemPath>
+      <itemPath>ftcid.h</itemPath>
+      <itemPath>ftcimage.h</itemPath>
+      <itemPath>ftcmanag.h</itemPath>
+      <itemPath>ftcmru.h</itemPath>
+      <itemPath>ftconfig.h</itemPath>
+      <itemPath>ftcsbits.h</itemPath>
+      <itemPath>ftdebug.h</itemPath>
+      <itemPath>ftdriver.h</itemPath>
+      <itemPath>fterrdef.h</itemPath>
+      <itemPath>fterrors.h</itemPath>
+      <itemPath>ftfntfmt.h</itemPath>
+      <itemPath>ftgasp.h</itemPath>
+      <itemPath>ftgloadr.h</itemPath>
+      <itemPath>ftglyph.h</itemPath>
+      <itemPath>ftgrays.h</itemPath>
+      <itemPath>ftgxval.h</itemPath>
+      <itemPath>ftgzip.h</itemPath>
+      <itemPath>fthash.h</itemPath>
+      <itemPath>ftheader.h</itemPath>
+      <itemPath>ftimage.h</itemPath>
+      <itemPath>ftincrem.h</itemPath>
+      <itemPath>ftlcdfil.h</itemPath>
+      <itemPath>ftlist.h</itemPath>
+      <itemPath>ftlzw.h</itemPath>
+      <itemPath>ftmemory.h</itemPath>
+      <itemPath>ftmisc.h</itemPath>
+      <itemPath>ftmm.h</itemPath>
+      <itemPath>ftmodapi.h</itemPath>
+      <itemPath>ftmoderr.h</itemPath>
+      <itemPath>ftmodule.h</itemPath>
+      <itemPath>ftobjs.h</itemPath>
+      <itemPath>ftoption.h</itemPath>
+      <itemPath>ftotval.h</itemPath>
+      <itemPath>ftoutln.h</itemPath>
+      <itemPath>ftpcfdrv.h</itemPath>
+      <itemPath>ftpfr.h</itemPath>
+      <itemPath>ftpic.h</itemPath>
+      <itemPath>ftraster.h</itemPath>
+      <itemPath>ftrend1.h</itemPath>
+      <itemPath>ftrender.h</itemPath>
+      <itemPath>ftrfork.h</itemPath>
+      <itemPath>ftserv.h</itemPath>
+      <itemPath>ftsizes.h</itemPath>
+      <itemPath>ftsmerrs.h</itemPath>
+      <itemPath>ftsmooth.h</itemPath>
+      <itemPath>ftsnames.h</itemPath>
+      <itemPath>ftspic.h</itemPath>
+      <itemPath>ftstdlib.h</itemPath>
+      <itemPath>ftstream.h</itemPath>
+      <itemPath>ftstroke.h</itemPath>
+      <itemPath>ftsynth.h</itemPath>
+      <itemPath>ftsystem.h</itemPath>
+      <itemPath>fttrace.h</itemPath>
+      <itemPath>fttrigon.h</itemPath>
+      <itemPath>ftttdrv.h</itemPath>
+      <itemPath>fttypes.h</itemPath>
+      <itemPath>ftvalid.h</itemPath>
+      <itemPath>ftwinfnt.h</itemPath>
+      <itemPath>ftzconf.h</itemPath>
+      <itemPath>ftzopen.h</itemPath>
+      <itemPath>infblock.h</itemPath>
+      <itemPath>infcodes.h</itemPath>
+      <itemPath>inffixed.h</itemPath>
+      <itemPath>inftrees.h</itemPath>
+      <itemPath>infutil.h</itemPath>
+      <itemPath>internal.h</itemPath>
+      <itemPath>md5.h</itemPath>
+      <itemPath>pcf.h</itemPath>
+      <itemPath>pcfdrivr.h</itemPath>
+      <itemPath>pcferror.h</itemPath>
+      <itemPath>pcfread.h</itemPath>
+      <itemPath>pcfutil.h</itemPath>
+      <itemPath>pfrcmap.h</itemPath>
+      <itemPath>pfrdrivr.h</itemPath>
+      <itemPath>pfrerror.h</itemPath>
+      <itemPath>pfrgload.h</itemPath>
+      <itemPath>pfrload.h</itemPath>
+      <itemPath>pfrobjs.h</itemPath>
+      <itemPath>pfrsbit.h</itemPath>
+      <itemPath>pfrtypes.h</itemPath>
+      <itemPath>photon.h</itemPath>
+      <itemPath>pngshim.h</itemPath>
+      <itemPath>psaux.h</itemPath>
+      <itemPath>psauxerr.h</itemPath>
+      <itemPath>psauxmod.h</itemPath>
+      <itemPath>psconv.h</itemPath>
+      <itemPath>pshalgo.h</itemPath>
+      <itemPath>pshglob.h</itemPath>
+      <itemPath>pshints.h</itemPath>
+      <itemPath>pshmod.h</itemPath>
+      <itemPath>pshnterr.h</itemPath>
+      <itemPath>pshpic.h</itemPath>
+      <itemPath>pshrec.h</itemPath>
+      <itemPath>psmodule.h</itemPath>
+      <itemPath>psnamerr.h</itemPath>
+      <itemPath>psobjs.h</itemPath>
+      <itemPath>pspic.h</itemPath>
+      <itemPath>pstables.h</itemPath>
+      <itemPath>rasterrs.h</itemPath>
+      <itemPath>rastpic.h</itemPath>
+      <itemPath>sfdriver.h</itemPath>
+      <itemPath>sferrors.h</itemPath>
+      <itemPath>sfnt.h</itemPath>
+      <itemPath>sfntpic.h</itemPath>
+      <itemPath>sfobjs.h</itemPath>
+      <itemPath>svbdf.h</itemPath>
+      <itemPath>svcid.h</itemPath>
+      <itemPath>svfntfmt.h</itemPath>
+      <itemPath>svgldict.h</itemPath>
+      <itemPath>svgxval.h</itemPath>
+      <itemPath>svkern.h</itemPath>
+      <itemPath>svmetric.h</itemPath>
+      <itemPath>svmm.h</itemPath>
+      <itemPath>svotval.h</itemPath>
+      <itemPath>svpfr.h</itemPath>
+      <itemPath>svpostnm.h</itemPath>
+      <itemPath>svprop.h</itemPath>
+      <itemPath>svpscmap.h</itemPath>
+      <itemPath>svpsinfo.h</itemPath>
+      <itemPath>svsfnt.h</itemPath>
+      <itemPath>svttcmap.h</itemPath>
+      <itemPath>svtteng.h</itemPath>
+      <itemPath>svttglyf.h</itemPath>
+      <itemPath>svwinfnt.h</itemPath>
+      <itemPath>t1afm.h</itemPath>
+      <itemPath>t1cmap.h</itemPath>
+      <itemPath>t1decode.h</itemPath>
+      <itemPath>t1driver.h</itemPath>
+      <itemPath>t1errors.h</itemPath>
+      <itemPath>t1gload.h</itemPath>
+      <itemPath>t1load.h</itemPath>
+      <itemPath>t1objs.h</itemPath>
+      <itemPath>t1parse.h</itemPath>
+      <itemPath>t1tables.h</itemPath>
+      <itemPath>t1tokens.h</itemPath>
+      <itemPath>t1types.h</itemPath>
+      <itemPath>t42drivr.h</itemPath>
+      <itemPath>t42error.h</itemPath>
+      <itemPath>t42objs.h</itemPath>
+      <itemPath>t42parse.h</itemPath>
+      <itemPath>t42types.h</itemPath>
+      <itemPath>ttbdf.h</itemPath>
+      <itemPath>ttcmap.h</itemPath>
+      <itemPath>ttcmapc.h</itemPath>
+      <itemPath>ttdriver.h</itemPath>
+      <itemPath>tterrors.h</itemPath>
+      <itemPath>ttgload.h</itemPath>
+      <itemPath>ttgxvar.h</itemPath>
+      <itemPath>ttinterp.h</itemPath>
+      <itemPath>ttkern.h</itemPath>
+      <itemPath>ttload.h</itemPath>
+      <itemPath>ttmtx.h</itemPath>
+      <itemPath>ttnameid.h</itemPath>
+      <itemPath>ttobjs.h</itemPath>
+      <itemPath>ttpic.h</itemPath>
+      <itemPath>ttpload.h</itemPath>
+      <itemPath>ttpost.h</itemPath>
+      <itemPath>ttsbit.h</itemPath>
+      <itemPath>ttsubpix.h</itemPath>
+      <itemPath>tttables.h</itemPath>
+      <itemPath>tttags.h</itemPath>
+      <itemPath>tttypes.h</itemPath>
+      <itemPath>ttunpat.h</itemPath>
+      <itemPath>winfnt.h</itemPath>
+      <itemPath>zlib.h</itemPath>
+      <itemPath>zutil.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="LinkerScript"
+                   displayName="Linker Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <itemPath>adler32.c</itemPath>
+      <itemPath>afangles.c</itemPath>
+      <itemPath>afblue.c</itemPath>
+      <itemPath>afcjk.c</itemPath>
+      <itemPath>afdummy.c</itemPath>
+      <itemPath>afglobal.c</itemPath>
+      <itemPath>afhints.c</itemPath>
+      <itemPath>afindic.c</itemPath>
+      <itemPath>aflatin.c</itemPath>
+      <itemPath>aflatin2.c</itemPath>
+      <itemPath>afloader.c</itemPath>
+      <itemPath>afmodule.c</itemPath>
+      <itemPath>afmparse.c</itemPath>
+      <itemPath>afpic.c</itemPath>
+      <itemPath>afranges.c</itemPath>
+      <itemPath>afshaper.c</itemPath>
+      <itemPath>afwarp.c</itemPath>
+      <itemPath>basepic.c</itemPath>
+      <itemPath>bdfdrivr.c</itemPath>
+      <itemPath>bdflib.c</itemPath>
+      <itemPath>cf2arrst.c</itemPath>
+      <itemPath>cf2blues.c</itemPath>
+      <itemPath>cf2error.c</itemPath>
+      <itemPath>cf2font.c</itemPath>
+      <itemPath>cf2ft.c</itemPath>
+      <itemPath>cf2hints.c</itemPath>
+      <itemPath>cf2intrp.c</itemPath>
+      <itemPath>cf2read.c</itemPath>
+      <itemPath>cf2stack.c</itemPath>
+      <itemPath>cffcmap.c</itemPath>
+      <itemPath>cffdrivr.c</itemPath>
+      <itemPath>cffgload.c</itemPath>
+      <itemPath>cffload.c</itemPath>
+      <itemPath>cffobjs.c</itemPath>
+      <itemPath>cffparse.c</itemPath>
+      <itemPath>cffpic.c</itemPath>
+      <itemPath>cidgload.c</itemPath>
+      <itemPath>cidload.c</itemPath>
+      <itemPath>cidobjs.c</itemPath>
+      <itemPath>cidparse.c</itemPath>
+      <itemPath>cidriver.c</itemPath>
+      <itemPath>ftadvanc.c</itemPath>
+      <itemPath>ftapi.c</itemPath>
+      <itemPath>ftbbox.c</itemPath>
+      <itemPath>ftbdf.c</itemPath>
+      <itemPath>ftbitmap.c</itemPath>
+      <itemPath>ftcalc.c</itemPath>
+      <itemPath>ftcbasic.c</itemPath>
+      <itemPath>ftccmap.c</itemPath>
+      <itemPath>ftcglyph.c</itemPath>
+      <itemPath>ftcid.c</itemPath>
+      <itemPath>ftcimage.c</itemPath>
+      <itemPath>ftcmanag.c</itemPath>
+      <itemPath>ftcmru.c</itemPath>
+      <itemPath>ftcsbits.c</itemPath>
+      <itemPath>ftdbgmem.c</itemPath>
+      <itemPath>ftdebug.c</itemPath>
+      <itemPath>ftfntfmt.c</itemPath>
+      <itemPath>ftfstype.c</itemPath>
+      <itemPath>ftgasp.c</itemPath>
+      <itemPath>ftgloadr.c</itemPath>
+      <itemPath>ftglyph.c</itemPath>
+      <itemPath>ftgrays.c</itemPath>
+      <itemPath>ftgxval.c</itemPath>
+      <itemPath>ftgzip.c</itemPath>
+      <itemPath>fthash.c</itemPath>
+      <itemPath>ftinit.c</itemPath>
+      <itemPath>ftlcdfil.c</itemPath>
+      <itemPath>ftlzw.c</itemPath>
+      <itemPath>ftmm.c</itemPath>
+      <itemPath>ftobjs.c</itemPath>
+      <itemPath>ftotval.c</itemPath>
+      <itemPath>ftoutln.c</itemPath>
+      <itemPath>ftpatent.c</itemPath>
+      <itemPath>ftpfr.c</itemPath>
+      <itemPath>ftpic.c</itemPath>
+      <itemPath>ftraster.c</itemPath>
+      <itemPath>ftrend1.c</itemPath>
+      <itemPath>ftrfork.c</itemPath>
+      <itemPath>ftsmooth.c</itemPath>
+      <itemPath>ftsnames.c</itemPath>
+      <itemPath>ftspic.c</itemPath>
+      <itemPath>ftstream.c</itemPath>
+      <itemPath>ftstroke.c</itemPath>
+      <itemPath>ftsynth.c</itemPath>
+      <itemPath>ftsystem.c</itemPath>
+      <itemPath>fttrigon.c</itemPath>
+      <itemPath>fttype1.c</itemPath>
+      <itemPath>ftutil.c</itemPath>
+      <itemPath>ftwinfnt.c</itemPath>
+      <itemPath>ftzopen.c</itemPath>
+      <itemPath>infblock.c</itemPath>
+      <itemPath>infcodes.c</itemPath>
+      <itemPath>inflate.c</itemPath>
+      <itemPath>inftrees.c</itemPath>
+      <itemPath>infutil.c</itemPath>
+      <itemPath>md5.c</itemPath>
+      <itemPath>pcfdrivr.c</itemPath>
+      <itemPath>pcfread.c</itemPath>
+      <itemPath>pcfutil.c</itemPath>
+      <itemPath>pfrcmap.c</itemPath>
+      <itemPath>pfrdrivr.c</itemPath>
+      <itemPath>pfrgload.c</itemPath>
+      <itemPath>pfrload.c</itemPath>
+      <itemPath>pfrobjs.c</itemPath>
+      <itemPath>pfrsbit.c</itemPath>
+      <itemPath>photon.c</itemPath>
+      <itemPath>pngshim.c</itemPath>
+      <itemPath>psauxmod.c</itemPath>
+      <itemPath>psconv.c</itemPath>
+      <itemPath>pshalgo.c</itemPath>
+      <itemPath>pshglob.c</itemPath>
+      <itemPath>pshmod.c</itemPath>
+      <itemPath>pshpic.c</itemPath>
+      <itemPath>pshrec.c</itemPath>
+      <itemPath>psmodule.c</itemPath>
+      <itemPath>psnames.c</itemPath>
+      <itemPath>psobjs.c</itemPath>
+      <itemPath>pspic.c</itemPath>
+      <itemPath>rastpic.c</itemPath>
+      <itemPath>sfdriver.c</itemPath>
+      <itemPath>sfntpic.c</itemPath>
+      <itemPath>sfobjs.c</itemPath>
+      <itemPath>t1afm.c</itemPath>
+      <itemPath>t1cmap.c</itemPath>
+      <itemPath>t1decode.c</itemPath>
+      <itemPath>t1driver.c</itemPath>
+      <itemPath>t1gload.c</itemPath>
+      <itemPath>t1load.c</itemPath>
+      <itemPath>t1objs.c</itemPath>
+      <itemPath>t1parse.c</itemPath>
+      <itemPath>t42drivr.c</itemPath>
+      <itemPath>t42objs.c</itemPath>
+      <itemPath>t42parse.c</itemPath>
+      <itemPath>ttbdf.c</itemPath>
+      <itemPath>ttcmap.c</itemPath>
+      <itemPath>ttdriver.c</itemPath>
+      <itemPath>ttgload.c</itemPath>
+      <itemPath>ttgxvar.c</itemPath>
+      <itemPath>ttinterp.c</itemPath>
+      <itemPath>ttkern.c</itemPath>
+      <itemPath>ttload.c</itemPath>
+      <itemPath>ttmtx.c</itemPath>
+      <itemPath>ttobjs.c</itemPath>
+      <itemPath>ttpic.c</itemPath>
+      <itemPath>ttpload.c</itemPath>
+      <itemPath>ttpost.c</itemPath>
+      <itemPath>ttsbit.c</itemPath>
+      <itemPath>ttsubpix.c</itemPath>
+      <itemPath>winfnt.c</itemPath>
+      <itemPath>zutil.c</itemPath>
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false">
+      <itemPath>Makefile</itemPath>
+      <itemPath>afblue.cin</itemPath>
+      <itemPath>afblue.dat</itemPath>
+      <itemPath>afblue.hin</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceRootList>
+    <Elem>.</Elem>
+  </sourceRootList>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="debug_pic32mz2048ECH144" type="2">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <targetDevice>PIC32MZ2048ECH144</targetDevice>
+        <targetHeader></targetHeader>
+        <targetPluginBoard></targetPluginBoard>
+        <platformTool>ICD3PlatformTool</platformTool>
+        <languageToolchain>XC32</languageToolchain>
+        <languageToolchainVersion></languageToolchainVersion>
+        <platform>3</platform>
+      </toolsSet>
+      <compileType>
+        <linkerTool>
+          <linkerLibItems>
+          </linkerLibItems>
+        </linkerTool>
+        <archiverTool>
+        </archiverTool>
+        <loading>
+          <useAlternateLoadableFile>false</useAlternateLoadableFile>
+          <parseOnProdLoad>false</parseOnProdLoad>
+          <alternateLoadableFile></alternateLoadableFile>
+        </loading>
+        <subordinates>
+        </subordinates>
+      </compileType>
+      <makeCustomizationType>
+        <makeCustomizationPreStepEnabled>false</makeCustomizationPreStepEnabled>
+        <makeCustomizationPreStep></makeCustomizationPreStep>
+        <makeCustomizationPostStepEnabled>false</makeCustomizationPostStepEnabled>
+        <makeCustomizationPostStep></makeCustomizationPostStep>
+        <makeCustomizationPutChecksumInUserID>false</makeCustomizationPutChecksumInUserID>
+        <makeCustomizationEnableLongLines>false</makeCustomizationEnableLongLines>
+        <makeCustomizationNormalizeHexFile>false</makeCustomizationNormalizeHexFile>
+      </makeCustomizationType>
+      <C32>
+        <property key="additional-warnings" value="false"/>
+        <property key="addresss-attribute-use" value="false"/>
+        <property key="enable-app-io" value="false"/>
+        <property key="enable-omit-frame-pointer" value="false"/>
+        <property key="enable-symbols" value="true"/>
+        <property key="enable-unroll-loops" value="false"/>
+        <property key="exclude-floating-point" value="false"/>
+        <property key="extra-include-directories" value=""/>
+        <property key="generate-16-bit-code" value="false"/>
+        <property key="generate-micro-compressed-code" value="false"/>
+        <property key="isolate-each-function" value="false"/>
+        <property key="make-warnings-into-errors" value="false"/>
+        <property key="optimization-level" value=""/>
+        <property key="place-data-into-section" value="false"/>
+        <property key="post-instruction-scheduling" value="default"/>
+        <property key="pre-instruction-scheduling" value="default"/>
+        <property key="preprocessor-macros" value="_DEBUG"/>
+        <property key="strict-ansi" value="false"/>
+        <property key="support-ansi" value="false"/>
+        <property key="toplevel-reordering" value=""/>
+        <property key="use-cci" value="false"/>
+        <property key="use-iar" value="false"/>
+        <property key="use-indirect-calls" value="false"/>
+      </C32>
+      <C32-AR>
+        <property key="additional-options-chop-files" value="false"/>
+      </C32-AR>
+      <C32-AS>
+        <property key="assembler-symbols" value=""/>
+        <property key="enable-symbols" value="true"/>
+        <property key="exclude-floating-point-library" value="false"/>
+        <property key="expand-macros" value="false"/>
+        <property key="extra-include-directories-for-assembler" value=""/>
+        <property key="extra-include-directories-for-preprocessor" value=""/>
+        <property key="false-conditionals" value="false"/>
+        <property key="generate-16-bit-code" value="false"/>
+        <property key="generate-micro-compressed-code" value="false"/>
+        <property key="keep-locals" value="false"/>
+        <property key="list-assembly" value="false"/>
+        <property key="list-source" value="false"/>
+        <property key="list-symbols" value="false"/>
+        <property key="oXC32asm-list-to-file" value="false"/>
+        <property key="omit-debug-dirs" value="false"/>
+        <property key="omit-forms" value="false"/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="warning-level" value=""/>
+      </C32-AS>
+      <C32-LD>
+        <property key="additional-options-use-response-files" value="false"/>
+        <property key="allocate-dinit" value="false"/>
+        <property key="code-dinit" value="false"/>
+        <property key="ebase-addr" value=""/>
+        <property key="enable-check-sections" value="false"/>
+        <property key="exclude-floating-point-library" value="false"/>
+        <property key="exclude-standard-libraries" value="false"/>
+        <property key="extra-lib-directories" value=""/>
+        <property key="fill-flash-options-addr" value=""/>
+        <property key="fill-flash-options-const" value=""/>
+        <property key="fill-flash-options-how" value="0"/>
+        <property key="fill-flash-options-inc-const" value="1"/>
+        <property key="fill-flash-options-increment" value=""/>
+        <property key="fill-flash-options-seq" value=""/>
+        <property key="fill-flash-options-what" value="0"/>
+        <property key="generate-16-bit-code" value="false"/>
+        <property key="generate-cross-reference-file" value="false"/>
+        <property key="generate-micro-compressed-code" value="false"/>
+        <property key="heap-size" value=""/>
+        <property key="input-libraries" value=""/>
+        <property key="kseg-length" value=""/>
+        <property key="kseg-origin" value=""/>
+        <property key="linker-symbols" value=""/>
+        <property key="map-file" value="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map"/>
+        <property key="no-startup-files" value="false"/>
+        <property key="oXC32ld-extra-opts" value=""/>
+        <property key="optimization-level" value=""/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="remove-unused-sections" value="false"/>
+        <property key="report-memory-usage" value="false"/>
+        <property key="serial-length" value=""/>
+        <property key="serial-origin" value=""/>
+        <property key="stack-size" value=""/>
+        <property key="symbol-stripping" value=""/>
+        <property key="trace-symbols" value=""/>
+        <property key="warn-section-align" value="false"/>
+      </C32-LD>
+      <C32CPP>
+        <property key="additional-warnings" value="false"/>
+        <property key="addresss-attribute-use" value="false"/>
+        <property key="check-new" value="false"/>
+        <property key="eh-specs" value="true"/>
+        <property key="enable-app-io" value="false"/>
+        <property key="enable-omit-frame-pointer" value="false"/>
+        <property key="enable-symbols" value="true"/>
+        <property key="enable-unroll-loops" value="false"/>
+        <property key="exceptions" value="true"/>
+        <property key="exclude-floating-point" value="false"/>
+        <property key="extra-include-directories" value=""/>
+        <property key="generate-16-bit-code" value="false"/>
+        <property key="generate-micro-compressed-code" value="false"/>
+        <property key="isolate-each-function" value="false"/>
+        <property key="make-warnings-into-errors" value="false"/>
+        <property key="optimization-level" value=""/>
+        <property key="place-data-into-section" value="false"/>
+        <property key="post-instruction-scheduling" value="default"/>
+        <property key="pre-instruction-scheduling" value="default"/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="rtti" value="true"/>
+        <property key="strict-ansi" value="false"/>
+        <property key="toplevel-reordering" value=""/>
+        <property key="use-cci" value="false"/>
+        <property key="use-iar" value="false"/>
+        <property key="use-indirect-calls" value="false"/>
+      </C32CPP>
+      <C32Global>
+        <property key="common-include-directories" value=""/>
+        <property key="gp-relative-option" value=""/>
+        <property key="legacy-libc" value="true"/>
+        <property key="relaxed-math" value="false"/>
+        <property key="save-temps" value="false"/>
+        <property key="wpo-lto" value="false"/>
+      </C32Global>
+      <ICD3PlatformTool>
+        <property key="AutoSelectMemRanges" value="auto"/>
+        <property key="CAN1" value="true"/>
+        <property key="CAN2" value="true"/>
+        <property key="CHANGE NOTICE A" value="true"/>
+        <property key="CHANGE NOTICE B" value="true"/>
+        <property key="CHANGE NOTICE C" value="true"/>
+        <property key="CHANGE NOTICE D" value="true"/>
+        <property key="CHANGE NOTICE E" value="true"/>
+        <property key="CHANGE NOTICE F" value="true"/>
+        <property key="CHANGE NOTICE G" value="true"/>
+        <property key="CHANGE NOTICE H" value="true"/>
+        <property key="CHANGE NOTICE J" value="true"/>
+        <property key="CHANGE NOTICE K" value="true"/>
+        <property key="COMPARATOR" value="true"/>
+        <property key="DMA" value="true"/>
+        <property key="ETHERNET CONTROLLER" value="true"/>
+        <property key="Freeze All Other Peripherals" value="true"/>
+        <property key="I2C 1" value="true"/>
+        <property key="I2C 2" value="true"/>
+        <property key="I2C 3" value="true"/>
+        <property key="I2C 4" value="true"/>
+        <property key="I2C 5" value="true"/>
+        <property key="INPUT CAPTURE 1" value="true"/>
+        <property key="INPUT CAPTURE 2" value="true"/>
+        <property key="INPUT CAPTURE 3" value="true"/>
+        <property key="INPUT CAPTURE 4" value="true"/>
+        <property key="INPUT CAPTURE 5" value="true"/>
+        <property key="INPUT CAPTURE 6" value="true"/>
+        <property key="INPUT CAPTURE 7" value="true"/>
+        <property key="INPUT CAPTURE 8" value="true"/>
+        <property key="INPUT CAPTURE 9" value="true"/>
+        <property key="INTERRUPT CONTROL" value="true"/>
+        <property key="OUTPUT COMPARE 1" value="true"/>
+        <property key="OUTPUT COMPARE 2" value="true"/>
+        <property key="OUTPUT COMPARE 3" value="true"/>
+        <property key="OUTPUT COMPARE 4" value="true"/>
+        <property key="OUTPUT COMPARE 5" value="true"/>
+        <property key="OUTPUT COMPARE 6" value="true"/>
+        <property key="OUTPUT COMPARE 7" value="true"/>
+        <property key="OUTPUT COMPARE 8" value="true"/>
+        <property key="OUTPUT COMPARE 9" value="true"/>
+        <property key="PARALLEL MASTER/SLAVE PORT" value="true"/>
+        <property key="REAL TIME CLOCK" value="true"/>
+        <property key="REFERENCE CLOCK1" value="true"/>
+        <property key="REFERENCE CLOCK2" value="true"/>
+        <property key="REFERENCE CLOCK3" value="true"/>
+        <property key="REFERENCE CLOCK4" value="true"/>
+        <property key="SPI/I2S 1" value="true"/>
+        <property key="SPI/I2S 2" value="true"/>
+        <property key="SPI/I2S 3" value="true"/>
+        <property key="SPI/I2S 4" value="true"/>
+        <property key="SPI/I2S 5" value="true"/>
+        <property key="SPI/I2S 6" value="true"/>
+        <property key="SecureSegment.SegmentProgramming" value="FullChipProgramming"/>
+        <property key="TIMER1" value="true"/>
+        <property key="TIMER2" value="true"/>
+        <property key="TIMER3" value="true"/>
+        <property key="TIMER4" value="true"/>
+        <property key="TIMER5" value="true"/>
+        <property key="TIMER6" value="true"/>
+        <property key="TIMER7" value="true"/>
+        <property key="TIMER8" value="true"/>
+        <property key="TIMER9" value="true"/>
+        <property key="ToolFirmwareFilePath"
+                  value="Press to browse for a specific firmware version"/>
+        <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
+        <property key="UART1" value="true"/>
+        <property key="UART2" value="true"/>
+        <property key="UART3" value="true"/>
+        <property key="UART4" value="true"/>
+        <property key="UART5" value="true"/>
+        <property key="UART6" value="true"/>
+        <property key="debugoptions.useswbreakpoints" value="false"/>
+        <property key="hwtoolclock.frcindebug" value="false"/>
+        <property key="memories.aux" value="false"/>
+        <property key="memories.bootflash" value="false"/>
+        <property key="memories.configurationmemory" value="true"/>
+        <property key="memories.configurationmemory2" value="true"/>
+        <property key="memories.dataflash" value="true"/>
+        <property key="memories.eeprom" value="true"/>
+        <property key="memories.flashdata" value="true"/>
+        <property key="memories.id" value="true"/>
+        <property key="memories.instruction.ram" value="true"/>
+        <property key="memories.instruction.ram.ranges"
+                  value="${memories.instruction.ram.ranges}"/>
+        <property key="memories.programmemory" value="true"/>
+        <property key="memories.programmemory.ranges" value="1d000000-1d1fffff"/>
+        <property key="poweroptions.powerenable" value="false"/>
+        <property key="programoptions.donoteraseauxmem" value="false"/>
+        <property key="programoptions.eraseb4program" value="true"/>
+        <property key="programoptions.preservedataflash" value="false"/>
+        <property key="programoptions.preservedataflash.ranges" value=""/>
+        <property key="programoptions.preserveeeprom" value="false"/>
+        <property key="programoptions.preserveeeprom.ranges" value=""/>
+        <property key="programoptions.preserveprogram.ranges" value=""/>
+        <property key="programoptions.preserveprogramrange" value="false"/>
+        <property key="programoptions.preserveuserid" value="false"/>
+        <property key="programoptions.programcalmem" value="false"/>
+        <property key="programoptions.programuserotp" value="false"/>
+        <property key="programoptions.testmodeentrymethod" value="VDDFirst"/>
+        <property key="programoptions.usehighvoltageonmclr" value="false"/>
+        <property key="programoptions.uselvpprogramming" value="false"/>
+        <property key="voltagevalue" value="3.25"/>
+      </ICD3PlatformTool>
+    </conf>
+    <conf name="release_pic32MZ2048ECH144" type="2">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <targetDevice>PIC32MZ2048ECH144</targetDevice>
+        <targetHeader></targetHeader>
+        <targetPluginBoard></targetPluginBoard>
+        <platformTool>ICD3PlatformTool</platformTool>
+        <languageToolchain>XC32</languageToolchain>
+        <languageToolchainVersion></languageToolchainVersion>
+        <platform>3</platform>
+      </toolsSet>
+      <compileType>
+        <linkerTool>
+          <linkerLibItems>
+          </linkerLibItems>
+        </linkerTool>
+        <archiverTool>
+        </archiverTool>
+        <loading>
+          <useAlternateLoadableFile>false</useAlternateLoadableFile>
+          <parseOnProdLoad>false</parseOnProdLoad>
+          <alternateLoadableFile></alternateLoadableFile>
+        </loading>
+        <subordinates>
+        </subordinates>
+      </compileType>
+      <makeCustomizationType>
+        <makeCustomizationPreStepEnabled>false</makeCustomizationPreStepEnabled>
+        <makeCustomizationPreStep></makeCustomizationPreStep>
+        <makeCustomizationPostStepEnabled>false</makeCustomizationPostStepEnabled>
+        <makeCustomizationPostStep></makeCustomizationPostStep>
+        <makeCustomizationPutChecksumInUserID>false</makeCustomizationPutChecksumInUserID>
+        <makeCustomizationEnableLongLines>false</makeCustomizationEnableLongLines>
+        <makeCustomizationNormalizeHexFile>false</makeCustomizationNormalizeHexFile>
+      </makeCustomizationType>
+      <C32>
+        <property key="additional-warnings" value="false"/>
+        <property key="addresss-attribute-use" value="false"/>
+        <property key="enable-app-io" value="false"/>
+        <property key="enable-omit-frame-pointer" value="false"/>
+        <property key="enable-symbols" value="true"/>
+        <property key="enable-unroll-loops" value="false"/>
+        <property key="exclude-floating-point" value="false"/>
+        <property key="extra-include-directories" value=""/>
+        <property key="generate-16-bit-code" value="false"/>
+        <property key="generate-micro-compressed-code" value="false"/>
+        <property key="isolate-each-function" value="false"/>
+        <property key="make-warnings-into-errors" value="false"/>
+        <property key="optimization-level" value=""/>
+        <property key="place-data-into-section" value="false"/>
+        <property key="post-instruction-scheduling" value="default"/>
+        <property key="pre-instruction-scheduling" value="default"/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="strict-ansi" value="false"/>
+        <property key="support-ansi" value="false"/>
+        <property key="toplevel-reordering" value=""/>
+        <property key="use-cci" value="false"/>
+        <property key="use-iar" value="false"/>
+        <property key="use-indirect-calls" value="false"/>
+      </C32>
+      <C32-AR>
+        <property key="additional-options-chop-files" value="false"/>
+      </C32-AR>
+      <C32-AS>
+        <property key="assembler-symbols" value=""/>
+        <property key="enable-symbols" value="true"/>
+        <property key="exclude-floating-point-library" value="false"/>
+        <property key="expand-macros" value="false"/>
+        <property key="extra-include-directories-for-assembler" value=""/>
+        <property key="extra-include-directories-for-preprocessor" value=""/>
+        <property key="false-conditionals" value="false"/>
+        <property key="generate-16-bit-code" value="false"/>
+        <property key="generate-micro-compressed-code" value="false"/>
+        <property key="keep-locals" value="false"/>
+        <property key="list-assembly" value="false"/>
+        <property key="list-source" value="false"/>
+        <property key="list-symbols" value="false"/>
+        <property key="oXC32asm-list-to-file" value="false"/>
+        <property key="omit-debug-dirs" value="false"/>
+        <property key="omit-forms" value="false"/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="warning-level" value=""/>
+      </C32-AS>
+      <C32-LD>
+        <property key="additional-options-use-response-files" value="false"/>
+        <property key="allocate-dinit" value="false"/>
+        <property key="code-dinit" value="false"/>
+        <property key="ebase-addr" value=""/>
+        <property key="enable-check-sections" value="false"/>
+        <property key="exclude-floating-point-library" value="false"/>
+        <property key="exclude-standard-libraries" value="false"/>
+        <property key="extra-lib-directories" value=""/>
+        <property key="fill-flash-options-addr" value=""/>
+        <property key="fill-flash-options-const" value=""/>
+        <property key="fill-flash-options-how" value="0"/>
+        <property key="fill-flash-options-inc-const" value="1"/>
+        <property key="fill-flash-options-increment" value=""/>
+        <property key="fill-flash-options-seq" value=""/>
+        <property key="fill-flash-options-what" value="0"/>
+        <property key="generate-16-bit-code" value="false"/>
+        <property key="generate-cross-reference-file" value="false"/>
+        <property key="generate-micro-compressed-code" value="false"/>
+        <property key="heap-size" value=""/>
+        <property key="input-libraries" value=""/>
+        <property key="kseg-length" value=""/>
+        <property key="kseg-origin" value=""/>
+        <property key="linker-symbols" value=""/>
+        <property key="map-file" value="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map"/>
+        <property key="no-startup-files" value="false"/>
+        <property key="oXC32ld-extra-opts" value=""/>
+        <property key="optimization-level" value=""/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="remove-unused-sections" value="false"/>
+        <property key="report-memory-usage" value="false"/>
+        <property key="serial-length" value=""/>
+        <property key="serial-origin" value=""/>
+        <property key="stack-size" value=""/>
+        <property key="symbol-stripping" value=""/>
+        <property key="trace-symbols" value=""/>
+        <property key="warn-section-align" value="false"/>
+      </C32-LD>
+      <C32CPP>
+        <property key="additional-warnings" value="false"/>
+        <property key="addresss-attribute-use" value="false"/>
+        <property key="check-new" value="false"/>
+        <property key="eh-specs" value="true"/>
+        <property key="enable-app-io" value="false"/>
+        <property key="enable-omit-frame-pointer" value="false"/>
+        <property key="enable-symbols" value="true"/>
+        <property key="enable-unroll-loops" value="false"/>
+        <property key="exceptions" value="true"/>
+        <property key="exclude-floating-point" value="false"/>
+        <property key="extra-include-directories" value=""/>
+        <property key="generate-16-bit-code" value="false"/>
+        <property key="generate-micro-compressed-code" value="false"/>
+        <property key="isolate-each-function" value="false"/>
+        <property key="make-warnings-into-errors" value="false"/>
+        <property key="optimization-level" value=""/>
+        <property key="place-data-into-section" value="false"/>
+        <property key="post-instruction-scheduling" value="default"/>
+        <property key="pre-instruction-scheduling" value="default"/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="rtti" value="true"/>
+        <property key="strict-ansi" value="false"/>
+        <property key="toplevel-reordering" value=""/>
+        <property key="use-cci" value="false"/>
+        <property key="use-iar" value="false"/>
+        <property key="use-indirect-calls" value="false"/>
+      </C32CPP>
+      <C32Global>
+        <property key="common-include-directories" value=""/>
+        <property key="gp-relative-option" value=""/>
+        <property key="legacy-libc" value="true"/>
+        <property key="relaxed-math" value="false"/>
+        <property key="save-temps" value="false"/>
+        <property key="wpo-lto" value="false"/>
+      </C32Global>
+      <ICD3PlatformTool>
+        <property key="AutoSelectMemRanges" value="auto"/>
+        <property key="CAN1" value="true"/>
+        <property key="CAN2" value="true"/>
+        <property key="CHANGE NOTICE A" value="true"/>
+        <property key="CHANGE NOTICE B" value="true"/>
+        <property key="CHANGE NOTICE C" value="true"/>
+        <property key="CHANGE NOTICE D" value="true"/>
+        <property key="CHANGE NOTICE E" value="true"/>
+        <property key="CHANGE NOTICE F" value="true"/>
+        <property key="CHANGE NOTICE G" value="true"/>
+        <property key="CHANGE NOTICE H" value="true"/>
+        <property key="CHANGE NOTICE J" value="true"/>
+        <property key="CHANGE NOTICE K" value="true"/>
+        <property key="COMPARATOR" value="true"/>
+        <property key="DMA" value="true"/>
+        <property key="ETHERNET CONTROLLER" value="true"/>
+        <property key="Freeze All Other Peripherals" value="true"/>
+        <property key="I2C 1" value="true"/>
+        <property key="I2C 2" value="true"/>
+        <property key="I2C 3" value="true"/>
+        <property key="I2C 4" value="true"/>
+        <property key="I2C 5" value="true"/>
+        <property key="INPUT CAPTURE 1" value="true"/>
+        <property key="INPUT CAPTURE 2" value="true"/>
+        <property key="INPUT CAPTURE 3" value="true"/>
+        <property key="INPUT CAPTURE 4" value="true"/>
+        <property key="INPUT CAPTURE 5" value="true"/>
+        <property key="INPUT CAPTURE 6" value="true"/>
+        <property key="INPUT CAPTURE 7" value="true"/>
+        <property key="INPUT CAPTURE 8" value="true"/>
+        <property key="INPUT CAPTURE 9" value="true"/>
+        <property key="INTERRUPT CONTROL" value="true"/>
+        <property key="OUTPUT COMPARE 1" value="true"/>
+        <property key="OUTPUT COMPARE 2" value="true"/>
+        <property key="OUTPUT COMPARE 3" value="true"/>
+        <property key="OUTPUT COMPARE 4" value="true"/>
+        <property key="OUTPUT COMPARE 5" value="true"/>
+        <property key="OUTPUT COMPARE 6" value="true"/>
+        <property key="OUTPUT COMPARE 7" value="true"/>
+        <property key="OUTPUT COMPARE 8" value="true"/>
+        <property key="OUTPUT COMPARE 9" value="true"/>
+        <property key="PARALLEL MASTER/SLAVE PORT" value="true"/>
+        <property key="REAL TIME CLOCK" value="true"/>
+        <property key="REFERENCE CLOCK1" value="true"/>
+        <property key="REFERENCE CLOCK2" value="true"/>
+        <property key="REFERENCE CLOCK3" value="true"/>
+        <property key="REFERENCE CLOCK4" value="true"/>
+        <property key="SPI/I2S 1" value="true"/>
+        <property key="SPI/I2S 2" value="true"/>
+        <property key="SPI/I2S 3" value="true"/>
+        <property key="SPI/I2S 4" value="true"/>
+        <property key="SPI/I2S 5" value="true"/>
+        <property key="SPI/I2S 6" value="true"/>
+        <property key="SecureSegment.SegmentProgramming" value="FullChipProgramming"/>
+        <property key="TIMER1" value="true"/>
+        <property key="TIMER2" value="true"/>
+        <property key="TIMER3" value="true"/>
+        <property key="TIMER4" value="true"/>
+        <property key="TIMER5" value="true"/>
+        <property key="TIMER6" value="true"/>
+        <property key="TIMER7" value="true"/>
+        <property key="TIMER8" value="true"/>
+        <property key="TIMER9" value="true"/>
+        <property key="ToolFirmwareFilePath"
+                  value="Press to browse for a specific firmware version"/>
+        <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
+        <property key="UART1" value="true"/>
+        <property key="UART2" value="true"/>
+        <property key="UART3" value="true"/>
+        <property key="UART4" value="true"/>
+        <property key="UART5" value="true"/>
+        <property key="UART6" value="true"/>
+        <property key="debugoptions.useswbreakpoints" value="false"/>
+        <property key="hwtoolclock.frcindebug" value="false"/>
+        <property key="memories.aux" value="false"/>
+        <property key="memories.bootflash" value="false"/>
+        <property key="memories.configurationmemory" value="true"/>
+        <property key="memories.configurationmemory2" value="true"/>
+        <property key="memories.dataflash" value="true"/>
+        <property key="memories.eeprom" value="true"/>
+        <property key="memories.flashdata" value="true"/>
+        <property key="memories.id" value="true"/>
+        <property key="memories.instruction.ram" value="true"/>
+        <property key="memories.instruction.ram.ranges"
+                  value="${memories.instruction.ram.ranges}"/>
+        <property key="memories.programmemory" value="true"/>
+        <property key="memories.programmemory.ranges" value="1d000000-1d1fffff"/>
+        <property key="poweroptions.powerenable" value="false"/>
+        <property key="programoptions.donoteraseauxmem" value="false"/>
+        <property key="programoptions.eraseb4program" value="true"/>
+        <property key="programoptions.preservedataflash" value="false"/>
+        <property key="programoptions.preservedataflash.ranges" value=""/>
+        <property key="programoptions.preserveeeprom" value="false"/>
+        <property key="programoptions.preserveeeprom.ranges" value=""/>
+        <property key="programoptions.preserveprogram.ranges" value=""/>
+        <property key="programoptions.preserveprogramrange" value="false"/>
+        <property key="programoptions.preserveuserid" value="false"/>
+        <property key="programoptions.programcalmem" value="false"/>
+        <property key="programoptions.programuserotp" value="false"/>
+        <property key="programoptions.testmodeentrymethod" value="VDDFirst"/>
+        <property key="programoptions.usehighvoltageonmclr" value="false"/>
+        <property key="programoptions.uselvpprogramming" value="false"/>
+        <property key="voltagevalue" value="3.25"/>
+      </ICD3PlatformTool>
+    </conf>
+  </confs>
+</configurationDescriptor>

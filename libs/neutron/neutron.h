@@ -2161,6 +2161,7 @@ extern result_t stream_setpos(handle_t stream, uint16_t pos);
  */
 extern result_t stream_length(handle_t stream, uint16_t *length);
 /**
+ * @function stream_truncate(handle_t stream, uint16_t length)
  * Set the stream length
  * @param stream    Stream to set
  * @param length    Length to truncate to.  This must be at or less than the
@@ -2169,6 +2170,7 @@ extern result_t stream_length(handle_t stream, uint16_t *length);
  */
 extern result_t stream_truncate(handle_t stream, uint16_t length);
 /**
+ * @function stream_copy(handle_t from, handle_t to)
  * Copy betrween two streams
  * @param from      Stream to copy from
  * @param to        Stream to copy to
@@ -2176,6 +2178,7 @@ extern result_t stream_truncate(handle_t stream, uint16_t length);
  */
 extern result_t stream_copy(handle_t from, handle_t to);
 /**
+ * @function stream_path(handle_t stream, bool full_path, uint16_t path_length, char *path)
 * Return the name of a stream
 * @param stream    Stream to get name of
 * @param full_path True if the full path of the stream is needed
@@ -2197,6 +2200,7 @@ extern handle_t console_out;
  */
 extern handle_t console_err;
 /**
+ * @function strstream_create(const char *lit, handle_t *stream)
  * Create an in-memory stream.  Should be deleted when done.
  * @param lit     Optional literal to copy into the stream
  * @param stream  Resulting stream
@@ -2204,6 +2208,7 @@ extern handle_t console_err;
  */
 extern result_t strstream_create(const char *lit, handle_t *stream);
 /**
+ * @function strstream_get(handle_t stream, const char **lit)
  * Return the underlying character buffer of the stream
  * @param stream  Stream to query
  * @param lit     Resulting buffer
@@ -2211,6 +2216,7 @@ extern result_t strstream_create(const char *lit, handle_t *stream);
  */
 extern result_t strstream_get(handle_t stream, const char **lit);
 /**
+ * @function stream_printf(handle_t stream, const char *format, ...)
  * Print a formatted string.
  * @param stream    Stream to print to
  * @param format    Format to print as
@@ -2220,6 +2226,7 @@ extern result_t strstream_get(handle_t stream, const char **lit);
  */
 extern result_t stream_printf(handle_t stream, const char *format, ...); // __attribute__((format(printf, 2, 3)));
 /**
+ * @function stream_vprintf(handle_t stream, const char *fmt, va_list ap)
  * print a formatted stream
  * @param stream
  * @param fmt
@@ -2240,6 +2247,7 @@ typedef enum _scan_type
   s_float,      // float, double
   } scan_type;
 /**
+ * @function get_arg_fn(uint16_t arg, void *argv, scan_type dt, void *value)
  * Callback function for scanf/printf
  * @param arg     Argument number 0..n
  * @param argv    Callback parameter
@@ -2249,6 +2257,7 @@ typedef enum _scan_type
  */
 typedef result_t (*get_arg_fn)(uint16_t arg, void *argv, scan_type dt, void *value);
 /**
+ * @function stream_printf_cb(handle_t stream, const char *format, get_arg_fn cb, void *argv)
  * Print a formatted string.
  * @param stream    Stream to print to
  * @param format    Format to print as
@@ -2258,6 +2267,7 @@ typedef result_t (*get_arg_fn)(uint16_t arg, void *argv, scan_type dt, void *val
  */
 extern result_t stream_printf_cb(handle_t stream, const char *format, get_arg_fn cb, void *argv);
 /**
+ * @function stream_scanf_cb(handle_t stream, const char *format, get_arg_fn cb, void *argv)
  * Scan arguments from a string.
  * @param stream    Stream to scan from
  * @param format    Format of the arguments
@@ -2267,6 +2277,7 @@ extern result_t stream_printf_cb(handle_t stream, const char *format, get_arg_fn
  */
 extern result_t stream_scanf_cb(handle_t stream, const char *format, get_arg_fn cb, void *argv);
 /**
+ * @function stream_scanf(handle_t stream, const char *format, ...)
  * Scan arguments from a stream.
  * @param stream    Stream to scan from
  * @param format    Format of the arguments
@@ -2276,6 +2287,7 @@ extern result_t stream_scanf_cb(handle_t stream, const char *format, get_arg_fn 
  */
 extern result_t stream_scanf(handle_t stream, const char *format, ...); //  __attribute__((format(scanf, 2, 3)));
 /**
+ * @function stream_vscanf(handle_t stream, const char *fmt, va_list ap)
  * Scan arguments from a stream
  * @param stream    Stream to scan from
  * @param fmt       Format of the arguments
@@ -2284,6 +2296,7 @@ extern result_t stream_scanf(handle_t stream, const char *format, ...); //  __at
  */
 extern result_t stream_vscanf(handle_t stream, const char *fmt, va_list ap);
 /**
+ * @function stream_getc(handle_t stream, char *ch)
  * Read one character from the stream
  * @param stream    Stream to read from
  * @param ch        character read
@@ -2291,6 +2304,7 @@ extern result_t stream_vscanf(handle_t stream, const char *fmt, va_list ap);
  */
 extern result_t stream_getc(handle_t stream, char *ch);
 /**
+ * @function stream_putc(handle_t stream, char ch)
  * Send one character to the stream
  * @param stream    Stream to write to
  * @param ch        character to write
@@ -2298,6 +2312,7 @@ extern result_t stream_getc(handle_t stream, char *ch);
  */
 extern result_t stream_putc(handle_t stream, char ch);
 /**
+ * @function stream_ungetc(handle_t stream, char ch
  * Push the character ch onto the end of the stream.
  * @param stream    Stream to write to
  * @param ch        character to append
@@ -2305,6 +2320,7 @@ extern result_t stream_putc(handle_t stream, char ch);
  */
 extern result_t stream_ungetc(handle_t stream, char ch);
 /**
+ * @function stream_gets(handle_t stream, char *buffer, uint16_t len)
  * Read an ascii line of characters from the stream.
  * @param stream    Stream to read from
  * @param buffer    Buffer to read into
@@ -2317,6 +2333,7 @@ extern result_t stream_ungetc(handle_t stream, char ch);
  */
 extern result_t stream_gets(handle_t stream, char *buffer, uint16_t len);
 /**
+ * @function stream_puts(handle_t stream, const char *str)
  * Write a string to a stream
  * @param stream    Stream to write to
  * @param str       string to send
@@ -2328,11 +2345,13 @@ extern result_t stream_puts(handle_t stream, const char *str);
 //
 // Kernel start routines
 /**
+ * @function scheduler_init()
  * Initialize the real-time scheduler
  * @return s_ok if created ok
  */
 extern result_t scheduler_init();
 /**
+ * @function neutron_run()
  * run the scheduler, never returns
  */
 extern void neutron_run();
