@@ -163,8 +163,16 @@ static result_t get_points(duk_context *ctx, duk_int_t obj_idx, point_t **pts, u
   return s_ok;
   }
 
+// return the pen array and its values
+static result_t get_pen(duk_context *ctx, pen_t *pen)
+  {
+
+  return s_ok;
+  }
+
 static duk_ret_t lib_polyline(duk_context *ctx)
   {
+  duk_ret_t retval;
   // get our context
   duk_push_this(ctx);
   // and get the magic number
@@ -179,9 +187,28 @@ static duk_ret_t lib_polyline(duk_context *ctx)
     return DUK_RET_TYPE_ERROR;
     }
 
+  pen_t pen;
+  if (failed(get_pen(ctx, &pen)))
+    {
+    duk_pop(ctx);
+    return DUK_RET_TYPE_ERROR;
+    }
 
+  point_t *pts = 0;
+  uint16_t len = 0;
+  if (failed(get_points(ctx, 0, &pts, &len)))
+    {
+    duk_pop(ctx);
+    return DUK_RET_TYPE_ERROR;
+    }
 
-  return 0;
+  if (failed(polyline(canvas, &clip_rect, &pen, pts, len)))
+    retval = DUK_RET_TYPE_ERROR;
+
+  duk_pop(ctx);
+  kfree(pts);
+
+  return retval;
   }
 
 // ellipse(const rect_t *clip_rect, const pen_t *pen, color_t color, const rect_t *area)
