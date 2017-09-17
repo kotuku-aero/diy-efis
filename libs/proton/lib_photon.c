@@ -170,6 +170,57 @@ static result_t get_pen(duk_context *ctx, pen_t *pen)
   return s_ok;
   }
 
+/*
+convert a parameter to a color.  Can be a string or an rgb value:
+#define color_white RGB(255, 255, 255)
+#define color_black RGB(0, 0, 0)
+#define color_gray RGB(128, 128, 128)
+#define color_light_gray RGB(192, 192, 192)
+#define color_dark_gray RGB(64, 64, 64)
+#define color_red RGB(255, 0, 0)
+#define color_pink RGB(255, 128, 128)
+#define color_blue RGB(0, 0, 255)
+#define color_green RGB(0, 255, 0)
+#define color_lightgreen RGB(0, 192, 0)
+#define color_yellow RGB(255, 255, 64)
+#define color_magenta RGB(255, 0, 255)
+#define color_cyan RGB(0, 255, 255)
+#define color_pale_yellow RGB(255, 255, 208)
+#define color_light_yellow RGB(255, 255, 128)
+#define color_lime_green RGB(192, 220, 192)
+#define color_teal RGB(64, 128, 128)
+#define color_dark_green RGB(0, 128, 0)
+#define color_maroon RGB(128, 0, 0)
+#define color_purple RGB(128, 0, 128)
+#define color_orange RGB(255, 192, 64)
+#define color_khaki RGB(167, 151, 107)
+#define color_olive RGB(128, 128, 0)
+#define color_brown RGB(192, 128, 32)
+#define color_navy RGB(0, 64, 128)
+#define color_light_blue RGB(128, 128, 255)
+#define color_faded_blue RGB(192, 192, 255)
+#define color_lightgrey RGB(192, 192, 192)
+#define color_darkgrey RGB(64, 64, 64)
+#define color_paleyellow RGB(255, 255, 208)
+#define color_lightyellow RGB(255, 255, 128)
+#define color_limegreen RGB(192, 220, 192)
+#define color_darkgreen RGB(0, 128, 0)
+#define color_lightblue RGB(128, 128, 255)
+#define color_fadedblue RGB(192, 192, 255)
+#define color_hollow RGBA(0, 0, 0, 0)
+
+a constant is:
+#RRGGBB
+or
+#AARRGGBB
+*/
+static color_t get_color(duk_context *ctx, duk_int_t obj_idx, bool get_bg)
+  {
+  // return the foreground color, or background color
+
+  return color_hollow;
+  }
+
 static duk_ret_t lib_polyline(duk_context *ctx)
   {
   duk_ret_t retval;
