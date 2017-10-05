@@ -352,6 +352,24 @@ extern result_t send_message(handle_t hwnd, const canmsg_t *msg);
  */
 extern result_t defwndproc(const window_msg_t *msg);
 /**
+ * @function attach_scriptlet(handle_t hwnd, uint16_t id, const char *scriptlet, const char *msg)
+ * attach an ECMA script handler to an event
+ * @param id      Can-ID to process
+ * @param scriptlet Path to script that contains the handler
+ * @param handler Name of the ECMA Script handler
+ * @return s_ok if handler attached
+ */
+extern result_t attach_scriptlet(handle_t hwnd, uint16_t id, const char *scriptlet, const char *handler);
+/**
+ * @function attach_handler(handle_t hwnd, uint16_t id, msg_hook_fn fnc)
+ * attach a native handler for a message id
+ * @param hwnd  Window to attach to
+ * @param id      Can-ID to process
+ * @param fnc   Native function to handle message
+ * @return s_ok if handler attached
+*/
+extern result_t attach_handler(handle_t hwnd, uint16_t id, msg_hook_fn fnc);
+/**
  * @function canvas_close(handle_t hwnd)
  * Close a canvas.
  * @param   canvas to release

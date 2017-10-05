@@ -6,6 +6,7 @@
  */
 
 #include "../neutron/bsp.h"
+#include "../ion/ion.h"
 
 #include "ft2build.h"
 #include "freetype.h"
@@ -60,6 +61,8 @@ typedef struct _screen_t
     msg_hook_t msg_hook;
     // this is the font library
     FT_Library ft_library;
+    // This is the script engine that is associated with the layout
+    ion_context_t *context;
   } screen_t;
 
 static screen_t *phys_screen;
@@ -72,6 +75,9 @@ static screen_t *phys_screen;
 #define max(a, b) ((a) > (b)? (a) : (b))
 #endif
 
+static void on_timer(const canmsg_t *msg)
+  {
+  }
 
 static const canmsg_t paint_msg = {
   .id = id_paint,
@@ -156,6 +162,8 @@ result_t open_screen(uint16_t orientation, wndproc cb, uint16_t id,
   phys_screen->msg_hook.callback = msg_hook;
   // hook the messages
   subscribe(&phys_screen->msg_hook);
+
+  // create an ecma script engine for this layout window.
 
   *hwnd = phys_screen;
   return s_ok;

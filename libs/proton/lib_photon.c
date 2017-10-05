@@ -22,7 +22,6 @@ also has methods
   hide
   show
   insert_before
-  invalidate
 
 the following methods can be over-ridden
   on_paint
