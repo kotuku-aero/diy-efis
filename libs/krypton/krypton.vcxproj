@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\pic\mfd3\splash.c" />
     <ClCompile Include="comm_device.c" />
     <ClCompile Include="deque.c" />
     <ClCompile Include="fb.c" />

@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c" />
+    <ClCompile Include="splash.c" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\libs\krypton\krypton.vcxproj">

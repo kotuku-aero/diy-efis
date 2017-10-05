@@ -1276,7 +1276,7 @@ static void publish_task(void *parg)
             create_can_msg_int8_4(&msg, 0, 0, dp->value.int8_value[0], dp->value.int8_value[1], dp->value.int8_value[2], dp->value.int8_value[3]);
             break;
           case CANAS_DATATYPE_UCHAR :
-            create_can_msg_uint8(&msg, 0, 0, dp->value.uint8_value);
+            create_can_msg_uint8(&msg, 0, 0, dp->value.uint8_value[0]);
             break;
           case CANAS_DATATYPE_UCHAR2:
             create_can_msg_uint8_2(&msg, 0, 0, dp->value.uint8_value[0], dp->value.uint8_value[1]);
