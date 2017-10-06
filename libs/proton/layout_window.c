@@ -35,7 +35,7 @@ static const char *layout_names[] = {
     "menu_window",         // menu window
 };
 
-result_t load_layout(handle_t parent, memid_t hive)
+result_t load_layout(handle_t screen, memid_t hive)
   {
   // the hive must have series of hives that form windows
   result_t result;
@@ -44,6 +44,14 @@ result_t load_layout(handle_t parent, memid_t hive)
   field_datatype type = field_key;
   // must be 0 on first call
   memid_t child = 0;
+
+  // detach the scriptlet interpreter and message hooks
+  if (failed(result = detach_ion(screen)))
+    return result;
+
+  // attach a scriplet interpreter
+  if (failed(result = attach_ion(screen, hive, "init.js")))
+    return result;
   
   while(succeeded(result = reg_enum_key(hive, &type, 0, 0, REG_NAME_MAX, name, &child)))
     {
@@ -51,6 +59,12 @@ result_t load_layout(handle_t parent, memid_t hive)
     memid_t key;
     if(failed(result = reg_open_key(hive, name, &key)))
       return result;
+
+    // we create a widget and pickup the widget defined settings.
+    // these are:
+    // font -> name of the font to load
+    // color -> foreground color
+    // background -> back
     
     char widget_type[REG_STRING_MAX +1];
     length = REG_STRING_MAX +1;
@@ -69,31 +83,31 @@ result_t load_layout(handle_t parent, memid_t hive)
     switch(ordinal)
       {
       case airspeed_window :
-        create_airspeed_window(parent, child, &hwnd);
+        create_airspeed_window(screen, child, &hwnd);
         break;
       case hsi_window :
-        create_hsi_window(parent, child, &hwnd);
+        create_hsi_window(screen, child, &hwnd);
         break;
       case attitude_window :
-        create_attitude_window(parent, child, &hwnd);
+        create_attitude_window(screen, child, &hwnd);
         break;
       case altitude_window :
-        create_altitude_window(parent, child, &hwnd);
+        create_altitude_window(screen, child, &hwnd);
         break;
       case gauge_window :
-        create_gauge_window(parent, child, &hwnd);
+        create_gauge_window(screen, child, &hwnd);
         break;
       case annunciator_window :
-        create_annunciator_window(parent, child, &hwnd);
+        create_annunciator_window(screen, child, &hwnd);
         break;
       case gps_window :
-        create_gps_window(parent, child, &hwnd);
+        create_gps_window(screen, child, &hwnd);
        break;
       case alert_window :
         
         break;
       case menu_window :
-        create_menu_window(parent, child, &hwnd);
+        create_menu_window(screen, child, &hwnd);
         break;
 
       default:

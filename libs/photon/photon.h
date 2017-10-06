@@ -179,6 +179,24 @@ typedef result_t (*wndproc)(const window_msg_t *msg);
  */
 extern result_t open_screen(uint16_t orientation, wndproc cb, uint16_t id, handle_t *hwnd);
 /**
+ * @function attach_ion(handle_t screen, memid_t key, const char *script)
+ * Attach an ion interpreter to the screen.  Will load the script as a startup script
+ * and call on_attach if it exists
+ * @param screen        Screen to attach to
+ * @param key           Registry hive to load all scripts from
+ * @param script        Startup script to run
+ * @return s_ok if the interpreter was started ok.
+ */
+extern result_t attach_ion(handle_t screen, memid_t key, const char *script);
+/**
+ * @function detach_ion(handle_t screen)
+ * Detach an interpreter and release all resources.  Will call on_detach if
+ * the startup script defined it
+ * @param screen      Screen to detach
+ * @return s_ok if the interpreter was detached ok.
+ */
+extern result_t detach_ion(handle_t screen);
+/**
  * @function create_window(handle_t parent, const rect_t *bounds, wndproc cb, uint16_t id, handle_t *hwnd)
  * Create a window.  Will create a new canvas
  * @param parent  Parent window.  if 0 then the top level window is created

@@ -163,9 +163,8 @@ result_t open_screen(uint16_t orientation, wndproc cb, uint16_t id,
   // hook the messages
   subscribe(&phys_screen->msg_hook);
 
-  // create an ecma script engine for this layout window.
-
   *hwnd = phys_screen;
+
   return s_ok;
   }
 
