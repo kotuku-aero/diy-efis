@@ -398,11 +398,17 @@ result_t ion_run()
   // enumerate the ion keys
   memid_t ion_home;
   if(failed(result = reg_open_key(0, ion_key, &ion_home)))
-    return result;
+    {
+    if(failed(result = reg_create_key(0, ion_key, &ion_home)))
+      return result;
+    }
   
   memid_t parent;
   if(failed(result = reg_open_key(ion_home, event_key, &parent)))
-    return result;
+    {
+    if(failed(result = reg_create_key(ion_home, event_key, &parent)))
+      return result;
+    }
   
   field_datatype dt = field_key;
   char event_name[REG_NAME_MAX+1];

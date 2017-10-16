@@ -60,7 +60,7 @@ result_t reg_read_bytes(uint32_t byte_offset,
     bytes_to_read -= read_size;
 
     // assume we write a full sector.
-    read_size = 128;
+    read_size = SECTOR_SIZE;
     }
 
   return s_ok;
@@ -106,7 +106,7 @@ result_t reg_write_bytes(uint32_t byte_offset,
     bytes_to_write -= write_size;
 
     // assume we write a full sector.
-    write_size = 128;
+    write_size = SECTOR_SIZE;
     }
 
   return s_ok;
@@ -145,7 +145,7 @@ result_t bsp_reg_init(bool factory_reset,
     root->hdr.hdr.length = num_bitmap_bytes + sizeof(eeprom_root_t);
     root->hdr.hdr.memid = 0;
     root->hdr.hdr.name[0] = '/';
-    if(failed(result = reg_write_bytes(0, num_bitmap_bytes+1, root)))
+    if(failed(result = reg_write_bytes(0, num_bitmap_bytes+ sizeof(eeprom_root_t), root)))
       return result;
 
     return e_not_initialized;
