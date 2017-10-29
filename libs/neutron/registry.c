@@ -29,6 +29,8 @@ result_t reg_read_bytes(uint32_t byte_offset,
 
   // calculate the first block to write.
   uint16_t read_size = 128 - (byte_offset & 0x7f);
+  
+  handle_t thread_mutex = bsp_thread_mutex();
 
   while(bytes_to_read > 0)
     {
@@ -46,12 +48,12 @@ result_t reg_read_bytes(uint32_t byte_offset,
     if(failed(result = bsp_reg_read_block(byte_offset,
                                           read_size,
                                           buffer,
-                                          last_read ? bsp_thread_mutex() : 0)))
+                                          last_read ? thread_mutex : 0)))
       return result;
 
     if(last_read)
       {
-      result = semaphore_wait(bsp_thread_mutex(), INDEFINITE_WAIT);
+      result = semaphore_wait(thread_mutex, INDEFINITE_WAIT);
       return result;
       }
 
@@ -76,6 +78,8 @@ result_t reg_write_bytes(uint32_t byte_offset,
   uint16_t write_size = SECTOR_SIZE - (byte_offset & (SECTOR_SIZE-1));
   if(write_size > bytes_to_write)
     write_size = bytes_to_write;
+  
+  handle_t thread_mutex = bsp_thread_mutex();
 
   while(bytes_to_write > 0)
     {
@@ -90,14 +94,14 @@ result_t reg_write_bytes(uint32_t byte_offset,
       }
 
     // last block is on a 128 byte page
-    if(failed(result = bsp_reg_write_block(byte_offset, write_size, buffer, last_write ? bsp_thread_mutex() : 0)))
+    if(failed(result = bsp_reg_write_block(byte_offset, write_size, buffer, last_write ? thread_mutex : 0)))
       {
       return result;
       }
 
     if(last_write)
       {
-      result = semaphore_wait(bsp_thread_mutex(), INDEFINITE_WAIT);
+      result = semaphore_wait(thread_mutex, INDEFINITE_WAIT);
       return result;
       }
 
