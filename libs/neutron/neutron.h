@@ -837,15 +837,15 @@ extern result_t can_send_raw(canmsg_t *);
  */
 extern result_t can_send_reply(canmsg_t *);
 
-typedef void (*msg_hook_fn)(const canmsg_t *);
 /**
- * @function register_service(uint8_t service, msg_hook_fn handler)
- * Register a service handler
- * @param service   service ID, cannot be 0
- * @param handler   handler
- * @return s_ok if the handler installed ok
+ * @function bool (*msg_hook_fn)(const canmsg_t *msg, void *parg)
+ * @param msg   Can message to process
+ * @param parg  Argument used when hook function registered
+ * @return true if the message was handled.  Only used when a service callback
+ * is used.
  */
-extern result_t register_service(uint8_t service, msg_hook_fn handler);
+
+typedef bool (*msg_hook_fn)(const canmsg_t *, void *parg);
 
 /**
  * @struct msg_hook_t
@@ -858,7 +858,17 @@ typedef struct _msg_hook_t
   struct _msg_hook_t *next;
   struct _msg_hook_t *prev;
   msg_hook_fn callback;
+  void *parg;
   } msg_hook_t;
+  
+/**
+ * @function register_service(uint8_t service, msg_hook_t *handler, void *parg)
+ * Register a service handler
+ * @param service   service ID, cannot be 0
+ * @param handler   handler
+ * @return s_ok if the handler installed ok
+ */
+extern result_t register_service(uint8_t service, msg_hook_t *handler);
 /**
  * @function subscribe(msg_hook_t *handler)
  * register a call-back function to handle messages.

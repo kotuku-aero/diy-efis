@@ -103,8 +103,6 @@ extern result_t send_can_id_type_session_val1_val2_val3_val4_action(cli_t *conte
 
 extern const enum_t can_types[];
 
-extern result_t exit_action(cli_t *context);
-
 extern result_t ion_add_id_name_msg_handler_action(cli_t *context, uint16_t ion_add_id_, string_t ion_add_id_name_, string_t ion_add_id_name_msg_handler_);
 
 extern result_t ion_del_id_name_action(cli_t *context, uint16_t ion_del_id_, string_t ion_del_id_name_);

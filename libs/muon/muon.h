@@ -41,7 +41,7 @@
  * Initialize the CLI parser.  Hooks the message queue
  * @return s_ok if hook installed ok
  */
-extern result_t muon_initialize_cli();
+extern result_t muon_initialize_cli(cli_node_t *cli_root);
 /**
  * Edit a stream
  * @param stdin   stream to read console from

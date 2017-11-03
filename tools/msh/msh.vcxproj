@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c" />
+    <ClCompile Include="msh_cli.c" />
     <ClCompile Include="splash.c" />
   </ItemGroup>
   <ItemGroup>
@@ -41,6 +42,12 @@
     <ProjectReference Include="..\proton\proton.vcxproj">
       <Project>{eb965c9f-0179-46ce-9f33-f2991b423515}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="msh.cli" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="msh_cli.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

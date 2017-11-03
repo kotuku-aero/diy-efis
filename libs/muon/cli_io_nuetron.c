@@ -58,14 +58,12 @@ static service_channel_t *open_channel(uint16_t can_id)
   uint16_t i;
   for (i = 0; i < MAX_CHANNELS; i++)
     {
-    if (channels[i]->channel_number == can_id)
-      break;
+    if (channels[i] != 0 &&
+        channels[i]->can_id == can_id)
+      return channels[i];
     }
 
-  if (i == MAX_CHANNELS)
-    return 0;
-
-  return channels[i];
+  return 0;
   }
 
 void close_channel(uint16_t can_id)
@@ -148,7 +146,7 @@ static result_t css_stream_read(stream_handle_t *hndl, void *buffer, uint16_t si
     buffer = ((uint8_t *)buffer)+1;
     size--;
     
-    if(*read != 0)
+    if(read != 0)
       *read = *read+1;
     }
   
@@ -204,7 +202,7 @@ static result_t css_stream_write(stream_handle_t *hndl, const void *buffer, uint
     else
       {
       msg.length = 5;
-      msg.canas.data_type = CANAS_DATATYPE_UCHAR;
+      msg.canas.data_type = CANAS_DATATYPE_CHAR;
       msg.canas.data[0] = *str++;
       size--;
       }
@@ -255,9 +253,7 @@ static void parser_worker(void *parg)
 
 #define RX_BUFFER_SIZE 128
 
-extern cli_node_t *app_cli_root;
-
-void create_channel(const canmsg_t *msg)
+void create_channel(const canmsg_t *msg, cli_node_t *app_cli_root)
   {
   uint16_t i;
   canmsg_t reply_msg;
@@ -300,7 +296,7 @@ void create_channel(const canmsg_t *msg)
   channel->parser.cfg.ch_del = 127;
   channel->parser.cfg.ch_help = '?';
   channel->parser.cfg.flags = 0;
-  strcpy(channel->parser.cfg.prompt, node_name);
+  channel->parser.cfg.prompt = string_dup(node_name);
 
   channel->parser.cfg.console_in = &channel->stream;
   channel->parser.cfg.console_out = &channel->stream;
@@ -319,7 +315,7 @@ void create_channel(const canmsg_t *msg)
     }
 
   // the channel is open.  create a task.
-  if (failed(task_create("CLI", DEFAULT_STACK_SIZE, parser_worker, 0, NORMAL_PRIORITY, &channel->worker)))
+  if (failed(task_create("CLI", DEFAULT_STACK_SIZE, parser_worker, channel, NORMAL_PRIORITY, &channel->worker)))
     {
     // reply to the message
     reply_msg.canas.message_code = NO_WORKER;
@@ -336,7 +332,7 @@ void create_channel(const canmsg_t *msg)
   can_send_reply(&reply_msg);
   }
 
-void process_ccs(const canmsg_t *msg)
+bool process_ccs(const canmsg_t *msg, void *parg)
   {
   // decide how to create 
   // find the channel
@@ -344,31 +340,34 @@ void process_ccs(const canmsg_t *msg)
   if(channel == 0)
     {
     // open a channel if possible
-    create_channel(msg);
+    create_channel(msg, (cli_node_t *)parg);
     return;
     }
 
-  // push the characters onto the worker queue
-  switch(msg->canas.data_type)
+  if(msg->canas.data_type != CANAS_DATATYPE_NODATA)
     {
-    case CANAS_DATATYPE_UCHAR :
-      push_back(channel->queue, &msg->canas.data[0], 0);
-      break;
-    case CANAS_DATATYPE_CHAR2 :
-      push_back(channel->queue, &msg->canas.data[0], 0);
-      push_back(channel->queue, &msg->canas.data[1], 0);
-      break;
-    case CANAS_DATATYPE_CHAR3 :
-      push_back(channel->queue, &msg->canas.data[0], 0);
-      push_back(channel->queue, &msg->canas.data[1], 0);
-      push_back(channel->queue, &msg->canas.data[2], 0);
-      break;
-    case CANAS_DATATYPE_CHAR4 :
-      push_back(channel->queue, &msg->canas.data[0], 0);
-      push_back(channel->queue, &msg->canas.data[1], 0);
-      push_back(channel->queue, &msg->canas.data[2], 0);
-      push_back(channel->queue, &msg->canas.data[3], 0);
-      break;
+    // push the characters onto the worker queue
+    switch(msg->canas.data_type)
+      {
+      case CANAS_DATATYPE_CHAR :
+        push_back(channel->queue, &msg->canas.data[0], 0);
+        break;
+      case CANAS_DATATYPE_CHAR2 :
+        push_back(channel->queue, &msg->canas.data[0], 0);
+        push_back(channel->queue, &msg->canas.data[1], 0);
+        break;
+      case CANAS_DATATYPE_CHAR3 :
+        push_back(channel->queue, &msg->canas.data[0], 0);
+        push_back(channel->queue, &msg->canas.data[1], 0);
+        push_back(channel->queue, &msg->canas.data[2], 0);
+        break;
+      case CANAS_DATATYPE_CHAR4 :
+        push_back(channel->queue, &msg->canas.data[0], 0);
+        push_back(channel->queue, &msg->canas.data[1], 0);
+        push_back(channel->queue, &msg->canas.data[2], 0);
+        push_back(channel->queue, &msg->canas.data[3], 0);
+        break;
+      }
     }
   
   // send ak
@@ -380,9 +379,14 @@ void process_ccs(const canmsg_t *msg)
   reply_msg.canas.service_code = id_ccs_service;
   reply_msg.canas.message_code = PARSER_OK;
   can_send_reply(&reply_msg);
+  
+  return true;
   }
 
-result_t muon_initialize_cli()
+static msg_hook_t service_hook = { 0, 0, process_ccs, 0 };
+
+result_t muon_initialize_cli(cli_node_t *cli_root)
   {
-  return register_service(id_ccs_service, process_ccs);
+  service_hook.parg = cli_root;
+  return register_service(id_ccs_service, &service_hook);
   }

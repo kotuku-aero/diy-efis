@@ -354,6 +354,13 @@ result_t can_send_raw(canmsg_t *msg)
      msg->length == 0)
     return e_bad_parameter;
   
+  // see if this is a service channel request where the
+  // node-id == this node, if that is the case then loop-back the message
+  if(((msg->id >= node_service_channel_0 && msg->id <= (node_service_channel_35+1)) ||
+      (msg->id >= node_service_channel_100 && msg->id <= (node_service_channel_115+1))) &&
+     msg->canas.node_id == node_id)
+    return push_back(can_rx_queue, msg, INDEFINITE_WAIT);
+  
   return push_back(can_tx_queue, msg, INDEFINITE_WAIT);
   }
 
@@ -414,7 +421,7 @@ result_t unsubscribe(msg_hook_t *handler)
 
 static uint8_t ids_reply[4];
 
-static void publish_ids(const canmsg_t *service_msg)
+static bool publish_ids(const canmsg_t *service_msg, void *parg)
   {
   
   // we only accept a publish ids if the addressed node id is 0 or the node if
@@ -426,21 +433,39 @@ static void publish_ids(const canmsg_t *service_msg)
     ids_reply[0] = hardware_revision;
     ids_reply[1] = software_revision;
 
-    can_send(create_can_msg_uint8_4(&msg, service_msg->id + 1, 0, ids_reply[0], ids_reply[1], ids_reply[2], ids_reply[3]));
+    can_send(create_can_msg_uint8_4(&msg, service_msg->id + 1, 0,
+                                    ids_reply[0], ids_reply[1],
+                                    ids_reply[2], ids_reply[3]));
+    
+    return true;
     }
+  
+  return false;
   }
+
+static msg_hook_t ids_hook = { 0, 0, publish_ids, 0 };
 
 static canmsg_t rx_msg;
 
-static msg_hook_fn services[num_services] = { publish_ids };
+static msg_hook_t *services[num_services];
 
-result_t register_service(uint8_t service, msg_hook_fn handler)
+result_t register_service(uint8_t service, msg_hook_t *handler)
   {
   if(service == 0 ||
      service >= num_services)
     return e_bad_parameter;
   
+  enter_critical();
+  
+  if(services[service] != 0)
+    {
+    handler->prev = services[service];
+    handler->prev->next = handler;
+    }
+  
   services[service] = handler;
+  
+  exit_critical();
   
   return s_ok;
   }
@@ -459,7 +484,7 @@ void can_rx_task(void *parg)
     // call all of the message handlers....
     msg_hook_t *handler;
     for(handler = listener; handler != 0; handler = handler->next)
-      (handler->callback)(&rx_msg);
+      (handler->callback)(&rx_msg, handler->parg);
 
     // handle the builtin services next.  The service channel +1 is the reply channel
     switch(rx_msg.id & 0xfffe)
@@ -518,7 +543,17 @@ void can_rx_task(void *parg)
       case node_service_channel_115 :
         if(rx_msg.canas.service_code < num_services &&
            services[rx_msg.canas.service_code] != 0)
-          (*services[rx_msg.canas.service_code])(&rx_msg);
+          {
+          msg_hook_t *service = services[rx_msg.canas.service_code];
+          
+          while(service != 0)
+            {
+            if((*service->callback)(&rx_msg, service->parg))
+              break;      // message was handled
+            
+            service = service->prev;
+            }
+          }
         break;
       }
     }
@@ -526,7 +561,7 @@ void can_rx_task(void *parg)
 
 extern result_t neutron_init(const neutron_parameters_t *params, bool init_mode);
 
-result_t publisher_init(const neutron_parameters_t *params, bool init_mode)
+result_t can_aerospace_init(const neutron_parameters_t *params, bool init_mode)
   {
   handle_t task_id;
   result_t result;
@@ -534,6 +569,8 @@ result_t publisher_init(const neutron_parameters_t *params, bool init_mode)
   hardware_revision = params->hardware_revision;
   software_revision = params->software_revision;
   node_id = params->node_id;
+  
+  register_service(id_ids_service, &ids_hook);
 
   if (failed(result = deque_create(sizeof(canmsg_t),
     params->tx_length == 0 ? 64 : params->tx_length,
@@ -569,7 +606,7 @@ result_t publisher_init(const neutron_parameters_t *params, bool init_mode)
     return result;
     }
   
-  if(failed(result = publisher_init(params, init_mode)))
+  if(failed(result = neutron_init(params, init_mode)))
     return result;
 
   // start the can driver running.

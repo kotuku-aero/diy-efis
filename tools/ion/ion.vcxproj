@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\libs\ion\duktape.c" />
-    <ClCompile Include="..\..\libs\ion\ion_cli.c" />
     <ClCompile Include="..\..\libs\ion\ion_cli_impl.c" />
     <ClCompile Include="..\..\libs\ion\ion_interactive.c" />
     <ClCompile Include="..\..\libs\ion\ion_lib.c" />

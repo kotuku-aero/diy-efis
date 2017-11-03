@@ -21,5 +21,18 @@
     <ClCompile Include="splash.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="msh_cli.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="msh.cli">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="msh_cli.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

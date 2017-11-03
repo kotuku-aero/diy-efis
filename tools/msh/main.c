@@ -6,7 +6,7 @@
 #include "../../libs/neutron/slcan.h"
 
 #include "../../libs/ion/interpreter.h"
-#include "../../libs/ion/ion_cli.h"
+#include "msh_cli.h"
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -225,7 +225,7 @@ int main(int argc, char **argv)
   channel.stream.stream_write = css_stream_write;
   channel.stream.stream_close = css_stream_close;
 
-  channel.parser.cfg.root = &ion_cli_root;
+  channel.parser.cfg.root = &msh_cli_root;
   channel.parser.cfg.ch_complete = '\t';
   channel.parser.cfg.ch_erase = '\b';
   channel.parser.cfg.ch_del = 127;

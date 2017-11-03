@@ -88,6 +88,14 @@ result_t stream_printf(handle_t stream, char const *fmt, ...)
   return stream_vprintf(stream, fmt, va);
   }
 
+static char *ensure_buffer(char **buffer)
+  {
+  if(*buffer == 0)
+    *buffer = (char *) kmalloc(64);
+  
+  return *buffer;
+  }
+
 result_t stream_vprintf(handle_t stream, const char *fmt, va_list ap)
   {
   bool is_long = false;
@@ -96,7 +104,7 @@ result_t stream_vprintf(handle_t stream, const char *fmt, va_list ap)
 
   char ch;
 
-  char buffer[512];
+  char *buffer = 0;
 
   while ((ch = *fmt++)!= 0)
     {
@@ -131,23 +139,23 @@ result_t stream_vprintf(handle_t stream, const char *fmt, va_list ap)
         /* %d: print out an int         */
       case 'd':
           if(is_unsigned)
-            neutron_itoa(va_arg(ap, uint32_t), buffer, 32);
+            neutron_itoa(va_arg(ap, uint32_t), ensure_buffer(&buffer), 32);
           else
-            neutron_itoa(va_arg(ap, int32_t), buffer, 32);
+            neutron_itoa(va_arg(ap, int32_t), ensure_buffer(&buffer), 32);
 
         stream_puts(stream, buffer);
         break;
 
         /* %x: print out an int in hex  */
       case 'x':
-          neutron_itox(va_arg(ap, uint32_t), buffer, 32);
+          neutron_itox(va_arg(ap, uint32_t), ensure_buffer(&buffer), 32);
 
         stream_puts(stream, buffer);
         break;
 
       case 'e':
       case 'f':
-        ftoa_fixed(buffer, (float)va_arg(ap, double));
+        ftoa_fixed(ensure_buffer(&buffer), (float)va_arg(ap, double));
         stream_puts(stream, buffer);
         break;
        }
@@ -158,6 +166,10 @@ result_t stream_vprintf(handle_t stream, const char *fmt, va_list ap)
     else
       stream_putc(stream, ch);
     }
+  
+  if(buffer != 0)
+    kfree(buffer);
+  
   return s_ok;
   }
 

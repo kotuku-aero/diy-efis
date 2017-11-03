@@ -1439,7 +1439,12 @@ result_t neutron_init(const neutron_parameters_t *params, bool init_mode)
     key_type = field_key;
 
     if(failed(result = reg_enum_key(publisher_key, &key_type, 0, 0, REG_NAME_MAX + 1, name, &key)))
+      {
+      if(result == e_not_found)
+        break;
+      
       return result;
+      }
 
     bool is_valid = true;
     uint16_t can_id = 0;

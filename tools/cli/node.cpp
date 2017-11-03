@@ -460,7 +460,7 @@ std::string node_t::glue_fn()
   to this end node
   */
   nodes_t nodes = walk_up_to_root();
-  msg << "result_t cli_" << path() << " (cli_t *parser)" << std::endl
+  msg << "static result_t cli_" << path() << " (cli_t *parser)" << std::endl
     << "  {" << std::endl;
 
   msg << "  result_t result;" << std::endl;

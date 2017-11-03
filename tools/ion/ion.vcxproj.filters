@@ -21,9 +21,6 @@
     <ClCompile Include="..\..\libs\ion\ion_cli_impl.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\ion\ion_cli.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libs\ion\ion_lib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -47,10 +44,10 @@
     <ClInclude Include="..\..\libs\ion\ion_cli_impl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\libs\ion\ion_cli.h">
+    <ClInclude Include="..\..\libs\ion\ion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\libs\ion\ion.h">
+    <ClInclude Include="..\..\libs\ion\ion_cli.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
