@@ -188,6 +188,18 @@ extern result_t reg_write_bytes(uint32_t byte_offset,
                                 uint16_t bytes_to_write,
                                 const void *buffer);
 
+/**
+ */
+extern void enter_registry();
+
+/**
+ */
+extern result_t exit_registry(result_t exit_code);
+
+extern result_t reg_query_child_impl(memid_t parent, const char *name, memid_t *key, field_datatype *type, uint16_t *len);
+extern result_t reg_query_memid_impl(memid_t memid, field_datatype *type, char *name, uint16_t *length, memid_t *parent);
+extern result_t reg_delete_value_impl(memid_t memid, const char *name);
+
 #ifdef	__cplusplus
   }
 #endif

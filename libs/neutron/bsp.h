@@ -170,7 +170,7 @@ extern result_t bsp_reg_init(bool factory_reset, uint16_t size, uint16_t row_siz
  * @param task_callback	Syncronisation semaphore to use if needed
  * @return s_ok if opened ok
  */
-extern result_t bsp_reg_read_block(uint32_t memid, uint16_t bytes_to_read, void *buffer, handle_t task_callback);
+extern result_t bsp_reg_read_block(uint32_t memid, uint16_t bytes_to_read, void *buffer);
 /**
  * Read blocks to the registry memory
  * @param memid			Starting memid
@@ -179,7 +179,7 @@ extern result_t bsp_reg_read_block(uint32_t memid, uint16_t bytes_to_read, void 
  * @param task_callback	Syncronisation semaphore to use if needed
  * @return s_ok if opened ok
  */
-extern result_t bsp_reg_write_block(uint32_t memid, uint16_t bytes_to_write, const void *buffer, handle_t task_callback);
+extern result_t bsp_reg_write_block(uint32_t memid, uint16_t bytes_to_write, const void *buffer);
 /**
  * open an manifest resource stream
  * @param path        uri path to the resource
@@ -220,11 +220,6 @@ typedef struct _neutron_parameters_t
  * @return s_ok if started ok
  */
 extern result_t neutron_init(const neutron_parameters_t *params, bool init_mode);
-/**
- * Return a semaphore the current thread can be blocked on.
- * @return mutex
- */
-extern handle_t bsp_thread_mutex();
 
 /////////////////////////////////////////////////////////////////////////////
 //

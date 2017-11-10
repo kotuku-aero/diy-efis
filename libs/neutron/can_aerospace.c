@@ -569,8 +569,6 @@ result_t can_aerospace_init(const neutron_parameters_t *params, bool init_mode)
   hardware_revision = params->hardware_revision;
   software_revision = params->software_revision;
   node_id = params->node_id;
-  
-  register_service(id_ids_service, &ids_hook);
 
   if (failed(result = deque_create(sizeof(canmsg_t),
     params->tx_length == 0 ? 64 : params->tx_length,

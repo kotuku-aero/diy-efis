@@ -1420,9 +1420,12 @@ result_t neutron_init(const neutron_parameters_t *params, bool init_mode)
     return result;
 
   memid_t publisher_key;
-  if(failed(result = (init_mode
-      ? reg_create_key(0, s_publisher_key, &publisher_key)
-      : reg_open_key(0, s_publisher_key, &publisher_key))))
+  if(init_mode)
+    result = reg_create_key(0, s_publisher_key, &publisher_key);
+  else
+    result = reg_open_key(0, s_publisher_key, &publisher_key);
+  
+  if(failed(result))
     return result;
 
   // create the trace handler

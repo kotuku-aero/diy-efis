@@ -1105,6 +1105,13 @@ extern result_t task_create(const char *name,
                            void *parg,
                            uint8_t priority,
                            handle_t *task);
+
+/**
+ * @function get_current_task()
+ * return the handle to the currently executing task
+ * @return task handle
+ */
+extern handle_t get_current_task();
 /**
  * @function set_task_priority(handle_t task, uint8_t priority)
  * Change the priority of a scheduled task
