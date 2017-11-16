@@ -1476,7 +1476,9 @@ result_t neutron_init(const neutron_parameters_t *params, bool init_mode)
 
   // create the publisher schedule
   return task_create("CAN_PUBLISHER",
-                     params->publisher_stack_length,
+                     params->publisher_stack_length == 0 
+                        ? DEFAULT_STACK_SIZE 
+                        : params->publisher_stack_length,
                      publish_task, 0,
                      NORMAL_PRIORITY, &task_id);
   }

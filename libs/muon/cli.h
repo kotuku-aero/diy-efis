@@ -873,6 +873,9 @@ typedef struct cli_token_ {
     /** Index (in the line) of the beginning of the token */
     uint16_t begin_ptr;    // if -1 then
     string_t buffer;      /**< Local copy of the token */
+
+    // if this is > then a string character " was detected and will be matched
+    uint16_t in_string;
     /** 
      * Pointer to the parent node whose one of its children matches
      * this token.

@@ -137,14 +137,18 @@ static result_t css_stream_read(stream_handle_t *hndl, void *buffer, uint16_t si
   if(read != 0)
     *read = 0;
   
-  while(size > 0)
+  char *str = (char *)buffer;
+  
+  while(size--)
     {
     // get the char
     if(failed(result = pop_front(channel->queue, buffer, INDEFINITE_WAIT)))
       return result;
     
-    buffer = ((uint8_t *)buffer)+1;
-    size--;
+    if(*str == '\r')
+      *str = '\n';
+    
+    str++;
     
     if(read != 0)
       *read = *read+1;
@@ -206,10 +210,10 @@ static result_t css_stream_write(stream_handle_t *hndl, const void *buffer, uint
       msg.canas.data[0] = *str++;
       size--;
       }
-    }
   
-  // this will set the message code correctly
-  can_send(&msg);
+    // this will set the message code correctly
+    can_send(&msg);
+    }
  
   return s_ok;
   }
@@ -315,7 +319,7 @@ void create_channel(const canmsg_t *msg, cli_node_t *app_cli_root)
     }
 
   // the channel is open.  create a task.
-  if (failed(task_create("CLI", DEFAULT_STACK_SIZE, parser_worker, channel, NORMAL_PRIORITY, &channel->worker)))
+  if (failed(task_create("CLI", DEFAULT_STACK_SIZE * 4, parser_worker, channel, NORMAL_PRIORITY-1, &channel->worker)))
     {
     // reply to the message
     reply_msg.canas.message_code = NO_WORKER;
@@ -341,7 +345,7 @@ bool process_ccs(const canmsg_t *msg, void *parg)
     {
     // open a channel if possible
     create_channel(msg, (cli_node_t *)parg);
-    return;
+    return true;
     }
 
   if(msg->canas.data_type != CANAS_DATATYPE_NODATA)

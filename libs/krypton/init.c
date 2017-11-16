@@ -116,23 +116,16 @@ extern result_t electron_init(const char *reg_path, bool factory_reset)
 
 #define BLOCK_SHIFT 5
 
-result_t bsp_reg_read_block(uint32_t offset, uint16_t bytes_to_read,
-  void *buffer, handle_t task_callback)
+result_t bsp_reg_read_block(uint32_t offset, uint16_t bytes_to_read, void *buffer)
   {
   memcpy(buffer, reg_buffer + offset, bytes_to_read);
-
-  if (task_callback != 0)
-    semaphore_signal(task_callback);
   return s_ok;
   }
 
-result_t bsp_reg_write_block(uint32_t offset, uint16_t bytes_to_write,
-  const void *buffer, handle_t task_callback)
+result_t bsp_reg_write_block(uint32_t offset, uint16_t bytes_to_write, const void *buffer)
   {
   memcpy(reg_buffer + offset, buffer, bytes_to_write);
   FlushViewOfFile(reg_buffer + offset, bytes_to_write);
-  if (task_callback != 0)
-    semaphore_signal(task_callback);
 
   return s_ok;
   }

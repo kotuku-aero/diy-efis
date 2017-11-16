@@ -2,6 +2,14 @@
 #include "bsp.h"
 #include <string.h>
 
+#ifndef DEFAULT_TX_QUEUE_SIZE
+#define DEFAULT_TX_QUEUE_SIZE  128
+#endif
+
+#ifndef DEFAULT_RX_QUEUE_SIZE
+#define DEFAULT_RX_QUEUE_SIZE  128
+#endif
+
 // global node id
 uint8_t node_id;
 static uint8_t hardware_revision;
@@ -337,9 +345,9 @@ static uint8_t message_code;
  * @param parg
  */
     
-static canmsg_t tx_msg;
 void can_tx_task(void *parg)
   {
+  canmsg_t tx_msg;
   while(true)
     {
     // block till a message is ready
@@ -353,13 +361,15 @@ result_t can_send_raw(canmsg_t *msg)
   if(msg == 0 ||
      msg->length == 0)
     return e_bad_parameter;
-  
+
+#if 0  
   // see if this is a service channel request where the
   // node-id == this node, if that is the case then loop-back the message
   if(((msg->id >= node_service_channel_0 && msg->id <= (node_service_channel_35+1)) ||
       (msg->id >= node_service_channel_100 && msg->id <= (node_service_channel_115+1))) &&
      msg->canas.node_id == node_id)
     return push_back(can_rx_queue, msg, INDEFINITE_WAIT);
+#endif
   
   return push_back(can_tx_queue, msg, INDEFINITE_WAIT);
   }
@@ -570,17 +580,21 @@ result_t can_aerospace_init(const neutron_parameters_t *params, bool init_mode)
   software_revision = params->software_revision;
   node_id = params->node_id;
 
-  if (failed(result = deque_create(sizeof(canmsg_t),
-    params->tx_length == 0 ? 64 : params->tx_length,
-    &can_tx_queue)))
+  if (failed(result = deque_create(sizeof(canmsg_t), 
+                                   params->tx_length == 0 
+                                      ? DEFAULT_TX_QUEUE_SIZE 
+                                      : params->tx_length,
+                                   &can_tx_queue)))
     {
     trace_error("Cannot create can_txt_queue");
     return result;
     }
 
   if (failed(result = deque_create(sizeof(canmsg_t),
-    params->rx_length == 0 ? 128 : params->rx_length,
-    &can_rx_queue)))
+                                   params->rx_length == 0 
+                                      ? DEFAULT_RX_QUEUE_SIZE 
+                                      : params->rx_length,
+                                   &can_rx_queue)))
     {
     trace_error("Cannot create can_rx_queue");
     return result;

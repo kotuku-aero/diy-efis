@@ -50,6 +50,9 @@ typedef struct _service_channel_t
     return feof(ci) ? s_ok : s_false;
     }
 
+static HANDLE clipdata = 0;
+static int offset = 0;
+
   static result_t css_stream_read(stream_handle_t *hndl, void *buffer, uint16_t size, uint16_t *read)
     {
     if(hndl == 0 || buffer == 0 || size == 0)
@@ -78,15 +81,67 @@ typedef struct _service_channel_t
     if(read != 0)
       *read = 1;
 #else
-    DWORD bytesRead;
-    ReadFile(ci, buffer, size, &bytesRead, NULL);
+    DWORD bytesRead = 0;
+    char *str = (char *)buffer;
+
+    if(clipdata != 0)
+      {
+      LPSTR hglb = GlobalLock(clipdata);
+
+      int len = strlen(hglb);
+
+      while(size > 0 && offset < len)
+        {
+        size--;
+
+        if (hglb[offset] == 0)
+          {
+          offset = -1;
+          size++;
+          break;
+          }
+
+        *str++ = hglb[offset++];
+        bytesRead++;
+        }
+
+      GlobalUnlock(clipdata);
+
+      if(offset == -1)
+        {
+        CloseClipboard(GetShellWindow());
+        clipdata = 0;
+        }
+      }
+
+    str = (char *)buffer;
+
+    if(size > 0 )
+      ReadFile(ci, buffer, size, &bytesRead, NULL);
+
     if (read != 0)
       *read = (uint16_t)bytesRead;
 
-    char *str = (char *)buffer;
     while (bytesRead--)
-      if (*str == '\r')
-        *str = '\n';
+      {
+      switch(*str)
+        {
+        case '\r' :
+          *str = '\n';
+          break;
+        case  0x16 :  // windows CTRL-V
+          if (clipdata == NULL)
+            {
+            if(!OpenClipboard(GetShellWindow()))
+              continue;
+            clipdata = GetClipboardData(CF_TEXT);
+            offset = 0;
+            }
+          break;
+        }
+      }
+      //if (*str == '\r')
+      //  *str = '\n';
 #endif
 
     return s_ok;

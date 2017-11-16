@@ -11,30 +11,13 @@ static uint16_t page_size;
 // at a time.
 static handle_t mutex;
 
-#ifdef _DEBUG
-static handle_t owner;
-#endif
-
 void enter_registry()
   {
-#ifdef _DEBUG
-  if(owner == get_current_task())
-    panic();        // recursive call!
-#endif
-  
   semaphore_wait(mutex, INDEFINITE_WAIT);
-  
-#ifdef _DEBUG
-  owner = get_current_task();
-#endif
   }
 
 result_t exit_registry(result_t exit_code)
   {
-#ifdef _DEBUG
-  owner = 0;
-#endif
-  
   semaphore_signal(mutex);
   
   return exit_code;

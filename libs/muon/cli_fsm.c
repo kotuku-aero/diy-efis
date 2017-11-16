@@ -172,12 +172,29 @@ static cli_state_t cli_ws_char(cli_t *parser, char ch, bool *ch_processed)
   cli_token_t *token;
   token = CUR_TOKEN(parser);
 
+  *ch_processed = false;
+
+  if (ch == '"')
+    {
+    if (token->in_string > 0)
+      token->in_string--;
+    else
+      {
+      token->in_string++;
+      token->begin_ptr = parser->current_pos;
+      return CLI_STATE_TOKEN;
+      }
+    }
+  else
+    /* A valid token found. Add to token stack */
+    token->buffer = string_push_back(token->buffer, ch);
+
   *ch_processed = true;
 
-  /* A valid token found. Add to token stack */
-  token->buffer = string_push_back(token->buffer, ch);
+  // TODO handle \" or \\n
   
-  if (!cli_match(parser, token, parser->cur_node, &match, &is_complete))
+  if (token->in_string == 0 &&
+      !cli_match(parser, token, parser->cur_node, &match, &is_complete))
     {
     string_set_length(token->buffer, string_length(token->buffer)-1);
     return CLI_STATE_ERROR; /* no token match */
@@ -236,10 +253,15 @@ static cli_state_t cli_tok_space(cli_t *parser, char ch, bool *ch_processed)
   {
   cli_node_t *match;
   bool is_complete;
-  cli_token_t *token;
+  cli_token_t *token = CUR_TOKEN(parser);
+
+  if (token->in_string > 0)
+    {
+    return cli_tok_char(parser, ch, ch_processed);
+    }
 
   *ch_processed = true;
-  token = CUR_TOKEN(parser);
+
   if ((1 <= cli_match(parser, token, parser->cur_node, &match, &is_complete)) &&
       (is_complete))
     {
@@ -276,17 +298,34 @@ static cli_state_t cli_tok_char(cli_t *parser, char ch, bool *ch_processed)
   {
   cli_node_t *match;
   bool is_complete;
-  cli_token_t *token;
+  cli_token_t *token = CUR_TOKEN(parser);
+
+  *ch_processed = false;
+
+  if (ch == '"')
+    {
+    if (token->in_string > 0)
+      token->in_string--;
+    else
+      {
+      token->in_string++;
+      token->begin_ptr = parser->current_pos;
+      return CLI_STATE_TOKEN;
+      }
+    }
+  else
+    {
+    /* A valid token found. Add to token stack */
+    if (string_length(token->buffer) < CLI_MAX_TOKEN_SIZE)
+      token->buffer = string_push_back(token->buffer, ch);
+    else
+      return CLI_STATE_ERROR;
+    }
 
   *ch_processed = true;
 
-  token = CUR_TOKEN(parser);
-  if (string_length(token->buffer) < CLI_MAX_TOKEN_SIZE)
-    token->buffer = string_push_back(token->buffer, ch);
-  else
-    return CLI_STATE_ERROR;
-
-  if (!cli_match(parser, token, parser->cur_node, &match, &is_complete))
+  if (token->in_string == 0 &&
+      !cli_match(parser, token, parser->cur_node, &match, &is_complete))
     {
     string_set_length(token->buffer, string_length(token->buffer)-1);
     return CLI_STATE_ERROR;
