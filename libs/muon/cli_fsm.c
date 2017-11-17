@@ -236,52 +236,6 @@ static cli_state_t cli_tok_erase(cli_t *parser, char ch, bool *ch_processed)
   }
 
 /**
- * Process a SPC in TOKEN state.
- *
- * \details  There are two possibilities: 1) The token was unique and 
- *           complete -> insert character, update cur_node/WHITESPACE,
- *           2) Otherwise -> insert character/ERROR.
- *
- * \param    parser Pointer to the parser structure.
- * \param    ch     Character to be input which must [SPC].
- *
- * \retval   ch_processed 1 if the character is used; 0 if the character 
- *                        is rejected by the parser FSM.
- * \return   New parser state.
- */
-static cli_state_t cli_tok_space(cli_t *parser, char ch, bool *ch_processed)
-  {
-  cli_node_t *match;
-  bool is_complete;
-  cli_token_t *token = CUR_TOKEN(parser);
-
-  if (token->in_string > 0)
-    {
-    return cli_tok_char(parser, ch, ch_processed);
-    }
-
-  *ch_processed = true;
-
-  if ((1 <= cli_match(parser, token, parser->cur_node, &match, &is_complete)) &&
-      (is_complete))
-    {
-    /* Save the parent node for this token and "close" the token */
-    token->parent = parser->cur_node;
-    token->node = match;
-
-    /* Push it into the stack */
-    parser->token_tos++;
-
-    token = CUR_TOKEN(parser);
-
-    parser->cur_node = match;
-
-    return CLI_STATE_WHITESPACE;
-    }
-  return CLI_STATE_ERROR;
-  }
-
-/**
  * Process a character in TOKEN state.
  *
  * \details  There are three possibilities: 1) there are too many
@@ -332,6 +286,52 @@ static cli_state_t cli_tok_char(cli_t *parser, char ch, bool *ch_processed)
     }
 
   return CLI_STATE_TOKEN;
+  }
+
+/**
+ * Process a SPC in TOKEN state.
+ *
+ * \details  There are two possibilities: 1) The token was unique and 
+ *           complete -> insert character, update cur_node/WHITESPACE,
+ *           2) Otherwise -> insert character/ERROR.
+ *
+ * \param    parser Pointer to the parser structure.
+ * \param    ch     Character to be input which must [SPC].
+ *
+ * \retval   ch_processed 1 if the character is used; 0 if the character 
+ *                        is rejected by the parser FSM.
+ * \return   New parser state.
+ */
+static cli_state_t cli_tok_space(cli_t *parser, char ch, bool *ch_processed)
+  {
+  cli_node_t *match;
+  bool is_complete;
+  cli_token_t *token = CUR_TOKEN(parser);
+
+  if (token->in_string > 0)
+    {
+    return cli_tok_char(parser, ch, ch_processed);
+    }
+
+  *ch_processed = true;
+
+  if ((1 <= cli_match(parser, token, parser->cur_node, &match, &is_complete)) &&
+      (is_complete))
+    {
+    /* Save the parent node for this token and "close" the token */
+    token->parent = parser->cur_node;
+    token->node = match;
+
+    /* Push it into the stack */
+    parser->token_tos++;
+
+    token = CUR_TOKEN(parser);
+
+    parser->cur_node = match;
+
+    return CLI_STATE_WHITESPACE;
+    }
+  return CLI_STATE_ERROR;
   }
 
 /**

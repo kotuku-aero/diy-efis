@@ -348,5 +348,21 @@ result_t ls_path_recursive_action(cli_t *context, string_t path)
 
 result_t exit_action(cli_t *context)
   {
-  return cli_quit(context);
+  if(context->current[context->root_level] == 0)
+    return cli_quit(context);
+
+  memid_t parent;
+  if(failed(reg_query_memid(context->current[context->root_level], 0, 0, 0, &parent)))
+    parent = 0;
+
+  context->current[context->root_level] = parent;
+  // update the submode
+  string_t dirname = get_full_path(parent);
+
+  string_t prompt = string_printf("%s %s ", node_name, dirname);
+  string_free(dirname);
+  string_free(context->prompt[context->root_level]);
+
+  context->prompt[context->root_level] = prompt;
+  return s_ok;
   }

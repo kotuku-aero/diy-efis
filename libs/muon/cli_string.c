@@ -10,12 +10,16 @@ typedef struct _string_header_t
   {
     uint16_t len; /* used */
     uint16_t alloc; /* excluding the header and null terminator */
-    char buf[];
   } string_header_t;
 
 static inline string_header_t *as_hdr(const string_t s)
   {
-  return (string_header_t *)&s[0-sizeof(string_header_t)];
+  return (string_header_t *)s - sizeof(string_header_t);
+  }
+
+static inline char *as_str(string_header_t *s)
+  {
+  return ((char *)s) + sizeof(string_header_t);
   }
 
 uint16_t string_length(const string_t s)
@@ -55,11 +59,6 @@ static inline void sdssetalloc(string_t s, uint16_t newlen)
   as_hdr(s)->alloc= newlen;
   }
 
-static inline uint16_t sdsHdrSize(char type)
-  {
-  return sizeof(string_header_t);
-  }
-
 string_t string_create_len(const char *init, uint16_t initlen)
   {
   string_header_t *sh;
@@ -77,7 +76,7 @@ string_t string_create_len(const char *init, uint16_t initlen)
   if (sh == 0)
     return 0;
 
-  s = &sh->buf[0];
+  s = as_str(sh);
 
   sh->len = initlen;
   sh->alloc = len;
@@ -106,7 +105,9 @@ void string_free(string_t s)
   {
   if (s == 0)
     return;
-  kfree((char*) s - sdsHdrSize(s[-1]));
+
+  string_header_t *sh = as_hdr(s);
+  kfree(sh);
   }
 
 void string_clear(string_t s)
@@ -128,7 +129,7 @@ static string_t string_make_room_for(string_t s, uint16_t addlen)
   uint16_t len, newlen;
 
   /* Return ASAP if there is enough space left. */
-  if (avail >= addlen)
+  if (avail > addlen)
     return s;
 
   len = string_length(s);
@@ -146,7 +147,7 @@ static string_t string_make_room_for(string_t s, uint16_t addlen)
   if (newsh == 0)
     return 0;
 
-  s = &newsh->buf[0];
+  s = as_str(newsh);
 
   sdssetalloc(s, newlen);
   return s;
@@ -187,9 +188,9 @@ string_t string_push_back(string_t s, char ch)
   s = string_make_room_for(s, 1);
 
   string_header_t *hdr = as_hdr(s);
-  hdr->buf[hdr->len] = ch;
+  as_str(hdr)[hdr->len] = ch;
   hdr->len++;
-  hdr->buf[hdr->len]=0;
+  as_str(hdr)[hdr->len]=0;
 
   return s;
   }
@@ -200,7 +201,7 @@ uint16_t string_size(string_t s)
     return 0;
 
   uint16_t alloc = string_alloc(s);
-  return sdsHdrSize(s[-1]) + alloc + 1;
+  return sizeof(string_header_t) + alloc + 1;
   }
 
 string_t string_grow_zero(string_t s, uint16_t len)
@@ -262,24 +263,12 @@ string_t string_copy(string_t s, const char *t)
 string_t string_vprintf(const char *fmt, va_list ap)
   {
   va_list cpy;
-  // TODO: FIXME!
-  char staticbuf[1024];
-  char *buf = staticbuf;
+  char *buf;
   char *t;
   uint16_t buflen = (uint16_t)strlen(fmt) * 2;
-
-  /* We try to start using a static buffer for speed.
-   * If not possible we revert to heap allocation. */
-  if (buflen > sizeof(staticbuf))
-    {
-    buf = kmalloc(buflen);
-    if (buf == 0)
-      return 0;
-    }
-  else
-    {
-    buflen = sizeof(staticbuf);
-    }
+  buf = kmalloc(buflen);
+  if (buf == 0)
+    return 0;
 
   string_t s = string_create_len(0, 0);
 
@@ -293,8 +282,7 @@ string_t string_vprintf(const char *fmt, va_list ap)
     va_end(cpy);
     if (buf[buflen - 2] != '\0')
       {
-      if (buf != staticbuf)
-        kfree(buf);
+      kfree(buf);
       buflen *= 2;
       buf = kmalloc(buflen);
       if (buf == 0)
@@ -307,8 +295,7 @@ string_t string_vprintf(const char *fmt, va_list ap)
   /* Finally concat the obtained string to the string and return it. */
   t = string_create(buf);
 
-  if (buf != staticbuf)
-    kfree(buf);
+  kfree(buf);
 
   return t;
   }
@@ -510,17 +497,17 @@ string_t string_insert(string_t s, uint16_t pos, char ch)
   if(pos >= sh->len)
     {
     // append char
-    sh->buf[sh->len] = ch;
+    as_str(sh)[sh->len] = ch;
     sh->len++;
-    sh->buf[sh->len] = 0;
+    as_str(sh)[sh->len] = 0;
     }
   else
     {
     uint16_t i;
     for(i = sh->len; i > pos; i--)
-      sh->buf[i] = sh->buf[i-1];
+      as_str(sh)[i] = as_str(sh)[i-1];
 
-    sh->buf[pos] = ch;
+    as_str(sh)[pos] = ch;
     sh->len++;
     }
 
@@ -535,12 +522,12 @@ void string_remove(string_t s, uint16_t pos)
     return;
 
   if(pos == (sh->len-1))
-    sh->buf[sh->len-1] = 0;
+    as_str(sh)[sh->len-1] = 0;
   else
     {
     uint16_t i;
     for(i = pos; i < sh->len; i++)
-      sh->buf[i] = sh->buf[i+1];
+      as_str(sh)[i] = as_str(sh)[i+1];
     }
   sh->len--;
 

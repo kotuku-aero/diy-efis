@@ -53,12 +53,57 @@ typedef struct _service_channel_t
 static HANDLE clipdata = 0;
 static int offset = 0;
 
+static result_t css_read_clipboard(stream_handle_t *hndl, void *buffer, uint16_t size, uint16_t *read)
+  {
+  int16_t bytesRead = 0;
+  char *str = (char *)buffer;
+  LPSTR hglb = GlobalLock(clipdata);
+
+  int len = strlen(hglb);
+
+  while (size > 0)
+    {
+    size--;
+    if (offset >= len ||
+        hglb[offset] == 0)
+      {
+      offset = -1;
+      break;
+      }
+
+    *str = hglb[offset++];
+
+    if(*str == '\r')
+      {
+      size++;
+      continue;
+      }
+
+    str++;
+    bytesRead++;
+    }
+
+  GlobalUnlock(clipdata);
+
+  if (offset == -1)
+    {
+    CloseClipboard(GetShellWindow());
+    clipdata = 0;
+    }
+
+  if (read != 0)
+    *read = (uint16_t)bytesRead;
+
+  if(bytesRead == 0)
+    return e_no_more_information;
+
+  return s_ok;
+  }
+
   static result_t css_stream_read(stream_handle_t *hndl, void *buffer, uint16_t size, uint16_t *read)
     {
     if(hndl == 0 || buffer == 0 || size == 0)
       return e_bad_parameter;
-
-
 
 #ifdef __linux__
     char *buf = (char *)buffer;
@@ -84,37 +129,8 @@ static int offset = 0;
     DWORD bytesRead = 0;
     char *str = (char *)buffer;
 
-    if(clipdata != 0)
-      {
-      LPSTR hglb = GlobalLock(clipdata);
-
-      int len = strlen(hglb);
-
-      while(size > 0 && offset < len)
-        {
-        size--;
-
-        if (hglb[offset] == 0)
-          {
-          offset = -1;
-          size++;
-          break;
-          }
-
-        *str++ = hglb[offset++];
-        bytesRead++;
-        }
-
-      GlobalUnlock(clipdata);
-
-      if(offset == -1)
-        {
-        CloseClipboard(GetShellWindow());
-        clipdata = 0;
-        }
-      }
-
-    str = (char *)buffer;
+    if(clipdata != 0 && succeeded(css_read_clipboard(hndl, buffer, size, read)))
+      return s_ok;
 
     if(size > 0 )
       ReadFile(ci, buffer, size, &bytesRead, NULL);
@@ -124,6 +140,7 @@ static int offset = 0;
 
     while (bytesRead--)
       {
+      size--;
       switch(*str)
         {
         case '\r' :
@@ -136,7 +153,10 @@ static int offset = 0;
               continue;
             clipdata = GetClipboardData(CF_TEXT);
             offset = 0;
+            size++;
+            return css_read_clipboard(hndl, str, size, read);
             }
+
           break;
         }
       }
