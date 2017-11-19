@@ -7,7 +7,9 @@
 result_t cli_line_init(cli_line_t *line)
   {
   line->current = 0;
-  line->buffer = string_create(0);
+  line->buffer = (char *)kmalloc(CLI_MAX_LINE_LENGTH+1);
+  line->buffer[0] = 0;
+  line->buflen = CLI_MAX_LINE_LENGTH;
 
   return s_ok;
   }
@@ -20,7 +22,7 @@ result_t cli_line_reset(cli_line_t *line)
     }
 
   line->current = 0;
-  string_clear(line->buffer);
+  line->buffer[0] = 0;
 
   return s_ok;
   }
@@ -34,7 +36,24 @@ result_t cli_line_insert(cli_t *parser, char ch)
     return e_bad_parameter;
 
   line = &parser->lines[parser->cur_line];
-  line->buffer = string_insert(line->buffer, line->current, ch);
+
+  uint16_t len = strlen(line->buffer);
+  if (len >= (line->buflen - 1))
+    {
+    // expand the buffer
+    char *new_buffer = (char *)kmalloc(line->buflen + 32);
+    strcpy(new_buffer, line->buffer);
+    line->buflen += 32;
+    kfree(line->buffer);
+    line->buffer = new_buffer;
+    }
+
+  // we can't assume the memove handles overlaps
+  uint16_t pos;
+  for (pos = len + 1; pos > line->current; pos--)
+    line->buffer[pos] = line->buffer[pos - 1];
+
+  line->buffer[line->current] = ch;
 
   /*
    * Insert the new character and update the line display. We do not
@@ -65,7 +84,7 @@ result_t cli_line_delete(cli_t *parser)
 
   line = &parser->lines[parser->cur_line];
 
-  uint16_t length = string_length(line->buffer);
+  uint16_t length = strlen(line->buffer);
 
   if (line->current == 0 || length == 0)
     {
@@ -74,7 +93,9 @@ result_t cli_line_delete(cli_t *parser)
     }
 
   line->current--;
-  string_remove(line->buffer, line->current);
+  uint16_t len = strlen(line->buffer);
+
+  memmove(&line->buffer[line->current], &line->buffer[line->current + 1], (len + 1) - line->current);
   length--;
 
   /* Update the display */

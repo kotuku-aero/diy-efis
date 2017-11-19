@@ -335,7 +335,7 @@ bool node_t::is_ref_type(node_t *node)
   {
   const std::string &value_type = node->variable_type();
 
-  if (value_type == "string_t")
+  if (value_type == "const char *")
     return false;
 
   // optional params always a reference
@@ -474,7 +474,7 @@ std::string node_t::glue_fn()
     skip = "\n";
 
     msg << "  " << (*it)->_variable_type << " " << (*it)->path() << "_";
-    if ((*it)->_variable_type == "string_t")
+    if ((*it)->_variable_type == "const char *")
       msg << " = 0";
 
     msg << ";" << std::endl;
@@ -495,7 +495,7 @@ std::string node_t::glue_fn()
     msg << "  if(";
     if ((*it)->is_optional())
       {
-      msg << "string_length(parser->tokens[" << k << "].buffer) > 0 &&" << std::endl;
+      msg << "strlen(parser->tokens[" << k << "].buffer) > 0 &&" << std::endl;
       msg << "    ";
       }
     std::string _variable_type = (*it)->variable_type();
@@ -525,7 +525,7 @@ std::string node_t::glue_fn()
       msg << ", ";
       if ((*it)->is_optional())
         {
-        msg << "((string_length(parser->tokens[" << k << "].buffer) > 0) ? ";
+        msg << "((strlen(parser->tokens[" << k << "].buffer) > 0) ? ";
         }
       msg << (is_ref_type(*it) ? "&" : "") << (*it)->path() << "_";
       if ((*it)->is_optional())
@@ -540,9 +540,9 @@ std::string node_t::glue_fn()
   for(nodes_t::iterator it = nodes.begin(); it != nodes.end(); it++, k++)
   {
   std::string _variable_type = (*it)->variable_type();
-  if((*it)->is_param() && _variable_type == "string_t")
+  if((*it)->is_param() && _variable_type == "const char *")
   {
-  msg << "  string_free(" << (*it)->path() << "_);" << std::endl;
+  msg << "  kfree(" << (*it)->path() << "_);" << std::endl;
   }
   }
   */

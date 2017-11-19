@@ -81,7 +81,7 @@ typedef struct _field_lla_t {
 typedef struct _field_string_t {
 	field_definition_t hdr;
   char value[36];
-	} field_string_t;
+  } field_string_t;
 
   // this MUST be 32 bytes
 typedef struct _field_key_t {

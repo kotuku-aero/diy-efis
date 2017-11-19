@@ -19,7 +19,7 @@ token_t::token_t(const char *str)
     it = result.begin();
     it++;
     _node_type = "STRING";
-    _variable_type = "string_t";
+    _variable_type = "const char *";
     _get_function_name = "cli_get_string";
     }
   else if (std::regex_search(token, result, std::regex("^\<(ENUM):([a-zA-Z][a-zA-Z0-9_]*):([a-zA-Z][a-zA-Z0-9_]*)(:?(.*))\>$")))
@@ -37,7 +37,7 @@ token_t::token_t(const char *str)
     it = result.begin();
     it++;
     _node_type = "PATH";
-    _variable_type = "string_t";
+    _variable_type = "const char *";
     _get_function_name = "cli_get_path";
     }
   else if (std::regex_search(token, result, std::regex("^\<(UINT16):([a-zA-Z][a-zA-Z0-9_]*)(:?(.*))\>$")))
@@ -94,7 +94,7 @@ token_t::token_t(const char *str)
     it = result.begin();
     it++;
     _node_type = "STRING";
-    _variable_type = "string_t";
+    _variable_type = "const char *";
     _get_function_name = "cli_get_script";
     }
   else if (std::regex_search(token, result, std::regex("^\<(XYZ):([a-zA-Z][a-zA-Z0-9_]*)(:?(.*))\>$")))

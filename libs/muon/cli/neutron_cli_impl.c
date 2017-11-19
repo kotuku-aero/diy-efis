@@ -24,14 +24,14 @@ result_t open_key(memid_t current, const char *path, bool create, memid_t *memid
     return s_ok;
     }
 
-  string_t s;
+  const char * s;
   if (failed(result = vector_at(parts, 0, &s)))
     {
-    string_free_split(parts);
+    kfree_split(parts);
     return result;
     }
 
-  if (string_length(s) == 0)
+  if (strlen(s) == 0)
     current = 0;        // start from the root as the part starts with /
 
   uint16_t i;
@@ -39,7 +39,7 @@ result_t open_key(memid_t current, const char *path, bool create, memid_t *memid
     {
     if (failed(result = vector_at(parts, i, &s)))
       {
-      string_free_split(parts);
+      kfree_split(parts);
 
       return result;
       }
@@ -69,33 +69,43 @@ result_t open_key(memid_t current, const char *path, bool create, memid_t *memid
     current = *memid;
     }
 
-  string_free_split(parts);
+  kfree_split(parts);
 
   return result;
   }
 
-string_t get_full_path(memid_t key)
+char * get_full_path(memid_t key)
   {
   char name[REG_NAME_MAX+1];
-  string_t path;
+  char * path = 0;
   memid_t parent;
   if (failed(reg_query_memid(key, 0, name, 0, &parent)))
     return 0;
 
   if (parent != 0)
     path = get_full_path(parent);
+
+  uint16_t path_length = (path != 0) ? strlen(path) : 0;
+  uint16_t name_length = strlen(name) + 1;    // assume a trailing '/'
+
+  char *result = (char *)kmalloc(path_length + name_length + 1);
+
+  if (path != 0)
+    {
+    strcpy(result, path);
+
+    if (path_length > 0 &&
+      (path_length > 1 || strcmp(path, "/") != 0))
+      strcat(result, "/");
+
+    kfree(path);
+    }
   else
-    path = string_create(0);
+    result[0] = 0;
 
-  uint16_t path_length = string_length(path);
+  strcat(result, name);
 
-  if (path_length > 0 &&
-    (path_length > 1 || strcmp(path, "/") != 0))
-    path = string_cat(path, "/");
-
-  path = string_cat(path, name);
-
-  return path;
+  return result;
   }
 
 result_t edit_script(cli_t *context, const char *title, handle_t stream)

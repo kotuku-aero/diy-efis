@@ -9,39 +9,39 @@ extern "C" {
 
 extern cli_node_t msh_cli_root;
 
-extern result_t uint16_name_value_action(cli_t *context, string_t uint16_name_, uint16_t uint16_name_value_);
+extern result_t uint16_name_value_action(cli_t *context, const char * uint16_name_, uint16_t uint16_name_value_);
 
-extern result_t int16_name_value_action(cli_t *context, string_t int16_name_, int16_t int16_name_value_);
+extern result_t int16_name_value_action(cli_t *context, const char * int16_name_, int16_t int16_name_value_);
 
-extern result_t uint32_name_value_action(cli_t *context, string_t uint32_name_, uint32_t uint32_name_value_);
+extern result_t uint32_name_value_action(cli_t *context, const char * uint32_name_, uint32_t uint32_name_value_);
 
-extern result_t int32_name_value_action(cli_t *context, string_t int32_name_, int32_t int32_name_value_);
+extern result_t int32_name_value_action(cli_t *context, const char * int32_name_, int32_t int32_name_value_);
 
-extern result_t xyz_name_value_action(cli_t *context, string_t xyz_name_, xyz_t *xyz_name_value_);
+extern result_t xyz_name_value_action(cli_t *context, const char * xyz_name_, xyz_t *xyz_name_value_);
 
-extern result_t matrix_name_value_action(cli_t *context, string_t matrix_name_, matrix_t *matrix_name_value_);
+extern result_t matrix_name_value_action(cli_t *context, const char * matrix_name_, matrix_t *matrix_name_value_);
 
-extern result_t string_name_value_action(cli_t *context, string_t string_name_, string_t string_name_value_);
+extern result_t string_name_value_action(cli_t *context, const char * string_name_, const char * string_name_value_);
 
-extern result_t bool_name_value_action(cli_t *context, string_t bool_name_, uint16_t bool_name_value_);
+extern result_t bool_name_value_action(cli_t *context, const char * bool_name_, uint16_t bool_name_value_);
 
 extern const enum_t booleans[];
 
-extern result_t float_name_value_action(cli_t *context, string_t float_name_, float float_name_value_);
+extern result_t float_name_value_action(cli_t *context, const char * float_name_, float float_name_value_);
 
-extern result_t edit_name_action(cli_t *context, string_t edit_name_);
+extern result_t edit_name_action(cli_t *context, const char * edit_name_);
 
-extern result_t cat_name_action(cli_t *context, string_t cat_name_);
+extern result_t cat_name_action(cli_t *context, const char * cat_name_);
 
-extern result_t rm_name_action(cli_t *context, string_t rm_name_);
+extern result_t rm_name_action(cli_t *context, const char * rm_name_);
 
-extern result_t mkdir_path_action(cli_t *context, string_t mkdir_path_);
+extern result_t mkdir_path_action(cli_t *context, const char * mkdir_path_);
 
-extern result_t rmdir_path_action(cli_t *context, string_t rmdir_path_);
+extern result_t rmdir_path_action(cli_t *context, const char * rmdir_path_);
 
-extern result_t cd_path_action(cli_t *context, string_t cd_path_);
+extern result_t cd_path_action(cli_t *context, const char * cd_path_);
 
-extern result_t ls_path_recursive_action(cli_t *context, string_t ls_path_);
+extern result_t ls_path_recursive_action(cli_t *context, const char * ls_path_);
 
 extern result_t neutron_ls_id_action(cli_t *context, uint16_t *neutron_ls_id_);
 
@@ -99,27 +99,27 @@ extern result_t neutron_exit_action(cli_t *context);
 
 extern result_t neutron_action(cli_t *context);
 
-extern result_t send_can_id_type_session_val1_val2_val3_val4_action(cli_t *context, uint16_t send_can_id_, uint16_t send_can_id_type_, uint16_t send_can_id_type_session_, string_t send_can_id_type_session_val1_, string_t send_can_id_type_session_val1_val2_, string_t send_can_id_type_session_val1_val2_val3_, string_t send_can_id_type_session_val1_val2_val3_val4_);
+extern result_t send_can_id_type_session_val1_val2_val3_val4_action(cli_t *context, uint16_t send_can_id_, uint16_t send_can_id_type_, uint16_t send_can_id_type_session_, const char * send_can_id_type_session_val1_, const char * send_can_id_type_session_val1_val2_, const char * send_can_id_type_session_val1_val2_val3_, const char * send_can_id_type_session_val1_val2_val3_val4_);
 
 extern const enum_t can_types[];
 
-extern result_t ion_add_id_name_msg_handler_action(cli_t *context, uint16_t ion_add_id_, string_t ion_add_id_name_, string_t ion_add_id_name_msg_handler_);
+extern result_t ion_add_id_name_msg_handler_action(cli_t *context, uint16_t ion_add_id_, const char * ion_add_id_name_, const char * ion_add_id_name_msg_handler_);
 
-extern result_t ion_del_id_name_action(cli_t *context, uint16_t ion_del_id_, string_t ion_del_id_name_);
+extern result_t ion_del_id_name_action(cli_t *context, uint16_t ion_del_id_, const char * ion_del_id_name_);
 
-extern result_t ion_cat_name_action(cli_t *context, string_t ion_cat_name_);
+extern result_t ion_cat_name_action(cli_t *context, const char * ion_cat_name_);
 
-extern result_t ion_edit_name_action(cli_t *context, string_t ion_edit_name_);
+extern result_t ion_edit_name_action(cli_t *context, const char * ion_edit_name_);
 
-extern result_t ion_create_name_content_action(cli_t *context, string_t ion_create_name_, string_t ion_create_name_content_);
+extern result_t ion_create_name_content_action(cli_t *context, const char * ion_create_name_, const char * ion_create_name_content_);
 
-extern result_t ion_rm_name_action(cli_t *context, string_t ion_rm_name_);
+extern result_t ion_rm_name_action(cli_t *context, const char * ion_rm_name_);
 
-extern result_t ion_ls_name_action(cli_t *context, string_t ion_ls_name_);
+extern result_t ion_ls_name_action(cli_t *context, const char * ion_ls_name_);
 
-extern result_t ion_debug_name_action(cli_t *context, string_t ion_debug_name_);
+extern result_t ion_debug_name_action(cli_t *context, const char * ion_debug_name_);
 
-extern result_t ion_exec_name_action(cli_t *context, string_t ion_exec_name_);
+extern result_t ion_exec_name_action(cli_t *context, const char * ion_exec_name_);
 
 extern result_t ion_exit_action(cli_t *context);
 

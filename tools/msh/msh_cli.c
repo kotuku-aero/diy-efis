@@ -4,7 +4,7 @@
 result_t cli_uint16_name_value (cli_t *parser)
   {
   result_t result;
-  string_t uint16_name_ = 0;
+  const char * uint16_name_ = 0;
   uint16_t uint16_name_value_;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &uint16_name_)))
@@ -23,7 +23,7 @@ result_t cli_uint16_name_value (cli_t *parser)
 result_t cli_int16_name_value (cli_t *parser)
   {
   result_t result;
-  string_t int16_name_ = 0;
+  const char * int16_name_ = 0;
   int16_t int16_name_value_;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &int16_name_)))
@@ -42,7 +42,7 @@ result_t cli_int16_name_value (cli_t *parser)
 result_t cli_uint32_name_value (cli_t *parser)
   {
   result_t result;
-  string_t uint32_name_ = 0;
+  const char * uint32_name_ = 0;
   uint32_t uint32_name_value_;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &uint32_name_)))
@@ -61,7 +61,7 @@ result_t cli_uint32_name_value (cli_t *parser)
 result_t cli_int32_name_value (cli_t *parser)
   {
   result_t result;
-  string_t int32_name_ = 0;
+  const char * int32_name_ = 0;
   int32_t int32_name_value_;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &int32_name_)))
@@ -80,7 +80,7 @@ result_t cli_int32_name_value (cli_t *parser)
 result_t cli_xyz_name_value (cli_t *parser)
   {
   result_t result;
-  string_t xyz_name_ = 0;
+  const char * xyz_name_ = 0;
   xyz_t xyz_name_value_;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &xyz_name_)))
@@ -99,7 +99,7 @@ result_t cli_xyz_name_value (cli_t *parser)
 result_t cli_matrix_name_value (cli_t *parser)
   {
   result_t result;
-  string_t matrix_name_ = 0;
+  const char * matrix_name_ = 0;
   matrix_t matrix_name_value_;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &matrix_name_)))
@@ -118,8 +118,8 @@ result_t cli_matrix_name_value (cli_t *parser)
 result_t cli_string_name_value (cli_t *parser)
   {
   result_t result;
-  string_t string_name_ = 0;
-  string_t string_name_value_ = 0;
+  const char * string_name_ = 0;
+  const char * string_name_value_ = 0;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &string_name_)))
     return result;
@@ -137,7 +137,7 @@ result_t cli_string_name_value (cli_t *parser)
 result_t cli_bool_name_value (cli_t *parser)
   {
   result_t result;
-  string_t bool_name_ = 0;
+  const char * bool_name_ = 0;
   uint16_t bool_name_value_;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &bool_name_)))
@@ -156,7 +156,7 @@ result_t cli_bool_name_value (cli_t *parser)
 result_t cli_float_name_value (cli_t *parser)
   {
   result_t result;
-  string_t float_name_ = 0;
+  const char * float_name_ = 0;
   float float_name_value_;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &float_name_)))
@@ -175,7 +175,7 @@ result_t cli_float_name_value (cli_t *parser)
 result_t cli_edit_name (cli_t *parser)
   {
   result_t result;
-  string_t edit_name_ = 0;
+  const char * edit_name_ = 0;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &edit_name_)))
     return result;
@@ -190,7 +190,7 @@ result_t cli_edit_name (cli_t *parser)
 result_t cli_cat_name (cli_t *parser)
   {
   result_t result;
-  string_t cat_name_ = 0;
+  const char * cat_name_ = 0;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &cat_name_)))
     return result;
@@ -205,7 +205,7 @@ result_t cli_cat_name (cli_t *parser)
 result_t cli_rm_name (cli_t *parser)
   {
   result_t result;
-  string_t rm_name_ = 0;
+  const char * rm_name_ = 0;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &rm_name_)))
     return result;
@@ -220,7 +220,7 @@ result_t cli_rm_name (cli_t *parser)
 result_t cli_mkdir_path (cli_t *parser)
   {
   result_t result;
-  string_t mkdir_path_ = 0;
+  const char * mkdir_path_ = 0;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &mkdir_path_)))
     return result;
@@ -235,7 +235,7 @@ result_t cli_mkdir_path (cli_t *parser)
 result_t cli_rmdir_path (cli_t *parser)
   {
   result_t result;
-  string_t rmdir_path_ = 0;
+  const char * rmdir_path_ = 0;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &rmdir_path_)))
     return result;
@@ -250,7 +250,7 @@ result_t cli_rmdir_path (cli_t *parser)
 result_t cli_cd_path (cli_t *parser)
   {
   result_t result;
-  string_t cd_path_ = 0;
+  const char * cd_path_ = 0;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &cd_path_)))
     return result;
@@ -265,7 +265,7 @@ result_t cli_cd_path (cli_t *parser)
 result_t cli_ls_path_recursive (cli_t *parser)
   {
   result_t result;
-  string_t ls_path_ = 0;
+  const char * ls_path_ = 0;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &ls_path_)))
     return result;
@@ -282,11 +282,11 @@ result_t cli_neutron_ls_id (cli_t *parser)
   result_t result;
   uint16_t neutron_ls_id_;
 
-  if(string_length(parser->tokens[1].buffer) > 0 &&
+  if(strlen(parser->tokens[1].buffer) > 0 &&
     failed(result = cli_get_enum(&parser->tokens[1], can_ids, &neutron_ls_id_)))
     return result;
 
-  result = neutron_ls_id_action(parser, ((string_length(parser->tokens[1].buffer) > 0) ? &neutron_ls_id_ : 0));
+  result = neutron_ls_id_action(parser, ((strlen(parser->tokens[1].buffer) > 0) ? &neutron_ls_id_ : 0));
 
 
   return result;
@@ -608,10 +608,10 @@ result_t cli_send_can_id_type_session_val1_val2_val3_val4 (cli_t *parser)
   uint16_t send_can_id_;
   uint16_t send_can_id_type_;
   uint16_t send_can_id_type_session_;
-  string_t send_can_id_type_session_val1_ = 0;
-  string_t send_can_id_type_session_val1_val2_ = 0;
-  string_t send_can_id_type_session_val1_val2_val3_ = 0;
-  string_t send_can_id_type_session_val1_val2_val3_val4_ = 0;
+  const char * send_can_id_type_session_val1_ = 0;
+  const char * send_can_id_type_session_val1_val2_ = 0;
+  const char * send_can_id_type_session_val1_val2_val3_ = 0;
+  const char * send_can_id_type_session_val1_val2_val3_val4_ = 0;
 
   if(failed(result = cli_get_enum(&parser->tokens[1], can_ids, &send_can_id_)))
     return result;
@@ -622,23 +622,23 @@ result_t cli_send_can_id_type_session_val1_val2_val3_val4 (cli_t *parser)
   if(failed(result = cli_get_uint16(&parser->tokens[3], &send_can_id_type_session_)))
     return result;
 
-  if(string_length(parser->tokens[4].buffer) > 0 &&
+  if(strlen(parser->tokens[4].buffer) > 0 &&
     failed(result = cli_get_string(&parser->tokens[4], &send_can_id_type_session_val1_)))
     return result;
 
-  if(string_length(parser->tokens[5].buffer) > 0 &&
+  if(strlen(parser->tokens[5].buffer) > 0 &&
     failed(result = cli_get_string(&parser->tokens[5], &send_can_id_type_session_val1_val2_)))
     return result;
 
-  if(string_length(parser->tokens[6].buffer) > 0 &&
+  if(strlen(parser->tokens[6].buffer) > 0 &&
     failed(result = cli_get_string(&parser->tokens[6], &send_can_id_type_session_val1_val2_val3_)))
     return result;
 
-  if(string_length(parser->tokens[7].buffer) > 0 &&
+  if(strlen(parser->tokens[7].buffer) > 0 &&
     failed(result = cli_get_string(&parser->tokens[7], &send_can_id_type_session_val1_val2_val3_val4_)))
     return result;
 
-  result = send_can_id_type_session_val1_val2_val3_val4_action(parser, send_can_id_, send_can_id_type_, send_can_id_type_session_, ((string_length(parser->tokens[4].buffer) > 0) ? send_can_id_type_session_val1_ : 0), ((string_length(parser->tokens[5].buffer) > 0) ? send_can_id_type_session_val1_val2_ : 0), ((string_length(parser->tokens[6].buffer) > 0) ? send_can_id_type_session_val1_val2_val3_ : 0), ((string_length(parser->tokens[7].buffer) > 0) ? send_can_id_type_session_val1_val2_val3_val4_ : 0));
+  result = send_can_id_type_session_val1_val2_val3_val4_action(parser, send_can_id_, send_can_id_type_, send_can_id_type_session_, ((strlen(parser->tokens[4].buffer) > 0) ? send_can_id_type_session_val1_ : 0), ((strlen(parser->tokens[5].buffer) > 0) ? send_can_id_type_session_val1_val2_ : 0), ((strlen(parser->tokens[6].buffer) > 0) ? send_can_id_type_session_val1_val2_val3_ : 0), ((strlen(parser->tokens[7].buffer) > 0) ? send_can_id_type_session_val1_val2_val3_val4_ : 0));
 
 
   return result;
@@ -649,8 +649,8 @@ result_t cli_ion_add_id_name_msg_handler (cli_t *parser)
   {
   result_t result;
   uint16_t ion_add_id_;
-  string_t ion_add_id_name_ = 0;
-  string_t ion_add_id_name_msg_handler_ = 0;
+  const char * ion_add_id_name_ = 0;
+  const char * ion_add_id_name_msg_handler_ = 0;
 
   if(failed(result = cli_get_enum(&parser->tokens[1], can_ids, &ion_add_id_)))
     return result;
@@ -672,7 +672,7 @@ result_t cli_ion_del_id_name (cli_t *parser)
   {
   result_t result;
   uint16_t ion_del_id_;
-  string_t ion_del_id_name_ = 0;
+  const char * ion_del_id_name_ = 0;
 
   if(failed(result = cli_get_enum(&parser->tokens[1], can_ids, &ion_del_id_)))
     return result;
@@ -690,7 +690,7 @@ result_t cli_ion_del_id_name (cli_t *parser)
 result_t cli_ion_cat_name (cli_t *parser)
   {
   result_t result;
-  string_t ion_cat_name_ = 0;
+  const char * ion_cat_name_ = 0;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &ion_cat_name_)))
     return result;
@@ -705,7 +705,7 @@ result_t cli_ion_cat_name (cli_t *parser)
 result_t cli_ion_edit_name (cli_t *parser)
   {
   result_t result;
-  string_t ion_edit_name_ = 0;
+  const char * ion_edit_name_ = 0;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &ion_edit_name_)))
     return result;
@@ -720,17 +720,17 @@ result_t cli_ion_edit_name (cli_t *parser)
 result_t cli_ion_create_name_content (cli_t *parser)
   {
   result_t result;
-  string_t ion_create_name_ = 0;
-  string_t ion_create_name_content_ = 0;
+  const char * ion_create_name_ = 0;
+  const char * ion_create_name_content_ = 0;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &ion_create_name_)))
     return result;
 
-  if(string_length(parser->tokens[2].buffer) > 0 &&
+  if(strlen(parser->tokens[2].buffer) > 0 &&
     failed(result = cli_get_string(&parser->tokens[2], &ion_create_name_content_)))
     return result;
 
-  result = ion_create_name_content_action(parser, ion_create_name_, ((string_length(parser->tokens[2].buffer) > 0) ? ion_create_name_content_ : 0));
+  result = ion_create_name_content_action(parser, ion_create_name_, ((strlen(parser->tokens[2].buffer) > 0) ? ion_create_name_content_ : 0));
 
 
   return result;
@@ -740,7 +740,7 @@ result_t cli_ion_create_name_content (cli_t *parser)
 result_t cli_ion_rm_name (cli_t *parser)
   {
   result_t result;
-  string_t ion_rm_name_ = 0;
+  const char * ion_rm_name_ = 0;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &ion_rm_name_)))
     return result;
@@ -755,13 +755,13 @@ result_t cli_ion_rm_name (cli_t *parser)
 result_t cli_ion_ls_name (cli_t *parser)
   {
   result_t result;
-  string_t ion_ls_name_ = 0;
+  const char * ion_ls_name_ = 0;
 
-  if(string_length(parser->tokens[1].buffer) > 0 &&
+  if(strlen(parser->tokens[1].buffer) > 0 &&
     failed(result = cli_get_string(&parser->tokens[1], &ion_ls_name_)))
     return result;
 
-  result = ion_ls_name_action(parser, ((string_length(parser->tokens[1].buffer) > 0) ? ion_ls_name_ : 0));
+  result = ion_ls_name_action(parser, ((strlen(parser->tokens[1].buffer) > 0) ? ion_ls_name_ : 0));
 
 
   return result;
@@ -771,13 +771,13 @@ result_t cli_ion_ls_name (cli_t *parser)
 result_t cli_ion_debug_name (cli_t *parser)
   {
   result_t result;
-  string_t ion_debug_name_ = 0;
+  const char * ion_debug_name_ = 0;
 
-  if(string_length(parser->tokens[1].buffer) > 0 &&
+  if(strlen(parser->tokens[1].buffer) > 0 &&
     failed(result = cli_get_string(&parser->tokens[1], &ion_debug_name_)))
     return result;
 
-  result = ion_debug_name_action(parser, ((string_length(parser->tokens[1].buffer) > 0) ? ion_debug_name_ : 0));
+  result = ion_debug_name_action(parser, ((strlen(parser->tokens[1].buffer) > 0) ? ion_debug_name_ : 0));
 
 
   return result;
@@ -787,13 +787,13 @@ result_t cli_ion_debug_name (cli_t *parser)
 result_t cli_ion_exec_name (cli_t *parser)
   {
   result_t result;
-  string_t ion_exec_name_ = 0;
+  const char * ion_exec_name_ = 0;
 
-  if(string_length(parser->tokens[1].buffer) > 0 &&
+  if(strlen(parser->tokens[1].buffer) > 0 &&
     failed(result = cli_get_string(&parser->tokens[1], &ion_exec_name_)))
     return result;
 
-  result = ion_exec_name_action(parser, ((string_length(parser->tokens[1].buffer) > 0) ? ion_exec_name_ : 0));
+  result = ion_exec_name_action(parser, ((strlen(parser->tokens[1].buffer) > 0) ? ion_exec_name_ : 0));
 
 
   return result;

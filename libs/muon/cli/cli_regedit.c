@@ -6,13 +6,13 @@ static const char *cr_lf = "\r\n";
 static void show_key(handle_t dest, memid_t key, bool full_path, bool recursive, uint16_t *indent)
   {
   char name[REG_NAME_MAX + 1];
-  string_t path;
+  const char * path;
   if(full_path)
     path = get_full_path(key);
   else
     {
     reg_query_memid(key, 0, name, 0, 0);
-    path = string_create(name);
+    path = strdup(name);
     }
 
   field_datatype type = 0;
@@ -51,7 +51,7 @@ result_t action(cli_t *context)
   return s_ok;
   }
 
-result_t uint16_name_value_action(cli_t *context, string_t name_, uint16_t value_)
+result_t uint16_name_value_action(cli_t *context, const char * name_, uint16_t value_)
   {
   if(name_ == 0)
     return e_bad_parameter;
@@ -60,7 +60,7 @@ result_t uint16_name_value_action(cli_t *context, string_t name_, uint16_t value
   return reg_set_uint16(get_context(context), name_, value_);
   }
 
-result_t int16_name_value_action(cli_t *context, string_t name_, int16_t value_)
+result_t int16_name_value_action(cli_t *context, const char * name_, int16_t value_)
   {
   if(name_ == 0)
     return e_bad_parameter;
@@ -69,7 +69,7 @@ result_t int16_name_value_action(cli_t *context, string_t name_, int16_t value_)
   return reg_set_int16(get_context(context), name_, value_);
    }
 
-result_t uint32_name_value_action(cli_t *context, string_t name_, uint32_t value_)
+result_t uint32_name_value_action(cli_t *context, const char * name_, uint32_t value_)
   {
   if(name_ == 0)
     return e_bad_parameter;
@@ -78,7 +78,7 @@ result_t uint32_name_value_action(cli_t *context, string_t name_, uint32_t value
   return reg_set_uint32(get_context(context), name_, value_);
   }
 
-result_t int32_name_value_action(cli_t *context, string_t name_, int32_t value_)
+result_t int32_name_value_action(cli_t *context, const char * name_, int32_t value_)
   {
   if(name_ == 0)
     return e_bad_parameter;
@@ -86,7 +86,7 @@ result_t int32_name_value_action(cli_t *context, string_t name_, int32_t value_)
   return reg_set_int32(get_context(context), name_, value_);
   }
 
-result_t xyz_name_value_action(cli_t *context, string_t name_, xyz_t *value_)
+result_t xyz_name_value_action(cli_t *context, const char * name_, xyz_t *value_)
   {
   if(name_ == 0 ||
       value_ == 0)
@@ -96,7 +96,7 @@ result_t xyz_name_value_action(cli_t *context, string_t name_, xyz_t *value_)
   return reg_set_xyz(get_context(context), name_, value_);
   }
 
-result_t matrix_name_value_action(cli_t *context, string_t name_, matrix_t *value_)
+result_t matrix_name_value_action(cli_t *context, const char * name_, matrix_t *value_)
   {
   if(name_ == 0 ||
       value_ == 0)
@@ -106,7 +106,7 @@ result_t matrix_name_value_action(cli_t *context, string_t name_, matrix_t *valu
   return reg_set_matrix(get_context(context), name_, value_);
   }
 
-result_t string_name_value_action(cli_t *context, string_t name_, string_t value_)
+result_t string_name_value_action(cli_t *context, const char * name_, const char * value_)
   {
   if(name_ == 0 ||
       value_ == 0)
@@ -116,7 +116,7 @@ result_t string_name_value_action(cli_t *context, string_t name_, string_t value
   return reg_set_string(get_context(context), name_, value_);
   }
 
-result_t bool_name_value_action(cli_t *context, string_t name_, uint16_t value_)
+result_t bool_name_value_action(cli_t *context, const char * name_, uint16_t value_)
   {
   if(name_ == 0)
     return e_bad_parameter;
@@ -125,7 +125,7 @@ result_t bool_name_value_action(cli_t *context, string_t name_, uint16_t value_)
   return reg_set_bool(get_context(context), name_, value_ != 0);
   }
 
-result_t float_name_value_action(cli_t *context, string_t name_, float value_)
+result_t float_name_value_action(cli_t *context, const char * name_, float value_)
   {
   if(name_ == 0)
     return e_bad_parameter;
@@ -134,7 +134,7 @@ result_t float_name_value_action(cli_t *context, string_t name_, float value_)
   return reg_set_float(get_context(context), name_, value_);
   }
 
-result_t edit_name_action(cli_t *context, string_t name_)
+result_t edit_name_action(cli_t *context, const char * name_)
   {
   if(name_ == 0)
     return e_bad_parameter;
@@ -152,7 +152,7 @@ result_t edit_name_action(cli_t *context, string_t name_)
   return edit_script(context, name_, stream);
   }
 
-result_t cat_name_action(cli_t *context, string_t name)
+result_t cat_name_action(cli_t *context, const char * name)
   {
   result_t result;
 
@@ -173,7 +173,7 @@ result_t cat_name_action(cli_t *context, string_t name)
   return result;
   }
 
-result_t rm_name_action(cli_t *context, string_t name_)
+result_t rm_name_action(cli_t *context, const char * name_)
   {
   result_t result;
   if(failed(result = reg_delete_value(get_context(context), name_)))
@@ -184,7 +184,7 @@ result_t rm_name_action(cli_t *context, string_t name_)
   return s_ok;
   }
 
-result_t rmdir_path_action(cli_t *context, string_t name_)
+result_t rmdir_path_action(cli_t *context, const char * name_)
   {
   result_t result;
   memid_t key;
@@ -198,7 +198,7 @@ result_t rmdir_path_action(cli_t *context, string_t name_)
   return s_ok;
   }
 
-result_t mkdir_path_action(cli_t *context, string_t name_)
+result_t mkdir_path_action(cli_t *context, const char * name_)
   {
   // open a sub-key
   result_t result;
@@ -210,19 +210,20 @@ result_t mkdir_path_action(cli_t *context, string_t name_)
     }
 
   // update the submode
-  string_t dirname = get_full_path(memid);
+  const char * dirname = get_full_path(memid);
 
-  string_t prompt = string_printf("%s %s ", node_name, dirname);
-  string_free(dirname);
-  string_free(context->prompt[context->root_level]);
+  char * prompt[MAX_PROMPT_LENGTH];
+  snprintf(prompt, MAX_PROMPT_LENGTH, "%s %s ", node_name, dirname);
 
-  context->prompt[context->root_level] = prompt;
+  kfree(dirname);
+
+  strncpy(context->prompt[context->root_level], prompt, MAX_PROMPT_LENGTH);
   context->current[context->root_level] = memid;
 
   return s_ok;
   }
 
-result_t cd_path_action(cli_t *context, string_t name_)
+result_t cd_path_action(cli_t *context, const char * name_)
   {
   // open a sub-key
   result_t result;
@@ -234,28 +235,28 @@ result_t cd_path_action(cli_t *context, string_t name_)
     }
 
   // update the submode
-  string_t dirname = get_full_path(memid);
+  const char * dirname = get_full_path(memid);
 
-  string_t prompt = string_printf("%s %s ", node_name, dirname);
-  string_free(dirname);
-  string_free(context->prompt[context->root_level]);
+  char prompt[MAX_PROMPT_LENGTH];
+  snprintf(prompt, MAX_PROMPT_LENGTH, "%s %s ", node_name, dirname);
+  kfree(dirname);
 
-  context->prompt[context->root_level] = prompt;
+  strncpy(context->prompt[context->root_level], prompt, MAX_PROMPT_LENGTH);
   context->current[context->root_level] = memid;
 
   return s_ok;
   }
 
-result_t ls_path_recursive_action(cli_t *context, string_t path)
+result_t ls_path_recursive_action(cli_t *context, const char * path)
   {
   uint16_t indent = 0;
   result_t result;
   memid_t key;
   handle_t matches = 0;
 
-  bool recursive = string_length(context->tokens[2].buffer) != 0;
+  bool recursive = strlen(context->tokens[2].buffer) != 0;
 
-  if (string_length(path) == 0)
+  if (strlen(path) == 0)
     {
     show_key(context->cfg.console_out, get_context(context), true, false, &indent);
     return s_ok;
@@ -282,16 +283,16 @@ result_t ls_path_recursive_action(cli_t *context, string_t path)
     uint16_t len;
     if (failed(result = vector_count(matches, &len)))
       {
-      string_free_split(matches);
+      kfree_split(matches);
       return result;
       }
 
     for (i = 0; i < len; i++)
       {
-      string_t name;
+      const char * name;
       if (failed(result = vector_at(matches, i, &name)))
         {
-        string_free_split(matches);
+        kfree_split(matches);
         return result;
         }
 
@@ -300,7 +301,7 @@ result_t ls_path_recursive_action(cli_t *context, string_t path)
         if (result == e_not_found)
           continue;      // very weird!
 
-        string_free_split(matches);
+        kfree_split(matches);
         return result;
         }
 
@@ -313,10 +314,10 @@ result_t ls_path_recursive_action(cli_t *context, string_t path)
     // now the directories
     for (i = 0; i < len; i++)
       {
-      string_t name;
+      const char * name;
       if (failed(result = vector_at(matches, i, &name)))
         {
-        string_free_split(matches);
+        kfree_split(matches);
         return result;
         }
 
@@ -325,7 +326,7 @@ result_t ls_path_recursive_action(cli_t *context, string_t path)
         if (result == e_not_found)
           continue;      // very weird!
 
-        string_free_split(matches);
+        kfree_split(matches);
         return result;
         }
 
@@ -341,7 +342,7 @@ result_t ls_path_recursive_action(cli_t *context, string_t path)
         }
       }
 
-    string_free_split(matches);
+    kfree_split(matches);
     }
   return s_ok;
   }
@@ -357,12 +358,12 @@ result_t exit_action(cli_t *context)
 
   context->current[context->root_level] = parent;
   // update the submode
-  string_t dirname = get_full_path(parent);
+  const char * dirname = get_full_path(parent);
 
-  string_t prompt = string_printf("%s %s ", node_name, dirname);
-  string_free(dirname);
-  string_free(context->prompt[context->root_level]);
+  char prompt[MAX_PROMPT_LENGTH];
+  snprintf(prompt, MAX_PROMPT_LENGTH, "%s %s ", node_name, dirname);
+  kfree(dirname);
 
-  context->prompt[context->root_level] = prompt;
+  strncpy(context->prompt[context->root_level], prompt, MAX_PROMPT_LENGTH);
   return s_ok;
   }

@@ -306,7 +306,7 @@ int main(int argc, char **argv)
   channel.parser.cfg.ch_del = 127;
   channel.parser.cfg.ch_help = '?';
   channel.parser.cfg.flags = 0;
-  channel.parser.cfg.prompt = string_create(node_name);
+  channel.parser.cfg.prompt = node_name;
 
   channel.parser.cfg.console_in = &channel.stream;
   channel.parser.cfg.console_out = &channel.stream;

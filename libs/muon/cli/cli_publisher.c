@@ -25,7 +25,7 @@ result_t neutron_action(cli_t *context)
   if(failed(result = open_key(0, publisher_key, true, &key)))
     return result;
 
-  return cli_submode_enter(context, key,string_create(publisher_name));
+  return cli_submode_enter(context, key, publisher_name);
   }
 
 result_t neutron_publish_id_action(cli_t *context, uint16_t id)
@@ -43,11 +43,11 @@ result_t neutron_publish_id_action(cli_t *context, uint16_t id)
     }
 
   const enum_t *enum_desc;
-  string_t prompt;
+  char prompt[MAX_PROMPT_LENGTH];
   if (succeeded(find_enum_name(can_ids, id, &enum_desc)))
-    prompt = string_printf("%s publish %s", publisher_name, enum_desc->name);
+    snprintf(prompt, MAX_PROMPT_LENGTH, "%s publish %s", publisher_name, enum_desc->name);
   else
-    prompt = string_printf("%s publish %d ", publisher_name, id);
+    snprintf(prompt, MAX_PROMPT_LENGTH, "%s publish %d ", publisher_name, id);
 
   return cli_submode_enter(context, key, prompt);
   }
@@ -68,7 +68,7 @@ result_t neutron_exit_action(cli_t *context)
 
 static result_t show_published_id(handle_t dest, memid_t key, uint16_t key_id)
   {
-  string_t name = 0;
+  char * name[32];
   result_t result;
   const enum_t *enum_desc;
 
@@ -120,7 +120,7 @@ static result_t show_published_id(handle_t dest, memid_t key, uint16_t key_id)
           // work over each coefficient.
           for (v_uint16 = 0; v_uint16 < length; v_uint16++)
             {
-            name = string_printf(s_coefficient_value, v_uint16 + 1);
+            snprintf(name, 32, s_coefficient_value, v_uint16 + 1);
             float coeff;
             if (failed(reg_get_float(key, name, &coeff)))
               coeff = 0;
@@ -257,10 +257,11 @@ result_t neutron_ls_id_action(cli_t *context, uint16_t *id)
       return s_ok;
     }
 
-  string_t key_name = string_printf("%d", *id);
+  char * key_name[32];
+  snprintf(key_name, 32, "%d", *id);
 
   result = reg_open_key(key, key_name, &published_id);
-  string_free(key_name);
+  kfree(key_name);
 
   if (failed(result))
     return result;
@@ -379,12 +380,12 @@ result_t neutron_publish_id_filter_filter_type_action(cli_t *context, uint16_t t
   // is filter mode.
   // todo: delete coefficients?
 
-  string_t prompt;
+  char prompt[MAX_PROMPT_LENGTH];
   const enum_t *enum_desc;
   if (succeeded(find_enum_name(filter_types, type_, &enum_desc)))
-    prompt = string_printf("%s publish filter %s", publisher_name, enum_desc->name);
+    snprintf(prompt, MAX_PROMPT_LENGTH, "%s publish filter %s", publisher_name, enum_desc->name);
   else
-    prompt = string_printf("%s publish filter %d", publisher_name, type_);
+    snprintf(prompt, MAX_PROMPT_LENGTH, "%s publish filter %d", publisher_name, type_);
 
   return cli_submode_enter(context, get_context(context), prompt);
   }
@@ -450,11 +451,11 @@ result_t neutron_publish_id_alarm_alarm_id_action(cli_t *context, uint16_t alarm
   // we have the alarm key
 
   const enum_t *enum_desc;
-  string_t prompt;
+  char prompt[MAX_PROMPT_LENGTH];
   if (succeeded(find_enum_name(can_ids, alarm_id_, &enum_desc)))
-    prompt = string_printf("%s publish alarm: %s", publisher_name, enum_desc->name);
+    snprintf(prompt, MAX_PROMPT_LENGTH, "%s publish alarm: %s", publisher_name, enum_desc->name);
   else
-    prompt = string_printf("%s publish alarm: %d ", publisher_name, alarm_id_);
+    snprintf(prompt, MAX_PROMPT_LENGTH, "%s publish alarm: %d ", publisher_name, alarm_id_);
 
   return cli_submode_enter(context, memid, prompt);
   }

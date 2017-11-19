@@ -919,8 +919,8 @@
     CFF_Builder*       builder = &decoder->builder;
     FT_Pos             x, y;
     FT_Fixed*          stack;
-    FT_Int             charstring_type =
-                         decoder->cff->top_font.font_dict.charstring_type;
+    FT_Int             charconst char *ype =
+                         decoder->cff->top_font.font_dict.charconst char *ype;
     FT_UShort          num_designs =
                          decoder->cff->top_font.font_dict.num_designs;
     FT_UShort          num_axes =
@@ -1008,7 +1008,7 @@
                             ( (FT_UInt32)ip[2] <<  8 ) |
                               (FT_UInt32)ip[3]         );
           ip    += 4;
-          if ( charstring_type == 2 )
+          if ( charconst char *ype == 2 )
             shift = 0;
         }
         if ( decoder->top - stack >= CFF_MAX_OPERANDS )

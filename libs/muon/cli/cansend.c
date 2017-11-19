@@ -6,31 +6,31 @@
 #include "neutron_cli.h"
 
 
-static uint32_t get_uint32(string_t str)
+static uint32_t get_uint32(const char * str)
   {
   uint32_t result = 0;
 
-  if(string_length(str) > 0)
+  if(strlen(str) > 0)
     result = strtoul(str, 0, 10);
 
   return result;
   }
 
-static int32_t get_int32(string_t str)
+static int32_t get_int32(const char * str)
   {
   int32_t result = 0;
 
-  if(string_length(str) > 0)
+  if(strlen(str) > 0)
     result = strtol(str, 0, 10);
 
   return result;
   }
 
-static float get_float(string_t str)
+static float get_float(const char * str)
   {
   float result = 0;
 
-  if(string_length(str)> 0)
+  if(strlen(str)> 0)
     result = strtof(str, 0);
 
   return result;
@@ -51,7 +51,7 @@ static inline uint8_t extract_float(float val, uint16_t byte)
   return extract_uint(*((uint32_t *)&val), byte);
   }
 
-result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t session, string_t val1, string_t val2, string_t val3, string_t val4)
+result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t session, const char * val1, const char * val2, const char * val3, const char * val4)
   {
   int32_t int_val;
   uint32_t uint_val;
@@ -301,7 +301,7 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
 
 
 result_t send_can_id_type_session_val1_val2_val3_val4_action(cli_t *context,
-  uint16_t can_id, uint16_t type, uint16_t session, string_t val1, string_t val2, string_t val3, string_t val4)
+  uint16_t can_id, uint16_t type, uint16_t session, const char * val1, const char * val2, const char * val3, const char * val4)
   {
   canmsg_t msg;
   result_t result;

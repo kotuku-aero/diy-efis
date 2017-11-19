@@ -76,10 +76,7 @@ static void cli_token_stack_reset(cli_t *parser)
     token->begin_ptr = 0;
     token->parent = 0;
     token->node = 0;
-    if(token->buffer == 0)
-      token->buffer = string_create(0);
-    else
-      string_clear(token->buffer);
+    token->buffer[0] = 0;
     }
   }
 
@@ -109,7 +106,7 @@ static cli_state_t cli_ws_erase(cli_t *parser, char ch, bool *ch_processed)
     if (0 < parser->token_tos)
       {
       token = &parser->tokens[parser->token_tos - 1];
-      if (token->begin_ptr + string_length(token->buffer) >= parser->current_pos)
+      if (token->begin_ptr + strlen(token->buffer) >= parser->current_pos)
         {
         parser->cur_node = token->parent;
         token->parent = 0;
@@ -117,7 +114,8 @@ static cli_state_t cli_ws_erase(cli_t *parser, char ch, bool *ch_processed)
         /* Pop the token on top of the stack */
         token = CUR_TOKEN(parser);
         token->begin_ptr = 0;
-        string_clear(token->buffer);
+        kfree(token->buffer);
+        token->buffer[0] = 0;
         token->parent = 0;
         token->node = 0;
         parser->token_tos--;
@@ -187,7 +185,11 @@ static cli_state_t cli_ws_char(cli_t *parser, char ch, bool *ch_processed)
     }
   else
     /* A valid token found. Add to token stack */
-    token->buffer = string_push_back(token->buffer, ch);
+    {
+    int len = strlen(token->buffer);
+    token->buffer[len] = ch;
+    token->buffer[len + 1] = 0;
+    }
 
   *ch_processed = true;
 
@@ -196,7 +198,7 @@ static cli_state_t cli_ws_char(cli_t *parser, char ch, bool *ch_processed)
   if (token->in_string == 0 &&
       !cli_match(parser, token, parser->cur_node, &match, &is_complete))
     {
-    string_set_length(token->buffer, string_length(token->buffer)-1);
+    token->buffer[strlen(token->buffer)-1] = 0;
     return CLI_STATE_ERROR; /* no token match */
     }
 
@@ -223,11 +225,11 @@ static cli_state_t cli_tok_erase(cli_t *parser, char ch, bool *ch_processed)
   cli_token_t *token;
 
   token = CUR_TOKEN(parser);
-  string_set_length(token->buffer, string_length(token->buffer)-1);
+  token->buffer[strlen(token->buffer)-1] = 0;
 
   parser->current_pos--;
   *ch_processed = true;
-  if (string_length(token->buffer) == 0)
+  if (strlen(token->buffer) == 0)
     {
     token->begin_ptr = 0;
     return CLI_STATE_WHITESPACE;
@@ -270,8 +272,12 @@ static cli_state_t cli_tok_char(cli_t *parser, char ch, bool *ch_processed)
   else
     {
     /* A valid token found. Add to token stack */
-    if (string_length(token->buffer) < CLI_MAX_TOKEN_SIZE)
-      token->buffer = string_push_back(token->buffer, ch);
+    if (strlen(token->buffer) < CLI_MAX_TOKEN_SIZE)
+      {
+      int len = strlen(token->buffer);
+      token->buffer[len] = ch;
+      token->buffer[len + 1] = 0;
+      }
     else
       return CLI_STATE_ERROR;
     }
@@ -281,7 +287,7 @@ static cli_state_t cli_tok_char(cli_t *parser, char ch, bool *ch_processed)
   if (token->in_string == 0 &&
       !cli_match(parser, token, parser->cur_node, &match, &is_complete))
     {
-    string_set_length(token->buffer, string_length(token->buffer)-1);
+    token->buffer[strlen(token->buffer)-1] = 0;
     return CLI_STATE_ERROR;
     }
 
@@ -352,7 +358,7 @@ static cli_state_t cli_err_erase(cli_t *parser, char ch, bool *ch_processed)
     {
     cli_token_t *token;
     token = CUR_TOKEN(parser);
-    if (token->begin_ptr + string_length(token->buffer) >= parser->current_pos)
+    if (token->begin_ptr + strlen(token->buffer) >= parser->current_pos)
       {
       return CLI_STATE_TOKEN;
       }

@@ -6,7 +6,7 @@
 const char *ion_key = "ion";
 const char *event_key = "events";
 const char *ion_name = "ion";
-extern string_t get_full_path(memid_t key);
+extern const char * get_full_path(memid_t key);
 
 // events are stored in the key called events.
 result_t ion_action(cli_t *context)
@@ -32,7 +32,10 @@ result_t ion_action(cli_t *context)
       }
     }
 
-  return cli_submode_enter(context, key, string_printf("%s ", ion_name));
+  char prompt[MAX_PROMPT_LENGTH];
+  snprintf(prompt, MAX_PROMPT_LENGTH, "%s ", ion_name);
+
+  return cli_submode_enter(context, key, prompt);
   }
 
 result_t ion_exit_action(cli_t *context)
@@ -42,7 +45,7 @@ result_t ion_exit_action(cli_t *context)
   return s_ok;
   }
 
-result_t ion_ls_name_action(cli_t *context, string_t path)
+result_t ion_ls_name_action(cli_t *context, const char * path)
   {
   // see if a name given
 
@@ -86,7 +89,7 @@ result_t ion_ls_name_action(cli_t *context, string_t path)
 
       while (succeeded(reg_enum_key(child, &dt, 0, 0, REG_NAME_MAX, name, &handler)))
         {
-        string_t str;
+        const char * str;
         if (succeeded(reg_get_string(child, name, event_fn, 0)))
           stream_printf(context->cfg.console_out, "  %s : function %s(msg);\r\n", name, event_fn);
 
@@ -106,7 +109,7 @@ result_t ion_ls_name_action(cli_t *context, string_t path)
     // see if there is a wildcard match
     if(path != 0)
       {
-      uint16_t len = string_length(path);
+      uint16_t len = strlen(path);
       uint16_t i;
       uint16_t p;
       for(i = 0, p=0; p < len && i < REG_NAME_MAX; i++)
@@ -184,7 +187,7 @@ result_t ion_ls_name_action(cli_t *context, string_t path)
   return s_ok;
   }
 
-result_t ion_rm_name_action(cli_t *context, string_t name)
+result_t ion_rm_name_action(cli_t *context, const char * name)
   {
   result_t result;
   handle_t stream;
@@ -202,7 +205,7 @@ result_t ion_rm_name_action(cli_t *context, string_t name)
   return stream_delete(stream);
   }
 
-result_t ion_create_name_content_action(cli_t *context, string_t name, string_t content)
+result_t ion_create_name_content_action(cli_t *context, const char * name, const char * content)
   {
   result_t result;
   handle_t stream;
@@ -224,24 +227,23 @@ result_t ion_create_name_content_action(cli_t *context, string_t name, string_t 
     }
   else
     {
-    string_t full_path = string_ensure_size(string_create(0), 256);
+    char * full_path = (char *)kmalloc(256);
     if (failed(result = stream_path(stream, true, 256, full_path)))
       {
       stream_close(stream);
-      string_free(full_path);
+      kfree(full_path);
       return result;
       }
 
-    string_set_length(full_path, strlen(full_path));
     result = edit_script(context, full_path, stream);
 
-    string_free(full_path);
+    kfree(full_path);
     }
 
   return result;
   }
 
-result_t ion_edit_name_action(cli_t *context, string_t name)
+result_t ion_edit_name_action(cli_t *context, const char * name)
   {
   result_t result;
   handle_t stream;
@@ -249,23 +251,22 @@ result_t ion_edit_name_action(cli_t *context, string_t name)
   if(failed(result = stream_open(get_context(context), name, &stream)))
     return result;
 
-  string_t full_path = string_ensure_size(string_create(0), 256);
+  char * full_path = (char *)kmalloc(256);
   if (failed(result = stream_path(stream, true, 256, full_path)))
     {
     stream_close(stream);
-    string_free(full_path);
+    kfree(full_path);
     return result;
     }
 
-  string_set_length(full_path, strlen(full_path));
   result = edit_script(context, full_path, stream);
 
-  string_free(full_path);
+  kfree(full_path);
 
   return result;
   }
 
-result_t ion_cat_name_action(cli_t *context, string_t name)
+result_t ion_cat_name_action(cli_t *context, const char * name)
   {
   result_t result;
   handle_t stream;
@@ -282,7 +283,7 @@ result_t ion_cat_name_action(cli_t *context, string_t name)
   return s_ok;
   }
 
-result_t ion_add_id_name_msg_handler_action(cli_t *context, uint16_t event_id, string_t ion_path, string_t event_handler)
+result_t ion_add_id_name_msg_handler_action(cli_t *context, uint16_t event_id, const char * ion_path, const char * event_handler)
   {
   memid_t key;
   result_t result;
@@ -296,7 +297,8 @@ result_t ion_add_id_name_msg_handler_action(cli_t *context, uint16_t event_id, s
       return result;
     }
 
-  string_t key_name = string_printf("%d", event_id);
+  char key_name[32];
+  snprintf(key_name, 32, "%d", event_id);
 
   // each event is a key, we add the string type and script path.
   memid_t event_key;
@@ -305,12 +307,12 @@ result_t ion_add_id_name_msg_handler_action(cli_t *context, uint16_t event_id, s
     if (result != e_path_not_found ||
       failed(result = reg_create_key(key, key_name, &event_key)))
       {
-      string_free(key_name);
+      kfree(key_name);
       return result;
       }
     }
 
-  string_free(key_name);
+  kfree(key_name);
 
   // TODO: check the event handler exists in the parent directory
 
@@ -320,7 +322,7 @@ result_t ion_add_id_name_msg_handler_action(cli_t *context, uint16_t event_id, s
   return reg_set_string(event_key, ion_path, event_handler);
   }
 
-result_t ion_del_id_name_action(cli_t *context, uint16_t del_id, string_t ion_name)
+result_t ion_del_id_name_action(cli_t *context, uint16_t del_id, const char * ion_name)
   {
   result_t result;
   memid_t key;
@@ -328,9 +330,11 @@ result_t ion_del_id_name_action(cli_t *context, uint16_t del_id, string_t ion_na
   if (failed(result = reg_open_key(get_context(context), event_key, &key)))
     return result;
 
-  string_t id_str = string_printf("%d", del_id);
+  char id_str[32];
+  snprintf(id_str, 32, "%d", del_id);
+
   result = reg_open_key(get_context(context), id_str, &key);
-  string_free(id_str);
+  kfree(id_str);
 
   if (failed(result))
     return result;
@@ -338,12 +342,12 @@ result_t ion_del_id_name_action(cli_t *context, uint16_t del_id, string_t ion_na
   return reg_delete_value(key, ion_name);
   }
 
-result_t ion_debug_name_action(cli_t *context, string_t path)
+result_t ion_debug_name_action(cli_t *context, const char * path)
   {
   return e_not_implemented;
   }
 
-result_t ion_exec_name_action(cli_t *context, string_t name)
+result_t ion_exec_name_action(cli_t *context, const char * name)
   {
   result_t result;
   memid_t parent = 0;

@@ -40,8 +40,8 @@ static void cli_help_print_node(cli_t *parser, cli_node_t *node,
     case CLI_NODE_ENUM :
       {
       const enum_t *lnode = (const enum_t *)node->param;
-      string_t token = CUR_TOKEN(parser)->buffer;
-      uint16_t len = string_length(token);
+      const char * token = CUR_TOKEN(parser)->buffer;
+      uint16_t len = strlen(token);
 
       while (lnode->name != 0)
         {
@@ -66,7 +66,7 @@ static void cli_help_print_node(cli_t *parser, cli_node_t *node,
           uint16_t i;
           for (i = 0; i < len; i++)
             {
-            string_t option;
+            const char * option;
 
             if (succeeded(vector_at(matches, i, &option)))
               {
@@ -77,7 +77,7 @@ static void cli_help_print_node(cli_t *parser, cli_node_t *node,
           }
         }
       if (matches != 0)
-        string_free_split(matches);
+        kfree_split(matches);
       }
       break;
     default:
@@ -105,7 +105,7 @@ static void cli_print_error(cli_t *parser, const char *msg)
 
   stream_puts(parser->cfg.console_out, "\r\n");
 
-  m = string_length(parser->prompt[parser->root_level]) + 1;
+  m = strlen(parser->prompt[parser->root_level]) + 1;
 
   for (n = 0; n < m + parser->last_good; n++)
     stream_putc(parser->cfg.console_out, ' ');
@@ -122,7 +122,7 @@ static void cli_print_error(cli_t *parser, const char *msg)
 static void cli_input_reset(cli_t *parser)
   {
   if(parser->user_buf != 0)
-    string_free(parser->user_buf);
+    kfree(parser->user_buf);
 
   parser->user_buf = 0;
   parser->user_input_cb = 0;
@@ -411,7 +411,7 @@ static int cli_complete_one_level(cli_t *parser)
          * parser. However, this is only useful for keywords. If there
          * is a parameter token in the match, we automatically abort.
          */
-        uint16_t len = string_length(token->buffer);
+        uint16_t len = strlen(token->buffer);
         offset = orig_offset = len;
         ch_ptr = ((char *)match->param) + len;
         while (('\0' != *ch_ptr) &&
@@ -709,11 +709,11 @@ result_t cli_init(cli_cfg_t *cfg, cli_t *parser)
   parser->root_level = 0;
 
   parser->root[0] = parser->cfg.root;       // root node
-  parser->prompt[0] = parser->cfg.prompt;   // root prompt
+  strncpy(parser->prompt[0], parser->cfg.prompt, MAX_PROMPT_LENGTH);   // root prompt
   parser->current[0] = 0;                   // root memid in the registry
 
   for(n = 1; n < CLI_MAX_NESTED_LEVELS; n++)
-    parser->prompt[n] = string_create(0);
+    parser->prompt[n][0] = 0;
 
   /* Initialize line buffering states */
   parser->max_line = 0;
@@ -722,9 +722,7 @@ result_t cli_init(cli_cfg_t *cfg, cli_t *parser)
     cli_line_init(&parser->lines[n]);
 
   for (n = 0; n < CLI_MAX_NUM_TOKENS; n++)
-    {
-    parser->tokens[n].buffer = string_create(0);
-    }
+    memset(&parser->tokens[n], 0, sizeof(cli_token_t));
 
     /* Initialize parser FSM state */
   cli_fsm_reset(parser);
@@ -745,7 +743,7 @@ result_t cli_quit(cli_t *parser)
   return s_ok;
   }
 
-result_t cli_submode_enter(cli_t *parser, memid_t key, string_t prompt)
+result_t cli_submode_enter(cli_t *parser, memid_t key, const char * prompt)
   {
   cli_node_t *new_root;
 
@@ -760,7 +758,7 @@ result_t cli_submode_enter(cli_t *parser, memid_t key, string_t prompt)
   new_root = parser->cur_node;
 
   parser->root[parser->root_level] = new_root;
-  parser->prompt[parser->root_level] = prompt;
+  strncpy(parser->prompt[parser->root_level], prompt, MAX_PROMPT_LENGTH);
   parser->current[parser->root_level] = key;
 
   return s_ok;
@@ -775,8 +773,8 @@ result_t cli_submode_exit(cli_t *parser)
     return e_unexpected;
 
   // release the dynamic prompt
-  string_free(parser->prompt[parser->root_level]);
-  parser->prompt[parser->root_level] = 0;
+  kfree(parser->prompt[parser->root_level]);
+  parser->prompt[parser->root_level][0] = 0;
   parser->current[parser->root_level] = 0;
   parser->root[parser->root_level] = 0;
 
@@ -1089,7 +1087,7 @@ result_t cli_user_input(cli_t *parser, const char *prompt, int do_echo, cli_inpu
     stream_puts(parser->cfg.console_out, prompt);
 
   /* Save the state */
-  parser->user_buf = string_create(0);
+  parser->user_buf = 0;
   parser->user_input_cb = cb;
   parser->user_do_echo = do_echo;
 
