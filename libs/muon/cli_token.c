@@ -840,30 +840,6 @@ result_t cli_complete_enum(cli_t *parser, const cli_node_t *node, cli_token_t *t
  * TOKEN GET FUNCTIONS - These functions are used by glue functions
  *     to extract the parameters and call the action function.
  ***********************************************************************/
-
-static result_t convert_string_to_uint32(const char * token, uint16_t start, uint32_t *value)
-  {
-  uint32_t new = 0, old, d = 0, n;
-  uint16_t len = strlen(token);
-  const char *str = token;
-
-  *value = old = 0;
-  for (n = start; n < len; n++)
-    {
-    if (('0' <= str[n]) && ('9' >= str[n]))
-      d = str[n] - '0';
-    else
-      return e_bad_parameter;
-
-    new = (old * 10) + d;
-    if (((new - d) / 10) != old)
-      return e_unexpected;
-    old = new;
-    }
-
-  *value = new;
-  return s_ok;
-  }
 /*
  * cli_get_string - Token get function for a string.
  */
@@ -911,8 +887,12 @@ result_t convert_string_to_enum(const const char * token, const enum_t *enums, u
   if (isdigit(*token))
     {
     // numeric
-    uint32_t v32;
-    convert_string_to_uint32(token, 0, &v32);
+    errno = 0;
+    uint32_t v32 = strtoul(token, 0, 0);
+
+    if (errno != 0)
+      return e_bad_parameter;
+
     if (v32 > UINT16_MAX)
       return e_bad_parameter;
 
@@ -955,14 +935,6 @@ result_t cli_get_bool(const cli_token_t *token, const enum_t *enums, bool *value
   return s_ok;
   }
 
-static result_t cli_get_uint32_internal(const cli_token_t *token, uint16_t start, uint32_t *value)
-  {
-  if(token == 0 || value == 0)
-    return e_bad_parameter;
-
-  return convert_string_to_uint32(token->buffer, start, value);
-  }
-
 /*
  * cli_get_uint - Token get function for 16-bit unsigned integer.
  */
@@ -981,13 +953,13 @@ result_t cli_get_uint16(const cli_token_t *token, uint16_t *value)
     return e_unexpected; /* optional argument wasn't provided */
     }
 
-  uint32_t tmp;
-  result = cli_get_uint32_internal(token, 0, &tmp);
+  errno = 0;
+  uint32_t tmp = strtoul(token->buffer, 0, 0);
 
-  if(failed(result))
-    return result;
+  if (errno != 0)
+    return e_bad_parameter;
 
-  if(*value > 65535)
+  if(tmp > 65535)
     return e_bad_parameter;
 
   *value = (uint16_t)tmp;
@@ -1011,8 +983,14 @@ result_t cli_get_uint32(const cli_token_t *token, uint32_t *value)
     return e_unexpected; /* optional argument wasn't provided */
     }
 
-  return cli_get_uint32_internal(token, 0, value);
-   }
+  errno = 0;
+  *value = strtoul(token->buffer, 0, 0);
+
+  if (errno != 0)
+    return e_bad_parameter;
+
+  return s_ok;
+  }
 
 /*
  * cli_get_int - Token get function for 32-bit integer.
@@ -1020,9 +998,6 @@ result_t cli_get_uint32(const cli_token_t *token, uint32_t *value)
 result_t cli_get_int16(const cli_token_t *token, int16_t *value)
   {
   result_t result;
-  int16_t sign = +1;
-  uint16_t init_pos = 0;
-  uint32_t tmp;
 
   if(token == 0 || value == 0)
     return e_bad_parameter;
@@ -1035,35 +1010,22 @@ result_t cli_get_int16(const cli_token_t *token, int16_t *value)
   if (len == 0)
     return e_unexpected; /* optional argument wasn't provided */
 
-  if ('-' == str[0])
-    {
-    sign = -1;
-    init_pos = 1;
-    }
-  if ('+' == str[0])
-    {
-    init_pos = 1;
-    }
-  if (failed(result = cli_get_uint32_internal(token, init_pos, &tmp)))
-    return result;
+  errno = 0;
+  int32_t temp = strtol(token->buffer, 0, 0);
 
-  if(sign >= 0)
-    {
-    if (tmp > 32767)
-      return e_unexpected;
+  if (errno != 0)
+    return e_bad_parameter;
 
-    *value = (int16_t) tmp;
-    }
-  else
-    {
-    *value = (int16_t) tmp;
-    if(*value != tmp)
-      return e_bad_parameter;
+  if (temp > 32768)
+    return e_bad_parameter;
 
-    *value = 0-*value;
-    }
+  if (temp < -32767)
+    return e_bad_parameter;
+
+  *value = (int16_t)temp;
 
   return s_ok;
+
   }
 
 /*
@@ -1072,8 +1034,6 @@ result_t cli_get_int16(const cli_token_t *token, int16_t *value)
 result_t cli_get_int32(const cli_token_t *token, int32_t *value)
   {
   result_t result;
-  int32_t sign = +1;
-  uint32_t tmp, init_pos = 0;
 
   if(token == 0 || value == 0)
     return e_bad_parameter;
@@ -1085,33 +1045,12 @@ result_t cli_get_int32(const cli_token_t *token, int32_t *value)
   if (len == 0)
     return e_unexpected; /* optional argument wasn't provided */
 
-  if ('-' == *str)
-    {
-    sign = -1;
-    init_pos = 1;
-    }
+  errno = 0;
+  *value = strtol(token->buffer, 0, 0);
 
-  if ('+' == *str)
-    {
-    init_pos = 1;
-    }
-  if (failed(result = cli_get_uint32_internal(token, init_pos, &tmp)))
-    return result;
+  if (errno != 0)
+    return e_bad_parameter;
 
-  if (sign >= 0)
-    {
-    if (tmp > 0x7fffffff)
-      return e_bad_parameter;
-
-    *value = (int32_t)tmp;
-    }
-  else
-    {
-    if(tmp > 0x80000000)
-      return e_bad_parameter;
-
-    *value = -((int32_t) tmp);
-    }
   return s_ok;
   }
 
