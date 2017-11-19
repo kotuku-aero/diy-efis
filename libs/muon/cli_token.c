@@ -1,6 +1,43 @@
+/*
+diy-efis
+Copyright (C) 2016 Kotuku Aerospace Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+If a file does not contain a copyright header, either because it is incomplete
+or a binary file then the above copyright notice will apply.
+
+Portions of this repository may have further copyright notices that may be
+identified in the respective files.  In those cases the above copyright notice and
+the GPL3 are subservient to that copyright notice.
+
+Portions of this repository contain code fragments from the following
+providers.
+
+
+If any file has a copyright notice or portions of code have been used
+and the original copyright notice is not yet transcribed to the repository
+then the origional copyright notice is to be respected.
+
+If any material is included in the repository that is not open source
+it must be removed as soon as possible after the code fragment is identified.
+*/
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
 
 #include "cli.h"
 
@@ -146,7 +183,9 @@ result_t match_path(cli_t *context, const char * path, bool ignore_wildcard, mem
         }
 
       // add the string.
-      char * new_name = strdup(name);
+      char *new_name = (char *)kmalloc(strlen(name) +1);
+      strcpy(new_name, name);
+
       if (failed(vector_push_back(*matches, &new_name)))
         {
         kfree_split(directories);
@@ -198,7 +237,7 @@ result_t cli_match_keyword(cli_t *context, cli_token_t *token, cli_node_t *node,
 
   //assert(token && node && (CLI_NODE_KEYWORD == node->type) && is_complete);
 
-  uint16_t len = strlen(token->buffer);
+  uint16_t len = token->token_length;
   //kw_len = strnlen(node->param, CLI_MAX_TOKEN_SIZE);
   const char *kw = (const char *)node->param;
   kw_len = strlen(kw);
@@ -210,7 +249,7 @@ result_t cli_match_keyword(cli_t *context, cli_token_t *token, cli_node_t *node,
 
   match_len = (kw_len < len ? kw_len : len);
 
-  if (!strncmp(token->buffer, node->param, match_len))
+  if (!strncmp(token->token_buffer, node->param, match_len))
     {
     *is_complete = (match_len == kw_len);
     return s_ok;
@@ -222,7 +261,7 @@ result_t cli_match_keyword(cli_t *context, cli_token_t *token, cli_node_t *node,
 
 result_t cli_match_enum(cli_t *context, cli_token_t *token, cli_node_t *node, bool *is_complete)
   {
-  uint16_t len = strlen(token->buffer);
+  uint16_t len = token->token_length;
   const enum_t *cp;
   uint16_t kw_len;
 
@@ -232,7 +271,7 @@ result_t cli_match_enum(cli_t *context, cli_token_t *token, cli_node_t *node, bo
     if (len > kw_len)
       continue;
 
-    if (strncmp(token->buffer, cp->name, len) == 0)
+    if (strncmp(token->token_buffer, cp->name, len) == 0)
       {
       *is_complete = (kw_len == len);
       return s_ok;
@@ -251,7 +290,7 @@ result_t cli_match_string(cli_t *context, cli_token_t *token, cli_node_t *node, 
   {
 
   *is_complete = 1;
-  uint16_t len = strlen(token->buffer);
+  uint16_t len = token->token_length;
 
   return len < REG_STRING_MAX ? s_ok : e_unexpected;
   }
@@ -262,7 +301,7 @@ result_t cli_match_path(cli_t *context, cli_token_t *token, cli_node_t *node, bo
   vector_t matched_filenames = 0;
   result_t result;
     
-  if (failed(result = match_path(context, token->buffer, true, &dir, &matched_filenames)))
+  if (failed(result = match_path(context, token->token_buffer, true, &dir, &matched_filenames)))
     return result;
 
   if (matched_filenames == 0)
@@ -285,7 +324,7 @@ result_t cli_match_path(cli_t *context, cli_token_t *token, cli_node_t *node, bo
         return result;
         }
 
-      *is_complete = strcmp(str, token->buffer) == 0;
+      *is_complete = strcmp(str, token->token_buffer) == 0;
       }
     else
       *is_complete = false;
@@ -309,8 +348,8 @@ result_t cli_match_uint(cli_t *context, cli_token_t *token, cli_node_t *node, bo
 
   *is_complete = 0;
   //assert(token_len > 0);
-  const char *str = token->buffer;
-  uint16_t len = strlen(token->buffer);
+  const char *str = token->token_buffer;
+  uint16_t len = token->token_length;
 
   /* The first character must be 0-9 */
   if (!isdigit(str[0]))
@@ -378,8 +417,8 @@ result_t cli_match_int(cli_t *context, cli_token_t *token, cli_node_t *node, boo
   //        (CLI_NODE_INT32 == node->type)));
 
   *is_complete = 0;
-  const char *str = token->buffer;
-  uint16_t len = strlen(token->buffer);
+  const char *str = token->token_buffer;
+  uint16_t len = token->token_length;
 
 
   /* 1st digit can be 0-9,-,+ */
@@ -415,8 +454,8 @@ result_t cli_match_hex(cli_t *context, cli_token_t *token, cli_node_t *node, boo
   //assert(token && node && is_complete &&
   //       ((CLI_NODE_HEX16 == node->type) ||
   //        (CLI_NODE_HEX32 == node->type)));
-  const char *str = token->buffer;
-  uint16_t len = strlen(token->buffer);
+  const char *str = token->token_buffer;
+  uint16_t len = token->token_length;
 
 
   *is_complete = 0;
@@ -539,7 +578,7 @@ static result_t match_float(const char **_str, const char *terms)
 result_t cli_match_float(cli_t *context, cli_token_t *token, cli_node_t *node, bool *is_complete)
   {
   //assert(token && node && (CLI_NODE_FLOAT == node->type) && is_complete);
-  const char *str = token->buffer;
+  const char *str = token->token_buffer;
 
   result_t result = match_float(&str, 0);
   *is_complete = *str == 0;
@@ -550,27 +589,27 @@ result_t cli_match_bool(cli_t *context, cli_token_t *token, cli_node_t *node, bo
   {
   uint16_t i;
   //assert(token && node && (CLI_NODE_FLOAT == node->type) && is_complete);
-  uint16_t len = strlen(token->buffer);
+  uint16_t len = token->token_length;
 
   *is_complete = false;
 
-  if(isdigit(token->buffer[0]))
+  if(isdigit(token->token_buffer[0]))
     {
     for(i = 0; i < len; i++)
-      if(!isdigit(token->buffer[i]))
+      if(!isdigit(token->token_buffer[i]))
         return e_unexpected;
 
     *is_complete = true;
     return s_ok;
     }
-  else if (strncmp(token->buffer, "true", len) == 0)
+  else if (strncmp(token->token_buffer, "true", len) == 0)
     {
-    *is_complete = strlen(token->buffer) == 4;
+    *is_complete = token->token_length == 4;
     return s_ok;
     }
-  else if(strncmp(token->buffer, "false", len) == 0)
+  else if(strncmp(token->token_buffer, "false", len) == 0)
     {
-    *is_complete = strlen(token->buffer) == 5;
+    *is_complete = token->token_length == 5;
     return s_ok;
     }
 
@@ -632,7 +671,7 @@ result_t cli_match_xyz(cli_t *context, cli_token_t *token, cli_node_t *node, boo
   {
   *is_complete = false;
   // a matrix is defined as [<float>,<float>,<float>]
-  const char *str = token->buffer;
+  const char *str = token->token_buffer;
   return match_tuple(&str, is_complete);
   }
 
@@ -640,7 +679,7 @@ result_t cli_match_matrix(cli_t *context, cli_token_t *token, cli_node_t *node, 
   {
   *is_complete = false;
   // a matrix is defined as [<float>,<float>,<float>][<float>,<float>,<float>][<float>,<float>,<float>]
-  const char *str = token->buffer;
+  const char *str = token->token_buffer;
   result_t result;
 
   if(failed(result = match_tuple(&str, is_complete)) ||
@@ -674,7 +713,7 @@ result_t cli_complete_keyword(cli_t *parser, const cli_node_t *node, cli_token_t
   result_t result;
   const char *ch_ptr;
 
-  uint16_t len = strlen(token->buffer);
+  uint16_t len = token->token_length;
 
   ch_ptr = ((const char *)node->param) + len;
   while(*ch_ptr)
@@ -699,13 +738,13 @@ result_t cli_complete_path(cli_t *context, const cli_node_t *node, cli_token_t *
 
   // match the path name to the first found name
   vector_t matched_paths = 0;
-  if (failed(result = match_path(context, token->buffer, false, &memid, &matched_paths)))
+  if (failed(result = match_path(context, token->token_buffer, false, &memid, &matched_paths)))
     {
     return result;      // not sure how we got here, just bail...
     }
 
   // find the last part of the path
-  vector_t directories = string_split(token->buffer, '/');
+  vector_t directories = string_split(token->token_buffer, '/');
   uint16_t num_matches;
   if (failed(result = vector_count(directories, &num_matches)))
     {
@@ -731,7 +770,7 @@ result_t cli_complete_path(cli_t *context, const cli_node_t *node, cli_token_t *
 
   if (failed(result = vector_count(matched_paths, &num_matches)))
     {
-    kfree(last_path);
+    kfree((void *)last_path);
     kfree_split(matched_paths);
     return result;
     }
@@ -742,7 +781,7 @@ result_t cli_complete_path(cli_t *context, const cli_node_t *node, cli_token_t *
     {
     if(failed(result = vector_at(matched_paths, match_num, &name)))
       {
-      kfree(last_path);
+      kfree((void *)last_path);
       kfree_split(matched_paths);
       return result;
       }
@@ -773,7 +812,7 @@ result_t cli_complete_path(cli_t *context, const cli_node_t *node, cli_token_t *
 
   if (match_name == 0)
     {
-    kfree(last_path);
+    kfree((void *)last_path);
     kfree_split(matched_paths);
     return e_unexpected;
     }
@@ -782,7 +821,7 @@ result_t cli_complete_path(cli_t *context, const cli_node_t *node, cli_token_t *
     if (failed(result = cli_input(context, match_name[n], CLI_CHAR_REGULAR)))
       return result;
 
-  kfree(last_path);
+  kfree((void *)last_path);
   kfree_split(matched_paths);
 
   return s_ok;
@@ -793,14 +832,14 @@ result_t cli_complete_enum(cli_t *parser, const cli_node_t *node, cli_token_t *t
   result_t result;
   int16_t match_len = -1;
   int16_t n;
-  uint16_t len = strlen(token->buffer);
+  uint16_t len = token->token_length;
   const enum_t *id;
   const enum_t *match_id;
 
   // find the best match for the string
   for (id = (const enum_t *)node->param; id->name != 0; id++)
     {
-    if (strncmp(id->name, token->buffer, len) == 0)
+    if (strncmp(id->name, token->token_buffer, len) == 0)
       {
       /* Prefix matches. See what is the longest suffix */
       if (match_len == -1)
@@ -848,13 +887,13 @@ result_t cli_get_string(const cli_token_t *token, const char * *value)
   if(token == 0 || value == 0)
     return e_bad_parameter;
 
-  if(strlen(token->buffer) == 0)
+  if(token->token_length == 0)
     {
     *value = 0;
     return e_unexpected; /* optional argument wasn't provided */
     }
 
-  *value = token->buffer;
+  *value = token->token_buffer;
   return s_ok;
   }
 
@@ -863,13 +902,13 @@ result_t cli_get_path(const cli_token_t *token, const char * *value)
   if (token == 0 || value == 0)
     return e_bad_parameter;
 
-  if (strlen(token->buffer) == 0)
+  if (token->token_length == 0)
     {
     *value = 0;
     return e_unexpected; /* optional argument wasn't provided */
     }
 
-  *value = token->buffer;
+  *value = token->token_buffer;
   return s_ok;
   }
 
@@ -918,7 +957,7 @@ result_t cli_get_enum(const cli_token_t *token, const enum_t *enums, uint16_t *v
   if (token == 0 || value == 0)
     return e_bad_parameter;
 
-  return convert_string_to_enum(token->buffer, enums, value);
+  return convert_string_to_enum(token->token_buffer, enums, value);
   }
 
 result_t cli_get_bool(const cli_token_t *token, const enum_t *enums, bool *value)
@@ -928,7 +967,7 @@ result_t cli_get_bool(const cli_token_t *token, const enum_t *enums, bool *value
 
   uint16_t val = 0;
   result_t result;
-  if (failed(result = convert_string_to_enum(token->buffer, enums, &val)))
+  if (failed(result = convert_string_to_enum(token->token_buffer, enums, &val)))
     return result;
 
   *value = val != 0;
@@ -944,8 +983,8 @@ result_t cli_get_uint16(const cli_token_t *token, uint16_t *value)
   if(token == 0 || value == 0)
     return e_bad_parameter;
 
-  uint16_t len = strlen(token->buffer);
-  const char *str = token->buffer;
+  uint16_t len = token->token_length;
+  const char *str = token->token_buffer;
 
   if (len == 0)
     {
@@ -954,7 +993,7 @@ result_t cli_get_uint16(const cli_token_t *token, uint16_t *value)
     }
 
   errno = 0;
-  uint32_t tmp = strtoul(token->buffer, 0, 0);
+  uint32_t tmp = strtoul(token->token_buffer, 0, 0);
 
   if (errno != 0)
     return e_bad_parameter;
@@ -974,8 +1013,8 @@ result_t cli_get_uint32(const cli_token_t *token, uint32_t *value)
   if(token == 0 || value == 0)
     return e_bad_parameter;
 
-  uint16_t len = strlen(token->buffer);
-  const char *str = token->buffer;
+  uint16_t len = token->token_length;
+  const char *str = token->token_buffer;
 
   if (len == 0)
     {
@@ -984,7 +1023,7 @@ result_t cli_get_uint32(const cli_token_t *token, uint32_t *value)
     }
 
   errno = 0;
-  *value = strtoul(token->buffer, 0, 0);
+  *value = strtoul(token->token_buffer, 0, 0);
 
   if (errno != 0)
     return e_bad_parameter;
@@ -1004,14 +1043,14 @@ result_t cli_get_int16(const cli_token_t *token, int16_t *value)
 
   *value = 0;
 
-  uint16_t len = strlen(token->buffer);
-  const char *str = token->buffer;
+  uint16_t len = token->token_length;
+  const char *str = token->token_buffer;
 
   if (len == 0)
     return e_unexpected; /* optional argument wasn't provided */
 
   errno = 0;
-  int32_t temp = strtol(token->buffer, 0, 0);
+  int32_t temp = strtol(token->token_buffer, 0, 0);
 
   if (errno != 0)
     return e_bad_parameter;
@@ -1040,13 +1079,13 @@ result_t cli_get_int32(const cli_token_t *token, int32_t *value)
 
   *value = 0;
 
-  uint16_t len = strlen(token->buffer);
-  const char *str = token->buffer;
+  uint16_t len = token->token_length;
+  const char *str = token->token_buffer;
   if (len == 0)
     return e_unexpected; /* optional argument wasn't provided */
 
   errno = 0;
-  *value = strtol(token->buffer, 0, 0);
+  *value = strtol(token->token_buffer, 0, 0);
 
   if (errno != 0)
     return e_bad_parameter;
@@ -1064,8 +1103,8 @@ result_t cli_get_float(const cli_token_t *token, float *value)
 
   *value = 0;
 
-  uint16_t len = strlen(token->buffer);
-  const char *str = token->buffer;
+  uint16_t len = token->token_length;
+  const char *str = token->token_buffer;
   if (len == 0)
     return e_unexpected; /* optional argument wasn't provided */
 
@@ -1086,13 +1125,13 @@ result_t cli_get_script(const cli_token_t *token, const char * *value)
   if(token == 0 || value == 0)
     return e_bad_parameter;
 
-  if(strlen(token->buffer) == 0)
+  if(token->token_length == 0)
     {
     *value = 0;
     return e_unexpected; /* optional argument wasn't provided */
     }
 
-  *value = token->buffer;
+  *value = token->token_buffer;
   return s_ok;
   }
 
@@ -1103,8 +1142,8 @@ result_t cli_get_matrix(const cli_token_t *token, matrix_t *value)
 
   memset(value, 0, sizeof(matrix_t));
 
-  uint16_t len = strlen(token->buffer);
-  const char *str = token->buffer;
+  uint16_t len = token->token_length;
+  const char *str = token->token_buffer;
   if (len == 0)
     return e_unexpected; /* optional argument wasn't provided */
 
@@ -1139,8 +1178,8 @@ result_t cli_get_xyz(const cli_token_t *token, xyz_t *value)
 
   memset(value, 0, sizeof(xyz_t));
 
-  uint16_t len = strlen(token->buffer);
-  const char *str = token->buffer;
+  uint16_t len = token->token_length;
+  const char *str = token->token_buffer;
   if (len == 0)
     return e_unexpected; /* optional argument wasn't provided */
 

@@ -4,7 +4,7 @@
 static result_t cli_uint16_name_value (cli_t *parser)
   {
   result_t result;
-  string_t uint16_name_ = 0;
+  const char * uint16_name_ = 0;
   uint16_t uint16_name_value_;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &uint16_name_)))
@@ -23,7 +23,7 @@ static result_t cli_uint16_name_value (cli_t *parser)
 static result_t cli_int16_name_value (cli_t *parser)
   {
   result_t result;
-  string_t int16_name_ = 0;
+  const char * int16_name_ = 0;
   int16_t int16_name_value_;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &int16_name_)))
@@ -42,7 +42,7 @@ static result_t cli_int16_name_value (cli_t *parser)
 static result_t cli_uint32_name_value (cli_t *parser)
   {
   result_t result;
-  string_t uint32_name_ = 0;
+  const char * uint32_name_ = 0;
   uint32_t uint32_name_value_;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &uint32_name_)))
@@ -61,7 +61,7 @@ static result_t cli_uint32_name_value (cli_t *parser)
 static result_t cli_int32_name_value (cli_t *parser)
   {
   result_t result;
-  string_t int32_name_ = 0;
+  const char * int32_name_ = 0;
   int32_t int32_name_value_;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &int32_name_)))
@@ -80,7 +80,7 @@ static result_t cli_int32_name_value (cli_t *parser)
 static result_t cli_xyz_name_value (cli_t *parser)
   {
   result_t result;
-  string_t xyz_name_ = 0;
+  const char * xyz_name_ = 0;
   xyz_t xyz_name_value_;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &xyz_name_)))
@@ -99,7 +99,7 @@ static result_t cli_xyz_name_value (cli_t *parser)
 static result_t cli_matrix_name_value (cli_t *parser)
   {
   result_t result;
-  string_t matrix_name_ = 0;
+  const char * matrix_name_ = 0;
   matrix_t matrix_name_value_;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &matrix_name_)))
@@ -118,8 +118,8 @@ static result_t cli_matrix_name_value (cli_t *parser)
 static result_t cli_string_name_value (cli_t *parser)
   {
   result_t result;
-  string_t string_name_ = 0;
-  string_t string_name_value_ = 0;
+  const char * string_name_ = 0;
+  const char * string_name_value_ = 0;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &string_name_)))
     return result;
@@ -137,7 +137,7 @@ static result_t cli_string_name_value (cli_t *parser)
 static result_t cli_bool_name_value (cli_t *parser)
   {
   result_t result;
-  string_t bool_name_ = 0;
+  const char * bool_name_ = 0;
   uint16_t bool_name_value_;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &bool_name_)))
@@ -156,7 +156,7 @@ static result_t cli_bool_name_value (cli_t *parser)
 static result_t cli_float_name_value (cli_t *parser)
   {
   result_t result;
-  string_t float_name_ = 0;
+  const char * float_name_ = 0;
   float float_name_value_;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &float_name_)))
@@ -175,7 +175,7 @@ static result_t cli_float_name_value (cli_t *parser)
 static result_t cli_edit_name (cli_t *parser)
   {
   result_t result;
-  string_t edit_name_ = 0;
+  const char * edit_name_ = 0;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &edit_name_)))
     return result;
@@ -190,7 +190,7 @@ static result_t cli_edit_name (cli_t *parser)
 static result_t cli_cat_name (cli_t *parser)
   {
   result_t result;
-  string_t cat_name_ = 0;
+  const char * cat_name_ = 0;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &cat_name_)))
     return result;
@@ -205,7 +205,7 @@ static result_t cli_cat_name (cli_t *parser)
 static result_t cli_rm_name (cli_t *parser)
   {
   result_t result;
-  string_t rm_name_ = 0;
+  const char * rm_name_ = 0;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &rm_name_)))
     return result;
@@ -220,7 +220,7 @@ static result_t cli_rm_name (cli_t *parser)
 static result_t cli_mkdir_path (cli_t *parser)
   {
   result_t result;
-  string_t mkdir_path_ = 0;
+  const char * mkdir_path_ = 0;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &mkdir_path_)))
     return result;
@@ -235,7 +235,7 @@ static result_t cli_mkdir_path (cli_t *parser)
 static result_t cli_rmdir_path (cli_t *parser)
   {
   result_t result;
-  string_t rmdir_path_ = 0;
+  const char * rmdir_path_ = 0;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &rmdir_path_)))
     return result;
@@ -250,7 +250,7 @@ static result_t cli_rmdir_path (cli_t *parser)
 static result_t cli_cd_path (cli_t *parser)
   {
   result_t result;
-  string_t cd_path_ = 0;
+  const char * cd_path_ = 0;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &cd_path_)))
     return result;
@@ -265,7 +265,7 @@ static result_t cli_cd_path (cli_t *parser)
 static result_t cli_ls_path_recursive (cli_t *parser)
   {
   result_t result;
-  string_t ls_path_ = 0;
+  const char * ls_path_ = 0;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &ls_path_)))
     return result;
@@ -606,8 +606,8 @@ static result_t cli_script_add_id_name_msg_handler (cli_t *parser)
   {
   result_t result;
   uint16_t script_add_id_;
-  string_t script_add_id_name_ = 0;
-  string_t script_add_id_name_msg_handler_ = 0;
+  const char * script_add_id_name_ = 0;
+  const char * script_add_id_name_msg_handler_ = 0;
 
   if(failed(result = cli_get_enum(&parser->tokens[1], can_ids, &script_add_id_)))
     return result;
@@ -629,7 +629,7 @@ static result_t cli_script_del_id_name (cli_t *parser)
   {
   result_t result;
   uint16_t script_del_id_;
-  string_t script_del_id_name_ = 0;
+  const char * script_del_id_name_ = 0;
 
   if(failed(result = cli_get_enum(&parser->tokens[1], can_ids, &script_del_id_)))
     return result;
@@ -647,7 +647,7 @@ static result_t cli_script_del_id_name (cli_t *parser)
 static result_t cli_script_cat_name (cli_t *parser)
   {
   result_t result;
-  string_t script_cat_name_ = 0;
+  const char * script_cat_name_ = 0;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &script_cat_name_)))
     return result;
@@ -662,7 +662,7 @@ static result_t cli_script_cat_name (cli_t *parser)
 static result_t cli_script_edit_name (cli_t *parser)
   {
   result_t result;
-  string_t script_edit_name_ = 0;
+  const char * script_edit_name_ = 0;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &script_edit_name_)))
     return result;
@@ -677,7 +677,7 @@ static result_t cli_script_edit_name (cli_t *parser)
 static result_t cli_script_create_name (cli_t *parser)
   {
   result_t result;
-  string_t script_create_name_ = 0;
+  const char * script_create_name_ = 0;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &script_create_name_)))
     return result;
@@ -692,7 +692,7 @@ static result_t cli_script_create_name (cli_t *parser)
 static result_t cli_script_rm_name (cli_t *parser)
   {
   result_t result;
-  string_t script_rm_name_ = 0;
+  const char * script_rm_name_ = 0;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &script_rm_name_)))
     return result;
@@ -707,7 +707,7 @@ static result_t cli_script_rm_name (cli_t *parser)
 static result_t cli_script_ls_name (cli_t *parser)
   {
   result_t result;
-  string_t script_ls_name_ = 0;
+  const char * script_ls_name_ = 0;
 
   if(string_length(parser->tokens[1].buffer) > 0 &&
     failed(result = cli_get_string(&parser->tokens[1], &script_ls_name_)))
@@ -723,7 +723,7 @@ static result_t cli_script_ls_name (cli_t *parser)
 static result_t cli_script_debug_name (cli_t *parser)
   {
   result_t result;
-  string_t script_debug_name_ = 0;
+  const char * script_debug_name_ = 0;
 
   if(failed(result = cli_get_string(&parser->tokens[1], &script_debug_name_)))
     return result;
@@ -761,10 +761,10 @@ static result_t cli_send_can_id_type_session_val1_val2_val3_val4 (cli_t *parser)
   uint16_t send_can_id_;
   uint16_t send_can_id_type_;
   uint16_t send_can_id_type_session_;
-  string_t send_can_id_type_session_val1_ = 0;
-  string_t send_can_id_type_session_val1_val2_ = 0;
-  string_t send_can_id_type_session_val1_val2_val3_ = 0;
-  string_t send_can_id_type_session_val1_val2_val3_val4_ = 0;
+  const char * send_can_id_type_session_val1_ = 0;
+  const char * send_can_id_type_session_val1_val2_ = 0;
+  const char * send_can_id_type_session_val1_val2_val3_ = 0;
+  const char * send_can_id_type_session_val1_val2_val3_val4_ = 0;
 
   if(failed(result = cli_get_enum(&parser->tokens[1], can_ids, &send_can_id_)))
     return result;

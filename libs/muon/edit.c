@@ -1,5 +1,6 @@
 #include "../neutron/neutron.h"
 #include <string.h>
+#include <stdio.h>
 
 #define MINEXTEND      32768
 #define LINEBUF_EXTRA  32
@@ -142,8 +143,8 @@ typedef struct _editor_t
 
   int untitled; // Counter for untitled files
 
-  handle_t stdin;
-  handle_t stdout;
+  handle_t console_in;
+  handle_t console_out;
 
   handle_t stream;
   const char *title;        // name of the stream
@@ -152,7 +153,7 @@ typedef struct _editor_t
 static char _getchar(editor_t *ed)
   {
   char ch;
-  stream_read(ed->stdin, &ch, 1, 0);
+  stream_read(ed->console_in, &ch, 1, 0);
   return ch;
   }
 
@@ -726,12 +727,12 @@ void get_console_size(editor_t *ed)
 
 static void outch(editor_t *ed, char c)
   {
-  stream_write(ed->stdout, &c, 1);
+  stream_write(ed->console_out, &c, 1);
   }
 
 static void outbuf(editor_t *ed, char *buf, int len)
   {
-  stream_write(ed->stdout, buf, len);
+  stream_write(ed->console_out, buf, len);
   }
 
 static void outstr(editor_t *ed, char *str)
@@ -1152,7 +1153,7 @@ void display_message(editor_t *ed, char *fmt, ...)
   gotoxy(ed, 0, ed->lines);
   outstr(ed, STATUS_COLOR);
 
-  stream_printf(ed->stdout, fmt, printf_args, (&fmt)+1);
+  stream_printf(ed->console_out, fmt, printf_args, (&fmt)+1);
 
   outstr(ed, CLREOL TEXT_COLOR);
   }
@@ -2071,19 +2072,19 @@ void help(editor_t *ed)
 
 /**
  * Edit a stream
- * @param stdin   stream to read console from
- * @param stdout  stream to write console to
+ * @param console_in   stream to read console from
+ * @param console_out  stream to write console to
  * @param stream  stream to read/write file to
  */
-void muon_edit(handle_t stdin, handle_t stdout, const char *title, handle_t stream)
+void muon_edit(handle_t console_in, handle_t console_out, const char *title, handle_t stream)
   {
   int rc;
   int i;
 
   editor_t *ed = (editor_t *) kmalloc(sizeof(editor_t));
   memset(ed, 0, sizeof(editor_t));
-  ed->stdin = stdin;
-  ed->stdout = stdout;
+  ed->console_in = console_in;
+  ed->console_out = console_out;
   ed->title = title;
   ed->anchor = -1;
 

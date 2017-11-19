@@ -282,11 +282,11 @@ result_t cli_neutron_ls_id (cli_t *parser)
   result_t result;
   uint16_t neutron_ls_id_;
 
-  if(strlen(parser->tokens[1].buffer) > 0 &&
+  if(parser->tokens[1].token_length > 0 &&
     failed(result = cli_get_enum(&parser->tokens[1], can_ids, &neutron_ls_id_)))
     return result;
 
-  result = neutron_ls_id_action(parser, ((strlen(parser->tokens[1].buffer) > 0) ? &neutron_ls_id_ : 0));
+  result = neutron_ls_id_action(parser, ((parser->tokens[1].token_length > 0) ? &neutron_ls_id_ : 0));
 
 
   return result;
@@ -622,23 +622,29 @@ result_t cli_send_can_id_type_session_val1_val2_val3_val4 (cli_t *parser)
   if(failed(result = cli_get_uint16(&parser->tokens[3], &send_can_id_type_session_)))
     return result;
 
-  if(strlen(parser->tokens[4].buffer) > 0 &&
+  if(parser->tokens[4].token_length > 0 &&
     failed(result = cli_get_string(&parser->tokens[4], &send_can_id_type_session_val1_)))
     return result;
 
-  if(strlen(parser->tokens[5].buffer) > 0 &&
+  if(parser->tokens[5].token_length > 0 &&
     failed(result = cli_get_string(&parser->tokens[5], &send_can_id_type_session_val1_val2_)))
     return result;
 
-  if(strlen(parser->tokens[6].buffer) > 0 &&
+  if(parser->tokens[6].token_length > 0 &&
     failed(result = cli_get_string(&parser->tokens[6], &send_can_id_type_session_val1_val2_val3_)))
     return result;
 
-  if(strlen(parser->tokens[7].buffer) > 0 &&
+  if(parser->tokens[7].token_length > 0 &&
     failed(result = cli_get_string(&parser->tokens[7], &send_can_id_type_session_val1_val2_val3_val4_)))
     return result;
 
-  result = send_can_id_type_session_val1_val2_val3_val4_action(parser, send_can_id_, send_can_id_type_, send_can_id_type_session_, ((strlen(parser->tokens[4].buffer) > 0) ? send_can_id_type_session_val1_ : 0), ((strlen(parser->tokens[5].buffer) > 0) ? send_can_id_type_session_val1_val2_ : 0), ((strlen(parser->tokens[6].buffer) > 0) ? send_can_id_type_session_val1_val2_val3_ : 0), ((strlen(parser->tokens[7].buffer) > 0) ? send_can_id_type_session_val1_val2_val3_val4_ : 0));
+  result = send_can_id_type_session_val1_val2_val3_val4_action(parser, send_can_id_, 
+      send_can_id_type_, 
+      send_can_id_type_session_, 
+      ((parser->tokens[4].token_length > 0) ? send_can_id_type_session_val1_ : 0),
+      ((parser->tokens[5].token_length > 0) ? send_can_id_type_session_val1_val2_ : 0),
+      ((parser->tokens[6].token_length > 0) ? send_can_id_type_session_val1_val2_val3_ : 0),
+      ((parser->tokens[7].token_length > 0) ? send_can_id_type_session_val1_val2_val3_val4_ : 0));
 
 
   return result;
@@ -726,11 +732,12 @@ result_t cli_ion_create_name_content (cli_t *parser)
   if(failed(result = cli_get_string(&parser->tokens[1], &ion_create_name_)))
     return result;
 
-  if(strlen(parser->tokens[2].buffer) > 0 &&
+  if(parser->tokens[2].token_length > 0 &&
     failed(result = cli_get_string(&parser->tokens[2], &ion_create_name_content_)))
     return result;
 
-  result = ion_create_name_content_action(parser, ion_create_name_, ((strlen(parser->tokens[2].buffer) > 0) ? ion_create_name_content_ : 0));
+  result = ion_create_name_content_action(parser, ion_create_name_, 
+      ((parser->tokens[2].token_length > 0) ? ion_create_name_content_ : 0));
 
 
   return result;
@@ -757,11 +764,11 @@ result_t cli_ion_ls_name (cli_t *parser)
   result_t result;
   const char * ion_ls_name_ = 0;
 
-  if(strlen(parser->tokens[1].buffer) > 0 &&
+  if(parser->tokens[1].token_length > 0 &&
     failed(result = cli_get_string(&parser->tokens[1], &ion_ls_name_)))
     return result;
 
-  result = ion_ls_name_action(parser, ((strlen(parser->tokens[1].buffer) > 0) ? ion_ls_name_ : 0));
+  result = ion_ls_name_action(parser, ((parser->tokens[1].token_length > 0) ? ion_ls_name_ : 0));
 
 
   return result;
@@ -773,11 +780,11 @@ result_t cli_ion_debug_name (cli_t *parser)
   result_t result;
   const char * ion_debug_name_ = 0;
 
-  if(strlen(parser->tokens[1].buffer) > 0 &&
+  if(parser->tokens[1].token_length > 0 &&
     failed(result = cli_get_string(&parser->tokens[1], &ion_debug_name_)))
     return result;
 
-  result = ion_debug_name_action(parser, ((strlen(parser->tokens[1].buffer) > 0) ? ion_debug_name_ : 0));
+  result = ion_debug_name_action(parser, ((parser->tokens[1].token_length > 0) ? ion_debug_name_ : 0));
 
 
   return result;
@@ -789,11 +796,11 @@ result_t cli_ion_exec_name (cli_t *parser)
   result_t result;
   const char * ion_exec_name_ = 0;
 
-  if(strlen(parser->tokens[1].buffer) > 0 &&
+  if(parser->tokens[1].token_length > 0 &&
     failed(result = cli_get_string(&parser->tokens[1], &ion_exec_name_)))
     return result;
 
-  result = ion_exec_name_action(parser, ((strlen(parser->tokens[1].buffer) > 0) ? ion_exec_name_ : 0));
+  result = ion_exec_name_action(parser, ((parser->tokens[1].token_length > 0) ? ion_exec_name_ : 0));
 
 
   return result;

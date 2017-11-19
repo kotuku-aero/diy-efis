@@ -1,3 +1,38 @@
+/*
+diy-efis
+Copyright (C) 2016 Kotuku Aerospace Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+If a file does not contain a copyright header, either because it is incomplete
+or a binary file then the above copyright notice will apply.
+
+Portions of this repository may have further copyright notices that may be
+identified in the respective files.  In those cases the above copyright notice and
+the GPL3 are subservient to that copyright notice.
+
+Portions of this repository contain code fragments from the following
+providers.
+
+
+If any file has a copyright notice or portions of code have been used
+and the original copyright notice is not yet transcribed to the repository
+then the origional copyright notice is to be respected.
+
+If any material is included in the repository that is not open source
+it must be removed as soon as possible after the code fragment is identified.
+*/
 #ifndef __CLI_H__
 #define __CLI_H__
 
@@ -113,7 +148,9 @@ typedef struct cli_node_ {
 typedef struct cli_token_ {
     /** Index (in the line) of the beginning of the token */
     uint16_t begin_ptr;    // if -1 then
-    char buffer[CLI_MAX_TOKEN_SIZE];      /**< Local copy of the token */
+    uint16_t token_buflen;
+    uint16_t token_length;      // length of the token
+    char *token_buffer;         // Local copy of the token
 
     // if this is > then a string character " was detected and will be matched
     uint16_t in_string;
@@ -147,7 +184,7 @@ typedef struct {
     uint16_t  current;   /**< Point to the current character. */
     /** Buffer that holds the user input characters. */
     uint16_t buflen;
-    char * buffer;
+    char *buffer;
 } cli_line_t;
 
 /**
@@ -288,6 +325,11 @@ typedef result_t (*cli_walker_fn)(cli_t *parser, cli_node_t *node, void *cookie)
 extern result_t cli_init(cli_cfg_t *cfg, cli_t *parser);
 
 /**
+Cleanup and release all resources
+*/
+extern void cli_cleanup(cli_t *parser);
+
+/**
  * \brief    Input a character to the parser.
  *
  * \param    parser  Pointer to the parser structure.
@@ -337,22 +379,6 @@ extern result_t cli_walk(cli_t *parser, cli_walker_fn pre_fn,
  *           the parser structure is invalid.
  */
 extern result_t cli_help_cmd(cli_t *parser, char *str);
-
-/**
- * \brief    Load a command/config file to the parser. 
- * \details  A command/config file is just a text file with CLI commands. 
- *           (One command per line.) The only difference is that submode 
- *           is automatically exited if the indentation changes. This 
- *           behavior is the same as Cisco CLI.
- *
- * \param    parser   Pointer to the parser structure.
- * \param    filename Pointer to the filename.
- *
- * \return   s_ok if succeeded; e_bad_parameter
- *           if the input parameters are 0; e_unexpected if the file
- *           cannot be opened.
- */
-extern result_t cli_load_cmd(cli_t *parser, char *filename);
 
 /**
  * \brief    Exit a parser session.

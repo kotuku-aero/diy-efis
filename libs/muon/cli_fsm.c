@@ -1,3 +1,38 @@
+/*
+diy-efis
+Copyright (C) 2016 Kotuku Aerospace Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+If a file does not contain a copyright header, either because it is incomplete
+or a binary file then the above copyright notice will apply.
+
+Portions of this repository may have further copyright notices that may be
+identified in the respective files.  In those cases the above copyright notice and
+the GPL3 are subservient to that copyright notice.
+
+Portions of this repository contain code fragments from the following
+providers.
+
+
+If any file has a copyright notice or portions of code have been used
+and the original copyright notice is not yet transcribed to the repository
+then the origional copyright notice is to be respected.
+
+If any material is included in the repository that is not open source
+it must be removed as soon as possible after the code fragment is identified.
+*/
 #include "cli.h"
 #include <string.h>
 
@@ -56,31 +91,6 @@ int cli_match(cli_t *parser,
   }
 
 /**
- * Reset the token stack in parser FSM.
- *
- * \param    parser Pointer to the parser structure.
- *
- * \return   None.
- */
-static void cli_token_stack_reset(cli_t *parser)
-  {
-  int n;
-  cli_token_t *token;
-
-  parser->last_good = -1;
-  parser->current_pos = 0;
-  parser->token_tos = 0;
-  for (n = 0; n < CLI_MAX_NUM_TOKENS; n++)
-    {
-    token = &parser->tokens[n];
-    token->begin_ptr = 0;
-    token->parent = 0;
-    token->node = 0;
-    token->buffer[0] = 0;
-    }
-  }
-
-/**
  * Process a BS in WHITESPACE state. 
  *
  * \details  There are two possibilities: 1) after erasing a character, 
@@ -106,7 +116,7 @@ static cli_state_t cli_ws_erase(cli_t *parser, char ch, bool *ch_processed)
     if (0 < parser->token_tos)
       {
       token = &parser->tokens[parser->token_tos - 1];
-      if (token->begin_ptr + strlen(token->buffer) >= parser->current_pos)
+      if (token->begin_ptr + token->token_length >= parser->current_pos)
         {
         parser->cur_node = token->parent;
         token->parent = 0;
@@ -114,8 +124,11 @@ static cli_state_t cli_ws_erase(cli_t *parser, char ch, bool *ch_processed)
         /* Pop the token on top of the stack */
         token = CUR_TOKEN(parser);
         token->begin_ptr = 0;
-        kfree(token->buffer);
-        token->buffer[0] = 0;
+        if (token->token_buffer != 0)
+          {
+          token->token_buffer[0] = 0;
+          token->token_length = 0;
+          }
         token->parent = 0;
         token->node = 0;
         parser->token_tos--;
@@ -149,6 +162,34 @@ static cli_state_t cli_ws_space(cli_t *parser, char ch, bool *ch_processed)
   return CLI_STATE_WHITESPACE;
   }
 
+static cli_state_t push_back_char(cli_token_t *token, char ch)
+  {
+  if (token->token_length >= CLI_MAX_TOKEN_SIZE)
+    return CLI_STATE_ERROR;
+
+  if(token->token_buffer == 0 ||
+     token->token_buflen == 0 ||
+     token->token_length == (token->token_buflen-1))
+    {
+    // re-allocate the buffer
+    char *new_buffer = (char *)kmalloc(token->token_buflen + 32);
+    if(token->token_buffer != 0)
+      {
+      strcpy(new_buffer, token->token_buffer);
+      kfree(token->token_buffer);
+      }
+    else
+      new_buffer[0] = 0;
+    token->token_buffer = new_buffer;
+    token->token_buflen += 32;
+    }
+
+  token->token_buffer[token->token_length++] = ch;
+  token->token_buffer[token->token_length] = 0;
+
+  return CLI_STATE_TOKEN;
+  }
+
 /**
  * Process a character in WHITESPACE state.
  *
@@ -168,6 +209,7 @@ static cli_state_t cli_ws_char(cli_t *parser, char ch, bool *ch_processed)
   cli_node_t *match;
   bool is_complete;
   cli_token_t *token;
+  cli_state_t state;
   token = CUR_TOKEN(parser);
 
   *ch_processed = false;
@@ -184,11 +226,10 @@ static cli_state_t cli_ws_char(cli_t *parser, char ch, bool *ch_processed)
       }
     }
   else
-    /* A valid token found. Add to token stack */
     {
-    int len = strlen(token->buffer);
-    token->buffer[len] = ch;
-    token->buffer[len + 1] = 0;
+    /* A valid token found. Add to token stack */
+    if((state = push_back_char(token, ch) )== CLI_STATE_ERROR)
+      return state;
     }
 
   *ch_processed = true;
@@ -198,7 +239,8 @@ static cli_state_t cli_ws_char(cli_t *parser, char ch, bool *ch_processed)
   if (token->in_string == 0 &&
       !cli_match(parser, token, parser->cur_node, &match, &is_complete))
     {
-    token->buffer[strlen(token->buffer)-1] = 0;
+    token->token_buffer[--token->token_length] = 0;
+
     return CLI_STATE_ERROR; /* no token match */
     }
 
@@ -225,11 +267,11 @@ static cli_state_t cli_tok_erase(cli_t *parser, char ch, bool *ch_processed)
   cli_token_t *token;
 
   token = CUR_TOKEN(parser);
-  token->buffer[strlen(token->buffer)-1] = 0;
+  token->token_buffer[--token->token_length] = 0;
 
   parser->current_pos--;
   *ch_processed = true;
-  if (strlen(token->buffer) == 0)
+  if (token->token_length == 0)
     {
     token->begin_ptr = 0;
     return CLI_STATE_WHITESPACE;
@@ -272,13 +314,7 @@ static cli_state_t cli_tok_char(cli_t *parser, char ch, bool *ch_processed)
   else
     {
     /* A valid token found. Add to token stack */
-    if (strlen(token->buffer) < CLI_MAX_TOKEN_SIZE)
-      {
-      int len = strlen(token->buffer);
-      token->buffer[len] = ch;
-      token->buffer[len + 1] = 0;
-      }
-    else
+    if (push_back_char(token, ch) == CLI_STATE_ERROR)
       return CLI_STATE_ERROR;
     }
 
@@ -287,7 +323,7 @@ static cli_state_t cli_tok_char(cli_t *parser, char ch, bool *ch_processed)
   if (token->in_string == 0 &&
       !cli_match(parser, token, parser->cur_node, &match, &is_complete))
     {
-    token->buffer[strlen(token->buffer)-1] = 0;
+    token->token_buffer[--token->token_length] = 0;
     return CLI_STATE_ERROR;
     }
 
@@ -358,7 +394,7 @@ static cli_state_t cli_err_erase(cli_t *parser, char ch, bool *ch_processed)
     {
     cli_token_t *token;
     token = CUR_TOKEN(parser);
-    if (token->begin_ptr + strlen(token->buffer) >= parser->current_pos)
+    if (token->begin_ptr + token->token_length >= parser->current_pos)
       {
       return CLI_STATE_TOKEN;
       }
@@ -464,7 +500,25 @@ result_t cli_fsm_input(cli_t *parser, char ch)
 
 void cli_fsm_reset(cli_t *parser)
   {
-  cli_token_stack_reset(parser);
+  int n;
+  cli_token_t *token;
+
+  parser->last_good = -1;
+  parser->current_pos = 0;
+  parser->token_tos = 0;
+  for (n = 0; n < CLI_MAX_NUM_TOKENS; n++)
+    {
+    token = &parser->tokens[n];
+    token->begin_ptr = 0;
+    token->parent = 0;
+    token->node = 0;
+    // if this is a new reset the alloc a small buffer
+    if (token->token_buffer != 0)
+      token->token_buffer[0] = 0;
+
+    token->token_length = 0;
+    }
+
   parser->cur_node = parser->root[parser->root_level];
   parser->state = CLI_STATE_WHITESPACE;
   }

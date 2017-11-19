@@ -1,3 +1,38 @@
+/*
+diy-efis
+Copyright (C) 2016 Kotuku Aerospace Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+If a file does not contain a copyright header, either because it is incomplete
+or a binary file then the above copyright notice will apply.
+
+Portions of this repository may have further copyright notices that may be
+identified in the respective files.  In those cases the above copyright notice and
+the GPL3 are subservient to that copyright notice.
+
+Portions of this repository contain code fragments from the following
+providers.
+
+
+If any file has a copyright notice or portions of code have been used
+and the original copyright notice is not yet transcribed to the repository
+then the origional copyright notice is to be respected.
+
+If any material is included in the repository that is not open source
+it must be removed as soon as possible after the code fragment is identified.
+*/
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -40,7 +75,7 @@ static void cli_help_print_node(cli_t *parser, cli_node_t *node,
     case CLI_NODE_ENUM :
       {
       const enum_t *lnode = (const enum_t *)node->param;
-      const char * token = CUR_TOKEN(parser)->buffer;
+      const char * token = CUR_TOKEN(parser)->token_buffer;
       uint16_t len = strlen(token);
 
       while (lnode->name != 0)
@@ -58,7 +93,7 @@ static void cli_help_print_node(cli_t *parser, cli_node_t *node,
     case CLI_NODE_PATH :
       {
       vector_t matches = 0;
-      if (succeeded(match_path(parser, CUR_TOKEN(parser)->buffer, false, 0, &matches)))
+      if (succeeded(match_path(parser, CUR_TOKEN(parser)->token_buffer, false, 0, &matches)))
         {
         uint16_t len;
         if (succeeded(vector_count(matches, &len)))
@@ -122,7 +157,7 @@ static void cli_print_error(cli_t *parser, const char *msg)
 static void cli_input_reset(cli_t *parser)
   {
   if(parser->user_buf != 0)
-    kfree(parser->user_buf);
+    kfree((void *)parser->user_buf);
 
   parser->user_buf = 0;
   parser->user_input_cb = 0;
@@ -411,7 +446,7 @@ static int cli_complete_one_level(cli_t *parser)
          * parser. However, this is only useful for keywords. If there
          * is a parameter token in the match, we automatically abort.
          */
-        uint16_t len = strlen(token->buffer);
+        uint16_t len = token->token_length;
         offset = orig_offset = len;
         ch_ptr = ((char *)match->param) + len;
         while (('\0' != *ch_ptr) &&
@@ -718,6 +753,8 @@ result_t cli_init(cli_cfg_t *cfg, cli_t *parser)
   /* Initialize line buffering states */
   parser->max_line = 0;
   parser->cur_line = 0;
+
+  // TODO: make lines dynamic.....
   for (n = 0; n < CLI_MAX_LINES; n++)
     cli_line_init(&parser->lines[n]);
 
@@ -731,6 +768,27 @@ result_t cli_init(cli_cfg_t *cfg, cli_t *parser)
   cli_input_reset(parser);
 
   return s_ok;
+  }
+
+void cli_cleanup(cli_t *parser)
+  {
+  int n;
+
+  for (n = 0; n < CLI_MAX_LINES; n++)
+    {
+    if(parser->lines[n].buffer != 0)
+      kfree(parser->lines[n].buffer);
+
+    parser->lines[n].buffer = 0;
+    }
+
+  for (n = 0; n < CLI_MAX_NUM_TOKENS; n++)
+    {
+    if(parser->tokens[n].token_buffer != 0)
+      kfree(parser->tokens[n].token_buffer);
+
+    memset(&parser->tokens[n], 0, sizeof(cli_token_t));
+    }
   }
 
 result_t cli_quit(cli_t *parser)
@@ -773,107 +831,11 @@ result_t cli_submode_exit(cli_t *parser)
     return e_unexpected;
 
   // release the dynamic prompt
-  kfree(parser->prompt[parser->root_level]);
   parser->prompt[parser->root_level][0] = 0;
   parser->current[parser->root_level] = 0;
   parser->root[parser->root_level] = 0;
 
   parser->root_level--;
-  return s_ok;
-  }
-
-result_t cli_load_cmd(cli_t *parser, char *filename)
-  {
-  handle_t fp;
-  char buf[128];
-  uint16_t rsize;
-  uint16_t n;
-  int indent = 0, last_indent = -1, new_line = 1, m, line_num = 0;
-
-  if (!VALID_PARSER(parser) || !filename)
-    {
-    return e_bad_parameter;
-    }
-
-  if (failed(stream_open(0, filename, &fp)))
-    return e_unexpected;
-
-  cli_fsm_reset(parser);
-  while (failed(stream_eof(fp)))
-    {
-    if (failed(stream_read(fp, buf, sizeof (buf), &rsize)))
-      break;
-
-    //rsize = fread(buf, 1, sizeof (buf), fp);
-    for (n = 0; n < rsize; n++)
-      {
-      /* Examine the input characters to maintain indent level */
-      if ('\n' == buf[n])
-        {
-        result_t rc;
-        char buf[128];
-
-        line_num++;
-        indent = 0;
-        new_line = 1;
-        rc = cli_execute_cmd(parser);
-        if (s_ok == rc)
-          {
-          continue;
-          }
-
-        switch (rc)
-          {
-          case e_parse_error:
-            snprintf(buf, sizeof (buf), "Line %d: Parse error.\r\n", line_num);
-            stream_puts(parser->cfg.console_out, buf);
-            break;
-          case e_incomplete_command:
-            snprintf(buf, sizeof (buf), "Line %d: Incomplete command.\r\n", line_num);
-            stream_puts(parser->cfg.console_out, buf);
-            break;
-          default:
-            break;
-          }
-        return e_unexpected;
-        }
-      else if (' ' == buf[n])
-        {
-        if (new_line)
-          {
-          indent++;
-          }
-        }
-      else
-        {
-        if (new_line)
-          {
-          new_line = 0;
-          if (indent < last_indent)
-            {
-            for (m = indent; m < last_indent; m++)
-              {
-              if (s_ok != cli_submode_exit(parser))
-                {
-                break;
-                }
-              cli_fsm_reset(parser);
-              }
-            }
-          last_indent = indent;
-          }
-        }
-      (void) cli_fsm_input(parser, buf[n]);
-      }
-    }
-  stream_close(fp);
-
-  while (parser->root_level)
-    {
-    (void) cli_submode_exit(parser);
-    cli_fsm_reset(parser);
-    }
-
   return s_ok;
   }
 

@@ -1,3 +1,38 @@
+/*
+diy-efis
+Copyright (C) 2016 Kotuku Aerospace Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+If a file does not contain a copyright header, either because it is incomplete
+or a binary file then the above copyright notice will apply.
+
+Portions of this repository may have further copyright notices that may be
+identified in the respective files.  In those cases the above copyright notice and
+the GPL3 are subservient to that copyright notice.
+
+Portions of this repository contain code fragments from the following
+providers.
+
+
+If any file has a copyright notice or portions of code have been used
+and the original copyright notice is not yet transcribed to the repository
+then the origional copyright notice is to be respected.
+
+If any material is included in the repository that is not open source
+it must be removed as soon as possible after the code fragment is identified.
+*/
 #include "ion.h"
 
 #include <ctype.h>
@@ -329,12 +364,17 @@ result_t ion_create(memid_t home, const char *path,
 #define WORKER_QUEUE_LENGTH 32
 static handle_t ion_queue;
 
-static void ion_hook_handler(const canmsg_t *msg)
+static bool ion_hook_handler(const canmsg_t *msg, void *parg)
   {
   // the hook handler discards messages so that if
   // the dispatcher is hung up the publisher is not stopped.
   if(ion_queue != 0)
+    {
     push_back(ion_queue, msg, 0);
+    return true;
+    }
+  
+  return false;
   }
 
 static msg_hook_t ion_hook = { 0, 0, ion_hook_handler };
@@ -356,8 +396,8 @@ static void dup_key(const void *src, void **dst)
 
 static int compare_key(const void *left, const void *right)
   {
-  uint16_t v1 = (uint16_t)left;
-  uint16_t v2 = (uint16_t)right;
+  uint16_t v1 = (uint16_t)(uint32_t)left;
+  uint16_t v2 = (uint16_t)(uint32_t)right;
   
   if (v1 > v2)
     return 1;
