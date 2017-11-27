@@ -42,7 +42,7 @@ it must be removed as soon as possible after the code fragment is identified.
 result_t cli_line_init(cli_line_t *line)
   {
   line->current = 0;
-  line->buffer = (char *)kmalloc(CLI_MAX_LINE_LENGTH+1);
+  line->buffer = (char *)neutron_malloc(CLI_MAX_LINE_LENGTH+1);
   line->buffer[0] = 0;
   line->buflen = CLI_MAX_LINE_LENGTH;
 
@@ -76,10 +76,10 @@ result_t cli_line_insert(cli_t *parser, char ch)
   if (len >= (line->buflen - 1))
     {
     // expand the buffer
-    char *new_buffer = (char *)kmalloc(line->buflen + 32);
+    char *new_buffer = (char *)neutron_malloc(line->buflen + 32);
     strcpy(new_buffer, line->buffer);
     line->buflen += 32;
-    kfree(line->buffer);
+    neutron_free(line->buffer);
     line->buffer = new_buffer;
     }
 

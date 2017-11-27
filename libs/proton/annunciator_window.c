@@ -34,7 +34,6 @@ If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
 #include "widget.h"
-#include "fonts.h"
 #include "pens.h"
 
 static const point_t clock_pt = { 1, 10 };
@@ -55,9 +54,12 @@ typedef struct _annunciator_window_t {
   uint16_t clock;
   int16_t oat;
   uint16_t cas;
+
+  handle_t  small_font;
+  handle_t  large_font;
   } annunciator_window_t;
 
-static result_t widget_wndproc(const window_msg_t *data);
+static result_t widget_wndproc(handle_t hwnd, const canmsg_t *data);
 /**
  * Draw an annunciator
  * @param hwnd      Window to draw on
@@ -77,7 +79,7 @@ result_t create_annunciator_window(handle_t parent, memid_t key, handle_t *hwnd)
     return result;
 
   // create the window data.
-  annunciator_window_t *wnd = (annunciator_window_t *)kmalloc(sizeof(annunciator_window_t));
+  annunciator_window_t *wnd = (annunciator_window_t *)neutron_malloc(sizeof(annunciator_window_t));
   memset(wnd, 0, sizeof(annunciator_window_t));
 
   wnd->version = sizeof(annunciator_window_t);
@@ -91,6 +93,17 @@ result_t create_annunciator_window(handle_t parent, memid_t key, handle_t *hwnd)
   rect_t rect;
   get_window_rect(*hwnd, &rect);
   invalidate_rect(*hwnd, &rect);
+
+  // get the small font
+  if (failed(result = lookup_font(key, "small-font", wnd->small_font)))
+    {
+
+    }
+
+  if (failed(result = lookup_font(key, "large-font", wnd->large_font)))
+    {
+
+    }
 
   return s_ok;
   }
@@ -126,22 +139,22 @@ static void update_window(handle_t hwnd, annunciator_window_t *wnd)
   draw_annunciator(hwnd, &wnd_rect, wnd, &cas_pt, "CAS", msg);
   }
 
-static result_t widget_wndproc(const window_msg_t *data)
+static result_t widget_wndproc(handle_t hwnd, const canmsg_t *msg)
   {
   bool changed = false;
   annunciator_window_t *wnd;
-  get_wnddata(data->hwnd, (void **)&wnd);
+  get_wnddata(hwnd, (void **)&wnd);
 
 
-  switch (data->msg.id)
+  switch (msg->id)
     {
     case id_def_utc:
     {
     uint8_t v;
     uint16_t minutes;
-    get_param_uint8(&data->msg, 0, &v);
+    get_param_uint8(msg, 0, &v);
     minutes = v * 60;
-    get_param_uint8(&data->msg, 1, &v);
+    get_param_uint8(msg, 1, &v);
     minutes += v;
 
     changed = wnd->clock != minutes;
@@ -151,7 +164,7 @@ static result_t widget_wndproc(const window_msg_t *data)
     case id_qnh:
     {
     uint16_t value;
-    get_param_uint16(&data->msg, 0, &value);
+    get_param_uint16(msg, 0, &value);
     changed = wnd->qnh != value;
     wnd->qnh = value;
     }
@@ -159,7 +172,7 @@ static result_t widget_wndproc(const window_msg_t *data)
     case id_true_airspeed:
     {
     uint16_t value;
-    get_param_uint16(&data->msg, 0, &value);
+    get_param_uint16(msg, 0, &value);
     changed = wnd->cas != value;
     wnd->cas = value;
     }
@@ -167,7 +180,7 @@ static result_t widget_wndproc(const window_msg_t *data)
     case id_outside_air_temperature:
     {
     int16_t value;
-    get_param_int16(&data->msg, 0, &value);
+    get_param_int16(msg, 0, &value);
     changed = wnd->oat != value;
     wnd->oat = value;
     }
@@ -175,22 +188,22 @@ static result_t widget_wndproc(const window_msg_t *data)
     case id_air_time:
     {
     uint32_t value;
-    get_param_uint32(&data->msg, &value);
+    get_param_uint32(msg, &value);
     changed = wnd->hours != value;
     wnd->hours = value;
     }
     break;
     case id_paint:
-      begin_paint(data->hwnd);
-      update_window(data->hwnd, wnd);
-      end_paint(data->hwnd);
+      begin_paint(hwnd);
+      update_window(hwnd, wnd);
+      end_paint(hwnd);
       break;
     default:
-      return defwndproc(data);
+      return defwndproc(hwnd, msg);
     }
 
   if (changed)
-    invalidate_rect(data->hwnd, 0);
+    invalidate_rect(hwnd, 0);
 
   return s_ok;
   }
@@ -210,7 +223,7 @@ static void draw_annunciator(handle_t hwnd,
   rect_t rect;
 
   extent_t label_size;
-  text_extent(hwnd, &arial_9_font, label, text_len, &label_size);
+  text_extent(hwnd, wnd->small_font, label, text_len, &label_size);
 
   gdi_dim_t width = rect_width(wnd_rect);
   gdi_dim_t text_start = pt->x + width - (label_size.dx + 3);
@@ -231,11 +244,11 @@ static void draw_annunciator(handle_t hwnd,
     pt->y + 30 + label_size.dy,
     &rect);
 
-  draw_text(hwnd, wnd_rect, &arial_9_font, color_white, color_black,
+  draw_text(hwnd, wnd_rect, wnd->small_font, color_white, color_black,
     label, 0, &label_origin, &rect, 0, 0);
 
   extent_t text_size;
-  text_extent(hwnd, &arial_15_font, value, 0, &text_size);
+  text_extent(hwnd, wnd->large_font, value, 0, &text_size);
 
   // center of the text is 37, 16
   point_t origin = {
@@ -245,6 +258,6 @@ static void draw_annunciator(handle_t hwnd,
 
   make_rect_pt(&origin, &text_size, &rect);
 
-  draw_text(hwnd, wnd_rect, &arial_15_font, color_white, color_hollow,
+  draw_text(hwnd, wnd_rect, wnd->large_font, color_white, color_hollow,
     value, 0, &origin, &rect, 0, 0);
   }

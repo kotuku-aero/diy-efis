@@ -34,8 +34,6 @@ If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
  */
 #include "widget.h"
-#include "fonts.h"
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -105,15 +103,7 @@ result_t lookup_enum(memid_t key,
   return e_not_found;
   }
 
-static const char *font_names[] ={
-                                  "arial_9_font",
-                                  "arial_12_font",
-                                  "arial_15_font",
-                                  "arial_20_font",
-                                  "arial_25_font"
-  };
-
-result_t lookup_font(memid_t key, const char *name, const font_t **font)
+result_t lookup_font(memid_t key, const char *name, handle_t  *font)
   {
   result_t result;
   if(name == 0 ||
@@ -121,33 +111,24 @@ result_t lookup_font(memid_t key, const char *name, const font_t **font)
     return e_bad_parameter;
   
   *font = 0;
-  
-  int val;
-  if(failed(result = lookup_enum(key, name, font_names, 5, &val)))
-      return result;
-  
-  switch (val)
-    {
-    case 0:
-      *font = &arial_9_font;
-      break;
-    case 1:
-      *font = &arial_12_font;
-      break;
-    case 2:
-      *font = &arial_15_font;
-      break;
-    case 3:
-      *font = &arial_20_font;
-      break;
-    case 4:
-      *font = &arial_25_font;
-      break;
-    default :
-      return e_not_found;
-    }
 
-  return s_ok;
+  memid_t font_key;
+  if(failed(result = reg_open_key(key, name, &font_key)))
+    return result;
+
+  char font_name[REG_STRING_MAX];
+  
+  if(failed(result = reg_open_string(font_key, "name", font_name, 0)))
+      return result;
+
+  uint16_t pts;
+  if(failed(result = reg_get_uint16(font_key, "size", &pts)))
+    return result;
+
+  // pts is the vertical size.
+  point_t char_metrics = { 0, pts << 6 };
+
+  return create_font(font_name, &char_metrics, 0, font);
   }
 
 typedef struct _color_lookup_t
@@ -296,13 +277,15 @@ result_t display_roller(handle_t hwnd,
                         uint32_t value,
                         int digits,
                         color_t bg_color,
-                        color_t fg_color)
+                        color_t fg_color,
+                        handle_t  large_font,
+                        handle_t  small_font)
   {
   // we need to work out the size of the roller digits first
-//  const font_t *old_font = cv.font(&arial_12_font);
+//  const handle_t  *old_font = cv.font(&arial_12_font);
   
   extent_t size_medium;
-  text_extent(hwnd, &arial_12_font, "00", 2, &size_medium);
+  text_extent(hwnd, small_font, "00", 2, &size_medium);
 
   point_t pt = {
     bounds->right - (digits == 1 ? size_medium.dx >>= 1 : size_medium.dx),
@@ -344,7 +327,7 @@ result_t display_roller(handle_t hwnd,
       else
         sprintf(str, "%02.2d", (int) minor);
 
-      draw_text(hwnd, bounds, &arial_12_font, fg_color, bg_color,
+      draw_text(hwnd, bounds, small_font, fg_color, bg_color,
                 str, 0, &pt, bounds, eto_clipped, 0);
       }
 
@@ -360,14 +343,14 @@ result_t display_roller(handle_t hwnd,
   // calc the size
   //cv.font(&arial_15_font);
   extent_t large_size;
-  text_extent(hwnd, &arial_15_font, str, len, &large_size);
+  text_extent(hwnd, large_font, str, len, &large_size);
 
   pt.x -= large_size.dx;
   pt.y = bounds->top;
   pt.y += (bounds->bottom - bounds->top) >> 1;
   pt.y -= large_size.dy >> 1;
 
-  draw_text(hwnd, bounds, &arial_15_font, fg_color, bg_color,
+  draw_text(hwnd, bounds, large_font, fg_color, bg_color,
             str, len, &pt, bounds, eto_clipped, 0);
 
   return s_ok;

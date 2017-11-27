@@ -34,68 +34,51 @@ If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
 
-#include "../neutron/bsp.h"
-#include "../ion/ion.h"
+#include "ion_proxy.h"
+#include "truetype.h"
 
-#include "ft2build.h"
-#include "freetype.h"
+typedef struct _fontrec_t;
 
-#ifdef max
-#undef max
-#endif
+// a glyph is stored as a vector of alpha values (255 = opaque, 0 = transparent)
+// to allow alpha blended font outlines.
+typedef struct _glyph_t {
+  uint16_t length;        // is length of bitmap, structure size is sizeof(font_glyph_t) + length
+  uint16_t wchar;         // unicode character
+  uint16_t codepoint;     // offset into file
+  uint16_t x;             // size-x
+  uint16_t y;             // size-y
+  int16_t origin_x;       // x position for left most column of glyph (can be - for blank columns)
+  int16_t origin_y;       // y position for top of glyph (can be - if blank lines)
+  uint16_t advance;       // width of cell
+  uint16_t pitch;         // bytes between rows
+  uint8_t bitmap[];
+  } glyph_t;
 
-#ifdef min
-#undef min
-#endif
-#include <math.h>
-#include <string.h>
+typedef struct _font_t {
+  uint16_t version;
+  struct _fontrec_t *fontrec;
+  uint16_t size;          // size of the font
+  handle_t glyphs;       // map of characters to cached bitmap rects
+  } font_t;
 
-#define WINDOW_QUEUE_SIZE 128
+// We cache the fonts into an array of fonts.
+// this structure holds the name->font mapping
+typedef struct _fontrec_t {
+  const char *name;       // registered name of the font
+  handle_t file;          // handle to file for the font
+  handle_t fonts;         // font vector.
+  stbtt_fontinfo info;    // loaded font info
+  } fontrec_t;
 
-// shared structure for all canvas's
-typedef struct _window_t
-  {
-    uint16_t version;
-    // canvas that holds the window drawing surface
-    canvas_t *canvas;
-    // next canvas in the list. 0 == end
-    struct _window_t *next;
-    // previous canvas in the list. 0 == end
-    struct _window_t *previous;
-    // parent canvas, 0 = root canvas
-    struct _window_t *parent;
-    // first child of this window
-    struct _window_t *child;
-    // true if this window is invalidated and needs a redraw
-    // note the invalidate function does not use the rect hint
-    bool invalid;
-    // dimensions of the canvas
-    rect_t position;          // position of the canvas.  Relative to the parent
-    // window procedure used to process messages
-    wndproc window_proc;
-    // id of the window
-    uint16_t id;
-    // painting order
-    uint8_t z_order;
-    // the window data that is stored for the window
-    void *wnd_data;
-  } window_t;
-
-typedef struct _screen_t
-  {
-    window_t wnd;
-    // the event queue for the window.
-    handle_t event_queue;
-    // callback for CAN messages
-    msg_hook_t msg_hook;
-    // this is the font library
-    FT_Library ft_library;
-    // This is the script engine that is associated with the layout
-    ion_context_t *context;
-  } screen_t;
+/**
+* @struct window_msg_t
+*/
+typedef struct _window_msg_t {
+  canmsg_t msg;
+  handle_t hwnd;
+  } window_msg_t;
 
 static screen_t *phys_screen;
-
 #ifndef min
 #define min(a, b) ((a) > (b)? (b) : (a))
 #endif
@@ -114,36 +97,17 @@ static const canmsg_t paint_msg = {
   .canas.data_type = CANAS_DATATYPE_NODATA
   };
 
-// ONLY works if first elements are uint16_t
-static result_t is_window(handle_t hndl)
-  {
-  if (hndl == 0)
-    return e_bad_parameter;
-
-  return
-      *((uint16_t *) hndl) == sizeof(window_t)
-          || *((uint16_t *) hndl) == sizeof(screen_t) ? s_ok : e_bad_handle;
-  }
-
 static result_t get_canvas(handle_t hwnd, canvas_t **canvas)
   {
   result_t result;
 
-  if (failed(result = is_window(hwnd)))
+  window_t *wnd;
+  if (failed(result = as_window(hwnd, &wnd)))
     return result;
 
-  window_t *wnd = (window_t *) hwnd;
   // proton does not use a separate canvas
   *canvas = wnd->canvas;
   return s_ok;
-  }
-
-static result_t is_screen(handle_t hndl)
-  {
-  if (hndl == 0)
-    return e_bad_parameter;
-
-  return *((uint16_t *) hndl) == sizeof(screen_t) ? s_ok : e_bad_handle;
   }
 
 static void msg_hook(const canmsg_t *msg)
@@ -161,7 +125,7 @@ result_t open_screen(uint16_t orientation, wndproc cb, uint16_t id,
   if (failed(result = bsp_canvas_open_framebuffer(&canvas)))
     return result;
 
-  phys_screen = (screen_t *)kmalloc(sizeof(screen_t));
+  phys_screen = (screen_t *)neutron_malloc(sizeof(screen_t));
 
   memset(phys_screen, 0, sizeof(screen_t));
 
@@ -173,8 +137,7 @@ result_t open_screen(uint16_t orientation, wndproc cb, uint16_t id,
   phys_screen->wnd.previous = 0;
 
   // initialize the font system
-  if (FT_Init_FreeType(&phys_screen->ft_library))
-    return e_generic_error;
+  vector_create(sizeof(fontrec_t), &phys_screen->fonts);
 
   deque_create(sizeof(window_msg_t), WINDOW_QUEUE_SIZE, &phys_screen->event_queue);
 
@@ -197,6 +160,17 @@ result_t open_screen(uint16_t orientation, wndproc cb, uint16_t id,
   return s_ok;
   }
 
+result_t get_screen(handle_t *screen)
+  {
+  if(screen == 0)
+    return e_bad_parameter;
+
+  if(phys_screen == 0)
+    return e_unexpected;
+
+  *screen = phys_screen;
+  return s_ok;
+  }
 result_t create_window(handle_t hwnd_parent, const rect_t *bounds, wndproc cb,
     uint16_t id, handle_t *hwnd)
   {
@@ -207,10 +181,10 @@ result_t create_window(handle_t hwnd_parent, const rect_t *bounds, wndproc cb,
   if (hwnd_parent == 0 || bounds == 0 || cb == 0 || hwnd == 0)
     return e_bad_parameter;
 
-  if (failed(result = is_window(hwnd_parent)))
+  window_t *parent;
+  if (failed(result = as_window(hwnd_parent, &parent)))
     return result;
 
-  window_t *parent = (window_t *) hwnd_parent;
   extent_t size =
     {
     .dx = rect_width(bounds), .dy = rect_height(bounds)
@@ -219,7 +193,7 @@ result_t create_window(handle_t hwnd_parent, const rect_t *bounds, wndproc cb,
   if (failed(result = bsp_canvas_create_rect(&size, &canvas)))
     return result;
 
-  wnd = (window_t *) kmalloc(sizeof(window_t));
+  wnd = (window_t *) neutron_malloc(sizeof(window_t));
   memset(wnd, 0, sizeof(window_t));
 
   wnd->parent = parent;
@@ -228,6 +202,9 @@ result_t create_window(handle_t hwnd_parent, const rect_t *bounds, wndproc cb,
   wnd->canvas = canvas;
   wnd->window_proc = cb;
   wnd->id = id;
+
+  // attach the default event handlers to the window
+  attach_proxy(wnd);
 
   *hwnd = wnd;
 
@@ -249,10 +226,10 @@ result_t create_child_window(handle_t hwnd_parent, const rect_t *bounds,
   if (hwnd_parent == 0 || bounds == 0 || cb == 0 || hwnd == 0)
     return e_bad_parameter;
 
-  if (failed(result = is_window(hwnd_parent)))
+  window_t *parent;
+  if (failed(result = as_window(hwnd_parent, &parent)))
     return result;
 
-  window_t *parent = (window_t *) hwnd_parent;
 
   canvas_t *parent_canvas;
 
@@ -262,7 +239,7 @@ result_t create_child_window(handle_t hwnd_parent, const rect_t *bounds,
   if (failed(result = bsp_canvas_create_child(parent_canvas, bounds, &canvas)))
     return result;
 
-  wnd = (window_t *) kmalloc(sizeof(window_t));
+  wnd = (window_t *) neutron_malloc(sizeof(window_t));
   memset(wnd, 0, sizeof(window_t));
 
   wnd->parent = parent;
@@ -288,10 +265,10 @@ result_t get_parent(handle_t window, handle_t *parent)
   if (parent == 0)
     return e_bad_parameter;
 
-  if (failed(result = is_window(window)))
+  window_t *wnd;
+  if (failed(result = as_window(window, &wnd)))
     return result;
 
-  window_t *wnd = (window_t *) window;
   *parent = wnd->parent;
 
   return s_ok;
@@ -303,10 +280,10 @@ result_t get_window_by_id(handle_t parent, uint16_t id, handle_t *child)
   if (child == 0)
     return e_bad_parameter;
 
-  if (failed(result = is_window(parent)))
+  window_t *wnd;
+  if (failed(result = as_window(parent, &wnd)))
     return result;
 
-  window_t *wnd = (window_t *) parent;
 
   // see if the child is the parent!
   if (wnd->id == id)
@@ -318,7 +295,7 @@ result_t get_window_by_id(handle_t parent, uint16_t id, handle_t *child)
 
   handle_t hwnd_child;
   if (failed(result = get_first_child(parent, &hwnd_child)) ||
-  failed(is_window(hwnd_child)))
+      failed(as_window(hwnd_child, &wnd)))
     return result;        // possibly e_not_found
 
   do
@@ -351,10 +328,10 @@ result_t get_first_child(handle_t parent, handle_t *child)
 
   *child = 0;
 
-  if (failed(result = is_window(parent)))
+  window_t *wnd;
+  if (failed(result = as_window(parent, &wnd)))
     return result;
 
-  window_t *wnd = (window_t *) parent;
 
   *child = wnd->child;
 
@@ -371,10 +348,10 @@ result_t get_next_sibling(handle_t wnd, handle_t *sibling)
 
   *sibling = 0;
 
-  if (failed(result = is_window(wnd)))
+  window_t *window;
+  if (failed(result = as_window(wnd, &window)))
     return result;
 
-  window_t *window = (window_t *) wnd;
 
   *sibling = window->next;
 
@@ -392,10 +369,10 @@ result_t get_previous_sibling(handle_t wnd, handle_t *sibling)
 
   *sibling = 0;
 
-  if (failed(result = is_window(wnd)))
+  window_t *window;
+  if (failed(result = as_window(wnd, &window)))
     return result;
 
-  window_t *window = (window_t *) wnd;
 
   *sibling = window->previous;
 
@@ -408,11 +385,10 @@ result_t get_previous_sibling(handle_t wnd, handle_t *sibling)
 result_t insert_before(handle_t wnd, handle_t sibling)
   {
   result_t result;
-  if (failed(result = is_window(wnd)) || failed(result = is_window(sibling)))
+  window_t *next;
+  window_t *child;
+  if (failed(result = as_window(wnd, &child)) || failed(result = as_window(sibling, &next)))
     return result;
-
-  window_t *next = (window_t *) sibling;
-  window_t *child = (window_t *) wnd;
 
   child->previous = next->previous;
 
@@ -429,11 +405,11 @@ result_t insert_before(handle_t wnd, handle_t sibling)
 result_t insert_after(handle_t wnd, handle_t sibling)
   {
   result_t result;
-  if (failed(result = is_window(wnd)) || failed(result = is_window(sibling)))
+  window_t *previous;
+  window_t *child;
+  if (failed(result = as_window(wnd, &child)) || failed(result = as_window(sibling, &previous)))
     return result;
 
-  window_t *previous = (window_t *) sibling;
-  window_t *child = (window_t *) wnd;
 
   child->next = previous->next;
 
@@ -450,10 +426,10 @@ result_t get_window_rect(handle_t hwnd, rect_t *rect)
   {
   result_t result;
 
-  if (failed(result = is_window(hwnd)))
+  window_t *window;
+  if (failed(result = as_window(hwnd, &window)))
     return result;
 
-  window_t *window = (window_t *) hwnd;
 
   rect->left = 0;
   rect->top = 0;
@@ -483,10 +459,10 @@ result_t get_wnddata(handle_t hwnd, void **wnd_data)
   {
   result_t result;
 
-  if (failed(result = is_window(hwnd)))
+  window_t *wnd;
+  if (failed(result = as_window(hwnd, &wnd)))
     return result;
 
-  window_t *wnd = (window_t *) hwnd;
 
   *wnd_data = wnd->wnd_data;
   return s_ok;
@@ -496,10 +472,10 @@ result_t set_wnddata(handle_t hwnd, void *wnd_data)
   {
   result_t result;
 
-  if (failed(result = is_window(hwnd)))
+  window_t *wnd;
+  if (failed(result = as_window(hwnd, &wnd)))
     return result;
 
-  window_t *wnd = (window_t *) hwnd;
 
   wnd->wnd_data = wnd_data;
   return s_ok;
@@ -509,10 +485,10 @@ result_t get_orientation(handle_t hwnd, uint16_t *orientation)
   {
   result_t result;
 
-  if (failed(result = is_window(hwnd)))
+  window_t *wnd;
+  if (failed(result = as_window(hwnd, &wnd)))
     return result;
 
-  window_t *wnd = (window_t *) hwnd;
 
   return wnd->canvas->orientation;
   }
@@ -521,30 +497,34 @@ result_t set_orientation(handle_t hwnd, uint16_t orientation)
   {
   result_t result;
 
-  if (failed(result = is_window(hwnd)))
+  window_t *wnd;
+  if (failed(result = as_window(hwnd, &wnd)))
     return result;
 
   if (orientation != 0 && orientation != 90 && orientation != 180
       && orientation != 270)
     return e_bad_parameter;
 
-  window_t *wnd = (window_t *) hwnd;
 
   wnd->canvas->orientation = orientation;
 
   return s_ok;
   }
 
-result_t get_message(handle_t hwnd, window_msg_t *msg)
+result_t get_message(handle_t hscreen, handle_t *hwnd, canmsg_t *msg)
   {
   result_t result;
 
-  if (failed(result = is_screen(hwnd)))
+  screen_t *screen;
+  if (failed(result = as_screen(hscreen, &screen)))
     return result;
 
-  screen_t *screen = (screen_t *) hwnd;
+  if(hwnd == 0)
+    return e_bad_parameter;
 
   uint16_t queue_count;
+
+  window_msg_t wndmsg;
 
   if (failed(result = count(screen->event_queue, &queue_count)))
     return result;
@@ -553,8 +533,8 @@ result_t get_message(handle_t hwnd, window_msg_t *msg)
     {
     if (succeeded((*screen->wnd.canvas->queue_empty)(hwnd)))
       {
-      memcpy(&msg->msg, &paint_msg, sizeof(canmsg_t));
-      msg->hwnd = hwnd;
+      memcpy(msg, &paint_msg, sizeof(canmsg_t));
+      *hwnd = hwnd;
       return s_ok;          // paint message found
       }
 
@@ -562,18 +542,22 @@ result_t get_message(handle_t hwnd, window_msg_t *msg)
     }
 
   // get the message off the queue
-  pop_front(screen->event_queue, msg, INDEFINITE_WAIT);
+  pop_front(screen->event_queue, &wndmsg, INDEFINITE_WAIT);
+
+  *hwnd = wndmsg.hwnd;
+  memcpy(msg, &wndmsg.msg, sizeof(canmsg_t));
+
   return s_ok;
   }
 
 // send a message to the chain of windows
-static void broadcast_message(window_t *wnd, const window_msg_t *msg)
+static void broadcast_message(window_t *wnd, const canmsg_t *msg)
   {
   // send to all
   while (wnd != 0)
     {
     // send to self
-    send_message(wnd, &msg->msg);
+    send_message(wnd, msg);
     // recursive send to children
     broadcast_message(wnd->child, msg);
     // skip next
@@ -581,10 +565,10 @@ static void broadcast_message(window_t *wnd, const window_msg_t *msg)
     }
   }
 
-result_t dispatch_message(const window_msg_t *msg)
+result_t dispatch_message(handle_t hwnd, const canmsg_t *msg)
   {
   // send the message to the wndproc
-  if (msg->hwnd == 0)
+  if (hwnd == 0)
     {
     if (phys_screen == 0)
       return e_bad_parameter;
@@ -600,34 +584,29 @@ result_t dispatch_message(const window_msg_t *msg)
   // message
   result_t result;
 
-  if (failed(result = is_window(msg->hwnd)))
+  window_t *wnd;
+  if (failed(result = as_window(hwnd, &wnd)))
     return result;
 
-  window_t *wnd = (window_t *) msg->hwnd;
-  return (*wnd->window_proc)(msg);
+  return (*wnd->window_proc)(hwnd, msg);
   }
 
 result_t send_message(handle_t hwnd, const canmsg_t *msg)
   {
   result_t result;
 
-  if (failed(result = is_window(hwnd)))
+  window_t *wnd;
+  if (failed(result = as_window(hwnd, &wnd)))
     return result;
 
-  window_t *wnd = (window_t *) hwnd;
-
-  window_msg_t w_msg;
-  w_msg.hwnd = hwnd;
-  memcpy(&w_msg.msg, msg, sizeof(canmsg_t));
-
-  return (*wnd->window_proc)(&w_msg);
+  return (*wnd->window_proc)(hwnd, msg);
   }
 
 result_t post_message(handle_t hwnd, const canmsg_t *msg, uint32_t max_wait)
   {
   result_t result;
 
-  if (hwnd != 0 && failed(result = is_window(hwnd)))
+  if (hwnd != 0 && failed(result = as_window(hwnd, 0)))
     return result;
 
   // prepare the window message to despatch
@@ -668,20 +647,20 @@ result_t canvas_close(handle_t hc)
 result_t is_invalid(handle_t hwnd)
   {
   result_t result;
-  if (failed(result = is_window(hwnd)))
+  window_t *wnd;
+  if (failed(result = as_window(hwnd, &wnd)))
     return result;
 
-  window_t *wnd = (window_t *) hwnd;
   return wnd->invalid ? s_ok : s_false;
   }
 
 result_t begin_paint(handle_t hwnd)
   {
   result_t result;
-  if (failed(result = is_window(hwnd)))
+  window_t *wnd;
+  if (failed(result = as_window(hwnd, &wnd)))
     return result;
 
-  window_t *wnd = (window_t *) hwnd;
   wnd->invalid = false;
 
   return (*wnd->canvas->begin_paint)(wnd);
@@ -690,10 +669,11 @@ result_t begin_paint(handle_t hwnd)
 result_t end_paint(handle_t hwnd)
   {
   result_t result;
-  if (failed(result = is_window(hwnd)))
+  window_t *wnd;
+
+  if (failed(result = as_window(hwnd, &wnd)))
     return result;
 
-  window_t *wnd = (window_t *) hwnd;
   wnd->invalid = false;
 
   return (*wnd->canvas->end_paint)(wnd);
@@ -2152,7 +2132,7 @@ result_t polygon(handle_t hwnd, const rect_t *clip_rect, const pen_t *outline,
 
   int i, y;
 
-  get = (edge_t *) kmalloc(points_size(points) * sizeof(edge_t));
+  get = (edge_t *) neutron_malloc(points_size(points) * sizeof(edge_t));
 
   if (get == 0)
     {
@@ -2160,11 +2140,11 @@ result_t polygon(handle_t hwnd, const rect_t *clip_rect, const pen_t *outline,
     return e_not_enough_memory;
     }
 
-  aet = (edge_t *) kmalloc(points_size(points) * sizeof(edge_t));
+  aet = (edge_t *) neutron_malloc(points_size(points) * sizeof(edge_t));
 
   if (aet == 0)
     {
-    kfree(get);
+    neutron_free(get);
     vector_close(points);
     return e_not_enough_memory;
     }
@@ -2270,8 +2250,8 @@ result_t polygon(handle_t hwnd, const rect_t *clip_rect, const pen_t *outline,
   while ((nae > 0) || (nge > 0));
 
   /* all done, free the edge tables */
-  kfree(aet);
-  kfree(get);
+  neutron_free(aet);
+  neutron_free(get);
   vector_close(points);
 
   // now outline the polygon using the pen
@@ -2940,7 +2920,7 @@ result_t pie(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
     segs++;
 
 // We allocate 1 more point so that the polyline will fill the area.
-  point_t *pts = kmalloc(sizeof(point_t) * (segs + 1));
+  point_t *pts = neutron_malloc(sizeof(point_t) * (segs + 1));
 
   int pt = 1;
   copy_point(p, pts);
@@ -2968,62 +2948,305 @@ result_t pie(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
 
   polygon(canvas, clip_rect, pen, c, pts, segs + 1);
 
-  kfree(pts);
+  neutron_free(pts);
 
   return s_ok;
   }
 
-result_t create_font(const char *path, const point_t *char_metrics, const point_t *device_metrics, font_t *font)
+static int compare_font(const void *left, const void *right)
+  {
+  const glyph_t *fl = (const glyph_t *)left;
+  const glyph_t *fr = (const glyph_t *)right;
+
+  return (fl->wchar > fr->wchar) ? 1 : (fl->wchar < fr->wchar) ? -1 : 0;
+  }
+
+static void dup_font(const void *src, void **dst)
+  {
+  *dst = src;       // stored by reference
+  }
+
+static void destroy_key_font(void *key)
+  {
+  // do not destroy the key!
+  }
+
+static void destroy_value_font(void *value)
+  {
+  neutron_free(value);
+  }
+
+
+// cache (if possible) the character ch in th font
+static result_t ensure_glyph(font_t *font, char ch, const glyph_t **gp)
+  {
+  result_t result;
+  glyph_t *glyph = 0;
+
+  if(font == 0)
+    return e_bad_parameter;
+
+  result = map_find(font->glyphs, (uint16_t)ch, (void **)&glyph);
+  if(result != e_not_found && failed(result))
+    return result;
+
+  if (succeeded(result))
+    {
+    if(gp != 0)
+      *gp = glyph;
+
+    return s_ok;
+    }
+
+  // see if the fontrec has the character we need
+  int codepoint = stbtt_FindGlyphIndex(&font->fontrec->info, ch);
+  if(codepoint == 0)
+    return e_not_found;
+
+  // THIS IS NOT VERY GOOD.  We create a rectangular bitmap....
+  uint16_t x = phys_screen->wnd.canvas->default_char_metrics.x * font->size;
+  uint16_t y = phys_screen->wnd.canvas->default_char_metrics.y * font->size;
+
+  uint16_t bitmap_length = x * y;
+  glyph = (glyph_t *) neutron_alloc(sizeof(glyph_t) + bitmap_length);
+
+  glyph->x = x;
+  glyph->y = y;
+  glyph->length = bitmap_length;
+  glyph->wchar = ch;
+  glyph->codepoint = codepoint;
+  glyph->origin_x = 0;
+  glyph->origin_y = 0;
+  stbtt_bakedchar baked_info;
+  if (stbtt_BakeFontBitmap_fontinfo(&font->fontrec->info, 0, y, &glyph->bitmap[0], x, y, ch, 1, &baked_info) == 0)
+    {
+    neutron_free(glyph);
+    return e_unexpected;
+    }
+
+  glyph->advance = (uint16_t)baked_info.xadvance;
+  glyph->pitch = baked_info.x1 - baked_info.x0;
+
+  if(gp != 0)
+    *gp = glyph;
+
+  // add the glyph
+  return map_add(font->glyphs, glyph, glyph);
+  }
+
+static result_t release_glyph(glyph_t *glyph)
+  {
+  // just free it
+  neutron_free(glyph);
+
+  return s_ok;
+  }
+
+result_t create_font(const char *name, uint16_t points, const char *hint, handle_t  *fh)
+  {
+  result_t result;
+  if (name == 0 || points == 0)
+    return e_bad_parameter;
+
+  fontrec_t *fr = 0;
+  uint16_t count;         // will never be many fonts, could convert to a nv map.
+  if (failed(result = vector_count(phys_screen->fonts, &count)))
+    return result;
+
+  uint16_t font_index;
+  for (font_index = 0; font_index < count; font_index++)
+    {
+    if (failed(result = vector_at(phys_screen->fonts, font_index, &fr)))
+      return result;
+
+    if (strcmp(fr->name, name) == 0)
+      break;
+
+    fr = 0;
+    }
+
+  if (fr == 0)
+    return e_not_found;
+
+  if (failed(result = vector_count(fr->fonts, &count)))
+    return result;
+
+  font_t *font = 0;
+  for (font_index = count; font_index > 0; font_index--)
+    {
+    if(failed(result = vector_at(fr->fonts, font_index, &font)))
+      return result;
+
+    if (font->size == points)
+      break;
+    }
+
+  if (fr == 0)
+    {
+    // point size does not exist so create it
+    font = (font_t *)neutron_alloc(sizeof(font_t));
+    font->fontrec = fr;
+    font->size = points;
+    font->version = sizeof(font_t);
+    if (failed(result = map_create(dup_font, dup_font, compare_font, destroy_key_font, destroy_value_font, &font->glyphs)))
+      {
+      neutron_free(font);
+      return result;
+      }
+    }
+
+  // the font is loaded, see if the user wants it
+  if(fh != 0)
+    *fh = font;
+
+  // font is created.  So not init the cache
+  if (hint != 0)
+    {
+    char ch;
+    for (ch = *hint; ch != 0; hint++)
+      {
+      if(failed(result = ensure_glyph(font, ch, 0)))
+        return result;
+      }
+    }
+
+  return s_ok;
+  }
+
+result_t load_font(const char *name, handle_t stream)
   {
   result_t result;
 
-  // see if we can open the stream first
-  handle_t stream;
-  if (failed(result = bsp_open_resource(path, &stream)))
+  if(name == 0 || stream == 0)
+    return e_bad_parameter;
+
+  fontrec_t *fr;
+  uint16_t count;         // will never be many fonts, could convert to a nv map.
+  if(failed(result = vector_count(phys_screen->fonts, &count)))
     return result;
-  
-  FT_Face new_face;
 
-  if (FT_New_Face(phys_screen->ft_library, path, 0, &new_face) != 0)
-    return e_not_found;
-
-  if (FT_Set_Char_Size(new_face, char_metrics->x, char_metrics->y, device_metrics->x, device_metrics->y))
+  uint16_t i;
+  for (i = 0; i < count; i++)
     {
-    FT_Done_Face(new_face);
-    return e_bad_handle;
+    if(failed(result = vector_at(phys_screen->fonts, i, &fr)))
+      return result;
+
+    if (strcmp(fr->name, name) == 0)
+      return e_exists;
     }
 
-  // the face is valid...
-  font = new_face;
+  // font does not exist.
+  fr = (fontrec_t *)neutron_alloc(sizeof(fontrec_t));
+  fr->file = stream;
+  // create an empty font list
+  if (failed(result = vector_create(sizeof(font_t), &fr->fonts)) ||
+    stbtt_InitFont(&fr->info, stream, 0) == 0)
+    {
+    neutron_free(fr);
+    return result;
+    }
+
+  fr->name = neutron_strdup(name);
 
   return s_ok;
   }
 
-result_t release_font(font_t font)
+result_t release_font(const char *name)
   {
-  FT_Face face = (FT_Face)font;
-  if (FT_Done_Face(face) != 0)
-    return e_unexpected;
+  result_t result;
+  if (name == 0)
+    return e_bad_parameter;
+
+  fontrec_t *fr = 0;
+  uint16_t count;         // will never be many fonts, could convert to a nv map.
+  if (failed(result = vector_count(phys_screen->fonts, &count)))
+    return result;
+
+  uint16_t font_index;
+  for (font_index = 0; font_index < count; font_index++)
+    {
+    if (failed(result = vector_at(phys_screen->fonts, font_index, &fr)))
+      return result;
+
+    if (strcmp(fr->name, name) == 0)
+      break;
+
+    fr = 0;
+    }
+
+  if(fr == 0)
+    return e_not_found;
+
+  if(failed(result = vector_count(fr->fonts, &count)))
+    return result;
+    
+  uint16_t glyph_index;
+  for (glyph_index = count; glyph_index > 0; glyph_index--)
+    {
+    glyph_t *glyph;
+    if(failed(result = vector_at(fr->fonts, glyph_index-1, &glyph)))
+      return result;
+
+    if(failed(result = vector_erase(fr->fonts, glyph_index-1)))
+      return result;
+    }
+
+  if (failed(result = vector_close(fr->fonts)))
+    {
+    // todo: this is not good.....
+    fr->fonts = 0;
+    return result;
+    }
+
+  if (failed(result = stream_close(fr->file)))
+    {
+    fr->file = 0;
+    return result;
+    }
+
+  // fontinfo is only data...
+  neutron_free(fr->name);
+  fr->name = 0;
+
+  if(failed(result = vector_erase(phys_screen->fonts, font_index)))
+    return result;
+
+  neutron_free(fr);
 
   return s_ok;
   }
 
-result_t draw_text(handle_t hndl, const rect_t *clip_rect, font_t font,
+static result_t is_valid_font(handle_t hndl, font_t **fp)
+  {
+  font_t *font = (font_t *)hndl;
+  if(font == 0 || font->version != sizeof(font_t))
+    return e_bad_handle;
+
+  if(fp != 0)
+    *fp = font;
+
+  return s_ok;
+  }
+
+result_t draw_text(handle_t hndl, const rect_t *clip_rect, handle_t  fp,
     color_t fg, color_t bg, const char *str, uint16_t count, const point_t *pt,
     const rect_t *txt_clip_rect, text_flags format, uint16_t *char_widths)
   {
   result_t result;
   if(hndl == 0 ||
-     font == 0 ||
+     fp == 0 ||
      str == 0 ||
      pt == 0)
     return e_bad_parameter;
+
+  font_t *font;
+  if(failed(result = is_valid_font(fp, &font)))
+    return result;
 
   canvas_t *canvas;
   if(failed(result = get_canvas(hndl, &canvas)))
     return result;
 
-  FT_Face face = (FT_Face)font;
 
   // create a clipping rectangle as needed
   rect_t txt_rect;
@@ -3041,32 +3264,27 @@ result_t draw_text(handle_t hndl, const rect_t *clip_rect, font_t font,
     count = strlen(str);
 
   uint16_t ch;
-
   for (ch = 0; ch < count; ch++)
     {
     // get the character to use.  If the character is outside the
     // map then we use the default char
     char c = str[ch];
 
-    FT_UInt glyph_index = FT_Get_Char_Index(face, c);
-    FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
-
-    if(face->glyph->format != FT_GLYPH_FORMAT_BITMAP)
-      FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
+    const glyph_t *glyph = 0;
+    if(failed(result = ensure_glyph(font, c, &glyph)))
+      return result;
 
     // see if the user wants the widths returned
     if (char_widths != 0)
-      char_widths[ch] = face->glyph->advance.x;
+      char_widths[ch] = glyph->x;
 
     uint16_t row;
-    for (row = 0; row < face->glyph->advance.y; row++)
+    for (row = 0; row < glyph->y; row++)
       {
       // set to the top of the bitmap
-      uint16_t offset = (face->glyph->bitmap_top + row) *  face->glyph->bitmap.pitch;
-      // distance from start of line.
-      offset += face->glyph->bitmap_left;
+      uint16_t offset = row *  glyph->pitch;
       uint16_t col;
-      for (col = 0; col < face->glyph->advance.x; col++)
+      for (col = 0; col < glyph->y; col++)
         {
         point_t pos =
         {
@@ -3074,7 +3292,7 @@ result_t draw_text(handle_t hndl, const rect_t *clip_rect, font_t font,
         };
         if (point_in_rect(&pos, clip_rect))
           {
-          uint8_t bit = face->glyph->bitmap.buffer[offset];
+          uint8_t bit = glyph->bitmap[offset];
 
           if (format & eto_opaque)
             {
@@ -3091,18 +3309,19 @@ result_t draw_text(handle_t hndl, const rect_t *clip_rect, font_t font,
 
         offset++;
         }
-      }
+    }
 
     // advance in 1/64's pixels
-    pt_pos.x += (gdi_dim_t) (face->glyph->advance.x >> 6);
+    pt_pos.x += glyph->advance;
     }
 
   return s_ok;
   }
 
-result_t text_extent(handle_t hndl, font_t font, const char *str,
+result_t text_extent(handle_t hndl, handle_t  font, const char *str,
     uint16_t count, extent_t *ex)
   {
+  result_t result;
   if(hndl == 0 ||
      font == 0 ||
      str == 0 ||
@@ -3110,8 +3329,6 @@ result_t text_extent(handle_t hndl, font_t font, const char *str,
     return e_bad_parameter;
   
   uint16_t ch;
-
-  FT_Face face = (FT_Face)font;
 
   ex->dx = 0;
   ex->dy = 0;
@@ -3127,15 +3344,16 @@ result_t text_extent(handle_t hndl, font_t font, const char *str,
     if (c == 0)
       break;              // end of the string
 
-    FT_UInt glyph_index = FT_Get_Char_Index(face, c);
-    FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
 
-    if (face->glyph->format != FT_GLYPH_FORMAT_BITMAP)
-      FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
+    const glyph_t *glyph = 0;
+    if (failed(result = ensure_glyph(font, c, &glyph)))
+      return result;
 
-    ex->dy = max(ex->dy, face->glyph->advance.y);
+    // see if the user wants the widths returned
 
-    ex->dx += face->glyph->advance.x;
+    ex->dy = max(ex->dy, glyph->y);
+
+    ex->dx += glyph->x;
     }
 
   return s_ok;
@@ -3144,10 +3362,10 @@ result_t text_extent(handle_t hndl, font_t font, const char *str,
 result_t invalidate_rect(handle_t hwnd, const rect_t *rect)
   {
   result_t result;
-  if(failed(result = is_window(hwnd)))
-    return result;
+  window_t *wnd;
 
-  window_t *wnd = (window_t *) hwnd;
+  if(failed(result = as_window(hwnd, &wnd)))
+    return result;
 
   // see if the canvas is a parent draw canvas
   canvas_t *canvas;
@@ -3177,10 +3395,10 @@ result_t invalidate_rect(handle_t hwnd, const rect_t *rect)
   return s_ok;
   }
 
-result_t defwndproc(const window_msg_t *msg)
+result_t defwndproc(handle_t hwnd, const canmsg_t *msg)
   {
   result_t result;
-  if(msg->msg.id == id_paint)
+  if(msg->id == id_paint)
     {
     // we assume the widget has painted its canvas, we work over our children
     // in z-order
@@ -3190,17 +3408,17 @@ result_t defwndproc(const window_msg_t *msg)
     handle_t child;
     
     uint8_t z_order;
-    if(failed(result = get_z_order(msg->hwnd, &z_order)))
+    if(failed(result = get_z_order(hwnd, &z_order)))
       return result;
     
     max_order = z_order;
     painting_order = z_order;
     
-    begin_paint(msg->hwnd);
+    begin_paint(hwnd);
 
     do
       {
-      for(get_first_child(msg->hwnd, &child); child != 0; get_next_sibling(child, &child))
+      for(get_first_child(hwnd, &child); child != 0; get_next_sibling(child, &child))
         {
         get_z_order(child, &z_order);
         
@@ -3216,7 +3434,7 @@ result_t defwndproc(const window_msg_t *msg)
           }
         
         if(z_order == painting_order)
-          send_message(child, &msg->msg);         // is ok to paint
+          send_message(child, msg);         // is ok to paint
         }
       
       if(painting_order >= max_order)
@@ -3226,7 +3444,7 @@ result_t defwndproc(const window_msg_t *msg)
       
       } while(true);
 
-    end_paint(msg->hwnd);
+    end_paint(hwnd);
     }
 
   return s_false;
@@ -3238,10 +3456,10 @@ result_t get_z_order(handle_t hwnd, uint8_t *z_order)
   if(hwnd == 0 || z_order == 0)
     return e_bad_parameter;
 
-  if (failed(result = is_window(hwnd)))
+  window_t *wnd;
+  if (failed(result = as_window(hwnd, &wnd)))
     return result;
 
-  window_t *wnd = (window_t *) hwnd;
   
   *z_order = wnd->z_order;
 
@@ -3252,10 +3470,10 @@ result_t set_z_order(handle_t hwnd, uint8_t z_order)
   {
   result_t result;
 
-  if (failed(result = is_window(hwnd)))
+  window_t *wnd;
+  if (failed(result = as_window(hwnd, &wnd)))
     return result;
 
-  window_t *wnd = (window_t *) hwnd;
   
   wnd->z_order = z_order;
 

@@ -215,13 +215,6 @@ extern result_t bsp_reg_read_block(uint32_t memid, uint16_t bytes_to_read, void 
  * @return s_ok if opened ok
  */
 extern result_t bsp_reg_write_block(uint32_t memid, uint16_t bytes_to_write, const void *buffer);
-/**
- * open an manifest resource stream
- * @param path        uri path to the resource
- * @param stream      resulting stream
- * @result s_ok if the stream is opened
-*/
-extern result_t bsp_open_resource(const char *path, handle_t *stream);
 
 typedef struct _neutron_parameters_t
   {

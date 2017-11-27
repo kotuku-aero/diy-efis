@@ -2,7 +2,7 @@
 
 proton
 #submodule proton
-  screen <UINT16:screen_x> <UINT16:screen_y>
+  screen <UINT16:screen-x> <UINT16:screen-y>
   orientation <ENUM:orientations:orient>
   init <STRING:layout_name:Name of the initial layout>
   ls { <STRING:layout_name> }

@@ -68,14 +68,14 @@ static result_t ensure_space(vector_impl_t *vec, uint16_t length)
 
   if(vec->length == 0 && vec->buffer != 0)
     {
-    kfree(vec->buffer);
+    neutron_free(vec->buffer);
     vec->buffer = 0;
     }
 
   if(vec->buffer != 0)
-    vec->buffer = (byte_t *)krealloc(vec->buffer, array_size * vec->element_size);
+    vec->buffer = (byte_t *)neutron_realloc(vec->buffer, array_size * vec->element_size);
   else
-    vec->buffer = (byte_t *)kmalloc(array_size * vec->element_size);
+    vec->buffer = (byte_t *)neutron_malloc(array_size * vec->element_size);
 
   if(vec->buffer == 0)
     {
@@ -100,7 +100,7 @@ result_t vector_create(uint16_t element_size, handle_t *hndl)
       hndl == 0)
     return e_bad_parameter;
 
-  vector_impl_t *vec = (vector_impl_t *)kmalloc(sizeof(vector_impl_t));
+  vector_impl_t *vec = (vector_impl_t *)neutron_malloc(sizeof(vector_impl_t));
 
   if(vec == 0)
     return e_no_space;
@@ -123,7 +123,7 @@ result_t vector_copy(uint16_t element_size, uint16_t length, const void *element
       hndl == 0)
     return e_bad_parameter;
 
-  vector_impl_t *vec = (vector_impl_t *)kmalloc(sizeof(vector_impl_t));
+  vector_impl_t *vec = (vector_impl_t *)neutron_malloc(sizeof(vector_impl_t));
 
   if(vec == 0)
     return e_no_space;
@@ -135,7 +135,7 @@ result_t vector_copy(uint16_t element_size, uint16_t length, const void *element
 
   if(failed(result = ensure_space(vec, length)))
     {
-    kfree(vec);
+    neutron_free(vec);
     return e_no_space;
     }
 
@@ -154,9 +154,9 @@ result_t vector_close(handle_t hndl)
 
   vector_impl_t *vec = (vector_impl_t *)hndl;
   if(vec->buffer != 0)
-    kfree(vec->buffer);
+    neutron_free(vec->buffer);
 
-  kfree(vec);
+  neutron_free(vec);
 
   return s_ok;
   }

@@ -57,7 +57,7 @@ vector_t string_split(const char *s, char sep)
       {
       if(end > start)
         {
-        str = (char *)kmalloc(end - start + 1);
+        str = (char *)neutron_malloc(end - start + 1);
         memcpy(str, &s[start], end - start);
         str[end - start] = 0;
         vector_push_back(tokens, &str);
@@ -68,7 +68,7 @@ vector_t string_split(const char *s, char sep)
 
   if(end > start && end > 0)
     {
-    str = (char *)kmalloc(end - start + 1);
+    str = (char *)neutron_malloc(end - start + 1);
     memcpy(str, &s[start], end - start);
     str[end - start] = 0;
     vector_push_back(tokens, &str);
@@ -90,7 +90,7 @@ void kfree_split(vector_t tokens)
     {
     char * str;
     vector_at(tokens, i, &str);
-    kfree(str);
+    neutron_free(str);
     }
 
   vector_close(tokens);

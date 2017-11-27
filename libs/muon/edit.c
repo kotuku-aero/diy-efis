@@ -167,9 +167,9 @@ void clear_undo(editor_t *ed)
   while (undo)
     {
     undo_t *next = undo->next;
-    kfree(undo->undobuf);
-    kfree(undo->redobuf);
-    kfree(undo);
+    neutron_free(undo->undobuf);
+    neutron_free(undo->redobuf);
+    neutron_free(undo);
     undo = next;
     }
   ed->undohead = ed->undotail = ed->undo = 0;
@@ -188,9 +188,9 @@ void reset_undo(editor_t *ed)
       }
     ed->undotail = undo->prev;
     if (undo->prev) undo->prev->next = 0;
-    kfree(undo->undobuf);
-    kfree(undo->redobuf);
-    kfree(undo);
+    neutron_free(undo->undobuf);
+    neutron_free(undo->redobuf);
+    neutron_free(undo);
     }
   ed->undo = ed->undotail;
   }
@@ -206,7 +206,7 @@ result_t load_file(editor_t *ed, handle_t stream)
 
   ed->stream = stream;
 
-  ed->start = (char *) kmalloc(length + MINEXTEND);
+  ed->start = (char *) neutron_malloc(length + MINEXTEND);
   if (!ed->start)
     return e_no_space;
 
@@ -220,7 +220,7 @@ result_t load_file(editor_t *ed, handle_t stream)
 
   if (failed(result) && ed->start)
     {
-    kfree(ed->start);
+    neutron_free(ed->start);
     ed->start = 0;
     }
 
@@ -298,7 +298,7 @@ void move_gap(editor_t *ed, int pos, int minsize)
 
     if (gapsize + MINEXTEND > minsize) minsize = gapsize + MINEXTEND;
     newsize = (ed->end - ed->start) - gapsize + minsize;
-    start = (char *) kmalloc(newsize); // TODO check for out of memory
+    start = (char *) neutron_malloc(newsize); // TODO check for out of memory
     gap = start + pos;
     rest = gap + minsize;
     end = start + newsize;
@@ -316,7 +316,7 @@ void move_gap(editor_t *ed, int pos, int minsize)
       memcpy(rest, p, ed->end - p);
       }
 
-    kfree(ed->start);
+    neutron_free(ed->start);
     ed->start = start;
     ed->gap = gap;
     ed->rest = rest;
@@ -389,14 +389,14 @@ void replace(editor_t *ed, int pos, int len, char *buf, int bufsize, int doundo)
     if (undo && len == 0 && bufsize == 1 && undo->erased == 0 && pos == undo->pos + undo->inserted)
       {
       // Insert character at end of current redo buffer
-      undo->redobuf = krealloc(undo->redobuf, undo->inserted + 1);
+      undo->redobuf = neutron_realloc(undo->redobuf, undo->inserted + 1);
       undo->redobuf[undo->inserted] = *buf;
       undo->inserted++;
       }
     else if (undo && len == 1 && bufsize == 0 && undo->inserted == 0 && pos == undo->pos)
       {
       // Erase character at end of current undo buffer
-      undo->undobuf = krealloc(undo->undobuf, undo->erased + 1);
+      undo->undobuf = neutron_realloc(undo->undobuf, undo->erased + 1);
       undo->undobuf[undo->erased] = get(ed, pos);
       undo->erased++;
       }
@@ -404,7 +404,7 @@ void replace(editor_t *ed, int pos, int len, char *buf, int bufsize, int doundo)
       {
       // Erase character at beginning of current undo buffer
       undo->pos--;
-      undo->undobuf = krealloc(undo->undobuf, undo->erased + 1);
+      undo->undobuf = neutron_realloc(undo->undobuf, undo->erased + 1);
       memmove(undo->undobuf + 1, undo->undobuf, undo->erased);
       undo->undobuf[0] = get(ed, pos);
       undo->erased++;
@@ -412,7 +412,7 @@ void replace(editor_t *ed, int pos, int len, char *buf, int bufsize, int doundo)
     else
       {
       // Create new undo buffer
-      undo = (undo_t *) kmalloc(sizeof (struct _undo_t));
+      undo = (undo_t *) neutron_malloc(sizeof (struct _undo_t));
       if (ed->undotail) ed->undotail->next = undo;
       undo->prev = ed->undotail;
       undo->next = 0;
@@ -425,12 +425,12 @@ void replace(editor_t *ed, int pos, int len, char *buf, int bufsize, int doundo)
       undo->undobuf = undo->redobuf = 0;
       if (len > 0)
         {
-        undo->undobuf = kmalloc(len);
+        undo->undobuf = neutron_malloc(len);
         copy(ed, undo->undobuf, pos, len);
         }
       if (bufsize > 0)
         {
-        undo->redobuf = kmalloc(bufsize);
+        undo->redobuf = neutron_malloc(bufsize);
         memcpy(undo->redobuf, buf, bufsize);
         }
       }
@@ -722,7 +722,7 @@ void get_console_size(editor_t *ed)
   ed->cols = SCREEN_X;
   ed->lines = SCREEN_Y - 1;
 
-  ed->linebuf = krealloc(ed->linebuf, ed->cols + LINEBUF_EXTRA);
+  ed->linebuf = neutron_realloc(ed->linebuf, ed->cols + LINEBUF_EXTRA);
   }
 
 static void outch(editor_t *ed, char c)
@@ -1753,7 +1753,7 @@ void indent(editor_t *ed, char *indentation)
     if (get(ed, i) == '\n') newline = 1;
     }
   buflen = end - start + lines * width;
-  buffer = kmalloc(buflen);
+  buffer = neutron_malloc(buflen);
   if (!buffer) return;
 
   newline = 1;
@@ -1772,7 +1772,7 @@ void indent(editor_t *ed, char *indentation)
     }
 
   replace(ed, start, end - start, buffer, buflen, 1);
-  kfree(buffer);
+  neutron_free(buffer);
 
   if (ed->anchor < pos)
     {
@@ -1800,7 +1800,7 @@ void unindent(editor_t *ed, char *indentation)
 
   if (!get_selection(ed, &start, &end)) return;
 
-  buffer = kmalloc(end - start);
+  buffer = neutron_malloc(end - start);
   if (!buffer) return;
 
   newline = 1;
@@ -1828,12 +1828,12 @@ void unindent(editor_t *ed, char *indentation)
 
   if (!shrinkage)
     {
-    kfree(buffer);
+    neutron_free(buffer);
     return;
     }
 
   replace(ed, start, end - start, buffer, p - buffer, 1);
-  kfree(buffer);
+  neutron_free(buffer);
 
   if (ed->anchor < pos)
     {
@@ -1895,7 +1895,7 @@ void copy_selection(editor_t *ed)
   if (!get_selection(ed, &selstart, &selend))
     return;
   ed->clipsize = selend - selstart;
-  ed->clipboard = (char *) krealloc(ed->clipboard, ed->clipsize);
+  ed->clipboard = (char *) neutron_realloc(ed->clipboard, ed->clipsize);
   if (!ed->clipboard) return;
   copy(ed, ed->clipboard, selstart, ed->clipsize);
   }
@@ -1960,8 +1960,8 @@ void find_text(editor_t *ed, int next)
       return;
       }
     if (ed->search)
-      kfree(ed->search);
-    ed->search = kstrdup(ed->linebuf);
+      neutron_free(ed->search);
+    ed->search = neutron_strdup(ed->linebuf);
     }
 
   if (!ed->search) return;
@@ -2081,7 +2081,7 @@ void muon_edit(handle_t console_in, handle_t console_out, const char *title, han
   int rc;
   int i;
 
-  editor_t *ed = (editor_t *) kmalloc(sizeof(editor_t));
+  editor_t *ed = (editor_t *) neutron_malloc(sizeof(editor_t));
   memset(ed, 0, sizeof(editor_t));
   ed->console_in = console_in;
   ed->console_out = console_out;
@@ -2263,15 +2263,15 @@ void muon_edit(handle_t console_in, handle_t console_out, const char *title, han
   outstr(ed, RESET_COLOR CLREOL);
 
   if (ed->clipboard)
-    kfree(ed->clipboard);
+    neutron_free(ed->clipboard);
 
   if (ed->search)
-    kfree(ed->search);
+    neutron_free(ed->search);
 
   if (ed->linebuf)
-    kfree(ed->linebuf);
+    neutron_free(ed->linebuf);
 
   clear_undo(ed);
-  kfree(ed);
+  neutron_free(ed);
   }
 

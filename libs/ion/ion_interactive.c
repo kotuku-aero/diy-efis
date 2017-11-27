@@ -350,7 +350,7 @@ result_t ion_exec(ion_context_t *ion)
 	int rc;
 	bool got_eof = false;
 
-	buffer = (char *) kmalloc(LINEBUF_SIZE);
+	buffer = (char *) neutron_malloc(LINEBUF_SIZE);
 	if (!buffer)
     {
 		stream_printf(ion->console_err, "failed to allocated a line buffer\r\n");
@@ -424,7 +424,7 @@ result_t ion_exec(ion_context_t *ion)
  done:
 	if (buffer)
     {
-		kfree(buffer);
+		neutron_free(buffer);
 		buffer = NULL;
 	}
 

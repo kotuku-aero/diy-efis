@@ -183,7 +183,7 @@ result_t match_path(cli_t *context, const char * path, bool ignore_wildcard, mem
         }
 
       // add the string.
-      char *new_name = (char *)kmalloc(strlen(name) +1);
+      char *new_name = (char *)neutron_malloc(strlen(name) +1);
       strcpy(new_name, name);
 
       if (failed(vector_push_back(*matches, &new_name)))
@@ -770,7 +770,7 @@ result_t cli_complete_path(cli_t *context, const cli_node_t *node, cli_token_t *
 
   if (failed(result = vector_count(matched_paths, &num_matches)))
     {
-    kfree((void *)last_path);
+    neutron_free((void *)last_path);
     kfree_split(matched_paths);
     return result;
     }
@@ -781,7 +781,7 @@ result_t cli_complete_path(cli_t *context, const cli_node_t *node, cli_token_t *
     {
     if(failed(result = vector_at(matched_paths, match_num, &name)))
       {
-      kfree((void *)last_path);
+      neutron_free((void *)last_path);
       kfree_split(matched_paths);
       return result;
       }
@@ -812,7 +812,7 @@ result_t cli_complete_path(cli_t *context, const cli_node_t *node, cli_token_t *
 
   if (match_name == 0)
     {
-    kfree((void *)last_path);
+    neutron_free((void *)last_path);
     kfree_split(matched_paths);
     return e_unexpected;
     }
@@ -821,7 +821,7 @@ result_t cli_complete_path(cli_t *context, const cli_node_t *node, cli_token_t *
     if (failed(result = cli_input(context, match_name[n], CLI_CHAR_REGULAR)))
       return result;
 
-  kfree((void *)last_path);
+  neutron_free((void *)last_path);
   kfree_split(matched_paths);
 
   return s_ok;

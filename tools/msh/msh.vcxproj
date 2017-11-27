@@ -49,6 +49,9 @@
   <ItemGroup>
     <ClInclude Include="msh_cli.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Font Include="..\..\resources\myneofont.ttf" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{4B662258-EE25-4B87-AC06-3F4324BD4EAF}</ProjectGuid>
@@ -138,6 +141,10 @@
     <Link>
       <SubSystem>Console</SubSystem>
     </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>

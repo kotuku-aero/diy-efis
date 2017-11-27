@@ -36,7 +36,6 @@ it must be removed as soon as possible after the code fragment is identified.
 
 #include "widget.h"
 #include "pens.h"
-#include "fonts.h"
 
 static const rect_t waypoint = { 4, 10, 130, 55 };
 static const rect_t waypoint_text = { 7, 15, 126, 50 };
@@ -58,7 +57,7 @@ typedef struct _gps_window_t {
   
   extent_t font_cell_size;
   
-  const font_t *font;
+  const handle_t  *font;
 
   // current waypoint we are heading to.
   uint16_t dist_to_waypoint;
@@ -75,7 +74,7 @@ static void draw_detail(handle_t hwnd, gps_window_t *wnd,
                         const rect_t *clip_area, const rect_t *text_area, 
                         const char *value, color_t fg);
 
-static result_t widget_wndproc(const window_msg_t *data);
+static result_t widget_wndproc(handle_t hwnd, const canmsg_t *data);
 
 result_t create_gps_window(handle_t parent, memid_t key, handle_t *hwnd)
   {
@@ -86,7 +85,7 @@ result_t create_gps_window(handle_t parent, memid_t key, handle_t *hwnd)
 		return result;
 	
   // create the window data.
-  gps_window_t *wnd = (gps_window_t *)kmalloc(sizeof(gps_window_t));
+  gps_window_t *wnd = (gps_window_t *)neutron_malloc(sizeof(gps_window_t));
   memset(wnd, 0, sizeof(gps_window_t));
   
   wnd->version = sizeof(gps_window_t);
@@ -94,7 +93,8 @@ result_t create_gps_window(handle_t parent, memid_t key, handle_t *hwnd)
   wnd->time_to_next = -1;
   
   if(failed(lookup_font(key, "font", &wnd->font)))
-    wnd->font = &arial_12_font;
+    {
+    }
   
   text_extent(hwnd, wnd->font, "M", 1, &wnd->font_cell_size);
   wnd->font_cell_size.dx += 2;
@@ -159,18 +159,18 @@ static void update_window(handle_t hwnd, gps_window_t *wnd)
   draw_detail(hwnd, wnd, &wnd_rect, &time_to_waypoint_text, buf, color_magenta);
   }
 
-result_t widget_wndproc(const window_msg_t *msg)
+result_t widget_wndproc(handle_t hwnd, const canmsg_t *msg)
   {
   bool changed = false;
   gps_window_t *wnd;
-  get_wnddata(msg->hwnd, (void **)&wnd);
+  get_wnddata(hwnd, (void **)&wnd);
   
-  switch(msg->msg.id)
+  switch(msg->id)
     {
     case id_paint :
-      begin_paint(msg->hwnd);
-      update_window(msg->hwnd, wnd);
-      end_paint(msg->hwnd);
+      begin_paint(hwnd);
+      update_window(hwnd, wnd);
+      end_paint(hwnd);
       break;
 //    case 	id_new_route :
       // read the route
@@ -202,11 +202,11 @@ result_t widget_wndproc(const window_msg_t *msg)
   //    changed = assign_msg<int16_t>(msg.msg_data_16(), _time_to_next);
   //    break;
     default :
-      return defwndproc(msg);
+      return defwndproc(hwnd, msg);
     }
 
   if(changed)
-    invalidate_rect(msg->hwnd, 0);
+    invalidate_rect(hwnd, 0);
 
   return s_ok;
   }
@@ -220,7 +220,7 @@ void draw_background(handle_t hwnd,
    
   size_t text_len = strlen(label);
   extent_t label_size;
-  text_extent(hwnd, &arial_9_font, label, text_len, &label_size);
+  text_extent(hwnd, wnd->font, label, text_len, &label_size);
 
   int width = rect_width(text_area);
   int text_start = text_area->left + 3;
@@ -237,7 +237,7 @@ void draw_background(handle_t hwnd,
 
   point_t text_origin = { text_start, text_area->bottom - 15 };
 
-  draw_text(hwnd, wnd_rect, &arial_9_font, color_white, color_hollow, label, text_len,
+  draw_text(hwnd, wnd_rect, wnd->font, color_white, color_hollow, label, text_len,
             &text_origin, make_rect(text_origin.x, text_origin.y,
                                    text_origin.x + label_size.dx,
                                    text_origin.y + label_size.dy, &rect ), 0, 0);
@@ -273,7 +273,7 @@ void draw_detail(handle_t hwnd,
   for(c = 0; c < len; c++)
     {
     extent_t cell_size;
-    text_extent(wnd, &arial_12_font, txt + c, 1, &cell_size);
+    text_extent(wnd, wnd->font, txt + c, 1, &cell_size);
 
     point_t cp;
     copy_point(&pt, &cp);

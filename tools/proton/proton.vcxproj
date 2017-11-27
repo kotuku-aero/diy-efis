@@ -28,14 +28,12 @@
     <ClCompile Include="..\..\libs\proton\hsi_window.c" />
     <ClCompile Include="..\..\libs\proton\layout_window.c" />
     <ClCompile Include="..\..\libs\proton\lib_photon.c" />
-    <ClCompile Include="..\..\libs\proton\menu_window.c" />
     <ClCompile Include="..\..\libs\proton\pens.c" />
     <ClCompile Include="..\..\libs\proton\proton.c" />
     <ClCompile Include="..\..\libs\proton\regex.c" />
     <ClCompile Include="..\..\libs\proton\widget.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\libs\proton\menu_window.h" />
     <ClInclude Include="..\..\libs\proton\pens.h" />
     <ClInclude Include="..\..\libs\proton\proton.h" />
     <ClInclude Include="..\..\libs\proton\regex.h" />

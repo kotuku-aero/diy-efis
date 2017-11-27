@@ -130,31 +130,30 @@ result_t bsp_reg_write_block(uint32_t offset, uint16_t bytes_to_write, const voi
   return s_ok;
   }
 
-extern result_t create_root_screen(gdi_dim_t x, gdi_dim_t y, const char *device, int display_mode)
+void *neutron_calloc(size_t count, size_t size)
   {
-  return e_not_implemented;
+  return calloc(count, size);
   }
 
-
-void *kmalloc(size_t size)
+void *neutron_malloc(size_t size)
   {
   return malloc(size);
   }
 
-void kfree(void *mem)
+void neutron_free(void *mem)
   {
   free(mem);
   }
 
-void *krealloc(void *mem, size_t new_size)
+void *neutron_realloc(void *mem, size_t new_size)
   {
   return realloc(mem, new_size);
   }
 
-char *kstrdup(const char *str)
+char *neutron_strdup(const char *str)
   {
   size_t len = strlen(str);
-  char *buf = (char *)kmalloc(len + 1);
+  char *buf = (char *)neutron_malloc(len + 1);
 
   memcpy(buf, str, len + 1);
   return len;
@@ -167,7 +166,7 @@ typedef struct _semaphore_t {
 
 result_t semaphore_create(handle_t *handle)
   {
-  semaphore_t *semp = (semaphore_t *)kmalloc(sizeof(semaphore_t));
+  semaphore_t *semp = (semaphore_t *)neutron_malloc(sizeof(semaphore_t));
 
   semp->handle = CreateSemaphore(NULL, 0, INT_MAX, NULL);
   semp->cnt = 0;
@@ -181,7 +180,7 @@ result_t semaphore_close(handle_t hndl)
   {
   semaphore_t *semp = (semaphore_t *)hndl;
   CloseHandle(semp->handle);
-  kfree(semp);
+  neutron_free(semp);
 
   return s_ok;
   }
@@ -258,11 +257,14 @@ result_t task_create(const char *name,
   uint8_t priority,
   handle_t *task)
   {
-  tw_t *tw = (tw_t *)kmalloc(sizeof(tw_t));
+  tw_t *tw = (tw_t *)neutron_malloc(sizeof(tw_t));
   tw->cb = pfn;
   tw->parg = param;
 
-  task = CreateThread(NULL, stack_size, win_cb, tw, 0, NULL);
+  HANDLE the_task = CreateThread(NULL, stack_size, win_cb, tw, 0, NULL);
+
+  if(task != 0)
+    *task = the_task;
 
   SetThreadPriority(task, priority);
 

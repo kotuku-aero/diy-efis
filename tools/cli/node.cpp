@@ -530,7 +530,7 @@ std::string node_t::glue_fn()
     msg << "  if(";
     if ((*it)->is_optional())
       {
-      msg << "strlen(parser->tokens[" << k << "].buffer) > 0 &&" << std::endl;
+      msg << "parser->tokens[" << k << "].token_length > 0 &&" << std::endl;
       msg << "    ";
       }
     std::string _variable_type = (*it)->variable_type();
@@ -560,7 +560,7 @@ std::string node_t::glue_fn()
       msg << ", ";
       if ((*it)->is_optional())
         {
-        msg << "((strlen(parser->tokens[" << k << "].buffer) > 0) ? ";
+        msg << "((parser->tokens[" << k << "].token_length > 0) ? ";
         }
       msg << (is_ref_type(*it) ? "&" : "") << (*it)->path() << "_";
       if ((*it)->is_optional())
@@ -577,7 +577,7 @@ std::string node_t::glue_fn()
   std::string _variable_type = (*it)->variable_type();
   if((*it)->is_param() && _variable_type == "const char *")
   {
-  msg << "  kfree(" << (*it)->path() << "_);" << std::endl;
+  msg << "  neutron_free(" << (*it)->path() << "_);" << std::endl;
   }
   }
   */

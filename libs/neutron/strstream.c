@@ -249,7 +249,7 @@ static result_t strstream_delete(stream_handle_t *hndl)
   if(failed(result = vector_close(stream->buffer)))
     return result;
   
-  kfree(stream);
+  neutron_free(stream);
   return s_ok;
   }
 
@@ -276,7 +276,7 @@ result_t strstream_create(const char *lit, handle_t *hndl)
   if(hndl == 0)
     return e_bad_parameter;
   
-  strstream_handle_t *stream = (strstream_handle_t *)kmalloc(sizeof(strstream_handle_t));
+  strstream_handle_t *stream = (strstream_handle_t *)neutron_malloc(sizeof(strstream_handle_t));
   
   init_stream(stream);
   

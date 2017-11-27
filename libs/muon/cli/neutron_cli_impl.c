@@ -123,7 +123,7 @@ char * get_full_path(memid_t key)
   uint16_t path_length = (path != 0) ? strlen(path) : 0;
   uint16_t name_length = strlen(name) + 1;    // assume a trailing '/'
 
-  char *result = (char *)kmalloc(path_length + name_length + 1);
+  char *result = (char *)neutron_malloc(path_length + name_length + 1);
 
   if (path != 0)
     {
@@ -133,7 +133,7 @@ char * get_full_path(memid_t key)
       (path_length > 1 || strcmp(path, "/") != 0))
       strcat(result, "/");
 
-    kfree(path);
+    neutron_free(path);
     }
   else
     result[0] = 0;

@@ -172,11 +172,11 @@ static cli_state_t push_back_char(cli_token_t *token, char ch)
      token->token_length == (token->token_buflen-1))
     {
     // re-allocate the buffer
-    char *new_buffer = (char *)kmalloc(token->token_buflen + 32);
+    char *new_buffer = (char *)neutron_malloc(token->token_buflen + 32);
     if(token->token_buffer != 0)
       {
       strcpy(new_buffer, token->token_buffer);
-      kfree(token->token_buffer);
+      neutron_free(token->token_buffer);
       }
     else
       new_buffer[0] = 0;

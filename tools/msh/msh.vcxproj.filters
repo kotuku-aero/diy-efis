@@ -35,4 +35,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Font Include="..\..\resources\myneofont.ttf" />
+  </ItemGroup>
 </Project>

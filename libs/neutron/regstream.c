@@ -107,7 +107,7 @@ static result_t create_handle(memid_t parent, const char *name, bool create, han
       return exit_registry(e_path_not_found);
 
     // create the stream
-    new_stream = (regstream_handle_t *) kmalloc(sizeof (regstream_handle_t));
+    new_stream = (regstream_handle_t *) neutron_malloc(sizeof (regstream_handle_t));
     init_stream(new_stream);
 
     // and create the key.
@@ -136,12 +136,12 @@ static result_t create_handle(memid_t parent, const char *name, bool create, han
       return exit_registry(e_wrong_type);
 
     // create a stream
-    new_stream = (regstream_handle_t *) kmalloc(sizeof (regstream_handle_t));
+    new_stream = (regstream_handle_t *) neutron_malloc(sizeof (regstream_handle_t));
     init_stream(new_stream);
     // read the values  (TODO: check this!!!!)
     if (failed(result = reg_get_value(parent, name, &datatype, &length, &stream_memid, &length, &new_stream->field)))
       {
-      kfree(new_stream);
+      neutron_free(new_stream);
       return exit_registry(result);
       }
     }
@@ -671,7 +671,7 @@ static result_t regstream_truncate(stream_handle_t *hndl, uint16_t length)
 static result_t regstream_close(stream_handle_t *hndl)
   {
   // we only have to release the memory as the state is persisted
-  kfree(hndl);
+  neutron_free(hndl);
 
   return s_ok;
   }
@@ -692,7 +692,7 @@ static result_t regstream_delete(stream_handle_t *hndl)
   if(failed(result = reg_delete_value_impl(stream->field.hdr.parent, stream->field.hdr.name)))
     return exit_registry(result);
 
-  kfree(stream);
+  neutron_free(stream);
 
   return exit_registry(s_ok);
   }

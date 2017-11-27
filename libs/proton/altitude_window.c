@@ -35,7 +35,6 @@ it must be removed as soon as possible after the code fragment is identified.
 */
 #include "widget.h"
 #include "pens.h"
-#include "fonts.h"
 #include "spatial.h"
 
 typedef struct _vsi_markers {
@@ -53,10 +52,12 @@ typedef struct _altitude_window_t {
   color_t background_color;
   color_t text_color;
   pen_t pen;
-  const font_t *font;
+  handle_t  font;      // arial 9
+  handle_t  small_roller;  // arial 12
+  handle_t  large_roller;  // arial 15
 } altitude_window_t;
  
-static result_t widget_wndproc(const window_msg_t *data);
+static result_t widget_wndproc(handle_t hwnd, const canmsg_t *data);
 
 result_t create_altitude_window(handle_t parent, memid_t key, handle_t *hwnd)
 	{
@@ -67,13 +68,14 @@ result_t create_altitude_window(handle_t parent, memid_t key, handle_t *hwnd)
 		return result;
 	
   // create the window data.
-  altitude_window_t *wnd = (altitude_window_t *)kmalloc(sizeof(altitude_window_t));
+  altitude_window_t *wnd = (altitude_window_t *)neutron_malloc(sizeof(altitude_window_t));
   memset(wnd, 0, sizeof(altitude_window_t));
   
   wnd->version = sizeof(altitude_window_t);
   
-	if(failed(lookup_font(key, "font", &wnd->font)))
-    wnd->font = &arial_12_font;
+  lookup_font(key, "font", &wnd->font);
+  lookup_font(key, "large-font", &wnd->large_roller);
+  lookup_font(key, "small-font", &wnd->small_roller);
 
   if(failed(lookup_color(key, "back-color", &wnd->background_color)))
     wnd->background_color = color_black;
@@ -83,7 +85,7 @@ result_t create_altitude_window(handle_t parent, memid_t key, handle_t *hwnd)
 
   memid_t pen_key;
   if(failed(reg_open_key(key, "pen", &pen_key)) ||
-     failed(lookup_pen(pen_key, &wnd->pen)))
+     failed(lookup_pen(key, &wnd->pen)))
     {
     wnd->pen.color = color_white;
     wnd->pen.width = 1;
@@ -279,10 +281,10 @@ static void update_window(handle_t hwnd, altitude_window_t *wnd)
 
 	size_t len = strlen(str);
 	extent_t size;
-  text_extent(hwnd, &arial_9_font, str, len, &size);
+  text_extent(hwnd, wnd->font, str, len, &size);
   point_t pt;
 
-	draw_text(hwnd, &vsi_rect, &arial_9_font, color_green, color_black,
+	draw_text(hwnd, &vsi_rect, wnd->font, color_green, color_black,
            str, len,
            make_point(vsi_rect.left + (rect_width(&vsi_rect)>> 1) - (size.dx >> 1),
                vsi_rect.top+1, &pt),
@@ -302,27 +304,27 @@ static void update_window(handle_t hwnd, altitude_window_t *wnd)
   sprintf(str, "%d", wnd->qnh);
 
   len = strlen(str);
-  text_extent(hwnd, &arial_9_font, str, len, &size);
+  text_extent(hwnd, wnd->font, str, len, &size);
 
-  draw_text(hwnd, &vsi_rect, &arial_9_font, color_green, color_black,
+  draw_text(hwnd, &vsi_rect, wnd->font, color_green, color_black,
            str, len,
            make_point(vsi_rect.left + (rect_width(&vsi_rect)>> 1) - (size.dx >> 1),
                vsi_rect.top+1, &pt),
            &vsi_rect, 0, 0);
 	}
 
-static result_t widget_wndproc(const window_msg_t *data)
+static result_t widget_wndproc(handle_t hwnd, const canmsg_t *msg)
 	{
 	bool changed = false;
   altitude_window_t *wnd;
-  get_wnddata(data->hwnd, (void **)&wnd);
+  get_wnddata(hwnd, (void **)&wnd);
   
-	switch(data->msg.id)
+	switch(msg->id)
 		{
 		case id_baro_corrected_altitude :
       {
     float v;
-    get_param_float(&data->msg, &v);
+    get_param_float(msg, &v);
       int16_t value = (int16_t)roundf(v);
       changed = wnd->altitude != value;
       wnd->altitude = value;
@@ -331,7 +333,7 @@ static result_t widget_wndproc(const window_msg_t *data)
 		case id_altitude_rate :
       {
     float v;
-    get_param_float(&data->msg, &v);
+    get_param_float(msg, &v);
       int16_t value = (int16_t)roundf(v);
       changed = wnd->vertical_speed != value;
       wnd->vertical_speed = value;
@@ -340,22 +342,22 @@ static result_t widget_wndproc(const window_msg_t *data)
 		case id_qnh:
 		  {
     uint16_t value;
-    get_param_uint16(&data->msg, 0, &value);
+    get_param_uint16(msg, 0, &value);
 		  changed = wnd->vertical_speed != value;
 		  wnd->qnh = value;
 		  }
 		  break;
 		case id_paint :
-	    begin_paint(data->hwnd);
-	    update_window(data->hwnd, wnd);
-	    end_paint(data->hwnd);
+	    begin_paint(hwnd);
+	    update_window(hwnd, wnd);
+	    end_paint(hwnd);
 		  break;
 		default:
-			return defwndproc(data);
+			return defwndproc(hwnd, msg);
 		}
 
 	if(changed)
-	  invalidate_rect(data->hwnd, 0);
+	  invalidate_rect(hwnd, 0);
 
 	return s_ok;
 	}

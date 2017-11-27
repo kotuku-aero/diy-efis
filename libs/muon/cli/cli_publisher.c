@@ -296,7 +296,7 @@ result_t neutron_ls_id_action(cli_t *context, uint16_t *id)
   snprintf(key_name, 32, "%d", *id);
 
   result = reg_open_key(key, key_name, &published_id);
-  kfree(key_name);
+  neutron_free(key_name);
 
   if (failed(result))
     return result;

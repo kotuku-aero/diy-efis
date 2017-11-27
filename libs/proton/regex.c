@@ -92,7 +92,7 @@ static int trex_newnode(TRex *exp, TRexNodeType type)
 	if(exp->_nallocated < (exp->_nsize + 1)) {
 		int oldsize = exp->_nallocated;
 		exp->_nallocated *= 2;
-		exp->_nodes = (TRexNode *)krealloc(exp->_nodes, exp->_nallocated * sizeof(TRexNode));
+		exp->_nodes = (TRexNode *)neutron_realloc(exp->_nodes, exp->_nallocated * sizeof(TRexNode));
 	}
 	exp->_nodes[exp->_nsize++] = n;
 	newid = exp->_nsize - 1;
@@ -531,17 +531,17 @@ static const TRexChar *trex_matchnode(TRex* exp,TRexNode *node,const TRexChar *s
 /* public api */
 TRex *trex_compile(const TRexChar *pattern,const TRexChar **error)
 {
-	TRex *exp = (TRex *)kmalloc(sizeof(TRex));
+	TRex *exp = (TRex *)neutron_malloc(sizeof(TRex));
 	exp->_eol = exp->_bol = NULL;
 	exp->_p = pattern;
 	exp->_nallocated = (int)scstrlen(pattern) * sizeof(TRexChar);
-	exp->_nodes = (TRexNode *)kmalloc(exp->_nallocated * sizeof(TRexNode));
+	exp->_nodes = (TRexNode *)neutron_malloc(exp->_nallocated * sizeof(TRexNode));
 	exp->_nsize = 0;
 	exp->_matches = 0;
 	exp->_nsubexpr = 0;
 	exp->_first = trex_newnode(exp,OP_EXPR);
 	exp->_error = error;
-	exp->_jmpbuf = kmalloc(sizeof(jmp_buf));
+	exp->_jmpbuf = neutron_malloc(sizeof(jmp_buf));
 	if(setjmp(*((jmp_buf*)exp->_jmpbuf)) == 0) {
 		int res = trex_list(exp);
 		exp->_nodes[exp->_first].left = res;
@@ -564,7 +564,7 @@ TRex *trex_compile(const TRexChar *pattern,const TRexChar **error)
 			scprintf(_SC("\n"));
 		}
 #endif
-		exp->_matches = (TRexMatch *) kmalloc(exp->_nsubexpr * sizeof(TRexMatch));
+		exp->_matches = (TRexMatch *) neutron_malloc(exp->_nsubexpr * sizeof(TRexMatch));
 		memset(exp->_matches,0,exp->_nsubexpr * sizeof(TRexMatch));
 	}
 	else{
@@ -577,10 +577,10 @@ TRex *trex_compile(const TRexChar *pattern,const TRexChar **error)
 void trex_free(TRex *exp)
 {
 	if(exp)	{
-		if(exp->_nodes) kfree(exp->_nodes);
-		if(exp->_jmpbuf) kfree(exp->_jmpbuf);
-		if(exp->_matches) kfree(exp->_matches);
-		kfree(exp);
+		if(exp->_nodes) neutron_free(exp->_nodes);
+		if(exp->_jmpbuf) neutron_free(exp->_jmpbuf);
+		if(exp->_matches) neutron_free(exp->_matches);
+		neutron_free(exp);
 	}
 }
 

@@ -129,9 +129,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="..\..\libs\muon\cli.c" />
     <ClCompile Include="..\..\libs\muon\cli\cansend.c" />
     <ClCompile Include="..\..\libs\muon\cli\cli_enumerations.c" />

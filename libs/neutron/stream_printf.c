@@ -126,7 +126,7 @@ result_t stream_printf(handle_t stream, char const *fmt, ...)
 static char *ensure_buffer(char **buffer)
   {
   if(*buffer == 0)
-    *buffer = (char *) kmalloc(64);
+    *buffer = (char *) neutron_malloc(64);
   
   return *buffer;
   }
@@ -203,7 +203,7 @@ result_t stream_vprintf(handle_t stream, const char *fmt, va_list ap)
     }
   
   if(buffer != 0)
-    kfree(buffer);
+    neutron_free(buffer);
   
   return s_ok;
   }

@@ -1049,33 +1049,41 @@ extern result_t get_datapoint_float(uint16_t id, float *value);
 // Memory allocation routines.  Do not use malloc/free which are not thread safe
 //
 /**
- * @function kmalloc(size_t size)
+ * @function neutron_malloc(size_t size)
  * Allocate a block of memory, thread-safe
  * @param size  size to allocate
  * @return pointer to memory, 0 if failed
  */
-extern void *kmalloc(size_t size);
+extern void *neutron_malloc(size_t size);
 /**
- * @function  kfree(void *mem)
+ * @function void *neutron_calloc(size_t count, size_t size)
+ * Allocate a block of memory and initialize to 0's, thread-safe
+ * @param count count of blocks to allocate
+ * @param size  size of block to allocate
+ * @return pointer to memory, 0 if failed
+ */
+extern void *neutron_calloc(size_t count, size_t size);
+/**
+ * @function  neutron_free(void *mem)
  * Free a kernel allocated block of memory, thread-safe
  * @param mem memory to free
  */
-extern void kfree(void *mem);
+extern void neutron_free(void *mem);
 /**
- * @function krealloc(void *mem, size_t new_size)
+ * @function neutron_realloc(void *mem, size_t new_size)
  * Resize the buffer to be new_size, thread-safe
  * @param mem       pointer to the existing buffer
  * @param new_size  new size of the buffer
  * @return pointer to the new buffer
  */
-extern void *krealloc(void *mem, size_t new_size);
+extern void *neutron_realloc(void *mem, size_t new_size);
 /**
- * @function kstrdup(const char *str)
+ * @function neutron_strdup(const char *str)
  * Thread safe string duplicate
  * @param str string to copy
- * @return the duplicated string, can be freed with kfree
+ * @return the duplicated string, can be freed with neutron_free
  */
-extern char *kstrdup(const char *str);
+extern char *neutron_strdup(const char *str);
 
 
 typedef uint16_t memid_t;

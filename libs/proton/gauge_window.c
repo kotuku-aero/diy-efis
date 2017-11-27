@@ -36,7 +36,6 @@ it must be removed as soon as possible after the code fragment is identified.
 #include "widget.h"
 #include "spatial.h"
 #include "pens.h"
-#include "fonts.h"
 
 typedef enum 
   {
@@ -73,13 +72,13 @@ typedef struct _gauge_window_t {
   
   char name[REG_STRING_MAX +1];
   color_t name_color;
-  const font_t *name_font;
+  handle_t  name_font;
   point_t name_pt;
   bool draw_name;
   
   color_t background_color;
   bool draw_border;
-  const font_t *font;
+  handle_t  font;
 
   
   uint16_t num_values;
@@ -103,7 +102,7 @@ typedef struct _gauge_window_t {
   uint16_t width;          // pointer or sweep width
 
   bool draw_value;         // draw the value
-  const font_t *value_font;       // what font to draw a value in
+  const handle_t  *value_font;       // what font to draw a value in
   rect_t value_rect;
 
   handle_t steps;
@@ -146,7 +145,7 @@ static void draw_point(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rec
 static void draw_graph_value(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect, const pen_t *pen, size_t index, gdi_dim_t offset);
 static void draw_bar_graph(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect, const rect_t *rect);
 
-static result_t widget_wndproc(const window_msg_t *data);
+static result_t widget_wndproc(handle_t hwnd, const canmsg_t *data);
 
 result_t create_gauge_window(handle_t parent, memid_t key, handle_t *hwnd)
   {
@@ -159,7 +158,7 @@ result_t create_gauge_window(handle_t parent, memid_t key, handle_t *hwnd)
 		return result;
 	
   // create the window data.
-  gauge_window_t *wnd = (gauge_window_t *)kmalloc(sizeof(gauge_window_t));
+  gauge_window_t *wnd = (gauge_window_t *)neutron_malloc(sizeof(gauge_window_t));
   memset(wnd, 0, sizeof(gauge_window_t));
   
   wnd->version = sizeof(gauge_window_t);
@@ -182,7 +181,8 @@ result_t create_gauge_window(handle_t parent, memid_t key, handle_t *hwnd)
   reg_get_float(key, "reset-value",&wnd->reset_value);
 
   if(failed(lookup_font(key, "font", &wnd->font)))
-    wnd->font = &arial_9_font;
+    {
+    }
 
   if (failed(reg_get_int16(key, "center-x", &int_value)))
     wnd->center.x = rect_width(&rect_wnd) >> 1;
@@ -206,8 +206,8 @@ result_t create_gauge_window(handle_t parent, memid_t key, handle_t *hwnd)
       wnd->name_color = color_white;
 
     if(failed(lookup_font(key, "name-font", &wnd->name_font)))
-      wnd->name_font = &arial_12_font;
-
+     {
+     }
 
     if(failed(reg_get_int16(key, "name-x", &int_value)))
       wnd->name_pt.x = wnd->center.x;
@@ -235,7 +235,8 @@ result_t create_gauge_window(handle_t parent, memid_t key, handle_t *hwnd)
   if(wnd->draw_value)
     {
     if(failed(lookup_font(key, "value-font", &wnd->value_font)))
-      wnd->value_font = &arial_12_font;
+      {
+      }
 
     // default values
     wnd->value_rect.bottom = rect_wnd.bottom;
@@ -396,13 +397,13 @@ static void update_window(handle_t hwnd, gauge_window_t *wnd)
     update_dial_gauge(hwnd, wnd, &wnd_rect);
   }
 
-static result_t widget_wndproc(const window_msg_t *data)
+static result_t widget_wndproc(handle_t hwnd, const canmsg_t *msg)
   {
   bool changed = false;
   gauge_window_t *wnd;
-  get_wnddata(data->hwnd, (void **)&wnd);
+  get_wnddata(hwnd, (void **)&wnd);
 
-  if (data->msg.id == wnd->reset_label)
+  if (msg->id == wnd->reset_label)
     {
     size_t i;
     for (i = 0; i < 4; i++)
@@ -412,11 +413,11 @@ static result_t widget_wndproc(const window_msg_t *data)
       }
     changed = true;
     }
-  else if(data->msg.id == id_paint)
+  else if(msg->id == id_paint)
     {
-    begin_paint(data->hwnd);
-    update_window(data->hwnd, wnd);
-    end_paint(data->hwnd);
+    begin_paint(hwnd);
+    update_window(hwnd, wnd);
+    end_paint(hwnd);
     }
   else
     {
@@ -424,10 +425,10 @@ static result_t widget_wndproc(const window_msg_t *data)
     size_t i;
     for (i = 0; i < wnd->num_values; i++)
       {
-      if (data->msg.id ==  wnd->labels[i])
+      if (msg->id ==  wnd->labels[i])
         {
         float msg_value;
-        get_param_float(&data->msg, &msg_value);
+        get_param_float(msg, &msg_value);
         msg_value *=  wnd->scale;
         msg_value +=  wnd->offset;
 
@@ -443,11 +444,11 @@ static result_t widget_wndproc(const window_msg_t *data)
       }
     
     if(!processed)
-      return defwndproc(data);
+      return defwndproc(hwnd, msg);
     }
 
   if (changed)
-    invalidate_rect(data->hwnd, 0);
+    invalidate_rect(hwnd, 0);
 
   return s_ok;
   }
@@ -495,7 +496,7 @@ void update_bar_gauge(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect
   if(wnd->draw_name)
     {
     extent_t sz;
-    text_extent(hwnd, &arial_9_font, wnd->name, 0, &sz);
+    text_extent(hwnd, wnd->font, wnd->name, 0, &sz);
     point_t pt;
     bottom_right(wnd_rect, &pt);
 
@@ -503,7 +504,7 @@ void update_bar_gauge(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect
     pt.x -= sz.dx;
     pt.y -= sz.dy;
 
-    draw_text(hwnd, wnd_rect, &arial_9_font,
+    draw_text(hwnd, wnd_rect, wnd->font,
               wnd->name_color, wnd->background_color,
               wnd->name, 0, &pt, 0, 0, 0);
     }
@@ -534,7 +535,7 @@ void update_bar_gauge(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect
       long value = last_tick.value;
 
       extent_t sz;
-      text_extent(hwnd, &arial_9_font, last_tick.text, 0, &sz);
+      text_extent(hwnd, wnd->font, last_tick.text, 0, &sz);
 
       float relative_value = value - first_tick.value;
       float pixels = relative_value * pixels_per_unit;
@@ -543,7 +544,7 @@ void update_bar_gauge(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect
           (graph.bottom - pixels) - 7 - (sz.dy >> 1)
         };
 
-      draw_text(hwnd, wnd_rect, &arial_9_font,
+      draw_text(hwnd, wnd_rect, wnd->font,
                 wnd->name_color, wnd->background_color,
                 last_tick.text, 0, &pt, 0, 0, 0);
       }

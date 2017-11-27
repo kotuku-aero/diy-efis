@@ -157,7 +157,7 @@ static void cli_print_error(cli_t *parser, const char *msg)
 static void cli_input_reset(cli_t *parser)
   {
   if(parser->user_buf != 0)
-    kfree((void *)parser->user_buf);
+    neutron_free((void *)parser->user_buf);
 
   parser->user_buf = 0;
   parser->user_input_cb = 0;
@@ -777,7 +777,7 @@ void cli_cleanup(cli_t *parser)
   for (n = 0; n < CLI_MAX_LINES; n++)
     {
     if(parser->lines[n].buffer != 0)
-      kfree(parser->lines[n].buffer);
+      neutron_free(parser->lines[n].buffer);
 
     parser->lines[n].buffer = 0;
     }
@@ -785,7 +785,7 @@ void cli_cleanup(cli_t *parser)
   for (n = 0; n < CLI_MAX_NUM_TOKENS; n++)
     {
     if(parser->tokens[n].token_buffer != 0)
-      kfree(parser->tokens[n].token_buffer);
+      neutron_free(parser->tokens[n].token_buffer);
 
     memset(&parser->tokens[n], 0, sizeof(cli_token_t));
     }

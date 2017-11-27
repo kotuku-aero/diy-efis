@@ -634,7 +634,7 @@ int main(int argc, const char **argv)
   hdr << "#ifdef __cplusplus" << std::endl;
   hdr << "extern \"C\" {" << std::endl;
   hdr << "#endif" << std::endl << std::endl;
-  hdr << "extern cli_node_t " << filename << "_cli_root;" << std::endl << std::endl;
+  hdr << "extern cli_node_t " << filename << "_root;" << std::endl << std::endl;
   root->walk(print_action, &hdr);
   hdr << "#ifdef __cplusplus" << std::endl;
   hdr << "}" << std::endl;

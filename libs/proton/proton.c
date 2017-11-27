@@ -36,6 +36,9 @@ it must be removed as soon as possible after the code fragment is identified.
 #include "fonts.h"
 
 #include "../neutron/bsp.h"
+#include "../photon/ion_proxy.h"
+
+extern result_t layout_wndproc(handle_t hwnd, const canmsg_t *msg);
 
 /**
  * Load a registry hive that describes a series of windows
@@ -66,18 +69,70 @@ void run_proton(void *parg)
 
     if (failed(result = reg_get_string(key, "layout", layout_name, 0)) ||
       failed(result = reg_open_key(0, layout_name, &layout_key)))
-      return result;
+      return;
 
-    if(succeeded(result = open_screen(orientation, defwndproc, 0, &main_window)))
+    if(succeeded(result = open_screen(orientation, layout_wndproc, 0, &main_window)))
+      {
+      char startup_script[REG_STRING_MAX];
+      const char *init_script = 0;
+      if (succeeded(reg_get_string(key, "init", startup_script, 0)))
+        init_script = startup_script;
+
+      // attach the ion interpreter to the screen
+      if (succeeded(attach_ion(main_window, key, init_script)) &&
+         init_script != 0)
+        {
+        // the interpreter has loaded ok.  if the init_script is > 0 then
+        // we can attach any events to run on window events.
+        memid_t events;
+        if (succeeded(reg_open_key(key, "events", &events)))
+          {
+          // enumerate the keys
+          field_datatype dt = field_key;
+          char name[REG_NAME_MAX];
+          char event_fn[REG_STRING_MAX];
+
+          memid_t child = 0;
+
+          while (succeeded(reg_enum_key(key, &dt, 0, 0, REG_NAME_MAX, name, &child)))
+            {
+            uint16_t can_id = (uint16_t) strtoul(name, 0, 10);
+
+            if(can_id > 0)
+              {
+
+              // now enumerate the strings in it
+              memid_t handler = 0;
+              dt = field_string;
+
+              while (succeeded(reg_enum_key(child, &dt, 0, 0, REG_NAME_MAX, name, &handler)))
+                {
+                if (succeeded(reg_get_string(child, name, event_fn, 0)))
+                  {
+                  add_handler(main_window, can_id, event_fn);
+                  }
+
+                dt = field_string;
+                }
+
+              dt = field_key;
+              }
+            }
+          }
+        }
+
+      // finally load the layout
       load_layout(main_window, layout_key);
+      }
     }
   
   // run the message queue
   // despatch messages
-  window_msg_t msg;
+  canmsg_t msg;
+  handle_t hwnd;
   // returns s_false to stop the queue
   while (true)
-    if(succeeded(get_message(main_window, &msg)))
-      dispatch_message(&msg);
+    if(succeeded(get_message(main_window, &hwnd, &msg)))
+      dispatch_message(hwnd, &msg);
   }
 

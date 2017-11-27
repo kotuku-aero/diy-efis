@@ -783,7 +783,7 @@ struct fb_var_screeninfo {
   uint32_t reserved[4];		/* Reserved for future compatibility */
   };
 
-result_t bsp_canvas_open_fb_buffer(canvas_t **canvas)
+result_t bsp_canvas_open_framebuffer(canvas_t **canvas)
   {
   result_t result;
   uint16_t x;

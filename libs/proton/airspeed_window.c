@@ -35,7 +35,6 @@ it must be removed as soon as possible after the code fragment is identified.
 */
 #include "widget.h"
 #include "spatial.h"
-#include "fonts.h"
 #include "pens.h"
 
 #include <math.h>
@@ -61,11 +60,11 @@ typedef struct _airspeed_window_t {
   color_t background_color;
   color_t text_color;
   pen_t pen;
-  const font_t *font;
+  handle_t  font;
 	bool draw_border;
 } airspeed_window_t;
  
-static result_t widget_wndproc(const window_msg_t *data);
+static result_t widget_wndproc(handle_t hwnd, const canmsg_t *data);
 
 result_t create_airspeed_window(handle_t parent, memid_t key, handle_t *hwnd)
   {
@@ -76,7 +75,7 @@ result_t create_airspeed_window(handle_t parent, memid_t key, handle_t *hwnd)
 		return result;
 	
   // create the window data.
-  airspeed_window_t *wnd = (airspeed_window_t *)kmalloc(sizeof(airspeed_window_t));
+  airspeed_window_t *wnd = (airspeed_window_t *)neutron_malloc(sizeof(airspeed_window_t));
   memset(wnd, 0, sizeof(airspeed_window_t));
   
   wnd->version = sizeof(airspeed_window_t);
@@ -97,7 +96,8 @@ result_t create_airspeed_window(handle_t parent, memid_t key, handle_t *hwnd)
   reg_get_float(key, "offset", &wnd->offset);
   
 	if(failed(lookup_font(key, "font", &wnd->font)))
-    wnd->font = &arial_12_font;
+    {
+    }
 
   if(failed(lookup_color(key, "back-color", &wnd->background_color)))
     wnd->background_color = color_black;
@@ -106,18 +106,8 @@ result_t create_airspeed_window(handle_t parent, memid_t key, handle_t *hwnd)
     wnd->text_color = color_white;
 
   memid_t pen_key;
-  if(succeeded(reg_open_key(key, "pen", &pen_key)))
-    {
-    if(failed(lookup_color(pen_key, "color", &wnd->pen.color)))
-      wnd->pen.color = color_white;
-    
-    if(failed(reg_get_uint16(pen_key, "width", &wnd->pen.width)))
-      wnd->pen.width = 1;
-
-    if (failed(lookup_pen_style(pen_key, "style", &wnd->pen.style)))
-      wnd->pen.style=ps_solid;
-    }
-  else
+  if (failed(reg_open_key(key, "pen", &pen_key)) ||
+    failed(lookup_pen(key, &wnd->pen)))
     {
     wnd->pen.color = color_white;
     wnd->pen.width = 1;
@@ -253,19 +243,19 @@ static void update_window(handle_t hwnd, airspeed_window_t *wnd)
                         min((gdi_dim_t)ex.dy-8, vx_pixels), &rect));
   }
 
-static result_t widget_wndproc(const window_msg_t *data)
+static result_t widget_wndproc(handle_t hwnd, const canmsg_t *msg)
   {
   bool changed = false;
   airspeed_window_t *wnd;
-  get_wnddata(data->hwnd, (void **)&wnd);
+  get_wnddata(hwnd, (void **)&wnd);
   
-  switch(data->msg.id)
+  switch(msg->id)
     {
     case id_indicated_airspeed :
       {
       // airspeed is in m/s convert to knots
     float v;
-    get_param_float(&data->msg, &v);
+    get_param_float(msg, &v);
       float airspeed = v * wnd->scale;
       airspeed += wnd->offset;
       
@@ -276,16 +266,16 @@ static result_t widget_wndproc(const window_msg_t *data)
       }
       break;
   case id_paint :
-    begin_paint(data->hwnd);
-    update_window(data->hwnd, wnd);
-    end_paint(data->hwnd);
+    begin_paint(hwnd);
+    update_window(hwnd, wnd);
+    end_paint(hwnd);
     break;
   default :
-    return defwndproc(data);
+    return defwndproc(hwnd, msg);
     }
 
   if(changed)
-    invalidate_rect(data->hwnd, 0);
+    invalidate_rect(hwnd, 0);
 
   return true;
   }

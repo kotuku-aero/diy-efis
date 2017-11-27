@@ -266,7 +266,7 @@ static result_t css_stream_close(stream_handle_t *hndl)
   // make sure any in-mem ptrs gone.
   memset(channel, 0, sizeof(service_channel_t));
   
-  kfree(channel);
+  neutron_free(channel);
   
   return s_ok;
   }
@@ -285,7 +285,7 @@ static void parser_worker(void *parg)
     deque_close(channel->queue);
     
   channels[channel->can_id] = 0;
-  kfree(channel);
+  neutron_free(channel);
   
   close_task(us);
   }
@@ -318,7 +318,7 @@ void create_channel(const canmsg_t *msg, cli_node_t *app_cli_root)
     }
 
   // we have a channels so create one.
-  service_channel_t *channel = (service_channel_t *) kmalloc(sizeof (service_channel_t));
+  service_channel_t *channel = (service_channel_t *) neutron_malloc(sizeof (service_channel_t));
   memset(channel, 0, sizeof (service_channel_t));
   
   channel->stream.version = sizeof(service_channel_t);
@@ -349,7 +349,7 @@ void create_channel(const canmsg_t *msg, cli_node_t *app_cli_root)
     reply_msg.canas.message_code = BAD_INIT; // flag the message code won't work
     can_send_reply(&reply_msg);
 
-    kfree(channel);
+    neutron_free(channel);
     return;
     }
 
@@ -360,7 +360,7 @@ void create_channel(const canmsg_t *msg, cli_node_t *app_cli_root)
     reply_msg.canas.message_code = NO_WORKER;
     can_send_reply(&reply_msg);
 
-    kfree(channel);
+    neutron_free(channel);
     return;
     }
 

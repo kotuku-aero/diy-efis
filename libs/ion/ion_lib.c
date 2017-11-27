@@ -1039,7 +1039,7 @@ static void add_function(duk_context *ctx, duk_c_function fn, const char *name, 
 result_t ion_split_path(const char *id, memid_t *parent, char *filename)
   {
   size_t path_len = strlen(id);
-  char *path = (char *)kmalloc(path_len + 1);
+  char *path = (char *)neutron_malloc(path_len + 1);
 
   if (path == 0)
     return e_not_enough_memory;
@@ -1057,7 +1057,7 @@ result_t ion_split_path(const char *id, memid_t *parent, char *filename)
       *s = 0;
       if (failed(reg_open_key(*parent, name, parent)))
         {
-        kfree(path);
+        neutron_free(path);
         return DUK_RET_TYPE_ERROR;
         }
 
@@ -1071,7 +1071,7 @@ result_t ion_split_path(const char *id, memid_t *parent, char *filename)
   strncpy(filename, name, REG_NAME_MAX);
   filename[REG_NAME_MAX] = 0;
 
-  kfree(path);
+  neutron_free(path);
 
   return s_ok;
   }
@@ -1097,7 +1097,7 @@ static duk_ret_t ion_load_script(ion_context_t *ion, const char *id)
     return DUK_RET_TYPE_ERROR;
     }
 
-  char *script = (char *)kmalloc(len + 1);
+  char *script = (char *)neutron_malloc(len + 1);
 
   if (script == 0)
     {
@@ -1107,7 +1107,7 @@ static duk_ret_t ion_load_script(ion_context_t *ion, const char *id)
 
   if (failed(stream_read(stream, script, len, &len)))
     {
-    kfree(script);
+    neutron_free(script);
     stream_close(stream);
     return DUK_RET_TYPE_ERROR;
     }
@@ -1115,7 +1115,7 @@ static duk_ret_t ion_load_script(ion_context_t *ion, const char *id)
   script[len] = 0;
 
   duk_push_lstring(ion->ctx, script, len);
-  kfree(script);
+  neutron_free(script);
   stream_close(stream);
 
   return 1;

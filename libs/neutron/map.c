@@ -80,7 +80,7 @@ result_t map_create(dup_fn copy_key,
   rb_tree_t* new_tree;
   rb_tree_entry_t* temp;
 
-  new_tree = (rb_tree_t*) kmalloc(sizeof (rb_tree_t));
+  new_tree = (rb_tree_t*) neutron_malloc(sizeof (rb_tree_t));
   new_tree->copy_key = copy_key;
   new_tree->copy_value = copy_value;
   new_tree->compare = comp_fn;
@@ -89,11 +89,11 @@ result_t map_create(dup_fn copy_key,
 
   /*  see the comment in the rb_tree_t structure in red_black_tree.h */
   /*  for information on nil and root */
-  temp = new_tree->nil = (rb_tree_entry_t*) kmalloc(sizeof (rb_tree_entry_t));
+  temp = new_tree->nil = (rb_tree_entry_t*) neutron_malloc(sizeof (rb_tree_entry_t));
   temp->parent = temp->left = temp->right = temp;
   temp->red = false;;
   temp->key = 0;
-  temp = new_tree->root = (rb_tree_entry_t*) kmalloc(sizeof (rb_tree_entry_t));
+  temp = new_tree->root = (rb_tree_entry_t*) neutron_malloc(sizeof (rb_tree_entry_t));
   temp->parent = temp->left = temp->right = new_tree->nil;
   temp->key = 0;
   temp->red = false;
@@ -103,7 +103,7 @@ result_t map_create(dup_fn copy_key,
 
 static void copy_str(const void *in, void **out)
   {
-  *((char **)out) = kstrdup((const char *)in);
+  *((char **)out) = neutron_strdup((const char *)in);
   }
 
 result_t map_create_nv(dup_fn copy_fn,
@@ -113,7 +113,7 @@ result_t map_create_nv(dup_fn copy_fn,
   return map_create(copy_str,
                     copy_fn,
                     (compare_key_fn)strcmp,
-                    kfree,
+                    neutron_free,
                     destroy_value,
                     handle);
   }
@@ -469,7 +469,7 @@ static void tree_destroy_helper(rb_tree_t* tree, rb_tree_entry_t* x)
     tree_destroy_helper(tree, x->right);
     tree->destroy_key(x->key);
     tree->destroy_value(x->value);
-    kfree(x);
+    neutron_free(x);
     }
   }
 
@@ -486,7 +486,7 @@ result_t map_add(handle_t map, const void *key, const void *value)
 
   rb_tree_t *tree = (rb_tree_t *) map;
 
-  x = (rb_tree_entry_t*) kmalloc(sizeof (rb_tree_entry_t));
+  x = (rb_tree_entry_t*) neutron_malloc(sizeof (rb_tree_entry_t));
   
   (*tree->copy_key)(key, &x->key);
   (*tree->copy_value)(value, &x->value);
@@ -600,7 +600,7 @@ result_t map_remove(handle_t map, const void *key)
       {
       z->parent->right = y;
       }
-    kfree(z);
+    neutron_free(z);
     }
   else
     {
@@ -608,7 +608,7 @@ result_t map_remove(handle_t map, const void *key)
     tree->destroy_value(y->value);
     if (!(y->red))
       delete_fix_up(tree, x);
-    kfree(y);
+    neutron_free(y);
     }
 
   return s_ok;
@@ -621,9 +621,9 @@ result_t map_close(handle_t map)
 
   rb_tree_t *tree = (rb_tree_t *) map;
   tree_destroy_helper(tree, tree->root->left);
-  kfree(tree->root);
-  kfree(tree->nil);
-  kfree(tree);
+  neutron_free(tree->root);
+  neutron_free(tree->nil);
+  neutron_free(tree);
   
   return s_ok;
   }

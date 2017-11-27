@@ -85,7 +85,7 @@ result_t ion_init()
     failed(semaphore_signal(ion_mutex)))
     return result;
 
-  scripts = (ion_context_t **)kmalloc(sizeof(ion_context_t *) * NUM_SCRIPTS);
+  scripts = (ion_context_t **)neutron_malloc(sizeof(ion_context_t *) * NUM_SCRIPTS);
   if (scripts == 0)
     return e_not_enough_memory;
 
@@ -115,7 +115,7 @@ extern result_t ion_close(struct _ion_context_t *ion)
   deque_close(ion->message_queue);
   duk_destroy_heap(ion->ctx);
 
-  kfree(ion);
+  neutron_free(ion);
   return s_ok;
   }
 
@@ -143,17 +143,17 @@ result_t ion_queue_message(struct _ion_context_t *ion, const char *handler, cons
 
 static void *neutron_alloc_function(void *udata, duk_size_t size)
   {
-  return kmalloc(size);
+  return neutron_malloc(size);
   }
 
 static void *neutron_realloc_function(void *udata, void *ptr, duk_size_t size)
   {
-  return krealloc(ptr, size);
+  return neutron_realloc(ptr, size);
   }
 
 static void neutron_free_function(void *udata, void *ptr)
   {
-  kfree(ptr);
+  neutron_free(ptr);
   }
 
 static void neutron_fatal_function(void *udata, const char *msg)
@@ -238,7 +238,7 @@ result_t ion_create_worker(memid_t home,
   if (ion_ctx != 0)
     {
     // means the last ptr != 0
-    ion_context_t **new_scripts = (ion_context_t **)krealloc(scripts, num_scripts + NUM_SCRIPTS);   // allocate new pointers...
+    ion_context_t **new_scripts = (ion_context_t **)neutron_realloc(scripts, num_scripts + NUM_SCRIPTS);   // allocate new pointers...
     if (new_scripts == 0)
       {
       semaphore_signal(ion_mutex);
@@ -249,7 +249,7 @@ result_t ion_create_worker(memid_t home,
     num_scripts += NUM_SCRIPTS;
     }
 
-  ion_ctx = (ion_context_t *)kmalloc(sizeof(ion_context_t));
+  ion_ctx = (ion_context_t *)neutron_malloc(sizeof(ion_context_t));
   if (*ion == 0)
     {
     semaphore_signal(ion_mutex);
@@ -309,7 +309,7 @@ result_t ion_create_worker(memid_t home,
       return result;
       }
 
-    char *text = (char *)kmalloc(len + 1);
+    char *text = (char *)neutron_malloc(len + 1);
     if (text == 0)
       {
       stream_close(script);
@@ -320,7 +320,7 @@ result_t ion_create_worker(memid_t home,
 
     if (failed(result = stream_read(script, text, len, &len)))
       {
-      kfree(text);
+      neutron_free(text);
       stream_close(script);
       // release the context..
       ion_close(ion_ctx);
@@ -330,7 +330,7 @@ result_t ion_create_worker(memid_t home,
     text[len] = 0;
 
     duk_push_lstring(ctx, text, (duk_size_t)len);
-    kfree(text);
+    neutron_free(text);
     stream_close(script);
 
     if (duk_peval(ctx) != 0)
@@ -532,7 +532,7 @@ result_t ion_run()
 
       if (atom == 0)
         {
-        atom = kstrdup(func_name);
+        atom = neutron_strdup(func_name);
         vector_append(atoms, 1, atom);
         }
 

@@ -262,17 +262,17 @@ result_t ion_create_name_content_action(cli_t *context, const char * name, const
     }
   else
     {
-    char * full_path = (char *)kmalloc(256);
+    char * full_path = (char *)neutron_malloc(256);
     if (failed(result = stream_path(stream, true, 256, full_path)))
       {
       stream_close(stream);
-      kfree(full_path);
+      neutron_free(full_path);
       return result;
       }
 
     result = edit_script(context, full_path, stream);
 
-    kfree(full_path);
+    neutron_free(full_path);
     }
 
   return result;
@@ -286,17 +286,17 @@ result_t ion_edit_name_action(cli_t *context, const char * name)
   if(failed(result = stream_open(get_context(context), name, &stream)))
     return result;
 
-  char * full_path = (char *)kmalloc(256);
+  char * full_path = (char *)neutron_malloc(256);
   if (failed(result = stream_path(stream, true, 256, full_path)))
     {
     stream_close(stream);
-    kfree(full_path);
+    neutron_free(full_path);
     return result;
     }
 
   result = edit_script(context, full_path, stream);
 
-  kfree(full_path);
+  neutron_free(full_path);
 
   return result;
   }
@@ -342,12 +342,12 @@ result_t ion_add_id_name_msg_handler_action(cli_t *context, uint16_t event_id, c
     if (result != e_path_not_found ||
       failed(result = reg_create_key(key, key_name, &event_key)))
       {
-      kfree(key_name);
+      neutron_free(key_name);
       return result;
       }
     }
 
-  kfree(key_name);
+  neutron_free(key_name);
 
   // TODO: check the event handler exists in the parent directory
 
@@ -369,7 +369,7 @@ result_t ion_del_id_name_action(cli_t *context, uint16_t del_id, const char * io
   snprintf(id_str, 32, "%d", del_id);
 
   result = reg_open_key(get_context(context), id_str, &key);
-  kfree(id_str);
+  neutron_free(id_str);
 
   if (failed(result))
     return result;

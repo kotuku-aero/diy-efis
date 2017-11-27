@@ -36,7 +36,6 @@ it must be removed as soon as possible after the code fragment is identified.
 #include "widget.h"
 #include "spatial.h"
 #include "pens.h"
-#include "fonts.h"
 
 static const gdi_dim_t pixels_per_degree = 49;
 
@@ -66,9 +65,11 @@ typedef struct _attitude_window_t {
   bool show_glideslope;
 
   point_t median;
+
+  handle_t  font;
   } attitude_window_t;
 
-static result_t widget_wndproc(const window_msg_t *data);
+static result_t widget_wndproc(handle_t hwnd, const canmsg_t *data);
 
 result_t create_attitude_window(handle_t parent, memid_t key, handle_t *hwnd)
   {
@@ -79,7 +80,7 @@ result_t create_attitude_window(handle_t parent, memid_t key, handle_t *hwnd)
     return result;
 
   // create the window data.
-  attitude_window_t *wnd = (attitude_window_t *)kmalloc(sizeof(attitude_window_t));
+  attitude_window_t *wnd = (attitude_window_t *)neutron_malloc(sizeof(attitude_window_t));
   memset(wnd, 0, sizeof(attitude_window_t));
 
   wnd->version = sizeof(attitude_window_t);
@@ -113,6 +114,10 @@ result_t create_attitude_window(handle_t parent, memid_t key, handle_t *hwnd)
   else
     wnd->median.y = rect_height(&wnd_rect) >> 1;
 
+  if (failed(result = lookup_font(key, "font", &wnd->font)))
+    {
+
+    }
 
   // store the parameters for the window
   set_wnddata(*hwnd, wnd);
@@ -267,14 +272,10 @@ static void update_window(handle_t hwnd, attitude_window_t *wnd)
         pt_left.x -= 9; pt_left.y -= 9;
         pt_right.x -= 9; pt_right.y -= 9;
 
-        const font_t *font = attitude_window_fonts[wnd->roll < 0 ?
-          wnd->roll + 360 :
-          wnd->roll];
-
-        draw_text(hwnd, &wnd_rect, font, color_white, color_hollow,
+        draw_text(hwnd, &wnd_rect, wnd->font, color_white, color_hollow,
           text_angle, 1, &pt_left, 0, 0, 0);
 
-        draw_text(hwnd, &wnd_rect, font, color_white, color_hollow,
+        draw_text(hwnd, &wnd_rect, wnd->font, color_white, color_hollow,
           text_angle, 1, &pt_right, 0, 0, 0);
         }
       pitch_angle -= 25;
@@ -497,19 +498,19 @@ static void update_window(handle_t hwnd, attitude_window_t *wnd)
   polygon(hwnd, &wnd_rect, &white_pen, color_hollow, roll_points_base, 5);
   }
 
-static result_t widget_wndproc(const window_msg_t *data)
+static result_t widget_wndproc(handle_t hwnd, const canmsg_t *msg)
   {
   //assert_valid(this);
   bool changed = false;
   attitude_window_t *wnd;
-  get_wnddata(data->hwnd, (void **)&wnd);
+  get_wnddata(hwnd, (void **)&wnd);
 
-  switch (data->msg.id)
+  switch (msg->id)
     {
     case id_yaw_angle:
     {
     float v;
-    get_param_float(&data->msg, &v);
+    get_param_float(msg, &v);
     int16_t value = (int16_t)radians_to_degrees(v);
     while (value > 179)
       value -= 360;
@@ -524,7 +525,7 @@ static result_t widget_wndproc(const window_msg_t *data)
     case id_roll_angle:
     {
     float v;
-    get_param_float(&data->msg, &v);
+    get_param_float(msg, &v);
     int16_t value = (int16_t)radians_to_degrees(v);
     while (value > 179)
       value -= 360;
@@ -547,7 +548,7 @@ static result_t widget_wndproc(const window_msg_t *data)
     case id_pitch_angle:
     {
     float v;
-    get_param_float(&data->msg, &v);
+    get_param_float(msg, &v);
     int16_t angle = (int16_t)radians_to_degrees(v);
 
     while (angle < -180)
@@ -585,16 +586,16 @@ static result_t widget_wndproc(const window_msg_t *data)
   //    changed |= assign_msg(data.msg_data_16(), _aoa_degrees);
   //    break;
     case id_paint:
-      begin_paint(data->hwnd);
-      update_window(data->hwnd, wnd);
-      end_paint(data->hwnd);
+      begin_paint(hwnd);
+      update_window(hwnd, wnd);
+      end_paint(hwnd);
       break;
     default:
-      return defwndproc(data);
+      return defwndproc(hwnd, msg);
     }
 
   if (changed)
-    invalidate_rect(data->hwnd, 0);
+    invalidate_rect(hwnd, 0);
 
   return true;
   }

@@ -206,7 +206,7 @@ static result_t get_points(duk_context *ctx, duk_int_t stk_bot, duk_int_t obj_id
   // first determine how many points;
 
   // allocate space
-  *pts = kmalloc(sizeof(point_t) * *len);
+  *pts = neutron_malloc(sizeof(point_t) * *len);
 
   // read the points from the property.
   uint16_t idx;
@@ -219,7 +219,7 @@ static result_t get_points(duk_context *ctx, duk_int_t stk_bot, duk_int_t obj_id
     // get the point
     if (failed(get_point(ctx, stk_bot, stk_bot -1, &(*pts)[idx])))
       {
-      kfree(*pts);
+      neutron_free(*pts);
       *pts = 0;
       *len = 0;
       return DUK_RET_TYPE_ERROR;
@@ -386,7 +386,7 @@ static duk_ret_t lib_polyline(duk_context *ctx)
     retval = DUK_RET_TYPE_ERROR;
 
   duk_pop(ctx);
-  kfree(pts);
+  neutron_free(pts);
 
   return retval;
   }
@@ -473,7 +473,7 @@ static duk_ret_t lib_polygon(duk_context *ctx)
     retval = DUK_RET_TYPE_ERROR;
 
   duk_pop(ctx);
-  kfree(pts);
+  neutron_free(pts);
 
   return retval;
   }
@@ -797,7 +797,7 @@ static duk_ret_t lib_pie(duk_context *ctx)
   return retval;
   }
 
-// draw_text(handle_t canvas, const rect_t *clip_rect, font_t font, color_t fg, color_t bg, const char *str, uint16_t count, const point_t *src_pt, const rect_t *txt_clip_rect, text_flags format, uint16_t *char_widths)
+// draw_text(handle_t canvas, const rect_t *clip_rect, handle_t  font, color_t fg, color_t bg, const char *str, uint16_t count, const point_t *src_pt, const rect_t *txt_clip_rect, text_flags format, uint16_t *char_widths)
 // this.text(str, point, clip_rect)
 static duk_ret_t lib_draw_text(duk_context *ctx)
   {
@@ -879,7 +879,7 @@ static duk_ret_t lib_draw_text(duk_context *ctx)
   return retval;
   }
 
-// text_extent(handle_t canvas, font_t font, const char *str, uint16_t count, extent_t *extent)
+// text_extent(handle_t canvas, handle_t  font, const char *str, uint16_t count, extent_t *extent)
 // json ext = this.extent(str)
 static duk_ret_t lib_text_extent(duk_context *ctx)
   {
@@ -1210,9 +1210,9 @@ void register_ion_functions(duk_context *ctx, handle_t co)
   register_function(ctx, lib_create_bitmap_canvas, "create_bitmap_canvas", 1);
   // extern result_t get_orientation(handle_t hwnd, uint16_t *orientation);
   register_function(ctx, lib_get_orientation, "get_orientation", 1);
-  // extern result_t create_font(const char *path, const point_t *char_metrics, const point_t *device_metrics, font_t *font);
+  // extern result_t create_font(const char *path, const point_t *char_metrics, const point_t *device_metrics, handle_t  *font);
   register_function(ctx, lib_create_font, "create_font", 1);
-  // extern result_t release_font(font_t font);
+  // extern result_t release_font(handle_t  font);
   register_function(ctx, lib_release_font, "release_font", 1);
 
   register_function(ctx, lib_get_transform, "get_transform", 1);

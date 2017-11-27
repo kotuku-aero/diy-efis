@@ -34,7 +34,6 @@ If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
 #include "widget.h"
-#include "fonts.h"
 #include "pens.h"
 #include "spatial.h"
 #include <math.h>
@@ -63,10 +62,11 @@ typedef struct _hsi_window_t {
   int16_t heading;
   color_t background_color;
   bool draw_border;
+  handle_t  font;
   } hsi_window_t;
 
 
-static result_t widget_wndproc(const window_msg_t *data);
+static result_t widget_wndproc(handle_t hwnd, const canmsg_t *data);
 
 result_t create_hsi_window(handle_t parent, memid_t key, handle_t *hwnd)
   {
@@ -77,7 +77,7 @@ result_t create_hsi_window(handle_t parent, memid_t key, handle_t *hwnd)
     return result;
 
   // create the window data.
-  hsi_window_t *wnd = (hsi_window_t *)kmalloc(sizeof(hsi_window_t));
+  hsi_window_t *wnd = (hsi_window_t *)neutron_malloc(sizeof(hsi_window_t));
   memset(wnd, 0, sizeof(hsi_window_t));
 
   wnd->version = sizeof(hsi_window_t);
@@ -86,6 +86,8 @@ result_t create_hsi_window(handle_t parent, memid_t key, handle_t *hwnd)
     wnd->background_color = color_black;
 
   reg_get_bool(key, "draw-border", &wnd->draw_border);
+
+  lookup_font(key, "font", &wnd->font);
 
   // store the parameters for the window
   set_wnddata(*hwnd, wnd);
@@ -173,7 +175,7 @@ static void update_window(handle_t hwnd, hsi_window_t *wnd)
     int16_t rotn = (index < 0) ? index + 360 : index;
     rotate_point(&median, &pts[0], rotn);
 
-    draw_text(hwnd, &wnd_rect, navigation_window_fonts[rotn], color_white, color_black,
+    draw_text(hwnd, &wnd_rect, wnd->font, color_white, color_black,
       (char *)&i, 1,
       make_point(pts[0].x - font_center, pts[0].y - font_center, &pt),
       0, 0, 0);
@@ -337,14 +339,14 @@ static void update_window(handle_t hwnd, hsi_window_t *wnd)
   size_t length = strlen(msg);
 
   extent_t pixels;
-  text_extent(wnd, &arial_9_font, msg, length, &pixels);
-  draw_text(hwnd, &wnd_rect, &arial_9_font, color_yellow, color_hollow,
+  text_extent(wnd, wnd->font, msg, length, &pixels);
+  draw_text(hwnd, &wnd_rect, wnd->font, color_yellow, color_hollow,
     msg, length, make_point(25 - (pixels.dx >> 1), 2, &pt), 0, 0, 0);
 
   sprintf(msg, "%d", wnd->wind_speed);
   length = strlen(msg);
-  text_extent(wnd, &arial_9_font, msg, length, &pixels);
-  draw_text(hwnd, &wnd_rect, &arial_9_font, color_yellow, color_hollow,
+  text_extent(wnd, wnd->font, msg, length, &pixels);
+  draw_text(hwnd, &wnd_rect, wnd->font, color_yellow, color_hollow,
     msg, length, make_point(25 - (pixels.dx >> 1), 13, &pt), 0, 0, 0);
 
   /////////////////////////////////////////////////////////////////////////////
@@ -352,33 +354,31 @@ static void update_window(handle_t hwnd, hsi_window_t *wnd)
   // drawn in top right as distance/time
   sprintf(msg, "%d", wnd->distance_to_waypoint);
   length = strlen(msg);
-  text_extent(wnd, &arial_9_font, msg, length, &pixels);
+  text_extent(wnd, wnd->font, msg, length, &pixels);
   draw_text(hwnd, &wnd_rect, &arial_9_font, color_yellow, color_hollow,
     msg, length, make_point(window_x - 25 - (pixels.dx >> 1), 2, &pt), 0, 0, 0);
 
   sprintf(msg, "%02.2d:%02.2d", wnd->time_to_waypoint / 60, wnd->time_to_waypoint % 60);
   length = strlen(msg);
-  text_extent(wnd, &arial_9_font, msg, length, &pixels);
+  text_extent(wnd, wnd->font, msg, length, &pixels);
   draw_text(hwnd, &wnd_rect, &arial_9_font, color_yellow, color_hollow,
     msg, length, make_point(window_x - 25 - (pixels.dx >> 1), 13, &pt), 0, 0, 0);
 
   sprintf(msg, "%s", wnd->waypoint_name);
   length = strlen(msg);
-  text_extent(wnd, &arial_9_font, msg, length, &pixels);
+  text_extent(wnd, wnd->font, msg, length, &pixels);
   draw_text(hwnd, &wnd_rect, &arial_9_font, color_yellow, color_hollow,
     msg, length, make_point(window_x - 25 - (pixels.dx >> 1), 24, &pt), 0, 0, 0);
   }
 
 
-result_t widget_wndproc(const window_msg_t *data)
+result_t widget_wndproc(handle_t hwnd, const canmsg_t *msg)
   {
   bool changed = false;
   hsi_window_t *wnd;
-  get_wnddata(data->hwnd, (void **)&wnd);
+  get_wnddata(hwnd, (void **)&wnd);
 
-  const canmsg_t *msg = &data->msg;
-
-  switch (data->msg.id)
+  switch (msg->id)
     {
     case id_magnetic_heading:
     {
@@ -480,16 +480,16 @@ result_t widget_wndproc(const window_msg_t *data)
     }
     break;
     case id_paint:
-      begin_paint(data->hwnd);
-      update_window(data->hwnd, wnd);
-      end_paint(data->hwnd);
+      begin_paint(hwnd);
+      update_window(hwnd, wnd);
+      end_paint(hwnd);
       break;
     default:
-      return defwndproc(data);
+      return defwndproc(hwnd, msg);
     }
 
   if (changed)
-    invalidate_rect(data->hwnd, 0);
+    invalidate_rect(hwnd, 0);
 
   return s_ok;
   }

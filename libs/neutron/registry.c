@@ -190,7 +190,7 @@ result_t bsp_reg_init(bool factory_reset, uint16_t _size, uint16_t _page_size)
     {
     uint16_t num_reserved = num_bitmap_bytes >> BLOCK_SHIFT;    // blocks in the bitmap
 
-    root = (eeprom_root_t *)kmalloc(num_bitmap_bytes + sizeof(eeprom_root_t));
+    root = (eeprom_root_t *)neutron_malloc(num_bitmap_bytes + sizeof(eeprom_root_t));
     // clear out root blocks.
     memset(root, 0, num_bitmap_bytes + sizeof(eeprom_root_t));
 
@@ -208,7 +208,7 @@ result_t bsp_reg_init(bool factory_reset, uint16_t _size, uint16_t _page_size)
     }
 
   // read the root block.
-  root = (eeprom_root_t *)kmalloc(num_bitmap_bytes + sizeof(eeprom_root_t));
+  root = (eeprom_root_t *)neutron_malloc(num_bitmap_bytes + sizeof(eeprom_root_t));
 
   return reg_read_bytes(0, num_bitmap_bytes + sizeof(eeprom_root_t), root);
   }
@@ -258,7 +258,7 @@ static void allocate_blocks(uint16_t first_block,
 static void release_block(uint16_t first_block,
 													uint16_t num_blocks)
 	{
-	// point to the first byte to kmalloc
+	// point to the first byte to neutron_malloc
   byte_t *base = root->bitmap;
 	base += first_block >> 3;
 

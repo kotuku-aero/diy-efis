@@ -39,9 +39,6 @@
     <ClCompile Include="..\..\libs\proton\layout_window.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\proton\menu_window.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libs\proton\pens.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -59,9 +56,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\libs\proton\menu_window.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\libs\proton\pens.h">
       <Filter>Header Files</Filter>
     </ClInclude>

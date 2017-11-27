@@ -47,7 +47,7 @@ static void show_key(handle_t dest, memid_t key, bool full_path, bool recursive,
   else
     {
     reg_query_memid(key, 0, name, 0, 0);
-    path = (char *)kmalloc(strlen(name)+1);
+    path = (char *)neutron_malloc(strlen(name)+1);
     strcpy((char *)path, name);
     }
 
@@ -251,7 +251,7 @@ result_t mkdir_path_action(cli_t *context, const char * name_)
   char prompt[MAX_PROMPT_LENGTH];
   snprintf(prompt, MAX_PROMPT_LENGTH, "%s %s ", node_name, dirname);
 
-  kfree((void *)dirname);
+  neutron_free((void *)dirname);
 
   strncpy(context->prompt[context->root_level], prompt, MAX_PROMPT_LENGTH);
   context->current[context->root_level] = memid;
@@ -275,7 +275,7 @@ result_t cd_path_action(cli_t *context, const char * name_)
 
   char prompt[MAX_PROMPT_LENGTH];
   snprintf(prompt, MAX_PROMPT_LENGTH, "%s %s ", node_name, dirname);
-  kfree((void *)dirname);
+  neutron_free((void *)dirname);
 
   strncpy(context->prompt[context->root_level], prompt, MAX_PROMPT_LENGTH);
   context->current[context->root_level] = memid;
@@ -398,7 +398,7 @@ result_t exit_action(cli_t *context)
 
   char prompt[MAX_PROMPT_LENGTH];
   snprintf(prompt, MAX_PROMPT_LENGTH, "%s %s ", node_name, dirname);
-  kfree((void *)dirname);
+  neutron_free((void *)dirname);
 
   strncpy(context->prompt[context->root_level], prompt, MAX_PROMPT_LENGTH);
   return s_ok;

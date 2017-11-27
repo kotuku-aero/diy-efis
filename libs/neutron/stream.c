@@ -133,7 +133,7 @@ result_t stream_copy(handle_t from, handle_t to)
     return result;
 
   uint16_t read = 0;
-  byte_t *buffer = (byte_t *)kmalloc(128);
+  byte_t *buffer = (byte_t *)neutron_malloc(128);
   if(buffer == 0)
     return e_not_enough_memory;
 
@@ -152,7 +152,7 @@ result_t stream_copy(handle_t from, handle_t to)
     chunk = min(128, len);
     }
 
-  kfree(buffer);
+  neutron_free(buffer);
   return result;
   }
 

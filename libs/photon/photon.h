@@ -159,9 +159,6 @@ typedef struct _pen_t
   uint16_t width;
   pen_style style;
   } pen_t;
-
-typedef void *font_t;
-  
   
 ////////////////////////////////////////////////////////////////////////////
 typedef uint32_t text_flags;
@@ -170,15 +167,8 @@ enum {
   eto_clipped = 0x00000004
   };
 
-/**
- * @struct window_msg_t
- */
-typedef struct _window_msg_t {
-  canmsg_t msg;
-  handle_t hwnd;
-  } window_msg_t;
   
-typedef result_t (*wndproc)(const window_msg_t *msg);
+typedef result_t (*wndproc)(handle_t hwnd, const canmsg_t *msg);
 
 #define HWND_BROADCAST  (handle_t)(0xffffffff)
   
@@ -214,15 +204,20 @@ typedef result_t (*wndproc)(const window_msg_t *msg);
  */
 extern result_t open_screen(uint16_t orientation, wndproc cb, uint16_t id, handle_t *hwnd);
 /**
- * @function attach_ion(handle_t screen, memid_t key, const char *script)
+ * @function result_t get_screen(handle_t *screen)
+ * Return the root display screen
+ * @param screen      Root display window
+ * @return s_ok if the screen has been opened.
+ */
+extern result_t get_screen(handle_t *screen);
+/**
+ * @function attach_ion(handle_t screen)
  * Attach an ion interpreter to the screen.  Will load the script as a startup script
  * and call on_attach if it exists
  * @param screen        Screen to attach to
- * @param key           Registry hive to load all scripts from
- * @param script        Startup script to run
  * @return s_ok if the interpreter was started ok.
  */
-extern result_t attach_ion(handle_t screen, memid_t key, const char *script);
+extern result_t attach_ion(handle_t screen);
 /**
  * @function detach_ion(handle_t screen)
  * Detach an interpreter and release all resources.  Will call on_detach if
@@ -358,7 +353,7 @@ extern result_t set_wnddata(handle_t window, void *wnd_data);
  * @param msg         pointer to a canmsg_t that received the message
  * @return s_ok if a message was retrieved.
  */
-extern result_t get_message(handle_t hwnd, window_msg_t *msg);
+extern result_t get_message(handle_t hscreen, handle_t *hwnd, canmsg_t *msg);
 /**
  * @function dispatch_message(const window_msg_t *msg)
  * Dispatches a message to a window procedure. It is typically used to dispatch
@@ -366,7 +361,7 @@ extern result_t get_message(handle_t hwnd, window_msg_t *msg);
  * @param msg     Message to despatch
  * @return s_ok if despatched ok
  */
-extern result_t dispatch_message(const window_msg_t *msg);
+extern result_t dispatch_message(handle_t hwnd, const canmsg_t *msg);
 /**
  * @function post_message(handle_t hwnd, const canmsg_t *msg, uint32_t max_wait)
  * Places (posts) a message in the message queue associated with the specified
@@ -400,28 +395,58 @@ extern result_t send_message(handle_t hwnd, const canmsg_t *msg);
 /**
  * @function defwndproc(const window_msg_t *msg)
  * Perform default processing of messages
+ * @param hwnd  handle of window processing the message
  * @param msg   Message to process
  * @return s_ok if process, s_false if not handled
  */
-extern result_t defwndproc(const window_msg_t *msg);
+extern result_t defwndproc(handle_t hwnd, const canmsg_t *msg);
 /**
- * @function attach_scriptlet(handle_t hwnd, uint16_t id, const char *scriptlet, const char *msg)
- * attach an ECMA script handler to an event
- * @param id      Can-ID to process
- * @param scriptlet Path to script that contains the handler
- * @param handler Name of the ECMA Script handler
- * @return s_ok if handler attached
+ * @function result_t add_handler(handle_t hwnd, uint16_t id, const char *func)
+ * Register a javascript event handler with a window
+ * @param hwnd        window to attach a script to
+ * @param id          message id process
+ * @param func        name of the function
+ * @return  s_ok if the id can be processed and the function exists
+ * @remark  The screen must have a valid scriptlet with the function
+ * name as defined.  See the attach_script function
  */
-extern result_t attach_scriptlet(handle_t hwnd, uint16_t id, const char *scriptlet, const char *handler);
+extern result_t add_handler(handle_t hwnd, uint16_t id, const char *func);
 /**
- * @function attach_handler(handle_t hwnd, uint16_t id, msg_hook_fn fnc)
- * attach a native handler for a message id
- * @param hwnd  Window to attach to
- * @param id      Can-ID to process
- * @param fnc   Native function to handle message
- * @return s_ok if handler attached
+ * @function  remove_handler(handle_t hwnd, uint16_t id)
+ * Remove a registered handler
+ * @param hwnd      window to remove event handler from
+ * @param id        message id to remove
+ * @return s_ok if the handler is removed
+ */
+extern result_t remove_handler(handle_t hwnd, uint16_t id);
+/**
+ * @function attach_script(handle_t screen, memid_t key, const char *name)
+ * Attach a scriptlet to the screen.  The script must exist at the specified registry
+ * hive, given the path.  Also the ion_attach call must have been made.
+ * @param screen      Screen to attach to.  Can be obtained using the get_screen function
+ * @param key         Registry hive that contains the scriptlet
+ * @param name        Name of the script to attach
+ * @return s_ok if the script can be attached, e_exists if already attached
+ * @remark  As is common to all javascript code there is no namespacing.  to allow
+ * for this is it recommended all scripts are modules with the module name
+ * being unique.
+ */
+extern result_t attach_script(handle_t screen, memid_t key, const char *name);
+/**
+ * @function detach_script(handle_t screen, memid_t key, const char *name)
+ * Detach a previously attached script from a screen
+ * @param screen        Screen to detach from
+ * @param key           Registry key that contains the scriptlet
+ * @param name          Name of the script to detach
+ * @return s_ok if the script can be attached
 */
-extern result_t attach_handler(handle_t hwnd, uint16_t id, msg_hook_fn fnc);
+extern result_t detach_script(handle_t screen, memid_t key, const char *name);
+/**
+ * @function detach_all_scripts(handle_t screen)
+ * Remove all scripts attached to a screen
+ * @param screen        Screen to detach from
+*/
+extern result_t detach_all_scripts(handle_t screen);
 /**
  * @function canvas_close(handle_t hwnd)
  * Close a canvas.
@@ -636,29 +661,35 @@ extern result_t pie(handle_t canvas,
                            gdi_dim_t radii,
                            gdi_dim_t inner);
 /**
- * @function create_font(const char *path, const point_t *char_metrics, const point_t *device_metrics, font_t *font)
- * Load a font.
- * @param path            Name of the font.  See remarks
- * @param char_metrics    The ref char with in 1/64 points
- * @param device_metrics  Width of the device in dots per inch
- * @param font          resulting font
+ * @function create_font(const char *path, const point_t *char_metrics, const point_t *device_metrics, handle_t  *font)
+ * generate a font
+ * @param name            Name of the font must be registered withe the load_font call
+ * @param points          The ref char height in 1/64 points
+ * @param hint            optional string of characters to cache in the font cache, makes rendering faster
+ * @param font            resulting font
  * @return s_ok if the font is loaded
- * @remark if either the char_widths are 0 then the corresponding value is
- * the value of the opposite axis.  If 0 then default values are used.
- * If either of the device_meterics are 0 then the corresponding value is the
- * value of the opposite index.  If 0 then default values are used
  *
 */
-extern result_t create_font(const char *path, const point_t *char_metrics, const point_t *device_metrics, font_t *font);
+extern result_t create_font(const char *name, uint16_t points, const char *hint, handle_t *font);
 /**
- * @function release_font(font_t font)
+ * @result_t load_font(const char *name, handle_t stream)
+ * Load a font into the font cache
+ * @param name      Name of the font
+ * @param stream    Stream to read the true type font from
+ * @return s_ok if the font was loaded into the cache and is available for use.
+ * @remark  The handle to the font must remain open till release_font is called
+ * the font engine will close the stream handle
+ */
+extern result_t load_font(const char *name, handle_t stream);
+/**
+ * @function release_font(handle_t  font)
  * release a font and all the resources
- * @param font    Font to release
+ * @param name    Font to release
  * @result s_ok if font released ok
 */
-extern result_t release_font(font_t font);
+extern result_t release_font(const char *name);
 /**
- * @function draw_text(handle_t canvas, const rect_t *clip_rect, font_t font, color_t fg, color_t bg, const char *str, uint16_t count, const point_t *src_pt, const rect_t *txt_clip_rect, text_flags format, uint16_t *char_widths)
+ * @function draw_text(handle_t canvas, const rect_t *clip_rect, handle_t  font, color_t fg, color_t bg, const char *str, uint16_t count, const point_t *src_pt, const rect_t *txt_clip_rect, text_flags format, uint16_t *char_widths)
  * Draw text
  * @param canvas      canvas to write to
  * @param clip_rect   rectangle to clip to
@@ -675,7 +706,7 @@ extern result_t release_font(font_t font);
  */
 extern result_t draw_text(handle_t canvas,
                                  const rect_t *clip_rect,
-                                 font_t font,
+                                 handle_t  font,
                                  color_t fg,
                                  color_t bg,
                                  const char *str,
@@ -685,7 +716,7 @@ extern result_t draw_text(handle_t canvas,
                                  text_flags format,
                                  uint16_t *char_widths);
 /**
- * @function text_extent(handle_t canvas, font_t font, const char *str, uint16_t count, extent_t *extent)
+ * @function text_extent(handle_t canvas, handle_t  font, const char *str, uint16_t count, extent_t *extent)
  * Return the area text draws within
  * @param canvas      canvas to write to
  * @param font        font to use
@@ -695,7 +726,7 @@ extern result_t draw_text(handle_t canvas,
  * @return  s_ok if completed
  */
 extern result_t text_extent(handle_t canvas,
-                            font_t font,
+                            handle_t  font,
                             const char *str,
                             uint16_t count,
                             extent_t *extent);
