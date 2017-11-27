@@ -65,5 +65,8 @@
     <ClCompile Include="..\..\libs\neutron\neutron.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\libs\neutron\manifest.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

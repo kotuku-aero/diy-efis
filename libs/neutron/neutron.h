@@ -2145,6 +2145,7 @@ extern result_t stream_create(memid_t parent, const char *path, handle_t *stream
 /**
  * @function manifest_open(const char *path, handle_t *stream)
  * Open a manifest stream.  
+ * @param key       Key to open resource from
  * @param path      Path to the stream. see remarks
  * @param stream    opened stream
  * @return s_ok if the stream was opened ok
@@ -2153,7 +2154,7 @@ extern result_t stream_create(memid_t parent, const char *path, handle_t *stream
  * the CLI to store resources (images and fonts) in the registry
  * or in code.  The resource is read-only
  */
-extern result_t manifest_open(const char *path, handle_t *stream);
+extern result_t manifest_open(memid_t key, const char *path, handle_t *stream);
 /**
  * @function manifest_create(const char *path, handle_t *stream)
  * Open a manifest stream.  
