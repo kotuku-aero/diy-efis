@@ -103,7 +103,7 @@ result_t lookup_enum(memid_t key,
   return e_not_found;
   }
 
-result_t lookup_font(memid_t key, const char *name, handle_t  *font)
+result_t lookup_font(memid_t key, const char *name, const char *hints, handle_t  *font)
   {
   result_t result;
   if(name == 0 ||
@@ -126,9 +126,7 @@ result_t lookup_font(memid_t key, const char *name, handle_t  *font)
     return result;
 
   // pts is the vertical size.
-  point_t char_metrics = { 0, pts << 6 };
-
-  return create_font(font_name, &char_metrics, 0, font);
+  return create_font(font_name, pts, hints, font);
   }
 
 typedef struct _color_lookup_t

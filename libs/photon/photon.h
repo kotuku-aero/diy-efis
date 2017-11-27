@@ -215,9 +215,11 @@ extern result_t get_screen(handle_t *screen);
  * Attach an ion interpreter to the screen.  Will load the script as a startup script
  * and call on_attach if it exists
  * @param screen        Screen to attach to
+ * @param key           Root registry key for the screen
+ * @param startup_script  Script to execute
  * @return s_ok if the interpreter was started ok.
  */
-extern result_t attach_ion(handle_t screen);
+extern result_t attach_ion(handle_t screen, memid_t key, const char *startup_script);
 /**
  * @function detach_ion(handle_t screen)
  * Detach an interpreter and release all resources.  Will call on_detach if

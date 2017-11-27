@@ -50,6 +50,9 @@ extern result_t load_layout(handle_t canvas, memid_t hive);
 
 handle_t main_window = 0;
 
+// this is a base64 encoded file.
+extern const char *neo_base64;
+
 void run_proton(void *parg)
   {
   result_t result;
@@ -62,6 +65,8 @@ void run_proton(void *parg)
 
     if(failed(reg_get_uint16(key, "orientation", &orientation)))
       orientation = 0;
+
+    // load and cache the neo font
 
     char layout_name[REG_STRING_MAX];
 

@@ -1560,6 +1560,9 @@ static void draw_menu_item(handle_t hwnd,
 
   }
 
+// we cache the font metrics for the layout window as loading them takes a while
+static const char *font_hints = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
+
 result_t load_layout(handle_t hwnd, memid_t hive)
   {
   // the hive must have series of hives that form windows
@@ -1569,14 +1572,6 @@ result_t load_layout(handle_t hwnd, memid_t hive)
   field_datatype type = field_key;
   // must be 0 on first call
   memid_t child = 0;
-
-  // detach the scriptlet interpreter and message hooks
-  if (failed(result = detach_ion(hwnd)))
-    return result;
-
-  // attach a scriplet interpreter
-  if (failed(result = attach_ion(hwnd, hive, "init.js")))
-    return result;
   
   while(succeeded(result = reg_enum_key(hive, &type, 0, 0, REG_NAME_MAX, name, &child)))
     {
@@ -1701,9 +1696,10 @@ result_t load_layout(handle_t hwnd, memid_t hive)
     lookup_pen(pen_key, &wnd->border_pen);
 
   // check for the font
-  if (failed(lookup_font(menu, "font", &wnd->font)))
+  if (failed(lookup_font(menu, "font", font_hints, &wnd->font)))
     {
-    // TODO: handle this...
+    // we always have the neo font.
+
     }
 
   // store the parameters for the window

@@ -270,7 +270,6 @@ static void init_stream(strstream_handle_t *stream)
   stream->stream.stream_delete = strstream_delete;
   }
 
-
 result_t strstream_create(const char *lit, handle_t *hndl)
   {
   if(hndl == 0)

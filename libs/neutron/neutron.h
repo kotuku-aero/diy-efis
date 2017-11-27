@@ -2144,16 +2144,28 @@ extern result_t stream_open(memid_t parent, const char *path, handle_t *stream);
 extern result_t stream_create(memid_t parent, const char *path, handle_t *stream);
 /**
  * @function manifest_open(const char *path, handle_t *stream)
- * Open an implementation dependent manifest stream.
+ * Open a manifest stream.  
  * @param path      Path to the stream. see remarks
  * @param stream    opened stream
  * @return s_ok if the stream was opened ok
- * @remark The path to the manifest stream is dependent on the underlying
- * bsp support.  For linux the path is a regular file path.  For Windows
- * the path can have an optional drive letter.  With ION as the embedded
- * solution the path is a simple list of resource names
+ * @remark A manifest stream is a file that is stored as a base64
+ * encoded file.  This allows for streams to be created using
+ * the CLI to store resources (images and fonts) in the registry
+ * or in code.  The resource is read-only
  */
 extern result_t manifest_open(const char *path, handle_t *stream);
+/**
+ * @function manifest_create(const char *path, handle_t *stream)
+ * Open a manifest stream.  
+ * @param literal   Base64 encoded binary image
+ * @param stream    opened stream
+ * @return s_ok if the stream was opened ok
+ * @remark A manifest stream is a file that is stored as a base64
+ * encoded file.  This allows for streams to be created using
+ * the CLI to store resources (images and fonts) in the registry
+ * or in code.  The resource is read only
+ */
+extern result_t manifest_create(const char *literal, handle_t *stream);
 /**
  * @function stream_close(handle_t stream)
  * Close the stream handle and release all resources

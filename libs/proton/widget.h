@@ -44,7 +44,7 @@ extern result_t create_child_widget(handle_t parent, memid_t key, wndproc cb, ha
   // look up a settings and return the enumeration value
   // returns -1 if setting not found otherwise integer index of lookup
 extern result_t lookup_enum(memid_t key, const char *name, const char **values, int max_values, int *value);
-extern result_t lookup_font(memid_t key, const char *name, const handle_t  *font) ;
+extern result_t lookup_font(memid_t key, const char *name, const char *hints, const handle_t  *font) ;
 extern result_t lookup_color(memid_t key, const char *name, color_t *color);
 extern result_t lookup_pen_style(memid_t key, const char *name, pen_style *style);
 extern result_t lookup_pen(memid_t key, pen_t *pen);

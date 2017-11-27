@@ -60,12 +60,12 @@ extern "C" {
 typedef result_t (*event_handler_fn)(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg);
 
 // this structure is used to hold a callback
-typedef struct _proxy_t {
+typedef struct _event_proxy_t {
   uint16_t msg_id;                // message id that is handled
   event_handler_fn callback;      // callback to execute
   const char *func;               // optional callback name
   void *parg;                     // user defined argument
-  } proxy_t;
+  } event_proxy_t;
 
 // shared structure for all canvas's
 typedef struct _window_t
@@ -99,8 +99,8 @@ typedef struct _window_t
     void *wnd_data;
     // Array of event handlers for a window.  The well-known ones are cached
     handle_t events;
-    proxy_t *on_draw_background;   // called when a draw background event is received
-    proxy_t *on_paint;             // called when a paint event occurs
+    event_proxy_t *on_draw_background;   // called when a draw background event is received
+    event_proxy_t *on_paint;             // called when a paint event occurs
   } window_t;
 
 typedef struct _screen_t
@@ -174,7 +174,7 @@ extern result_t release_proxy(handle_t handle);
  * is erased.
  * @return s_ok if the event is hooked.
  */
-extern result_t add_event(handle_t hwnd, uint16_t id, void *parg, const char *func, event_handler_fn callback, proxy_t *previous);
+extern result_t add_event(handle_t hwnd, uint16_t id, void *parg, const char *func, event_handler_fn callback, event_proxy_t *previous);
 /**
  * @function result_t remove_event(uint16_t id, proxy_t *previous)
  * Remove an event handler
@@ -183,7 +183,7 @@ extern result_t add_event(handle_t hwnd, uint16_t id, void *parg, const char *fu
  * @param previous  If provided, the event handler will be replaced with the previous handler
  * @return s_ok if the event is removed
  */
-extern result_t remove_event(handle_t hwnd, uint16_t id, proxy_t *previous);
+extern result_t remove_event(handle_t hwnd, uint16_t id, event_proxy_t *previous);
 /**
  * @function result_t find_event(uint16_t id, proxy_t *details)
  * Find an event handler given the requested id
@@ -192,7 +192,7 @@ extern result_t remove_event(handle_t hwnd, uint16_t id, proxy_t *previous);
  * @param details   Details of the handler
  * @return s_ok if the handler was found ok
  */
-extern result_t find_event(handle_t hwnd, uint16_t id, proxy_t *details);
+extern result_t find_event(handle_t hwnd, uint16_t id, event_proxy_t *details);
 
 #ifdef __cplusplus
 }
