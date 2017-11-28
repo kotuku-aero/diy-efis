@@ -78,6 +78,14 @@ void run_proton(void *parg)
 
     if(succeeded(result = open_screen(orientation, layout_wndproc, 0, &main_window)))
       {
+      // load the neon font.
+      handle_t neo_stream;
+      if(failed(result = manifest_create(neo_base64, &neo_stream)) ||
+         failed(result = load_font("neo", neo_stream)))
+         return result;
+
+      // note we don't load hints, just the font so there is always a TTF available
+
       char startup_script[REG_STRING_MAX];
       const char *init_script = 0;
       if (succeeded(reg_get_string(key, "init", startup_script, 0)))
@@ -113,9 +121,7 @@ void run_proton(void *parg)
               while (succeeded(reg_enum_key(child, &dt, 0, 0, REG_NAME_MAX, name, &handler)))
                 {
                 if (succeeded(reg_get_string(child, name, event_fn, 0)))
-                  {
                   add_handler(main_window, can_id, event_fn);
-                  }
 
                 dt = field_string;
                 }

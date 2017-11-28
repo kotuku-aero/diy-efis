@@ -37,6 +37,8 @@ it must be removed as soon as possible after the code fragment is identified.
 #include "regex.h"
 #include "pens.h"
 
+#include "../photon/ion_proxy.h"
+
 extern result_t create_airspeed_window(handle_t parent, memid_t section, handle_t *hwnd);
 extern result_t create_altitude_window(handle_t parent, memid_t section, handle_t *hwnd);
 extern result_t create_annunciator_window(handle_t parent, memid_t section, handle_t *hwnd);
@@ -173,6 +175,9 @@ static void draw_menu_item(handle_t hwnd,
 typedef struct _layout_window_t
   {
   uint16_t version;
+  // this holds the screen window definitions.  Filled in with
+  // the attach_window hidden system call
+  handle_t window;
   /**
   * This holds the global root menu for the system
   */
@@ -1298,243 +1303,26 @@ static result_t layout_wndproc(handle_t hwnd, const canmsg_t *msg)
   layout_window_t *wnd;
   get_wnddata(hwnd, (void **)&wnd);
 
-  const rect_t *wnd_rect;
-  get_window_rect(hwnd, &wnd_rect);
-
-  uint16_t id = msg->id;
-  int16_t value;
-  get_param_int16(msg, 0, &value);
-  switch (id)
+  uint16_t count;
+  uint16_t item;
+  // now we work through the event handlers.  These can either be 
+  // the built in ones, or overloaded javascript handlers.
+  window_t *window;
+  if (succeeded(as_window(hwnd, &window)))
     {
-    case id_key0:
-      if (wnd->active_keys != 0)
-        {
-        if (wnd->active_keys->key0 != 0 &&
-          value > 0 &&
-          (*wnd->active_keys->key0->is_enabled)(wnd, wnd->active_keys->key0, msg))
-          {
-          if (wnd->menu_timer != 0)
-            (*wnd->active_keys->key0->evaluate)(wnd, wnd->active_keys->key0, msg);
-          wnd->menu_timer = menu_timeout;
-          changed = true;
-          }
-        }
-      else
-        {
-        wnd->active_keys = wnd->root_keys;
-        wnd->menu_timer = 0;
-        changed = true;
-        }
-      break;
-    case id_key1:
-      if (wnd->active_keys != 0)
-        {
-        if (wnd->active_keys->key1 != 0 &&
-          value > 0 &&
-          (*wnd->active_keys->key1->is_enabled)(wnd, wnd->active_keys->key1, msg))
-          {
-          if (wnd->menu_timer != 0)
-            (*wnd->active_keys->key1->evaluate)(wnd, wnd->active_keys->key1, msg);
-
-          wnd->menu_timer = menu_timeout;
-          changed = true;
-          }
-        }
-      else
-        {
-        wnd->active_keys = wnd->root_keys;
-        wnd->menu_timer = 0;
-        changed = true;
-        }
-      break;
-    case id_key2:
-      if (wnd->active_keys != 0)
-        {
-        if (wnd->active_keys->key2 != 0 &&
-          value > 0 &&
-          (*wnd->active_keys->key2->is_enabled)(wnd, wnd->active_keys->key2, msg))
-          {
-          if (wnd->menu_timer != 0)
-            (*wnd->active_keys->key2->evaluate)(wnd, wnd->active_keys->key2, msg);
-
-          wnd->menu_timer = menu_timeout;
-          changed = true;
-          }
-        }
-      else
-        {
-        wnd->active_keys = wnd->root_keys;
-        wnd->menu_timer = 0;
-        changed = true;
-        }
-      break;
-    case id_key3:
-      if (wnd->active_keys != 0)
-        {
-        if (wnd->active_keys->key3 != 0 &&
-          value > 0 &&
-          (*wnd->active_keys->key3->is_enabled)(wnd, wnd->active_keys->key3, msg))
-          {
-          if (wnd->menu_timer != 0)
-            (*wnd->active_keys->key3->evaluate)(wnd, wnd->active_keys->key3, msg);
-
-          wnd->menu_timer = menu_timeout;
-          changed = true;
-          }
-        }
-      else
-        {
-        wnd->active_keys = wnd->root_keys;
-        wnd->menu_timer = 0;
-        changed = true;
-        }
-      break;
-    case id_key4:
-      if (wnd->active_keys != 0)
-        {
-        if (wnd->active_keys->key4 != 0 &&
-          value > 0 &&
-          (*wnd->active_keys->key4->is_enabled)(wnd, wnd->active_keys->key4, msg))
-          {
-          if (wnd->menu_timer != 0)
-            (*wnd->active_keys->key4->evaluate)(wnd, wnd->active_keys->key4, msg);
-
-          wnd->menu_timer = menu_timeout;
-          changed = true;
-          }
-        }
-      else
-        {
-        wnd->active_keys = wnd->root_keys;
-        wnd->menu_timer = 0;
-        changed = true;
-        }
-      break;
-    case id_deckb:
-    {
-    const keys_t *handler = wnd->active_keys == 0 ? wnd->root_keys : wnd->active_keys;
-    if (value > 0)
+    vector_count(window->events, &count);
+    event_proxy_t *proxy;
+    for (item = 0; item < count; item++)
       {
-      if (handler->deckb_up != 0 && (*handler->deckb_up->is_enabled)(wnd, handler->deckb_up, msg))
-        {
-        if (wnd->menu_timer != 0)
-          wnd->menu_timer = menu_timeout;
-
-        (*handler->deckb_up->evaluate)(wnd, handler->deckb_up, msg);
-        changed = true;
-        }
+      vector_at(window->events, item, &proxy);
+      if (proxy != 0)
+        (*proxy->callback)(hwnd, proxy->parg, proxy->func, msg);
       }
-    else if (value < 0)
-      {
-      if (handler->deckb_dn != 0 && (*handler->deckb_dn->is_enabled)(wnd, handler->deckb_dn, msg))
-        {
-        if (wnd->menu_timer != 0)
-          wnd->menu_timer = menu_timeout;
-
-        (*handler->deckb_dn->evaluate)(wnd, handler->deckb_dn, msg);
-        changed = true;
-        }
-      }
-    }
-    break;
-    case id_decka:
-    {
-    const keys_t *handler = wnd->active_keys == 0 ? wnd->root_keys : wnd->active_keys;
-    if (value > 0)
-      {
-      if (handler->decka_up != 0 && (*handler->decka_up->is_enabled)(wnd, handler->decka_up, msg))
-        {
-        if (wnd->menu_timer != 0)
-          wnd->menu_timer = menu_timeout;
-
-        (*handler->decka_up->evaluate)(wnd, handler->decka_up, msg);
-        changed = true;
-        }
-      }
-    else if (value < 0)
-      {
-      if (handler->decka_dn != 0 && (*handler->decka_dn->is_enabled)(wnd, handler->decka_dn, msg))
-        {
-        if (wnd->menu_timer != 0)
-          wnd->menu_timer = menu_timeout;
-
-        (*handler->decka_dn->evaluate)(wnd, handler->decka_dn, msg);
-        changed = true;
-        }
-      }
-    }
-    break;
-    case id_menu_up:
-      // used to change the current popup menu index
-      if (wnd->current_menu != 0)
-        {
-        uint16_t count = menu_count(wnd->current_menu);
-        if (wnd->current_menu->selected_index < count - 1)
-          {
-          wnd->current_menu->selected_index++;
-          changed = true;
-          }
-        }
-      break;
-    case id_menu_dn:
-      // used to change the current popup menu index
-      if (wnd->current_menu != 0 && wnd->current_menu->selected_index > 0)
-        {
-        wnd->current_menu->selected_index--;
-        changed = true;
-        }
-      break;
-    case id_menu_left:
-      if (wnd->current_menu != 0)
-        {
-        // close the popup and open the parent if any
-        close_menu(wnd);
-        changed = true;
-        }
-      else
-        {
-        }
-      break;
-    case id_menu_right:
-      if (wnd->current_menu != 0)
-        {
-        menu_item_t *item = menu_item_at(wnd->current_menu, wnd->current_menu->selected_index);
-        if (item->item_type == mi_menu)
-          {
-          menu_item_menu_t *mi = (menu_item_menu_t *)item;
-          show_menu(wnd, mi->menu);     // show the popup
-          }
-        else if (item->item_type == mi_edit)
-          show_item_editor(wnd, item);
-        changed = true;
-        }
-      break;
-    case id_menu_ok:
-      // this is sent when an item is selected.  Only ever one
-      if (wnd->current_menu != 0)
-        {
-        menu_item_t *item = menu_item_at(wnd->current_menu, wnd->current_menu->selected_index);
-        if (item != 0)
-          (*item->evaluate)(wnd, item, msg);
-        }
-      break;
-    case id_menu_cancel:
-      close_menu(wnd);
-      break;
-    case id_paint:
-      begin_paint(hwnd);
-      update_window(hwnd, wnd);
-      end_paint(hwnd);
-      break;
-    default:
-      break;
     }
 
   // we go through all of the menu items and check to see if they are
-  // listening
-  uint16_t count;
+  // listening, and if their state has changed
   vector_count(wnd->menu_items, &count);
-  uint16_t item;
   for (item = 0; item < count; item++)
     {
     menu_item_t *mi;
@@ -1544,9 +1332,6 @@ static result_t layout_wndproc(handle_t hwnd, const canmsg_t *msg)
     if (mi->event != 0)
       (*mi->event)(wnd, mi, msg);
     }
-
-  if (changed)
-    invalidate_rect(hwnd, wnd_rect);
 
   return defwndproc(hwnd, msg);
   }
@@ -1560,6 +1345,426 @@ static void draw_menu_item(handle_t hwnd,
 
   }
 
+// these are the attached event handlers
+static result_t on_key0(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+  {
+  bool changed = false;
+  layout_window_t *wnd = (layout_window_t *)parg;
+  const rect_t *wnd_rect;
+  get_window_rect(hwnd, &wnd_rect);
+
+  uint16_t id = msg->id;
+  int16_t value;
+  get_param_int16(msg, 0, &value);
+  if (wnd->active_keys != 0)
+    {
+    if (wnd->active_keys->key0 != 0 &&
+      value > 0 &&
+      (*wnd->active_keys->key0->is_enabled)(wnd, wnd->active_keys->key0, msg))
+      {
+      if (wnd->menu_timer != 0)
+        (*wnd->active_keys->key0->evaluate)(wnd, wnd->active_keys->key0, msg);
+      wnd->menu_timer = menu_timeout;
+      changed = true;
+      }
+    }
+  else
+    {
+    wnd->active_keys = wnd->root_keys;
+    wnd->menu_timer = 0;
+    changed = true;
+    }
+
+  if(changed)
+    invalidate_rect(hwnd, 0);
+
+  return s_ok;
+  }
+
+static result_t on_key1(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+  {
+  bool changed = false;
+  layout_window_t *wnd = (layout_window_t *)parg;
+  const rect_t *wnd_rect;
+  get_window_rect(hwnd, &wnd_rect);
+
+  uint16_t id = msg->id;
+  int16_t value;
+  get_param_int16(msg, 0, &value);
+
+  if (wnd->active_keys != 0)
+    {
+    if (wnd->active_keys->key1 != 0 &&
+      value > 0 &&
+      (*wnd->active_keys->key1->is_enabled)(wnd, wnd->active_keys->key1, msg))
+      {
+      if (wnd->menu_timer != 0)
+        (*wnd->active_keys->key1->evaluate)(wnd, wnd->active_keys->key1, msg);
+
+      wnd->menu_timer = menu_timeout;
+      changed = true;
+      }
+    }
+  else
+    {
+    wnd->active_keys = wnd->root_keys;
+    wnd->menu_timer = 0;
+    changed = true;
+    }
+
+  if (changed)
+    invalidate_rect(hwnd, 0);
+
+  return s_ok;
+  }
+
+static result_t on_key2(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+  {
+  bool changed = false;
+  layout_window_t *wnd = (layout_window_t *)parg;
+  const rect_t *wnd_rect;
+  get_window_rect(hwnd, &wnd_rect);
+
+  uint16_t id = msg->id;
+  int16_t value;
+  get_param_int16(msg, 0, &value);
+
+  if (wnd->active_keys != 0)
+    {
+    if (wnd->active_keys->key2 != 0 &&
+      value > 0 &&
+      (*wnd->active_keys->key2->is_enabled)(wnd, wnd->active_keys->key2, msg))
+      {
+      if (wnd->menu_timer != 0)
+        (*wnd->active_keys->key2->evaluate)(wnd, wnd->active_keys->key2, msg);
+
+      wnd->menu_timer = menu_timeout;
+      changed = true;
+      }
+    }
+  else
+    {
+    wnd->active_keys = wnd->root_keys;
+    wnd->menu_timer = 0;
+    changed = true;
+    }
+
+  if (changed)
+    invalidate_rect(hwnd, 0);
+
+  return s_ok;
+  }
+
+static result_t on_key3(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+  {
+  bool changed = false;
+  layout_window_t *wnd = (layout_window_t *)parg;
+  const rect_t *wnd_rect;
+  get_window_rect(hwnd, &wnd_rect);
+
+  uint16_t id = msg->id;
+  int16_t value;
+  get_param_int16(msg, 0, &value);
+
+  if (wnd->active_keys != 0)
+    {
+    if (wnd->active_keys->key3 != 0 &&
+      value > 0 &&
+      (*wnd->active_keys->key3->is_enabled)(wnd, wnd->active_keys->key3, msg))
+      {
+      if (wnd->menu_timer != 0)
+        (*wnd->active_keys->key3->evaluate)(wnd, wnd->active_keys->key3, msg);
+
+      wnd->menu_timer = menu_timeout;
+      changed = true;
+      }
+    }
+  else
+    {
+    wnd->active_keys = wnd->root_keys;
+    wnd->menu_timer = 0;
+    changed = true;
+    }
+
+  if (changed)
+    invalidate_rect(hwnd, 0);
+
+  return s_ok;
+  }
+
+static result_t on_key4(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+  {
+  bool changed = false;
+  layout_window_t *wnd = (layout_window_t *)parg;
+  const rect_t *wnd_rect;
+  get_window_rect(hwnd, &wnd_rect);
+
+  uint16_t id = msg->id;
+  int16_t value;
+  get_param_int16(msg, 0, &value);
+  if (wnd->active_keys != 0)
+    {
+    if (wnd->active_keys->key4 != 0 &&
+      value > 0 &&
+      (*wnd->active_keys->key4->is_enabled)(wnd, wnd->active_keys->key4, msg))
+      {
+      if (wnd->menu_timer != 0)
+        (*wnd->active_keys->key4->evaluate)(wnd, wnd->active_keys->key4, msg);
+
+      wnd->menu_timer = menu_timeout;
+      changed = true;
+      }
+    }
+  else
+    {
+    wnd->active_keys = wnd->root_keys;
+    wnd->menu_timer = 0;
+    changed = true;
+    }
+
+  if (changed)
+    invalidate_rect(hwnd, 0);
+
+  return s_ok;
+  }
+
+static result_t on_decka(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+  {
+  bool changed = false;
+  layout_window_t *wnd = (layout_window_t *)parg;
+  const rect_t *wnd_rect;
+  get_window_rect(hwnd, &wnd_rect);
+
+  uint16_t id = msg->id;
+  int16_t value;
+  get_param_int16(msg, 0, &value);
+
+  const keys_t *handler = wnd->active_keys == 0 ? wnd->root_keys : wnd->active_keys;
+  if (value > 0)
+    {
+    if (handler->decka_up != 0 && (*handler->decka_up->is_enabled)(wnd, handler->decka_up, msg))
+      {
+      if (wnd->menu_timer != 0)
+        wnd->menu_timer = menu_timeout;
+
+      (*handler->decka_up->evaluate)(wnd, handler->decka_up, msg);
+      changed = true;
+      }
+    }
+  else if (value < 0)
+    {
+    if (handler->decka_dn != 0 && (*handler->decka_dn->is_enabled)(wnd, handler->decka_dn, msg))
+      {
+      if (wnd->menu_timer != 0)
+        wnd->menu_timer = menu_timeout;
+
+      (*handler->decka_dn->evaluate)(wnd, handler->decka_dn, msg);
+      changed = true;
+      }
+    }
+
+  if (changed)
+    invalidate_rect(hwnd, 0);
+
+  return s_ok;
+  }
+
+static result_t on_deckb(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+  {
+  bool changed = false;
+  layout_window_t *wnd = (layout_window_t *)parg;
+  const rect_t *wnd_rect;
+  get_window_rect(hwnd, &wnd_rect);
+
+  uint16_t id = msg->id;
+  int16_t value;
+  get_param_int16(msg, 0, &value);
+
+  const keys_t *handler = wnd->active_keys == 0 ? wnd->root_keys : wnd->active_keys;
+  if (value > 0)
+    {
+    if (handler->deckb_up != 0 && (*handler->deckb_up->is_enabled)(wnd, handler->deckb_up, msg))
+      {
+      if (wnd->menu_timer != 0)
+        wnd->menu_timer = menu_timeout;
+
+      (*handler->deckb_up->evaluate)(wnd, handler->deckb_up, msg);
+      changed = true;
+      }
+    }
+  else if (value < 0)
+    {
+    if (handler->deckb_dn != 0 && (*handler->deckb_dn->is_enabled)(wnd, handler->deckb_dn, msg))
+      {
+      if (wnd->menu_timer != 0)
+        wnd->menu_timer = menu_timeout;
+
+      (*handler->deckb_dn->evaluate)(wnd, handler->deckb_dn, msg);
+      changed = true;
+      }
+    }
+
+  if (changed)
+    invalidate_rect(hwnd, 0);
+
+  return s_ok;
+  }
+
+static result_t on_menu_up(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+  {
+  bool changed = false;
+  layout_window_t *wnd = (layout_window_t *)parg;
+  const rect_t *wnd_rect;
+  get_window_rect(hwnd, &wnd_rect);
+
+  uint16_t id = msg->id;
+  int16_t value;
+  get_param_int16(msg, 0, &value);
+
+  // used to change the current popup menu index
+  if (wnd->current_menu != 0)
+    {
+    uint16_t count = menu_count(wnd->current_menu);
+    if (wnd->current_menu->selected_index < count - 1)
+      {
+      wnd->current_menu->selected_index++;
+      changed = true;
+      }
+    }
+
+  if (changed)
+    invalidate_rect(hwnd, 0);
+
+  return s_ok;
+  }
+
+static result_t on_menu_dn(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+  {
+  bool changed = false;
+  layout_window_t *wnd = (layout_window_t *)parg;
+  const rect_t *wnd_rect;
+  get_window_rect(hwnd, &wnd_rect);
+
+  uint16_t id = msg->id;
+  int16_t value;
+  get_param_int16(msg, 0, &value);
+
+  // used to change the current popup menu index
+  if (wnd->current_menu != 0 && wnd->current_menu->selected_index > 0)
+    {
+    wnd->current_menu->selected_index--;
+    changed = true;
+    }
+
+  if (changed)
+    invalidate_rect(hwnd, 0);
+
+  return s_ok;
+  }
+
+static result_t on_menu_left(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+  {
+  bool changed = false;
+  layout_window_t *wnd = (layout_window_t *)parg;
+  const rect_t *wnd_rect;
+  get_window_rect(hwnd, &wnd_rect);
+
+  uint16_t id = msg->id;
+  int16_t value;
+  get_param_int16(msg, 0, &value);
+
+  if (wnd->current_menu != 0)
+    {
+    // close the popup and open the parent if any
+    close_menu(wnd);
+    changed = true;
+    }
+  else
+    {
+    }
+
+  if (changed)
+    invalidate_rect(hwnd, 0);
+
+  return s_ok;
+  }
+
+static result_t on_menu_right(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+  {
+  bool changed = false;
+  layout_window_t *wnd = (layout_window_t *)parg;
+  const rect_t *wnd_rect;
+  get_window_rect(hwnd, &wnd_rect);
+
+  uint16_t id = msg->id;
+  int16_t value;
+  get_param_int16(msg, 0, &value);
+
+  if (wnd->current_menu != 0)
+    {
+    menu_item_t *item = menu_item_at(wnd->current_menu, wnd->current_menu->selected_index);
+    if (item->item_type == mi_menu)
+      {
+      menu_item_menu_t *mi = (menu_item_menu_t *)item;
+      show_menu(wnd, mi->menu);     // show the popup
+      }
+    else if (item->item_type == mi_edit)
+      show_item_editor(wnd, item);
+    changed = true;
+    }
+
+  if (changed)
+    invalidate_rect(hwnd, 0);
+
+  return s_ok;
+  }
+
+static result_t on_ok(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+  {
+  bool changed = false;
+  layout_window_t *wnd = (layout_window_t *)parg;
+  const rect_t *wnd_rect;
+  get_window_rect(hwnd, &wnd_rect);
+
+  uint16_t id = msg->id;
+  int16_t value;
+  get_param_int16(msg, 0, &value);
+
+  // this is sent when an item is selected.  Only ever one
+  if (wnd->current_menu != 0)
+    {
+    menu_item_t *item = menu_item_at(wnd->current_menu, wnd->current_menu->selected_index);
+    if (item != 0)
+      (*item->evaluate)(wnd, item, msg);
+    }
+
+  if (changed)
+    invalidate_rect(hwnd, 0);
+
+  return s_ok;
+  }
+
+static result_t on_cancel(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+  {
+  layout_window_t *wnd = (layout_window_t *)parg;
+
+  close_menu(wnd);
+
+  return s_ok;
+  }
+
+static result_t on_paint(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+  {
+  bool changed = false;
+  layout_window_t *wnd = (layout_window_t *)parg;
+
+  begin_paint(hwnd);
+  update_window(hwnd, wnd);
+  end_paint(hwnd);
+
+  return s_ok;
+  }
+
 // we cache the font metrics for the layout window as loading them takes a while
 static const char *font_hints = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
 
@@ -1570,79 +1775,12 @@ result_t load_layout(handle_t hwnd, memid_t hive)
   char name[REG_NAME_MAX +1];
   uint16_t length = REG_NAME_MAX + 1;
   field_datatype type = field_key;
-  // must be 0 on first call
-  memid_t child = 0;
-  
-  while(succeeded(result = reg_enum_key(hive, &type, 0, 0, REG_NAME_MAX, name, &child)))
-    {
-    // open the window key
-    memid_t key;
-    if(failed(result = reg_open_key(hive, name, &key)))
-      return result;
 
-    // we create a widget and pickup the widget defined settings.
-    // these are:
-    // font -> name of the font to load
-    // color -> foreground color
-    // background -> back
-    
-    char widget_type[REG_STRING_MAX +1];
-    length = REG_STRING_MAX +1;
-    
-    int ordinal;
-    if(failed(lookup_enum(key, "type", layout_names, last_layout_enum, &ordinal)))
-      {
-      trace_warning("Section %s has a type of %s which is not recognised\n", name, widget_type);
-      continue;
-      }
-
-    trace_info("Create widget %s\n", name);
-    
-    handle_t hwnd;
-
-    switch(ordinal)
-      {
-      case airspeed_window :
-        create_airspeed_window(hwnd, child, &hwnd);
-        break;
-      case hsi_window :
-        create_hsi_window(hwnd, child, &hwnd);
-        break;
-      case attitude_window :
-        create_attitude_window(hwnd, child, &hwnd);
-        break;
-      case altitude_window :
-        create_altitude_window(hwnd, child, &hwnd);
-        break;
-      case gauge_window :
-        create_gauge_window(hwnd, child, &hwnd);
-        break;
-      case annunciator_window :
-        create_annunciator_window(hwnd, child, &hwnd);
-        break;
-      case gps_window :
-        create_gps_window(hwnd, child, &hwnd);
-       break;
-      case alert_window :
-        
-        break;
-      case widget :
-        create_widget(hwnd, child, &hwnd);
-        break;
-
-      default:
-        break;
-      }
-  
-    // field_datatype has the field type, name is the child name
-    type = field_key;
-    }
-
-  // we have loaded all of the widgets, now we try to load our menu
-  // create the window data.
   layout_window_t *wnd = (layout_window_t *)neutron_malloc(sizeof(layout_window_t));
   memset(wnd, 0, sizeof(layout_window_t));
 
+  // attach the window to the screen
+  wnd->window = hwnd;
   wnd->version = sizeof(layout_window_t);
 
   memid_t menu;
@@ -1699,7 +1837,92 @@ result_t load_layout(handle_t hwnd, memid_t hive)
   if (failed(lookup_font(menu, "font", font_hints, &wnd->font)))
     {
     // we always have the neo font.
+    if(failed(result = create_font("neo", 9, font_hints, &wnd->font)))
+      return result;
+    }
 
+  // attach all of our event handlers now
+  add_event(hwnd, id_paint, wnd, 0, on_paint, 0);
+  add_event(hwnd, id_key0, wnd, 0, on_key0, 0);
+  add_event(hwnd, id_key1, wnd, 0, on_key1, 0);
+  add_event(hwnd, id_key2, wnd, 0, on_key2, 0);
+  add_event(hwnd, id_key3, wnd, 0, on_key3, 0);
+  add_event(hwnd, id_key4, wnd, 0, on_key4, 0);
+  add_event(hwnd, id_decka, wnd, 0, on_decka, 0);
+  add_event(hwnd, id_deckb, wnd, 0, on_deckb, 0);
+  add_event(hwnd, id_menu_left, wnd, 0, on_menu_left, 0);
+  add_event(hwnd, id_menu_right, wnd, 0, on_menu_right, 0);
+  add_event(hwnd, id_menu_up, wnd, 0, on_menu_up, 0);
+  add_event(hwnd, id_menu_dn, wnd, 0, on_menu_dn, 0);
+  add_event(hwnd, id_menu_cancel, wnd, 0, on_cancel, 0);
+  add_event(hwnd, id_menu_ok, wnd, 0, on_ok, 0);
+
+  // must be 0 on first call
+  memid_t child = 0;
+
+  while (succeeded(result = reg_enum_key(hive, &type, 0, 0, REG_NAME_MAX, name, &child)))
+    {
+    // open the window key
+    memid_t key;
+    if (failed(result = reg_open_key(hive, name, &key)))
+      return result;
+
+    // we create a widget and pickup the widget defined settings.
+    // these are:
+    // font -> name of the font to load
+    // color -> foreground color
+    // background -> back
+
+    char widget_type[REG_STRING_MAX + 1];
+    length = REG_STRING_MAX + 1;
+
+    int ordinal;
+    if (failed(lookup_enum(key, "type", layout_names, last_layout_enum, &ordinal)))
+      {
+      trace_warning("Section %s has a type of %s which is not recognised\n", name, widget_type);
+      continue;
+      }
+
+    trace_info("Create widget %s\n", name);
+
+    handle_t hwnd;
+
+    switch (ordinal)
+      {
+      case airspeed_window:
+        create_airspeed_window(hwnd, child, &hwnd);
+        break;
+      case hsi_window:
+        create_hsi_window(hwnd, child, &hwnd);
+        break;
+      case attitude_window:
+        create_attitude_window(hwnd, child, &hwnd);
+        break;
+      case altitude_window:
+        create_altitude_window(hwnd, child, &hwnd);
+        break;
+      case gauge_window:
+        create_gauge_window(hwnd, child, &hwnd);
+        break;
+      case annunciator_window:
+        create_annunciator_window(hwnd, child, &hwnd);
+        break;
+      case gps_window:
+        create_gps_window(hwnd, child, &hwnd);
+        break;
+      case alert_window:
+
+        break;
+      case widget:
+        create_widget(hwnd, child, &hwnd);
+        break;
+
+      default:
+        break;
+      }
+
+    // field_datatype has the field type, name is the child name
+    type = field_key;
     }
 
   // store the parameters for the window

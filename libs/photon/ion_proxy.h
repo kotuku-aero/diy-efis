@@ -56,8 +56,10 @@ extern "C" {
 
 #define WINDOW_QUEUE_SIZE 128
 
+struct _event_proxy_t;
+
 // event handler callback
-typedef result_t (*event_handler_fn)(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg);
+typedef result_t (*event_handler_fn)(handle_t hwnd, struct _event_proxy_t *proxy,  const canmsg_t *msg);
 
 // this structure is used to hold a callback
 typedef struct _event_proxy_t {
@@ -65,6 +67,7 @@ typedef struct _event_proxy_t {
   event_handler_fn callback;      // callback to execute
   const char *func;               // optional callback name
   void *parg;                     // user defined argument
+  struct _event_proxy_t *previous;  // chain of event handlers.  The callback can use this
   } event_proxy_t;
 
 // shared structure for all canvas's
@@ -99,8 +102,6 @@ typedef struct _window_t
     void *wnd_data;
     // Array of event handlers for a window.  The well-known ones are cached
     handle_t events;
-    event_proxy_t *on_draw_background;   // called when a draw background event is received
-    event_proxy_t *on_paint;             // called when a paint event occurs
   } window_t;
 
 typedef struct _screen_t
@@ -112,12 +113,8 @@ typedef struct _screen_t
   msg_hook_t msg_hook;
   // this holds the fonts
   handle_t fonts;
-  // This is the script engine that is associated with the layout.. Each
-  // scriptlet that is loaded has its own context so it can be released
-  // separately
+  // ECMA script interpreter for the screen
   ion_context_t *context;
-  // array of scripts that are loaded
-  handle_t scriptlets;
   } screen_t;
 
 static inline result_t as_screen(handle_t handle, screen_t **screen)
@@ -170,20 +167,18 @@ extern result_t release_proxy(handle_t handle);
  * @param parg    Optional argument to be passed to the callback
  * @param func    Optional function name to be passed to the callback
  * @param callback  Function to call when the event occurs
- * @param previous  Optional structure to receive previous callback (if defined).  If not provided then the previous callback
- * is erased.
  * @return s_ok if the event is hooked.
  */
-extern result_t add_event(handle_t hwnd, uint16_t id, void *parg, const char *func, event_handler_fn callback, event_proxy_t *previous);
+extern result_t add_event(handle_t hwnd, uint16_t id, void *parg, const char *func, event_handler_fn callback);
 /**
  * @function result_t remove_event(uint16_t id, proxy_t *previous)
  * Remove an event handler
  * @param hwnd      Window to release
  * @param id        ID of the handler to remove
- * @param previous  If provided, the event handler will be replaced with the previous handler
+ * @param head_only True if remove only the first handler in the chain.
  * @return s_ok if the event is removed
  */
-extern result_t remove_event(handle_t hwnd, uint16_t id, event_proxy_t *previous);
+extern result_t remove_event(handle_t hwnd, uint16_t id, bool head_only);
 /**
  * @function result_t find_event(uint16_t id, proxy_t *details)
  * Find an event handler given the requested id
@@ -192,7 +187,7 @@ extern result_t remove_event(handle_t hwnd, uint16_t id, event_proxy_t *previous
  * @param details   Details of the handler
  * @return s_ok if the handler was found ok
  */
-extern result_t find_event(handle_t hwnd, uint16_t id, event_proxy_t *details);
+extern result_t find_event(handle_t hwnd, uint16_t id, event_proxy_t **details);
 
 #ifdef __cplusplus
 }
