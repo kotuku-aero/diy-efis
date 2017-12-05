@@ -19,14 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\libs\photon\ion_proxy.c" />
+    <ClCompile Include="..\..\libs\photon\font.c" />
+    <ClCompile Include="..\..\libs\photon\window.c" />
     <ClCompile Include="..\..\libs\photon\photon.c" />
     <ClCompile Include="..\..\libs\photon\truetype.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\libs\photon\ion_proxy.h" />
+    <ClInclude Include="..\..\libs\photon\font.h" />
+    <ClInclude Include="..\..\libs\photon\window.h" />
     <ClInclude Include="..\..\libs\photon\photon.h" />
-    <ClInclude Include="..\..\libs\photon\truetype.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

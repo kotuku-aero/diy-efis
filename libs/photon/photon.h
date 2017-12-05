@@ -259,9 +259,9 @@ extern result_t create_child_window(handle_t parent, const rect_t *bounds, wndpr
 extern result_t get_window_rect(handle_t window, rect_t *rect);
 /**
  * @function get_wnddata(handle_t window, void **wnd_data)
- * Get data associated with a window
+ * Get stream associated with a window
  * @param window    handle to window
- * @param wnd_data  data pointer associated with window
+ * @param wnd_data  stream pointer associated with window
  * @return s_ok if received ok
  */
 extern result_t get_wnddata(handle_t window, void **wnd_data);
@@ -340,8 +340,8 @@ extern result_t get_z_order(handle_t wnd, uint8_t *z_order);
 extern result_t set_z_order(handle_t wnd, uint8_t z_order);
 /**
  * @function set_wnddata(handle_t window, void *wnd_data)
- * Set window data
- * @param window      Window to associate data with
+ * Set window stream
+ * @param window      Window to associate stream with
  * @param wnd_data    Data pointer
  * @return s_ok if set ok
  */
@@ -457,9 +457,9 @@ extern result_t detach_all_scripts(handle_t screen);
  */
 extern result_t canvas_close(handle_t hwnd);
 /**
- * @function create_rect_canvas(const extent_t *size, handle_t *hndl)
+ * @function create_rect_canvas(const extent_t *length, handle_t *hndl)
  * Create an off screen canvas
- * @param size    dimensions of the display context
+ * @param length    dimensions of the display context
  * @param hndl    created handle
  * @return s_ok if enough memory for canvas
  */
@@ -474,7 +474,7 @@ extern result_t create_rect_canvas(const extent_t *size, handle_t *hndl);
  */
 extern result_t create_bitmap_canvas(const bitmap_t *bitmap, handle_t *hndl);
 /**
- * Get the size of a canvas
+ * Get the length of a canvas
  * @param canvas  Canvas to query
  * @param extent  extents of the canvas
  * @return s_ok if a valid canvas

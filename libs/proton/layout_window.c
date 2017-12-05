@@ -37,7 +37,7 @@ it must be removed as soon as possible after the code fragment is identified.
 #include "regex.h"
 #include "pens.h"
 
-#include "../photon/ion_proxy.h"
+#include "../photon/window.h"
 
 extern result_t create_airspeed_window(handle_t parent, memid_t section, handle_t *hwnd);
 extern result_t create_altitude_window(handle_t parent, memid_t section, handle_t *hwnd);
@@ -1301,24 +1301,13 @@ static result_t layout_wndproc(handle_t hwnd, const canmsg_t *msg)
   {
   bool changed = false;
   layout_window_t *wnd;
-  get_wnddata(hwnd, (void **)&wnd);
-
   uint16_t count;
   uint16_t item;
-  // now we work through the event handlers.  These can either be 
-  // the built in ones, or overloaded javascript handlers.
-  window_t *window;
-  if (succeeded(as_window(hwnd, &window)))
-    {
-    vector_count(window->events, &count);
-    event_proxy_t *proxy;
-    for (item = 0; item < count; item++)
-      {
-      vector_at(window->events, item, &proxy);
-      if (proxy != 0)
-        (*proxy->callback)(hwnd, proxy->parg, proxy->func, msg);
-      }
-    }
+
+  get_wnddata(hwnd, (void **)&wnd);
+
+  // do the default processing (calls event handlers)
+  defwndproc(hwnd, msg);
 
   // we go through all of the menu items and check to see if they are
   // listening, and if their state has changed
@@ -1753,18 +1742,6 @@ static result_t on_cancel(handle_t hwnd, void *parg, const char *func, const can
   return s_ok;
   }
 
-static result_t on_paint(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
-  {
-  bool changed = false;
-  layout_window_t *wnd = (layout_window_t *)parg;
-
-  begin_paint(hwnd);
-  update_window(hwnd, wnd);
-  end_paint(hwnd);
-
-  return s_ok;
-  }
-
 // we cache the font metrics for the layout window as loading them takes a while
 static const char *font_hints = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
 
@@ -1842,20 +1819,19 @@ result_t load_layout(handle_t hwnd, memid_t hive)
     }
 
   // attach all of our event handlers now
-  add_event(hwnd, id_paint, wnd, 0, on_paint, 0);
-  add_event(hwnd, id_key0, wnd, 0, on_key0, 0);
-  add_event(hwnd, id_key1, wnd, 0, on_key1, 0);
-  add_event(hwnd, id_key2, wnd, 0, on_key2, 0);
-  add_event(hwnd, id_key3, wnd, 0, on_key3, 0);
-  add_event(hwnd, id_key4, wnd, 0, on_key4, 0);
-  add_event(hwnd, id_decka, wnd, 0, on_decka, 0);
-  add_event(hwnd, id_deckb, wnd, 0, on_deckb, 0);
-  add_event(hwnd, id_menu_left, wnd, 0, on_menu_left, 0);
-  add_event(hwnd, id_menu_right, wnd, 0, on_menu_right, 0);
-  add_event(hwnd, id_menu_up, wnd, 0, on_menu_up, 0);
-  add_event(hwnd, id_menu_dn, wnd, 0, on_menu_dn, 0);
-  add_event(hwnd, id_menu_cancel, wnd, 0, on_cancel, 0);
-  add_event(hwnd, id_menu_ok, wnd, 0, on_ok, 0);
+  add_event(hwnd, id_key0, wnd, 0, on_key0);
+  add_event(hwnd, id_key1, wnd, 0, on_key1);
+  add_event(hwnd, id_key2, wnd, 0, on_key2);
+  add_event(hwnd, id_key3, wnd, 0, on_key3);
+  add_event(hwnd, id_key4, wnd, 0, on_key4);
+  add_event(hwnd, id_decka, wnd, 0, on_decka);
+  add_event(hwnd, id_deckb, wnd, 0, on_deckb);
+  add_event(hwnd, id_menu_left, wnd, 0, on_menu_left);
+  add_event(hwnd, id_menu_right, wnd, 0, on_menu_right);
+  add_event(hwnd, id_menu_up, wnd, 0, on_menu_up);
+  add_event(hwnd, id_menu_dn, wnd, 0, on_menu_dn);
+  add_event(hwnd, id_menu_cancel, wnd, 0, on_cancel);
+  add_event(hwnd, id_menu_ok, wnd, 0, on_ok);
 
   // must be 0 on first call
   memid_t child = 0;

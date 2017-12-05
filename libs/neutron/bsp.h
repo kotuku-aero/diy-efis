@@ -142,15 +142,6 @@ typedef struct _canvas_t
   fast_line_fn fast_line;
   fast_copy_fn fast_copy;
   copy_bitmap_fn bitmap_copy;
-  // default font char size
-  // is the default reference character width in 1/64 points.
-  // generally a 9pt font so will be 56,56
-  point_t default_char_metrics;
-  // default screen mapping
-  // sets the pixels per inch.
-  // dependent on the display.  The physical display
-  // is coded in the HAL and will be used for each canvas created
-  point_t default_device_metrics;
   } canvas_t;
 
 /**

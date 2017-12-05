@@ -1355,12 +1355,20 @@ extern result_t vector_erase(vector_t hndl, uint16_t at);
  * @function vector_append(vector_t hndl, uint16_t length, const void *elements)
  * Append the elements to a vector
  * @param hndl      Vector to change
- * @param at        position in the vector
  * @param length    Number of elements to append
  * @param elements  Elements to add to the vector
  * @return s_ok if elements appended ok
  */
 extern result_t vector_append(vector_t hndl, uint16_t length, const void *elements);
+/**
+* @function vector_truncate(vector_t hndl, uint16_t length)
+* set the length of the vector to the requested length
+* @param hndl      Vector to change
+* @param length    Number of elements to append
+* @return s_ok if vector truncated to size, if the size of the vector is less
+* than the length then e_invalid_argument is returned
+*/
+extern result_t vector_truncate(vector_t hndl, uint16_t length);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
