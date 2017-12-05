@@ -62,6 +62,8 @@ typedef struct _airspeed_window_t {
   pen_t pen;
   handle_t  font;
 	bool draw_border;
+  handle_t large_roller;
+  handle_t small_roller;
 } airspeed_window_t;
  
 static result_t widget_wndproc(handle_t hwnd, const canmsg_t *data);
@@ -71,7 +73,7 @@ result_t create_airspeed_window(handle_t parent, memid_t key, handle_t *hwnd)
 	result_t result;
 	
   // create our window
-	if(failed(create_child_widget(parent, key, widget_wndproc, hwnd)))
+	if(failed(result = create_child_widget(parent, key, widget_wndproc, hwnd)))
 		return result;
 	
   // create the window data.
@@ -97,6 +99,23 @@ result_t create_airspeed_window(handle_t parent, memid_t key, handle_t *hwnd)
   
 	if(failed(lookup_font(key, "font", &wnd->font)))
     {
+    // we always have the neo font.
+    if (failed(result = create_font("neo", 9, 0, &wnd->font)))
+      return result;
+    }
+
+  if (failed(lookup_font(key, "large-font", &wnd->large_roller)))
+    {
+    // we always have the neo font.
+    if (failed(result = create_font("neo", 15, 0, &wnd->font)))
+      return result;
+    }
+
+  if (failed(lookup_font(key, "small-font", &wnd->small_roller)))
+    {
+    // we always have the neo font.
+    if (failed(result = create_font("neo", 12, 0, &wnd->font)))
+      return result;
     }
 
   if(failed(lookup_color(key, "back-color", &wnd->background_color)))
@@ -167,7 +186,7 @@ static void update_window(handle_t hwnd, airspeed_window_t *wnd)
       char str[64];
       sprintf(str, "%d",(int)asi_line / 10);
 
-      size_t len = strlen(str);
+      uint16_t len = strlen(str);
       extent_t size;
       text_extent(hwnd, wnd->font, str, len, &size);
       point_t pt;
@@ -199,7 +218,8 @@ static void update_window(handle_t hwnd, airspeed_window_t *wnd)
 
   // now we draw the roller
   display_roller(hwnd, make_rect(1, median-19, 39, median+19, &rect), 
-                 wnd->airspeed, 1, color_black, color_white);
+                 wnd->airspeed, 1, color_black, color_white,
+                 wnd->large_roller, wnd->small_roller);
 
   // finally draw the markers that indicate the v-speeds
   // each knot is 10 pixels in the y direction

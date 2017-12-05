@@ -705,10 +705,15 @@ static void fb_run(void *parg)
   semaphore_create(&semp);
   while(true)
     {
-    wait(semp, 30);       // 30hz update
+    semaphore_wait(semp, 30);       // 30hz update
 
     bsp_sync();
     }
+  }
+
+result_t bsp_sync_framebuffer()
+  {
+
   }
 
 // this is the actual memory mapped fb_buffer

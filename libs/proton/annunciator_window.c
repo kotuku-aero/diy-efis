@@ -95,14 +95,18 @@ result_t create_annunciator_window(handle_t parent, memid_t key, handle_t *hwnd)
   invalidate_rect(*hwnd, &rect);
 
   // get the small font
-  if (failed(result = lookup_font(key, "small-font", wnd->small_font)))
+  if (failed(lookup_font(key, "small-font", wnd->small_font)))
     {
-
+    // we always have the neo font.
+    if (failed(result = create_font("neo", 9, 0, &wnd->small_font)))
+      return result;
     }
 
-  if (failed(result = lookup_font(key, "large-font", wnd->large_font)))
+  if (failed(lookup_font(key, "large-font", wnd->large_font)))
     {
-
+    // we always have the neo font.
+    if (failed(result = create_font("neo", 15, 0, &wnd->large_font)))
+      return result;
     }
 
   return s_ok;

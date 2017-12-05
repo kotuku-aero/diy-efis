@@ -46,7 +46,6 @@ extern result_t create_attitude_window(handle_t parent, memid_t section, handle_
 extern result_t create_gauge_window(handle_t parent, memid_t section, handle_t *hwnd);
 extern result_t create_gps_window(handle_t parent, memid_t section, handle_t *hwnd);
 extern result_t create_hsi_window(handle_t parent, memid_t section, handle_t *hwnd);
-extern result_t create_menu_window(handle_t parent, memid_t section, handle_t *hwnd);
 
   enum window_type
     {
@@ -1276,7 +1275,7 @@ static result_t find_menu(layout_window_t *wnd, const char *name, menu_t **menu)
       return result;
       }
 
-    popup->name = strdup(name);
+    popup->name = neutron_strdup(name);
     vector_create(sizeof(menu_item_t *), &popup->menu_items);
 
     memid_t item_key = 0;
@@ -1297,7 +1296,7 @@ static result_t find_menu(layout_window_t *wnd, const char *name, menu_t **menu)
   }
 
 
-static result_t layout_wndproc(handle_t hwnd, const canmsg_t *msg)
+result_t layout_wndproc(handle_t hwnd, const canmsg_t *msg)
   {
   bool changed = false;
   layout_window_t *wnd;
@@ -1811,7 +1810,7 @@ result_t load_layout(handle_t hwnd, memid_t hive)
     lookup_pen(pen_key, &wnd->border_pen);
 
   // check for the font
-  if (failed(lookup_font(menu, "font", font_hints, &wnd->font)))
+  if (failed(lookup_font(menu, "font",  &wnd->font)))
     {
     // we always have the neo font.
     if(failed(result = create_font("neo", 9, font_hints, &wnd->font)))
@@ -1890,7 +1889,7 @@ result_t load_layout(handle_t hwnd, memid_t hive)
 
         break;
       case widget:
-        create_widget(hwnd, child, &hwnd);
+        //create_widget(hwnd, child, &hwnd);
         break;
 
       default:

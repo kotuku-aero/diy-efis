@@ -92,8 +92,11 @@ result_t create_gps_window(handle_t parent, memid_t key, handle_t *hwnd)
   
   wnd->time_to_next = -1;
   
-  if(failed(lookup_font(key, "font", &wnd->font)))
+  if (failed(lookup_font(key, "font", &wnd->font)))
     {
+    // we always have the neo font.
+    if (failed(result = create_font("neo", 9, 0, &wnd->font)))
+      return result;
     }
   
   text_extent(hwnd, wnd->font, "M", 1, &wnd->font_cell_size);

@@ -38,7 +38,7 @@ it must be removed as soon as possible after the code fragment is identified.
 typedef struct _vector_impl_t {
   size_t version;
   uint16_t element_size;  // how large each element is
-  byte_t *buffer;     // buffer of data
+  byte_t *buffer;      // buffer of data
   uint16_t length;      // how much data allocated
   uint16_t end;         // end of the vector
 
@@ -245,6 +245,26 @@ result_t vector_count(handle_t hndl, uint16_t *value)
 
   vector_impl_t *vec = (vector_impl_t *)hndl;
   *value = vec->length;
+
+  return s_ok;
+  }
+
+result_t vector_truncate(handle_t hndl, uint16_t length)
+  {
+  result_t result;
+  if (hndl == 0)
+    return e_bad_parameter;
+
+  if (failed(result = is_valid_vector(hndl)))
+    return result;
+
+  vector_impl_t *vec = (vector_impl_t *)hndl;
+
+  if(vec->length < length)
+    return e_bad_parameter;
+
+  // elements past the length are lost
+  vec->length = length;
 
   return s_ok;
   }

@@ -65,7 +65,6 @@ typedef struct _hsi_window_t {
   handle_t  font;
   } hsi_window_t;
 
-
 static result_t widget_wndproc(handle_t hwnd, const canmsg_t *data);
 
 result_t create_hsi_window(handle_t parent, memid_t key, handle_t *hwnd)
@@ -87,7 +86,12 @@ result_t create_hsi_window(handle_t parent, memid_t key, handle_t *hwnd)
 
   reg_get_bool(key, "draw-border", &wnd->draw_border);
 
-  lookup_font(key, "font", &wnd->font);
+  if (failed(lookup_font(key, "font", 0, &wnd->font)))
+    {
+    // we always have the neo font.
+    if (failed(result = create_font("neo", 9, 0, &wnd->font)))
+      return result;
+    }
 
   // store the parameters for the window
   set_wnddata(*hwnd, wnd);
@@ -355,19 +359,19 @@ static void update_window(handle_t hwnd, hsi_window_t *wnd)
   sprintf(msg, "%d", wnd->distance_to_waypoint);
   length = strlen(msg);
   text_extent(wnd, wnd->font, msg, length, &pixels);
-  draw_text(hwnd, &wnd_rect, &arial_9_font, color_yellow, color_hollow,
+  draw_text(hwnd, &wnd_rect, wnd->font, color_yellow, color_hollow,
     msg, length, make_point(window_x - 25 - (pixels.dx >> 1), 2, &pt), 0, 0, 0);
 
   sprintf(msg, "%02.2d:%02.2d", wnd->time_to_waypoint / 60, wnd->time_to_waypoint % 60);
   length = strlen(msg);
   text_extent(wnd, wnd->font, msg, length, &pixels);
-  draw_text(hwnd, &wnd_rect, &arial_9_font, color_yellow, color_hollow,
+  draw_text(hwnd, &wnd_rect, wnd->font, color_yellow, color_hollow,
     msg, length, make_point(window_x - 25 - (pixels.dx >> 1), 13, &pt), 0, 0, 0);
 
   sprintf(msg, "%s", wnd->waypoint_name);
   length = strlen(msg);
   text_extent(wnd, wnd->font, msg, length, &pixels);
-  draw_text(hwnd, &wnd_rect, &arial_9_font, color_yellow, color_hollow,
+  draw_text(hwnd, &wnd_rect, wnd->font, color_yellow, color_hollow,
     msg, length, make_point(window_x - 25 - (pixels.dx >> 1), 24, &pt), 0, 0, 0);
   }
 

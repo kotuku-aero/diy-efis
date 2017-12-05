@@ -395,7 +395,7 @@ result_t bsp_send_can(const canmsg_t *msg)
 
   return slcan_send(driver, msg);
   }
-
+/*
 #include "../../libs/neutron/stream.h"
 
 typedef struct _win_stream_handle_t {
@@ -532,3 +532,4 @@ result_t manifest_open(const char *path, handle_t *stream)
   *stream = resource_stream;
   return s_ok;
   }
+*/

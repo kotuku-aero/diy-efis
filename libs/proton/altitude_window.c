@@ -39,7 +39,7 @@ it must be removed as soon as possible after the code fragment is identified.
 
 typedef struct _vsi_markers {
 	const char *text;
-	size_t length;
+	uint16_t length;
 	int pos;
 } vsi_markers;
 
@@ -53,8 +53,8 @@ typedef struct _altitude_window_t {
   color_t text_color;
   pen_t pen;
   handle_t  font;      // arial 9
-  handle_t  small_roller;  // arial 12
-  handle_t  large_roller;  // arial 15
+  handle_t  small_roller;  // neo 12
+  handle_t  large_roller;  // neo 15
 } altitude_window_t;
  
 static result_t widget_wndproc(handle_t hwnd, const canmsg_t *data);
@@ -64,7 +64,7 @@ result_t create_altitude_window(handle_t parent, memid_t key, handle_t *hwnd)
   result_t result;
 	
   // create our window
-	if(failed(create_child_widget(parent, key, widget_wndproc, hwnd)))
+	if(failed(result = create_child_widget(parent, key, widget_wndproc, hwnd)))
 		return result;
 	
   // create the window data.
@@ -73,9 +73,26 @@ result_t create_altitude_window(handle_t parent, memid_t key, handle_t *hwnd)
   
   wnd->version = sizeof(altitude_window_t);
   
-  lookup_font(key, "font", &wnd->font);
-  lookup_font(key, "large-font", &wnd->large_roller);
-  lookup_font(key, "small-font", &wnd->small_roller);
+  if (failed(lookup_font(key, "font", &wnd->font)))
+    {
+    // we always have the neo font.
+    if (failed(result = create_font("neo", 9, 0, &wnd->font)))
+      return result;
+    }
+
+  if (failed(lookup_font(key, "large-font", &wnd->large_roller)))
+    {
+    // we always have the neo font.
+    if (failed(result = create_font("neo", 15, 0, &wnd->font)))
+      return result;
+    }
+
+  if (failed(lookup_font(key, "small-font", &wnd->small_roller)))
+    {
+    // we always have the neo font.
+    if (failed(result = create_font("neo", 12, 0, &wnd->font)))
+      return result;
+    }
 
   if(failed(lookup_color(key, "back-color", &wnd->background_color)))
     wnd->background_color = color_black;
@@ -146,7 +163,7 @@ static void update_window(handle_t hwnd, altitude_window_t *wnd)
 
 	// the vertical tape displays 250 ft = 20 pixels
 	gdi_dim_t num_pixels = rect_height(&paint_area) >> 1;
-	float num_grads = num_pixels / 20;
+	float num_grads = num_pixels / 20.0;
 	num_grads *= 250;           // altitude offset
 
 	num_grads += 8;
@@ -178,7 +195,7 @@ static void update_window(handle_t hwnd, altitude_window_t *wnd)
 			{
 			sprintf(str, "%d",(int)line_altitude);
 
-			size_t len = strlen(str);
+			uint16_t len = strlen(str);
 			extent_t size;
       text_extent(hwnd, wnd->font, str, len, &size);
       point_t pt;
@@ -213,7 +230,7 @@ static void update_window(handle_t hwnd, altitude_window_t *wnd)
 	rect_t text_rect;
   (36, median_y-19, 88, median_y+19);
 	display_roller(hwnd, make_rect(36, median_y-19, ex.dx-8, median_y+19, &text_rect),
-                 wnd->altitude, 2, wnd->background_color, wnd->text_color);
+                 wnd->altitude, 2, wnd->background_color, wnd->text_color, wnd->large_roller, wnd->small_roller);
 
 	/////////////////////////////////////////////////////////////////////////////
 	//
@@ -279,7 +296,7 @@ static void update_window(handle_t hwnd, altitude_window_t *wnd)
 
 	sprintf(str, "%d", vs);
 
-	size_t len = strlen(str);
+  uint16_t len = strlen(str);
 	extent_t size;
   text_extent(hwnd, wnd->font, str, len, &size);
   point_t pt;

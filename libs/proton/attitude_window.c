@@ -114,9 +114,11 @@ result_t create_attitude_window(handle_t parent, memid_t key, handle_t *hwnd)
   else
     wnd->median.y = rect_height(&wnd_rect) >> 1;
 
-  if (failed(result = lookup_font(key, "font", &wnd->font)))
+  if (failed(lookup_font(key, "font", &wnd->font)))
     {
-
+    // we always have the neo font.
+    if (failed(result = create_font("neo", 9, 0, &wnd->font)))
+      return result;
     }
 
   // store the parameters for the window

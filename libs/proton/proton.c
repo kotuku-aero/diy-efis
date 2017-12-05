@@ -33,10 +33,7 @@ then the origional copyright notice is to be respected.
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
-#include "fonts.h"
-
 #include "../neutron/bsp.h"
-#include "../photon/ion_proxy.h"
 
 extern result_t layout_wndproc(handle_t hwnd, const canmsg_t *msg);
 

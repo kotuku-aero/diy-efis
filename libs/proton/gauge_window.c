@@ -180,8 +180,11 @@ result_t create_gauge_window(handle_t parent, memid_t key, handle_t *hwnd)
   reg_get_uint16(key, "reset-id", &wnd->reset_label);
   reg_get_float(key, "reset-value",&wnd->reset_value);
 
-  if(failed(lookup_font(key, "font", &wnd->font)))
+  if(failed(lookup_font(key, "font", 0, &wnd->font)))
     {
+    // we always have the neo font.
+    if (failed(result = create_font("neo", 9, 0, &wnd->font)))
+      return result;
     }
 
   if (failed(reg_get_int16(key, "center-x", &int_value)))
@@ -205,9 +208,12 @@ result_t create_gauge_window(handle_t parent, memid_t key, handle_t *hwnd)
     if(failed(lookup_color(key, "name-color", &wnd->name_color)))
       wnd->name_color = color_white;
 
-    if(failed(lookup_font(key, "name-font", &wnd->name_font)))
-     {
-     }
+    if (failed(lookup_font(key, "name-font", &wnd->name_font)))
+      {
+      // we always have the neo font.
+      if (failed(result = create_font("neo", 9, 0, &wnd->name_font)))
+        return result;
+      }
 
     if(failed(reg_get_int16(key, "name-x", &int_value)))
       wnd->name_pt.x = wnd->center.x;
@@ -234,8 +240,11 @@ result_t create_gauge_window(handle_t parent, memid_t key, handle_t *hwnd)
 
   if(wnd->draw_value)
     {
-    if(failed(lookup_font(key, "value-font", &wnd->value_font)))
+    if (failed(lookup_font(key, "value-font", &wnd->value_font)))
       {
+      // we always have the neo font.
+      if (failed(result = create_font("neo", 9, 0, &wnd->value_font)))
+        return result;
       }
 
     // default values

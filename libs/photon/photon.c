@@ -2741,7 +2741,7 @@ result_t draw_text(handle_t hndl, const rect_t *clip_rect, handle_t  fp,
           uint16_t alpha_pel = bit * alpha(fg);
           alpha_pel >>= 8;
 
-          (*canvas->set_pixel)(canvas, &pos, rgba(alpha_pel, ref(fg), green(fg), blue(fg)));
+          (*canvas->set_pixel)(canvas, &pos, rgba(alpha_pel, red(fg), green(fg), blue(fg)));
           }
 
         offset++;
