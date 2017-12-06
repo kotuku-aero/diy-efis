@@ -193,16 +193,16 @@ static inline int32_t read_int32_setpos(handle_t stream, uint16_t offset)
   return read_int32(stream);
   }
 
-static result_t get_index(handle_t stream, uint16_t offset, tt_stream_index_t *index)
+static result_t get_index(handle_t stream, uint16_t offset, uint16_t *index)
   {
   uint32_t value;
 
   offset += 8;          // skip the name and checksum
   value = read_uint32(stream);
-  index->offset = (uint16_t)value;
+  *index = (uint16_t)value;
 
+  // length not used.
   value = read_uint32(stream);
-  index->length = (uint16_t)value;
 
   return s_ok;
   }
@@ -220,7 +220,7 @@ static inline bool is_str(uint32_t value, const char *str)
   return is_tag(value, (uint8_t)str[0], (uint8_t)str[1], (uint8_t)str[2], (uint8_t)str[3]);
   }
 
-static result_t find_table(handle_t stream, const char *tag, tt_stream_index_t *index)
+static result_t find_table(handle_t stream, const char *name, uint16_t *index)
   {
   int32_t num_tables = read_uint16_setpos(stream, 4);
   int32_t i;
@@ -229,12 +229,12 @@ static result_t find_table(handle_t stream, const char *tag, tt_stream_index_t *
     {
     stream_setpos(stream, loc);
 
-    if (is_str(read_uint32(stream), tag))
+    uint32_t tag = read_uint32(stream);
+    if (is_str(tag, name))
       {
-      // skip the checksum
-      stream_setpos(stream, loc + 8);
-      index->offset = read_uint32_setpos(stream, loc + 8);
-      index->length = read_uint32(stream);
+      read_uint32(stream);    // skip the checksum
+      *index = read_uint32(stream);
+      read_uint32(stream);    // skip the length
 
       return s_ok;
       }
@@ -248,10 +248,12 @@ static result_t find_table(handle_t stream, const char *tag, tt_stream_index_t *
 result_t init_font(fontinfo_t *info, handle_t stream)
   {
   result_t result;
-  tt_stream_index_t cmap;
-  int32_t i, numTables;
+  uint16_t cmap;
+  int32_t i;
 
   info->stream = stream;
+
+  uint32_t version = read_uint32(stream);
 
   if (failed(result = find_table(stream, "cmap", &cmap)) ||
     failed(result = find_table(stream, "loca", &info->loca)) ||
@@ -261,49 +263,60 @@ result_t init_font(fontinfo_t *info, handle_t stream)
     failed(result = find_table(stream, "hmtx", &info->hmtx)))
     return result;
 
-  tt_stream_index_t maxp;
+  uint16_t maxp;
   if (failed(result = find_table(stream, "maxp", &maxp)))
-    info->numGlyphs = 0xffff;
+    info->num_glyphs = -1;
   else
-    info->numGlyphs = read_uint16_setpos(stream, maxp.offset + 4);
+    info->num_glyphs = read_int16_setpos(stream, maxp + 4);
 
   // find a cmap encoding table we understand *now* to avoid searching
   // later. (todo: could make this installable)
   // the same regardless of glyph.
-  numTables = read_uint16_setpos(stream, cmap.offset + 2);
+  uint16_t cmap_version = read_uint16_setpos(stream, cmap);
+  uint16_t num_cmap_tables = read_uint16_setpos(stream, cmap + 2);
   info->index_map = 0;
-  for (i = 0; i < numTables; ++i)
+  for (i = 0; i < num_cmap_tables; ++i)
     {
+    uint16_t platform_id = read_uint16(stream);
+    uint16_t encoding_id = read_uint16(stream);
+    uint32_t offset = read_uint32(stream);
+
     // find an encoding we understand:
-    switch (read_uint16(stream))
+    switch (platform_id)
       {
       case 3:             // PLATFORM_ID_MICROSOFT
-        switch (read_uint16(stream))
+        switch (encoding_id)
           {
           case 1:         // UNICODE BMP
           case 10:        // UNICODE FULL
             // MS/Unicode
-            info->index_map = (uint16_t)cmap.offset + read_uint32(stream);
+            info->index_map = cmap + (uint16_t)offset;
             break;
           }
         break;
       case 0:               // PLATFORM_ID_UNICODE
         // Mac/iOS has these
         // all the encodingIDs are unicode, so we don't bother to check it
-        info->index_map = cmap.offset + read_uint32(stream);
+        info->index_map = cmap + (uint16_t)offset;
         break;
       }
     }
+
   if (info->index_map == 0)
     return 0;
 
-  info->indexToLocFormat = read_uint16_setpos(stream, info->head.offset + 50);
-  return 1;
+  info->index_to_location_format = read_uint16_setpos(stream, info->head + 50);
+  return s_ok;
   }
 
-result_t find_glyph_index(const fontinfo_t *info, uint16_t unicode_codepoint, uint16_t *value)
+result_t find_glyph_index(const fontinfo_t *info, uint16_t unicode_codepoint, uint16_t *glyph_offset)
   {
   uint32_t index_map = info->index_map;
+
+  if(glyph_offset == 0)
+    return e_bad_parameter;
+
+  *glyph_offset = 0;
 
   uint16_t format = read_uint16_setpos(info->stream, index_map + 0);
   if (format == 0)
@@ -311,7 +324,7 @@ result_t find_glyph_index(const fontinfo_t *info, uint16_t unicode_codepoint, ui
     int32_t bytes = read_uint16_setpos(info->stream, index_map + 2);
     if (unicode_codepoint < bytes - 6)
       {
-      *value = read_uint8_setpos(info->stream, index_map + 6 + unicode_codepoint);
+      *glyph_offset = read_uint8_setpos(info->stream, index_map + 6 + unicode_codepoint);
       return s_ok;
       }
     return e_not_found;
@@ -322,7 +335,7 @@ result_t find_glyph_index(const fontinfo_t *info, uint16_t unicode_codepoint, ui
     uint32_t count = read_uint16_setpos(info->stream, index_map + 8);
     if ((uint32_t)unicode_codepoint >= first && (uint32_t)unicode_codepoint < first + count)
       {
-      *value = read_uint16_setpos(info->stream, index_map + 10 + (unicode_codepoint - first) * 2);
+      *glyph_offset = read_uint16_setpos(info->stream, index_map + 10 + (unicode_codepoint - first) * 2);
       return s_ok;
       }
     return e_not_found;
@@ -332,49 +345,40 @@ result_t find_glyph_index(const fontinfo_t *info, uint16_t unicode_codepoint, ui
     return e_not_found;
     }
   else if (format == 4)
-    { // standard mapping for windows fonts: binary search collection of ranges
-    uint16_t segcount = read_uint16_setpos(info->stream, index_map + 6) >> 1;
-    uint16_t searchRange = read_uint16_setpos(info->stream, index_map + 8) >> 1;
-    uint16_t entrySelector = read_uint16_setpos(info->stream, index_map + 10);
-    uint16_t rangeShift = read_uint16_setpos(info->stream, index_map + 12) >> 1;
+    { // standard mapping for windows fonts: binary end_count_pos collection of ranges
+    read_uint16(info->stream);      // length
+    read_uint16(info->stream);      // version
+    uint16_t seg_count = read_uint16(info->stream) >> 1;
+    uint16_t search_range = read_uint16(info->stream) >> 1;
+    uint16_t entry_selector = read_uint16(info->stream);
+    uint16_t range_shift = read_uint16(info->stream) >> 1;
 
-    // do a binary search of the segments
-    uint32_t endCount = index_map + 14;
-    uint32_t search = endCount;
-
+    // do a binary end_count_pos of the segments
     if (unicode_codepoint > 0xffff)
       return e_not_found;
 
-    // they lie from endCount .. endCount + segCount
-    // but searchRange is the nearest power of two, so...
-    if (unicode_codepoint >= read_uint16_setpos(info->stream, search + rangeShift * 2))
-      search += rangeShift * 2;
+    uint16_t end_count_pos;
+    stream_getpos(info->stream, &end_count_pos);
+    uint16_t start_count_pos = end_count_pos + (seg_count << 1) + 2;
+    uint16_t delta_pos = start_count_pos + (seg_count << 1);
+    uint16_t range_pos = delta_pos + (seg_count << 1);
 
-    // now decrement to bias correctly to find smallest
-    search -= 2;
-    while (entrySelector)
+    uint16_t i;
+    for (i = 0; i < seg_count; i++)
       {
-      uint16_t end;
-      searchRange >>= 1;
-      end = read_uint16_setpos(info->stream, search + searchRange * 2);
-      if (unicode_codepoint > end)
-        search += searchRange * 2;
-      --entrySelector;
+      if (unicode_codepoint <= read_uint16_setpos(info->stream, end_count_pos + (i << 1)) &&
+        unicode_codepoint >= read_uint16_setpos(info->stream, start_count_pos + (i << 1)))
+        {
+        int16_t delta = read_int16_setpos(info->stream, delta_pos + (i << 1));
+        unicode_codepoint += delta;
+        *glyph_offset = unicode_codepoint;
+        break;
+        }
       }
-    search += 2;
 
-    uint16_t offset, start;
-    uint16_t item = (uint16_t)((search - endCount) >> 1);
-
-    start = read_uint16_setpos(info->stream, index_map + 14 + segcount * 2 + 2 + 2 * item);
-    if (unicode_codepoint < start)
+    if(glyph_offset == 0)
       return e_not_found;
 
-    offset = read_uint16_setpos(info->stream, index_map + 14 + segcount * 6 + 2 + 2 * item);
-    if (offset == 0)
-      *value = (uint16_t)(unicode_codepoint + read_int16_setpos(info->stream, index_map + 14 + segcount * 4 + 2 + 2 * item));
-    else
-      *value = read_uint16_setpos(info->stream, offset + (unicode_codepoint - start) * 2 + index_map + 14 + segcount * 6 + 2 + 2 * item);
     return s_ok;
     }
   else if (format == 12 || format == 13)
@@ -382,7 +386,7 @@ result_t find_glyph_index(const fontinfo_t *info, uint16_t unicode_codepoint, ui
     uint32_t ngroups = read_uint32_setpos(info->stream, index_map + 12);
     int32_t low, high;
     low = 0; high = (int32_t)ngroups;
-    // Binary search the right group.
+    // Binary end_count_pos the right group.
     while (low < high)
       {
       int32_t mid = low + ((high - low) >> 1); // rounds down, so low <= mid < high
@@ -396,9 +400,9 @@ result_t find_glyph_index(const fontinfo_t *info, uint16_t unicode_codepoint, ui
         {
         uint32_t start_glyph = read_uint32_setpos(info->stream, index_map + 16 + mid * 12 + 8);
         if (format == 12)
-          *value = start_glyph + unicode_codepoint - start_char;
+          *glyph_offset = start_glyph + unicode_codepoint - start_char;
         else // format == 13
-          *value = start_glyph;
+          *glyph_offset = start_glyph;
         return s_ok;
         }
       }
@@ -407,34 +411,40 @@ result_t find_glyph_index(const fontinfo_t *info, uint16_t unicode_codepoint, ui
   return e_not_found;
   }
 
-static int get_glyph_offset(const fontinfo_t *info, int glyph_index)
+static result_t get_glyph_offset(const fontinfo_t *info, int glyph_index, uint16_t *offset)
   {
-  int g1, g2;
+  uint32_t g1, g2;
 
-  if (glyph_index >= info->numGlyphs)
-    return -1; // glyph index out of range
-  if (info->indexToLocFormat >= 2)
-    return -1; // unknown index->glyph map format
+  if (glyph_index >= info->num_glyphs)
+    return e_bad_parameter; // glyph index out of range
+  if (info->index_to_location_format >= 2)
+    return e_bad_handle; // unknown index->glyph map format
 
-  if (info->indexToLocFormat == 0)
+  if (info->index_to_location_format == 0)
     {
-    g1 = info->glyf.offset + read_uint16_setpos(info->stream, info->loca.offset + glyph_index * 2) * 2;
-    g2 = info->glyf.offset + read_uint16_setpos(info->stream, info->loca.offset + glyph_index * 2 + 2) * 2;
+    g1 = info->glyf + read_uint16_setpos(info->stream, info->loca + glyph_index * 2) * 2;
+    g2 = info->glyf + read_uint16_setpos(info->stream, info->loca + glyph_index * 2 + 2) * 2;
     }
   else
     {
-    g1 = info->glyf.offset + read_uint32_setpos(info->stream, info->loca.offset + glyph_index * 4);
-    g2 = info->glyf.offset + read_uint32_setpos(info->stream, info->loca.offset + glyph_index * 4 + 4);
+    g1 = info->glyf + read_uint32_setpos(info->stream, info->loca + glyph_index * 4);
+    g2 = info->glyf + read_uint32_setpos(info->stream, info->loca + glyph_index * 4 + 4);
     }
 
-  return g1 == g2 ? -1 : g1; // if length is 0, return -1
+  if(g1 == g2)
+    return e_not_found;
+
+  *offset = (uint16_t)g1;
+
+  return s_ok;
   }
 
 result_t get_glyph_box(const fontinfo_t *info, int glyph_index, int16_t *x0, int16_t *y0, int16_t *x1, int16_t *y1)
   {
-  int g = get_glyph_offset(info, glyph_index);
-  if (g < 0)
-    return e_not_found;
+  result_t result;
+  uint16_t g = 0;
+  if(failed(result = get_glyph_offset(info, glyph_index, &g)))
+    return result;
 
   if (x0)
     *x0 = read_int16_setpos(info->stream, g + 2);
@@ -488,9 +498,9 @@ static void read_coord(bool is_y, uint8_t byte_flag, uint8_t delta_flag, int16_t
       }
 
     if (is_y)
-      vert.y = min(val_max, max(val_min, value));
+      vert.y = value; // min(val_max, max(val_min, value));
     else
-      vert.x = min(val_max, max(val_min, value));
+      vert.x = value; // min(val_max, max(val_min, value));
 
     vector_set(vertices, index, &vert);
     }
@@ -599,10 +609,13 @@ between the two OffCurve points.)
 */
 
 // change vertices to a dynamic array
-static result_t photon_get_glyph_shape(const fontinfo_t *info, int glyph_index, handle_t *hshape)
+static result_t get_glyph_shape(const fontinfo_t *info, int glyph_index, handle_t *hshape)
   {
+  result_t result;
   int num_vertices = 0;
-  uint16_t g = get_glyph_offset(info, glyph_index);
+  uint16_t g = 0;
+  if(failed(result = get_glyph_offset(info, glyph_index, &g)))
+    return result;
 
   // a glyph is an array of arrays of vertices describing the shape.
   handle_t shape;
@@ -620,7 +633,7 @@ static result_t photon_get_glyph_shape(const fontinfo_t *info, int glyph_index, 
   int16_t x_max = read_int16(info->stream);
   int16_t y_max = read_int16(info->stream);
 
-  // number of contours == -1 is a compound glyph
+  // number of contours == -1 is a compound glyph (not supported)
 
   if (numberOfContours > 0)
     {
@@ -647,7 +660,7 @@ static result_t photon_get_glyph_shape(const fontinfo_t *info, int glyph_index, 
       glyph_vertex_t vert;
 
       vector_create(sizeof(glyph_vertex_t), &ct.vertices);    // create the vertex list
-      vector_set(shape, i, &ct);
+      vector_set(shape, contour_num, &ct);
 
       for (ins = 0; ins < ct.num_points; ins++)
         {
@@ -672,8 +685,9 @@ static result_t photon_get_glyph_shape(const fontinfo_t *info, int glyph_index, 
 
       // we now walk the contour and convert to a ready to process form
       bool start_off = false;       // if the first point was an off-curve then this will be set
-      int16_t start_x;              // only used if first is a control point
-      int16_t start_y;
+      bool was_off = false;
+      int16_t start_x = 0;              // only used if first is a control point
+      int16_t start_y = 0;
       uint16_t i = 0;
       uint16_t next_pt = 0;         // these are the actual points
       glyph_vertex_t curve_pt;      // the point on the curve
@@ -718,7 +732,6 @@ static result_t photon_get_glyph_shape(const fontinfo_t *info, int glyph_index, 
       // set the start point
       vector_set(ct.vertices, next_pt++, &curve_pt);
 
-      bool was_off = false;
       for (; i < ct.num_points; i++)
         {
         vector_at(ct.vertices, i++, &vert);
@@ -738,12 +751,12 @@ static result_t photon_get_glyph_shape(const fontinfo_t *info, int glyph_index, 
             vector_set(ct.vertices, next_pt++, &curve_pt);
 
             was_off = false;
-            memset(&curve_pt, 0, sizeof(glyph_vertex_t));
             }
           else
             {
             // previous was a point so we make this a curve
             was_off = true;
+            next_pt--;
             curve_pt.cx = vert.x;
             curve_pt.cy = vert.y;
             curve_pt.type = contour_vcurve;
@@ -752,13 +765,13 @@ static result_t photon_get_glyph_shape(const fontinfo_t *info, int glyph_index, 
           }
         else
           {
+          memset(&curve_pt, 0, sizeof(glyph_vertex_t));
           was_off = false;
           curve_pt.x = vert.x;
           curve_pt.y = vert.y;
           curve_pt.type = contour_vline;
 
           vector_set(ct.vertices, next_pt++, &curve_pt);
-          memset(&curve_pt, 0, sizeof(glyph_vertex_t));
           }
         }
 
@@ -777,12 +790,15 @@ static result_t photon_get_glyph_shape(const fontinfo_t *info, int glyph_index, 
       vector_set(shape, contour_num, &ct);
       }
     }
-    return s_ok;
+  else
+    return e_bad_handle;
+
+  return s_ok;
   }
 
 static float scale_for_pixel_height(const fontinfo_t *info, float height)
   {
-  int fheight = read_int16_setpos(info->stream, info->hhea.offset + 4) - read_int16_setpos(info->stream, info->hhea.offset + 6);
+  int fheight = read_int16_setpos(info->stream, info->hhea + 4) - read_int16_setpos(info->stream, info->hhea + 6);
   return (float)height / fheight;
   }
 
@@ -816,13 +832,13 @@ static void get_glyph_bitmap_box_subpixel(const fontinfo_t *font, int glyph, flo
       *ix0 = (int)floor(x0 * scale_x + shift_x);
 
     if (iy0)
-      *iy0 = (int)floor(-y1 * scale_y + shift_y);
+      *iy0 = (int)floor(y0 * scale_y + shift_y);
 
     if (ix1)
       *ix1 = (int)ceil(x1 * scale_x + shift_x);
 
     if (iy1)
-      *iy1 = (int)ceil(-y0 * scale_y + shift_y);
+      *iy1 = (int)ceil(y1 * scale_y + shift_y);
     }
   }
 
@@ -1281,8 +1297,8 @@ static void sort_edges_quicksort(edge_t *p, int n)
       /* otherwise, we'll need to swap something else to middle */
       int z;
       c = COMPARE(&p[0], &p[n - 1]);
-      /* 0>mid && mid<n:  0>n => n; 0<n => 0 */
-      /* 0<mid && mid>n:  0>n => 0; 0<n => n */
+      /* 0>mid && mid<num_edges:  0>num_edges => num_edges; 0<num_edges => 0 */
+      /* 0<mid && mid>num_edges:  0>num_edges => 0; 0<num_edges => num_edges */
       z = (c == c12) ? 0 : n - 1;
       t = p[z];
       p[z] = p[m];
@@ -1348,56 +1364,71 @@ typedef struct
   float x, y;
   } f_point_t;
 
-static void rasterize_windings(font_bitmap_t *result, f_point_t *pts, int *wcount, int windings, float scale_x, float scale_y, float shift_x, float shift_y, int off_x, int off_y, int invert)
+static result_t rasterize_windings(font_bitmap_t *result, handle_t contours, float scale_x, float scale_y, float shift_x, float shift_y, int off_x, int off_y, int invert)
   {
   float y_scale_inv = invert ? -scale_y : scale_y;
   edge_t *e;
-  int n, i, j, k, m;
+  uint16_t num_edges;
+  uint16_t i, j, k, m;
   int vsubsample = 1;
   // vsubsample should divide 255 evenly; otherwise we won't reach full opacity
 
   // now we have to blow out the windings into explicit edge lists
-  n = 0;
-  for (i = 0; i < windings; ++i)
-    n += wcount[i];
+  num_edges = 0;
+  uint16_t num_contours;
+  uint16_t pt_count;
+  contour_t contour;
+  vector_count(contours, &num_contours);
+  for (i = 0; i < num_contours; i++)
+    {
+    vector_at(contours, i, &contour);
+    vector_count(contour.vertices, &pt_count);
 
-  e = (edge_t *)neutron_malloc(sizeof(*e) * (n + 1)); // add an extra one as a sentinel
+    num_edges += pt_count;
+    }
+
+  e = (edge_t *)neutron_malloc(sizeof(edge_t) * (num_edges + 1)); // add an extra one as a sentinel
   if (e == 0) return;
-  n = 0;
+  num_edges = 0;
 
   m = 0;
-  for (i = 0; i < windings; ++i)
+  for (i = 0; i < num_contours; ++i)
     {
-    f_point_t *p = pts + m;
-    m += wcount[i];
-    j = wcount[i] - 1;
-    for (k = 0; k < wcount[i]; j = k++)
+    vector_at(contours, i, &contour);
+    vector_count(contour.vertices, &pt_count);
+
+    f_point_t *p;
+    vector_begin(contour.vertices, (void **)&p);
+
+    m += pt_count;
+    j = 0;
+    for (k = 0; k < pt_count; j = k++)
       {
       int a = k, b = j;
       // skip the edge if horizontal
       if (p[j].y == p[k].y)
         continue;
       // add edge from j to k to the list
-      e[n].invert = 0;
+      e[num_edges].invert = 0;
       if (invert ? p[j].y > p[k].y : p[j].y < p[k].y)
         {
-        e[n].invert = 1;
+        e[num_edges].invert = 1;
         a = j, b = k;
         }
-      e[n].x0 = p[a].x * scale_x + shift_x;
-      e[n].y0 = (p[a].y * y_scale_inv + shift_y) * vsubsample;
-      e[n].x1 = p[b].x * scale_x + shift_x;
-      e[n].y1 = (p[b].y * y_scale_inv + shift_y) * vsubsample;
-      ++n;
+      e[num_edges].x0 = p[a].x * scale_x + shift_x;
+      e[num_edges].y0 = (p[a].y * y_scale_inv + shift_y) * vsubsample;
+      e[num_edges].x1 = p[b].x * scale_x + shift_x;
+      e[num_edges].y1 = (p[b].y * y_scale_inv + shift_y) * vsubsample;
+      ++num_edges;
       }
     }
 
   // now sort the edges by their highest point (should snap to integer, and then by x)
-  //STBTT_sort(e, n, sizeof(e[0]), stbtt__edge_compare);
-  sort_edges(e, n);
+  //STBTT_sort(e, num_edges, sizeof(e[0]), stbtt__edge_compare);
+  sort_edges(e, num_edges);
 
   // now, traverse the scanlines and find the intersections on each scanline, use xor winding rule
-  rasterize_sorted_edges(result, e, n, vsubsample, off_x, off_y);
+  rasterize_sorted_edges(result, e, num_edges, vsubsample, off_x, off_y);
 
   neutron_free(e);
   }
@@ -1411,8 +1442,11 @@ static void add_point(f_point_t *points, int n, float x, float y)
   }
 
 // tesselate until threshhold p is happy... @TODO warped to compensate for non-linear stretching
-static int tesselate_curve(f_point_t *points, int *num_points, float x0, float y0, float x1, float y1, float x2, float y2, float objspace_flatness_squared, int n)
+
+static result_t tesselate_curve(handle_t points, float x0, float y0, float x1, float y1, float x2, float y2, float objspace_flatness_squared, int n)
   {
+  result_t result;
+
   // midpoint
   float mx = (x0 + 2 * x1 + x2) / 4;
   float my = (y0 + 2 * y1 + y2) / 4;
@@ -1421,115 +1455,116 @@ static int tesselate_curve(f_point_t *points, int *num_points, float x0, float y
   float dy = (y0 + y2) / 2 - my;
 
   if (n > 16) // 65536 segments on one curve better be enough!
-    return 1;
+    return e_unexpected;
+
   if (dx*dx + dy*dy > objspace_flatness_squared)
     { // half-pixel error allowed... need to be smaller if AA
-    tesselate_curve(points, num_points, x0, y0, (x0 + x1) / 2.0f, (y0 + y1) / 2.0f, mx, my, objspace_flatness_squared, n + 1);
-    tesselate_curve(points, num_points, mx, my, (x1 + x2) / 2.0f, (y1 + y2) / 2.0f, x2, y2, objspace_flatness_squared, n + 1);
+    if(failed(result = tesselate_curve(points, x0, y0, (x0 + x1) / 2.0f, (y0 + y1) / 2.0f, mx, my, objspace_flatness_squared, n + 1)))
+      return result;
+
+    if(failed(result = tesselate_curve(points, mx, my, (x1 + x2) / 2.0f, (y1 + y2) / 2.0f, x2, y2, objspace_flatness_squared, n + 1)))
+      return result;
     }
   else
     {
-    add_point(points, *num_points, x2, y2);
-    *num_points = *num_points + 1;
+    f_point_t pt;
+    pt.x = x2;
+    pt.y = y2;
+    vector_push_back(points, &pt);
     }
-  return 1;
+  return s_ok;
   }
 
 // returns number of contours
-static f_point_t *photon_flatten_curves(glyph_vertex_t *vertices, int num_verts, float objspace_flatness, int **contour_lengths, int *num_contours)
+static result_t flatten_curves(handle_t vertices, float objspace_flatness)
   {
-  f_point_t *points = 0;
+  result_t result;
   int num_points = 0;
 
   float objspace_flatness_squared = objspace_flatness * objspace_flatness;
-  int i, n = 0, start = 0, pass;
+  uint16_t i, n = 0, start = 0, pass;
 
-  // count how many "moves" there are to get the contour count
-  for (i = 0; i < num_verts; ++i)
-    if (vertices[i].type == contour_vmove)
-      ++n;
+  uint16_t contour_count;
+  if(failed(result = vector_count(vertices, &contour_count)))
+    return result;
 
-  *num_contours = n;
-  if (n == 0) return 0;
-
-  *contour_lengths = (int *)neutron_malloc(sizeof(**contour_lengths) * n);
-
-  if (*contour_lengths == 0)
+  for (i = 0; i < contour_count; i++)
     {
-    *num_contours = 0;
-    return 0;
-    }
-
-  // make two passes through the points so we don't need to realloc
-  for (pass = 0; pass < 2; ++pass)
-    {
-    float x = 0, y = 0;
-    if (pass == 1) {
-      points = (f_point_t *)neutron_malloc(num_points * sizeof(points[0]));
-      if (points == 0) goto error;
-      }
-    num_points = 0;
-    n = -1;
-    for (i = 0; i < num_verts; ++i)
+    contour_t contour;
+    if (failed(result = vector_at(vertices, i, &contour)))
       {
-      switch (vertices[i].type)
-        {
-        case contour_vmove:
-          // start the next contour
-          if (n >= 0)
-            (*contour_lengths)[n] = num_points - start;
-          ++n;
-          start = num_points;
+      handle_t points;
+      if(failed(result = vector_create(sizeof(f_point_t), &points)))
+        return result;
 
-          x = vertices[i].x, y = vertices[i].y;
-          add_point(points, num_points++, x, y);
-          break;
-        case contour_vline:
-          x = vertices[i].x, y = vertices[i].y;
-          add_point(points, num_points++, x, y);
-          break;
-        case contour_vcurve:
-          tesselate_curve(points, &num_points, x, y,
-            vertices[i].cx, vertices[i].cy,
-            vertices[i].x, vertices[i].y,
-            objspace_flatness_squared, 0);
-          x = vertices[i].x, y = vertices[i].y;
-          break;
+      glyph_vertex_t vert;
+      f_point_t pt = { 0, 0 };
+      uint16_t num_ver;
+      if (failed(result = vector_count(contour.vertices, &num_ver)))
+        {
+        vector_close(points);
+        return result;
         }
+
+      uint16_t v;
+      for (v = 0; v < num_ver; v++)
+        {
+        if(failed(result = vector_at(contour.vertices, v, &vert)))
+          {
+          vector_close(points);
+          return result;
+          }
+
+        switch (vert.type)
+          {
+          case contour_vmove :
+          case contour_vline :
+            pt.x = vert.x;
+            pt.y = vert.y;
+            vector_push_back(points, &pt);
+            break;
+          case contour_vcurve :
+            if(failed(result = tesselate_curve(points, pt.x, pt.y, vert.cx, vert.cy, vert.x, vert.y, objspace_flatness_squared, 0)))
+              return result;
+            pt.x = vert.x;
+            pt.y = vert.y;
+            break;
+          }
+        }
+
+      // free the old contour
+      vector_close(contour.vertices);
+      contour.vertices = points;
+      contour.num_points = 0;
+      vector_set(vertices, i, &contour);
       }
-    (*contour_lengths)[n] = num_points - start;
     }
 
-  return points;
-error:
-  neutron_free(points);
-  neutron_free(*contour_lengths);
-  *contour_lengths = 0;
-  *num_contours = 0;
-  return 0;
+  return s_ok;
   }
 
-static void rasterize(font_bitmap_t *result, float flatness_in_pixels, glyph_vertex_t *vertices, int num_verts,
+static result_t rasterize(font_bitmap_t *bm, float flatness_in_pixels, handle_t vertices, 
   float scale_x, float scale_y, float shift_x, float shift_y, int x_off, int y_off, int invert)
   {
+  result_t result;
   float scale = scale_x > scale_y ? scale_y : scale_x;
-  int winding_count, *winding_lengths;
-  f_point_t *windings = photon_flatten_curves(vertices, num_verts, flatness_in_pixels / scale, &winding_lengths, &winding_count);
-  if (windings)
-    {
-    rasterize_windings(result, windings, winding_lengths, winding_count, scale_x, scale_y, shift_x, shift_y, x_off, y_off, invert);
-    neutron_free(winding_lengths);
-    neutron_free(windings);
-    }
+
+  if(failed(result = flatten_curves(vertices, flatness_in_pixels / scale)))
+    return result;
+
+  return rasterize_windings(bm, vertices, scale_x, scale_y, shift_x, shift_y, x_off, y_off, invert);
   }
 
-void photon_make_glyph_bitmap_subpixel(const fontinfo_t *info, unsigned char *output,
+static result_t make_glyph_bitmap_subpixel(const fontinfo_t *info, unsigned char *output,
   int out_w, int out_h, int out_stride, float scale_x, float scale_y, float shift_x, float shift_y, int glyph)
   {
+  result_t result;
   int16_t ix0, iy0;
   handle_t vertices;
 
-  int num_verts = photon_get_glyph_shape(info, glyph, &vertices);
+  if(failed(result = get_glyph_shape(info, glyph, &vertices)))
+    return result;
+
   font_bitmap_t gbm;
 
   get_glyph_bitmap_box_subpixel(info, glyph, scale_x, scale_y, shift_x, shift_y, &ix0, &iy0, 0, 0);
@@ -1539,13 +1574,31 @@ void photon_make_glyph_bitmap_subpixel(const fontinfo_t *info, unsigned char *ou
   gbm.stride = out_stride;
 
   if (gbm.w && gbm.h)
-    rasterize(&gbm, 0.35f, vertices, num_verts, scale_x, scale_y, shift_x, shift_y, ix0, iy0, 1);
+    if(failed(result = rasterize(&gbm, 0.35f, vertices, scale_x, scale_y, shift_x, shift_y, ix0, iy0, 1)))
+      return result;
 
-  neutron_free(vertices);
+  uint16_t count;
+  if(failed(vector_count(vertices, &count)))
+    return result;
+
+  uint16_t i;
+  for (i = 0; i < count; i++)
+    {
+    contour_t hndl;
+    if(failed(result = vector_at(vertices, i, &hndl)))
+      return result;
+
+    if(failed(result = vector_close(hndl.vertices)))
+      return result;
+    }
+
+  return vector_close(vertices);
   }
 
 result_t create_scaled_glyph(fontinfo_t *f, uint16_t pixel_height, char ch, glyph_t **gp)
   {
+  result_t result;
+
   if(f == 0 || gp == 0)
     return e_bad_parameter;
 
@@ -1557,7 +1610,6 @@ result_t create_scaled_glyph(fontinfo_t *f, uint16_t pixel_height, char ch, glyp
   float scale = scale_for_pixel_height(f, pixel_height);
 
   int16_t advance;
-  int16_t lsb;
   int16_t x0;
   int16_t y0;
   int16_t x1;
@@ -1566,50 +1618,29 @@ result_t create_scaled_glyph(fontinfo_t *f, uint16_t pixel_height, char ch, glyp
   int16_t gh;
   uint16_t g;
 
-  find_glyph_index(f, ch, &g);
+  if(failed(result = find_glyph_index(f, ch, &g)))
+    return result;
 
-  uint16_t numOfLongHorMetrics = read_uint16_setpos(f->stream, f->hhea.offset + 34);
+  uint16_t numOfLongHorMetrics = read_uint16_setpos(f->stream, f->hhea + 34);
   if (g < numOfLongHorMetrics)
-  {
-    advance = read_int16_setpos(f->stream, f->hmtx.offset + 4 * g);
-    lsb = read_int16_setpos(f->stream, f->hmtx.offset + 4 * g + 2);
-    }
+    advance = read_int16_setpos(f->stream, f->hmtx + 4 * g);
   else
-    {
-    advance = read_int16_setpos(f->stream,  f->hmtx.offset + 4 * (numOfLongHorMetrics - 1));
-    lsb = read_int16_setpos(f->stream, f->hmtx.offset + 4 * numOfLongHorMetrics + 2 * (g - numOfLongHorMetrics));
-    }
+    advance = read_int16_setpos(f->stream,  f->hmtx + 4 * (numOfLongHorMetrics - 1));
 
   get_glyph_bitmap_box_subpixel(f, g, scale, scale, 0.0f, 0.0f, &x0, &y0, &x1, &y1);
   gw = x1 - x0;
   gh = y1 - y0;
 
-  int16_t pw = (int16_t)(scale * (x1 - x0));
-  int16_t ph = (int16_t)(scale * (y1 - y0));
-
-  if (x + gw + 1 >= pw)
-    {
-    y = bottom_y;
-    x = 1; // advance to next row
-    }
-
-  if (y + gh + 1 >= ph) // check if it fits vertically AFTER potentially moving to next row
-    return e_unexpected;
-
-
-  uint16_t bitmap_length = pw * ph;
+  uint16_t bitmap_length = gw * gh;
   glyph_t *glyph = (glyph_t *)neutron_malloc(sizeof(glyph_t) + bitmap_length);
 
-  glyph->x = 0;
-  glyph->y = 0;
+  glyph->width = gw;
+  glyph->height = gh;
   glyph->length = bitmap_length;
   glyph->wchar = ch;
   glyph->codepoint = g;
-  glyph->origin_x = 0;
-  glyph->origin_y = 0;
-  glyph->advance = (uint16_t)(scale * advance);
 
-  photon_make_glyph_bitmap_subpixel(f, glyph->bitmap, gw, gh, pw, scale, scale, 0.0f, 0.0f, g);
+  make_glyph_bitmap_subpixel(f, glyph->bitmap, gw, gh, gw, scale, scale, 0.0f, 0.0f, g);
 
   *gp = glyph;
 

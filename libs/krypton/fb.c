@@ -794,7 +794,6 @@ result_t bsp_canvas_open_framebuffer(canvas_t **canvas)
   uint16_t x;
   uint16_t y;
   uint16_t length = REG_STRING_MAX + 1;
-  char device[REG_STRING_MAX + 1];
   struct fb_var_screeninfo vinfo;
   struct fb_fix_screeninfo finfo;
 
@@ -802,7 +801,7 @@ result_t bsp_canvas_open_framebuffer(canvas_t **canvas)
     return e_bad_pointer;
 
   memid_t key;
-  if(failed(result = reg_open_key(0, "electron", &key)))
+  if(failed(result = reg_open_key(0, "krypton", &key)))
     return result;
 
   if(failed(result = reg_get_uint16(key, screen_x_s, &x)))
@@ -810,9 +809,6 @@ result_t bsp_canvas_open_framebuffer(canvas_t **canvas)
 
   if(failed(result = reg_get_uint16(key, screen_y_s, &y)))
     y = 240;
-
-  if(failed(result = reg_get_string(key, fb_buffer_device_s, device, &length)))
-    strcpy(device, "/tmp/fb0");
 
   // try to open the actual fb_buffer.
   // If this is a single-bufferred screen then it will usually be /dev/fb0

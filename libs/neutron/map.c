@@ -97,6 +97,8 @@ result_t map_create(dup_fn copy_key,
   temp->parent = temp->left = temp->right = new_tree->nil;
   temp->key = 0;
   temp->red = false;
+
+  *handle = new_tree;
   
   return s_ok;
   }

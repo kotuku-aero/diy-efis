@@ -66,85 +66,13 @@ typedef struct _airspeed_window_t {
   handle_t small_roller;
 } airspeed_window_t;
  
-static result_t widget_wndproc(handle_t hwnd, const canmsg_t *data);
 
-result_t create_airspeed_window(handle_t parent, memid_t key, handle_t *hwnd)
+static result_t on_paint(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
   {
-	result_t result;
-	
-  // create our window
-	if(failed(result = create_child_widget(parent, key, widget_wndproc, hwnd)))
-		return result;
-	
-  // create the window data.
-  airspeed_window_t *wnd = (airspeed_window_t *)neutron_malloc(sizeof(airspeed_window_t));
-  memset(wnd, 0, sizeof(airspeed_window_t));
-  
-  wnd->version = sizeof(airspeed_window_t);
-	
-	reg_get_uint16(key, "vs0", &wnd->vs0);
-  reg_get_uint16(key, "vs1", &wnd->vs1);
-  reg_get_uint16(key, "vfe", &wnd->vfe);
-  reg_get_uint16(key, "vno", &wnd->vno);
-  reg_get_uint16(key, "vne", &wnd->vne);
-  reg_get_uint16(key, "va", &wnd->va);
-  reg_get_uint16(key, "vx", &wnd->vx);
-  reg_get_uint16(key, "vy", &wnd->vy);
-  
-  // this conversion factor is for knots
-  if(failed(reg_get_float(key, "scale", &wnd->scale)))
-    wnd->scale = 1/0.5144444445610519f;
-  
-  reg_get_float(key, "offset", &wnd->offset);
-  
-	if(failed(lookup_font(key, "font", &wnd->font)))
-    {
-    // we always have the neo font.
-    if (failed(result = create_font("neo", 9, 0, &wnd->font)))
-      return result;
-    }
+  begin_paint(hwnd);
 
-  if (failed(lookup_font(key, "large-font", &wnd->large_roller)))
-    {
-    // we always have the neo font.
-    if (failed(result = create_font("neo", 15, 0, &wnd->font)))
-      return result;
-    }
+  airspeed_window_t *wnd = (airspeed_window_t *) parg;
 
-  if (failed(lookup_font(key, "small-font", &wnd->small_roller)))
-    {
-    // we always have the neo font.
-    if (failed(result = create_font("neo", 12, 0, &wnd->font)))
-      return result;
-    }
-
-  if(failed(lookup_color(key, "back-color", &wnd->background_color)))
-    wnd->background_color = color_black;
-  
-  if(failed(lookup_color(key, "text-color", &wnd->text_color)))
-    wnd->text_color = color_white;
-
-  memid_t pen_key;
-  if (failed(reg_open_key(key, "pen", &pen_key)) ||
-    failed(lookup_pen(key, &wnd->pen)))
-    {
-    wnd->pen.color = color_white;
-    wnd->pen.width = 1;
-    wnd->pen.style = ps_solid;
-    }
-
-  // store the parameters for the window
-  set_wnddata(*hwnd, wnd);
-
-  rect_t rect;
-  get_window_rect(*hwnd, &rect);
-  invalidate_rect(*hwnd, &rect);
-	
-	return s_ok;
-  }
-
-static void update_window(handle_t hwnd, airspeed_window_t *wnd)
-  {
   rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
   
@@ -261,41 +189,109 @@ static void update_window(handle_t hwnd, airspeed_window_t *wnd)
     rectangle(hwnd, &wnd_rect, 0, color_blue,
               make_rect(67, max((gdi_dim_t)8, vy_pixels), 71,
                         min((gdi_dim_t)ex.dy-8, vx_pixels), &rect));
+
+  end_paint(hwnd);
+  return s_ok;
   }
 
-static result_t widget_wndproc(handle_t hwnd, const canmsg_t *msg)
+static result_t on_indicated_airspeed(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
   {
   bool changed = false;
-  airspeed_window_t *wnd;
-  get_wnddata(hwnd, (void **)&wnd);
+
+  airspeed_window_t *wnd = (airspeed_window_t *)parg;
   
-  switch(msg->id)
-    {
-    case id_indicated_airspeed :
-      {
-      // airspeed is in m/s convert to knots
-    float v;
-    get_param_float(msg, &v);
-      float airspeed = v * wnd->scale;
-      airspeed += wnd->offset;
+  // airspeed is in m/s convert to display value (knots, km, m/h etc.)
+  float v;
+  get_param_float(msg, &v);
+
+  float airspeed = v * wnd->scale;
+  airspeed += wnd->offset;
       
-      long value = (long)(roundf(airspeed));
+  long value = (long)(roundf(airspeed));
       
-      changed = wnd->airspeed != value;
-      wnd->airspeed = value;
-      }
-      break;
-  case id_paint :
-    begin_paint(hwnd);
-    update_window(hwnd, wnd);
-    end_paint(hwnd);
-    break;
-  default :
-    return defwndproc(hwnd, msg);
-    }
+  changed = wnd->airspeed != value;
+  wnd->airspeed = value;
 
   if(changed)
     invalidate_rect(hwnd, 0);
 
-  return true;
+  return s_ok;
+  }
+
+result_t create_airspeed_window(handle_t parent, memid_t key, handle_t *hwnd)
+  {
+  result_t result;
+
+  // create our window
+  if (failed(result = create_child_widget(parent, key, defwndproc, hwnd)))
+    return result;
+
+  // create the window data.
+  airspeed_window_t *wnd = (airspeed_window_t *)neutron_malloc(sizeof(airspeed_window_t));
+  memset(wnd, 0, sizeof(airspeed_window_t));
+
+  wnd->version = sizeof(airspeed_window_t);
+
+  reg_get_uint16(key, "vs0", &wnd->vs0);
+  reg_get_uint16(key, "vs1", &wnd->vs1);
+  reg_get_uint16(key, "vfe", &wnd->vfe);
+  reg_get_uint16(key, "vno", &wnd->vno);
+  reg_get_uint16(key, "vne", &wnd->vne);
+  reg_get_uint16(key, "va", &wnd->va);
+  reg_get_uint16(key, "vx", &wnd->vx);
+  reg_get_uint16(key, "vy", &wnd->vy);
+
+  // this conversion factor is for knots
+  if (failed(reg_get_float(key, "scale", &wnd->scale)))
+    wnd->scale = 1 / 0.5144444445610519f;
+
+  reg_get_float(key, "offset", &wnd->offset);
+
+  if (failed(lookup_font(key, "font", &wnd->font)))
+    {
+    // we always have the neo font.
+    if (failed(result = create_font("neo", 9, 0, &wnd->font)))
+      return result;
+    }
+
+  if (failed(lookup_font(key, "large-font", &wnd->large_roller)))
+    {
+    // we always have the neo font.
+    if (failed(result = create_font("neo", 15, 0, &wnd->font)))
+      return result;
+    }
+
+  if (failed(lookup_font(key, "small-font", &wnd->small_roller)))
+    {
+    // we always have the neo font.
+    if (failed(result = create_font("neo", 12, 0, &wnd->font)))
+      return result;
+    }
+
+  if (failed(lookup_color(key, "back-color", &wnd->background_color)))
+    wnd->background_color = color_black;
+
+  if (failed(lookup_color(key, "text-color", &wnd->text_color)))
+    wnd->text_color = color_white;
+
+  memid_t pen_key;
+  if (failed(reg_open_key(key, "pen", &pen_key)) ||
+    failed(lookup_pen(key, &wnd->pen)))
+    {
+    wnd->pen.color = color_white;
+    wnd->pen.width = 1;
+    wnd->pen.style = ps_solid;
+    }
+
+  // store the parameters for the window
+  set_wnddata(*hwnd, wnd);
+
+  add_event(parent, id_paint, wnd, 0, on_paint);
+  add_event(parent, id_indicated_airspeed, wnd, 0, on_indicated_airspeed);
+
+  rect_t rect;
+  get_window_rect(*hwnd, &rect);
+  invalidate_rect(*hwnd, &rect);
+
+  return s_ok;
   }

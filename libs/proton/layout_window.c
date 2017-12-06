@@ -62,15 +62,15 @@ extern result_t create_hsi_window(handle_t parent, memid_t section, handle_t *hw
     };
 
 static const char *layout_names[] = {
-    "airspeed",            // vertical ticker-tape airspeed window
-    "hsi",                 // rectangular gyro position and heading
-    "attitude",            // rectangular attitude window
-    "altitude", // vertical ticker tape altitude and vertical speed indicator window
-    "gauge",               // general purpose round or bar gauge
-    "annunciator",         // time, oat etc.
-    "gps",                 // gps route map window
-    "alert",               // vertical alert window
-    "widget",              // a generic widget
+    "airspeed_window",      // vertical ticker-tape airspeed window
+    "hsi_window",           // rectangular gyro position and heading
+    "attitude_window",      // rectangular attitude window
+    "altitude_window",      // vertical ticker tape altitude and vertical speed indicator window
+    "gauge_window",         // general purpose round or bar gauge
+    "annunciator_window",   // time, oat etc.
+    "gps_window",           // gps route map window
+    "alert_window",         // vertical alert window
+    "widget",               // a generic widget
 };
 
 typedef enum
@@ -1308,17 +1308,20 @@ result_t layout_wndproc(handle_t hwnd, const canmsg_t *msg)
   // do the default processing (calls event handlers)
   defwndproc(hwnd, msg);
 
-  // we go through all of the menu items and check to see if they are
-  // listening, and if their state has changed
-  vector_count(wnd->menu_items, &count);
-  for (item = 0; item < count; item++)
+  if(wnd->menu_items != 0)
     {
-    menu_item_t *mi;
-    vector_at(wnd->menu_items, item, &mi);
+    // we go through all of the menu items and check to see if they are
+    // listening, and if their state has changed
+    vector_count(wnd->menu_items, &count);
+    for (item = 0; item < count; item++)
+      {
+      menu_item_t *mi;
+      vector_at(wnd->menu_items, item, &mi);
 
-    // update the controlling variable if it is being watched.
-    if (mi->event != 0)
-      (*mi->event)(wnd, mi, msg);
+      // update the controlling variable if it is being watched.
+      if (mi->event != 0)
+        (*mi->event)(wnd, mi, msg);
+      }
     }
 
   return defwndproc(hwnd, msg);
@@ -1744,7 +1747,7 @@ static result_t on_cancel(handle_t hwnd, void *parg, const char *func, const can
 // we cache the font metrics for the layout window as loading them takes a while
 static const char *font_hints = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
 
-result_t load_layout(handle_t hwnd, memid_t hive)
+result_t load_layout(handle_t parent, memid_t hive)
   {
   // the hive must have series of hives that form windows
   result_t result;
@@ -1756,10 +1759,10 @@ result_t load_layout(handle_t hwnd, memid_t hive)
   memset(wnd, 0, sizeof(layout_window_t));
 
   // attach the window to the screen
-  wnd->window = hwnd;
+  wnd->window = parent;
   wnd->version = sizeof(layout_window_t);
 
-  memid_t menu;
+  memid_t menu = 0;
   if (succeeded(reg_open_key(hive, "menu", &menu)))
     {
       // this stores a cache of loaded keys.
@@ -1818,19 +1821,19 @@ result_t load_layout(handle_t hwnd, memid_t hive)
     }
 
   // attach all of our event handlers now
-  add_event(hwnd, id_key0, wnd, 0, on_key0);
-  add_event(hwnd, id_key1, wnd, 0, on_key1);
-  add_event(hwnd, id_key2, wnd, 0, on_key2);
-  add_event(hwnd, id_key3, wnd, 0, on_key3);
-  add_event(hwnd, id_key4, wnd, 0, on_key4);
-  add_event(hwnd, id_decka, wnd, 0, on_decka);
-  add_event(hwnd, id_deckb, wnd, 0, on_deckb);
-  add_event(hwnd, id_menu_left, wnd, 0, on_menu_left);
-  add_event(hwnd, id_menu_right, wnd, 0, on_menu_right);
-  add_event(hwnd, id_menu_up, wnd, 0, on_menu_up);
-  add_event(hwnd, id_menu_dn, wnd, 0, on_menu_dn);
-  add_event(hwnd, id_menu_cancel, wnd, 0, on_cancel);
-  add_event(hwnd, id_menu_ok, wnd, 0, on_ok);
+  add_event(parent, id_key0, wnd, 0, on_key0);
+  add_event(parent, id_key1, wnd, 0, on_key1);
+  add_event(parent, id_key2, wnd, 0, on_key2);
+  add_event(parent, id_key3, wnd, 0, on_key3);
+  add_event(parent, id_key4, wnd, 0, on_key4);
+  add_event(parent, id_decka, wnd, 0, on_decka);
+  add_event(parent, id_deckb, wnd, 0, on_deckb);
+  add_event(parent, id_menu_left, wnd, 0, on_menu_left);
+  add_event(parent, id_menu_right, wnd, 0, on_menu_right);
+  add_event(parent, id_menu_up, wnd, 0, on_menu_up);
+  add_event(parent, id_menu_dn, wnd, 0, on_menu_dn);
+  add_event(parent, id_menu_cancel, wnd, 0, on_cancel);
+  add_event(parent, id_menu_ok, wnd, 0, on_ok);
 
   // must be 0 on first call
   memid_t child = 0;
@@ -1854,7 +1857,6 @@ result_t load_layout(handle_t hwnd, memid_t hive)
     int ordinal;
     if (failed(lookup_enum(key, "type", layout_names, last_layout_enum, &ordinal)))
       {
-      trace_warning("Section %s has a type of %s which is not recognised\n", name, widget_type);
       continue;
       }
 
@@ -1865,31 +1867,31 @@ result_t load_layout(handle_t hwnd, memid_t hive)
     switch (ordinal)
       {
       case airspeed_window:
-        create_airspeed_window(hwnd, child, &hwnd);
+        create_airspeed_window(parent, child, &hwnd);
         break;
       case hsi_window:
-        create_hsi_window(hwnd, child, &hwnd);
+        create_hsi_window(parent, child, &hwnd);
         break;
       case attitude_window:
-        create_attitude_window(hwnd, child, &hwnd);
+        create_attitude_window(parent, child, &hwnd);
         break;
       case altitude_window:
-        create_altitude_window(hwnd, child, &hwnd);
+        create_altitude_window(parent, child, &hwnd);
         break;
       case gauge_window:
-        create_gauge_window(hwnd, child, &hwnd);
+        create_gauge_window(parent, child, &hwnd);
         break;
       case annunciator_window:
-        create_annunciator_window(hwnd, child, &hwnd);
+        create_annunciator_window(parent, child, &hwnd);
         break;
       case gps_window:
-        create_gps_window(hwnd, child, &hwnd);
+        create_gps_window(parent, child, &hwnd);
         break;
       case alert_window:
 
         break;
       case widget:
-        //create_widget(hwnd, child, &hwnd);
+        //create_widget(parent, child, &hwnd);
         break;
 
       default:
@@ -1901,11 +1903,11 @@ result_t load_layout(handle_t hwnd, memid_t hive)
     }
 
   // store the parameters for the window
-  set_wnddata(hwnd, wnd);
+  set_wnddata(parent, wnd);
 
   rect_t rect;
-  get_window_rect(hwnd, &rect);
-  invalidate_rect(hwnd, &rect);
+  get_window_rect(parent, &rect);
+  invalidate_rect(parent, &rect);
 
   return s_ok;
   }

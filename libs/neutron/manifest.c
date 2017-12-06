@@ -76,13 +76,11 @@ static const uint8_t esab64[256] =
 static result_t decode_byte(manifest_handle_t *stream, uint16_t offset, uint8_t *value)
   {
   result_t result;
-  // fast divide by 3 = (n * 86) / 256
-  //
-  // is ((offset * 64) + (offset * 16) + (offset * 4) + (offset * 2)) / 256 
-  int32_t required_window = ((offset << 6) + (offset << 4) + (offset << 2) + (offset << 1)) >> 8;
+  int32_t offs_32 = offset;
+  int32_t required_window = offs_32 / 3;
 
   // adjust to base 64 chars (4 chars == 3 bytes)
-  required_window << 2;
+  required_window <<= 2;
 
   // see if the bytes exist in the window
   if (stream->window_pos != required_window)
@@ -100,18 +98,18 @@ static result_t decode_byte(manifest_handle_t *stream, uint16_t offset, uint8_t 
     }
 
   // calculate the window * 3
-  required_window >> 1;
+  required_window >>= 1;
   required_window += (required_window >> 1);
 
-  offset -= (uint16_t) required_window;   // will be 0, 1, 2
+  offs_32 -= required_window;   // will be 0, 1, 2
 
-  switch (offset)
+  switch (offs_32)
     {
     case 0 :
       *value = (esab64[stream->buffer[0]]<< 2) | (esab64[stream->buffer[1]] >> 4);
       break;
     case 1 :
-      *value = (esab64[stream->buffer[1]] << 4) | (esab64[stream->buffer[2]] << 4);
+      *value = (esab64[stream->buffer[1]] << 4) | (esab64[stream->buffer[2]] >> 2);
       break;
     case 2 :
       *value = (esab64[stream->buffer[2]] << 6) | esab64[stream->buffer[3]];
@@ -301,6 +299,7 @@ result_t manifest_create(const char *literal, handle_t *hndl)
   init_stream(stream);
   stream->literal = literal;
   stream->source_length = strlen(literal);
+  stream->length = (stream->source_length / 4) * 3;
 
   *hndl = stream;
   return s_ok;

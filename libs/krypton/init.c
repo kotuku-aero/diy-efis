@@ -156,7 +156,7 @@ char *neutron_strdup(const char *str)
   char *buf = (char *)neutron_malloc(len + 1);
 
   memcpy(buf, str, len + 1);
-  return len;
+  return buf;
   }
 
 typedef struct _semaphore_t {

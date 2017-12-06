@@ -234,7 +234,7 @@ result_t get_message(handle_t hscreen, handle_t *hwnd, canmsg_t *msg)
     if (succeeded((*screen->wnd.canvas->queue_empty)(hwnd)))
       {
       memcpy(msg, &paint_msg, sizeof(canmsg_t));
-      *hwnd = hwnd;
+      *hwnd = hscreen;
       return s_ok;          // paint message found
       }
 
@@ -2713,15 +2713,15 @@ result_t draw_text(handle_t hndl, const rect_t *clip_rect, handle_t  fp,
 
     // see if the user wants the widths returned
     if (char_widths != 0)
-      char_widths[ch] = glyph->x;
+      char_widths[ch] = glyph->width;
 
     uint16_t row;
-    for (row = 0; row < glyph->y; row++)
+    for (row = 0; row < glyph->height; row++)
       {
       // set to the top of the bitmap
-      uint16_t offset = row *  glyph->pitch;
+      uint16_t offset = row *  glyph->width;
       uint16_t col;
-      for (col = 0; col < glyph->y; col++)
+      for (col = 0; col < glyph->width; col++)
         {
         point_t pos =
         {
@@ -2749,7 +2749,7 @@ result_t draw_text(handle_t hndl, const rect_t *clip_rect, handle_t  fp,
     }
 
     // advance in 1/64's pixels
-    pt_pos.x += glyph->advance;
+    pt_pos.x += glyph->width;
     }
 
   return s_ok;
@@ -2787,10 +2787,8 @@ result_t text_extent(handle_t hndl, handle_t  font, const char *str,
       return result;
 
     // see if the user wants the widths returned
-
-    ex->dy = max(ex->dy, glyph->y);
-
-    ex->dx += glyph->x;
+    ex->dy = max(ex->dy, glyph->height);
+    ex->dx += glyph->width;
     }
 
   return s_ok;

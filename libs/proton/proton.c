@@ -70,7 +70,7 @@ void run_proton(void *parg)
     memid_t layout_key;
 
     if (failed(result = reg_get_string(key, "layout", layout_name, 0)) ||
-      failed(result = reg_open_key(0, layout_name, &layout_key)))
+      failed(result = reg_open_key(key, layout_name, &layout_key)))
       return;
 
     if(succeeded(result = open_screen(orientation, layout_wndproc, 0, &main_window)))
