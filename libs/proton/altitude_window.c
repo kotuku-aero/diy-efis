@@ -57,72 +57,11 @@ typedef struct _altitude_window_t {
   handle_t  large_roller;  // neo 15
 } altitude_window_t;
  
-static result_t widget_wndproc(handle_t hwnd, const canmsg_t *data);
+static result_t on_paint(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+  {
+  begin_paint(hwnd);
 
-result_t create_altitude_window(handle_t parent, memid_t key, handle_t *hwnd)
-	{
-  result_t result;
-	
-  // create our window
-	if(failed(result = create_child_widget(parent, key, widget_wndproc, hwnd)))
-		return result;
-	
-  // create the window data.
-  altitude_window_t *wnd = (altitude_window_t *)neutron_malloc(sizeof(altitude_window_t));
-  memset(wnd, 0, sizeof(altitude_window_t));
-  
-  wnd->version = sizeof(altitude_window_t);
-  
-  if (failed(lookup_font(key, "font", &wnd->font)))
-    {
-    // we always have the neo font.
-    if (failed(result = create_font("neo", 9, 0, &wnd->font)))
-      return result;
-    }
-
-  if (failed(lookup_font(key, "large-font", &wnd->large_roller)))
-    {
-    // we always have the neo font.
-    if (failed(result = create_font("neo", 15, 0, &wnd->font)))
-      return result;
-    }
-
-  if (failed(lookup_font(key, "small-font", &wnd->small_roller)))
-    {
-    // we always have the neo font.
-    if (failed(result = create_font("neo", 12, 0, &wnd->font)))
-      return result;
-    }
-
-  if(failed(lookup_color(key, "back-color", &wnd->background_color)))
-    wnd->background_color = color_black;
-  
-  if(failed(lookup_color(key, "text-color", &wnd->text_color)))
-    wnd->text_color = color_white;
-
-  memid_t pen_key;
-  if(failed(reg_open_key(key, "pen", &pen_key)) ||
-     failed(lookup_pen(key, &wnd->pen)))
-    {
-    wnd->pen.color = color_white;
-    wnd->pen.width = 1;
-    wnd->pen.style = ps_solid;
-    }
-  
-  wnd->qnh = 1013;
-
-  // store the parameters for the window
-  set_wnddata(*hwnd, wnd);
-
-  rect_t rect;
-  get_window_rect(*hwnd, &rect);
-  invalidate_rect(*hwnd, &rect);
-  
-  return s_ok;
-	}
-	
-static void update_window(handle_t hwnd, altitude_window_t *wnd)
-	{
+  altitude_window_t *wnd = (altitude_window_t *)parg;
   rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
   
@@ -328,53 +267,123 @@ static void update_window(handle_t hwnd, altitude_window_t *wnd)
            make_point(vsi_rect.left + (rect_width(&vsi_rect)>> 1) - (size.dx >> 1),
                vsi_rect.top+1, &pt),
            &vsi_rect, 0, 0);
+
+  end_paint(hwnd);
 	}
 
-static result_t widget_wndproc(handle_t hwnd, const canmsg_t *msg)
-	{
-	bool changed = false;
-  altitude_window_t *wnd;
-  get_wnddata(hwnd, (void **)&wnd);
+static result_t on_baro_corrected_altitude(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+  {
+  altitude_window_t *wnd = (altitude_window_t *)parg;
+  bool changed = false;
   
-	switch(msg->id)
-		{
-		case id_baro_corrected_altitude :
-      {
-    float v;
-    get_param_float(msg, &v);
-      int16_t value = (int16_t)roundf(v);
-      changed = wnd->altitude != value;
-      wnd->altitude = value;
-      }
-			break;
-		case id_altitude_rate :
-      {
-    float v;
-    get_param_float(msg, &v);
-      int16_t value = (int16_t)roundf(v);
-      changed = wnd->vertical_speed != value;
-      wnd->vertical_speed = value;
-      }
-			break;
-		case id_qnh:
-		  {
-    uint16_t value;
-    get_param_uint16(msg, 0, &value);
-		  changed = wnd->vertical_speed != value;
-		  wnd->qnh = value;
-		  }
-		  break;
-		case id_paint :
-	    begin_paint(hwnd);
-	    update_window(hwnd, wnd);
-	    end_paint(hwnd);
-		  break;
-		default:
-			return defwndproc(hwnd, msg);
-		}
+  float v;
+  get_param_float(msg, &v);
+  int16_t value = (int16_t)roundf(v);
+  changed = wnd->altitude != value;
+  wnd->altitude = value;
 
 	if(changed)
 	  invalidate_rect(hwnd, 0);
 
 	return s_ok;
 	}
+
+static result_t on_altitude_rate(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+  {
+  altitude_window_t *wnd = (altitude_window_t *)parg;
+  bool changed = false;
+
+  float v;
+  get_param_float(msg, &v);
+  int16_t value = (int16_t)roundf(v);
+  changed = wnd->vertical_speed != value;
+  wnd->vertical_speed = value;
+
+  if (changed)
+    invalidate_rect(hwnd, 0);
+
+  return s_ok;
+  }
+
+static result_t on_qnh(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+  {
+  altitude_window_t *wnd = (altitude_window_t *)parg;
+  bool changed = false;
+
+  uint16_t value;
+  get_param_uint16(msg, 0, &value);
+  changed = wnd->vertical_speed != value;
+  wnd->qnh = value;
+
+  if (changed)
+    invalidate_rect(hwnd, 0);
+
+  return s_ok;
+  }
+
+result_t create_altitude_window(handle_t parent, memid_t key, handle_t *hwnd)
+  {
+  result_t result;
+
+  // create our window
+  if (failed(result = create_child_widget(parent, key, defwndproc, hwnd)))
+    return result;
+
+  // create the window data.
+  altitude_window_t *wnd = (altitude_window_t *)neutron_malloc(sizeof(altitude_window_t));
+  memset(wnd, 0, sizeof(altitude_window_t));
+
+  wnd->version = sizeof(altitude_window_t);
+
+  if (failed(lookup_font(key, "font", &wnd->font)))
+    {
+    // we always have the neo font.
+    if (failed(result = create_font("neo", 9, 0, &wnd->font)))
+      return result;
+    }
+
+  if (failed(lookup_font(key, "large-font", &wnd->large_roller)))
+    {
+    // we always have the neo font.
+    if (failed(result = create_font("neo", 15, 0, &wnd->font)))
+      return result;
+    }
+
+  if (failed(lookup_font(key, "small-font", &wnd->small_roller)))
+    {
+    // we always have the neo font.
+    if (failed(result = create_font("neo", 12, 0, &wnd->font)))
+      return result;
+    }
+
+  if (failed(lookup_color(key, "back-color", &wnd->background_color)))
+    wnd->background_color = color_black;
+
+  if (failed(lookup_color(key, "text-color", &wnd->text_color)))
+    wnd->text_color = color_white;
+
+  memid_t pen_key;
+  if (failed(reg_open_key(key, "pen", &pen_key)) ||
+    failed(lookup_pen(key, &wnd->pen)))
+    {
+    wnd->pen.color = color_white;
+    wnd->pen.width = 1;
+    wnd->pen.style = ps_solid;
+    }
+
+  wnd->qnh = 1013;
+
+  // store the parameters for the window
+  set_wnddata(*hwnd, wnd);
+
+  add_event(*hwnd, id_paint, wnd, 0, on_paint);
+  add_event(*hwnd, id_baro_corrected_altitude, wnd, 0, on_baro_corrected_altitude);
+  add_event(*hwnd, id_altitude_rate, wnd, 0, on_altitude_rate);
+  add_event(*hwnd, id_qnh, wnd, 0, on_qnh);
+
+  rect_t rect;
+  get_window_rect(*hwnd, &rect);
+  invalidate_rect(*hwnd, &rect);
+
+  return s_ok;
+  }

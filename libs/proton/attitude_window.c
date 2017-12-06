@@ -69,69 +69,12 @@ typedef struct _attitude_window_t {
   handle_t  font;
   } attitude_window_t;
 
-static result_t widget_wndproc(handle_t hwnd, const canmsg_t *data);
 
-result_t create_attitude_window(handle_t parent, memid_t key, handle_t *hwnd)
+static result_t on_paint(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
   {
-  result_t result;
+  begin_paint(hwnd);
 
-  // create our window
-  if (failed(create_child_widget(parent, key, widget_wndproc, hwnd)))
-    return result;
-
-  // create the window data.
-  attitude_window_t *wnd = (attitude_window_t *)neutron_malloc(sizeof(attitude_window_t));
-  memset(wnd, 0, sizeof(attitude_window_t));
-
-  wnd->version = sizeof(attitude_window_t);
-
-  reg_get_uint16(key, "critical-aoa", &wnd->critical_aoa);
-  reg_get_uint16(key, "approach-aoa", &wnd->approach_aoa);
-  reg_get_uint16(key, "climb-aoa", &wnd->climb_aoa);
-  reg_get_uint16(key, "cruise-aoa", &wnd->cruise_aoa);
-  if (failed(reg_get_uint16(key, "yaw-max", &wnd->yaw_max)))
-    wnd->yaw_max = 45;
-
-  reg_get_bool(key, "show-aoa", &wnd->show_aoa);
-  reg_get_bool(key, "show-gs", &wnd->show_glideslope);
-  wnd->aoa_degrees = wnd->cruise_aoa;
-
-  // aoa is 40 pixels
-  wnd->aoa_pixels_per_degree = 40.0 / (wnd->critical_aoa - wnd->cruise_aoa);
-  wnd->aoa_degrees_per_mark = (wnd->critical_aoa - wnd->cruise_aoa) / 8.0;
-
-  rect_t wnd_rect;
-  get_window_rect(*hwnd, &wnd_rect);
-
-  int16_t value;
-  if (succeeded(reg_get_int16(key, "center-x", &value)))
-    wnd->median.x = (gdi_dim_t)value;
-  else
-    wnd->median.x = rect_width(&wnd_rect) >> 1;
-
-  if (succeeded(reg_get_int16(key, "center-y", &value)))
-    wnd->median.y = (gdi_dim_t)value;
-  else
-    wnd->median.y = rect_height(&wnd_rect) >> 1;
-
-  if (failed(lookup_font(key, "font", &wnd->font)))
-    {
-    // we always have the neo font.
-    if (failed(result = create_font("neo", 9, 0, &wnd->font)))
-      return result;
-    }
-
-  // store the parameters for the window
-  set_wnddata(*hwnd, wnd);
-
-  invalidate_rect(*hwnd, &wnd_rect);
-
-  return s_ok;
-  }
-
-
-static void update_window(handle_t hwnd, attitude_window_t *wnd)
-  {
+  attitude_window_t *wnd = (attitude_window_t *)parg;
   rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
 
@@ -498,106 +441,155 @@ static void update_window(handle_t hwnd, attitude_window_t *wnd)
     };
 
   polygon(hwnd, &wnd_rect, &white_pen, color_hollow, roll_points_base, 5);
+  end_paint(hwnd);
+
+  return s_ok;
   }
 
-static result_t widget_wndproc(handle_t hwnd, const canmsg_t *msg)
+static result_t on_yaw_angle(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
   {
-  //assert_valid(this);
+  attitude_window_t *wnd = (attitude_window_t *)parg;
   bool changed = false;
-  attitude_window_t *wnd;
-  get_wnddata(hwnd, (void **)&wnd);
 
-  switch (msg->id)
-    {
-    case id_yaw_angle:
-    {
-    float v;
-    get_param_float(msg, &v);
-    int16_t value = (int16_t)radians_to_degrees(v);
-    while (value > 179)
-      value -= 360;
+  float v;
+  get_param_float(msg, &v);
+  int16_t value = (int16_t)radians_to_degrees(v);
+  while (value > 179)
+    value -= 360;
 
-    while (value < -180)
-      value += 360;
+  while (value < -180)
+    value += 360;
 
-    changed = wnd->yaw != value;
-    wnd->yaw = value;
-    }
-    break;
-    case id_roll_angle:
-    {
-    float v;
-    get_param_float(msg, &v);
-    int16_t value = (int16_t)radians_to_degrees(v);
-    while (value > 179)
-      value -= 360;
-
-    while (value < -180)
-      value += 360;
-
-    if (value > 90 || value < -90)
-      value -= 180;
-
-    while (value < -180)
-      value += 360;
-
-    value = min(90, max(-90, value));
-
-    changed = wnd->roll != value;
-    wnd->roll = value;
-    }
-    break;
-    case id_pitch_angle:
-    {
-    float v;
-    get_param_float(msg, &v);
-    int16_t angle = (int16_t)radians_to_degrees(v);
-
-    while (angle < -180)
-      angle += 180;
-
-    while (angle > 180)
-      angle -= 180;
-
-    // angle is now within range
-    if (angle > 90)
-      angle = 180 - angle;
-
-    else if (angle < -90)
-      angle = -180 - angle;
-
-    changed = wnd->pitch != angle;
-    wnd->pitch = angle;
-    }
-    break;
-    //case id_glideslope_deviation :
-    //	// glideslope is 0.4 / 4096
-    //	// we represent this as +/- 120 pixels
-    //	changed |= assign_msg(long(data.msg_data_16() *(120 / 4096)), _glideslope);
-    //break;
-  //  case id_glideslope_aquired :
-  //    changed |= assign_msg(data.msg_data_16() != 0, _glideslope_aquired);
-  //  break;
-    //case id_localizer_deviation :
-    //	changed |= assign_msg(long(data.msg_data_16() *(120 / 4096)), _localizer);
-    //break;
-  //  case id_localizer_aquired :
-  //    changed |= assign_msg(data.msg_data_16() != 0, _localizer_aquired);
-  //  break;
-  //  case id_angle_of_attack :
-  //    changed |= assign_msg(data.msg_data_16(), _aoa_degrees);
-  //    break;
-    case id_paint:
-      begin_paint(hwnd);
-      update_window(hwnd, wnd);
-      end_paint(hwnd);
-      break;
-    default:
-      return defwndproc(hwnd, msg);
-    }
+  changed = wnd->yaw != value;
+  wnd->yaw = value;
 
   if (changed)
     invalidate_rect(hwnd, 0);
 
-  return true;
+  return s_ok;
   }
+
+static result_t on_roll_angle(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+  {
+  attitude_window_t *wnd = (attitude_window_t *)parg;
+  bool changed = false;
+
+  float v;
+  get_param_float(msg, &v);
+  int16_t value = (int16_t)radians_to_degrees(v);
+  while (value > 179)
+    value -= 360;
+
+  while (value < -180)
+    value += 360;
+
+  if (value > 90 || value < -90)
+    value -= 180;
+
+  while (value < -180)
+    value += 360;
+
+  value = min(90, max(-90, value));
+
+  changed = wnd->roll != value;
+  wnd->roll = value;
+
+  if (changed)
+    invalidate_rect(hwnd, 0);
+
+  return s_ok;
+  }
+
+static result_t on_pitch_angle(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+  {
+  attitude_window_t *wnd = (attitude_window_t *)parg;
+  bool changed = false;
+
+  float v;
+  get_param_float(msg, &v);
+  int16_t angle = (int16_t)radians_to_degrees(v);
+
+  while (angle < -180)
+    angle += 180;
+
+  while (angle > 180)
+    angle -= 180;
+
+  // angle is now within range
+  if (angle > 90)
+    angle = 180 - angle;
+
+  else if (angle < -90)
+    angle = -180 - angle;
+
+  changed = wnd->pitch != angle;
+  wnd->pitch = angle;
+
+  if (changed)
+    invalidate_rect(hwnd, 0);
+
+  return s_ok;
+  }
+
+  result_t create_attitude_window(handle_t parent, memid_t key, handle_t *hwnd)
+    {
+    result_t result;
+
+    // create our window
+    if (failed(create_child_widget(parent, key, defwndproc, hwnd)))
+      return result;
+
+    // create the window data.
+    attitude_window_t *wnd = (attitude_window_t *)neutron_malloc(sizeof(attitude_window_t));
+    memset(wnd, 0, sizeof(attitude_window_t));
+
+    wnd->version = sizeof(attitude_window_t);
+
+    reg_get_uint16(key, "critical-aoa", &wnd->critical_aoa);
+    reg_get_uint16(key, "approach-aoa", &wnd->approach_aoa);
+    reg_get_uint16(key, "climb-aoa", &wnd->climb_aoa);
+    reg_get_uint16(key, "cruise-aoa", &wnd->cruise_aoa);
+    if (failed(reg_get_uint16(key, "yaw-max", &wnd->yaw_max)))
+      wnd->yaw_max = 45;
+
+    reg_get_bool(key, "show-aoa", &wnd->show_aoa);
+    reg_get_bool(key, "show-gs", &wnd->show_glideslope);
+    wnd->aoa_degrees = wnd->cruise_aoa;
+
+    // aoa is 40 pixels
+    wnd->aoa_pixels_per_degree = 40.0 / (wnd->critical_aoa - wnd->cruise_aoa);
+    wnd->aoa_degrees_per_mark = (wnd->critical_aoa - wnd->cruise_aoa) / 8.0;
+
+    rect_t wnd_rect;
+    get_window_rect(*hwnd, &wnd_rect);
+
+    int16_t value;
+    if (succeeded(reg_get_int16(key, "center-x", &value)))
+      wnd->median.x = (gdi_dim_t)value;
+    else
+      wnd->median.x = rect_width(&wnd_rect) >> 1;
+
+    if (succeeded(reg_get_int16(key, "center-y", &value)))
+      wnd->median.y = (gdi_dim_t)value;
+    else
+      wnd->median.y = rect_height(&wnd_rect) >> 1;
+
+    if (failed(lookup_font(key, "font", &wnd->font)))
+      {
+      // we always have the neo font.
+      if (failed(result = create_font("neo", 9, 0, &wnd->font)))
+        return result;
+      }
+
+    // store the parameters for the window
+    set_wnddata(*hwnd, wnd);
+
+    add_event(*hwnd, id_paint, wnd, 0, on_paint);
+    add_event(*hwnd, id_yaw_angle, wnd, 0, on_yaw_angle);
+    add_event(*hwnd, id_roll_angle, wnd, 0, on_roll_angle);
+    add_event(*hwnd, id_pitch_angle, wnd, 0, on_pitch_angle);
+
+    invalidate_rect(*hwnd, &wnd_rect);
+
+    return s_ok;
+    }

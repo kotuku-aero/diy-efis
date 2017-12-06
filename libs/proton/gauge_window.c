@@ -145,249 +145,11 @@ static void draw_point(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rec
 static void draw_graph_value(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect, const pen_t *pen, size_t index, gdi_dim_t offset);
 static void draw_bar_graph(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect, const rect_t *rect);
 
-static result_t widget_wndproc(handle_t hwnd, const canmsg_t *data);
-
-result_t create_gauge_window(handle_t parent, memid_t key, handle_t *hwnd)
+static result_t on_paint(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
   {
-	result_t result;
-  int16_t int_value;
-  uint16_t uint_value;
-	
-  // create our window
-	if(failed(result = create_child_widget(parent, key, widget_wndproc, hwnd)))
-		return result;
-	
-  // create the window data.
-  gauge_window_t *wnd = (gauge_window_t *)neutron_malloc(sizeof(gauge_window_t));
-  memset(wnd, 0, sizeof(gauge_window_t));
-  
-  wnd->version = sizeof(gauge_window_t);
-  
-  rect_t rect_wnd;
+  begin_paint(hwnd);
 
-  get_window_rect(*hwnd, &rect_wnd);
-  
-  uint16_t len = REG_STRING_MAX +1;
-  if (failed(reg_get_float(key, "scale", &wnd->scale)))
-    wnd->scale = 1.0;
-
-  if (failed(reg_get_float(key, "offset", &wnd->offset)))
-    wnd->offset = 0.0;
-
-  if(failed(lookup_enum(key, "style", gauge_style_values, num_elements(gauge_style_values), (int *)&wnd->style)))
-    wnd->style = gs_pointer;
-
-  reg_get_uint16(key, "reset-id", &wnd->reset_label);
-  reg_get_float(key, "reset-value",&wnd->reset_value);
-
-  if(failed(lookup_font(key, "font", 0, &wnd->font)))
-    {
-    // we always have the neo font.
-    if (failed(result = create_font("neo", 9, 0, &wnd->font)))
-      return result;
-    }
-
-  if (failed(reg_get_int16(key, "center-x", &int_value)))
-    wnd->center.x = rect_width(&rect_wnd) >> 1;
-  else
-    wnd->center.x = (gdi_dim_t) int_value;
-
-  if (failed(reg_get_int16(key, "center-y", &int_value)))
-    wnd->center.y = rect_height(&rect_wnd) >> 1;
-  else
-    wnd->center.y = (gdi_dim_t) int_value;
-  
-  // get the details for the name
-  if(failed(reg_get_bool(key, "draw-name", &wnd->draw_name)))
-    wnd->draw_name = true;
-  
-  if(wnd->draw_name)
-    {
-    reg_get_string(key, "name", wnd->name, &len);
-    
-    if(failed(lookup_color(key, "name-color", &wnd->name_color)))
-      wnd->name_color = color_white;
-
-    if (failed(lookup_font(key, "name-font", &wnd->name_font)))
-      {
-      // we always have the neo font.
-      if (failed(result = create_font("neo", 9, 0, &wnd->name_font)))
-        return result;
-      }
-
-    if(failed(reg_get_int16(key, "name-x", &int_value)))
-      wnd->name_pt.x = wnd->center.x;
-    else
-      wnd->name_pt.x = (gdi_dim_t)int_value;
-
-    if(failed(reg_get_int16(key, "name-y", &int_value)))
-      wnd->name_pt.y = wnd->center.y;
-    else
-      wnd->name_pt.y = (gdi_dim_t)int_value;
-    }
-
-  if (failed(reg_get_uint16(key, "arc-begin", &wnd->arc_begin)))
-    wnd->arc_begin = 120;
-
-  if (failed(reg_get_uint16(key, "arc-range", &wnd->arc_range)))
-    wnd->arc_range = 270;
-
-  if (failed(reg_get_uint16(key, "width", &wnd->width)))
-    wnd->width = 7;
-
-  if(failed(reg_get_bool(key, "draw-value", &wnd->draw_value)))
-    wnd->draw_value = true;
-
-  if(wnd->draw_value)
-    {
-    if (failed(lookup_font(key, "value-font", &wnd->value_font)))
-      {
-      // we always have the neo font.
-      if (failed(result = create_font("neo", 9, 0, &wnd->value_font)))
-        return result;
-      }
-
-    // default values
-    wnd->value_rect.bottom = rect_wnd.bottom;
-    wnd->value_rect.left = wnd->center.x + 2;
-    wnd->value_rect.top = wnd->value_rect.bottom - 25;
-    wnd->value_rect.right = rect_wnd.right;
-
-    if(succeeded(reg_get_int16(key, "value-x", &int_value)))
-      wnd->value_rect.left = (gdi_dim_t)int_value;
-
-    if(succeeded(reg_get_uint16(key, "value-y", &uint_value)))
-      wnd->value_rect.top = (gdi_dim_t)uint_value;
-
-    if(succeeded(reg_get_uint16(key, "value-w", &uint_value)))
-      wnd->value_rect.right = (gdi_dim_t)uint_value + wnd->value_rect.left;
-
-    if(succeeded(reg_get_uint16(key, "value-h", &uint_value)))
-      wnd->value_rect.bottom = (gdi_dim_t)uint_value + wnd->value_rect.top;
-    }
-
-  char temp_name[REG_NAME_MAX+1];
-  if (failed(reg_get_uint16(key, "can-id", &uint_value)))
-    {
-    // could be can value 0..3
-    for (wnd->num_values = 0; wnd->num_values < 4; wnd->num_values++)
-      {
-      snprintf(temp_name, sizeof(temp_name), "can-id-%d", wnd->num_values);
-
-      if (failed(reg_get_uint16(key, temp_name, &uint_value)))
-        break;
-
-      wnd->labels[wnd->num_values] = uint_value;
-      wnd->values[wnd->num_values] = wnd->reset_value;
-      wnd->min_values[wnd->num_values] = wnd->reset_value;
-      wnd->max_values[wnd->num_values] = wnd->reset_value;
-      }
-    }
-  else
-    {
-    wnd->labels[0] = uint_value;
-    wnd->values[0] = wnd->reset_value;
-    wnd->min_values[0] = wnd->reset_value;
-    wnd->max_values[0] = wnd->reset_value;
-    wnd->num_values = 1;
-    }
-  
-  if (failed(reg_get_uint16(key, "radii", &uint_value)))
-    uint_value = (rect_width(&rect_wnd) >> 1) - 5;
-
-  wnd->gauge_radii = (gdi_dim_t) uint_value;
-
-  // open a step key
-  memid_t step_key;
-
-  if (succeeded(reg_open_key(key, "step", &step_key)))
-    {
-    vector_create(sizeof(step_t), &wnd->steps);
-    
-    int i;
-    // only support 99 ticks/steps
-    for(i = 0; i < 99; i++)
-      {
-      snprintf(temp_name, 32, "%d", i);
-
-      memid_t child_key;
-
-      if (succeeded(reg_open_key(step_key, temp_name, &child_key)))
-        {
-
-        // the step is a series of settings in the form:
-        // step-0=15, color_orange, 5, ps_solid , color_light_blue
-        // param1 -> step level
-        // param2 -> pen color
-        // param3 -> pen width
-        // param4 -> pen style
-        // param5 -> pointer color
-        step_t new_step;
-        memset(&new_step, 0, sizeof(new_step));
-
-        reg_get_int16(child_key, "value", &new_step.value);
-        lookup_color(child_key, "color", &new_step.gauge_color);
-
-        memid_t pen_key;
-        if(failed(reg_open_key(child_key, "pen", &pen_key)) ||
-           failed(lookup_pen(pen_key, &new_step.pen)))
-          {
-          new_step.pen.color = color_lightblue;
-          new_step.pen.width = 5;
-          new_step.pen.style = ps_solid;
-          }
-
-        vector_push_back(wnd->steps, &new_step);
-        }
-      }
-    }
-
-  if (succeeded(reg_open_key(key, "tick", &step_key)))
-    {
-    vector_create(sizeof(tick_mark_t), &wnd->ticks);
-
-    int i;
-    for (i = 0; i < 99; i++)
-      {
-      snprintf(temp_name, 32, "%d", i);
-
-      memid_t child_key;
-
-      if (succeeded(reg_open_key(step_key, temp_name, &child_key)))
-        {
-
-        // the step is a series of settings in the form:
-        // tick-0=650, 650
-        // param1 -> tick point
-        // param2 -> tick label
-        tick_mark_t new_tick;
-        memset(&new_tick, 0, sizeof(tick_mark_t));
-
-        if(failed(reg_get_int16(child_key, "value", &new_tick.value)))
-          new_tick.value = 0;
-
-        reg_get_string(child_key, "text", new_tick.text, 0);
-
-        vector_push_back(wnd->ticks, &new_tick);
-        }
-      }
-    }
-
-  if(failed(lookup_color(key, "background-color", &wnd->background_color)))
-    wnd->background_color = color_black;
-  
-  reg_get_bool(key, "draw-border", &wnd->draw_border);
-
-  // store the parameters for the window
-  set_wnddata(*hwnd, wnd);
-
-  invalidate_rect(*hwnd, &rect_wnd);
-	
-	return s_ok;
-  }
-
-static void update_window(handle_t hwnd, gauge_window_t *wnd)
-  {
+  gauge_window_t *wnd = (gauge_window_t *)parg;
   rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
   
@@ -404,57 +166,55 @@ static void update_window(handle_t hwnd, gauge_window_t *wnd)
     update_bar_gauge(hwnd, wnd, &wnd_rect);
   else
     update_dial_gauge(hwnd, wnd, &wnd_rect);
+
+  end_paint(hwnd);
+  return s_ok;
   }
 
-static result_t widget_wndproc(handle_t hwnd, const canmsg_t *msg)
+static result_t on_reset_label(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
   {
   bool changed = false;
-  gauge_window_t *wnd;
-  get_wnddata(hwnd, (void **)&wnd);
+  gauge_window_t *wnd = (gauge_window_t *)parg;
 
-  if (msg->id == wnd->reset_label)
+  size_t i;
+  for (i = 0; i < 4; i++)
     {
-    size_t i;
-    for (i = 0; i < 4; i++)
-      {
-      wnd->min_values[i] = wnd->reset_value;
-      wnd->max_values[i] = wnd->min_values[i];
-      }
-    changed = true;
+    wnd->min_values[i] = wnd->reset_value;
+    wnd->max_values[i] = wnd->min_values[i];
     }
-  else if(msg->id == id_paint)
-    {
-    begin_paint(hwnd);
-    update_window(hwnd, wnd);
-    end_paint(hwnd);
-    }
-  else
-    {
-    bool processed = false;
-    size_t i;
-    for (i = 0; i < wnd->num_values; i++)
-      {
-      if (msg->id ==  wnd->labels[i])
-        {
-        float msg_value;
-        get_param_float(msg, &msg_value);
-        msg_value *=  wnd->scale;
-        msg_value +=  wnd->offset;
+  changed = true;
 
-        changed = wnd->values[i] != msg_value;
-        wnd->values[i] = msg_value;
-        
-        wnd->min_values[i] = min(wnd->min_values[i], wnd->values[i]);
-        wnd->max_values[i] = max(wnd->max_values[i], wnd->values[i]);
-        
-        processed = true;
-        break;
-        }
+  if (changed)
+    invalidate_rect(hwnd, 0);
+
+  return s_ok;
+  }
+
+static result_t on_value_label(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+  {
+  bool changed = false;
+  gauge_window_t *wnd = (gauge_window_t *)parg;
+
+  size_t i;
+  for (i = 0; i < wnd->num_values; i++)
+    {
+    if (msg->id == wnd->labels[i])
+      {
+      float msg_value;
+      get_param_float(msg, &msg_value);
+      msg_value *= wnd->scale;
+      msg_value += wnd->offset;
+
+      changed = wnd->values[i] != msg_value;
+      wnd->values[i] = msg_value;
+
+      wnd->min_values[i] = min(wnd->min_values[i], wnd->values[i]);
+      wnd->max_values[i] = max(wnd->max_values[i], wnd->values[i]);
+
+      break;
       }
-    
-    if(!processed)
-      return defwndproc(hwnd, msg);
     }
+
 
   if (changed)
     invalidate_rect(hwnd, 0);
@@ -1101,4 +861,256 @@ static void draw_graph_value(handle_t hwnd,
       polygon(hwnd, wnd_rect, outline_pen, color_hollow, pts, 4);
       }
     }
+  }
+
+
+result_t create_gauge_window(handle_t parent, memid_t key, handle_t *hwnd)
+  {
+  result_t result;
+  int16_t int_value;
+  uint16_t uint_value;
+
+  // create our window
+  if (failed(result = create_child_widget(parent, key, widget_wndproc, hwnd)))
+    return result;
+
+  // create the window data.
+  gauge_window_t *wnd = (gauge_window_t *)neutron_malloc(sizeof(gauge_window_t));
+  memset(wnd, 0, sizeof(gauge_window_t));
+
+  wnd->version = sizeof(gauge_window_t);
+
+  rect_t rect_wnd;
+
+  get_window_rect(*hwnd, &rect_wnd);
+
+  uint16_t len = REG_STRING_MAX + 1;
+  if (failed(reg_get_float(key, "scale", &wnd->scale)))
+    wnd->scale = 1.0;
+
+  if (failed(reg_get_float(key, "offset", &wnd->offset)))
+    wnd->offset = 0.0;
+
+  if (failed(lookup_enum(key, "style", gauge_style_values, num_elements(gauge_style_values), (int *)&wnd->style)))
+    wnd->style = gs_pointer;
+
+  reg_get_uint16(key, "reset-id", &wnd->reset_label);
+  reg_get_float(key, "reset-value", &wnd->reset_value);
+
+  if (failed(lookup_font(key, "font", 0, &wnd->font)))
+    {
+    // we always have the neo font.
+    if (failed(result = create_font("neo", 9, 0, &wnd->font)))
+      return result;
+    }
+
+  if (failed(reg_get_int16(key, "center-x", &int_value)))
+    wnd->center.x = rect_width(&rect_wnd) >> 1;
+  else
+    wnd->center.x = (gdi_dim_t)int_value;
+
+  if (failed(reg_get_int16(key, "center-y", &int_value)))
+    wnd->center.y = rect_height(&rect_wnd) >> 1;
+  else
+    wnd->center.y = (gdi_dim_t)int_value;
+
+  // get the details for the name
+  if (failed(reg_get_bool(key, "draw-name", &wnd->draw_name)))
+    wnd->draw_name = true;
+
+  if (wnd->draw_name)
+    {
+    reg_get_string(key, "name", wnd->name, &len);
+
+    if (failed(lookup_color(key, "name-color", &wnd->name_color)))
+      wnd->name_color = color_white;
+
+    if (failed(lookup_font(key, "name-font", &wnd->name_font)))
+      {
+      // we always have the neo font.
+      if (failed(result = create_font("neo", 9, 0, &wnd->name_font)))
+        return result;
+      }
+
+    if (failed(reg_get_int16(key, "name-x", &int_value)))
+      wnd->name_pt.x = wnd->center.x;
+    else
+      wnd->name_pt.x = (gdi_dim_t)int_value;
+
+    if (failed(reg_get_int16(key, "name-y", &int_value)))
+      wnd->name_pt.y = wnd->center.y;
+    else
+      wnd->name_pt.y = (gdi_dim_t)int_value;
+    }
+
+  if (failed(reg_get_uint16(key, "arc-begin", &wnd->arc_begin)))
+    wnd->arc_begin = 120;
+
+  if (failed(reg_get_uint16(key, "arc-range", &wnd->arc_range)))
+    wnd->arc_range = 270;
+
+  if (failed(reg_get_uint16(key, "width", &wnd->width)))
+    wnd->width = 7;
+
+  if (failed(reg_get_bool(key, "draw-value", &wnd->draw_value)))
+    wnd->draw_value = true;
+
+  if (wnd->draw_value)
+    {
+    if (failed(lookup_font(key, "value-font", &wnd->value_font)))
+      {
+      // we always have the neo font.
+      if (failed(result = create_font("neo", 9, 0, &wnd->value_font)))
+        return result;
+      }
+
+    // default values
+    wnd->value_rect.bottom = rect_wnd.bottom;
+    wnd->value_rect.left = wnd->center.x + 2;
+    wnd->value_rect.top = wnd->value_rect.bottom - 25;
+    wnd->value_rect.right = rect_wnd.right;
+
+    if (succeeded(reg_get_int16(key, "value-x", &int_value)))
+      wnd->value_rect.left = (gdi_dim_t)int_value;
+
+    if (succeeded(reg_get_uint16(key, "value-y", &uint_value)))
+      wnd->value_rect.top = (gdi_dim_t)uint_value;
+
+    if (succeeded(reg_get_uint16(key, "value-w", &uint_value)))
+      wnd->value_rect.right = (gdi_dim_t)uint_value + wnd->value_rect.left;
+
+    if (succeeded(reg_get_uint16(key, "value-h", &uint_value)))
+      wnd->value_rect.bottom = (gdi_dim_t)uint_value + wnd->value_rect.top;
+    }
+
+  char temp_name[REG_NAME_MAX + 1];
+  if (failed(reg_get_uint16(key, "can-id", &uint_value)))
+    {
+    // could be can value 0..3
+    for (wnd->num_values = 0; wnd->num_values < 4; wnd->num_values++)
+      {
+      snprintf(temp_name, sizeof(temp_name), "can-id-%d", wnd->num_values);
+
+      if (failed(reg_get_uint16(key, temp_name, &uint_value)))
+        break;
+
+      wnd->labels[wnd->num_values] = uint_value;
+      wnd->values[wnd->num_values] = wnd->reset_value;
+      wnd->min_values[wnd->num_values] = wnd->reset_value;
+      wnd->max_values[wnd->num_values] = wnd->reset_value;
+      }
+    }
+  else
+    {
+    wnd->labels[0] = uint_value;
+    wnd->values[0] = wnd->reset_value;
+    wnd->min_values[0] = wnd->reset_value;
+    wnd->max_values[0] = wnd->reset_value;
+    wnd->num_values = 1;
+    }
+
+  if (failed(reg_get_uint16(key, "radii", &uint_value)))
+    uint_value = (rect_width(&rect_wnd) >> 1) - 5;
+
+  wnd->gauge_radii = (gdi_dim_t)uint_value;
+
+  // open a step key
+  memid_t step_key;
+
+  if (succeeded(reg_open_key(key, "step", &step_key)))
+    {
+    vector_create(sizeof(step_t), &wnd->steps);
+
+    int i;
+    // only support 99 ticks/steps
+    for (i = 0; i < 99; i++)
+      {
+      snprintf(temp_name, 32, "%d", i);
+
+      memid_t child_key;
+
+      if (succeeded(reg_open_key(step_key, temp_name, &child_key)))
+        {
+
+        // the step is a series of settings in the form:
+        // step-0=15, color_orange, 5, ps_solid , color_light_blue
+        // param1 -> step level
+        // param2 -> pen color
+        // param3 -> pen width
+        // param4 -> pen style
+        // param5 -> pointer color
+        step_t new_step;
+        memset(&new_step, 0, sizeof(new_step));
+
+        reg_get_int16(child_key, "value", &new_step.value);
+        lookup_color(child_key, "color", &new_step.gauge_color);
+
+        memid_t pen_key;
+        if (failed(reg_open_key(child_key, "pen", &pen_key)) ||
+          failed(lookup_pen(pen_key, &new_step.pen)))
+          {
+          new_step.pen.color = color_lightblue;
+          new_step.pen.width = 5;
+          new_step.pen.style = ps_solid;
+          }
+
+        vector_push_back(wnd->steps, &new_step);
+        }
+      }
+    }
+
+  if (succeeded(reg_open_key(key, "tick", &step_key)))
+    {
+    vector_create(sizeof(tick_mark_t), &wnd->ticks);
+
+    int i;
+    for (i = 0; i < 99; i++)
+      {
+      snprintf(temp_name, 32, "%d", i);
+
+      memid_t child_key;
+
+      if (succeeded(reg_open_key(step_key, temp_name, &child_key)))
+        {
+
+        // the step is a series of settings in the form:
+        // tick-0=650, 650
+        // param1 -> tick point
+        // param2 -> tick label
+        tick_mark_t new_tick;
+        memset(&new_tick, 0, sizeof(tick_mark_t));
+
+        if (failed(reg_get_int16(child_key, "value", &new_tick.value)))
+          new_tick.value = 0;
+
+        reg_get_string(child_key, "text", new_tick.text, 0);
+
+        vector_push_back(wnd->ticks, &new_tick);
+        }
+      }
+    }
+
+  if (failed(lookup_color(key, "background-color", &wnd->background_color)))
+    wnd->background_color = color_black;
+
+  reg_get_bool(key, "draw-border", &wnd->draw_border);
+
+  // store the parameters for the window
+  set_wnddata(*hwnd, wnd);
+
+  // add all of the properties now
+  add_event(*hwnd, id_paint, wnd, 0, on_paint);
+
+  if(wnd->reset_label != 0)
+    add_event(*hwnd, wnd->reset_label, wnd, 0, on_reset_label);
+
+  uint16_t i;
+  for (i = 0; i < wnd->num_values; i++)
+    {
+    add_event(*hwnd, wnd->labels[i], wnd, 0, on_value_label);
+    }      
+
+  invalidate_rect(*hwnd, &rect_wnd);
+
+  return s_ok;
   }

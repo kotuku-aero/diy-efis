@@ -34,6 +34,7 @@ If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
 #include "widget.h"
+#include "../photon/window.h"
 #include "spatial.h"
 #include "pens.h"
 
@@ -65,7 +66,31 @@ typedef struct _airspeed_window_t {
   handle_t large_roller;
   handle_t small_roller;
 } airspeed_window_t;
- 
+
+static result_t get_vs0(handle_t hwnd, const char *property_name, void *parg, variant_t *value)
+  {
+  airspeed_window_t *wnd = (airspeed_window_t *)parg;
+  value->dt = field_uint16;
+  value->v_uint16 = wnd->vs0;
+
+  return s_ok;
+  }
+
+static result_t set_vs0(handle_t hwnd, const char *property_name, void *parg, const variant_t *value)
+  {
+  airspeed_window_t *wnd = (airspeed_window_t *)parg;
+  if (value->dt != field_uint16)
+    return e_bad_type;
+
+  bool changed = wnd->vs0 != value->v_uint16;
+  if (changed)
+    {
+    wnd->vs0 = value->v_uint16;
+    invalidate_rect(hwnd, 0);
+    }
+
+  return s_ok;
+  }
 
 static result_t on_paint(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
   {
@@ -286,8 +311,10 @@ result_t create_airspeed_window(handle_t parent, memid_t key, handle_t *hwnd)
   // store the parameters for the window
   set_wnddata(*hwnd, wnd);
 
-  add_event(parent, id_paint, wnd, 0, on_paint);
-  add_event(parent, id_indicated_airspeed, wnd, 0, on_indicated_airspeed);
+  add_property(*hwnd, "vs0", wnd, get_vs0, set_vs0, field_uint16, 0);
+
+  add_event(*hwnd, id_paint, wnd, 0, on_paint);
+  add_event(*hwnd, id_indicated_airspeed, wnd, 0, on_indicated_airspeed);
 
   rect_t rect;
   get_window_rect(*hwnd, &rect);

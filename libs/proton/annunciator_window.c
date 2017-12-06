@@ -59,7 +59,6 @@ typedef struct _annunciator_window_t {
   handle_t  large_font;
   } annunciator_window_t;
 
-static result_t widget_wndproc(handle_t hwnd, const canmsg_t *data);
 /**
  * Draw an annunciator
  * @param hwnd      Window to draw on
@@ -70,50 +69,13 @@ static result_t widget_wndproc(handle_t hwnd, const canmsg_t *data);
  */
 static void draw_annunciator(handle_t hwnd, const rect_t *wnd_rect, annunciator_window_t *wnd, const point_t *pt, const char *label, const char *value);
 
-result_t create_annunciator_window(handle_t parent, memid_t key, handle_t *hwnd)
+static result_t on_paint(handle_t hwnd, void *parg, const char *func, const canmsg_t *canmsg)
   {
-  result_t result;
+  bool changed = false;
+  annunciator_window_t *wnd = (annunciator_window_t *)parg;
 
-  // create our window
-  if (failed(create_child_widget(parent, key, widget_wndproc, hwnd)))
-    return result;
+  begin_paint(hwnd);
 
-  // create the window data.
-  annunciator_window_t *wnd = (annunciator_window_t *)neutron_malloc(sizeof(annunciator_window_t));
-  memset(wnd, 0, sizeof(annunciator_window_t));
-
-  wnd->version = sizeof(annunciator_window_t);
-
-
-  reg_get_bool(key, "draw-border", &wnd->draw_border);
-
-  // store the parameters for the window
-  set_wnddata(*hwnd, wnd);
-
-  rect_t rect;
-  get_window_rect(*hwnd, &rect);
-  invalidate_rect(*hwnd, &rect);
-
-  // get the small font
-  if (failed(lookup_font(key, "small-font", wnd->small_font)))
-    {
-    // we always have the neo font.
-    if (failed(result = create_font("neo", 9, 0, &wnd->small_font)))
-      return result;
-    }
-
-  if (failed(lookup_font(key, "large-font", wnd->large_font)))
-    {
-    // we always have the neo font.
-    if (failed(result = create_font("neo", 15, 0, &wnd->large_font)))
-      return result;
-    }
-
-  return s_ok;
-  }
-
-static void update_window(handle_t hwnd, annunciator_window_t *wnd)
-  {
   rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
 
@@ -141,70 +103,89 @@ static void update_window(handle_t hwnd, annunciator_window_t *wnd)
 
   sprintf(msg, "%d", wnd->cas);
   draw_annunciator(hwnd, &wnd_rect, wnd, &cas_pt, "CAS", msg);
+
+  end_paint(hwnd);
+  return s_ok;
   }
 
-static result_t widget_wndproc(handle_t hwnd, const canmsg_t *msg)
+static result_t on_def_utc(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
   {
   bool changed = false;
-  annunciator_window_t *wnd;
-  get_wnddata(hwnd, (void **)&wnd);
+  annunciator_window_t *wnd = (annunciator_window_t *)parg;
 
+  uint8_t v;
+  uint16_t minutes;
+  get_param_uint8(msg, 0, &v);
+  minutes = v * 60;
+  get_param_uint8(msg, 1, &v);
+  minutes += v;
 
-  switch (msg->id)
-    {
-    case id_def_utc:
-    {
-    uint8_t v;
-    uint16_t minutes;
-    get_param_uint8(msg, 0, &v);
-    minutes = v * 60;
-    get_param_uint8(msg, 1, &v);
-    minutes += v;
+  changed = wnd->clock != minutes;
+  wnd->clock = minutes;
 
-    changed = wnd->clock != minutes;
-    wnd->clock = minutes;
-    }
-    break;
-    case id_qnh:
-    {
-    uint16_t value;
-    get_param_uint16(msg, 0, &value);
-    changed = wnd->qnh != value;
-    wnd->qnh = value;
-    }
-    break;
-    case id_true_airspeed:
-    {
-    uint16_t value;
-    get_param_uint16(msg, 0, &value);
-    changed = wnd->cas != value;
-    wnd->cas = value;
-    }
-    break;
-    case id_outside_air_temperature:
-    {
-    int16_t value;
-    get_param_int16(msg, 0, &value);
-    changed = wnd->oat != value;
-    wnd->oat = value;
-    }
-    break;
-    case id_air_time:
-    {
-    uint32_t value;
-    get_param_uint32(msg, &value);
-    changed = wnd->hours != value;
-    wnd->hours = value;
-    }
-    break;
-    case id_paint:
-      begin_paint(hwnd);
-      update_window(hwnd, wnd);
-      end_paint(hwnd);
-      break;
-    default:
-      return defwndproc(hwnd, msg);
-    }
+  if (changed)
+    invalidate_rect(hwnd, 0);
+
+  return s_ok;
+  }
+
+static result_t on_qnh(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+  {
+  bool changed = false;
+  annunciator_window_t *wnd = (annunciator_window_t *)parg;
+
+  uint16_t value;
+  get_param_uint16(msg, 0, &value);
+  changed = wnd->qnh != value;
+  wnd->qnh = value;
+
+  if (changed)
+    invalidate_rect(hwnd, 0);
+
+  return s_ok;
+  }
+
+static result_t on_true_airspeed(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+  {
+  bool changed = false;
+  annunciator_window_t *wnd = (annunciator_window_t *)parg;
+
+  uint16_t value;
+  get_param_uint16(msg, 0, &value);
+  changed = wnd->cas != value;
+  wnd->cas = value;
+
+  if (changed)
+    invalidate_rect(hwnd, 0);
+
+  return s_ok;
+  }
+
+static result_t on_outside_air_temperature(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+  {
+  bool changed = false;
+  annunciator_window_t *wnd = (annunciator_window_t *)parg;
+
+  int16_t value;
+  get_param_int16(msg, 0, &value);
+  changed = wnd->oat != value;
+  wnd->oat = value;
+
+  if (changed)
+    invalidate_rect(hwnd, 0);
+
+  return s_ok;
+  }
+
+static result_t on_air_time(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+  {
+  bool changed = false;
+  annunciator_window_t *wnd = (annunciator_window_t *)parg;
+
+  uint32_t value;
+  get_param_uint32(msg, &value);
+  changed = wnd->hours != value;
+  wnd->hours = value;
 
   if (changed)
     invalidate_rect(hwnd, 0);
@@ -264,4 +245,53 @@ static void draw_annunciator(handle_t hwnd,
 
   draw_text(hwnd, wnd_rect, wnd->large_font, color_white, color_hollow,
     value, 0, &origin, &rect, 0, 0);
+  }
+
+result_t create_annunciator_window(handle_t parent, memid_t key, handle_t *hwnd)
+  {
+  result_t result;
+
+  // create our window
+  if (failed(create_child_widget(parent, key, defwndproc, hwnd)))
+    return result;
+
+  // create the window data.
+  annunciator_window_t *wnd = (annunciator_window_t *)neutron_malloc(sizeof(annunciator_window_t));
+  memset(wnd, 0, sizeof(annunciator_window_t));
+
+  wnd->version = sizeof(annunciator_window_t);
+
+
+  reg_get_bool(key, "draw-border", &wnd->draw_border);
+
+  // store the parameters for the window
+  set_wnddata(*hwnd, wnd);
+
+  rect_t rect;
+  get_window_rect(*hwnd, &rect);
+  invalidate_rect(*hwnd, &rect);
+
+  // get the small font
+  if (failed(lookup_font(key, "small-font", wnd->small_font)))
+    {
+    // we always have the neo font.
+    if (failed(result = create_font("neo", 9, 0, &wnd->small_font)))
+      return result;
+    }
+
+  if (failed(lookup_font(key, "large-font", wnd->large_font)))
+    {
+    // we always have the neo font.
+    if (failed(result = create_font("neo", 15, 0, &wnd->large_font)))
+      return result;
+    }
+
+  add_event(*hwnd, id_paint, wnd, 0, on_paint);
+  add_event(*hwnd, id_def_utc, wnd, 0, on_def_utc);
+  add_event(*hwnd, id_qnh, wnd, 0, on_qnh);
+  add_event(*hwnd, id_true_airspeed, wnd, 0, on_true_airspeed);
+  add_event(*hwnd, id_outside_air_temperature, wnd, 0, on_outside_air_temperature);
+  add_event(*hwnd, id_air_time, wnd, 0, on_air_time);
+
+  return s_ok;
   }
