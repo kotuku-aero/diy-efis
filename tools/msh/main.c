@@ -67,6 +67,7 @@ extern cli_node_t cli_root;
 #define CAN_RX_BUFFER_LEN 1024
 
 const char *node_name = "muon";
+extern const char *splash_base64;     // 320x240
 
 static FILE *ci;
 static FILE *co;
@@ -352,7 +353,7 @@ int main(int argc, char **argv)
   memid_t proton_key;
   if(succeeded(reg_open_key(0, "proton", &proton_key)))
     {
-    task_create("PROTON", DEFAULT_STACK_SIZE * 4, run_proton, 0, NORMAL_PRIORITY, 0);
+    task_create("PROTON", DEFAULT_STACK_SIZE * 4, run_proton, splash_base64, NORMAL_PRIORITY, 0);
     }
 
   if (failed(ion_init()))

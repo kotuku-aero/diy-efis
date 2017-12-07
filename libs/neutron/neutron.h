@@ -88,7 +88,7 @@ enum {
   e_wrong_type = -24,
   e_parse_error = -25,
   e_incomplete_command = -26,
-  e_bad_type,
+  e_bad_type = -27,
   };
 
 static inline bool failed(result_t r)
@@ -840,13 +840,17 @@ extern result_t get_param_int32(const canmsg_t *msg, int32_t *value);
  */
 extern result_t get_param_uint32(const canmsg_t *msg, uint32_t *value);
 
-#ifndef min
+#ifdef min
+#undef min
+#endif
 #define min(a, b) ((a) < (b) ? (a) : b)
-#endif
 
-#ifndef max
-#define max(a, b) ((a) > (b) ? (a) : b)
+
+#ifdef max
+#undef max
 #endif
+#define max(a, b) ((a) > (b) ? (a) : b)
+
 
 // this is the node ID that is normally defined in the registry
 extern uint8_t node_id;

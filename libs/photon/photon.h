@@ -167,6 +167,13 @@ enum {
   eto_clipped = 0x00000004
   };
 
+enum {
+  e_not_png = -100, /* image data does not have a PNG header */
+  e_png_malformed = -101, /* image data is not a valid PNG image */
+  e_png_unsupported = -102, /* critical PNG chunk type is not supported */
+  e_png_interlaced = -103, /* image interlacing is not supported */
+  e_png_bad_format = -104, /* image color format is not supported */
+  };
   
 typedef result_t (*wndproc)(handle_t hwnd, const canmsg_t *msg);
 
@@ -474,6 +481,14 @@ extern result_t create_rect_canvas(const extent_t *size, handle_t *hndl);
  */
 extern result_t create_bitmap_canvas(const bitmap_t *bitmap, handle_t *hndl);
 /**
+* @function create_png_canvas(handle_t stream, handle_t *hndl)
+* Create a canvas from the PNG image provided in the stream
+* @param stream    stream to read the PNG image from
+* @param hndl      created canvas
+* @return s_ok if canvas created ok
+*/
+extern result_t create_png_canvas(handle_t stream, handle_t *hndl);
+/**
  * Get the length of a canvas
  * @param canvas  Canvas to query
  * @param extent  extents of the canvas
@@ -612,8 +627,8 @@ extern result_t get_pixel(handle_t canvas,
  * @param clip_rect   rectangle to clip to
  * @param pt          point to wite
  * @param c           color to write
- * @param rop         raster operation to perform
- * @return old pixel
+ * @param pixel       optional old pixel
+ * @return s_ok if set ok
  */
 extern result_t set_pixel(handle_t canvas,
                                 const rect_t *clip_rect,

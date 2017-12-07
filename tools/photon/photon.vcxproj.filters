@@ -27,6 +27,9 @@
     <ClCompile Include="..\..\libs\photon\font.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\libs\photon\png_canvas.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libs\photon\photon.h">

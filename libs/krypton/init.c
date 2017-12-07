@@ -69,7 +69,6 @@ static void create_or_open_mmap(const char *filename, uint32_t size, HANDLE *hnd
   }
 
 extern void start_fb(uint16_t x, uint16_t y, uint8_t *);
-extern const bitmap_t  splash_bitmap;     // 320x240
 
 extern result_t electron_init(const char *reg_path, bool factory_reset)
   {
@@ -100,12 +99,7 @@ extern result_t electron_init(const char *reg_path, bool factory_reset)
       // this creates the emulator
       fb_buffer = (uint8_t *)malloc(size);
 
-      if (x == 320 && y == 240)
-        {
-        memcpy(fb_buffer, splash_bitmap.pixels, size);
-        }
-      else
-       memset(fb_buffer, 0, size);
+      memset(fb_buffer, 0, size);
 
       start_fb(x, y, fb_buffer);
       }

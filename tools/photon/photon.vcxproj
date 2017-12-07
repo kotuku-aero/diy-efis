@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\libs\photon\font.c" />
+    <ClCompile Include="..\..\libs\photon\png_canvas.c" />
     <ClCompile Include="..\..\libs\photon\window.c" />
     <ClCompile Include="..\..\libs\photon\photon.c" />
     <ClCompile Include="..\..\libs\photon\truetype.c" />

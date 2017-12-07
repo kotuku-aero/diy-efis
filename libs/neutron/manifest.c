@@ -121,7 +121,7 @@ static result_t decode_byte(manifest_handle_t *stream, uint16_t offset, uint8_t 
   return s_ok;
   }
 
-static result_t check_handle(handle_t hndl)
+static inline result_t check_handle(handle_t hndl)
   {
   if (hndl == 0)
     return e_bad_parameter;
@@ -286,6 +286,9 @@ result_t manifest_open(memid_t key, const char *path, handle_t *hndl)
     return result;
     }
 
+  if (failed(result = stream_read(stream->reg_stream, stream->buffer, 4, 0)))
+    return result;
+
   *hndl = stream;
   return s_ok;
 
@@ -300,6 +303,8 @@ result_t manifest_create(const char *literal, handle_t *hndl)
   stream->literal = literal;
   stream->source_length = strlen(literal);
   stream->length = (stream->source_length / 4) * 3;
+
+  memcpy(stream->buffer, stream->literal, 4);
 
   *hndl = stream;
   return s_ok;

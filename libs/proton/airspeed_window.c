@@ -33,12 +33,12 @@ then the origional copyright notice is to be respected.
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
+#include <math.h>
 #include "widget.h"
 #include "../photon/window.h"
 #include "spatial.h"
 #include "pens.h"
 
-#include <math.h>
 
 typedef struct _airspeed_window_t {
   size_t version;

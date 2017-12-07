@@ -46,13 +46,6 @@ typedef struct _window_msg_t {
   } window_msg_t;
 
 static screen_t *phys_screen;
-#ifndef min
-#define min(a, b) ((a) > (b)? (b) : (a))
-#endif
-
-#ifndef max
-#define max(a, b) ((a) > (b)? (a) : (b))
-#endif
 
 static void on_timer(const canmsg_t *msg)
   {
@@ -2683,7 +2676,6 @@ result_t draw_text(handle_t hndl, const rect_t *clip_rect, handle_t  fp,
   canvas_t *canvas;
   if(failed(result = get_canvas(hndl, &canvas)))
     return result;
-
 
   // create a clipping rectangle as needed
   rect_t txt_rect;

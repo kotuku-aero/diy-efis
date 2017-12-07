@@ -871,7 +871,7 @@ result_t create_gauge_window(handle_t parent, memid_t key, handle_t *hwnd)
   uint16_t uint_value;
 
   // create our window
-  if (failed(result = create_child_widget(parent, key, widget_wndproc, hwnd)))
+  if (failed(result = create_child_widget(parent, key, defwndproc, hwnd)))
     return result;
 
   // create the window data.

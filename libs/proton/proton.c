@@ -55,6 +55,8 @@ void run_proton(void *parg)
   result_t result;
   memid_t key;
 
+  const char *splash_base64 = (const char *)parg;
+
   if(succeeded(reg_open_key(0, "proton", &key)))
     {
     // create the root window
@@ -75,11 +77,36 @@ void run_proton(void *parg)
 
     if(succeeded(result = open_screen(orientation, layout_wndproc, 0, &main_window)))
       {
+      if (splash_base64 != 0)
+        {
+        handle_t splash;
+        handle_t splash_canvas;
+
+        if (succeeded(manifest_create(splash_base64, &splash)))
+          {
+          if(succeeded(create_png_canvas(splash, &splash_canvas)))
+            {
+            extent_t ex;
+            get_canvas_extents(splash_canvas, &ex);
+
+            rect_t src_clip = { 0, 0, ex.dx, ex.dy };
+            point_t src_pt = { 0, 0 };
+
+            rect_t rect;
+            get_window_rect(main_window, &rect);
+
+            bit_blt(main_window, &rect, &rect, splash_canvas, &src_clip, &src_pt);
+
+            canvas_close(splash_canvas);
+            }
+
+          stream_close(splash);
+          }
+        }
       // load the neon font.
       handle_t neo_stream;
-      if(failed(result = manifest_create(neo_base64, &neo_stream)) ||
-         failed(result = load_font("neo", neo_stream)))
-         return result;
+      if(succeeded(result = manifest_create(neo_base64, &neo_stream)))
+        load_font("neo", neo_stream);
 
       // note we don't load hints, just the font so there is always a TTF available
 
