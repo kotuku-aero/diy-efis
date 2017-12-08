@@ -6,14 +6,7 @@
 
 extern uint8_t *fb_buffer;
 
-// data that is based on the actual fb_buffer
-static int fbfd;          // actual fb_buffer
-
 static handle_t worker;
-
-// set to the screen fb_buffer handle.
-// if single bufferred will be /dev/fb0, double bufferred will be /dev/fb1
-static int fbfd = -1;
 
 static const char *screen_x_s = "screen-x";
 static const char *screen_y_s = "screen-y";
@@ -61,8 +54,6 @@ static void bsp_fast_fill(canvas_t *canvas, const rect_t *dest, color_t fill_col
 static void bsp_fast_line(canvas_t *canvas, const point_t *p1, const point_t *p2, color_t fill_color);
 static void bsp_fast_copy(canvas_t *canvas, const point_t *dest, const canvas_t *src_canvas, const rect_t *src);
 static void bsp_copy_bitmap(canvas_t *canvas, const point_t *dest, const bitmap_t *src_bitmap, const rect_t *src);
-static uint32_t bsp_pack_pixel(fb_buffer_canvas_t *canvas, color_t color);
-static color_t bsp_unpack_pixel(fb_buffer_canvas_t *canvas, uint32_t pixel);
 
 static result_t init_canvas(fb_buffer_canvas_t *canvas,
                             gdi_dim_t dx,
@@ -305,43 +296,6 @@ static uint8_t *point_to_address(fb_buffer_canvas_t *canvas, const point_t *_pt)
   }
 
 /**
- * Return a pixel packed into an opaque type
- * @param canvas    Framebuffer details
- * @param color     color to pack
- * @return packed pixel
- */
-static uint32_t bsp_pack_pixel(fb_buffer_canvas_t *canvas, color_t color)
-  {
-  uint32_t pixel = 0;
-  pixel = ((red(color) >> canvas->red_shift)& canvas->red_mask) << canvas->red_offset;
-  pixel |= ((blue(color) >> canvas->blue_shift) & canvas->blue_mask) << canvas->blue_offset;
-  pixel |= ((green(color) >> canvas->green_shift) & canvas->green_mask) << canvas->green_offset;
-  pixel |= ((alpha(color) >> canvas->alpha_shift) & canvas->alpha_mask) << canvas->alpha_offset;
-
-  return pixel;
-  }
-
-/**
- * Unpack a packed pixel
- * @param canvas  Framebuffer details
- * @param pixel   pixel to unpack
- * @return color of pixel
- */
-static color_t bsp_unpack_pixel(fb_buffer_canvas_t *canvas, uint32_t pixel)
-  {
-  color_t red = ((pixel >> canvas->red_offset) & canvas->red_mask) << canvas->red_shift;
-  color_t blue = ((pixel >> canvas->blue_offset) & canvas->blue_mask) << canvas->blue_shift;
-  color_t green = ((pixel >> canvas->green_offset) & canvas->green_mask) << canvas->green_shift;
-  color_t alpha = ((pixel >> canvas->alpha_offset) & canvas->alpha_mask) << canvas->alpha_shift;
-
-  // see if a saturated color
-  if(canvas->alpha_mask == 0)
-    alpha = 0xff;
-
-  return rgba(alpha, red, green, blue);
-  }
-
-/**
  * Internal routine to return a pixel
  * @param canvas  Canvas that references the pixel
  * @param src     Address in the fb_buffer
@@ -349,14 +303,7 @@ static color_t bsp_unpack_pixel(fb_buffer_canvas_t *canvas, uint32_t pixel)
  */
 static color_t _get_pixel(fb_buffer_canvas_t *canvas, const uint8_t *src)
 	{
-  uint32_t pixel = 0;
-  if(canvas->pixel_shift == 1)
-    pixel = *((const uint16_t *)src);
-  else
-    pixel = *((const uint32_t *)src);
-
-  if(canvas->unpack_pixel != 0)
-    return (canvas->unpack_pixel)(canvas, pixel);
+  uint32_t pixel = *((const uint32_t *)src);
 
   return (color_t) pixel;
 	}
@@ -369,18 +316,7 @@ static color_t _get_pixel(fb_buffer_canvas_t *canvas, const uint8_t *src)
  */
 static void _set_pixel(fb_buffer_canvas_t *canvas, uint8_t *dest, color_t color)
   {
-  gdi_dim_t bytes_per_pixel = 1 << canvas->pixel_shift;
-  uint32_t pixel;
-  if(canvas->pack_pixel != 0)
-    pixel = (*canvas->pack_pixel)(canvas, color);
-  else
-    pixel = color;
-
-  while(bytes_per_pixel--)
-    {
-    *dest++ = (uint8_t) pixel;
-    pixel >>= 8;
-    }
+  *((uint32_t *)dest) = color;
   }
 
 static color_t bsp_get_pixel(canvas_t *hndl, const point_t *src)
@@ -699,94 +635,8 @@ void bsp_copy_bitmap(canvas_t *hndl,
     }
   }
 
-static void fb_run(void *parg)
-  {
-  handle_t semp;
-  semaphore_create(&semp);
-  while(true)
-    {
-    semaphore_wait(semp, 30);       // 30hz update
-
-    bsp_sync();
-    }
-  }
-
-result_t bsp_sync_framebuffer()
-  {
-
-  }
-
 // this is the actual memory mapped fb_buffer
-static uint8_t *draw_buffer;
 static uint32_t fb_length;
-
-struct fb_fix_screeninfo {
-  char id[16];			/* identification string eg "TT Builtin" */
-  unsigned long smem_start;	/* Start of frame buffer mem */
-                            /* (physical address) */
-  uint32_t smem_len;			/* Length of frame buffer mem */
-  uint32_t type;			/* see FB_TYPE_*		*/
-  uint32_t type_aux;			/* Interleave for interleaved Planes */
-  uint32_t visual;			/* see FB_VISUAL_*		*/
-  uint16_t xpanstep;			/* zero if no hardware panning  */
-  uint16_t ypanstep;			/* zero if no hardware panning  */
-  uint16_t ywrapstep;		/* zero if no hardware ywrap    */
-  uint32_t line_length;		/* length of a line in bytes    */
-  unsigned long mmio_start;	/* Start of Memory Mapped I/O   */
-                            /* (physical address) */
-  uint32_t mmio_len;			/* Length of Memory Mapped I/O  */
-  uint32_t accel;			/* Indicate to driver which	*/
-                    /*  specific chip/card we have	*/
-  uint16_t capabilities;		/* see FB_CAP_*			*/
-  uint16_t reserved[2];		/* Reserved for future compatibility */
-  };
-
-struct fb_bitfield {
-  uint32_t offset;			/* beginning of bitfield	*/
-  uint32_t length;			/* length of bitfield		*/
-  uint32_t msb_right;		/* != 0 : Most significant bit is */
-                      /* right */
-  };
-
-struct fb_var_screeninfo {
-  uint32_t xres;			/* visible resolution		*/
-  uint32_t yres;
-  uint32_t xres_virtual;		/* virtual resolution		*/
-  uint32_t yres_virtual;
-  uint32_t xoffset;			/* offset from virtual to visible */
-  uint32_t yoffset;			/* resolution			*/
-
-  uint32_t bits_per_pixel;		/* guess what			*/
-  uint32_t grayscale;		/* 0 = color, 1 = grayscale,	*/
-                      /* >1 = FOURCC			*/
-  struct fb_bitfield red;		/* bitfield in fb mem if true color, */
-  struct fb_bitfield green;	/* else only length is significant */
-  struct fb_bitfield blue;
-  struct fb_bitfield transp;	/* transparency			*/
-
-  uint32_t nonstd;			/* != 0 Non standard pixel format */
-
-  uint32_t activate;			/* see FB_ACTIVATE_*		*/
-
-  uint32_t height;			/* height of picture in mm    */
-  uint32_t width;			/* width of picture in mm     */
-
-  uint32_t accel_flags;		/* (OBSOLETE) see fb_info.flags */
-
-                        /* Timing: All values in pixclocks, except pixclock (of course) */
-  uint32_t pixclock;			/* pixel clock in ps (pico seconds) */
-  uint32_t left_margin;		/* time from sync to picture	*/
-  uint32_t right_margin;		/* time from picture to sync	*/
-  uint32_t upper_margin;		/* time from sync to picture	*/
-  uint32_t lower_margin;
-  uint32_t hsync_len;		/* length of horizontal sync	*/
-  uint32_t vsync_len;		/* length of vertical sync	*/
-  uint32_t sync;			/* see FB_SYNC_*		*/
-  uint32_t vmode;			/* see FB_VMODE_*		*/
-  uint32_t rotate;			/* angle we rotate counter clockwise */
-  uint32_t colorspace;		/* colorspace for FOURCC-based modes */
-  uint32_t reserved[4];		/* Reserved for future compatibility */
-  };
 
 result_t bsp_canvas_open_framebuffer(canvas_t **canvas)
   {
@@ -794,8 +644,6 @@ result_t bsp_canvas_open_framebuffer(canvas_t **canvas)
   uint16_t x;
   uint16_t y;
   uint16_t length = REG_STRING_MAX + 1;
-  struct fb_var_screeninfo vinfo;
-  struct fb_fix_screeninfo finfo;
 
   if (fb_buffer == 0)
     return e_bad_pointer;
@@ -810,54 +658,16 @@ result_t bsp_canvas_open_framebuffer(canvas_t **canvas)
   if(failed(result = reg_get_uint16(key, screen_y_s, &y)))
     y = 240;
 
-  // try to open the actual fb_buffer.
-  // If this is a single-bufferred screen then it will usually be /dev/fb0
-  // if double buffered then it will
-
-  // determine if we are double-buffered
-  // open the fb_buffer device
-  int pixel_increment = 4;
-  memset(&vinfo, 0, sizeof(vinfo));
-  memset(&finfo, 0, sizeof(finfo));
-
-  // handle operation on the emulation platform
-  vinfo.bits_per_pixel = 32;
-  vinfo.red.length = 8;
-  vinfo.red.offset = 16;
-
-  vinfo.green.length = 8;
-  vinfo.green.offset = 8;
-
-  vinfo.blue.length = 8;
-  vinfo.blue.offset = 0;
-
-  vinfo.transp.length = 0;
-  vinfo.transp.offset = 0;
-
-  vinfo.xres = x;
-  vinfo.yres = y;
-
-    pixel_increment = vinfo.bits_per_pixel >> 3;
-
   // calc bytes to store the values
-  fb_length = vinfo.xres * vinfo.yres * pixel_increment;
-
-  draw_buffer = (uint8_t *)malloc(fb_length);
-
-  memset(draw_buffer, 0, fb_length);
-
-  // create the thread first
-  if(failed(result = task_create("FB", 4096, fb_run, 0, NORMAL_PRIORITY, &worker)) ||
-      failed(result = task_resume(worker)))
-    return result;
+  fb_length = x * y * 4;
 
   fb_buffer_canvas_t *fbc = (fb_buffer_canvas_t *) malloc(sizeof(fb_buffer_canvas_t));
 
   memset(fbc, 0, sizeof(fb_buffer_canvas_t));
   fbc->canvas.version = sizeof(fb_buffer_canvas_t);
-  fbc->canvas.bits_per_pixel = vinfo.bits_per_pixel;
-  fbc->canvas.width = vinfo.xres;
-  fbc->canvas.height = vinfo.yres;
+  fbc->canvas.bits_per_pixel = 32;
+  fbc->canvas.width = x;
+  fbc->canvas.height = y;
   fbc->canvas.get_pixel = bsp_get_pixel;
   fbc->canvas.set_pixel = bsp_set_pixel;
   fbc->canvas.fast_fill = bsp_fast_fill;
@@ -869,27 +679,25 @@ result_t bsp_canvas_open_framebuffer(canvas_t **canvas)
   fbc->canvas.end_paint = bsp_end_paint;
   fbc->canvas.own_buffer = true;
 
-  fbc->pack_pixel = bsp_pack_pixel;
-  fbc->unpack_pixel = bsp_unpack_pixel;
+  fbc->red_mask = 0x00ff0000;
+  fbc->red_shift = 0;
+  fbc->red_offset = 16;
 
-  fbc->red_mask = (1 << vinfo.red.length)-1;
-  fbc->blue_mask = (1 << vinfo.blue.length)-1;
-  fbc->green_mask = (1 << vinfo.green.length)-1;
-  fbc->alpha_mask = (1 << vinfo.transp.length)-1;
+  fbc->blue_mask = 0x000000ff;
+  fbc->blue_shift = 0;
+  fbc->blue_offset = 0;
 
-  fbc->red_shift = 8 - vinfo.red.length;
-  fbc->blue_shift = 8 - vinfo.blue.length;
-  fbc->green_shift = 8 - vinfo.green.length;
-  fbc->alpha_shift = 8 - vinfo.transp.length;
+  fbc->green_mask = 0x0000ff00;
+  fbc->green_shift = 0;
+  fbc->green_offset = 8;
 
-  fbc->red_offset = vinfo.red.offset;
-  fbc->green_offset = vinfo.green.offset;
-  fbc->blue_offset = vinfo.blue.offset;
-  fbc->alpha_offset = vinfo.transp.offset;
+  fbc->alpha_mask = 0xff000000;
+  fbc->alpha_shift = 0;
+  fbc->alpha_offset = 24;
 
-  fbc->buffer = draw_buffer;
+  fbc->buffer = fb_buffer;
   fbc->owns = false;
-  fbc->pixel_shift = fbc->canvas.bits_per_pixel == 16 ? 1 : 2;
+  fbc->pixel_shift = 2;
 
   // save the root canvas
   *canvas = &fbc->canvas;
@@ -897,9 +705,8 @@ result_t bsp_canvas_open_framebuffer(canvas_t **canvas)
   return s_ok;
   }
 
-result_t bsp_sync_fb_buffer()
+result_t bsp_sync_framebuffer()
   {
-  memcpy(fb_buffer, draw_buffer, fb_length);
 
-  bsp_sync_done();
+  return bsp_sync_done();
   }

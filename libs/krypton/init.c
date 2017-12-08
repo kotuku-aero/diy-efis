@@ -1,6 +1,7 @@
 #include "../../libs/electron/electron.h"
 
 #include <Windows.h>
+#include <malloc.h>
 
 static HANDLE reg_fd;
 static HANDLE reg_mm;
@@ -124,23 +125,40 @@ result_t bsp_reg_write_block(uint32_t offset, uint16_t bytes_to_write, const voi
   return s_ok;
   }
 
+void memory_check()
+  {
+  if (_heapchk() != _HEAPOK)
+    {
+    trace_error("Heap is corrupted\n");
+    DebugBreak();
+    }
+  }
+
 void *neutron_calloc(size_t count, size_t size)
   {
+  memory_check();
+
   return calloc(count, size);
   }
 
 void *neutron_malloc(size_t size)
   {
+  memory_check();
+
   return malloc(size);
   }
 
 void neutron_free(void *mem)
   {
+  memory_check();
+
   free(mem);
   }
 
 void *neutron_realloc(void *mem, size_t new_size)
   {
+  memory_check();
+
   return realloc(mem, new_size);
   }
 

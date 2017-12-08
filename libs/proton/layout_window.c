@@ -1308,7 +1308,7 @@ result_t layout_wndproc(handle_t hwnd, const canmsg_t *msg)
   // do the default processing (calls event handlers)
   defwndproc(hwnd, msg);
 
-  if(wnd->menu_items != 0)
+  if(wnd != 0 && wnd->menu_items != 0)
     {
     // we go through all of the menu items and check to see if they are
     // listening, and if their state has changed
@@ -1324,7 +1324,7 @@ result_t layout_wndproc(handle_t hwnd, const canmsg_t *msg)
       }
     }
 
-  return defwndproc(hwnd, msg);
+  return s_ok;
   }
 
 static void draw_menu_item(handle_t hwnd,

@@ -314,13 +314,16 @@ result_t defwndproc(handle_t hwnd, const canmsg_t *msg)
   window_t *window;
   if (succeeded(as_window(hwnd, &window)))
     {
-    vector_count(window->events, &count);
-    event_proxy_t *proxy;
-    for (item = 0; item < count; item++)
+    if (window->events != 0)
       {
-      vector_at(window->events, item, &proxy);
-      if (proxy != 0 && proxy->msg_id == msg->id)
-        (*proxy->callback)(hwnd, proxy, msg);
+      vector_count(window->events, &count);
+      event_proxy_t *proxy;
+      for (item = 0; item < count; item++)
+        {
+        vector_at(window->events, item, &proxy);
+        if (proxy != 0 && proxy->msg_id == msg->id)
+          (*proxy->callback)(hwnd, proxy, msg);
+        }
       }
     }
   return s_false;

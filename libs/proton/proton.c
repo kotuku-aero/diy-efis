@@ -80,26 +80,10 @@ void run_proton(void *parg)
       if (splash_base64 != 0)
         {
         handle_t splash;
-        handle_t splash_canvas;
 
         if (succeeded(manifest_create(splash_base64, &splash)))
           {
-          if(succeeded(create_png_canvas(splash, &splash_canvas)))
-            {
-            extent_t ex;
-            get_canvas_extents(splash_canvas, &ex);
-
-            rect_t src_clip = { 0, 0, ex.dx, ex.dy };
-            point_t src_pt = { 0, 0 };
-
-            rect_t rect;
-            get_window_rect(main_window, &rect);
-
-            bit_blt(main_window, &rect, &rect, splash_canvas, &src_clip, &src_pt);
-
-            canvas_close(splash_canvas);
-            }
-
+          load_png(main_window, splash, 0);
           stream_close(splash);
           }
         }

@@ -68,18 +68,17 @@ freely, subject to the following restrictions:
 #include "../neutron/bsp.h"
 #include "../neutron/stream.h"
 
+#ifdef _MSC_VER
+#include <malloc.h>
+#endif
+
 typedef enum upng_format {
   UPNG_BADFORMAT,
   UPNG_RGB8,
-  UPNG_RGB16,
   UPNG_RGBA8,
-  UPNG_RGBA16,
-  UPNG_LUMINANCE1,
-  UPNG_LUMINANCE2,
-  UPNG_LUMINANCE4,
   UPNG_LUMINANCE8,
   UPNG_LUMINANCE_ALPHA8
-  } upng_format;
+  } png_format_type;
 
 #define FIRST_LENGTH_CODE_INDEX 257
 #define LAST_LENGTH_CODE_INDEX 285
@@ -98,7 +97,7 @@ typedef enum upng_format {
 #define DISTANCE_BUFFER_SIZE (NUM_DISTANCE_SYMBOLS * 2)
 #define CODE_LENGTH_BUFFER_SIZE (NUM_DISTANCE_SYMBOLS * 2)
 
-#define SET_ERROR(upng,code) do { (upng)->error = (code); (upng)->error_line = __LINE__; } while (0)
+#define SET_ERROR(png_stream,code) do { (png_stream)->error = (code); (png_stream)->error_line = __LINE__; } while (0)
 
 typedef enum upng_state {
   UPNG_ERROR = -1,
@@ -112,7 +111,7 @@ typedef enum upng_color {
   UPNG_RGB = 2,
   UPNG_LUMA = 4,
   UPNG_RGBA = 6
-  } upng_color;
+  } png_color_type;
 
 typedef enum {
   ct_stored,
@@ -126,7 +125,7 @@ typedef struct _huffman_tree_t {
   uint16_t numcodes;	/*number of symbols in the alphabet = number of codes */
   } huffman_tree_t;
 
-typedef struct _upng_t
+typedef struct _png_stream_t
   {
   stream_handle_t stream;
   // only 1 of these can be valid at a time
@@ -137,6 +136,11 @@ typedef struct _upng_t
   uint16_t chunk_offset;  // current offset in the stream.
   uint16_t chunk_length;  // length of the current chunk
   uint16_t source_offset; // current source position in the decoder.
+  // canvas details
+  handle_t canvas;
+  point_t origin;
+  rect_t clip_rect;
+
   // Compressed stream variables
   compression_type compression;       // true if reading from the hauffman decoder
   bool end_of_block;      // end of block found
@@ -145,26 +149,57 @@ typedef struct _upng_t
   uint32_t bitpointer;    // if huaffman then this is a bit offset, otherwise length of block
   uint8_t data;
 
+  // when the data is decoded, the canvas bit field is used to store the
+  // scanline to stop us having to store in dynamic arrays.
+  // however each scanline has 1 extra byte at the start that is the filter type
+  // for the scanline.  This array stores that.  It is width long
+  uint8_t *filter_types;
+
   huffman_tree_t *codetree;
-  huffman_tree_t *codetreeD;
+  huffman_tree_t *codetree_distances;
   huffman_tree_t *codelengthcodetree;
   uint16_t *codetree_buffer;
-  uint16_t *codetreeD_buffer;
+  uint16_t *codetree_distance_buffer;
   uint16_t *codelengthcodetree_buffer;
 
   // these are read from the png stream
   uint16_t version;
   uint16_t width;
   uint16_t height;
-  upng_color		color_type;
-  uint16_t		color_depth;
-  upng_format		format;
-  byte_t *buffer;
-  uint16_t	size;
+  png_color_type color_type;
+  uint16_t color_depth;
+  png_format_type format;
+  uint32_t bytes_per_pixel;
+  uint32_t stride;            // bytes/row = (bytes_per_pixel * width) + 1
   result_t error;
-  uint16_t error_line;
-  upng_state		state;
-  } upng_t;
+  } png_stream_t;
+
+static inline uint32_t make_uint32(uint8_t a, uint8_t b, uint8_t c, uint8_t d)
+  {
+  return (a << 24) | (b << 16) | (c << 8) | d;
+  }
+
+static result_t read_uint32(handle_t stream, uint32_t *value)
+  {
+  result_t result;
+  uint8_t buffer[4];
+  if (failed(result = stream_read(stream, buffer, 4, 0)))
+    return result;
+
+  *value = (buffer[0] << 24) | (buffer[1] << 16) | (buffer[2] << 8) | buffer[3];
+  return s_ok;
+  }
+
+static result_t read_uint16(handle_t stream, uint16_t *value)
+  {
+  result_t result;
+  uint8_t buffer[2];
+  if (failed(result = stream_read(stream, buffer, 2, 0)))
+    return result;
+
+  *value = (buffer[2] << 8) | buffer[3];
+  return s_ok;
+  }
 
 static inline result_t check_handle(handle_t hndl)
   {
@@ -172,34 +207,34 @@ static inline result_t check_handle(handle_t hndl)
     return e_bad_parameter;
 
   stream_handle_t *stream = (stream_handle_t *)hndl;
-  if (stream->version != sizeof(upng_t))
+  if (stream->version != sizeof(png_stream_t))
     return e_bad_parameter;
 
   return s_ok;
   }
 
-static result_t get_next_chunk(upng_t *upng)
+static result_t get_next_chunk(png_stream_t *png_stream)
   {
   // skip
   result_t result;
 
-  while (failed(stream_eof(upng->source)))
+  while (failed(stream_eof(png_stream->source)))
     {
-    uint16_t next_chunk = upng->chunk_start + upng->chunk_length + 12;
+    uint16_t next_chunk = png_stream->chunk_start + png_stream->chunk_length + 12;
 
-    if (failed(result = stream_setpos(upng->source, next_chunk)))
+    if (failed(result = stream_setpos(png_stream->source, next_chunk)))
       return result;
 
     uint32_t v_uint32;
-    if (failed(result = read_uint32(upng->source, &v_uint32)))
+    if (failed(result = read_uint32(png_stream->source, &v_uint32)))
       return result;
-    upng->chunk_length = (uint16_t)v_uint32;
+    png_stream->chunk_length = (uint16_t)v_uint32;
 
-    if (failed(read_uint32(upng->source, &v_uint32)))
+    if (failed(read_uint32(png_stream->source, &v_uint32)))
       return e_png_malformed;
 
-    upng->chunk_start = next_chunk;
-    upng->chunk_offset = 0;
+    png_stream->chunk_start = next_chunk;
+    png_stream->chunk_offset = 0;
 
     if(v_uint32 == make_uint32('I', 'D', 'A', 'T'))
       return s_ok;
@@ -217,7 +252,7 @@ static result_t png_stream_eof(stream_handle_t *hndl)
   if (failed(result = check_handle(hndl)))
     return result;
 
-  upng_t *stream = (upng_t *)hndl;
+  png_stream_t *stream = (png_stream_t *)hndl;
 
   return stream_eof(stream->source);
   }
@@ -233,7 +268,7 @@ static result_t png_stream_read(stream_handle_t *hndl, void *buffer, uint16_t si
 
   uint8_t *bufp = (uint8_t *)buffer;
 
-  upng_t *stream = (upng_t *)hndl;
+  png_stream_t *stream = (png_stream_t *)hndl;
 
   // read chunks as required
   while (size > 0)
@@ -269,7 +304,7 @@ static result_t png_stream_getpos(stream_handle_t *hndl, uint16_t *pos)
   if (failed(result = check_handle(hndl)))
     return result;
 
-  upng_t *stream = (upng_t *)hndl;
+  png_stream_t *stream = (png_stream_t *)hndl;
 
   *pos = stream->source_offset;
   return s_ok;
@@ -284,7 +319,7 @@ static result_t png_stream_setpos(stream_handle_t *hndl, uint16_t pos)
   if (failed(result = check_handle(hndl)))
     return result;
 
-  upng_t *stream = (upng_t *)hndl;
+  png_stream_t *stream = (png_stream_t *)hndl;
 
   // go to chunk 0
   stream_setpos(stream->source, stream->chunk0);
@@ -330,7 +365,7 @@ static result_t png_stream_length(stream_handle_t *hndl, uint16_t *length)
   if (failed(result = check_handle(hndl)))
     return result;
 
-  upng_t *stream = (upng_t *)hndl;
+  png_stream_t *stream = (png_stream_t *)hndl;
 
   return stream_length(stream->source, length);
   }
@@ -341,15 +376,37 @@ static result_t png_stream_close(stream_handle_t *hndl)
   if (failed(result = check_handle(hndl)))
     return result;
 
-  upng_t *stream = (upng_t *)hndl;
+  png_stream_t *png_stream = (png_stream_t *)hndl;
 
+  if (png_stream->compression > 0)
+    {
+    neutron_free(png_stream->codetree);
+    neutron_free(png_stream->codetree_distances);
 
-  neutron_free(stream);
+    if (png_stream->compression > 1)
+      {
+      neutron_free(png_stream->codetree_buffer);
+      neutron_free(png_stream->codetree_distance_buffer);
+      neutron_free(png_stream->codelengthcodetree_buffer);
+      neutron_free(png_stream->codelengthcodetree);
+      }
+
+    png_stream->codetree = 0;
+    png_stream->codetree_distances = 0;
+    png_stream->codetree_buffer = 0;
+    png_stream->codelengthcodetree = 0;
+    png_stream->codelengthcodetree_buffer = 0;
+    png_stream->codetree_distance_buffer = 0;
+    }
+
+  neutron_free(png_stream->filter_types);
+
+  neutron_free(png_stream);
 
   return result;
   }
 
-static result_t open_png_stream(handle_t stream, upng_t **hndl)
+static result_t open_png_stream(handle_t stream, png_stream_t **hndl)
   {
   result_t result;
   /*read the information from the header and store it in the upng_Info. return value is error*/
@@ -364,27 +421,26 @@ static result_t open_png_stream(handle_t stream, upng_t **hndl)
   if (len < 29)
     return e_not_png;
 
-  upng_t *upng = (upng_t *)neutron_malloc(sizeof(upng_t));
+  png_stream_t *png_stream = (png_stream_t *)neutron_malloc(sizeof(png_stream_t));
 
-  memset(upng, 0, sizeof(upng_t));
+  memset(png_stream, 0, sizeof(png_stream_t));
 
-  upng->stream.version = sizeof(upng_t);
-  upng->stream.stream_eof = png_stream_eof;
-  upng->stream.stream_getpos = png_stream_getpos;
-  upng->stream.stream_length = png_stream_length;
-  upng->stream.stream_read = png_stream_read;
-  upng->stream.stream_setpos = png_stream_setpos;
-  upng->stream.stream_truncate = 0;
-  upng->stream.stream_write = 0;
-  upng->stream.stream_close = png_stream_close;
-  upng->stream.stream_delete = 0;
+  png_stream->stream.version = sizeof(png_stream_t);
+  png_stream->stream.stream_eof = png_stream_eof;
+  png_stream->stream.stream_getpos = png_stream_getpos;
+  png_stream->stream.stream_length = png_stream_length;
+  png_stream->stream.stream_read = png_stream_read;
+  png_stream->stream.stream_setpos = png_stream_setpos;
+  png_stream->stream.stream_truncate = 0;
+  png_stream->stream.stream_write = 0;
+  png_stream->stream.stream_close = png_stream_close;
+  png_stream->stream.stream_delete = 0;
 
-  upng->color_type = UPNG_RGBA;
-  upng->color_depth = 8;
-  upng->format = UPNG_RGBA8;
-  upng->state = UPNG_NEW;
-  upng->error = s_ok;
-  upng->source = stream;
+  png_stream->color_type = UPNG_RGBA;
+  png_stream->color_depth = 8;
+  png_stream->format = UPNG_RGBA8;
+  png_stream->error = s_ok;
+  png_stream->source = stream;
 
   uint32_t v_uint32;
   /* check that PNG header matches expected value */
@@ -399,7 +455,7 @@ static result_t open_png_stream(handle_t stream, upng_t **hndl)
   if (failed(read_uint32(stream, &v_uint32)))
     return e_png_malformed;
 
-  upng->chunk_length = v_uint32;
+  png_stream->chunk_length = v_uint32;
 
   if(failed(read_uint32(stream, &v_uint32)) ||
     v_uint32 != make_uint32('I', 'H', 'D', 'R'))
@@ -408,72 +464,69 @@ static result_t open_png_stream(handle_t stream, upng_t **hndl)
   if (failed(result = read_uint32(stream, &v_uint32)))
     return result;
 
-  upng->width = (uint16_t)v_uint32;
+  png_stream->width = (uint16_t)v_uint32;
 
   if (failed(result = read_uint32(stream, &v_uint32)))
     return result;
 
-  upng->height = (uint16_t)v_uint32;
+  png_stream->height = (uint16_t)v_uint32;
 
-  if (failed(result = stream_read(stream, &upng->color_depth, 1, 0)))
+  if (failed(result = stream_read(stream, &png_stream->color_depth, 1, 0)))
     return result;
 
-  if (failed(result = stream_read(stream, &upng->color_type, 1, 0)))
+  if (failed(result = stream_read(stream, &png_stream->color_type, 1, 0)))
     return result;
 
   /* determine our color format */
-  switch (upng->color_type)
+  switch (png_stream->color_type)
     {
     case UPNG_LUM:
-      switch (upng->color_depth)
+      switch (png_stream->color_depth)
         {
-        case 1:
-          upng->format = UPNG_LUMINANCE1;
-          break;
-        case 2:
-          upng->format = UPNG_LUMINANCE2;
-          break;
-        case 4:
-          upng->format = UPNG_LUMINANCE4;
-          break;
         case 8:
-          upng->format = UPNG_LUMINANCE8;
+          png_stream->format = UPNG_LUMINANCE8;
+          // 1 byte grayscale
+          png_stream->bytes_per_pixel = 1;
+          png_stream->stride = png_stream->width +1;
           break;
         default:
           return e_png_bad_format;
         }
         break;
     case UPNG_RGB:
-      switch (upng->color_depth)
+      switch (png_stream->color_depth)
         {
         case 8:
-          upng->format = UPNG_RGB8;
-          break;
-        case 16:
-          upng->format = UPNG_RGB16;
+          png_stream->format = UPNG_RGB8;
+          // 3 byte RGB
+          png_stream->bytes_per_pixel = 3;
+          png_stream->stride = (png_stream->width * 3) + 1;
           break;
         default:
           return e_png_bad_format;
         }
         break;
     case UPNG_LUMA:
-      switch (upng->color_depth)
+      switch (png_stream->color_depth)
         {
         case 8:
-          upng->format = UPNG_LUMINANCE_ALPHA8;
+          png_stream->format = UPNG_LUMINANCE_ALPHA8;
+          // 2 byte grayscale
+          png_stream->bytes_per_pixel = 2;
+          png_stream->stride = (png_stream->width * 2) + 1;
           break;
         default:
           return e_png_bad_format;
         }
         break;
     case UPNG_RGBA:
-      switch (upng->color_depth)
+      switch (png_stream->color_depth)
         {
         case 8:
-          upng->format = UPNG_RGBA8;
-          break;
-        case 16:
-          upng->format = UPNG_RGBA16;
+          png_stream->format = UPNG_RGBA8;
+          // 4 byte RGB
+          png_stream->bytes_per_pixel = 4;
+          png_stream->stride = (png_stream->width * 4)+1;
           break;
         default:
           return e_png_bad_format;
@@ -506,15 +559,15 @@ static result_t open_png_stream(handle_t stream, upng_t **hndl)
   if (v_uint8 != 0)
     return e_png_interlaced;
 
-  upng->chunk_start = 8;      // first 8 bytes are the header
+  png_stream->chunk_start = 8;      // first 8 bytes are the header
 
-  if(failed(result = get_next_chunk(upng)))
+  if(failed(result = get_next_chunk(png_stream)))
     return result;
   // create a decompression stream.  Uses the same logic as a stream
   // but will handle chunking of the file
   /* we require two bytes for the zlib data header */
   uint8_t hdr[2];
-  if (failed(stream_read(upng, hdr, 2, 0)) ||
+  if (failed(stream_read(png_stream, hdr, 2, 0)) ||
     ((hdr[0] * 256 + hdr[1]) % 31 != 0) ||                /* 256 * in[0] + in[1] must be a multiple of 31, the FCHECK value is supposed to be made that way */
     ((hdr[0] & 15) != 8 || ((hdr[0] >> 4) & 15) > 7) ||   /*error: only compression method 8: inflate with sliding window of 32k is supported by the PNG spec */
     (((hdr[1] >> 5) & 1) != 0))                            /* the specification of PNG says about the zlib stream: "The additional flags shall not specify a preset dictionary." */
@@ -522,10 +575,128 @@ static result_t open_png_stream(handle_t stream, upng_t **hndl)
     return e_png_malformed;
     }
 
-  *hndl = upng;
+  // allocate the filter
+  png_stream->filter_types = (uint8_t *)neutron_malloc(png_stream->width);
+  memset(png_stream->filter_types, 0, png_stream->width);
+
+  *hndl = png_stream;
 
   return s_ok;
   }
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Byte accessors
+//
+
+// treat the canvas like a byte array and read a byte
+static uint8_t get_byte(png_stream_t *png_stream, uint32_t offset)
+  {
+  // we treat the canvas as an array of bytes, but depending on the color type
+  // it is modified.
+  uint32_t x;
+  uint32_t y;
+
+  color_t color;
+
+  // the stride is 1 byte longer due to the filter byte
+  y = offset / png_stream->stride;
+  x = offset % png_stream->stride;
+
+  if(x == 0)
+    return png_stream->filter_types[y];
+
+  // adjust for the filter byte
+  x--;
+
+  uint16_t bytenum;
+  
+  bytenum = x % png_stream->bytes_per_pixel;
+  x /= png_stream->bytes_per_pixel;
+
+  point_t pt;
+  pt.x = x + png_stream->origin.x;
+  pt.y = y + png_stream->origin.y;
+
+
+  get_pixel(png_stream->canvas, &png_stream->clip_rect, &pt, &color);
+  switch (bytenum)
+    {
+    case 0:
+      return red(color);
+    case 1:
+      if (png_stream->format == UPNG_LUMINANCE_ALPHA8)
+        return alpha(color);
+
+      return green(color);
+    case 2:
+      return blue(color);
+    case 3:
+      return alpha(color);
+    }
+
+  return 0;
+  }
+
+static void set_byte(png_stream_t *png_stream, uint32_t offset, uint8_t byte)
+  {
+  // we treat the canvas as an array of bytes, but depending on the color type
+  // it is modified.
+
+  uint32_t x;
+  uint32_t y;
+  color_t color;
+
+  // the stride is 1 byte longer due to the filter byte
+  y = offset / png_stream->stride;
+  x = offset % png_stream->stride;
+
+  if (x == 0)
+    {
+    png_stream->filter_types[y] = byte;
+
+    return;
+    }
+
+  // adjust for the filter byte
+  x--;
+
+  uint16_t bytenum;
+  
+  bytenum = x % png_stream->bytes_per_pixel;
+  x /= png_stream->bytes_per_pixel;
+
+  point_t pt;
+  pt.x = x + png_stream->origin.x;
+  pt.y = y + png_stream->origin.y;
+
+  get_pixel(png_stream->canvas, &png_stream->clip_rect, &pt, &color);
+  switch (bytenum)
+    {
+    case 0:
+      if(png_stream->format == UPNG_LUMINANCE8)
+        color = rgba(alpha(color), byte, byte, byte);
+      else
+        color = rgba(alpha(color), byte, green(color), blue(color));
+      break;
+    case 1:
+      color = rgba(alpha(color), red(color), byte, blue(color));
+      break;
+    case 2:
+      color = rgba(alpha(color), red(color), green(color), byte);
+      break;
+    case 3:
+      color = rgba(byte, red(color), blue(color), green(color));
+      break;
+    }
+
+  set_pixel(png_stream->canvas, &png_stream->clip_rect, &pt, color, 0);
+  }
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Hauffman decoder
+//
 
 static const uint16_t length_base[29] = {	/*the base lengths represented by codes 257-285 */
   3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59,
@@ -597,7 +768,7 @@ static const uint16_t fixed_distance_tree[NUM_DISTANCE_SYMBOLS * 2] = {
   29, 30, 31, 0, 0
   };
 
-static uint8_t read_bit(upng_t *bitstream)
+static uint8_t read_bit(png_stream_t *bitstream)
   {
   uint32_t cbp = bitstream->bitpointer;
 
@@ -610,7 +781,7 @@ static uint8_t read_bit(upng_t *bitstream)
   return result;
   }
 
-static uint16_t read_bits(upng_t *bitstream, uint16_t nbits)
+static uint16_t read_bits(png_stream_t *bitstream, uint16_t nbits)
   {
   uint16_t result = 0, i;
   for (i = 0; i < nbits; i++)
@@ -628,7 +799,7 @@ static void huffman_tree_init(huffman_tree_t* tree, uint16_t* buffer, uint16_t n
 
 /*given the code lengths (as stored in the PNG file), generate the tree as defined by Deflate.
 maxbitlen is the maximum bits that a code in the tree can have. return value is error.*/
-static void huffman_tree_create_lengths(upng_t* upng, huffman_tree_t* tree, const uint16_t *bitlen)
+static void huffman_tree_create_lengths(png_stream_t* png_stream, huffman_tree_t* tree, const uint16_t *bitlen)
   {
   uint16_t tree1d[MAX_SYMBOLS];
   uint16_t blcount[MAX_BIT_LENGTH];
@@ -641,70 +812,104 @@ static void huffman_tree_create_lengths(upng_t* upng, huffman_tree_t* tree, cons
   memset(blcount, 0, sizeof(blcount));
   memset(nextcode, 0, sizeof(nextcode));
 
-  /*step 1: count number of instances of each code length */
-  for (bits = 0; bits < tree->numcodes; bits++) {
-    blcount[bitlen[bits]]++;
-    }
+#ifdef _MSC_VER
+  _heapchk();
+#endif
 
+  /*step 1: count number of instances of each code length */
+  for (bits = 0; bits < tree->numcodes; bits++)
+    blcount[bitlen[bits]]++;
+
+#ifdef _MSC_VER
+  _heapchk();
+#endif
   /*step 2: generate the nextcode values */
-  for (bits = 1; bits <= tree->maxbitlen; bits++) {
+  for (bits = 1; bits <= tree->maxbitlen; bits++)
     nextcode[bits] = (nextcode[bits - 1] + blcount[bits - 1]) << 1;
-    }
 
   /*step 3: generate all the codes */
-  for (n = 0; n < tree->numcodes; n++) {
-    if (bitlen[n] != 0) {
+  for (n = 0; n < tree->numcodes; n++) 
+    {
+    if (bitlen[n] != 0)
       tree1d[n] = nextcode[bitlen[n]]++;
-      }
     }
 
-  /*convert tree1d[] to tree2d[][]. In the 2D array, a value of 32767 means uninited, a value >= numcodes is an address to another bit, a value < numcodes is a code. The 2 rows are the 2 possible bit values (0 or 1), there are as many columns as codes - 1
-     a good huffmann tree has N * 2 - 1 nodes, of which N - 1 are internal nodes. Here, the internal nodes are stored (what their 0 and 1 option point to). There is only memory for such good tree currently, if there are more nodes (due to too long length codes), error 55 will happen */
-  for (n = 0; n < tree->numcodes * 2; n++) {
+
+#ifdef _MSC_VER
+  _heapchk();
+#endif
+  /*
+  convert tree1d[] to tree2d[][]. In the 2D array, a value of 32767 means uninited,
+  a value >= numcodes is an address to another bit, a value < numcodes is a code.
+  The 2 rows are the 2 possible bit values (0 or 1), there are as many columns as codes - 1
+  a good huffmann tree has N * 2 - 1 nodes, of which N - 1 are internal nodes.
+  Here, the internal nodes are stored (what their 0 and 1 option point to). There is only
+  memory for such good tree currently, if there are more nodes (due to too long length codes),
+  error 55 will happen */
+
+  for (n = 0; n < tree->numcodes * 2; n++)
     tree->tree2d[n] = 32767;	/*32767 here means the tree2d isn't filled there yet */
-    }
+#ifdef _MSC_VER
+  _heapchk();
+#endif
 
-  for (n = 0; n < tree->numcodes; n++) {	/*the codes */
-    for (i = 0; i < bitlen[n]; i++) {	/*the bits for this code */
+  for (n = 0; n < tree->numcodes; n++)
+    {	/*the codes */
+    for (i = 0; i < bitlen[n]; i++)
+      {	/*the bits for this code */
       uint8_t bit = (uint8_t)((tree1d[n] >> (bitlen[n] - i - 1)) & 1);
       /* check if oversubscribed */
-      if (treepos > tree->numcodes - 2) {
-        SET_ERROR(upng, e_png_malformed);
+      if (treepos > tree->numcodes - 2)
+        {
+        png_stream->error = e_png_malformed;
         return;
         }
 
       if (tree->tree2d[2 * treepos + bit] == 32767) {	/*not yet filled in */
-        if (i + 1 == bitlen[n]) {	/*last bit */
+        if (i + 1 == bitlen[n])
+          {	/*last bit */
           tree->tree2d[2 * treepos + bit] = n;	/*put the current code in it */
           treepos = 0;
+#ifdef _MSC_VER
+          _heapchk();
+#endif
           }
-        else {	/*put address of the next step in here, first that address has to be found of course (it's just nodefilled + 1)... */
+        else
+          {	/*put address of the next step in here, first that address has to be found of course (it's just nodefilled + 1)... */
           nodefilled++;
           tree->tree2d[2 * treepos + bit] = nodefilled + tree->numcodes;	/*addresses encoded with numcodes added to it */
           treepos = nodefilled;
+#ifdef _MSC_VER
+          _heapchk();
+#endif
           }
         }
-      else {
+      else
+        {
         treepos = tree->tree2d[2 * treepos + bit] - tree->numcodes;
         }
       }
     }
 
-  for (n = 0; n < tree->numcodes * 2; n++) {
-    if (tree->tree2d[n] == 32767) {
+#ifdef _MSC_VER
+  _heapchk();
+#endif
+
+  for (n = 0; n < tree->numcodes * 2; n++) 
+    {
+    if (tree->tree2d[n] == 32767) 
       tree->tree2d[n] = 0;	/*remove possible remaining 32767's */
-      }
     }
   }
 
-static uint16_t huffman_decode_symbol(upng_t *upng, const huffman_tree_t* codetree)
+static uint16_t huffman_decode_symbol(png_stream_t *png_stream, const huffman_tree_t* codetree)
   {
   uint16_t treepos = 0, ct;
   uint8_t bit;
   for (;;)
     {
 
-    bit = read_bit(upng);
+    bit = read_bit(png_stream);
 
     ct = codetree->tree2d[(treepos << 1) | bit];
     if (ct < codetree->numcodes)
@@ -715,53 +920,66 @@ static uint16_t huffman_decode_symbol(upng_t *upng, const huffman_tree_t* codetr
     treepos = ct - codetree->numcodes;
     if (treepos >= codetree->numcodes)
       {
-      SET_ERROR(upng, e_png_malformed);
+      png_stream->error = e_png_malformed;
       return 0;
       }
     }
   }
 
 /* get the tree of a deflated block with dynamic tree, the tree itself is also Huffman compressed with a known tree*/
-static result_t get_tree_inflate_dynamic(upng_t* upng, huffman_tree_t* codetree, huffman_tree_t* codetreeD, huffman_tree_t* codelengthcodetree)
+static result_t get_tree_inflate_dynamic(png_stream_t* png_stream, huffman_tree_t* codetree, huffman_tree_t* codetree_distance, huffman_tree_t* codelengthcodetree)
   {
-  uint16_t codelengthcode[NUM_CODE_LENGTH_CODES];
-  uint16_t bitlen[NUM_DEFLATE_CODE_SYMBOLS];
-  uint16_t bitlenD[NUM_DISTANCE_SYMBOLS];
+  uint16_t *codelengthcode = (uint16_t *)neutron_malloc(sizeof(uint16_t) * NUM_CODE_LENGTH_CODES);
+  uint16_t *bitlen = (uint16_t *)neutron_malloc(sizeof(uint16_t) * NUM_DEFLATE_CODE_SYMBOLS);
+  uint16_t *bitlength_distance = (uint16_t *)neutron_malloc(sizeof(uint16_t) * NUM_DISTANCE_SYMBOLS);
   uint16_t n, hlit, hdist, hclen, i;
 
   /* clear bitlen arrays */
-  memset(bitlen, 0, sizeof(bitlen));
-  memset(bitlenD, 0, sizeof(bitlenD));
+  memset(bitlen, 0, sizeof(uint16_t) * NUM_DEFLATE_CODE_SYMBOLS);
+  memset(bitlength_distance, 0, sizeof(uint16_t) * NUM_DISTANCE_SYMBOLS);
 
   /*the bit pointer is or will go past the memory */
-  hlit = read_bits(upng, 5) + 257;	/*number of literal/length codes + 257. Unlike the spec, the value 257 is added to it here already */
-  hdist = read_bits(upng, 5) + 1;	/*number of distance codes. Unlike the spec, the value 1 is added to it here already */
-  hclen = read_bits(upng, 4) + 4;	/*number of code length codes. Unlike the spec, the value 4 is added to it here already */
+  hlit = read_bits(png_stream, 5) + 257;	/*number of literal/length codes + 257. Unlike the spec, the value 257 is added to it here already */
+  hdist = read_bits(png_stream, 5) + 1;	/*number of distance codes. Unlike the spec, the value 1 is added to it here already */
+  hclen = read_bits(png_stream, 4) + 4;	/*number of code length codes. Unlike the spec, the value 4 is added to it here already */
+#ifdef _MSC_VER
+  _heapchk();
+#endif
 
   for (i = 0; i < NUM_CODE_LENGTH_CODES; i++)
     {
     if (i < hclen)
-      {
-      codelengthcode[clcl[i]] = read_bits(upng, 3);
-      }
+      codelengthcode[clcl[i]] = read_bits(png_stream, 3);
     else
-      {
       codelengthcode[clcl[i]] = 0;	/*if not, it must stay 0 */
-      }
     }
+#ifdef _MSC_VER
+  _heapchk();
+#endif
 
-  huffman_tree_create_lengths(upng, codelengthcodetree, codelengthcode);
+  huffman_tree_create_lengths(png_stream, codelengthcodetree, codelengthcode);
+#ifdef _MSC_VER
+  _heapchk();
+#endif
 
   /* bail now if we encountered an error earlier */
-  if (failed(upng->error))
-    return upng->error;
+  if (failed(png_stream->error))
+    {
+    neutron_free(codelengthcode);
+    neutron_free(bitlen);
+    neutron_free(bitlength_distance);
+    return png_stream->error;
+    }
 
   /*now we can use this tree to read the lengths for the tree that this function will return */
   i = 0;
   while (i < hlit + hdist)
     {	/*i is the current symbol we're reading in the part that contains the code lengths of lit/len codes and dist codes */
-    uint16_t code = huffman_decode_symbol(upng, codelengthcodetree);
-    if (upng->error != s_ok)
+#ifdef _MSC_VER
+    _heapchk();
+#endif
+    uint16_t code = huffman_decode_symbol(png_stream, codelengthcodetree);
+    if (png_stream->error != s_ok)
       {
       break;
       }
@@ -774,7 +992,7 @@ static result_t get_tree_inflate_dynamic(upng_t* upng, huffman_tree_t* codetree,
         }
       else
         {
-        bitlenD[i - hlit] = code;
+        bitlength_distance[i - hlit] = code;
         }
       i++;
       }
@@ -785,7 +1003,7 @@ static result_t get_tree_inflate_dynamic(upng_t* upng, huffman_tree_t* codetree,
 
 
       /*error, bit pointer jumps past memory */
-      replength += read_bits(upng, 2);
+      replength += read_bits(png_stream, 2);
 
       if ((i - 1) < hlit)
         {
@@ -793,7 +1011,7 @@ static result_t get_tree_inflate_dynamic(upng_t* upng, huffman_tree_t* codetree,
         }
       else
         {
-        value = bitlenD[i - hlit - 1];
+        value = bitlength_distance[i - hlit - 1];
         }
 
       /*repeat this value in the next lengths */
@@ -802,7 +1020,7 @@ static result_t get_tree_inflate_dynamic(upng_t* upng, huffman_tree_t* codetree,
         /* i is larger than the amount of codes */
         if (i >= hlit + hdist)
           {
-          SET_ERROR(upng, e_png_malformed);
+          png_stream->error = e_png_malformed;
           break;
           }
 
@@ -812,7 +1030,7 @@ static result_t get_tree_inflate_dynamic(upng_t* upng, huffman_tree_t* codetree,
           }
         else
           {
-          bitlenD[i - hlit] = value;
+          bitlength_distance[i - hlit] = value;
           }
         i++;
         }
@@ -822,7 +1040,7 @@ static result_t get_tree_inflate_dynamic(upng_t* upng, huffman_tree_t* codetree,
       uint16_t replength = 3;	/*read in the bits that indicate repeat length */
 
       /*error, bit pointer jumps past memory */
-      replength += read_bits(upng, 3);
+      replength += read_bits(png_stream, 3);
 
       /*repeat this value in the next lengths */
       for (n = 0; n < replength; n++)
@@ -830,7 +1048,7 @@ static result_t get_tree_inflate_dynamic(upng_t* upng, huffman_tree_t* codetree,
         /* error: i is larger than the amount of codes */
         if (i >= hlit + hdist)
           {
-          SET_ERROR(upng, e_png_malformed);
+          png_stream->error = e_png_malformed;
           break;
           }
 
@@ -839,7 +1057,7 @@ static result_t get_tree_inflate_dynamic(upng_t* upng, huffman_tree_t* codetree,
           bitlen[i] = 0;
           }
         else {
-          bitlenD[i - hlit] = 0;
+          bitlength_distance[i - hlit] = 0;
           }
         i++;
         }
@@ -849,7 +1067,7 @@ static result_t get_tree_inflate_dynamic(upng_t* upng, huffman_tree_t* codetree,
       uint16_t replength = 11;	/*read in the bits that indicate repeat length */
       /* error, bit pointer jumps past memory */
 
-      replength += read_bits(upng, 7);
+      replength += read_bits(png_stream, 7);
 
       /*repeat this value in the next lengths */
       for (n = 0; n < replength; n++)
@@ -857,43 +1075,48 @@ static result_t get_tree_inflate_dynamic(upng_t* upng, huffman_tree_t* codetree,
         /* i is larger than the amount of codes */
         if (i >= hlit + hdist)
           {
-          SET_ERROR(upng, e_png_malformed);
+          png_stream->error = e_png_malformed;
           break;
           }
         if (i < hlit)
           bitlen[i] = 0;
         else
-          bitlenD[i - hlit] = 0;
+          bitlength_distance[i - hlit] = 0;
         i++;
         }
       }
     else {
       /* somehow an unexisting code appeared. This can never happen. */
-      SET_ERROR(upng, e_png_malformed);
+      png_stream->error = e_png_malformed;
       break;
       }
     }
+#ifdef _MSC_VER
+    _heapchk();
+#endif
 
-  if (upng->error == s_ok && bitlen[256] == 0)
-    {
-    SET_ERROR(upng, e_png_malformed);
-    }
+  if (png_stream->error == s_ok && bitlen[256] == 0)
+    png_stream->error = e_png_malformed;
 
   /*the length of the end code 256 must be larger than 0 */
   /*now we've finally got hlit and hdist, so generate the code trees, and the function is done */
-  if (upng->error == s_ok)
-    {
-    huffman_tree_create_lengths(upng, codetree, bitlen);
-    }
-  if (upng->error == s_ok)
-    {
-    huffman_tree_create_lengths(upng, codetreeD, bitlenD);
-    }
-  }
+  if (succeeded(png_stream->error))
+    huffman_tree_create_lengths(png_stream, codetree, bitlen);
 
-/*inflate a block with dynamic of fixed Huffman tree*/
-static result_t inflate_huffman(upng_t* upng, uint8_t *out, uint16_t outsize, uint16_t *bytes_read, uint16_t btype)
-  {
+#ifdef _MSC_VER
+  _heapchk();
+#endif
+  if (succeeded(png_stream->error))
+    huffman_tree_create_lengths(png_stream, codetree_distance, bitlength_distance);
+#ifdef _MSC_VER
+  _heapchk();
+#endif
+
+  neutron_free(codelengthcode);
+  neutron_free(bitlen);
+  neutron_free(bitlength_distance);
+
+  return png_stream->error;
   }
 
 /*Paeth predicter, used by PNG filter type 4*/
@@ -912,9 +1135,9 @@ static int paeth_predictor(int a, int b, int c)
     return c;
   }
 
-static uint16_t upng_get_components(const upng_t* upng)
+static uint16_t upng_get_components(const png_stream_t* png_stream)
   {
-  switch (upng->color_type) {
+  switch (png_stream->color_type) {
     case UPNG_LUM:
       return 1;
     case UPNG_RGB:
@@ -928,178 +1151,137 @@ static uint16_t upng_get_components(const upng_t* upng)
     }
   }
 
-static uint16_t upng_get_bpp(const upng_t* upng)
+static uint16_t upng_get_bpp(const png_stream_t* png_stream)
   {
-  return upng->color_depth * upng_get_components(upng);
+  return png_stream->color_depth * upng_get_components(png_stream);
   }
 
-static inline uint32_t make_uint32(uint8_t a, uint8_t b, uint8_t c, uint8_t d)
+static result_t cleanup(png_stream_t *png_stream, result_t result)
   {
-  return (a << 24) | (b << 16) | (c << 8) | d;
-  }
-
-static result_t read_uint32(handle_t stream, uint32_t *value)
-  {
-  result_t result;
-  uint8_t buffer[4];
-  if (failed(result = stream_read(stream, buffer, 4, 0)))
-    return result;
-
-  *value = (buffer[0] << 24) | (buffer[1] << 16) | (buffer[2] << 8) | buffer[3];
-  return s_ok;
-  }
-
-static result_t read_uint16(handle_t stream, uint16_t *value)
-  {
-  result_t result;
-  uint8_t buffer[2];
-  if (failed(result = stream_read(stream, buffer, 2, 0)))
-    return result;
-
-  *value = (buffer[2] << 8) | buffer[3];
-  return s_ok;
-  }
-
-static result_t cleanup(upng_t *upng, result_t result)
-  {
-  if (upng->compression > 0)
-    {
-    neutron_free(upng->codetree);
-    neutron_free(upng->codetreeD);
-
-    if(upng->compression > 1)
-      {
-      neutron_free(upng->codetree_buffer);
-      neutron_free(upng->codelengthcodetree);
-      neutron_free(upng->codelengthcodetree_buffer);
-      neutron_free(upng->codelengthcodetree);
-      }
-
-    upng->codetree = 0;
-    upng->codetreeD = 0;
-    upng->codetree_buffer = 0;
-    upng->codelengthcodetree = 0;
-    upng->codelengthcodetree_buffer = 0;
-    upng->codelengthcodetree = 0;
-    }
 
   return result;
   }
 
 // read bytes from compressed stream into the buffer
-static result_t decompress(upng_t *upng, uint8_t *out, uint16_t bytes)
+static result_t decompress(png_stream_t *png_stream, uint16_t bytes)
   {
   result_t result;
-  uint16_t bp = 0;	/*bit pointer in the "in" data, current byte is bp >> 3, current bit is bp & 0x7 (from lsb to msb of the byte) */
-  uint16_t pos = 0;	/*byte position in the out buffer */
-  uint16_t bytes_read = 0;
+  uint32_t bp = 0;	/*bit pointer in the "in" data, current byte is bp >> 3, current bit is bp & 0x7 (from lsb to msb of the byte) */
+  uint32_t pos = 0;	/*byte position in the out buffer */
+  uint32_t bytes_read = 0;
   
-  while (bytes > 0)
+  while (true)
     {
-    if(upng->end_of_block)
+    if(png_stream->end_of_block)
       {
-      if (upng->last_block)
-        return cleanup(upng, e_no_more_information);
+      if (png_stream->last_block)
+        return cleanup(png_stream, s_ok);
 
       /* read block control bits */
       // must be on a byte boundary
-      upng->bitpointer = upng->source_offset << 3;
-      upng->last_block = read_bit(upng);
+      png_stream->bitpointer = png_stream->source_offset << 3;
+      png_stream->last_block = read_bit(png_stream);
 
-      upng->compression = read_bit(upng) | (read_bit(upng) << 1);
+      png_stream->compression = read_bit(png_stream) | (read_bit(png_stream) << 1);
 
-      if (upng->compression == 0)
+      if (png_stream->compression == 0)
         {
         // this is a stored block so we read it.
         uint16_t len, nlen;
 
         // the underlying stream is at the next byte. 
-        if (failed(result = read_uint16(upng, &len)) ||
-          failed(result = read_uint16(upng, &nlen)))
-          return cleanup(upng, result);
+        if (failed(result = read_uint16(png_stream, &len)) ||
+          failed(result = read_uint16(png_stream, &nlen)))
+          return cleanup(png_stream, result);
 
         /* read len (2 bytes) and nlen (2 bytes) */
         /* check if 16-bit nlen is really the one's complement of len */
         if (len + nlen != 65535)
-          return cleanup(upng, e_png_malformed);
+          return cleanup(png_stream, e_png_malformed);
 
         // number of bytes in the stored block
-        upng->bitpointer = len; 
+        png_stream->bitpointer = len; 
         }
-      else if (upng->compression == 1)
+      else if (png_stream->compression == 1)
         {
-        upng->codetree_buffer = fixed_deflate_codetree;
-        upng->codelengthcodetree = fixed_distance_tree;
-        upng->codetree = (huffman_tree_t *)neutron_malloc(sizeof(huffman_tree_t));
-        upng->codetreeD = (huffman_tree_t *)neutron_malloc(sizeof(huffman_tree_t));
+        png_stream->codetree_buffer = fixed_deflate_codetree;
+        png_stream->codetree_distance_buffer = fixed_distance_tree;
+        png_stream->codetree = (huffman_tree_t *)neutron_malloc(sizeof(huffman_tree_t));
+        png_stream->codetree_distances = (huffman_tree_t *)neutron_malloc(sizeof(huffman_tree_t));
         /* fixed trees */
-        huffman_tree_init(upng->codetree, upng->codetree_buffer, NUM_DEFLATE_CODE_SYMBOLS, DEFLATE_CODE_BITLEN);
-        huffman_tree_init(upng->codetreeD, upng->codelengthcodetree, NUM_DISTANCE_SYMBOLS, DISTANCE_BITLEN);
+        huffman_tree_init(png_stream->codetree, png_stream->codetree_buffer, NUM_DEFLATE_CODE_SYMBOLS, DEFLATE_CODE_BITLEN);
+        huffman_tree_init(png_stream->codetree_distances, png_stream->codetree_distance_buffer, NUM_DISTANCE_SYMBOLS, DISTANCE_BITLEN);
         }
-      else if (upng->compression == 2)
+      else if (png_stream->compression == 2)
         {
         /* dynamic trees */
-        upng->codetree_buffer = (uint16_t *)neutron_malloc(sizeof(uint16_t) * NUM_DEFLATE_CODE_SYMBOLS);
-        upng->codelengthcodetree = (uint16_t *)neutron_malloc(sizeof(uint16_t) * NUM_DISTANCE_SYMBOLS);
-        upng->codelengthcodetree_buffer = (uint16_t *)neutron_malloc(sizeof(uint16_t) * NUM_DISTANCE_SYMBOLS * 2);
-        upng->codetree = (huffman_tree_t *)neutron_malloc(sizeof(huffman_tree_t));
-        upng->codetreeD = (huffman_tree_t *)neutron_malloc(sizeof(huffman_tree_t));
-        upng->codelengthcodetree = (huffman_tree_t *)neutron_malloc(sizeof(huffman_tree_t));
+        png_stream->codetree_buffer = (uint16_t *)neutron_malloc(sizeof(uint16_t) * NUM_DEFLATE_CODE_SYMBOLS *2);
+        memset(png_stream->codetree_buffer, 0, sizeof(uint16_t) * NUM_DEFLATE_CODE_SYMBOLS);
 
-        huffman_tree_init(upng->codetree, upng->codetree_buffer, NUM_DEFLATE_CODE_SYMBOLS, DEFLATE_CODE_BITLEN);
-        huffman_tree_init(upng->codetreeD, upng->codelengthcodetree, NUM_DISTANCE_SYMBOLS, DISTANCE_BITLEN);
-        huffman_tree_init(upng->codelengthcodetree, upng->codelengthcodetree_buffer, NUM_CODE_LENGTH_CODES, CODE_LENGTH_BITLEN);
-        get_tree_inflate_dynamic(upng, upng->codetree, upng->codetreeD, upng->codelengthcodetree);
+        png_stream->codetree_distance_buffer = (uint16_t *)neutron_malloc(sizeof(uint16_t) * NUM_DISTANCE_SYMBOLS *2);
+        memset(png_stream->codetree_distance_buffer, 0, sizeof(uint16_t) * NUM_DISTANCE_SYMBOLS);
+
+        png_stream->codelengthcodetree_buffer = (uint16_t *)neutron_malloc(sizeof(uint16_t) * NUM_CODE_LENGTH_CODES *2);
+        memset(png_stream->codelengthcodetree_buffer, 0, sizeof(uint16_t) * NUM_CODE_LENGTH_CODES);
+
+        png_stream->codetree = (huffman_tree_t *)neutron_malloc(sizeof(huffman_tree_t));
+        png_stream->codetree_distances = (huffman_tree_t *)neutron_malloc(sizeof(huffman_tree_t));
+        png_stream->codelengthcodetree = (huffman_tree_t *)neutron_malloc(sizeof(huffman_tree_t));
+
+        huffman_tree_init(png_stream->codetree, png_stream->codetree_buffer, NUM_DEFLATE_CODE_SYMBOLS, DEFLATE_CODE_BITLEN);
+        huffman_tree_init(png_stream->codetree_distances, png_stream->codetree_distance_buffer, NUM_DISTANCE_SYMBOLS, DISTANCE_BITLEN);
+        huffman_tree_init(png_stream->codelengthcodetree, png_stream->codelengthcodetree_buffer, NUM_CODE_LENGTH_CODES, CODE_LENGTH_BITLEN);
+
+        get_tree_inflate_dynamic(png_stream, png_stream->codetree, png_stream->codetree_distances, png_stream->codelengthcodetree);
         }
       }
 
-    if(upng->compression != 0)
+    if(png_stream->compression != 0)
       {
       while (bytes > 0)
         {
-        uint16_t code = huffman_decode_symbol(upng, upng->codetree);
-        if (upng->error != s_ok)
-          return cleanup(upng, upng->error);
+        uint16_t code = huffman_decode_symbol(png_stream, png_stream->codetree);
+        if (png_stream->error != s_ok)
+          return cleanup(png_stream, png_stream->error);
 
         if (code == 256)
           {
           /* end code */
-          upng->end_of_block = true;
+          png_stream->end_of_block = true;
           break;
           }
         else if (code <= 255)
           {
           /* store output */
-          out[pos++] = (uint8_t) code;
-          bytes--;
+          set_byte(png_stream, pos++, (uint8_t) code);
           }
         else if (code >= FIRST_LENGTH_CODE_INDEX && code <= LAST_LENGTH_CODE_INDEX)
           {	/*length code */
             /* part 1: get length base */
-          uint16_t length = length_base[code - FIRST_LENGTH_CODE_INDEX];
-          uint16_t codeD, distance, numextrabitsD;
-          uint16_t start, forward, backward, numextrabits;
+          uint32_t length = length_base[code - FIRST_LENGTH_CODE_INDEX];
+          uint32_t codeD, distance, numextrabitsD;
+          uint32_t start, forward, backward, numextrabits;
 
           /* part 2: get extra bits and add the value of that to length */
           numextrabits = length_extra[code - FIRST_LENGTH_CODE_INDEX];
 
-          length += read_bits(upng, numextrabits);
+          length += read_bits(png_stream, numextrabits);
 
           /*part 3: get distance code */
-          codeD = huffman_decode_symbol(upng, upng->codetreeD);
-          if (failed(upng->error))
-            return cleanup(upng, upng->error);
+          codeD = huffman_decode_symbol(png_stream, png_stream->codetree_distances);
+          if (failed(png_stream->error))
+            return cleanup(png_stream, png_stream->error);
 
           /* invalid distance code (30-31 are never used) */
           if (codeD > 29)
-            return cleanup(upng, e_png_malformed);
+            return cleanup(png_stream, e_png_malformed);
 
           distance = distance_base[codeD];
 
           /*part 4: get extra bits from distance */
           numextrabitsD = distance_extra[codeD];
 
-          distance += read_bits(upng, numextrabitsD);
+          distance += read_bits(png_stream, numextrabitsD);
 
           /*part 5: fill in all the out[n] values based on the length and dist */
           start = pos;
@@ -1107,7 +1289,7 @@ static result_t decompress(upng_t *upng, uint8_t *out, uint16_t bytes)
 
           for (forward = 0; forward < length; forward++)
             {
-            out[pos++] = out[backward];
+            set_byte(png_stream, pos++, get_byte(png_stream, backward));
             backward++;
 
             if (backward >= start)
@@ -1118,18 +1300,26 @@ static result_t decompress(upng_t *upng, uint8_t *out, uint16_t bytes)
       }
     else
       {
-      if(failed(result = stream_read(upng, out, bytes, &bytes_read)))
-        return cleanup(upng, result);
+      uint8_t byte;
+      for (bytes_read = 0; bytes_read < bytes; bytes_read++)
+        {
+        uint16_t num_read = 0;
+        
+        if(failed(result = stream_read(png_stream, &byte, 1, &num_read)))
+          return cleanup(png_stream, result);
 
-      if(bytes_read < bytes)
-        upng->end_of_block = true;
+        if(bytes_read == 0)
+          {
+          png_stream->end_of_block = true;
+          break;
+          }
+        else
+          set_byte(png_stream, pos++, byte);
+        }
       }
-
-    bytes -= bytes_read;
-    out += bytes_read;
     }
 
-  return cleanup(upng, s_ok);
+  return cleanup(png_stream, s_ok);
   }
 
 static inline uint8_t get_bits(const uint8_t *buffer, uint16_t bitpos, uint8_t num_bits)
@@ -1166,207 +1356,166 @@ static color_t get_grayscale(uint8_t luminance, uint8_t num_bits, uint8_t alpha)
   return rgba(alpha, luminance, luminance, luminance);
   }
 
+static result_t render_png(png_stream_t *png_stream)
+  {
+  result_t result;
+
+  png_stream->clip_rect.left = png_stream->origin.x;
+  png_stream->clip_rect.top = png_stream->origin.y;
+  png_stream->clip_rect.right = png_stream->origin.x + png_stream->width;
+  png_stream->clip_rect.bottom = png_stream->origin.y + png_stream->height;
+
+  uint16_t bpp = upng_get_bpp(png_stream);
+  uint16_t x;
+  uint16_t y;
+  uint16_t pixel_width = bpp >> 3;
+  uint16_t linebytes = (png_stream->width * pixel_width)+1;
+
+  uint16_t prior_scanline = 0;
+  uint16_t current_scanline = 0;
+
+  png_stream->end_of_block = true;
+  // and read the first byte
+  stream_read(png_stream, &png_stream->data, 1, 0);
+
+  // decompress all scanlines, and store them in the bitmap (un-filtered)
+  if (failed(result = decompress(png_stream, png_stream->height * linebytes)))
+    return result;
+
+  // we now work through all of the pixels and filter them
+  for (y = 0; y < png_stream->height; y++)
+    {
+
+    uint8_t filterType = png_stream->filter_types[y];
+
+    uint16_t i;
+    // NOTE: indexes to x=values start at 1 to allow for the extra prepended of array filter type
+    switch (filterType)
+      {
+      case 0:
+        break;
+      case 1:
+        for (i = pixel_width+1; i < linebytes; i++)
+          set_byte(png_stream,current_scanline + i, get_byte(png_stream, current_scanline + i) + get_byte(png_stream, current_scanline + i - pixel_width));
+        break;
+      case 2:
+        if (y > 0)
+          for (i = 1; i < linebytes; i++)
+            set_byte(png_stream,current_scanline + i, get_byte(png_stream, current_scanline + i) + get_byte(png_stream, prior_scanline + i));
+        break;
+      case 3:
+        if (y > 0)
+          {
+          for (i = 1; i < (pixel_width + 1); i++)
+            set_byte(png_stream, current_scanline + i, get_byte(png_stream, current_scanline + i) + (get_byte(png_stream, prior_scanline + i) >> 1));
+
+          for (; i < linebytes; i++)
+            set_byte(png_stream, current_scanline + i, get_byte(png_stream,current_scanline + i) + ((get_byte(png_stream,current_scanline + i - pixel_width) + get_byte(png_stream, prior_scanline + i)) >> 1));
+          }
+        else
+          {
+          for (i = (pixel_width + 1); i < linebytes; i++)
+            set_byte(png_stream, current_scanline + i, get_byte(png_stream, current_scanline + i) + (get_byte(png_stream, current_scanline + i - pixel_width) >> 1));
+          }
+        break;
+      case 4:
+        if (i > 0)
+          {
+          for (i = 1; i < (pixel_width + 1); i++)
+            set_byte(png_stream, current_scanline + i, (uint8_t)(get_byte(png_stream, current_scanline + i) + paeth_predictor(0, get_byte(png_stream, prior_scanline + i), 0)));
+
+          for (; i < linebytes; i++)
+            set_byte(png_stream, current_scanline + i, (uint8_t)(get_byte(png_stream, current_scanline + i) + 
+                paeth_predictor(get_byte(png_stream, current_scanline + i - pixel_width), 
+                                get_byte(png_stream, prior_scanline + i),
+                                get_byte(png_stream, prior_scanline + i - pixel_width))));
+          }
+        else
+          {
+          for (i = pixel_width+1; i < linebytes; i++)
+            set_byte(png_stream, current_scanline + i, (uint8_t)(get_byte(png_stream, current_scanline + i) + paeth_predictor(get_byte(png_stream, current_scanline + i - pixel_width), 0, 0)));
+          }
+        break;
+      }
+
+
+    // rotate the buffer
+    prior_scanline = current_scanline;
+    current_scanline += linebytes;
+    }
+
+
+  return png_stream->error;
+  }
+
+result_t load_png(handle_t canvas, handle_t stream, const point_t *pt)
+  {
+  result_t result;
+  if (stream == 0 || canvas == 0)
+    return e_bad_parameter;
+
+  png_stream_t *png_stream;
+  if (failed(result = open_png_stream(stream, &png_stream)))
+    return result;
+
+  /* allocate space to store inflated (but still filtered) data */
+  extent_t dim;
+  dim.dx = png_stream->width;
+  dim.dy = png_stream->height;
+
+  // make sure the canvas is valid
+  extent_t ex;
+  if (succeeded(result = get_canvas_extents(canvas, &ex)))
+    {
+    if(dim.dx <= ex.dx && dim.dy <= ex.dy )
+      {
+      png_stream->canvas = canvas;
+      if (pt != 0)
+        {
+        png_stream->origin.x = pt->x;
+        png_stream->origin.y = pt->y;
+        }
+      result = render_png(png_stream);
+      }
+    else
+      result = e_buffer_too_small;
+    }
+
+  stream_close(png_stream);
+  return result;
+  }
+
 result_t create_png_canvas(handle_t stream, handle_t *hndl)
   {
   result_t result;
   if (stream == 0 || hndl == 0)
     return e_bad_parameter;
 
-  upng_t *upng;
-  if(failed(result = open_png_stream(stream, &upng)))
+  png_stream_t *png_stream;
+  if(failed(result = open_png_stream(stream, &png_stream)))
     return result;
 
   /* allocate space to store inflated (but still filtered) data */
   extent_t dim;
-  dim.dx = upng->width;
-  dim.dy = upng->height;
+  dim.dx = png_stream->width;
+  dim.dy = png_stream->height;
 
   handle_t canvas;
   if (failed(result = create_rect_canvas(&dim, &canvas)))
     {
-    stream_close(upng);
+    stream_close(png_stream);
     return result;
     }
 
-  rect_t clip_rect = { 0, 0, upng->width, upng->height };
-  uint16_t bpp = upng_get_bpp(upng);
-  uint16_t x;
-  uint16_t y;
-  uint16_t bytewidth = (bpp + 7) >> 3;	/*bytewidth is used for filtering, is 1 when bpp < 8, number of bytes per pixel otherwise */
-  uint16_t linebytes = (upng->width * bpp + 7) >> 3;
+  png_stream->canvas = canvas;
 
-  // we allocate 3 buffer for the scanline decoder.  this makes a sliding window:
-  // 0 -> previous un-converted scanline
-  // 1 -> un-converted current scanline
-  // 2 -> reconstituded scanline
+  result = render_png(png_stream);
 
-  uint16_t bufp[3] = { 0, 0, linebytes };
-  uint8_t *buffer;
-
-  buffer = (uint8_t *)neutron_malloc(linebytes * upng->height);
-
-  upng->end_of_block = true;
-  // and read the first byte
-  stream_read(upng, &upng->data, 1, 0);
-
-  // read the next scanline
-  if (failed(result = decompress(upng, buffer, upng->height * linebytes)))
-    {
-    neutron_free(buffer);
-    canvas_close(canvas);
-    stream_close(upng);
-
-    return result;
-    }
-
-
-  // we now work through all of the chunks in the file
-  for (y = 0; y < upng->height; y++)
-    {
-
-    /*
-    For PNG filter method 0
-    this function unfilters a single image (e.g. without interlacing this is called once, with Adam7 it's called 7 times)
-    out must have enough bytes allocated already, in must have the scanlines + 1 filtertype byte per scanline
-    x and y are image dimensions or dimensions of reduced image, bpp is bpp per pixel
-    in and out are allowed to be the same memory address!
-    */
-
-    uint16_t inindex = (1 + linebytes) * y;	/*the extra filterbyte added to each row */
-    uint8_t filterType = buffer[bufp[1] + inindex];
-
-    /*
-    For PNG filter method 0
-    unfilter a PNG image scanline by scanline. when the pixels are smaller than 1 byte, the filter works byte per byte (bytewidth = 1)
-    precon is the previous unfiltered scanline, recon the result, scanline the current one
-    the incoming scanlines do NOT include the filtertype byte, that one is given in the parameter filterType instead
-    recon and scanline MAY be the same memory address! precon must be disjoint.
-    */
-
-    uint16_t i;
-    switch (filterType)
-      {
-      case 0:
-        for (i = 0; i < linebytes; i++)
-          buffer[bufp[2] + i] = buffer[bufp[1] + i];
-        break;
-      case 1:
-        for (i = 0; i < bytewidth; i++)
-          buffer[bufp[2] + i] = buffer[bufp[1] + i];
-        for (i = bytewidth; i < linebytes; i++)
-          buffer[bufp[2] + i] = buffer[bufp[1] + i] + buffer[bufp[2] + i - bytewidth];
-        break;
-      case 2:
-        if (i > 0)
-          for (i = 0; i < linebytes; i++)
-            buffer[bufp[2] + i] = buffer[bufp[1] + i] + buffer[bufp[0] + i];
-        else
-          for (i = 0; i < linebytes; i++)
-            buffer[bufp[2] + i] = buffer[bufp[1] + i];
-        break;
-      case 3:
-        if (i > 0)
-          {
-          for (i = 0; i < bytewidth; i++)
-            buffer[bufp[2] + i] = buffer[bufp[1] + i] + (buffer[bufp[0] + i] >> 1);
-          for (i = bytewidth; i < linebytes; i++)
-            buffer[bufp[2] + i] = buffer[bufp[1] + i] + ((buffer[bufp[2] + i - bytewidth] + buffer[bufp[0] + i]) >> 1);
-          }
-        else
-          {
-          for (i = 0; i < bytewidth; i++)
-            buffer[bufp[2] + i] = buffer[bufp[1] + i];
-          for (i = bytewidth; i < linebytes; i++)
-            buffer[bufp[2] + i] = buffer[bufp[1] + i] + buffer[bufp[2] + i - bytewidth] / 2;
-          }
-        break;
-      case 4:
-        if (i > 0)
-          {
-          for (i = 0; i < bytewidth; i++)
-            buffer[bufp[2] + i] = (uint8_t)(buffer[bufp[1] + i] + paeth_predictor(0, buffer[bufp[0] + i], 0));
-          for (i = bytewidth; i < linebytes; i++)
-            buffer[bufp[2] + i] = (uint8_t)(buffer[bufp[1] + i] + paeth_predictor(buffer[bufp[2] + i - bytewidth], buffer[bufp[0] + i], buffer[bufp[0] + i - bytewidth]));
-          }
-        else
-          {
-          for (i = 0; i < bytewidth; i++)
-            buffer[bufp[2] + i] = buffer[bufp[1] + i];
-          for (i = bytewidth; i < linebytes; i++)
-            buffer[bufp[2] + i] = (uint8_t)(buffer[bufp[1] + i] + paeth_predictor(buffer[bufp[2] + i - bytewidth], 0, 0));
-          }
-        break;
-      }
-
-    uint16_t bitpos = 0;
-    color_t pixel_color;
-    // copy the buffer
-    for (x = 0; x < upng->width; x++)
-      {
-      point_t pixel = { x, y };
-      switch (upng->format)
-        {
-        case UPNG_RGB8:
-          set_pixel(canvas, &clip_rect, &pixel, rgb(buffer[bufp[1] + bitpos + 0], buffer[bufp[1] + bitpos + 1], buffer[bufp[1] + bitpos + 2]), 0);
-          bitpos += 3;
-          break;
-        case UPNG_RGB16:
-          set_pixel(canvas, &clip_rect, &pixel, rgb(buffer[bufp[1] + bitpos + 0], buffer[bufp[1] + bitpos + 2], buffer[bufp[1] + bitpos + 4]), 0);
-          bitpos += 8;
-          break;
-        case UPNG_RGBA8:
-          set_pixel(canvas, &clip_rect, &pixel, rgba(buffer[bufp[1] + bitpos + 3], buffer[bufp[1] + bitpos + 0], buffer[bufp[1] + bitpos + 1], buffer[bufp[1] + bitpos + 2]), 0);
-          bitpos += 4;
-          break;
-        case UPNG_RGBA16:
-          set_pixel(canvas, &clip_rect, &pixel, rgba(buffer[bufp[1] + bitpos + 6], buffer[bufp[1] + bitpos + 0], buffer[bufp[1] + bitpos + 2], buffer[bufp[1] + bitpos + 4]), 0);
-          bitpos += 8;
-          break;
-        case UPNG_LUMINANCE1:
-          // 1 bit grayscale
-          set_pixel(canvas, &clip_rect, &pixel, get_grayscale(get_bits(buffer[bufp[1]], bitpos, 1), 1, 255), 0);
-          bitpos++;
-          break;
-        case UPNG_LUMINANCE2:
-          // 2 bit grayscale
-          set_pixel(canvas, &clip_rect, &pixel, get_grayscale(get_bits(buffer[bufp[1]], bitpos, 2), 2, 255), 0);
-          bitpos += 2;
-          break;
-        case UPNG_LUMINANCE4:
-          // 4 bit grayscale
-          set_pixel(canvas, &clip_rect, &pixel, get_grayscale(get_bits(buffer[bufp[1]], bitpos, 4), 4, 255), 0);
-          bitpos += 4;
-          break;
-        case UPNG_LUMINANCE8:
-          // 1 byte grayscale
-          set_pixel(canvas, &clip_rect, &pixel, get_grayscale(get_bits(buffer[bufp[1]], bitpos, 8), 8, 255), 0);
-          bitpos += 8;
-          break;
-        case UPNG_LUMINANCE_ALPHA8:
-        {
-        uint8_t colorref = get_bits(buffer[bufp[1]], bitpos, 8);
-        bitpos += 8;
-        set_pixel(canvas, &clip_rect, &pixel, get_grayscale(colorref, 8, get_bits(buffer[bufp[1]], bitpos, 8)), 0);
-        bitpos += 8;
-        }
-        break;
-        }
-      }
-
-
-    // rotate the buffer
-    bufp[0] = bufp[1];
-    bufp[1] = bufp[2];
-    bufp[2] = bufp[1] + linebytes;
-    }
-
-  neutron_free(buffer);
-
-  if(succeeded(upng->error))
+  if (succeeded(png_stream->error))
     *hndl = canvas;
   else
     canvas_close(canvas);
 
-  stream_close(upng);
-  return upng->error;
+  stream_close(png_stream);
+  return result;
   }

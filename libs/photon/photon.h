@@ -489,6 +489,15 @@ extern result_t create_bitmap_canvas(const bitmap_t *bitmap, handle_t *hndl);
 */
 extern result_t create_png_canvas(handle_t stream, handle_t *hndl);
 /**
+ * @function load_png(handle_t canvas, handle_t stream, const point_t *pt)
+ * Load a png image from the stream onto the canvas.
+ * @param canvas    canvas to render png onto
+ * @param strean    Stream to read from
+ * @param pt        optional point to load image onto 0,0 if not given
+ * @return s_ok if the canvas is large enough and the stream is a valid png
+*/
+extern result_t load_png(handle_t canvas, handle_t stream, const point_t *pt);
+/**
  * Get the length of a canvas
  * @param canvas  Canvas to query
  * @param extent  extents of the canvas

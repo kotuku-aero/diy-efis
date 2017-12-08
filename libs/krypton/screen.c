@@ -13,11 +13,11 @@ uint32_t *crcs;
 handle_t h_worker;
 
 static HWND window;
-static const uint32_t *crtbuf;
-
 static bool repaint = false;
 static uint16_t dimx;
 static uint16_t dimy;
+
+extern const uint32_t *fb_buffer;
 
 static LRESULT CALLBACK wndproc(HWND   hwnd, UINT   uMsg, WPARAM wParam, LPARAM lParam)
   {
@@ -46,7 +46,7 @@ static LRESULT CALLBACK wndproc(HWND   hwnd, UINT   uMsg, WPARAM wParam, LPARAM 
             {
             unsigned long dat;
             size_t pixel = off + x + (y * dimx);
-            dat = crtbuf[pixel];
+            dat = fb_buffer[pixel];
 
             /*     crc^=((crc^dat)<<1)^((dat&0x8000) ? 0x1048:0);
             */
@@ -65,9 +65,14 @@ static LRESULT CALLBACK wndproc(HWND   hwnd, UINT   uMsg, WPARAM wParam, LPARAM 
           for (int y = 0; y < CHUNKY; y++)
             for (int x = 0; x < CHUNKX; x++)
               {
-              uint32_t color = crtbuf[off + x + (y * dimx)];
+              uint32_t color = fb_buffer[off + x + (y * dimx)];
 
-              SetPixel(dc, dest_x + x, dest_y + y, color);
+              uint32_t c1 = color;
+              color &= 0x0000FF00;
+              color |= (c1 & 0xff) << 16;
+              color |= (c1 & 0x00ff0000) >> 16;
+
+              SetPixel(dc, dest_x + x, dest_y + y, color & 0x00FFFFFF);
               }
 
 
@@ -133,7 +138,7 @@ void start_fb(uint16_t x, uint16_t y, uint8_t *buffer)
   {
   dimx = x;
   dimy = y;
-  crtbuf = (const uint32_t *)buffer;
+  fb_buffer = (const uint32_t *)buffer;
 
   task_create("wnd", DEFAULT_STACK_SIZE, worker, 0, BELOW_NORMAL, &h_worker);
   }
