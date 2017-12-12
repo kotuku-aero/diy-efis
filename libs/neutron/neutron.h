@@ -2426,6 +2426,43 @@ extern result_t stream_gets(handle_t stream, char *buffer, uint16_t len);
  */
 extern result_t stream_puts(handle_t stream, const char *str);
 
+///////////////////////////////////////////////////////////////////////////////
+//
+// Decompression of a stream.
+//
+// Functions to take a stream of bytes that is compressed using the DEFLATE
+// algorithm.
+//
+/**
+ * @function result_t (*get_byte_fn)(handle_t parg, uint32_t offset, uint8_t *data)
+ * Get a byte from the decompressed buffer
+ * @param parg    Opaque argument for the accessor
+ * @param offset  Offset into the buffer
+ * @param data    Data returned
+ * @return s_ok if the offset is within bounds of the buffer and the data is available
+ */
+typedef result_t (*get_byte_fn)(handle_t parg, uint32_t offset, uint8_t *data);
+/**
+* @function result_t (*get_byte_fn)(handle_t parg, uint32_t offset, uint8_t *data)
+* Get a byte from the decompressed buffer
+* @param parg    Opaque argument for the accessor
+* @param offset  Offset into the buffer
+* @param data    Data to de assigned
+* @return s_ok if the offset is within bounds of the buffer and the data was written
+*/
+typedef result_t (*set_byte_fn)(handle_t parg, uint32_t offset, uint8_t data);
+/**
+ * @function result_t decompress(handle_t stream, handle_t parg, get_byte_fn getter, set_byte_fn setter, uint32_t *length)
+ * Decompress a stream into a user defined buffer
+ * @param stream    Source stream to read from.  Must be a valid DEFLATE format stream
+ * @param parg      User defined callback argument
+ * @param getter    Function to read a byte from the user buffer
+ * @param setter    Function to set a byte into the user buffer
+ * @param length    Optional value that counts the number of bytes decompressed
+ * @return s_ok if the stream was decoded ok.
+ */
+extern result_t decompress(handle_t stream, handle_t parg, get_byte_fn getter, set_byte_fn setter, uint32_t *length);
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Kernel start routines
