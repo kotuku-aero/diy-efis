@@ -50,12 +50,11 @@ handle_t main_window = 0;
 // this is a base64 encoded file.
 extern const char *neo_base64;
 
+// if parg is given then is a handle to a stream which will be closed
 void run_proton(void *parg)
   {
   result_t result;
   memid_t key;
-
-  const char *splash_base64 = (const char *)parg;
 
   if(succeeded(reg_open_key(0, "proton", &key)))
     {
@@ -77,16 +76,12 @@ void run_proton(void *parg)
 
     if(succeeded(result = open_screen(orientation, layout_wndproc, 0, &main_window)))
       {
-      if (splash_base64 != 0)
+      if (parg != 0)
         {
-        handle_t splash;
-
-        if (succeeded(manifest_create(splash_base64, &splash)))
-          {
-          load_png(main_window, splash, 0);
-          stream_close(splash);
-          }
+        load_png(main_window, parg, 0);
+        stream_close(parg);
         }
+
       // load the neon font.
       handle_t neo_stream;
       if(succeeded(result = manifest_create(neo_base64, &neo_stream)))

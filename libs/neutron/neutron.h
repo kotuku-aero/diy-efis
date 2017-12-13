@@ -2288,10 +2288,11 @@ extern handle_t console_err;
  * @function strstream_create(const char *lit, handle_t *stream)
  * Create an in-memory stream.  Should be deleted when done.
  * @param lit     Optional literal to copy into the stream
+ * @param len     Length of the literal
  * @param stream  Resulting stream
  * @return s_ok if created ok
  */
-extern result_t strstream_create(const char *lit, handle_t *stream);
+extern result_t strstream_create(const void *buffer, uint16_t len, handle_t *stream);
 /**
  * @function strstream_get(handle_t stream, const char **lit)
  * Return the underlying character buffer of the stream
@@ -2299,7 +2300,7 @@ extern result_t strstream_create(const char *lit, handle_t *stream);
  * @param lit     Resulting buffer
  * @return s_ok if stream is a string stream.
  */
-extern result_t strstream_get(handle_t stream, const char **lit);
+extern result_t strstream_get(handle_t stream, const void **lit);
 /**
  * @function stream_printf(handle_t stream, const char *format, ...)
  * Print a formatted string.

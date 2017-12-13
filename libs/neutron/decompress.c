@@ -29,7 +29,8 @@ static const uint16_t length_extra[29] = {	/*the extra bits used by codes 257-28
   5, 5, 5, 0
   };
 
-static const uint16_t distance_base[30] = {	/*the base backwards distances (the bits of distance codes appear after length_code codes and use their own huffman tree) */
+/*the base backwards distances (the bits of distance codes appear after length_code codes and use their own huffman tree) */
+static const uint16_t distance_base[30] = {	
   1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513,
   769, 1025, 1537, 2049, 3073, 4097, 6145, 8193, 12289, 16385, 24577
   };
@@ -39,7 +40,8 @@ static const uint16_t distance_extra[30] = {	/*the extra bits of backwards dista
   11, 11, 12, 12, 13, 13
   };
 
-static const uint16_t code_lengths_order[NUM_CODE_LENGTH_CODES]	/*the order in which "code length_code alphabet code lengths" are stored, out of this the huffman tree of the dynamic huffman tree lengths is generated */
+/*the order in which "code length_code alphabet code lengths" are stored, out of this the huffman tree of the dynamic huffman tree lengths is generated */
+static const uint16_t code_lengths_order[NUM_CODE_LENGTH_CODES]	
 = { 16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15 };
 
 static const uint16_t fixed_deflate_codetree[NUM_DEFLATE_CODE_SYMBOLS * 2] = {
@@ -110,6 +112,7 @@ typedef struct _decoder_state_t {
   bool end_of_block;      // end of block found
   bool last_block;        // was last block
                           // this is used by the decoder
+  handle_t stream;        // stream we are reading from
   uint32_t bitpointer;    // if huaffman then this is a bit offset, otherwise length_code of block
   uint8_t data;
 
@@ -129,7 +132,7 @@ static uint8_t read_bit(decoder_state_t *bitstream)
   bitstream->bitpointer++;
 
   if ((cbp & 0xfffffff8) != (bitstream->bitpointer & 0xfffffff8))
-    stream_read(bitstream, &bitstream->data, 1, 0);
+    stream_read(bitstream->stream, &bitstream->data, 1, 0);
 
   return result;
   }
@@ -154,19 +157,19 @@ static void huffman_tree_init(huffman_tree_t* tree, huffman_node_t *buffer, uint
 maxbitlen is the maximum bits that a code in the tree can have. return value is error.*/
 static result_t huffman_tree_create_lengths(decoder_state_t* decoder, huffman_tree_t* tree, const uint16_t *bitlen)
   {
-  uint16_t *tree1d = (uint16_t *)neutron_malloc(sizeof(int16_t) * tree->numcodes);
-  //uint16_t tree1d[MAX_SYMBOLS];
-  uint16_t *blcount = (uint16_t *)neutron_malloc(sizeof(int16_t) * MAX_BIT_LENGTH);
-  //uint16_t blcount[MAX_BIT_LENGTH];
-   uint16_t *nextcode = (uint16_t *)neutron_malloc(sizeof(int16_t) * (MAX_BIT_LENGTH + 1));
-  //uint16_t nextcode[MAX_BIT_LENGTH+1];
+   uint16_t *tree1d = (uint16_t *)neutron_malloc(sizeof(int16_t) * tree->numcodes);
+  //uint16_t tree1d[NUM_DEFLATE_CODE_SYMBOLS];
+  uint16_t *blcount = (uint16_t *)neutron_malloc(sizeof(int16_t) * (MAX_BIT_LENGTH + 1));
+  //uint16_t blcount[MAX_BIT_LENGTH + 1];
+  uint16_t *nextcode = (uint16_t *)neutron_malloc(sizeof(int16_t) * (MAX_BIT_LENGTH + 1));
+  //uint16_t nextcode[MAX_BIT_LENGTH + 1];
 
   uint16_t bits, n, i;
   uint16_t nodefilled = 0;	/*up to which node it is filled */
   uint16_t treepos = 0;	/*position in the tree (1 of the numcodes columns) */
 
                         /* initialize local vectors */
-  memset(blcount, 0, sizeof(int16_t) * MAX_BIT_LENGTH);
+  memset(blcount, 0, sizeof(int16_t) * (MAX_BIT_LENGTH + 1));
   memset(nextcode, 0, sizeof(int16_t) * (MAX_BIT_LENGTH + 1));
 
   /*step 1: count number of instances of each code length_code */
@@ -175,7 +178,7 @@ static result_t huffman_tree_create_lengths(decoder_state_t* decoder, huffman_tr
 
   /*step 2: generate the nextcode values */
   for (bits = 1; bits <= tree->maxbitlen; bits++)
-    nextcode[bits] = (nextcode[bits - 1] + blcount[bits - 1]) << 1;
+    nextcode[bits] = (nextcode[bits - 1] + blcount[bits - 1])<<1;
 
   /*step 3: generate all the codes */
   for (n = 0; n < tree->numcodes; n++)
@@ -301,7 +304,9 @@ static result_t get_tree_inflate_dynamic(decoder_state_t* decoder, huffman_tree_
     return e_bad_parameter;
 
   uint16_t *codelengthcode = (uint16_t *)neutron_malloc(sizeof(uint16_t) * NUM_CODE_LENGTH_CODES);
+  //uint16_t codelengthcode[NUM_CODE_LENGTH_CODES];
   uint16_t *bitlen = (uint16_t *)neutron_malloc(sizeof(uint16_t) * NUM_DEFLATE_CODE_SYMBOLS);
+  //uint16_t bitlen[NUM_DEFLATE_CODE_SYMBOLS];
   uint16_t *bitlength_distance = (uint16_t *)neutron_malloc(sizeof(uint16_t) * NUM_DISTANCE_SYMBOLS);
 
   /* clear bitlen arrays */
@@ -436,11 +441,10 @@ static result_t get_tree_inflate_dynamic(decoder_state_t* decoder, huffman_tree_
       }
     }
 
-  // check for an end of block code.
+  /*the length_code of the end code 256 must be larger than 0 */
   if (succeeded(result) && bitlen[256] == 0)
     result = e_unexpected;
 
-  /*the length_code of the end code 256 must be larger than 0 */
   /*now we've finally got hlit and hdist, so generate the code trees, and the function is done */
   if (succeeded(result))
     result = huffman_tree_create_lengths(decoder, codetree, bitlen);
@@ -509,6 +513,7 @@ result_t decompress(handle_t stream, handle_t parg, get_byte_fn getter, set_byte
 
   // and read the first byte
   stream_read(stream, &decoder.data, 1, 0);
+  decoder.stream = stream;
 
   if(length != 0)
     *length = 0;
@@ -525,7 +530,7 @@ result_t decompress(handle_t stream, handle_t parg, get_byte_fn getter, set_byte
       decoder.bitpointer = 0;
       decoder.last_block = read_bit(&decoder);
 
-      decoder.compression = read_bit(&decoder) | (read_bit(&decoder) << 1);
+      decoder.compression = read_bits(&decoder, 2);
 
       if (decoder.compression == 0)
         {
@@ -610,7 +615,8 @@ result_t decompress(handle_t stream, handle_t parg, get_byte_fn getter, set_byte
           /* part 2: get extra bits and add the value of that to length_code */
           numextrabits = length_extra[code - FIRST_LENGTH_CODE_INDEX];
 
-          length_code += read_bits(&decoder, numextrabits);
+          if(numextrabits > 0)
+            length_code += read_bits(&decoder, numextrabits);
 
           /*part 3: get distance code */
           if(failed(result = huffman_decode_symbol(&decoder, decoder.codetree_distances, &codeD)))
@@ -625,7 +631,8 @@ result_t decompress(handle_t stream, handle_t parg, get_byte_fn getter, set_byte
           /*part 4: get extra bits from distance */
           numextrabitsD = distance_extra[codeD];
 
-          distance += read_bits(&decoder, numextrabitsD);
+          if(numextrabitsD > 0)
+            distance += read_bits(&decoder, numextrabitsD);
 
           /*part 5: fill in all the out[n] values based on the length_code and dist */
           start = pos;
@@ -640,7 +647,7 @@ result_t decompress(handle_t stream, handle_t parg, get_byte_fn getter, set_byte
             if(failed(result = (*setter)(parg, pos++, value)))
               return result;
 
-            if (*length != 0)
+            if (length != 0)
               *length = *length + 1;
 
             backward++;

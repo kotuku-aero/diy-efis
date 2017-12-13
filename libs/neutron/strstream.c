@@ -57,7 +57,7 @@ static result_t check_handle(handle_t hndl)
   return s_ok;
   }
 
-result_t strstream_get(handle_t hndl, const char **lit)
+result_t strstream_get(handle_t hndl, const void **lit)
   {
   result_t result;
   if(lit == 0 || hndl == 0)
@@ -270,7 +270,7 @@ static void init_stream(strstream_handle_t *stream)
   stream->stream.stream_delete = strstream_delete;
   }
 
-result_t strstream_create(const char *lit, handle_t *hndl)
+result_t strstream_create(const void *lit, uint16_t len, handle_t *hndl)
   {
   if(hndl == 0)
     return e_bad_parameter;
@@ -280,7 +280,7 @@ result_t strstream_create(const char *lit, handle_t *hndl)
   init_stream(stream);
   
   if(lit != 0)
-    vector_copy(sizeof(uint8_t), strlen(lit), lit, &stream->buffer);
+    vector_copy(sizeof(uint8_t), len, lit, &stream->buffer);
   else
     vector_create(sizeof(uint8_t), &stream->buffer);
   

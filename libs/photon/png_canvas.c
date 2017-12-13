@@ -76,8 +76,6 @@ typedef enum upng_format {
   UPNG_LUMINANCE_ALPHA8
   } png_format_type;
 
-#define SET_ERROR(png_stream,code) do { (png_stream)->error = (code); (png_stream)->error_line = __LINE__; } while (0)
-
 typedef enum upng_state {
   UPNG_ERROR = -1,
   UPNG_DECODED = 0,
@@ -91,6 +89,20 @@ typedef enum upng_color {
   UPNG_LUMA = 4,
   UPNG_RGBA = 6
   } png_color_type;
+
+typedef enum {
+  pce_valid = 0x01,
+  pce_dirty = 0x02
+  } png_cache_flags;
+
+typedef struct _png_cache_entry_t {
+  uint8_t flags;
+  point_t pt;
+  color_t color;
+  uint32_t hit;
+  } png_cache_entry_t;
+
+#define NUM_CACHE_ENTRIES 8
 
 typedef struct _png_stream_t
   {
@@ -107,6 +119,8 @@ typedef struct _png_stream_t
   handle_t canvas;
   point_t origin;
   rect_t clip_rect;
+  uint32_t cycle;
+  png_cache_entry_t cache[NUM_CACHE_ENTRIES];
 
   // when the data is decoded, the canvas bit field is used to store the
   // scanline to stop us having to store in dynamic arrays.
@@ -123,7 +137,6 @@ typedef struct _png_stream_t
   png_format_type format;
   uint32_t bytes_per_pixel;
   uint32_t stride;            // bytes/row = (bytes_per_pixel * width) + 1
-  result_t error;
   } png_stream_t;
 
 static inline uint32_t make_uint32(uint8_t a, uint8_t b, uint8_t c, uint8_t d)
@@ -396,7 +409,6 @@ static result_t open_png_stream(handle_t stream, png_stream_t **hndl)
   png_stream->color_type = UPNG_RGBA;
   png_stream->color_depth = 8;
   png_stream->format = UPNG_RGBA8;
-  png_stream->error = s_ok;
   png_stream->source = stream;
 
   uint32_t v_uint32;
@@ -546,16 +558,117 @@ static result_t open_png_stream(handle_t stream, png_stream_t **hndl)
 // Byte accessors
 //
 
+// refresh the cache with a new color.  If cache dirty then store the pixel
+// if no pt passed in then just flush the cache
+static result_t cache_color(png_stream_t *png_stream, const point_t *pt, color_t color, bool write)
+  {
+  result_t result;
+  if(png_stream == 0)
+    return e_bad_parameter;
+
+  uint16_t i;
+  // see if the position is in the cache
+  for (i = 0; i < NUM_CACHE_ENTRIES; i++)
+    {
+    // is this a flush?
+    if (pt == 0)
+      {
+      if (png_stream->cache[i].flags == 3)
+        {
+        if (failed(result = set_pixel(png_stream->canvas, &png_stream->clip_rect, &png_stream->cache[i].pt, png_stream->cache[i].color, 0)))
+          return result;
+
+        png_stream->cache[i].flags &= ~pce_dirty;
+        }
+      }
+    else if((png_stream->cache[i].flags & pce_valid)!= 0 &&
+             pt->x == png_stream->cache[i].pt.x && 
+             pt->y == png_stream->cache[i].pt.y)
+      {
+      png_stream->cache[i].hit = ++png_stream->cycle;
+      if(color != png_stream->cache[i].color)
+        {
+        png_stream->cache[i].color = color;
+        if(write)
+          png_stream->cache[i].flags |= pce_dirty;
+        }
+      return s_ok;
+      }
+    }
+
+  if(pt == 0)
+    return s_ok;        // flush completed
+
+  uint16_t old_index = NUM_CACHE_ENTRIES;
+  for (i = 0; i < NUM_CACHE_ENTRIES; i++)
+    {
+    if (png_stream->cache[i].flags == 0)
+      {
+      // empty slot
+      old_index = i;
+      break;
+      }
+
+    if ((png_stream->cache[i].flags & pce_valid) != 0)
+      {
+      if(old_index == NUM_CACHE_ENTRIES || png_stream->cache[old_index].hit > png_stream->cache[i].hit)
+        old_index = i;
+      }
+    }
+
+  if(old_index == NUM_CACHE_ENTRIES)
+    old_index = 0;                  // purge first entry
+
+  if (png_stream->cache[old_index].flags == 3)
+    {
+    // the old entry is a valid dirty one so write it to the buffer
+    if (failed(result = set_pixel(png_stream->canvas, &png_stream->clip_rect, &png_stream->cache[old_index].pt, png_stream->cache[old_index].color, 0)))
+      return result;
+    }
+
+  png_stream->cache[old_index].flags = pce_valid | (write ? pce_dirty : 0);
+  png_stream->cache[old_index].pt = *pt;
+  png_stream->cache[old_index].color = color;
+  png_stream->cache[old_index].hit = ++png_stream->cycle;
+
+  return s_ok;
+  }
+
+static result_t lookup_color(png_stream_t *png_stream, const point_t *pt, color_t *color)
+  {
+  result_t result;
+  if(png_stream == 0 || pt == 0 || color == 0)
+    return e_bad_parameter;
+
+  uint16_t i;
+  for (i = 0; i < NUM_CACHE_ENTRIES; i++)
+    {
+    if ((png_stream->cache[i].flags & pce_valid) != 0 &&
+      png_stream->cache[i].pt.x == pt->x &&
+      png_stream->cache[i].pt.y == pt->y)
+      {
+      png_stream->cache[i].hit = ++png_stream->cycle;
+      *color = png_stream->cache[i].color;
+      return s_ok;
+      }
+    }
+
+  if(failed(result = get_pixel(png_stream->canvas, &png_stream->clip_rect, pt, color)))
+    return result;
+
+  // cache the value
+  return cache_color(png_stream, pt, *color, false);
+  }
+
 // treat the canvas like a byte array and read a byte
 static result_t get_byte(handle_t parg, uint32_t offset, uint8_t *value)
   {
+  result_t result;
   png_stream_t *png_stream = (png_stream_t *)parg;
   // we treat the canvas as an array of bytes, but depending on the color type
   // it is modified.
   uint32_t x;
   uint32_t y;
-
-  color_t color;
 
   // the stride is 1 byte longer due to the filter byte
   y = offset / png_stream->stride;
@@ -576,8 +689,11 @@ static result_t get_byte(handle_t parg, uint32_t offset, uint8_t *value)
   pt.x = x + png_stream->origin.x;
   pt.y = y + png_stream->origin.y;
 
+  color_t color;
 
-  get_pixel(png_stream->canvas, &png_stream->clip_rect, &pt, &color);
+  if(failed(result = lookup_color(png_stream, &pt, &color)))
+    return result;
+
   switch (bytenum)
     {
     case 0:
@@ -634,7 +750,7 @@ static result_t set_byte(handle_t parg, uint32_t offset, uint8_t byte)
   pt.x = x + png_stream->origin.x;
   pt.y = y + png_stream->origin.y;
 
-  if(failed(result = get_pixel(png_stream->canvas, &png_stream->clip_rect, &pt, &color)))
+  if(failed(result = lookup_color(png_stream, &pt, &color)))
     return result;
 
   switch (bytenum)
@@ -656,7 +772,7 @@ static result_t set_byte(handle_t parg, uint32_t offset, uint8_t byte)
       break;
     }
 
-  return set_pixel(png_stream->canvas, &png_stream->clip_rect, &pt, color, 0);
+ return cache_color(png_stream, &pt, color, true);
   }
 
 static inline uint8_t get_bits(const uint8_t *buffer, uint16_t bitpos, uint8_t num_bits)
@@ -703,14 +819,12 @@ static result_t render_png(png_stream_t *png_stream)
   png_stream->clip_rect.bottom = png_stream->origin.y + png_stream->height;
 
   uint16_t bpp = upng_get_bpp(png_stream);
-  uint16_t x;
   uint16_t y;
   uint16_t pixel_width = bpp >> 3;
   uint16_t linebytes = (png_stream->width * pixel_width)+1;
 
   uint16_t prior_scanline = 0;
   uint16_t current_scanline = 0;
-
 
   // decompress all scanlines, and store them in the bitmap (un-filtered)
   if (failed(result = decompress(png_stream, png_stream, get_byte, set_byte, 0)))
@@ -780,7 +894,7 @@ static result_t render_png(png_stream_t *png_stream)
           for (i = (pixel_width + 1); i < linebytes; i++)
             {
             get_byte(png_stream, current_scanline + i, &v1);
-            get_byte(png_stream, current_scanline + i - pixel_width, v2);
+            get_byte(png_stream, current_scanline + i - pixel_width, &v2);
 
             set_byte(png_stream, current_scanline + i, v1 + (v2 >> 1));
             }
@@ -814,7 +928,7 @@ static result_t render_png(png_stream_t *png_stream)
             get_byte(png_stream, current_scanline + i, &v1);
             get_byte(png_stream, current_scanline + i - pixel_width, &v2);
 
-            set_byte(png_stream, current_scanline + i, (uint8_t)(v1 + paeth_predictor(&v2, 0, 0)));
+            set_byte(png_stream, current_scanline + i, (uint8_t)(v1 + paeth_predictor(v2, 0, 0)));
             }
           }
         break;
@@ -826,8 +940,8 @@ static result_t render_png(png_stream_t *png_stream)
     current_scanline += linebytes;
     }
 
-
-  return png_stream->error;
+  // flush the cache
+  return cache_color(png_stream, 0, 0, true);
   }
 
 result_t load_png(handle_t canvas, handle_t stream, const point_t *pt)
@@ -891,9 +1005,7 @@ result_t create_png_canvas(handle_t stream, handle_t *hndl)
 
   png_stream->canvas = canvas;
 
-  result = render_png(png_stream);
-
-  if (succeeded(png_stream->error))
+  if (succeeded(result = render_png(png_stream)))
     *hndl = canvas;
   else
     canvas_close(canvas);
