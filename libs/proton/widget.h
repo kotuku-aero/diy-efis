@@ -39,6 +39,7 @@ it must be removed as soon as possible after the code fragment is identified.
 #include <stdio.h>
 
 #include "../photon/photon.h"
+#include "../photon/window.h"
 
 extern result_t create_child_widget(handle_t parent, memid_t key, wndproc cb, handle_t *hwnd);
   // look up a settings and return the enumeration value

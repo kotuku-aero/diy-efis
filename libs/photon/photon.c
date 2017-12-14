@@ -75,6 +75,9 @@ static void msg_hook(const canmsg_t *msg)
   post_message(0, msg, 0);
   }
 
+// this is defined in window.c
+extern result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg);
+
 result_t open_screen(uint16_t orientation, wndproc cb, uint16_t id,
     handle_t *hwnd)
   {
@@ -114,6 +117,9 @@ result_t open_screen(uint16_t orientation, wndproc cb, uint16_t id,
   phys_screen->msg_hook.callback = msg_hook;
   // hook the messages
   subscribe(&phys_screen->msg_hook);
+
+  // attach the default event handlers to the window
+  add_event(phys_screen, id_paint, phys_screen, 0, on_paint);
 
   *hwnd = phys_screen;
 

@@ -57,11 +57,11 @@ typedef struct _altitude_window_t {
   handle_t  large_roller;  // neo 15
 } altitude_window_t;
  
-static result_t on_paint(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
   begin_paint(hwnd);
 
-  altitude_window_t *wnd = (altitude_window_t *)parg;
+  altitude_window_t *wnd = (altitude_window_t *)proxy->parg;
   rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
   

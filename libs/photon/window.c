@@ -248,14 +248,10 @@ result_t remove_handler(handle_t hwnd, uint16_t id)
   return remove_event(hwnd, id, true);
   }
 
-static result_t on_paint(handle_t hwnd, struct _event_proxy_t *proxy, const canmsg_t *msg)
+result_t on_paint(handle_t hwnd, struct _event_proxy_t *proxy, const canmsg_t *msg)
   {
   result_t result;
-  window_t *wnd;
-
-  if(failed(result = as_window(hwnd, &wnd)))
-    return result;
-
+  
   // we assume the widget has painted its canvas, we work over our children
   // in z-order
   uint16_t painting_order = 0;

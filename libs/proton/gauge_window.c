@@ -145,11 +145,11 @@ static void draw_point(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rec
 static void draw_graph_value(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect, const pen_t *pen, size_t index, gdi_dim_t offset);
 static void draw_bar_graph(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect, const rect_t *rect);
 
-static result_t on_paint(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
   begin_paint(hwnd);
 
-  gauge_window_t *wnd = (gauge_window_t *)parg;
+  gauge_window_t *wnd = (gauge_window_t *)proxy->parg;
   rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
   

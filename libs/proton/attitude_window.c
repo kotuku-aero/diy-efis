@@ -70,11 +70,11 @@ typedef struct _attitude_window_t {
   } attitude_window_t;
 
 
-static result_t on_paint(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
   begin_paint(hwnd);
 
-  attitude_window_t *wnd = (attitude_window_t *)parg;
+  attitude_window_t *wnd = (attitude_window_t *)proxy->parg;
   rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
 

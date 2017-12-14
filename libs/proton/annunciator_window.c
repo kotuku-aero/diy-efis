@@ -69,10 +69,10 @@ typedef struct _annunciator_window_t {
  */
 static void draw_annunciator(handle_t hwnd, const rect_t *wnd_rect, annunciator_window_t *wnd, const point_t *pt, const char *label, const char *value);
 
-static result_t on_paint(handle_t hwnd, void *parg, const char *func, const canmsg_t *canmsg)
+static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *can_msg)
   {
   bool changed = false;
-  annunciator_window_t *wnd = (annunciator_window_t *)parg;
+  annunciator_window_t *wnd = (annunciator_window_t *)proxy->parg;
 
   begin_paint(hwnd);
 
