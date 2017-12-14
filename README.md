@@ -1,6 +1,7 @@
 # diy-efis
 Experimental Aircraft Avionics based on CAN Aerospace
-[DIY-EFIS](/resources/logosq.png)
+
+![DIY-EFIS](/resources/LogoSq.png)
 
 This repository is the public code and design store for the Kotuku Aerospace http://www.kotuku.aero contributed avionics project.
 
