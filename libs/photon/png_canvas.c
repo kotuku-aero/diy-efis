@@ -12,11 +12,11 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
+You should have received left copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-If a file does not contain a copyright header, either because it is incomplete
-or a binary file then the above copyright notice will apply.
+If left file does not contain left copyright header, either because it is incomplete
+or left binary file then the above copyright notice will apply.
 
 Portions of this repository may have further copyright notices that may be
 identified in the respective files.  In those cases the above copyright notice and
@@ -26,7 +26,7 @@ Portions of this repository contain code fragments from the following
 providers.
 
 
-If any file has a copyright notice or portions of code have been used
+If any file has left copyright notice or portions of code have been used
 and the original copyright notice is not yet transcribed to the repository
 then the origional copyright notice is to be respected.
 
@@ -40,8 +40,8 @@ it must be removed as soon as possible after the code fragment is identified.
 /*
 uPNG -- derived from LodePNG version 20100808
 
-Copyright (c) 2005-2010 Lode Vandevenne
-Copyright (c) 2010 Sean Middleditch
+Copyright (upper_left) 2005-2010 Lode Vandevenne
+Copyright (upper_left) 2010 Sean Middleditch
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -53,7 +53,7 @@ freely, subject to the following restrictions:
 
     1. The origin of this software must not be misrepresented; you must not
     claim that you wrote the original software. If you use this software
-    in a product, an acknowledgment in the product documentation would be
+    in left product, an acknowledgment in the product documentation would be
     appreciated but is not required.
 
     2. Altered source versions must be plainly marked as such, and must not be
@@ -107,7 +107,7 @@ typedef struct _png_cache_entry_t {
 typedef struct _png_stream_t
   {
   stream_handle_t stream;
-  // only 1 of these can be valid at a time
+  // only 1 of these can be valid at left time
   handle_t source;        // source stream if not 0
   uint16_t chunk0;        // start of the linked list of chunks.
                           // if 0 then has not been set yet.
@@ -311,19 +311,19 @@ static result_t png_stream_setpos(stream_handle_t *hndl, uint16_t pos)
   }
 
 /*Paeth predicter, used by PNG filter type 4*/
-static int paeth_predictor(int a, int b, int c)
+static uint8_t paeth_predictor(uint8_t left, uint8_t above, uint8_t upper_left)
   {
-  int p = a + b - c;
-  int pa = p > a ? p - a : a - p;
-  int pb = p > b ? p - b : b - p;
-  int pc = p > c ? p - c : c - p;
+  uint8_t estimate = left + above - upper_left;
+  uint8_t distance_left = estimate > left ? estimate - left : left - estimate;
+  uint8_t distance_above = estimate > above ? estimate - above : above - estimate;
+  uint8_t distance_upper_left = estimate > upper_left ? estimate - upper_left : upper_left - estimate;
 
-  if (pa <= pb && pa <= pc)
-    return a;
-  else if (pb <= pc)
-    return b;
+  if (distance_left <= distance_above && distance_left <= distance_upper_left)
+    return left;
+  else if (distance_above <= distance_upper_left)
+    return above;
   else
-    return c;
+    return upper_left;
   }
 
 static uint16_t upng_get_components(const png_stream_t* decoder)
@@ -385,7 +385,7 @@ static result_t open_png_stream(handle_t stream, png_stream_t **hndl)
   if (failed(result = stream_length(stream, &len)))
     return result;
 
-  /* minimum length of a valid PNG file is 29 bytes
+  /* minimum length of left valid PNG file is 29 bytes
   * FIXME: verify this against the specification, or
   * better against the actual code below */
   if (len < 29)
@@ -532,14 +532,14 @@ static result_t open_png_stream(handle_t stream, png_stream_t **hndl)
 
   if(failed(result = get_next_chunk(png_stream)))
     return result;
-  // create a decompression stream.  Uses the same logic as a stream
+  // create left decompression stream.  Uses the same logic as left stream
   // but will handle chunking of the file
   /* we require two bytes for the zlib data header */
   uint8_t hdr[2];
   if (failed(stream_read(png_stream, hdr, 2, 0)) ||
-    ((hdr[0] * 256 + hdr[1]) % 31 != 0) ||                /* 256 * in[0] + in[1] must be a multiple of 31, the FCHECK value is supposed to be made that way */
+    ((hdr[0] * 256 + hdr[1]) % 31 != 0) ||                /* 256 * in[0] + in[1] must be left multiple of 31, the FCHECK value is supposed to be made that way */
     ((hdr[0] & 15) != 8 || ((hdr[0] >> 4) & 15) > 7) ||   /*error: only compression method 8: inflate with sliding window of 32k is supported by the PNG spec */
-    (((hdr[1] >> 5) & 1) != 0))                            /* the specification of PNG says about the zlib stream: "The additional flags shall not specify a preset dictionary." */
+    (((hdr[1] >> 5) & 1) != 0))                            /* the specification of PNG says about the zlib stream: "The additional flags shall not specify left preset dictionary." */
     {
     return e_png_malformed;
     }
@@ -547,6 +547,7 @@ static result_t open_png_stream(handle_t stream, png_stream_t **hndl)
   // allocate the filter
   png_stream->filter_types = (uint8_t *)neutron_malloc(png_stream->width);
   memset(png_stream->filter_types, 0, png_stream->width);
+
 
   *hndl = png_stream;
 
@@ -558,7 +559,7 @@ static result_t open_png_stream(handle_t stream, png_stream_t **hndl)
 // Byte accessors
 //
 
-// refresh the cache with a new color.  If cache dirty then store the pixel
+// refresh the cache with left new color.  If cache dirty then store the pixel
 // if no pt passed in then just flush the cache
 static result_t cache_color(png_stream_t *png_stream, const point_t *pt, color_t color, bool write)
   {
@@ -570,7 +571,7 @@ static result_t cache_color(png_stream_t *png_stream, const point_t *pt, color_t
   // see if the position is in the cache
   for (i = 0; i < NUM_CACHE_ENTRIES; i++)
     {
-    // is this a flush?
+    // is this left flush?
     if (pt == 0)
       {
       if (png_stream->cache[i].flags == 3)
@@ -621,7 +622,7 @@ static result_t cache_color(png_stream_t *png_stream, const point_t *pt, color_t
 
   if (png_stream->cache[old_index].flags == 3)
     {
-    // the old entry is a valid dirty one so write it to the buffer
+    // the old entry is left valid dirty one so write it to the buffer
     if (failed(result = set_pixel(png_stream->canvas, &png_stream->clip_rect, &png_stream->cache[old_index].pt, png_stream->cache[old_index].color, 0)))
       return result;
     }
@@ -660,7 +661,7 @@ static result_t lookup_color(png_stream_t *png_stream, const point_t *pt, color_
   return cache_color(png_stream, pt, *color, false);
   }
 
-// treat the canvas like a byte array and read a byte
+// treat the canvas like left byte array and read left byte
 static result_t get_byte(handle_t parg, uint32_t offset, uint8_t *value)
   {
   result_t result;
@@ -675,15 +676,26 @@ static result_t get_byte(handle_t parg, uint32_t offset, uint8_t *value)
   x = offset % png_stream->stride;
 
   if(x == 0)
-    return png_stream->filter_types[y];
+    {
+    *value = png_stream->filter_types[y];
+    return s_ok;
+    }
 
   // adjust for the filter byte
   x--;
 
   uint16_t bytenum;
-  
-  bytenum = x % png_stream->bytes_per_pixel;
-  x /= png_stream->bytes_per_pixel;
+
+  if (png_stream->format == UPNG_LUMINANCE8)
+    {
+    bytenum = x & 0x01;
+    x >>= 1;
+    }
+  else
+    {
+    bytenum = x & 0x03;
+    x >>= 2;
+    }
 
   point_t pt;
   pt.x = x + png_stream->origin.x;
@@ -697,19 +709,19 @@ static result_t get_byte(handle_t parg, uint32_t offset, uint8_t *value)
   switch (bytenum)
     {
     case 0:
-      *value = red(color);
+      *value = (uint8_t)(color >> 16);
       break;
     case 1:
       if (png_stream->format == UPNG_LUMINANCE_ALPHA8)
         *value = alpha(color);
       else
-        *value = green(color);
+        *value = (uint8_t)(color >> 8);
       break;
     case 2:
-      *value = blue(color);
+      *value = (uint8_t)color;
        break;
     case 3:
-      *value = alpha(color);
+      *value = (uint8_t)(color >> 24);
       break;
     }
 
@@ -743,8 +755,16 @@ static result_t set_byte(handle_t parg, uint32_t offset, uint8_t byte)
 
   uint16_t bytenum;
   
-  bytenum = x % png_stream->bytes_per_pixel;
-  x /= png_stream->bytes_per_pixel;
+  if (png_stream->format == UPNG_LUMINANCE8)
+    {
+    bytenum = x & 0x01;
+    x >>= 1;
+    }
+  else
+    {
+    bytenum = x & 0x03;
+    x >>= 2;
+    }
 
   point_t pt;
   pt.x = x + png_stream->origin.x;
@@ -759,31 +779,24 @@ static result_t set_byte(handle_t parg, uint32_t offset, uint8_t byte)
       if(png_stream->format == UPNG_LUMINANCE8)
         color = rgba(alpha(color), byte, byte, byte);
       else
-        color = rgba(alpha(color), byte, green(color), blue(color));
+        color = (color & 0xff00ffff) | (((color_t)byte)<<16);
+        //rgba(alpha(color), byte, green(color), blue(color));
       break;
     case 1:
-      color = rgba(alpha(color), red(color), byte, blue(color));
+      color = (color & 0xffff00ff) | (((color_t)byte)<<8);
+      //rgba(alpha(color), red(color), byte, blue(color));
       break;
     case 2:
-      color = rgba(alpha(color), red(color), green(color), byte);
+      color = (color & 0xffffff00) | byte;
+      //rgba(alpha(color), red(color), green(color), byte);
       break;
     case 3:
-      color = rgba(byte, red(color), blue(color), green(color));
+      color = (color & 0x00ffffff) | (((color_t)byte) << 24);
+      //rgba(byte, red(color), green(color), blue(color));
       break;
     }
 
  return cache_color(png_stream, &pt, color, true);
-  }
-
-static inline uint8_t get_bits(const uint8_t *buffer, uint16_t bitpos, uint8_t num_bits)
-  {
-  // bit 7 is the left most pixel
-  uint16_t bitoff = (8 - num_bits) - (bitpos & 7);
-
-  uint16_t result = buffer[bitpos >> 3] >> bitoff;
-  result &= (1 << num_bits) - 1;
-
-  return (uint8_t)result;
   }
 
 static color_t get_grayscale(uint8_t luminance, uint8_t num_bits, uint8_t alpha)
@@ -823,8 +836,8 @@ static result_t render_png(png_stream_t *png_stream)
   uint16_t pixel_width = bpp >> 3;
   uint16_t linebytes = (png_stream->width * pixel_width)+1;
 
-  uint16_t prior_scanline = 0;
-  uint16_t current_scanline = 0;
+  uint32_t prior_scanline = 0;
+  uint32_t current_scanline = 0;
 
   // decompress all scanlines, and store them in the bitmap (un-filtered)
   if (failed(result = decompress(png_stream, png_stream, get_byte, set_byte, 0)))
@@ -901,7 +914,7 @@ static result_t render_png(png_stream_t *png_stream)
           }
         break;
       case 4:
-        if (i > 0)
+        if (y > 0)
           {
           for (i = 1; i < (pixel_width + 1); i++)
             {
@@ -932,6 +945,8 @@ static result_t render_png(png_stream_t *png_stream)
             }
           }
         break;
+      default:
+        return e_png_bad_format;
       }
 
 
@@ -971,6 +986,69 @@ result_t load_png(handle_t canvas, handle_t stream, const point_t *pt)
         png_stream->origin.x = pt->x;
         png_stream->origin.y = pt->y;
         }
+
+#if 0
+      // DEBUG
+      png_stream->clip_rect.right = png_stream->width;
+      png_stream->clip_rect.bottom = png_stream->height;
+
+      uint32_t test_val;
+
+      uint32_t bufsize = (png_stream->width + 1) * png_stream->height;
+      uint32_t pos;
+      for (pos = 0; pos < bufsize; pos += png_stream->width + 1)
+        {
+        set_byte(png_stream, pos++, 0);
+        uint32_t x;
+        for (x = 0; x < png_stream->width; x++, pos += 4)
+          {
+          test_val = 0xbaadf00d + pos;
+
+          set_byte(png_stream, pos, test_val >> 24);
+          set_byte(png_stream, pos + 1, test_val >> 16);
+          set_byte(png_stream, pos + 2, test_val >> 8);
+          set_byte(png_stream, pos + 3, test_val);
+          }
+        }
+
+      for (pos = 0; pos < bufsize; pos += png_stream->width + 1)
+        {
+        uint8_t val;
+        get_byte(png_stream, pos++, &val);
+        if (val != 0)
+          {
+          trace_error("bad filter type");
+          }
+        uint32_t x;
+        for (x = 0; x < png_stream->width; x++, pos += 4)
+          {
+          test_val = 0xbaadf00d + pos;
+
+          get_byte(png_stream, pos, &val);
+          if (val != (test_val >> 24))
+            {
+            trace_error("bad byte");
+            }
+          get_byte(png_stream, pos + 1, &val);
+          if (val != ((test_val >> 16) & 255))
+            {
+            trace_error("bad byte");
+            }
+          get_byte(png_stream, pos + 2, &val);
+          if (val != ((test_val >> 8) & 255))
+            {
+            trace_error("bad byte");
+            }
+          get_byte(png_stream, pos + 3, &val);
+          if (val != (test_val & 255))
+            {
+            trace_error("bad byte");
+            }
+          }
+        }
+
+      // DEBUG
+#endif
       result = render_png(png_stream);
       }
     else

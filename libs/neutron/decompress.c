@@ -406,7 +406,8 @@ static result_t get_tree_inflate_dynamic(decoder_state_t* decoder, huffman_tree_
           {
           bitlen[i] = 0;
           }
-        else {
+        else
+          {
           bitlength_distance[i - hlit] = 0;
           }
         i++;
@@ -609,8 +610,13 @@ result_t decompress(handle_t stream, handle_t parg, get_byte_fn getter, set_byte
           {	/*length_code code */
             /* part 1: get length_code base */
           uint32_t length_code = length_base[code - FIRST_LENGTH_CODE_INDEX];
-          uint16_t codeD, distance, numextrabitsD;
-          uint32_t start, forward, backward, numextrabits;
+          uint16_t codeD;
+          uint32_t distance;
+          uint16_t numextrabitsD;
+          uint32_t start;
+          uint32_t forward;
+          uint32_t backward;
+          uint16_t numextrabits;
 
           /* part 2: get extra bits and add the value of that to length_code */
           numextrabits = length_extra[code - FIRST_LENGTH_CODE_INDEX];
@@ -656,6 +662,8 @@ result_t decompress(handle_t stream, handle_t parg, get_byte_fn getter, set_byte
               backward = start - distance;
             }
           }
+        else
+          return e_bad_handle;
         }
       }
     else

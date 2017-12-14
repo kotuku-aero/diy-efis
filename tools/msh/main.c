@@ -68,8 +68,6 @@ extern cli_node_t cli_root;
 
 const char *node_name = "muon";
 extern const char *splash_base64;     // 320x240
-extern const uint8_t splash;
-extern uint16_t splash_length;
 
 static FILE *ci;
 static FILE *co;
@@ -355,10 +353,8 @@ int main(int argc, char **argv)
   memid_t proton_key;
   if(succeeded(reg_open_key(0, "proton", &proton_key)))
     {
-    handle_t stream = 0;
-
-    // TODO: very inefficient as the literal is copied.  for testing only!
-    strstream_create(&splash, splash_length, &stream);
+    handle_t stream;
+    manifest_create(splash_base64, &stream);
 
     task_create("PROTON", DEFAULT_STACK_SIZE * 4, run_proton, stream, NORMAL_PRIORITY, 0);
     }

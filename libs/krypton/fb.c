@@ -352,10 +352,6 @@ void bsp_set_pixel(canvas_t *hndl,
      dest->y >= canvas->canvas.height)
     return;
 
-  // alpha blend the color if it is not opaque
-  if(alpha(color) != 255)
-    color = alpha_blend(color, bsp_get_pixel(hndl, dest));
-
 	_set_pixel(canvas, point_to_address(canvas, dest), color);
   }
 
