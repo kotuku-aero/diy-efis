@@ -23,6 +23,9 @@ The simplest way to try the code is to build on Microsoft Windows.  This is not 
     string layout "test"
     uint16 screen-x 320
     uint16 screen-y 240
+		mkdir test
+		exit
+		exit
 		exit
 
 * This will exit the shell.  The code does not support run-time reconfiguration. Run it again and now 2 windows should open with one showing the startup logo.  From this point the script for the layout and event handlers can be developed.  Checkout the [Facebook page](https://www.facebook.com/diyefis/) for a screen cast of what happens next

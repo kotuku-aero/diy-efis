@@ -1840,22 +1840,13 @@ result_t load_layout(handle_t parent, memid_t hive)
 
   while (succeeded(result = reg_enum_key(hive, &type, 0, 0, REG_NAME_MAX, name, &child)))
     {
-    // open the window key
-    memid_t key;
-    if (failed(result = reg_open_key(hive, name, &key)))
-      return result;
-
     // we create a widget and pickup the widget defined settings.
     // these are:
     // font -> name of the font to load
     // color -> foreground color
     // background -> back
-
-    char widget_type[REG_STRING_MAX + 1];
-    length = REG_STRING_MAX + 1;
-
     int ordinal;
-    if (failed(lookup_enum(key, "type", layout_names, last_layout_enum, &ordinal)))
+    if (failed(lookup_enum(child, "type", layout_names, last_layout_enum, &ordinal)))
       {
       continue;
       }

@@ -240,34 +240,50 @@ result_t lookup_color(memid_t key, const char *name, color_t *color)
   if(name == 0 ||
      color == 0)
     return e_bad_parameter;
-  
-  char str[REG_STRING_MAX];
-  
-  *color = color_hollow;
 
-  if (failed(result = reg_get_string(key, name, str, 0)))
+  // determine the type of the registry key
+  field_datatype dt = 0;
+  memid_t memid;
+  if(failed(result = reg_query_child(key, name, &memid, &dt, 0)))
     return result;
 
-  if (str[0] == '0')
+  if(dt == field_string)
     {
-    *color = (color_t) strtoul(str, 0, 0);
-    return s_ok;
-    }
+    // handle a string type
+    char str[REG_STRING_MAX];
+  
+    *color = color_hollow;
 
-  color_lookup_t *colors = color_lookups;
+    if (failed(result = reg_get_string(key, name, str, 0)))
+      return result;
 
-  while (colors->name != 0)
-    {
-    if (strcasecmp(str, colors->name) == 0)
+    if (str[0] == '0' || str[0] == '-')
       {
-      *color = colors->color;
+      *color = (color_t) strtoul(str, 0, 0);
       return s_ok;
       }
 
-    colors++;
+    color_lookup_t *colors = color_lookups;
+
+    while (colors->name != 0)
+      {
+      if (strcasecmp(str, colors->name) == 0)
+        {
+        *color = colors->color;
+        return s_ok;
+        }
+
+      colors++;
+      }
+    return e_not_found;
+    }
+  else if (dt = field_uint32)
+    {
+    // numeric field
+    return reg_get_uint32(key, name, color);
     }
 
-  return e_not_found;
+  return e_bad_parameter;
   }
 
 typedef struct _pen_value_lookup_t

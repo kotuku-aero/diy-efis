@@ -230,14 +230,15 @@ result_t get_message(handle_t hscreen, handle_t *hwnd, canmsg_t *msg)
   // see if the queue is empty...
   if (queue_count == 0)
     {
-    if (succeeded((*screen->wnd.canvas->queue_empty)(hwnd)))
+    if (succeeded((*screen->wnd.canvas->queue_empty)(hwnd)) &&
+     screen->wnd.invalid)
       {
       memcpy(msg, &paint_msg, sizeof(canmsg_t));
       *hwnd = hscreen;
       return s_ok;          // paint message found
       }
 
-    return s_false;
+    // this means the window is painted, and there are no more messages
     }
 
   // get the message off the queue

@@ -125,7 +125,7 @@ static void worker(void *argv)
   ShowWindow(window, SW_SHOW);
 
   DWORD idEvent;
-  SetTimer(window, &idEvent, 100, NULL);
+  SetTimer(window, &idEvent, 2000, NULL);
   MSG msg;
   while (true)
     {
