@@ -156,7 +156,7 @@ result_t lookup_enum(memid_t key,
   return e_not_found;
   }
 
-const char *font_hints = "ABCDEFGHIKLMNOPQRSTUVXYZ0123456789 ";
+const char *font_hints = "1ABCDEFGHIKLMNOPQRSTUVXYZ0123456789 ";
 
 result_t lookup_font(memid_t key, const char *name, handle_t  *font)
   {

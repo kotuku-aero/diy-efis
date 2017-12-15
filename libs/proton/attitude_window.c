@@ -217,6 +217,8 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
         pt_left.x -= 9; pt_left.y -= 9;
         pt_right.x -= 9; pt_right.y -= 9;
 
+        text_angle[0] += '0';
+
         draw_text(hwnd, &wnd_rect, wnd->font, color_white, color_hollow,
           text_angle, 1, &pt_left, 0, 0, 0);
 

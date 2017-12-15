@@ -462,7 +462,7 @@ result_t get_glyph_box(const fontinfo_t *info, int glyph_index, int16_t *x0, int
   }
 
 typedef struct _contour_t {
-  uint16_t num_points;
+  uint16_t end_flags;
   handle_t vertices;
   } contour_t;
 
@@ -474,10 +474,13 @@ typedef struct _contour_t {
 #define Y_DELTA 32
 
 static void read_coord(bool is_y, uint8_t byte_flag, uint8_t delta_flag, int16_t val_min,
-  int16_t val_max, uint16_t num_points, handle_t stream, handle_t vertices)
+  int16_t val_max, handle_t stream, handle_t vertices)
   {
   uint16_t index;
   int16_t value = 0;
+  uint16_t num_points;
+  vector_count(vertices, &num_points);
+
   for (index = 0; index < num_points; index++)
     {
     glyph_vertex_t vert;
@@ -491,7 +494,7 @@ static void read_coord(bool is_y, uint8_t byte_flag, uint8_t delta_flag, int16_t
       else
         value -= offs;
       }
-    else if (!(vert.type & delta_flag))
+    else if ((vert.type & delta_flag)== 0)
       {
       int16_t offs = read_int16(stream);
       value += offs;
@@ -640,6 +643,7 @@ static result_t get_glyph_shape(const fontinfo_t *info, int glyph_index, handle_
     uint8_t flags = 0;
     int32_t j = 0, was_off = 0, start_off = 0;
     int16_t i;
+    uint16_t end_pt = 0;
     for (i = 0; i < numberOfContours; i++)
       {
       contour_t ct = { read_uint16(info->stream), 0 };
@@ -652,6 +656,7 @@ static result_t get_glyph_shape(const fontinfo_t *info, int glyph_index, handle_
     stream_setpos(info->stream, pos + ins);         // skip the instructions
 
     int16_t contour_num;
+    ins = 0;
     // now we read the x and y stream and flags
     for (contour_num = 0; contour_num < numberOfContours; contour_num++)
       {
@@ -662,7 +667,7 @@ static result_t get_glyph_shape(const fontinfo_t *info, int glyph_index, handle_
       vector_create(sizeof(glyph_vertex_t), &ct.vertices);    // create the vertex list
       vector_set(shape, contour_num, &ct);
 
-      for (ins = 0; ins < ct.num_points; ins++)
+      for (; ins <= ct.end_flags; ins++)
         {
         memset(&vert, 0, sizeof(glyph_vertex_t));
         stream_read(info->stream, &vert.type, 1, 0);
@@ -673,15 +678,45 @@ static result_t get_glyph_shape(const fontinfo_t *info, int glyph_index, handle_
           // ins += rpt;       // same flag for a while...
           stream_read(info->stream, &rpt, 1, 0);
           while (rpt--)
+            {
+            ins++;
             vector_push_back(ct.vertices, &vert);
+            }
           }
-        else
-          vector_push_back(ct.vertices, &vert);
+
+        vector_push_back(ct.vertices, &vert);
         }
+      }
+
+    // re-read the contors now
+    for (contour_num = 0; contour_num < numberOfContours; contour_num++)
+      {
+      contour_t ct;
+      vector_at(shape, contour_num, &ct);
+      glyph_vertex_t vert;
 
       // now we read the x-coordinates
-      read_coord(false, X_IS_BYTE, X_DELTA, x_min, x_max, ct.num_points, info->stream, ct.vertices);
-      read_coord(true, Y_IS_BYTE, Y_DELTA, y_min, y_max, ct.num_points, info->stream, ct.vertices);
+      read_coord(false, X_IS_BYTE, X_DELTA, x_min, x_max, info->stream, ct.vertices);
+      read_coord(true, Y_IS_BYTE, Y_DELTA, y_min, y_max, info->stream, ct.vertices);
+      // DEBUG
+      if (glyph_index == 18)
+        {
+        uint16_t i;
+        // now we read the x-coordinates
+        trace_debug("Contour %d\r\n", contour_num);
+          uint16_t num_vertices;
+          vector_count(ct.vertices, &num_vertices);
+          uint16_t j;
+          for (j = 0; j < num_vertices; j++)
+            {
+            glyph_vertex_t gv;
+            vector_at(ct.vertices, j, &gv);
+            const char *vertex_name;
+
+            trace_debug("  Vertex %d - flags: %x, x: %d, y: %d\r\n", j, gv.type, gv.x, gv.y);
+            }
+        }
+       // DEBUG
 
       // we now walk the contour and convert to a ready to process form
       bool start_off = false;       // if the first point was an off-curve then this will be set
@@ -690,9 +725,11 @@ static result_t get_glyph_shape(const fontinfo_t *info, int glyph_index, handle_
       int16_t start_y = 0;
       uint16_t i = 0;
       uint16_t next_pt = 0;         // these are the actual points
+      uint16_t num_points;
       glyph_vertex_t curve_pt;      // the point on the curve
       memset(&curve_pt, 0, sizeof(glyph_vertex_t));
 
+      vector_count(ct.vertices, &num_points);
       vector_at(ct.vertices, i++, &vert);
 
       if ((vert.type & ON_CURVE) == 0)
@@ -732,9 +769,9 @@ static result_t get_glyph_shape(const fontinfo_t *info, int glyph_index, handle_
       // set the start point
       vector_set(ct.vertices, next_pt++, &curve_pt);
 
-      for (; i < ct.num_points; i++)
+      for (; i < ct.end_flags; i++)
         {
-        vector_at(ct.vertices, i++, &vert);
+        vector_at(ct.vertices, i, &vert);
 
         if ((vert.type & ON_CURVE) == 0)
           {
@@ -743,10 +780,10 @@ static result_t get_glyph_shape(const fontinfo_t *info, int glyph_index, handle_
             {
             // if the previous was off the curve then this is two beziers.
             // convert the first part to a curve, and insert the new point into the array
-            curve_pt.x = curve_pt.cx;
-            curve_pt.y = curve_pt.cy;
-            curve_pt.cx = (curve_pt.cx + vert.x) >> 1;
-            curve_pt.cy = (curve_pt.cy + vert.y) >> 1;
+            curve_pt.x = (curve_pt.cx + vert.x) >> 1;
+            curve_pt.y = (curve_pt.cy + vert.y) >> 1;
+            curve_pt.cx = vert.x;
+            curve_pt.cy = vert.y;
             curve_pt.type = contour_vcurve;
             vector_set(ct.vertices, next_pt++, &curve_pt);
 
@@ -784,7 +821,41 @@ static result_t get_glyph_shape(const fontinfo_t *info, int glyph_index, handle_
       curve_pt.x = vert.x;
       curve_pt.y = vert.y;
       curve_pt.type = start_off ? contour_vcurve : contour_vline;
-      vector_set(ct.vertices, next_pt, &curve_pt);
+      vector_push_back(ct.vertices, &curve_pt);
+
+
+      // DEBUG
+      if (glyph_index == 18)
+        {
+          trace_debug("converted glyph\r\n");
+          uint16_t num_vertices;
+          vector_count(ct.vertices, &num_vertices);
+          uint16_t j;
+          for (j = 0; j < num_vertices; j++)
+            {
+            glyph_vertex_t gv;
+            vector_at(ct.vertices, j, &gv);
+            const char *vertex_name;
+            switch (gv.type)
+              {
+              case contour_vmove:
+                vertex_name = "move";
+                break;
+              case contour_vline:
+                vertex_name = "line";
+                break;
+              case contour_vcurve:
+                vertex_name = "curve";
+                break;
+              default:
+                vertex_name = "unknown";
+                break;
+              }
+
+            trace_debug("  Vertex %d - Type: %s, x: %d, y: %d, cx: %d, cy: %d\r\n", j, vertex_name, gv.x, gv.y, gv.cx, gv.cy);
+            }
+        }
+      // DEBUG
 
       // and save the contour
       vector_set(shape, contour_num, &ct);
@@ -798,8 +869,11 @@ static result_t get_glyph_shape(const fontinfo_t *info, int glyph_index, handle_
 
 static float scale_for_pixel_height(const fontinfo_t *info, float height)
   {
-  int fheight = read_int16_setpos(info->stream, info->hhea + 4) - read_int16_setpos(info->stream, info->hhea + 6);
-  return (float)height / fheight;
+  float ascender = read_int16_setpos(info->stream, info->hhea + 4);
+  float descender = read_int16_setpos(info->stream, info->hhea + 6);
+
+
+  return (float)height / (ascender + descender);
   }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1233,7 +1307,8 @@ static void rasterize_sorted_edges(font_bitmap_t *result, edge_t *e, int n, int 
       k = scanline[i] + sum;
       k = (float)fabs(k) * 255 + 0.5f;
       m = (int)k;
-      if (m > 255) m = 255;
+      if (m > 255)
+        m = 255;
       result->pixels[j*result->stride + i] = (unsigned char)m;
       }
 
@@ -1491,7 +1566,7 @@ static result_t flatten_curves(handle_t vertices, float objspace_flatness)
   for (i = 0; i < contour_count; i++)
     {
     contour_t contour;
-    if (failed(result = vector_at(vertices, i, &contour)))
+    if (succeeded(result = vector_at(vertices, i, &contour)))
       {
       handle_t points;
       if(failed(result = vector_create(sizeof(f_point_t), &points)))
@@ -1535,7 +1610,7 @@ static result_t flatten_curves(handle_t vertices, float objspace_flatness)
       // free the old contour
       vector_close(contour.vertices);
       contour.vertices = points;
-      contour.num_points = 0;
+      contour.end_flags = 0;
       vector_set(vertices, i, &contour);
       }
     }

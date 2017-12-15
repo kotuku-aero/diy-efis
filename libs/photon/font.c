@@ -106,7 +106,7 @@ result_t create_font(const char *name, uint16_t points, const char *hint, handle
     return result;
 
   font_t *font = 0;
-  for (font_index = count; font_index > 0; font_index--)
+  for (font_index = 0; font_index < count; font_index++)
     {
     if (failed(result = vector_at(fr->fonts, font_index, &font)))
       return result;
@@ -127,6 +127,9 @@ result_t create_font(const char *name, uint16_t points, const char *hint, handle
       neutron_free(font);
       return result;
       }
+
+    if(failed(result = vector_push_back(fr->fonts, &font)))
+      return result;
     }
 
   // the font is loaded, see if the user wants it

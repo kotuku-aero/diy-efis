@@ -2728,19 +2728,16 @@ result_t draw_text(handle_t hndl, const rect_t *clip_rect, handle_t  fp,
         };
         if (point_in_rect(&pos, clip_rect))
           {
-          uint8_t bit = glyph->bitmap[offset];
+          uint16_t alpha_pel = glyph->bitmap[offset];
+          color_t bg_color;
 
-          if (format & eto_opaque)
-            {
-            // set the background color, then merge
-            (*canvas->set_pixel)(canvas, &pos, bg);
-            }
+          if(format & eto_opaque)
+            bg_color = bg;
+          else
+            bg_color = (*canvas->get_pixel)(canvas, &pos);
  
-          // the alpha of the fg color is calculated
-          uint16_t alpha_pel = bit * alpha(fg);
-          alpha_pel >>= 8;
-
-          (*canvas->set_pixel)(canvas, &pos, rgba(alpha_pel, red(fg), green(fg), blue(fg)));
+          (*canvas->set_pixel)(canvas, &pos, 
+            aplha_blend(fg, bg_color, alpha_pel));
           }
 
         offset++;
