@@ -338,7 +338,9 @@ static rb_tree_entry_t* exact_query(rb_tree_t* tree, const void* q)
   rb_tree_entry_t* x = tree->root->left;
   rb_tree_entry_t* nil = tree->nil;
   int compVal;
-  if (x == nil) return (0);
+  if (x == nil)
+    return (0);
+
   compVal = tree->compare(x->key, (int*) q);
   while (0 != compVal)
     {/*assignemnt*/
@@ -350,7 +352,10 @@ static rb_tree_entry_t* exact_query(rb_tree_t* tree, const void* q)
       {
       x = x->right;
       }
-    if (x == nil) return (0);
+
+    if (x == nil)
+      return (0);
+
     compVal = tree->compare(x->key, (int*) q);
     }
   return (x);
@@ -630,7 +635,7 @@ result_t map_close(handle_t map)
   return s_ok;
   }
 
-result_t map_find(handle_t map, const void *key, void **value)
+result_t map_find(handle_t map, const void *key, void *value)
   {
   if (map == 0 || key == 0 || value == 0)
     return e_bad_parameter;
@@ -642,7 +647,7 @@ result_t map_find(handle_t map, const void *key, void **value)
   if(z == 0)
     return e_not_found;
   
-  (*tree->copy_value)(z->value, value);
+  (*tree->copy_value)(&z->value, value);
   
   return s_ok;
   }

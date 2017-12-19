@@ -124,7 +124,7 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
     rotate_point(&wnd->median, &pts[pt], wnd->roll);
   pts[4] = pts[0];
 
-  polygon(hwnd, &wnd_rect, 0, color_brown, pts, 5);
+  polygon(hwnd, &wnd_rect, 0, color_brown, 5, pts);
 
   /////////////////////////////////////////////////////////////////////////////
   //	Draw the pitch indicator
@@ -255,7 +255,7 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
       rotate_point(&wnd->median, &pts[0], wnd->roll);
       rotate_point(&wnd->median, &pts[1], wnd->roll);
 
-      polyline(hwnd, &wnd_rect, &white_pen, pts, 2);
+      polyline(hwnd, &wnd_rect, &white_pen, 2, pts);
 
       pitch_angle -= 25;
       line += 20;
@@ -322,17 +322,17 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
   aircraft_points[0].x = wnd->median.x - 7; aircraft_points[0].y = wnd->median.y;
   aircraft_points[1].x = wnd->median.x - 22; aircraft_points[1].y = wnd->median.y;
 
-  polygon(hwnd, &wnd_rect, &white_pen, color_hollow, 2, aircraft_points);
+  polyline(hwnd, &wnd_rect, &white_pen, 2, aircraft_points);
 
   aircraft_points[0].x = wnd->median.x + 7; aircraft_points[0].y = wnd->median.y;
   aircraft_points[1].x = wnd->median.x + 22; aircraft_points[1].y = wnd->median.y;
 
-  polygon(hwnd, &wnd_rect, &white_pen, color_hollow, 2, aircraft_points);
+  polyline(hwnd, &wnd_rect, &white_pen, 2, aircraft_points);
 
   aircraft_points[0].x = wnd->median.x; aircraft_points[0].y = wnd->median.y - 7;
   aircraft_points[1].x = wnd->median.x; aircraft_points[1].y = wnd->median.y - 15;
 
-  polygon(hwnd, &wnd_rect, &white_pen, color_hollow, 2, aircraft_points);
+  polyline(hwnd, &wnd_rect, &white_pen, 2, aircraft_points);
 
   ellipse(hwnd, &wnd_rect, &white_pen, color_hollow,
     make_rect(wnd->median.x - 7, wnd->median.y - 7,

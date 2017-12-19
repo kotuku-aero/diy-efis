@@ -37,6 +37,7 @@ it must be removed as soon as possible after the code fragment is identified.
 #include "../neutron/bsp.h"
 #include <math.h>
 
+extern result_t polypolygon_impl(canvas_t *canvas, const rect_t *clip_rect, const pen_t *outline, color_t fill, uint16_t count, const uint16_t *lengths, const point_t *pts);
 extern color_t aplha_blend(color_t pixel, color_t back, uint8_t weighting);
 
 enum {
@@ -84,7 +85,8 @@ typedef struct
 typedef struct _glyph_t {
   uint16_t wchar;         // unicode character
   uint16_t codepoint;     // offset into file
-  font_bitmap_t bitmap;        // de-compressed bitmap
+  gdi_dim_t advance;           // advance for the glyph
+  font_bitmap_t bitmap;       // de-compressed bitmap
   } glyph_t;
 
 typedef struct _rendered_glyph_cache_t {
@@ -219,6 +221,11 @@ static void dup_codepoint(const void *src, void **dst)
   *dst = (void *)src;       // stored by reference
   }
 
+static void dup_glyph(const void *src, void **dst)
+  {
+  *dst = *((glyph_t **)src);       // stored by reference
+  }
+
 static void destroy_codepoint(void *key)
   {
   // do not destroy the key!
@@ -241,6 +248,7 @@ static void destroy_shape(void *value)
 
 static void dup_shape(const void *src, void **dst)
   {
+  *dst = *((glyph_shape_t **)src);
   }
 
 result_t find_glyph_index(const fontinfo_t *info, uint16_t unicode_codepoint, uint16_t *glyph_offset)
@@ -345,34 +353,6 @@ result_t find_glyph_index(const fontinfo_t *info, uint16_t unicode_codepoint, ui
   return e_not_found;
   }
 
-  static result_t get_glyph_offset(const fontinfo_t *info, uint16_t glyph_index, uint16_t *offset)
-    {
-    uint32_t g1, g2;
-
-    if (glyph_index >= info->num_glyphs)
-      return e_bad_parameter; // glyph index out of range
-    if (info->index_to_location_format >= 2)
-      return e_bad_handle; // unknown index->glyph map format
-
-    if (info->index_to_location_format == 0)
-      {
-      g1 = info->glyf + read_uint16_setpos(info->stream, info->loca + glyph_index * 2) * 2;
-      g2 = info->glyf + read_uint16_setpos(info->stream, info->loca + glyph_index * 2 + 2) * 2;
-      }
-    else
-      {
-      g1 = info->glyf + read_uint32_setpos(info->stream, info->loca + glyph_index * 4);
-      g2 = info->glyf + read_uint32_setpos(info->stream, info->loca + glyph_index * 4 + 4);
-      }
-
-    if (g1 == g2)
-      return e_not_found;
-
-    *offset = (uint16_t)g1;
-
-    return s_ok;
-    }
-
   static double scale_for_pixel_height(const fontinfo_t *info, double height)
     {
     double ascender = read_int16_setpos(info->stream, info->hhea + 4);
@@ -390,10 +370,9 @@ result_t find_glyph_index(const fontinfo_t *info, uint16_t unicode_codepoint, ui
 #define Y_DELTA 32
 
 static void read_coord(bool is_y, uint8_t byte_flag, uint8_t delta_flag, int16_t val_min,
-  int16_t val_max, handle_t stream, glyph_contour_t *contour)
+  int16_t val_max, handle_t stream, glyph_contour_t *contour, int16_t *value)
   {
   uint16_t index;
-  int16_t value = 0;
 
   for (index = 0; index < contour->num_vertices; index++)
     {
@@ -402,20 +381,20 @@ static void read_coord(bool is_y, uint8_t byte_flag, uint8_t delta_flag, int16_t
       uint8_t offs;
       stream_read(stream, &offs, 1, 0);
       if (contour->vertices[index].type & delta_flag)
-        value += offs;
+        *value += offs;
       else
-        value -= offs;
+        *value -= offs;
       }
     else if ((contour->vertices[index].type & delta_flag) == 0)
       {
       int16_t offs = read_int16(stream);
-      value += offs;
+      *value += offs;
       }
 
     if (is_y)
-      contour->vertices[index].y = value; // min(val_max, max(val_min, value));
+      contour->vertices[index].y = *value; // min(val_max, max(val_min, value));
     else
-      contour->vertices[index].x = value; // min(val_max, max(val_min, value));
+      contour->vertices[index].x = *value; // min(val_max, max(val_min, value));
     }
   }
 
@@ -540,13 +519,32 @@ static void store_vertex(glyph_contour_t *contour, uint16_t pos, glyph_vertex_t 
 
 static result_t get_glyph_shape(const fontinfo_t *font, uint16_t glyph_index, glyph_shape_t **hshape)
   {
-  result_t result;
   int num_vertices = 0;
-  uint16_t g = 0;
-  if (failed(result = get_glyph_offset(font, glyph_index, &g)))
-    return result;
+  uint16_t offset = 0;
+  uint16_t end_offset;
 
-  int16_t number_of_contours = read_int16_setpos(font->stream, g);
+  if(glyph_index >= font->num_glyphs)
+    return e_bad_parameter; // glyph index out of range
+  if(font->index_to_location_format >= 2)
+    return e_bad_handle; // unknown index->glyph map format
+
+  if(font->index_to_location_format == 0)
+    {
+    offset = font->glyf + read_uint16_setpos(font->stream, font->loca + glyph_index * 2) * 2;
+    end_offset = font->glyf + read_uint16_setpos(font->stream, font->loca + glyph_index * 2 + 2) * 2;
+    }
+  else
+    {
+    offset = font->glyf + read_uint32_setpos(font->stream, font->loca + glyph_index * 4);
+    end_offset = font->glyf + read_uint32_setpos(font->stream, font->loca + glyph_index * 4 + 4);
+    }
+
+  int16_t number_of_contours;
+  if(offset == end_offset)
+    number_of_contours = 0;
+  else
+    number_of_contours = read_int16_setpos(font->stream, offset);
+
   // a glyph is an array of arrays of vertices describing the shape.
   glyph_shape_t *shape = (glyph_shape_t *)neutron_malloc(sizeof(glyph_shape_t) + (sizeof(glyph_vertex_t *) * number_of_contours));
   glyph_contour_t *contour;
@@ -556,8 +554,8 @@ static result_t get_glyph_shape(const fontinfo_t *font, uint16_t glyph_index, gl
 
   *hshape = shape;
 
-  if (g < 1)
-    return e_not_found;
+  if(number_of_contours == 0)
+    return s_ok;                  // space glyph
 
   // this will seek to the start of the contours
   shape->x_min = read_int16(font->stream);
@@ -574,12 +572,21 @@ static result_t get_glyph_shape(const fontinfo_t *font, uint16_t glyph_index, gl
     int16_t i;
     uint16_t end_pt = 0;
     uint16_t start_pt = 0;
+
+    trace_debug("Shape Index: %d, x_min:%d, x_max:%d, y_min:%d, y_max:%d\r\n",
+      glyph_index, shape->x_min, shape->x_max, shape->y_min, shape->y_max);
+
     for (i = 0; i < number_of_contours; i++)
       {
       uint16_t end_flag = read_uint16(font->stream);
       uint16_t num_vertices = end_flag - start_pt + 1;
 
       shape->contours[i] = (glyph_contour_t *)neutron_malloc(sizeof(glyph_contour_t));
+      memset(shape->contours[i], 0, sizeof(glyph_contour_t));
+      shape->contours[i]->x_max = shape->x_min;
+      shape->contours[i]->x_min = shape->x_max;
+      shape->contours[i]->y_max = shape->y_min;
+      shape->contours[i]->y_min = shape->y_max;
 
       shape->contours[i]->vertices = (glyph_vertex_t *)neutron_malloc((sizeof(glyph_vertex_t) * num_vertices));
       memset(shape->contours[i]->vertices, 0, (sizeof(glyph_vertex_t) * num_vertices));
@@ -625,24 +632,28 @@ static result_t get_glyph_shape(const fontinfo_t *font, uint16_t glyph_index, gl
       }
 
     // re-read the contors now
+    int16_t value = 0;
     for (contour_num = 0; contour_num < number_of_contours; contour_num++)
       {
       contour = shape->contours[contour_num];
       // now we read the x-coordinates
-      read_coord(false, X_IS_BYTE, X_DELTA, shape->x_min, shape->x_max, font->stream, contour);
+      read_coord(false, X_IS_BYTE, X_DELTA, shape->x_min, shape->x_max, font->stream, contour, &value);
+      }
+
+    value = 0;
+    for(contour_num = 0; contour_num < number_of_contours; contour_num++)
+      {
+      contour = shape->contours[contour_num];
+      read_coord(true, Y_IS_BYTE, Y_DELTA, shape->y_min, shape->y_max, font->stream, contour, &value);
       }
 
     for(contour_num = 0; contour_num < number_of_contours; contour_num++)
       {
       contour = shape->contours[contour_num];
-      read_coord(true, Y_IS_BYTE, Y_DELTA, shape->y_min, shape->y_max, font->stream, contour);
-      }
 
-    for(contour_num = 0; contour_num < number_of_contours; contour_num++)
-      {
-      contour = shape->contours[contour_num];
-
-#if _DEBUG
+#if _DEBUG_FONTS
+      trace_debug("Contour %d, x_min:%d, x_max:%d, y_min:%d, y_max:%d\r\n",
+        contour_num, contour->x_min, contour->x_max, contour->y_min, contour->y_max);
       for(i = 0; i < contour->num_vertices; i++)
         {
         trace_debug("Vertex %d : flags: %x, x:%d, y:%d\r\n", i, contour->vertices[i].type, contour->vertices[i].x, contour->vertices[i].y);
@@ -865,6 +876,10 @@ static void fc_fast_copy(canvas_t *hndl, const point_t *dest, const struct _canv
 
   }
 
+#if _DEBUG_FONTS
+static glyph_t *tg = 0;
+#endif
+
 static pen_t white_pen = { color_white, 1, ps_solid };
 
 // cache (if possible) the character ch in th font
@@ -945,134 +960,167 @@ result_t ensure_glyph(sized_font_t *font, char ch, const glyph_t **gp)
   glyph->bitmap.height = gh;
   glyph->wchar = ch;
   glyph->codepoint = g;
+  glyph->advance = ((gdi_dim_t)(scale * advance));
 
-  handle_t poly;
-  handle_t lengths;
-  // remove un-needed curves
-  double objspace_flatness_squared = scale * scale * 0.35;
-  uint16_t i, n = 0, start = 0;
-
-  // we know how many vertices there are so we can allocate a polypolygon
-  result = vector_create(sizeof(point_t), &poly);
-
-  if (failed(result))
-    return result;
-
-  result = vector_create(sizeof(uint16_t), &lengths);
-
-  if(failed(result))
+  if(bitmap_length > sizeof(glyph_t))
     {
-    vector_close(poly);
-    return result;
-    }
-
-  point_t prev_pt = { 0, 0 };
-  point_t pt;
-  point_t gdi_pt = { 0, 0 };
-
-  uint16_t contour_start = 0;
-
-  for (i = 0; i < shape->num_contours; i++)
-    {
+    handle_t poly;
+    handle_t lengths;
+    // remove un-needed curves
+    double objspace_flatness_squared = scale * scale * 0.35;
+    uint16_t i;
+    uint16_t n = 0;
+    uint16_t start = 0;
     uint16_t v;
-    for (v = 0; v < shape->contours[i]->num_vertices; v++)
+
+    // we know how many vertices there are so we can allocate a polypolygon
+    result = vector_create(sizeof(point_t), &poly);
+
+    if (failed(result))
+      return result;
+
+    result = vector_create(sizeof(uint16_t), &lengths);
+
+    if(failed(result))
       {
-      switch (shape->contours[i]->vertices[v].type)
-        {
-        case contour_vmove:
-        case contour_vline:
-        case contour_vcurve:
-          prev_pt.x = shape->contours[i]->vertices[v].x;
-          prev_pt.y = shape->contours[i]->vertices[v].y;
-          pt.x = (gdi_dim_t)(scale * prev_pt.x);
-          pt.y = (gdi_dim_t)(scale * prev_pt.y);
-          if ( gdi_pt.x != pt.x || gdi_pt.y != pt.y)
-            {
-            if(failed(result = vector_push_back(poly, &pt)))
-              {
-              vector_close(poly);
-              vector_close(lengths);
-              return result;
-              }
-            }
-          gdi_pt.x = pt.x;
-          gdi_pt.y = pt.y;
-          break;
-        //case contour_vcurve:
-        //  if(failed(result = tesselate_curve(prev_pt.x, prev_pt.y,
-        //    shape->contours[i]->vertices[v].cx, shape->contours[i]->vertices[v].cy,
-        //    shape->contours[i]->vertices[v].x, shape->contours[i]->vertices[v].y, objspace_flatness_squared, poly, 1)))
-        //    {
-        //    vector_close(poly);
-        //    vector_close(lengths);
-        //    return result;
-        //    }
-        //  prev_pt.x = shape->contours[i]->vertices[v].x;
-        //  prev_pt.y = shape->contours[i]->vertices[v].y;
-        //  break;
-        }
+      vector_close(poly);
+      return result;
       }
 
-      uint16_t poly_length;
-      if(failed(result = vector_count(poly, &poly_length)))
+    point_t prev_pt = { 0, 0 };
+    point_t pt;
+    point_t gdi_pt = { 0, 0 };
+
+    uint16_t contour_start = 0;
+
+    // this inverts the shape
+    gdi_dim_t y_offs = shape->y_max - shape->y_min;
+
+    for (i = 0; i < shape->num_contours; i++)
+      {
+      for (v = 0; v < shape->contours[i]->num_vertices; v++)
         {
-        vector_close(poly);
-        vector_close(lengths);
-        return result;
+        switch (shape->contours[i]->vertices[v].type)
+          {
+          case contour_vmove:
+          case contour_vline:
+          case contour_vcurve:
+            prev_pt.x = shape->contours[i]->vertices[v].x;
+            prev_pt.y = shape->contours[i]->vertices[v].y;
+            pt.x = ((gdi_dim_t)(scale * (prev_pt.x - shape->x_min)));
+            pt.y = ((gdi_dim_t)(scale * (y_offs - (prev_pt.y - shape->y_min))));
+            if ( gdi_pt.x != pt.x || gdi_pt.y != pt.y)
+              {
+              if(failed(result = vector_push_back(poly, &pt)))
+                {
+                vector_close(poly);
+                vector_close(lengths);
+                return result;
+                }
+              }
+            gdi_pt.x = pt.x;
+            gdi_pt.y = pt.y;
+            break;
+          //case contour_vcurve:
+          //  if(failed(result = tesselate_curve(prev_pt.x, prev_pt.y,
+          //    shape->contours[i]->vertices[v].cx, shape->contours[i]->vertices[v].cy,
+          //    shape->contours[i]->vertices[v].x, shape->contours[i]->vertices[v].y, objspace_flatness_squared, poly, 1)))
+          //    {
+          //    vector_close(poly);
+          //    vector_close(lengths);
+          //    return result;
+          //    }
+          //  prev_pt.x = shape->contours[i]->vertices[v].x;
+          //  prev_pt.y = shape->contours[i]->vertices[v].y;
+          //  break;
+          }
         }
 
-      uint16_t contour_length = poly_length - contour_start;
-      contour_start = poly_length;
-      if(failed(vector_push_back(lengths, &contour_length)))
+        uint16_t poly_length;
+        if(failed(result = vector_count(poly, &poly_length)))
+          {
+          vector_close(poly);
+          vector_close(lengths);
+          return result;
+          }
+
+        uint16_t contour_length = poly_length - contour_start;
+        contour_start = poly_length;
+        if(failed(vector_push_back(lengths, &contour_length)))
+          {
+          vector_close(poly);
+          vector_close(lengths);
+          return result;
+          }
+      }
+
+    // at this point we have a scaled and flattened version of the bezier curves that make
+    // up the font.  
+    // we create a canvas that renders the alpha values assuming a white polygon
+    font_canvas_t fc;
+
+    memset(&fc, 0, sizeof(font_canvas_t));
+
+    fc.glyph = glyph;
+    fc.canvas.fast_copy = fc_fast_copy;
+    fc.canvas.fast_fill = fc_fast_fill;
+    fc.canvas.fast_line = fc_fast_line;
+    fc.canvas.get_pixel = fc_get_pixel;
+    fc.canvas.set_pixel = fc_set_pixel;
+    fc.canvas.height = gh;
+    fc.canvas.width = gw;
+    fc.canvas.version = sizeof(font_canvas_t);
+
+    rect_t rect;
+    rect.left = 0;
+    rect.top = 0;
+    rect.right = gw;
+    rect.bottom = gh;
+
+    uint16_t *ptr_lengths;
+    point_t *ptr_points;
+
+    if(succeeded(result = vector_begin(poly, (void **)&ptr_points)) &&
+      succeeded(result = vector_begin(lengths, (void **)&ptr_lengths)))
+      {
+
+  #ifdef _DEBUG_FONTS
+      trace_debug("Num contours: %d, clip: left:%d, top:%d, right:%d, bottom:%d\r\n",
+        shape->num_contours, rect.left, rect.top, rect.right, rect.bottom);
+      n = 0;
+      for(i = 0; i < shape->num_contours; i++)
         {
-        vector_close(poly);
-        vector_close(lengths);
-        return result;
+        trace_debug("Contour %d, Length: %d\r\n", i, ptr_lengths[i]);
+        for(v = 0; v < ptr_lengths[i]; v++)
+          {
+          trace_debug("Vertex %d, x:%d, y:%d\r\n", v, ptr_points[n + v].x, ptr_points[n + v].y);
+          }
+        n += ptr_lengths[i];
         }
+  #endif
+      // render the polypolygon onto the bitmap
+      result = polypolygon_impl(&fc, &rect, 0, color_white, shape->num_contours, ptr_lengths, ptr_points);
+      }
+
+    vector_close(poly);
+    vector_close(lengths);
+
+    if(failed(result))
+      return result;
     }
-
-  // at this point we have a scaled and flattened version of the bezier curves that make
-  // up the font.  
-  // we create a canvas that renders the alpha values assuming a white polygon
-  font_canvas_t fc;
-
-  memset(&fc, 0, sizeof(font_canvas_t));
-
-  fc.glyph = glyph;
-  fc.canvas.fast_copy = fc_fast_copy;
-  fc.canvas.fast_fill = fc_fast_fill;
-  fc.canvas.fast_line = fc_fast_line;
-  fc.canvas.get_pixel = fc_get_pixel;
-  fc.canvas.set_pixel = fc_set_pixel;
-  fc.canvas.height = gh;
-  fc.canvas.width = gw;
-  fc.canvas.version = sizeof(font_canvas_t);
-
-  rect_t rect;
-  rect.left = 0;
-  rect.top = 0;
-  rect.right = gw;
-  rect.bottom = gh;
-
-  uint16_t *ptr_lengths;
-  point_t *ptr_points;
-
-  if(succeeded(result = vector_begin(poly, (void **)&ptr_points)) &&
-    succeeded(result = vector_begin(lengths, (void **)&ptr_lengths)))
-    {
-    // render the polypolygon onto the bitmap
-    result = polypolygon(&fc, &rect, &white_pen, color_white, shape->num_contours, ptr_lengths, ptr_points);
-    }
-
-  vector_close(poly);
-  vector_close(lengths);
-
-  if(failed(result))
-    return result;
 
   if (gp != 0)
     *gp = glyph;
 
+#if _DEBUG_FONTS
+    if(tg == 0 && ch == '1')
+      tg = glyph;
+    else if(tg != 0)
+      if(tg->wchar != '1')
+        {
+        trace_debug("Help me....\r\n");
+        }
+#endif
   // add the glyph
   return map_add(font->glyphs, (void *) ch, &glyph);
   }
@@ -1253,7 +1301,7 @@ result_t create_font(const char *name, uint16_t points, const char *hint, handle
     font->fontrec = fr;
     font->size = points;
     font->version = sizeof(sized_font_t);
-    if (failed(result = map_create(dup_codepoint, dup_codepoint, compare_codepoint, destroy_codepoint, destroy_glyph, &font->glyphs)))
+    if (failed(result = map_create(dup_codepoint, dup_glyph, compare_codepoint, destroy_codepoint, destroy_glyph, &font->glyphs)))
       {
       neutron_free(font);
       return result;
@@ -1487,8 +1535,7 @@ result_t draw_text(handle_t hndl, const rect_t *clip_rect, handle_t  fp,
         }
       }
 
-    // advance in 1/64's pixels
-    pt_pos.x += glyph->bitmap.width;
+    pt_pos.x += glyph->advance;
     }
 
   return s_ok;
@@ -1527,7 +1574,7 @@ result_t text_extent(handle_t hndl, handle_t  font, const char *str,
 
     // see if the user wants the widths returned
     ex->dy = max(ex->dy, glyph->bitmap.height);
-    ex->dx += glyph->bitmap.width;
+    ex->dx += glyph->advance;
     }
 
   return s_ok;
