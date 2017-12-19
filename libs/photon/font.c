@@ -586,6 +586,7 @@ static result_t get_glyph_shape(const fontinfo_t *font, uint16_t glyph_index, gl
 
       shape->contours[i]->num_vertices = num_vertices;
       shape->contours[i]->end_flag = end_flag;
+      start_pt = end_flag + 1;
       }
 
     // skip the instructions
@@ -605,21 +606,21 @@ static result_t get_glyph_shape(const fontinfo_t *font, uint16_t glyph_index, gl
         {
         uint8_t type; 
         stream_read(font->stream, &type, 1, 0);
-        contour->vertices[v++].type = type;
 
-        if ((contour->vertices[ins].type & REPEAT) != 0)
+        if ((type & REPEAT) != 0)
           {
           uint8_t rpt = 0;
           // ins += rpt;       // same flag for a while...
           stream_read(font->stream, &rpt, 1, 0);
-          ins++;
 
           // this expands the array
-          contour->num_vertices += rpt;
-          contour->vertices = (glyph_vertex_t *)neutron_realloc(contour->vertices, sizeof(glyph_vertex_t) * contour->num_vertices);
           while (rpt--)
+            {
+            ins++;
             contour->vertices[v++].type = type;
+            }
           }
+        contour->vertices[v++].type = type;
         }
       }
 
@@ -629,7 +630,24 @@ static result_t get_glyph_shape(const fontinfo_t *font, uint16_t glyph_index, gl
       contour = shape->contours[contour_num];
       // now we read the x-coordinates
       read_coord(false, X_IS_BYTE, X_DELTA, shape->x_min, shape->x_max, font->stream, contour);
+      }
+
+    for(contour_num = 0; contour_num < number_of_contours; contour_num++)
+      {
+      contour = shape->contours[contour_num];
       read_coord(true, Y_IS_BYTE, Y_DELTA, shape->y_min, shape->y_max, font->stream, contour);
+      }
+
+    for(contour_num = 0; contour_num < number_of_contours; contour_num++)
+      {
+      contour = shape->contours[contour_num];
+
+#if _DEBUG
+      for(i = 0; i < contour->num_vertices; i++)
+        {
+        trace_debug("Vertex %d : flags: %x, x:%d, y:%d\r\n", i, contour->vertices[i].type, contour->vertices[i].x, contour->vertices[i].y);
+        }
+#endif
 
       // we now walk the contour and convert to a ready to process form
       bool start_off = false;       // if the first point was an off-curve then this will be set
@@ -950,6 +968,7 @@ result_t ensure_glyph(sized_font_t *font, char ch, const glyph_t **gp)
 
   point_t prev_pt = { 0, 0 };
   point_t pt;
+  point_t gdi_pt = { 0, 0 };
 
   uint16_t contour_start = 0;
 
@@ -962,29 +981,35 @@ result_t ensure_glyph(sized_font_t *font, char ch, const glyph_t **gp)
         {
         case contour_vmove:
         case contour_vline:
-          prev_pt.x = shape->contours[i]->vertices[v].x;
-          prev_pt.y = shape->contours[i]->vertices[v].y;
-          pt.x = (gdi_dim_t)(scale * shape->contours[i]->vertices[v].x);
-          pt.y = (gdi_dim_t)(scale * shape->contours[i]->vertices[v].y);
-          if (failed(result = vector_push_back(poly, &pt)))
-            {
-            vector_close(poly);
-            vector_close(lengths);
-            return result;
-            }
-          break;
         case contour_vcurve:
-          if(failed(result = tesselate_curve(prev_pt.x, prev_pt.y,
-            shape->contours[i]->vertices[v].cx, shape->contours[i]->vertices[v].cy,
-            shape->contours[i]->vertices[v].x, shape->contours[i]->vertices[v].y, objspace_flatness_squared, poly, 1)))
-            {
-            vector_close(poly);
-            vector_close(lengths);
-            return result;
-            }
           prev_pt.x = shape->contours[i]->vertices[v].x;
           prev_pt.y = shape->contours[i]->vertices[v].y;
+          pt.x = (gdi_dim_t)(scale * prev_pt.x);
+          pt.y = (gdi_dim_t)(scale * prev_pt.y);
+          if ( gdi_pt.x != pt.x || gdi_pt.y != pt.y)
+            {
+            if(failed(result = vector_push_back(poly, &pt)))
+              {
+              vector_close(poly);
+              vector_close(lengths);
+              return result;
+              }
+            }
+          gdi_pt.x = pt.x;
+          gdi_pt.y = pt.y;
           break;
+        //case contour_vcurve:
+        //  if(failed(result = tesselate_curve(prev_pt.x, prev_pt.y,
+        //    shape->contours[i]->vertices[v].cx, shape->contours[i]->vertices[v].cy,
+        //    shape->contours[i]->vertices[v].x, shape->contours[i]->vertices[v].y, objspace_flatness_squared, poly, 1)))
+        //    {
+        //    vector_close(poly);
+        //    vector_close(lengths);
+        //    return result;
+        //    }
+        //  prev_pt.x = shape->contours[i]->vertices[v].x;
+        //  prev_pt.y = shape->contours[i]->vertices[v].y;
+        //  break;
         }
       }
 
@@ -1032,7 +1057,7 @@ result_t ensure_glyph(sized_font_t *font, char ch, const glyph_t **gp)
   uint16_t *ptr_lengths;
   point_t *ptr_points;
 
-  if(succeeded(result = vector_begin(poly, (void **)&ptr_points)) ||
+  if(succeeded(result = vector_begin(poly, (void **)&ptr_points)) &&
     succeeded(result = vector_begin(lengths, (void **)&ptr_lengths)))
     {
     // render the polypolygon onto the bitmap
