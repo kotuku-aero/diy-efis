@@ -132,7 +132,7 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
       { 65, marker_line }
       };
 
-    polyline(hwnd, &wnd_rect, &wnd->pen, pts, 2);
+    polyline(hwnd, &wnd_rect, &wnd->pen, 2, pts);
 
     if(asi_line ==((asi_line / 100) * 100))
       {
@@ -167,7 +167,7 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
     { 47,  median }
     };
 
-  polygon(hwnd, &wnd_rect, &white_pen, color_black, roller, 8);
+  polygon(hwnd, &wnd_rect, &white_pen, color_black, 8, roller);
 
   // now we draw the roller
   display_roller(hwnd, make_rect(1, median-19, 39, median+19, &rect), 

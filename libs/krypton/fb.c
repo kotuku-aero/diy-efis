@@ -630,7 +630,6 @@ void bsp_copy_bitmap(canvas_t *hndl,
     src_pt.y++;
     }
   }
-
 // this is the actual memory mapped fb_buffer
 static uint32_t fb_length;
 
@@ -669,7 +668,6 @@ result_t bsp_canvas_open_framebuffer(canvas_t **canvas)
   fbc->canvas.fast_fill = bsp_fast_fill;
   fbc->canvas.fast_line = bsp_fast_line;
   fbc->canvas.fast_copy = bsp_fast_copy;
-  fbc->canvas.bitmap_copy = bsp_copy_bitmap;
   fbc->canvas.queue_empty = bsp_queue_empty;
   fbc->canvas.begin_paint = bsp_begin_paint;
   fbc->canvas.end_paint = bsp_end_paint;

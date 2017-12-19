@@ -111,7 +111,7 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
 
   pts[4] = pts[0];
 
-  polygon(hwnd, &wnd_rect, 0, color_lightblue, pts, 5);
+  polygon(hwnd, &wnd_rect, 0, color_lightblue, 5, pts);
 
   pts[0].x = -500; pts[0].y = wnd->median.y + pitch;
   pts[1].x = 500;  pts[1].y = wnd->median.y + pitch;
@@ -154,7 +154,7 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
     rotate_point(&wnd->median, &slip_indicator[i + 1], wnd->roll);
 
     polyline(hwnd, &wnd_rect, i == 16 ? &green_pen_3 : &green_pen,
-      slip_indicator + i, 2);
+      2, slip_indicator + i);
     }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -193,7 +193,7 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
       rotate_point(&wnd->median, &pts[0], wnd->roll);
       rotate_point(&wnd->median, &pts[1], wnd->roll);
 
-      polyline(hwnd, &wnd_rect, &white_pen, pts, 2);
+      polyline(hwnd, &wnd_rect, &white_pen, 2, pts);
 
       // we have a bitmap which is the text to draw.  We then select the bitmap
       // from the text angle and the rotation angle.
@@ -239,7 +239,7 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
       rotate_point(&wnd->median, &pts[0], wnd->roll);
       rotate_point(&wnd->median, &pts[1], wnd->roll);
 
-      polyline(hwnd, &wnd_rect, &white_pen, pts, 2);
+      polyline(hwnd, &wnd_rect, &white_pen, 2, pts);
 
       pitch_angle -= 25;
       line += 20;
@@ -288,7 +288,7 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
             { wnd->median.x + 15, pixels + wnd->median.y - offset }
           };
 
-        polyline(hwnd, &wnd_rect, &red_pen_3, chevron, 3);
+        polyline(hwnd, &wnd_rect, &red_pen_3, 3, chevron);
         }
       else if (aoa_marker > wnd->climb_aoa)
         {
@@ -298,7 +298,7 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
             { wnd->median.x + 15, pixels + wnd->median.y - offset }
           };
 
-        polyline(hwnd, &wnd_rect, &yellow_pen_3, marker, 2);
+        polyline(hwnd, &wnd_rect, &yellow_pen_3, 2, marker);
         }
       else
         {
@@ -308,7 +308,7 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
             { wnd->median.x + 15, pixels + wnd->median.y - offset }
           };
 
-        polyline(hwnd, &wnd_rect, &green_pen_3, marker, 2);
+        polyline(hwnd, &wnd_rect, &green_pen_3, 2, marker);
         }
 
       aoa_marker -= wnd->aoa_degrees_per_mark;
@@ -322,17 +322,17 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
   aircraft_points[0].x = wnd->median.x - 7; aircraft_points[0].y = wnd->median.y;
   aircraft_points[1].x = wnd->median.x - 22; aircraft_points[1].y = wnd->median.y;
 
-  polygon(hwnd, &wnd_rect, &white_pen, color_hollow, aircraft_points, 2);
+  polygon(hwnd, &wnd_rect, &white_pen, color_hollow, 2, aircraft_points);
 
   aircraft_points[0].x = wnd->median.x + 7; aircraft_points[0].y = wnd->median.y;
   aircraft_points[1].x = wnd->median.x + 22; aircraft_points[1].y = wnd->median.y;
 
-  polygon(hwnd, &wnd_rect, &white_pen, color_hollow, aircraft_points, 2);
+  polygon(hwnd, &wnd_rect, &white_pen, color_hollow, 2, aircraft_points);
 
   aircraft_points[0].x = wnd->median.x; aircraft_points[0].y = wnd->median.y - 7;
   aircraft_points[1].x = wnd->median.x; aircraft_points[1].y = wnd->median.y - 15;
 
-  polygon(hwnd, &wnd_rect, &white_pen, color_hollow, aircraft_points, 2);
+  polygon(hwnd, &wnd_rect, &white_pen, color_hollow, 2, aircraft_points);
 
   ellipse(hwnd, &wnd_rect, &white_pen, color_hollow,
     make_rect(wnd->median.x - 7, wnd->median.y - 7,
@@ -355,7 +355,7 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
       { wnd_rect.right, wnd->median.y }
       };
 
-    polyline(hwnd, &wnd_rect, &white_pen, pts, 2);
+    polyline(hwnd, &wnd_rect, &white_pen, 2, pts);
 
     static rect_t glideslope[4] =
       {
@@ -392,7 +392,7 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
       { wnd->median.x, wnd->median.y }
       };
 
-    polyline(hwnd, &wnd_rect, &white_pen_3, pts, 2);
+    polyline(hwnd, &wnd_rect, &white_pen_3, 2, pts);
 
     static rect_t localizer[4] = {
       {  57, 230,  65, 238 },
@@ -432,7 +432,7 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
   roll_points[2].x += offset;
   roll_points[3].x += offset;
 
-  polygon(hwnd, &wnd_rect, &white_pen, color_hollow, roll_points, 4);
+  polygon(hwnd, &wnd_rect, &white_pen, color_hollow, 4, roll_points);
 
   point_t roll_points_base[5] = {
     { wnd->median.x - 6, 23 },
@@ -442,7 +442,7 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
     { wnd->median.x - 6, 23 }
     };
 
-  polygon(hwnd, &wnd_rect, &white_pen, color_hollow, roll_points_base, 5);
+  polygon(hwnd, &wnd_rect, &white_pen, color_hollow, 5, roll_points_base);
   end_paint(hwnd);
 
   return s_ok;

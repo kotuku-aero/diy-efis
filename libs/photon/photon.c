@@ -35,7 +35,7 @@ it must be removed as soon as possible after the code fragment is identified.
 */
 
 #include "window.h"
-#include "font.h"
+#include <math.h>
 
 /**
 * @struct window_msg_t
@@ -70,13 +70,14 @@ result_t get_canvas(handle_t hwnd, canvas_t **canvas)
   return s_ok;
   }
 
-static void msg_hook(const canmsg_t *msg)
+static bool msg_hook(const canmsg_t *msg, void *parg)
   {
-  post_message(0, msg, 0);
+  return succeeded(post_message(0, msg, 0));
   }
 
 // this is defined in window.c
 extern result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg);
+extern uint16_t font_t_size;
 
 result_t open_screen(uint16_t orientation, wndproc cb, uint16_t id,
     handle_t *hwnd)
@@ -100,7 +101,7 @@ result_t open_screen(uint16_t orientation, wndproc cb, uint16_t id,
   phys_screen->wnd.previous = 0;
 
   // initialize the font system
-  vector_create(sizeof(fontrec_t), &phys_screen->fonts);
+  vector_create(font_t_size, &phys_screen->fonts);
 
   deque_create(sizeof(window_msg_t), WINDOW_QUEUE_SIZE, &phys_screen->event_queue);
 
@@ -419,7 +420,7 @@ const int RIGHT = 2;  // 0010
 const int BOTTOM = 4; // 0100
 const int TOP = 8;    // 1000
 
-static const float rotn_table[90][2] =
+static const double rotn_table[90][2] =
   {
     {
     0.000000000, 1.000000000
@@ -695,8 +696,8 @@ static const float rotn_table[90][2] =
 
 typedef struct _quadrants_t
   {
-    float s0, s1;
-    float c0, c1;
+    double s0, s1;
+    double c0, c1;
   } quadrants_t;
 
 // first 2 are sin conversions
@@ -717,14 +718,14 @@ static const quadrants_t quadrants[4] =
         }
   };
 
- float roundf(float value)
+float roundf(float value)
   {
-  int val = value;
-  float rem = value - val;
-  if(fabs(rem) >= 0.5f)
-  val = val < 0 ? val-1 : val+1;
+  return (float) (value < 0.0 ? ceil(value - 0.5) : floor(value + 0.5));
+  }
 
-  return val;
+double round(double value)
+  {
+  return value < 0.0 ? ceil(value - 0.5) : floor(value + 0.5);
   }
 
 // angle is in degrees, not radians.
@@ -739,15 +740,15 @@ const point_t *rotate_point(const point_t *center, point_t *pt, int angle)
   int la = angle % 90;
   int qd = angle / 90;
   // convert the angle to a usefull form
-  float cos_theta = rotn_table[la][0] * quadrants[qd].c0
+  double cos_theta = rotn_table[la][0] * quadrants[qd].c0
       + rotn_table[la][1] * quadrants[qd].c1;
-  float sin_theta = rotn_table[la][0] * quadrants[qd].s0
+  double sin_theta = rotn_table[la][0] * quadrants[qd].s0
       + rotn_table[la][1] * quadrants[qd].s1;
 
   // calc the transformation
-  gdi_dim_t x2 = (gdi_dim_t) (roundf(
+  gdi_dim_t x2 = (gdi_dim_t) (round(
       (pt->x - center->x) * cos_theta - (pt->y - center->y) * sin_theta));
-  gdi_dim_t y2 = (gdi_dim_t) (roundf(
+  gdi_dim_t y2 = (gdi_dim_t) (round(
       (pt->x - center->x) * sin_theta + (pt->y - center->y) * cos_theta));
 
   pt->x = x2 + center->x;
@@ -795,7 +796,7 @@ static bool clip_line(point_t *p1, point_t *p2, const rect_t *clip_rect)
       {
       // failed both tests, so calculate the line segment to clip
       // from an outside point to an intersection with clip edge
-      float x, y;
+      double x, y;
 
       // At least one endpoint is outside the clip rectangle; pick it.
       out_code_t outcodeOut = outcode0 ? outcode0 : outcode1;
@@ -831,14 +832,14 @@ static bool clip_line(point_t *p1, point_t *p2, const rect_t *clip_rect)
       // and get ready for next pass.
       if (outcodeOut == outcode0)
         {
-        p1->x = x;
-        p1->y = y;
+        p1->x = (gdi_dim_t)x;
+        p1->y = (gdi_dim_t)y;
         outcode0 = compute_out_code(p1, clip_rect);
         }
       else
         {
-        p2->x = x;
-        p2->y = y;
+        p2->x = (gdi_dim_t)x;
+        p2->y = (gdi_dim_t)y;
         outcode1 = compute_out_code(p2, clip_rect);
         }
       }
@@ -982,6 +983,7 @@ static bool point_in_polygon(const point_t *pt, handle_t subject)
 
   return wn > 0;
   }
+
 typedef struct
   {
     point_t pt;
@@ -1194,8 +1196,7 @@ static void polygon_intersect(const rect_t *clip_rect, const point_t *pts,
   vector_close(subject_points);
   }
 
-result_t polyline(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
-    const point_t *points, uint16_t count)
+result_t polyline(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen, uint16_t count, const point_t *points)
   {
   result_t result;
   canvas_t *canvas;
@@ -1372,8 +1373,7 @@ result_t polyline(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
 
             if (point_in_rect(&p1, clip_rect))
               (*canvas->set_pixel)(canvas, &p1,
-                  aplha_blend((*canvas->get_pixel)(canvas, &p1), pen->color,
-                      weighting)); // plot the pixel
+                  aplha_blend((*canvas->get_pixel)(canvas, &p1), pen->color, (uint8_t) weighting)); // plot the pixel
 
             p_alias.x = p1.x + x_incr;
             p_alias.y = p1.y;
@@ -1430,8 +1430,7 @@ result_t polyline(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
 
             if (point_in_rect(&p1, clip_rect))
               (*canvas->set_pixel)(canvas, &p1,
-                  aplha_blend((*canvas->get_pixel)(canvas, &p1), pen->color,
-                      weighting)); // plot the pixel
+                  aplha_blend((*canvas->get_pixel)(canvas, &p1), pen->color, (uint8_t) weighting)); // plot the pixel
 
             p_alias.x = p1.x;
             p_alias.y = p1.y + 1;
@@ -1477,8 +1476,6 @@ result_t polyline(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
 static result_t fill_rect(canvas_t *canvas, const rect_t *clip_rect, const rect_t *rect,
     color_t color)
   {
-  result_t result;
-
   rect_t bounds;
   extent_t size;
 
@@ -1796,25 +1793,44 @@ static void sort_edges(edge_t *a, int l, int u)
     }
   }
 
-result_t polygon(handle_t hwnd, const rect_t *clip_rect, const pen_t *outline,
-    color_t fill, const point_t *pts, uint16_t count)
+result_t polygon(handle_t canvas, const rect_t *clip_rect, const pen_t *outline,
+    color_t fill, uint16_t count, const point_t *pts)
   {
+  return polypolygon(canvas, clip_rect, outline, fill, 1, &count, pts);
+  }
+
+result_t polypolygon(handle_t hwnd, const rect_t *clip_rect, const pen_t *outline, color_t fill, uint16_t count, const uint16_t *lengths, const point_t *pts)
+  {
+  result_t result;
   // if the interior color is hollow then just a line draw
   if (fill == color_hollow)
-    return polyline(hwnd, clip_rect, outline, pts, count);
+    {
+    uint16_t contour_num;
+    for(contour_num = 0; contour_num < count; contour_num++)
+      {
+      if(failed(result = polyline(hwnd, clip_rect, outline, lengths[contour_num], pts)))
+        return result;
 
-  result_t result;
+     pts += lengths[contour_num];
+     }
+    }
+
   canvas_t *canvas;
   if(failed(result = get_canvas(hwnd, &canvas)))
     return result;
 
 
-// clip the polygon
+  // clip the polygon(s) and ensure the polygons are closed.
   handle_t points;
   if (failed(result = vector_create(sizeof(point_t), &points)))
     return result;
 
-  polygon_intersect(clip_rect, pts, count, points);
+  uint16_t contour_num;
+  for(contour_num = 0; contour_num < count; contour_num++)
+    {
+    polygon_intersect(clip_rect, pts, lengths[contour_num], points);
+    pts += lengths[contour_num];
+    }
 
   // ignore small polygons
   if (points_size(points) < 3)
@@ -1956,7 +1972,7 @@ result_t polygon(handle_t hwnd, const rect_t *clip_rect, const pen_t *outline,
 
   // now outline the polygon using the pen
   if (outline != 0 && outline->color != color_hollow)
-    return polyline(canvas, clip_rect, outline, pts, count);
+    return polyline(canvas, clip_rect, outline, count, pts);
 
   return s_ok;
   }
@@ -2004,7 +2020,7 @@ result_t rectangle(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
         }
       };
 
-    return polyline(hwnd, clip_rect, pen, pts, 5);
+    return polyline(hwnd, clip_rect, pen, 5, pts);
     }
 
   return s_ok;
@@ -2062,7 +2078,7 @@ result_t round_rect(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
   pts[1].x = draw_rect.right - dim;
   pts[1].y = draw_rect.top;
 
-  if ((result = polyline(hwnd, clip_rect, pen, pts, 2)) != s_ok)   // top
+  if ((result = polyline(hwnd, clip_rect, pen, 2, pts)) != s_ok)   // top
     return result;
 
   pts[0].x = draw_rect.right;
@@ -2071,7 +2087,7 @@ result_t round_rect(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
   pts[1].x = draw_rect.right;
   pts[1].y = draw_rect.bottom - dim;
 
-  if ((result = polyline(hwnd, clip_rect, pen, pts, 2)) != s_ok)   // right
+  if ((result = polyline(hwnd, clip_rect, pen, 2, pts)) != s_ok)   // right
     return result;
 
   pts[0].x = draw_rect.left;
@@ -2080,7 +2096,7 @@ result_t round_rect(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
   pts[1].x = draw_rect.left;
   pts[1].y = draw_rect.bottom - dim;
 
-  if ((result = polyline(hwnd, clip_rect, pen, pts, 2)) != s_ok)   // left
+  if ((result = polyline(hwnd, clip_rect, pen, 2, pts)) != s_ok)   // left
     return result;
 
   pts[0].x = draw_rect.left + dim;
@@ -2089,7 +2105,7 @@ result_t round_rect(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
   pts[1].x = draw_rect.right - dim;
   pts[1].y = draw_rect.bottom;
 
-  if ((result = polyline(hwnd, clip_rect, pen, pts, 2)) != s_ok)   // bottom
+  if ((result = polyline(hwnd, clip_rect, pen, 2, pts)) != s_ok)   // bottom
     return result;
 
   // Arcs
@@ -2332,9 +2348,9 @@ static const uint32_t arctans[45] =
       499695
   };
 
-static int lookup_atan2(float scale, int y, int x)
+static int lookup_atan2(double scale, gdi_dim_t y, gdi_dim_t x)
   {
-  int prod = (int) ((y * scale) * (x * scale));
+  uint32_t prod = (uint32_t) ((y * scale) * (x * scale));
   int s;
   // find the offset
   if (prod < arctans[5])
@@ -2423,7 +2439,7 @@ result_t arc(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
 
   // our angles are 0..44 but our radius varies.  We need to calculate from
   // a given x and y coordinate the approximate angle.
-  float scale = 1000.0f / radius;
+  double scale = 1000.0f / radius;
 
   point_t dp;
   rect_t dr;
@@ -2595,20 +2611,20 @@ result_t pie(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
     rotate_point(p, &pts[0], start);
     rotate_point(p, &pts[1], start);
 
-    return polyline(canvas, clip_rect, pen, pts, 2);
+    return polyline(canvas, clip_rect, pen, 2, pts);
     }
 // we draw a polygon using the current pen
 // and brush.  We first need to calculate the outer
 // point count
 
-  float outer_incr = atan2(1.0, radii);
-  float delta = end - start;
+  double outer_incr = atan2(1.0, radii);
+  double delta = end - start;
 
   delta = (delta < 0) ? -delta : delta;
 
   gdi_dim_t segs = (gdi_dim_t) (delta / outer_incr) + 1;
 
-  float inner_incr;
+  double inner_incr;
 
 // see if we have an inner radii
   if (inner > 0)
@@ -2624,8 +2640,8 @@ result_t pie(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
 
   int pt = 1;
   copy_point(p, pts);
-  double theta;
-  for (theta = start; theta <= end; theta += outer_incr)
+  int theta;
+  for (theta = start; theta <= end; theta += (int) floor(outer_incr))
     {
     pts[pt].x = p->x + radii;
     pts[pt].y = p->y;
@@ -2635,7 +2651,7 @@ result_t pie(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
 
   if (inner > 0)
     {
-    for (theta = end; theta >= start; theta -= inner_incr)
+    for (theta = end; theta >= start; theta -= (int) floor(inner_incr))
       {
       pts[pt].x = p->x + inner;
       pts[pt].y = p->y;
@@ -2646,146 +2662,9 @@ result_t pie(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
   else
     copy_point(p, pts + pt);
 
-  polygon(canvas, clip_rect, pen, c, pts, segs + 1);
+  polygon(canvas, clip_rect, pen, c, segs + 1, pts);
 
   neutron_free(pts);
-
-  return s_ok;
-  }
-
-static result_t is_valid_font(handle_t hndl, font_t **fp)
-  {
-  font_t *font = (font_t *)hndl;
-  if(font == 0 || font->version != sizeof(font_t))
-    return e_bad_handle;
-
-  if(fp != 0)
-    *fp = font;
-
-  return s_ok;
-  }
-
-result_t draw_text(handle_t hndl, const rect_t *clip_rect, handle_t  fp,
-    color_t fg, color_t bg, const char *str, uint16_t count, const point_t *pt,
-    const rect_t *txt_clip_rect, text_flags format, uint16_t *char_widths)
-  {
-  result_t result;
-  if(hndl == 0 ||
-     fp == 0 ||
-     str == 0 ||
-     pt == 0)
-    return e_bad_parameter;
-
-  font_t *font;
-  if(failed(result = is_valid_font(fp, &font)))
-    return result;
-
-  canvas_t *canvas;
-  if(failed(result = get_canvas(hndl, &canvas)))
-    return result;
-
-  // create a clipping rectangle as needed
-  rect_t txt_rect;
-  point_t pt_pos =
-    {
-    pt->x, pt->y
-    };
-
-  copy_rect(clip_rect, &txt_rect);
-
-  if (format & eto_clipped)
-    intersect_rect(txt_clip_rect, &txt_rect);
-  
-  if(count == 0)
-    count = strlen(str);
-
-  uint16_t ch;
-  for (ch = 0; ch < count; ch++)
-    {
-    // get the character to use.  If the character is outside the
-    // map then we use the default char
-    char c = str[ch];
-
-    const glyph_t *glyph = 0;
-    if(failed(result = ensure_glyph(font, c, &glyph)))
-      return result;
-
-    // see if the user wants the widths returned
-    if (char_widths != 0)
-      char_widths[ch] = glyph->width;
-
-    uint16_t row;
-    for (row = 0; row < glyph->height; row++)
-      {
-      // set to the top of the bitmap
-      uint16_t offset = row *  glyph->width;
-      uint16_t col;
-      for (col = 0; col < glyph->width; col++)
-        {
-        point_t pos =
-        {
-        (gdi_dim_t) (pt_pos.x + col), (gdi_dim_t) (pt_pos.y + row)
-        };
-        if (point_in_rect(&pos, clip_rect))
-          {
-          uint16_t alpha_pel = glyph->bitmap[offset];
-          color_t bg_color;
-
-          if(format & eto_opaque)
-            bg_color = bg;
-          else
-            bg_color = (*canvas->get_pixel)(canvas, &pos);
- 
-          (*canvas->set_pixel)(canvas, &pos, 
-            aplha_blend(fg, bg_color, alpha_pel));
-          }
-
-        offset++;
-        }
-    }
-
-    // advance in 1/64's pixels
-    pt_pos.x += glyph->width;
-    }
-
-  return s_ok;
-  }
-
-result_t text_extent(handle_t hndl, handle_t  font, const char *str,
-    uint16_t count, extent_t *ex)
-  {
-  result_t result;
-  if(hndl == 0 ||
-     font == 0 ||
-     str == 0 ||
-     ex == 0)
-    return e_bad_parameter;
-  
-  uint16_t ch;
-
-  ex->dx = 0;
-  ex->dy = 0;
-  
-  if(count == 0)
-    count = strlen(str);
-
-  for (ch = 0; ch < count; ch++)
-    {
-    // get the character to use.  If the character is outside the
-    // map then we use the default char
-    char c = str[ch];
-    if (c == 0)
-      break;              // end of the string
-
-
-    const glyph_t *glyph = 0;
-    if (failed(result = ensure_glyph(font, c, &glyph)))
-      return result;
-
-    // see if the user wants the widths returned
-    ex->dy = max(ex->dy, glyph->height);
-    ex->dx += glyph->width;
-    }
 
   return s_ok;
   }

@@ -382,7 +382,7 @@ static duk_ret_t lib_polyline(duk_context *ctx)
     return DUK_RET_TYPE_ERROR;
     }
 
-  if (failed(polyline(canvas, &clip_rect, &pen, pts, len)))
+  if (failed(polyline(canvas, &clip_rect, &pen, len, pts)))
     retval = DUK_RET_TYPE_ERROR;
 
   duk_pop(ctx);
@@ -469,7 +469,7 @@ static duk_ret_t lib_polygon(duk_context *ctx)
     return DUK_RET_TYPE_ERROR;
     }
 
-  if (failed(polygon(canvas, &clip_rect, &pen, fill_color, pts, len)))
+  if (failed(polygon(canvas, &clip_rect, &pen, fill_color, len, pts)))
     retval = DUK_RET_TYPE_ERROR;
 
   duk_pop(ctx);

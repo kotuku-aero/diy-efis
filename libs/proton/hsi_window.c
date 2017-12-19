@@ -86,7 +86,7 @@ result_t create_hsi_window(handle_t parent, memid_t key, handle_t *hwnd)
 
   reg_get_bool(key, "draw-border", &wnd->draw_border);
 
-  if (failed(lookup_font(key, "font", 0, &wnd->font)))
+  if (failed(lookup_font(key, "font", &wnd->font)))
     {
     // we always have the neo font.
     if (failed(result = create_font("neo", 9, 0, &wnd->font)))
@@ -156,7 +156,7 @@ static void update_window(handle_t hwnd, hsi_window_t *wnd)
     rotate_point(&median, &pts[0], index);
     rotate_point(&median, &pts[1], index);
 
-    polyline(hwnd, &wnd_rect, &white_pen, pts, 2);
+    polyline(hwnd, &wnd_rect, &white_pen, 2, pts);
 
     bool do_minor_mark = false;
     int16_t minor_index;
@@ -168,7 +168,7 @@ static void update_window(handle_t hwnd, hsi_window_t *wnd)
       rotate_point(&median, &pts[0], index + minor_index);
       rotate_point(&median, &pts[1], index + minor_index);
 
-      polyline(hwnd, &wnd_rect, &white_pen, pts, 2);
+      polyline(hwnd, &wnd_rect, &white_pen, 2, pts);
 
       do_minor_mark = !do_minor_mark;
       }
@@ -201,7 +201,7 @@ static void update_window(handle_t hwnd, hsi_window_t *wnd)
   for (i = 0; i < 4; i++)
     rotate_point(&median, &track_marker[i], rotation);
 
-  polygon(hwnd, &wnd_rect, &gray_pen, color_hollow, track_marker, 4);
+  polygon(hwnd, &wnd_rect, &gray_pen, color_hollow, 4, track_marker);
 
   point_t track_line[2] = {
     { center_x, center_y - 88 },
@@ -210,7 +210,7 @@ static void update_window(handle_t hwnd, hsi_window_t *wnd)
 
   rotate_point(&median, &track_line[0], rotation);
 
-  polyline(hwnd, &wnd_rect, &track_pen, track_line, 2);
+  polyline(hwnd, &wnd_rect, &track_pen, 2, track_line);
 
   ///////////////////////////////////////////////////////////////////////////
   // Draw the CDI
@@ -231,7 +231,7 @@ static void update_window(handle_t hwnd, hsi_window_t *wnd)
     rotate_point(&median, &pts[0], rotation);
     rotate_point(&median, &pts[1], rotation);
 
-    polyline(hwnd, &wnd_rect, &green_pen_3, pts, 2);
+    polyline(hwnd, &wnd_rect, &green_pen_3, 2, pts);
     }
 
   // draw the CDI Marker head next
@@ -245,13 +245,13 @@ static void update_window(handle_t hwnd, hsi_window_t *wnd)
   for (i = 0; i < 4; i++)
     rotate_point(&median, &cdi_pts[i], rotation);
 
-  polygon(hwnd, &wnd_rect, 0, color_green, cdi_pts, 4);
+  polygon(hwnd, &wnd_rect, 0, color_green, 4, cdi_pts);
 
   // we now convert the deviation to pixels.
   // 1 degree = 24 pixels
   double cdi_var = pixels_per_nm_cdi *((double)wnd->deviation / 10);
 
-  gdi_dim_t cdi = max(-66, min(66, roundf(cdi_var)));
+  gdi_dim_t cdi = (gdi_dim_t) max(-66, min(66, roundf(cdi_var)));
 
   point_t pts[4];
   pts[0].x = center_x; pts[0].y = center_y - 98;
@@ -260,7 +260,7 @@ static void update_window(handle_t hwnd, hsi_window_t *wnd)
   rotate_point(&median, &pts[0], rotation);
   rotate_point(&median, &pts[1], rotation);
 
-  polyline(hwnd, &wnd_rect, &green_pen_3, pts, 2);
+  polyline(hwnd, &wnd_rect, &green_pen_3, 2, pts);
 
   pts[0].x = center_x; pts[0].y = center_y + 50;
   pts[1].x = center_x; pts[1].y = center_y + 98;
@@ -268,7 +268,7 @@ static void update_window(handle_t hwnd, hsi_window_t *wnd)
   rotate_point(&median, &pts[0], rotation);
   rotate_point(&median, &pts[1], rotation);
 
-  polyline(hwnd, &wnd_rect, &green_pen_3, pts, 2);
+  polyline(hwnd, &wnd_rect, &green_pen_3, 2, pts);
 
   pts[0].x = center_x + cdi; pts[0].y = center_y - 48;
   pts[1].x = pts[0].x; pts[1].y = center_y + 48;
@@ -276,7 +276,7 @@ static void update_window(handle_t hwnd, hsi_window_t *wnd)
   rotate_point(&median, &pts[0], rotation);
   rotate_point(&median, &pts[1], rotation);
 
-  polyline(hwnd, &wnd_rect, &green_pen_3, pts, 2);
+  polyline(hwnd, &wnd_rect, &green_pen_3, 2, pts);
 
   /////////////////////////////////////////////////////////////////////////////
   //	Draw the heading bug.
@@ -297,14 +297,14 @@ static void update_window(handle_t hwnd, hsi_window_t *wnd)
   for (i = 0; i < 8; i++)
     rotate_point(&median, &heading_points[i], hdg);
 
-  polyline(hwnd, &wnd_rect, &magenta_pen, heading_points, 8);
+  polyline(hwnd, &wnd_rect, &magenta_pen, 8, heading_points);
 
   heading_points[0].x = center_x - 5; heading_points[0].y = 0;
   heading_points[1].x = center_x + 5; heading_points[1].y = 0;
   heading_points[2].x = center_x; heading_points[2].y = 10;
   heading_points[3].x = center_x - 5; heading_points[3].y = 0;
 
-  polygon(hwnd, &wnd_rect, &white_pen, color_white, heading_points, 4);
+  polygon(hwnd, &wnd_rect, &white_pen, color_white, 4, heading_points);
 
   /////////////////////////////////////////////////////////////////////////////
   // Draw the wind direction indicator.
@@ -334,7 +334,7 @@ static void update_window(handle_t hwnd, hsi_window_t *wnd)
   for (i = 0; i < 4; i++)
     rotate_point(&median, &wind_bug[i], relative_wind);
 
-  polyline(hwnd, &wnd_rect, &yellow_pen, wind_bug, 4);
+  polyline(hwnd, &wnd_rect, &yellow_pen, 4, wind_bug);
 
   // now the text in upper left
 

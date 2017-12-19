@@ -23,10 +23,8 @@
     <ClCompile Include="..\..\libs\photon\png_canvas.c" />
     <ClCompile Include="..\..\libs\photon\window.c" />
     <ClCompile Include="..\..\libs\photon\photon.c" />
-    <ClCompile Include="..\..\libs\photon\truetype.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\libs\photon\font.h" />
     <ClInclude Include="..\..\libs\photon\window.h" />
     <ClInclude Include="..\..\libs\photon\photon.h" />
   </ItemGroup>

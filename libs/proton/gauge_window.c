@@ -454,7 +454,7 @@ void update_dial_gauge(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rec
 
       rotate_point(&wnd->center, &pts[1], arc_start);
 
-      polyline(hwnd, wnd_rect, &white_pen, pts, 2);
+      polyline(hwnd, wnd_rect, &white_pen, 2, pts);
 
       if (tick.text[0] != 0 && wnd->font != 0)
         {
@@ -572,7 +572,7 @@ static void draw_pointer(handle_t hwnd,
   rotate_point(&wnd->center, &pts[0], rotation+180);
   rotate_point(&wnd->center, &pts[1], rotation+180);
   
-  polyline(hwnd, wnd_rect, outline_pen, pts, 2);
+  polyline(hwnd, wnd_rect, outline_pen, 2, pts);
   }
 
 static void draw_sweep(handle_t hwnd,
@@ -641,7 +641,7 @@ static void draw_point(handle_t hwnd,
   rotate_point(&wnd->center, &pts[2], rotn);
   copy_point(&pts[0], &pts[3]);
 
-  polygon(hwnd, wnd_rect, outline_pen, outline_pen->color, pts, 4);
+  polygon(hwnd, wnd_rect, outline_pen, outline_pen->color, 4, pts);
   }
 
 static int calculate_rotation(gauge_window_t *wnd, float value)
@@ -826,7 +826,7 @@ static void draw_graph_value(handle_t hwnd,
       { offset, position + 5 }
     };
 
-  polygon(hwnd, wnd_rect, outline_pen, outline_pen->color, pts, 4);
+  polygon(hwnd, wnd_rect, outline_pen, outline_pen->color, 4, pts);
 
   if (wnd->style == bgs_pointer_minmax || wnd->style == bgs_pointer_max)
     {
@@ -841,7 +841,7 @@ static void draw_graph_value(handle_t hwnd,
       pts[2].x = offset; pts[2].y = position - 5;
       pts[3].x = offset; pts[3].y = position + 5;
 
-      polygon(hwnd, wnd_rect, outline_pen, color_hollow, pts, 4);
+      polygon(hwnd, wnd_rect, outline_pen, color_hollow, 4, pts);
       }
     }
 
@@ -858,7 +858,7 @@ static void draw_graph_value(handle_t hwnd,
       pts[2].x = offset; pts[2].y = position - 5;
       pts[3].x = offset; pts[3].y =  position + 5;
 
-      polygon(hwnd, wnd_rect, outline_pen, color_hollow, pts, 4);
+      polygon(hwnd, wnd_rect, outline_pen, color_hollow, 4, pts);
       }
     }
   }
@@ -897,7 +897,7 @@ result_t create_gauge_window(handle_t parent, memid_t key, handle_t *hwnd)
   reg_get_uint16(key, "reset-id", &wnd->reset_label);
   reg_get_float(key, "reset-value", &wnd->reset_value);
 
-  if (failed(lookup_font(key, "font", 0, &wnd->font)))
+  if (failed(lookup_font(key, "font", &wnd->font)))
     {
     // we always have the neo font.
     if (failed(result = create_font("neo", 9, 0, &wnd->font)))

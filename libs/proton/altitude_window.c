@@ -128,7 +128,7 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
 			{ 20, marker_line }
 			};
 
-		polyline(hwnd, &paint_area, &wnd->pen, pts, 2);
+		polyline(hwnd, &paint_area, &wnd->pen, 2, pts);
 
 		if(line_altitude ==((line_altitude / 500) * 500))
 			{
@@ -164,7 +164,7 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
 		{ 23,  median_y }
 		};
 
-	polygon(hwnd, &wnd_rect, &white_pen, color_black, roller, 8);
+	polygon(hwnd, &wnd_rect, &white_pen, color_black, 8, roller);
 
 	rect_t text_rect;
   (36, median_y-19, 88, median_y+19);

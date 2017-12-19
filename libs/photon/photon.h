@@ -526,15 +526,11 @@ extern result_t set_orientation(handle_t hwnd, uint16_t orientation);
  * @param canvas      canvas to draw on
  * @param clip_rect   rectangle to clip to
  * @param pen         pen to draw with
- * @param points      points to draw
  * @param count       number of points
+ * @param points      points to draw
  * @return s_ok if succeeded
  */
-extern result_t polyline(handle_t canvas,
-                         const rect_t *clip_rect,
-                         const pen_t *pen,
-                         const point_t *points,
-                         uint16_t count);
+extern result_t polyline(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, uint16_t count, const point_t *points);
 /**
  * @function ellipse(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, const rect_t *area)
  * Draw an ellipse
@@ -557,16 +553,23 @@ extern result_t ellipse(handle_t canvas,
  * @param clip_rect   rectangle to clip to
  * @param pen         pen to draw lines with
  * @param color       color to fill with
- * @param points      points of the polygon
  * @param count       number of points
+ * @param points      points of the polygon
  * @return  s_ok if succeeded
  */
-extern result_t polygon(handle_t canvas,
-                        const rect_t *clip_rect,
-                        const pen_t *pen,
-                        color_t color,
-                        const point_t *points,
-                        uint16_t count);
+extern result_t polygon(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, uint16_t count, const point_t *points);
+/**
+* @function polypolygon(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, handle_t poly)
+* Draw a polypolygon and optionally fill it
+* @param canvas      canvas to draw on
+* @param clip_rect   rectangle to clip to
+* @param pen         pen to draw lines with
+* @param color       color to fill with
+* @param count       number of contours in the polypolygon
+* @param lengths
+* @return  s_ok if succeeded
+*/
+extern result_t polypolygon(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, uint16_t count, const uint16_t *lengths, const point_t *points);
 /**
  * @function rectangle(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, const rect_t *area)
  * Draw a rectangle
