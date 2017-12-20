@@ -1853,7 +1853,7 @@ result_t polypolygon_impl(canvas_t *canvas, const rect_t *clip_rect, const pen_t
         vector_close(shape_points);
         vector_close(clipped_lengths);
         vector_close(clipped_contour);
-        return e_bad_parameter;
+        return s_ok; // e_bad_parameter;
         }
       const point_t *clipped_points = points_begin(clipped_contour);
       if(failed(result = vector_push_back(clipped_lengths, &contour_len)) ||

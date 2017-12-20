@@ -781,33 +781,43 @@ static result_t get_glyph_shape(const fontinfo_t *font, uint16_t glyph_index, gl
 
 // tesselate until threshhold p is happy... @TODO warped to compensate for non-linear stretching
 
-static result_t tesselate_curve(double x0, double y0, double x1, double y1, double x2, double y2, double objspace_flatness_squared, handle_t poly, int n)
+static result_t tesselate_curve(double start_x, double start_y, double mid_x, double mid_y, double end_x, double end_y, double objspace_flatness_squared, handle_t poly, int n)
   {
   result_t result;
 
   // midpoint
-  double mx = (x0 + 2 * x1 + x2) / 4;
-  double my = (y0 + 2 * y1 + y2) / 4;
+  double midpoint_x = (start_x + 2 * mid_x + end_x) / 4;
+  double midpoint_y = (start_y + 2 * mid_y + end_y) / 4;
   // versus directly drawn line
-  double dx = (x0 + x2) / 2 - mx;
-  double dy = (y0 + y2) / 2 - my;
+  double distance_x = (start_x + end_x) / 2 - midpoint_x;
+  double distance_y = (start_y + end_y) / 2 - midpoint_y;
 
   if (n > 16) // 65536 segments on one curve better be enough!
     return e_unexpected;
 
-  if (dx*dx + dy*dy > objspace_flatness_squared)
-    { // half-pixel error allowed... need to be smaller if AA
-    if (failed(result = tesselate_curve(x0, y0, (x0 + x1) / 2.0f, (y0 + y1) / 2.0f, mx, my, objspace_flatness_squared, poly, n + 1)))
+  if (distance_x * distance_x + distance_y*distance_y > objspace_flatness_squared)
+    {
+    // half-pixel error allowed... need to be smaller if AA
+    // tesselate from start->mid
+    if (failed(result = tesselate_curve(
+          start_x, start_y, 
+          (start_x + mid_x) / 2.0f, (start_y + mid_y) / 2.0f, 
+          midpoint_x, midpoint_y, objspace_flatness_squared, poly, n + 1)))
       return result;
 
-    if (failed(result = tesselate_curve(mx, my, (x1 + x2) / 2.0f, (y1 + y2) / 2.0f, x2, y2, objspace_flatness_squared, poly, n + 1)))
+    // tesselate mid->end
+    if (failed(result = tesselate_curve(
+      midpoint_x, midpoint_y, 
+      (mid_x + end_x) / 2.0f, (mid_y + end_y) / 2.0f, 
+      end_x, end_y, objspace_flatness_squared, poly, n + 1)))
       return result;
     }
   else
     {
     point_t pt;
-    pt.x = (gdi_dim_t) floor(x2);
-    pt.y = (gdi_dim_t) floor(y2);
+    pt.x = (gdi_dim_t) floor(end_x);
+    pt.y = (gdi_dim_t) floor(end_y);
+
     return vector_push_back(poly, &pt);
     }
   return s_ok;
@@ -976,8 +986,6 @@ result_t ensure_glyph(sized_font_t *font_info, char ch, const glyph_t **gp)
     {
     handle_t poly;
     handle_t lengths;
-    // remove un-needed curves
-    double objspace_flatness_squared = scale * scale * 0.35;
     uint16_t i;
     uint16_t n = 0;
     uint16_t start = 0;
@@ -1000,53 +1008,61 @@ result_t ensure_glyph(sized_font_t *font_info, char ch, const glyph_t **gp)
     point_t prev_pt = { 0, 0 };
     point_t pt;
     point_t gdi_pt = { 0, 0 };
-
+    uint16_t poly_length;
     uint16_t contour_start = 0;
 
     // this inverts the shape
     gdi_dim_t y_offs = shape->y_max - shape->y_min;
+    // remove un-needed curves
+    double objspace_flatness_squared = 1 / scale;
+
+    objspace_flatness_squared *= objspace_flatness_squared;
+    objspace_flatness_squared *= 0.35;
 
     for (i = 0; i < shape->num_contours; i++)
       {
       for (v = 0; v < shape->contours[i]->num_vertices; v++)
         {
-        switch (shape->contours[i]->vertices[v].type)
+
+        if(shape->contours[i]->vertices[v].type == contour_vcurve)
           {
-          case contour_vmove:
-          case contour_vline:
-          case contour_vcurve:
-            prev_pt.x = shape->contours[i]->vertices[v].x;
-            prev_pt.y = shape->contours[i]->vertices[v].y;
-            pt.x = ((gdi_dim_t)(scale * (prev_pt.x - shape->x_min)));
-            pt.y = ((gdi_dim_t)(scale * (y_offs - (prev_pt.y - shape->y_min))));
-            if ( gdi_pt.x != pt.x || gdi_pt.y != pt.y)
-              {
-              if(failed(result = vector_push_back(poly, &pt)))
-                {
-                vector_close(poly);
-                vector_close(lengths);
-                return result;
-                }
-              }
-            gdi_pt.x = pt.x;
-            gdi_pt.y = pt.y;
-            break;
-          //case contour_vcurve:
-          //  if(failed(result = tesselate_curve(prev_pt.x, prev_pt.y,
-          //    shape->contours[i]->vertices[v].cx, shape->contours[i]->vertices[v].cy,
-          //    shape->contours[i]->vertices[v].x, shape->contours[i]->vertices[v].y, objspace_flatness_squared, poly, 1)))
-          //    {
-          //    vector_close(poly);
-          //    vector_close(lengths);
-          //    return result;
-          //    }
-          //  prev_pt.x = shape->contours[i]->vertices[v].x;
-          //  prev_pt.y = shape->contours[i]->vertices[v].y;
-          //  break;
+          // add points from here to the next point
+          if(failed(result = tesselate_curve(prev_pt.x, prev_pt.y,
+            shape->contours[i]->vertices[v].cx, shape->contours[i]->vertices[v].cy,
+            shape->contours[i]->vertices[v].x, shape->contours[i]->vertices[v].y,
+            objspace_flatness_squared, poly, 1)))
+            {
+            vector_close(poly);
+            vector_close(lengths);
+            return result;
+            }
+
+          prev_pt.x = shape->contours[i]->vertices[v].x;
+          prev_pt.y = shape->contours[i]->vertices[v].y;
+          pt.x = prev_pt.x;
+          pt.y = prev_pt.y;
           }
+        else
+          {
+          prev_pt.x = shape->contours[i]->vertices[v].x;
+          prev_pt.y = shape->contours[i]->vertices[v].y;
+          pt.x = prev_pt.x;
+          pt.y = prev_pt.y;
+
+          if ( gdi_pt.x != pt.x || gdi_pt.y != pt.y)
+            {
+            if(failed(result = vector_push_back(poly, &pt)))
+              {
+              vector_close(poly);
+              vector_close(lengths);
+              return result;
+              }
+            }
+          }
+        gdi_pt.x = pt.x;
+        gdi_pt.y = pt.y;
         }
 
-        uint16_t poly_length;
         if(failed(result = vector_count(poly, &poly_length)))
           {
           vector_close(poly);
@@ -1090,11 +1106,24 @@ result_t ensure_glyph(sized_font_t *font_info, char ch, const glyph_t **gp)
     uint16_t *ptr_lengths;
     point_t *ptr_points;
 
+    if(failed(result = vector_count(poly, &poly_length)))
+      {
+      vector_close(poly);
+      vector_close(lengths);
+      return result;
+      }
+
     if(succeeded(result = vector_begin(poly, (void **)&ptr_points)) &&
       succeeded(result = vector_begin(lengths, (void **)&ptr_lengths)))
       {
+      // we have to modify all of the points to match our object space
+      for(i = 0; i < poly_length; i++)
+        {
+        ptr_points[i].x = (gdi_dim_t)((ptr_points[i].x - shape->x_min) * scale);
+        ptr_points[i].y = (gdi_dim_t)((y_offs - ptr_points[i].y - shape->y_min) * scale);
+        }
 
-  #ifdef _DEBUG_FONTS
+  #ifdef _DEBUG
       trace_debug("Num contours: %d, clip: left:%d, top:%d, right:%d, bottom:%d\r\n",
         shape->num_contours, rect.left, rect.top, rect.right, rect.bottom);
       n = 0;
