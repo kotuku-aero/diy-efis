@@ -156,7 +156,7 @@ result_t lookup_enum(memid_t key,
   return e_not_found;
   }
 
-const char *font_hints = "1ABCDEFGHIKLMNOPQRSTUVXYZ0123456789 ";
+extern const char *font_hints;
 
 result_t lookup_font(memid_t key, const char *name, handle_t  *font)
   {
@@ -169,10 +169,7 @@ result_t lookup_font(memid_t key, const char *name, handle_t  *font)
 
   memid_t font_key;
   if(failed(result = reg_open_key(key, name, &font_key)))
-    {
-    // the default font is loaded.  Use neo 9 pixel
-    return create_font("neo", 9, font_hints, font);
-    }
+    return e_not_found;
 
   char font_name[REG_STRING_MAX];
   

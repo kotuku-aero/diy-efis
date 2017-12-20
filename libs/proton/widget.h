@@ -61,6 +61,4 @@ extern result_t lookup_pen(memid_t key, pen_t *pen);
  */
 extern result_t display_roller(handle_t hwnd, const rect_t *bounds, uint32_t value, int digits, color_t bg_color, color_t fg_color, handle_t  large_font, handle_t  small_font);
 
-extern const char *font_hints;
-
 #endif

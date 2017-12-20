@@ -1794,241 +1794,240 @@ static void sort_edges(edge_t *a, int l, int u)
     }
   }
 
-result_t polygon(handle_t canvas, const rect_t *clip_rect, const pen_t *outline,
-    color_t fill, uint16_t count, const point_t *pts)
-  {
-  return polypolygon(canvas, clip_rect, outline, fill, 1, &count, pts);
-  }
-
 result_t polypolygon_impl(canvas_t *canvas, const rect_t *clip_rect, const pen_t *outline, color_t fill, uint16_t count, const uint16_t *lengths, const point_t *pts)
   {
   result_t result;
-  // clip the polygon(s) and ensure the polygons are closed.
-  handle_t shape_points;
-  if(failed(result = vector_create(sizeof(point_t), &shape_points)))
-    return result;
+  const point_t *cp = pts;
 
-  edge_t *get; /* global edge table */
-  int nge = 0; /* num global edges */
-  int cge = 0; /* cur global edge */
-
-  edge_t *aet; /* active edge table */
-  int nae = 0; /* num active edges */
-
-  int i, y;
-
-  handle_t clipped_lengths;
-  if(failed(result = vector_create(sizeof(point_t), &clipped_lengths)))
+  if(fill != color_hollow)
     {
-    vector_close(shape_points);
-    return result;
-    }
+    // clip the polygon(s) and ensure the polygons are closed.
+    handle_t shape_points;
+    if(failed(result = vector_create(sizeof(point_t), &shape_points)))
+      return result;
 
-  // this is the clipped contour
-  handle_t clipped_contour;
-  if(failed(result = vector_create(sizeof(point_t), &clipped_contour)))
-    {
-    vector_close(shape_points);
-    vector_close(clipped_lengths);
-    return result;
-    }
+    edge_t *get; /* global edge table */
+    int nge = 0; /* num global edges */
+    int cge = 0; /* cur global edge */
 
-  uint16_t last_count = 0;
-  uint16_t points_len;
-  uint16_t contour_num;
-  uint16_t contour_len;
-  for(contour_num = 0; contour_num < count; contour_num++)
-    {
-    if(failed(result = polygon_intersect(clip_rect, pts, lengths[contour_num], clipped_contour)))
+    edge_t *aet; /* active edge table */
+    int nae = 0; /* num active edges */
+
+    int i, y;
+
+    handle_t clipped_lengths;
+    if(failed(result = vector_create(sizeof(point_t), &clipped_lengths)))
       {
       vector_close(shape_points);
-      vector_close(clipped_lengths);
-      vector_close(clipped_contour);
       return result;
       }
-    pts += lengths[contour_num];
-    contour_len = points_size(clipped_contour);
 
-    // if the polygon does not have enough points then fail
-    if(contour_len < 3)
+    // this is the clipped contour
+    handle_t clipped_contour;
+    if(failed(result = vector_create(sizeof(point_t), &clipped_contour)))
       {
       vector_close(shape_points);
       vector_close(clipped_lengths);
-      vector_close(clipped_contour);
-      return e_bad_parameter;
-      }
-    const point_t *clipped_points = points_begin(clipped_contour);
-    if(failed(result = vector_push_back(clipped_lengths, &contour_len)) ||
-       failed(result = vector_append(shape_points, contour_len, clipped_points)))
-      {
-      vector_close(shape_points);
-      vector_close(clipped_lengths);
-      vector_close(clipped_contour);
       return result;
       }
-    }
 
-  vector_close(clipped_contour);
-
-  // TODO: make this checked vectors...
-
-  points_len = points_size(shape_points);
-  get = (edge_t *)neutron_malloc(points_len * sizeof(edge_t));
-
-  if(get == 0)
-    {
-    vector_close(shape_points);
-    return e_not_enough_memory;
-    }
-
-  aet = (edge_t *)neutron_malloc(points_len * sizeof(edge_t));
-
-  if(aet == 0)
-    {
-    neutron_free(get);
-    vector_close(shape_points);
-    return e_not_enough_memory;
-    }
-
-  // setup the global edge table
-  // when we get to the end of the contour, we then close the polygon with an
-  // edge to the start of the polygon
-  contour_num = 0;
-  last_count = 0;
-  point_t *clipped_points = points_begin(shape_points);
-
-  for(contour_num = 0; contour_num < count; contour_num++)
-    {
-    if(failed(result = vector_at(clipped_lengths, contour_num, &contour_len)))
+    uint16_t last_count = 0;
+    uint16_t points_len;
+    uint16_t contour_num;
+    uint16_t contour_len;
+    for(contour_num = 0; contour_num < count; contour_num++)
       {
-      vector_close(clipped_lengths);
+      if(failed(result = polygon_intersect(clip_rect, cp, lengths[contour_num], clipped_contour)))
+        {
+        vector_close(shape_points);
+        vector_close(clipped_lengths);
+        vector_close(clipped_contour);
+        return result;
+        }
+      cp += lengths[contour_num];
+      contour_len = points_size(clipped_contour);
+
+      // if the polygon does not have enough points then fail
+      if(contour_len < 3)
+        {
+        vector_close(shape_points);
+        vector_close(clipped_lengths);
+        vector_close(clipped_contour);
+        return e_bad_parameter;
+        }
+      const point_t *clipped_points = points_begin(clipped_contour);
+      if(failed(result = vector_push_back(clipped_lengths, &contour_len)) ||
+         failed(result = vector_append(shape_points, contour_len, clipped_points)))
+        {
+        vector_close(shape_points);
+        vector_close(clipped_lengths);
+        vector_close(clipped_contour);
+        return result;
+        }
+      }
+
+    vector_close(clipped_contour);
+
+    // TODO: make this checked vectors...
+
+    points_len = points_size(shape_points);
+    get = (edge_t *)neutron_malloc(points_len * sizeof(edge_t));
+
+    if(get == 0)
+      {
       vector_close(shape_points);
+      return e_not_enough_memory;
+      }
+
+    aet = (edge_t *)neutron_malloc(points_len * sizeof(edge_t));
+
+    if(aet == 0)
+      {
       neutron_free(get);
-      neutron_free(aet);
-      return result;
+      vector_close(shape_points);
+      return e_not_enough_memory;
       }
 
-    for(i = 0; i < contour_len; ++i)
+    // setup the global edge table
+    // when we get to the end of the contour, we then close the polygon with an
+    // edge to the start of the polygon
+    contour_num = 0;
+    last_count = 0;
+    point_t *clipped_points = points_begin(shape_points);
+
+    for(contour_num = 0; contour_num < count; contour_num++)
       {
-      get[nge].x1 = clipped_points[last_count].x;
-      get[nge].y1 = clipped_points[last_count].y;
-
-      if(i == (contour_len - 1))
+      if(failed(result = vector_at(clipped_lengths, contour_num, &contour_len)))
         {
-        // next is the start of the contour, this closes the edge
-        get[nge].x2 = clipped_points[last_count - contour_len +1].x;
-        get[nge].y2 = clipped_points[last_count - contour_len +1].y;
-        }
-      else
-        {
-        get[nge].x2 = clipped_points[(last_count + 1)].x;
-        get[nge].y2 = clipped_points[(last_count + 1)].y;
+        vector_close(clipped_lengths);
+        vector_close(shape_points);
+        neutron_free(get);
+        neutron_free(aet);
+        return result;
         }
 
-      last_count++;
-
-      if(get[nge].y1 != get[nge].y2)
+      for(i = 0; i < contour_len; ++i)
         {
-        if(get[nge].y1 > get[nge].y2)
+        get[nge].x1 = clipped_points[last_count].x;
+        get[nge].y1 = clipped_points[last_count].y;
+
+        if(i == (contour_len - 1))
           {
-          gdi_dim_t tmp;
-
-          tmp = get[nge].x1;
-          get[nge].x1 = get[nge].x2;
-          get[nge].x2 = tmp;
-
-          tmp = get[nge].y1;
-          get[nge].y1 = get[nge].y2;
-          get[nge].y2 = tmp;
+          // next is the start of the contour, this closes the edge
+          get[nge].x2 = clipped_points[last_count - contour_len +1].x;
+          get[nge].y2 = clipped_points[last_count - contour_len +1].y;
+          }
+        else
+          {
+          get[nge].x2 = clipped_points[(last_count + 1)].x;
+          get[nge].y2 = clipped_points[(last_count + 1)].y;
           }
 
-        get[nge].dx = get[nge].x1;
-        get[nge].mn = get[nge].x2 - get[nge].x1;
-        get[nge].d = get[nge].y2 - get[nge].y1;
-        get[nge].fn = get[nge].mn / 2;
-        ++nge;
-        }
-      }
-    }
+        last_count++;
 
-  sort_edges(get, 0, nge - 1);
-
-  /* start with the lowest y in the table */
-  y = get[0].y1;
-
-  do
-    {
-
-    /* add edges to the active table from the global table */
-    while((nge > 0) && (get[cge].y1 == y))
-      {
-      aet[nae] = get[cge++];
-      --nge;
-      aet[nae++].y1 = 0;
-      }
-
-    sort_edges(aet, 0, nae - 1);
-
-    /* using odd parity, render alternating line segments */
-    for(i = 1; i < nae; i += 2)
-      {
-      int l = (int)aet[i - 1].dx;
-      int r = (int)aet[i].dx;
-
-      if(r > l)
-        {
-        point_t p1;
-        point_t p2;
-
-        p1.x = l;
-        p1.y = y;
-
-        p2.x = r;
-        p2.y = y;
-        (*canvas->fast_line)(canvas, &p1, &p2, fill);
-        // draw line between l and r and not between l and (r-1)
-        }
-      }
-
-    /* prepare for the next scan line */
-    ++y;
-
-    /* remove inactive edges from the active edge table */
-    /* or update the current x position of active edges */
-    for(i = 0; i < nae; ++i)
-      {
-      if(aet[i].y2 == y)
-        aet[i--] = aet[--nae];
-      else
-        {
-        aet[i].fn += aet[i].mn;
-        if(aet[i].fn < 0)
+        if(get[nge].y1 != get[nge].y2)
           {
-          aet[i].dx += aet[i].fn / aet[i].d - 1;
-          aet[i].fn %= aet[i].d;
-          aet[i].fn += aet[i].d;
-          }
+          if(get[nge].y1 > get[nge].y2)
+            {
+            gdi_dim_t tmp;
 
-        if(aet[i].fn >= aet[i].d)
-          {
-          aet[i].dx += aet[i].fn / aet[i].d;
-          aet[i].fn %= aet[i].d;
+            tmp = get[nge].x1;
+            get[nge].x1 = get[nge].x2;
+            get[nge].x2 = tmp;
+
+            tmp = get[nge].y1;
+            get[nge].y1 = get[nge].y2;
+            get[nge].y2 = tmp;
+            }
+
+          get[nge].dx = get[nge].x1;
+          get[nge].mn = get[nge].x2 - get[nge].x1;
+          get[nge].d = get[nge].y2 - get[nge].y1;
+          get[nge].fn = get[nge].mn / 2;
+          ++nge;
           }
         }
       }
-    /* keep doing this while there are any edges left */
-    } while((nae > 0) || (nge > 0));
+
+    sort_edges(get, 0, nge - 1);
+
+    /* start with the lowest y in the table */
+    y = get[0].y1;
+
+    do
+      {
+
+      /* add edges to the active table from the global table */
+      while((nge > 0) && (get[cge].y1 == y))
+        {
+        aet[nae] = get[cge++];
+        --nge;
+        aet[nae++].y1 = 0;
+        }
+
+      sort_edges(aet, 0, nae - 1);
+
+      /* using odd parity, render alternating line segments */
+      for(i = 1; i < nae; i += 2)
+        {
+        int l = (int)aet[i - 1].dx;
+        int r = (int)aet[i].dx;
+
+        if(r > l)
+          {
+          point_t p1;
+          point_t p2;
+
+          p1.x = l;
+          p1.y = y;
+
+          p2.x = r;
+          p2.y = y;
+          (*canvas->fast_line)(canvas, &p1, &p2, fill);
+          // draw line between l and r and not between l and (r-1)
+          }
+        }
+
+      /* prepare for the next scan line */
+      ++y;
+
+      /* remove inactive edges from the active edge table */
+      /* or update the current x position of active edges */
+      for(i = 0; i < nae; ++i)
+        {
+        if(aet[i].y2 == y)
+          aet[i--] = aet[--nae];
+        else
+          {
+          aet[i].fn += aet[i].mn;
+          if(aet[i].fn < 0)
+            {
+            aet[i].dx += aet[i].fn / aet[i].d - 1;
+            aet[i].fn %= aet[i].d;
+            aet[i].fn += aet[i].d;
+            }
+
+          if(aet[i].fn >= aet[i].d)
+            {
+            aet[i].dx += aet[i].fn / aet[i].d;
+            aet[i].fn %= aet[i].d;
+            }
+          }
+        }
+      /* keep doing this while there are any edges left */
+      } while((nae > 0) || (nge > 0));
 
     /* all done, free the edge tables */
     neutron_free(aet);
     neutron_free(get);
     vector_close(shape_points);
+    }
 
-    // now outline the polygon using the pen
-    if(outline != 0 && outline->color != color_hollow)
-      return polyline(canvas, clip_rect, outline, count, pts);
+  // now outline the polygon using the pen
+  if(outline != 0 && outline->color != color_hollow)
+    return polyline(canvas, clip_rect, outline, count, cp);
 
-    return s_ok;
+  return s_ok;
   }
 
 result_t polypolygon(handle_t hwnd, const rect_t *clip_rect, const pen_t *outline, color_t fill, uint16_t count, const uint16_t *lengths, const point_t *pts)
@@ -2037,14 +2036,17 @@ result_t polypolygon(handle_t hwnd, const rect_t *clip_rect, const pen_t *outlin
   // if the interior color is hollow then just a line draw
   if (fill == color_hollow)
     {
+    const point_t *cp = pts;
     uint16_t contour_num;
     for(contour_num = 0; contour_num < count; contour_num++)
       {
-      if(failed(result = polyline(hwnd, clip_rect, outline, lengths[contour_num], pts)))
+      if(failed(result = polyline(hwnd, clip_rect, outline, lengths[contour_num], cp)))
         return result;
 
-     pts += lengths[contour_num];
+     cp += lengths[contour_num];
      }
+
+    return s_ok;
     }
 
   canvas_t *canvas;
@@ -2052,6 +2054,12 @@ result_t polypolygon(handle_t hwnd, const rect_t *clip_rect, const pen_t *outlin
     return result;
 
   return polypolygon_impl(canvas, clip_rect, outline, fill, count, lengths, pts);
+  }
+
+result_t polygon(handle_t canvas, const rect_t *clip_rect, const pen_t *outline,
+  color_t fill, uint16_t count, const point_t *pts)
+  {
+  return polypolygon(canvas, clip_rect, outline, fill, 1, &count, pts);
   }
 
 result_t rectangle(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,

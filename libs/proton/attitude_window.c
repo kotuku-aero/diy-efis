@@ -579,7 +579,7 @@ static result_t on_pitch_angle(handle_t hwnd, void *parg, const char *func, cons
     if (failed(lookup_font(key, "font", &wnd->font)))
       {
       // we always have the neo font.
-      if (failed(result = create_font("neo", 9, 0, &wnd->font)))
+      if (failed(result = create_font("neo", 8, 0, &wnd->font)))
         return result;
       }
 

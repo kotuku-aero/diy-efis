@@ -80,26 +80,32 @@ typedef struct
   uint8_t pixels[];
   } font_bitmap_t;
 
+struct _rendered_glyph_cache_t;
 // a glyph is stored as a vector of alpha values (255 = opaque, 0 = transparent)
 // to allow alpha blended font outlines.
 typedef struct _glyph_t {
+  struct _rendered_glyph_cache_t *font_info;
   uint16_t wchar;         // unicode character
   uint16_t codepoint;     // offset into file
   gdi_dim_t advance;           // advance for the glyph
+  gdi_dim_t baseline;         // baseline of the bitmap.
   font_bitmap_t bitmap;       // de-compressed bitmap
   } glyph_t;
 
 typedef struct _rendered_glyph_cache_t {
   uint16_t version;
-  uint16_t size;          // height of the font this bitmap renders
-  struct _font_t *fontrec;   // reference to the cache of fonts
-  handle_t glyphs;        // map of characters to cached bitmap rects
+  uint16_t size;              // height of the font this bitmap renders
+  gdi_dim_t vertical_height;  // height including ascender/descender
+  gdi_dim_t baseline;         // where logical 0 is for the font outline.
+  struct _font_t *fontrec;    // reference to the cache of fonts
+  handle_t glyphs;            // map of characters to cached bitmap rects
   } sized_font_t;
 
 typedef struct _font_info_t
   {
   handle_t stream;              // pointer to .ttf file
   int16_t num_glyphs;           // number of glyphs, needed for range checking
+  rect_t clip_rect;             // bounding box of the glyphs.
   uint16_t index_map;                     // a cmap mapping for our chosen character encoding
   uint16_t index_to_location_format;      // format needed to map from glyph index to glyph
   uint16_t loca;                  // index to location table
@@ -573,8 +579,10 @@ static result_t get_glyph_shape(const fontinfo_t *font, uint16_t glyph_index, gl
     uint16_t end_pt = 0;
     uint16_t start_pt = 0;
 
+#if _DEBUG_FONTS
     trace_debug("Shape Index: %d, x_min:%d, x_max:%d, y_min:%d, y_max:%d\r\n",
       glyph_index, shape->x_min, shape->x_max, shape->y_min, shape->y_max);
+#endif
 
     for (i = 0; i < number_of_contours; i++)
       {
@@ -883,15 +891,15 @@ static glyph_t *tg = 0;
 static pen_t white_pen = { color_white, 1, ps_solid };
 
 // cache (if possible) the character ch in th font
-result_t ensure_glyph(sized_font_t *font, char ch, const glyph_t **gp)
+result_t ensure_glyph(sized_font_t *font_info, char ch, const glyph_t **gp)
   {
   result_t result;
   glyph_t *glyph = 0;
 
-  if (font == 0)
+  if (font_info == 0)
     return e_bad_parameter;
 
-  result = map_find(font->glyphs, (const void *)ch, (void **)&glyph);
+  result = map_find(font_info->glyphs, (const void *)ch, (void **)&glyph);
   if (result != e_not_found && failed(result))
     return result;
 
@@ -909,14 +917,14 @@ result_t ensure_glyph(sized_font_t *font, char ch, const glyph_t **gp)
   screen_t *phys_screen;
   as_screen(hscreen, &phys_screen);
 
-  fontinfo_t *fontinfo = &font->fontrec->info;
+  fontinfo_t *fontinfo = &font_info->fontrec->info;
 
   int16_t x = 0;
   int16_t y = 0;
   int16_t bottom_y = 0;
 
   // calculate the x, y
-  double scale = scale_for_pixel_height(fontinfo, font->size);
+  double scale = scale_for_pixel_height(fontinfo, font_info->size);
 
   int16_t advance;
   int16_t gw;
@@ -935,14 +943,14 @@ result_t ensure_glyph(sized_font_t *font, char ch, const glyph_t **gp)
   glyph_shape_t *shape;
 
   // check to see if the shape is in the cache of font shapes.
-  if (failed(map_find(font->fontrec->shapes, (const void *)g, (void **)&shape)))
+  if (failed(map_find(font_info->fontrec->shapes, (const void *)g, (void **)&shape)))
     {
     // try to load the shape from the stream.  Very expensive operation
     if (failed(result = get_glyph_shape(fontinfo, g, &shape)))
       return result;
 
     // this caches the font into the map of stored shapes
-    if (failed(result = map_add(font->fontrec->shapes, (const void *)g, (const void *)&shape)))
+    if (failed(result = map_add(font_info->fontrec->shapes, (const void *)g, (const void *)&shape)))
       {
       destroy_shape(shape);
       return result;
@@ -961,6 +969,8 @@ result_t ensure_glyph(sized_font_t *font, char ch, const glyph_t **gp)
   glyph->wchar = ch;
   glyph->codepoint = g;
   glyph->advance = ((gdi_dim_t)(scale * advance));
+  glyph->font_info = font_info;
+  glyph->baseline = ((gdi_dim_t) floor(shape->y_min * scale))+gh;
 
   if(bitmap_length > sizeof(glyph_t))
     {
@@ -1099,7 +1109,7 @@ result_t ensure_glyph(sized_font_t *font, char ch, const glyph_t **gp)
         }
   #endif
       // render the polypolygon onto the bitmap
-      result = polypolygon_impl(&fc, &rect, 0, color_white, shape->num_contours, ptr_lengths, ptr_points);
+      result = polypolygon_impl(&fc.canvas, &rect, 0, color_white, shape->num_contours, ptr_lengths, ptr_points);
       }
 
     vector_close(poly);
@@ -1122,7 +1132,7 @@ result_t ensure_glyph(sized_font_t *font, char ch, const glyph_t **gp)
         }
 #endif
   // add the glyph
-  return map_add(font->glyphs, (void *) ch, &glyph);
+  return map_add(font_info->glyphs, (void *) ch, &glyph);
   }
 
 static result_t release_glyph(glyph_t *glyph)
@@ -1165,6 +1175,7 @@ static result_t find_table(handle_t stream, const char *name, uint16_t *index)
   int32_t num_tables = read_uint16_setpos(stream, 4);
   int32_t i;
   uint32_t loc = 12;
+  uint32_t length; 
   for (i = 0; i < num_tables; ++i)
     {
     stream_setpos(stream, loc);
@@ -1174,7 +1185,7 @@ static result_t find_table(handle_t stream, const char *name, uint16_t *index)
       {
       read_uint32(stream);    // skip the checksum
       *index = read_uint32(stream);
-      read_uint32(stream);    // skip the length
+      length = read_uint32(stream);    // skip the length
 
       return s_ok;
       }
@@ -1246,13 +1257,19 @@ result_t init_font(fontinfo_t *info, handle_t stream)
     return 0;
 
   info->index_to_location_format = read_uint16_setpos(stream, info->head + 50);
+
+  info->clip_rect.left = read_int16_setpos(stream, info->head + 36);
+  info->clip_rect.bottom = read_int16(stream);
+  info->clip_rect.right = read_int16(stream);
+  info->clip_rect.top = read_int16(stream);
+
   return s_ok;
   }
 
-result_t create_font(const char *name, uint16_t points, const char *hint, handle_t  *fh)
+result_t create_font(const char *name, uint16_t pixels, const char *hint, handle_t  *fh)
   {
   result_t result;
-  if (name == 0 || points == 0)
+  if (name == 0 || pixels == 0)
     return e_bad_parameter;
 
   handle_t hscreen;
@@ -1290,8 +1307,10 @@ result_t create_font(const char *name, uint16_t points, const char *hint, handle
     if (failed(result = vector_at(fr->fonts, font_index, &font)))
       return result;
 
-    if (font->size == points)
+    if (font->size == pixels)
       break;
+
+    font = 0;
     }
 
   if (font == 0)
@@ -1299,8 +1318,12 @@ result_t create_font(const char *name, uint16_t points, const char *hint, handle
     // point length does not exist so create it
     font = (sized_font_t *)neutron_malloc(sizeof(sized_font_t));
     font->fontrec = fr;
-    font->size = points;
+    font->size = pixels;
     font->version = sizeof(sized_font_t);
+    double scale = scale_for_pixel_height(&fr->info, pixels);
+    font->vertical_height = (gdi_dim_t) floor(fabs(rect_height(&fr->info.clip_rect) * scale));
+    font->baseline = (gdi_dim_t) floor(fr->info.clip_rect.bottom * scale);
+    
     if (failed(result = map_create(dup_codepoint, dup_glyph, compare_codepoint, destroy_codepoint, destroy_glyph, &font->glyphs)))
       {
       neutron_free(font);
@@ -1505,6 +1528,14 @@ result_t draw_text(handle_t hndl, const rect_t *clip_rect, handle_t  fp,
     if (char_widths != 0)
       char_widths[ch] = glyph->bitmap.width;
 
+    gdi_dim_t bitmap_top;
+    // first calculate the bottom of the pixel box
+    bitmap_top = glyph->font_info->vertical_height;
+    bitmap_top += glyph->font_info->baseline;  // baseline of all of the glyphs
+    // now move down by the number of pixels from the baseline to the glyph baseline
+    bitmap_top -= glyph->baseline;            // adjust toward the bottom of the line
+    bitmap_top += pt_pos.y;
+
     uint16_t row;
     for (row = 0; row < glyph->bitmap.height; row++)
       {
@@ -1513,10 +1544,12 @@ result_t draw_text(handle_t hndl, const rect_t *clip_rect, handle_t  fp,
       uint16_t col;
       for (col = 0; col < glyph->bitmap.width; col++)
         {
-        point_t pos =
-          {
-          (gdi_dim_t)(pt_pos.x + col), (gdi_dim_t)(pt_pos.y + row)
-          };
+        point_t pos;
+        pos.x = (gdi_dim_t)(pt_pos.x + col);
+
+        // position the bitmap relative to the 
+        pos.y = (gdi_dim_t)(bitmap_top + row);
+
         if (point_in_rect(&pos, clip_rect))
           {
           uint8_t alpha_pel = glyph->bitmap.pixels[offset];
@@ -1527,8 +1560,7 @@ result_t draw_text(handle_t hndl, const rect_t *clip_rect, handle_t  fp,
           else
             bg_color = (*canvas->get_pixel)(canvas, &pos);
 
-          (*canvas->set_pixel)(canvas, &pos,
-            aplha_blend(fg, bg_color, alpha_pel));
+          (*canvas->set_pixel)(canvas, &pos, aplha_blend(fg, bg_color, alpha_pel));
           }
 
         offset++;
@@ -1541,23 +1573,25 @@ result_t draw_text(handle_t hndl, const rect_t *clip_rect, handle_t  fp,
   return s_ok;
   }
 
-result_t text_extent(handle_t hndl, handle_t  font, const char *str,
-  uint16_t count, extent_t *ex)
+result_t text_extent(handle_t hndl, handle_t fh, const char *str, uint16_t count, extent_t *ex)
   {
   result_t result;
   if (hndl == 0 ||
-    font == 0 ||
+    fh == 0 ||
     str == 0 ||
     ex == 0)
     return e_bad_parameter;
 
   uint16_t ch;
+  sized_font_t *font = 0;
+  if(failed(result = is_valid_font(fh, &font)))
+    return result;
 
   ex->dx = 0;
-  ex->dy = 0;
-
   if (count == 0)
     count = strlen(str);
+
+  ex->dy = font->vertical_height;
 
   for (ch = 0; ch < count; ch++)
     {
@@ -1569,11 +1603,10 @@ result_t text_extent(handle_t hndl, handle_t  font, const char *str,
 
 
     const glyph_t *glyph = 0;
-    if (failed(result = ensure_glyph(font, c, &glyph)))
+    if (failed(result = ensure_glyph(fh, c, &glyph)))
       return result;
 
     // see if the user wants the widths returned
-    ex->dy = max(ex->dy, glyph->bitmap.height);
     ex->dx += glyph->advance;
     }
 

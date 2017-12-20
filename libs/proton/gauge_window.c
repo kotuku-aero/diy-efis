@@ -863,6 +863,7 @@ static void draw_graph_value(handle_t hwnd,
     }
   }
 
+static const char *hints = "ABCDEFGHIJKLMNOPQRSTUV0123456789 ";
 
 result_t create_gauge_window(handle_t parent, memid_t key, handle_t *hwnd)
   {
@@ -900,7 +901,7 @@ result_t create_gauge_window(handle_t parent, memid_t key, handle_t *hwnd)
   if (failed(lookup_font(key, "font", &wnd->font)))
     {
     // we always have the neo font.
-    if (failed(result = create_font("neo", 9, 0, &wnd->font)))
+    if (failed(result = create_font("neo", 8, hints, &wnd->font)))
       return result;
     }
 
@@ -928,7 +929,7 @@ result_t create_gauge_window(handle_t parent, memid_t key, handle_t *hwnd)
     if (failed(lookup_font(key, "name-font", &wnd->name_font)))
       {
       // we always have the neo font.
-      if (failed(result = create_font("neo", 9, 0, &wnd->name_font)))
+      if (failed(result = create_font("neo", 9, hints, &wnd->name_font)))
         return result;
       }
 
@@ -960,7 +961,7 @@ result_t create_gauge_window(handle_t parent, memid_t key, handle_t *hwnd)
     if (failed(lookup_font(key, "value-font", &wnd->value_font)))
       {
       // we always have the neo font.
-      if (failed(result = create_font("neo", 9, 0, &wnd->value_font)))
+      if (failed(result = create_font("neo", 9, hints, &wnd->value_font)))
         return result;
       }
 
