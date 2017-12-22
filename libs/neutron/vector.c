@@ -395,6 +395,54 @@ result_t vector_insert(handle_t hndl, uint16_t at, const void *element)
   return s_ok;
   }
 
+static inline void *address_of(vector_impl_t *vec, uint16_t pos)
+  {
+  return ((uint8_t *)vec->buffer) + (vec->element_size *pos);
+  }
+
+static void sort(vector_impl_t *vec, compare_element_fn comp, swap_fn swap, uint16_t begin, uint16_t end)
+  {
+  if(end > begin)
+    {
+    void *pivot = address_of(vec, begin);
+    uint16_t l = begin;
+    uint16_t r = end;
+    while(l < r)
+      {
+      if((*comp)(address_of(vec, l), pivot) <= 0)
+        {
+        l++;
+        }
+      else if((*comp)(address_of(vec, r), pivot) > 0)
+        {
+        r--;
+        }
+      else if(l < r)
+        {
+        (*swap)(address_of(vec, l), address_of(vec, r));
+        }
+      }
+    l--;
+    (*swap)(address_of(vec, begin), address_of(vec, l));
+    sort(vec, comp, swap, begin, l);
+    sort(vec, comp, swap, r, end);
+    }
+  }
+
+result_t vector_sort(vector_t hndl, compare_element_fn comp, swap_fn swap)
+  {
+  result_t result;
+
+  if(failed(result = is_valid_vector(hndl)))
+    return result;
+
+  vector_impl_t *vec = (vector_impl_t *)hndl;
+
+  sort(vec, comp, swap, 0, vec->length-1);
+
+  return s_ok;
+  }
+
 result_t vector_erase(handle_t hndl, uint16_t at)
   {
   result_t result;
@@ -409,6 +457,8 @@ result_t vector_erase(handle_t hndl, uint16_t at)
   uint16_t i;
   for(i = at; i < vec->length; i++)
     memcpy(calculate_offset(vec, i), calculate_offset(vec, i+1), vec->element_size);
+
+  vec->length--;
 
   return s_ok;
   }

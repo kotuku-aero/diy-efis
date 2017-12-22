@@ -1257,6 +1257,18 @@ typedef void (*incarnate_element_fn)(void *element, void *parg);
  * @return s_ok if expanded ok
  */
 extern result_t vector_expand(vector_t vector, uint16_t size, incarnate_element_fn callback, void *parg);
+//
+typedef int(*compare_element_fn)(const void *left, const void *right);
+typedef void(*swap_fn)(void *left, void *right);
+/**
+ * @function vector_compare(vector_t vector, compare_element_fn comp, swap_fn swap)
+ * Sort the vector using the passed in compare function
+ * @param vector        Handle to the vector
+ * @param comp          Comparison function
+ * @param swap          Swap elements function
+ * @return s_ok if a valid vector
+ */
+extern result_t vector_sort(vector_t vector, compare_element_fn comp, swap_fn swap);
 /**
  * @function vector_push_back(vector_t hndl, const void *element)
  * Push an element to the back of the vector

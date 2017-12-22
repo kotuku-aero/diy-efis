@@ -814,11 +814,19 @@ static result_t tesselate_curve(double start_x, double start_y, double mid_x, do
     }
   else
     {
-    point_t pt;
-    pt.x = (gdi_dim_t) floor(end_x);
-    pt.y = (gdi_dim_t) floor(end_y);
+    uint16_t len;
+    point_t prev_pt;
 
-    return vector_push_back(poly, &pt);
+    if(failed(result = vector_count(poly, &len)) ||
+       failed(result = vector_at(poly, len-1, &prev_pt)))
+       return result;
+
+    point_t pt;
+    pt.x = (gdi_dim_t) round(end_x);
+    pt.y = (gdi_dim_t) round(end_y);
+
+    if(pt.x != prev_pt.x || pt.y != prev_pt.y)
+      return vector_push_back(poly, &pt);
     }
   return s_ok;
   }
@@ -830,6 +838,10 @@ typedef struct _font_canvas_t {
   canvas_t canvas;
   glyph_t *glyph;
   } font_canvas_t;
+
+#define BITMAP_ANTI_ALIAS_SCALE 15
+#define BITMAP_ANTI_ALIAS_OFFSET (BITMAP_ANTI_ALIAS_SCALE >> 1)
+#define BITMAP_PEL_WEIGHT (256 / BITMAP_ANTI_ALIAS_SCALE)
 
 static inline result_t as_font_canvas(canvas_t *hndl, font_canvas_t **canvas)
   {
@@ -843,13 +855,7 @@ static inline result_t as_font_canvas(canvas_t *hndl, font_canvas_t **canvas)
 
 static color_t fc_get_pixel(canvas_t *hndl, const point_t *src)
   {
-  font_canvas_t *canvas;
-  if (src == 0 || failed(as_font_canvas(hndl, &canvas)))
-    return color_hollow;
-
-  uint8_t ac = canvas->glyph->bitmap.pixels[src->x + (src->y * canvas->glyph->bitmap.width)];
-
-  return rgba(ac, 255, 255, 255);
+  return color_hollow;
   }
 
 static void fc_set_pixel(canvas_t *hndl, const point_t *dest, color_t color)
@@ -858,22 +864,23 @@ static void fc_set_pixel(canvas_t *hndl, const point_t *dest, color_t color)
   if (dest == 0 || failed(as_font_canvas(hndl, &canvas)))
     return;
 
-  canvas->glyph->bitmap.pixels[dest->x + (dest->y * canvas->glyph->bitmap.width)] = alpha(color);
+  // calculate the distancs
+  gdi_dim_t x_pel = (dest->x - BITMAP_ANTI_ALIAS_OFFSET)/ BITMAP_ANTI_ALIAS_SCALE;
+  gdi_dim_t y_pel = (dest->y - BITMAP_ANTI_ALIAS_OFFSET)/ BITMAP_ANTI_ALIAS_SCALE;
+
+  // each time a pixel is writen we add 1
+#ifdef _DEBUG
+  if(x_pel > canvas->glyph->bitmap.width || y_pel > canvas->glyph->bitmap.height)
+    {
+    trace_debug("Range error\r\n");
+    }
+#endif
+
+  canvas->glyph->bitmap.pixels[x_pel + (y_pel * canvas->glyph->bitmap.width)] += BITMAP_PEL_WEIGHT;
   }
 
 static void fc_fast_fill(canvas_t *hndl, const rect_t *dest, color_t fill_color)
   {
-  font_canvas_t *canvas;
-  if (dest == 0 || failed(as_font_canvas(hndl, &canvas)))
-    return;
-
-  gdi_dim_t x;
-  gdi_dim_t y;
-  uint8_t ac = alpha(fill_color);
-
-  for (y = 0; y < (dest->bottom - dest->top); y++)
-    for (x = 0; x < (dest->right - dest->left); x++)
-      canvas->glyph->bitmap.pixels[x + (y * canvas->glyph->bitmap.width)] = ac;
   }
 
 static void fc_fast_line(canvas_t *hndl, const point_t *p1, const point_t *p2, color_t fill_color)
@@ -884,9 +891,22 @@ static void fc_fast_line(canvas_t *hndl, const point_t *p1, const point_t *p2, c
   uint8_t ac = alpha(fill_color);
 
   gdi_dim_t x;
+  // calculate the distancs
+  gdi_dim_t y_pel = (p1->y - BITMAP_ANTI_ALIAS_OFFSET) / BITMAP_ANTI_ALIAS_SCALE;
 
   for (x = p1->x; x < p2->x; x++)
-    canvas->glyph->bitmap.pixels[x + (p1->y * canvas->glyph->bitmap.width)] = ac;
+    {
+    gdi_dim_t x_pel = (x - BITMAP_ANTI_ALIAS_OFFSET) / BITMAP_ANTI_ALIAS_SCALE;
+
+#ifdef _DEBUG
+    if(x_pel > canvas->glyph->bitmap.width || y_pel > canvas->glyph->bitmap.height)
+      {
+      trace_debug("Range error\r\n");
+      }
+#endif
+
+    canvas->glyph->bitmap.pixels[x + (y_pel * canvas->glyph->bitmap.width)] += 17;
+    }
   }
 
 static void fc_fast_copy(canvas_t *hndl, const point_t *dest, const struct _canvas_t *src_canvas, const rect_t *src)
@@ -986,7 +1006,7 @@ result_t ensure_glyph(sized_font_t *font_info, char ch, const glyph_t **gp)
     {
     handle_t poly;
     handle_t lengths;
-    uint16_t i;
+    uint16_t contour_num;
     uint16_t n = 0;
     uint16_t start = 0;
     uint16_t v;
@@ -1013,54 +1033,54 @@ result_t ensure_glyph(sized_font_t *font_info, char ch, const glyph_t **gp)
 
     // this inverts the shape
     gdi_dim_t y_offs = shape->y_max - shape->y_min;
+
+    // the scale will shrink the curve down to the pixel size
+    // however to anti-alias we tell the GDI we are working with
+    // a bitmap (n * BITMAP_ANTI_ALIAS_SCALE) + BITMAP_ANTI_ALIAS_SCALE 
+    // with an offset of BITMAP_ANTI_ALIAS_OFFSET
+    // this will then give us a simple way to determine
+    // the alpha value of the pixel to a 25% subpixel scaling
+    scale *= BITMAP_ANTI_ALIAS_SCALE;
+
     // remove un-needed curves
     double objspace_flatness_squared = 1 / scale;
 
     objspace_flatness_squared *= objspace_flatness_squared;
     objspace_flatness_squared *= 0.35;
 
-    for (i = 0; i < shape->num_contours; i++)
+    for (contour_num = 0; contour_num < shape->num_contours; contour_num++)
       {
-      for (v = 0; v < shape->contours[i]->num_vertices; v++)
+      for (v = 0; v < shape->contours[contour_num]->num_vertices; v++)
         {
+        pt.x = shape->contours[contour_num]->vertices[v].x;
+        pt.y = shape->contours[contour_num]->vertices[v].y;
 
-        if(shape->contours[i]->vertices[v].type == contour_vcurve)
+        if(prev_pt.x != pt.x || prev_pt.y != pt.y)
           {
-          // add points from here to the next point
-          if(failed(result = tesselate_curve(prev_pt.x, prev_pt.y,
-            shape->contours[i]->vertices[v].cx, shape->contours[i]->vertices[v].cy,
-            shape->contours[i]->vertices[v].x, shape->contours[i]->vertices[v].y,
-            objspace_flatness_squared, poly, 1)))
+          if(failed(result = vector_push_back(poly, &pt)))
             {
             vector_close(poly);
             vector_close(lengths);
             return result;
             }
-
-          prev_pt.x = shape->contours[i]->vertices[v].x;
-          prev_pt.y = shape->contours[i]->vertices[v].y;
-          pt.x = prev_pt.x;
-          pt.y = prev_pt.y;
           }
-        else
-          {
-          prev_pt.x = shape->contours[i]->vertices[v].x;
-          prev_pt.y = shape->contours[i]->vertices[v].y;
-          pt.x = prev_pt.x;
-          pt.y = prev_pt.y;
 
-          if ( gdi_pt.x != pt.x || gdi_pt.y != pt.y)
+        if(shape->contours[contour_num]->vertices[v].type == contour_vcurve)
+          {
+          // add points from here to the next point
+          if(failed(result = tesselate_curve(prev_pt.x, prev_pt.y,
+                                             shape->contours[contour_num]->vertices[v].cx, shape->contours[contour_num]->vertices[v].cy,
+                                             shape->contours[contour_num]->vertices[v].x, shape->contours[contour_num]->vertices[v].y,
+                                             objspace_flatness_squared, poly, 1)))
             {
-            if(failed(result = vector_push_back(poly, &pt)))
-              {
-              vector_close(poly);
-              vector_close(lengths);
-              return result;
-              }
+            vector_close(poly);
+            vector_close(lengths);
+            return result;
             }
           }
-        gdi_pt.x = pt.x;
-        gdi_pt.y = pt.y;
+
+        prev_pt.x = pt.x;
+        prev_pt.y = pt.y;
         }
 
         if(failed(result = vector_count(poly, &poly_length)))
@@ -1093,15 +1113,15 @@ result_t ensure_glyph(sized_font_t *font_info, char ch, const glyph_t **gp)
     fc.canvas.fast_line = fc_fast_line;
     fc.canvas.get_pixel = fc_get_pixel;
     fc.canvas.set_pixel = fc_set_pixel;
-    fc.canvas.height = gh;
-    fc.canvas.width = gw;
+    fc.canvas.height = (gh * BITMAP_ANTI_ALIAS_SCALE)+ (BITMAP_ANTI_ALIAS_SCALE <<1);
+    fc.canvas.width = (gw * BITMAP_ANTI_ALIAS_SCALE) + (BITMAP_ANTI_ALIAS_SCALE << 1);
     fc.canvas.version = sizeof(font_canvas_t);
 
     rect_t rect;
     rect.left = 0;
     rect.top = 0;
-    rect.right = gw;
-    rect.bottom = gh;
+    rect.right = (gw * BITMAP_ANTI_ALIAS_SCALE)+ (BITMAP_ANTI_ALIAS_OFFSET << 1);
+    rect.bottom = (gh * BITMAP_ANTI_ALIAS_SCALE) + (BITMAP_ANTI_ALIAS_OFFSET << 1);
 
     uint16_t *ptr_lengths;
     point_t *ptr_points;
@@ -1116,25 +1136,59 @@ result_t ensure_glyph(sized_font_t *font_info, char ch, const glyph_t **gp)
     if(succeeded(result = vector_begin(poly, (void **)&ptr_points)) &&
       succeeded(result = vector_begin(lengths, (void **)&ptr_lengths)))
       {
-      // we have to modify all of the points to match our object space
-      for(i = 0; i < poly_length; i++)
+      uint16_t start = 0;
+      for(contour_num = 0; contour_num < shape->num_contours; contour_num++)
         {
-        ptr_points[i].x = (gdi_dim_t)((ptr_points[i].x - shape->x_min) * scale);
-        ptr_points[i].y = (gdi_dim_t)((y_offs - ptr_points[i].y - shape->y_min) * scale);
+        // we have to modify all of the points to match our object space
+        for(n = 0; n < ptr_lengths[contour_num]; n++)
+          {
+          ptr_points[n + start].x = BITMAP_ANTI_ALIAS_OFFSET +(gdi_dim_t)((ptr_points[n + start].x - shape->x_min) * scale);
+          ptr_points[n + start].y = BITMAP_ANTI_ALIAS_OFFSET + (gdi_dim_t)((y_offs - ptr_points[n + start].y - shape->y_min) * scale);
+
+          if(n == 0)
+            {
+            prev_pt.x = ptr_points[n + start].x;
+            prev_pt.y = ptr_points[n + start].y;
+            }
+          else
+            {
+            if(prev_pt.x == ptr_points[n + start].x && prev_pt.y == ptr_points[n + start].y)
+              {
+              // duplicate point, remove from the array
+              if(failed(result = vector_erase(poly, n + start)))
+                {
+                vector_close(poly);
+                vector_close(lengths);
+                return result;
+                }
+
+              // remove a point
+              n--;
+              ptr_lengths[contour_num]--;
+              }
+            else
+              {
+              prev_pt.x = ptr_points[n + start].x;
+              prev_pt.y = ptr_points[n + start].y;
+              }
+            }
+          }
+
+        start += n;
         }
 
   #ifdef _DEBUG
       trace_debug("Num contours: %d, clip: left:%d, top:%d, right:%d, bottom:%d\r\n",
         shape->num_contours, rect.left, rect.top, rect.right, rect.bottom);
       n = 0;
-      for(i = 0; i < shape->num_contours; i++)
+      for(contour_num = 0; contour_num < shape->num_contours; contour_num++)
         {
-        trace_debug("Contour %d, Length: %d\r\n", i, ptr_lengths[i]);
-        for(v = 0; v < ptr_lengths[i]; v++)
+        trace_debug("Contour %d, Length: %d\r\n", contour_num, ptr_lengths[contour_num]);
+        for(v = 0; v < ptr_lengths[contour_num]; v++)
           {
           trace_debug("Vertex %d, x:%d, y:%d\r\n", v, ptr_points[n + v].x, ptr_points[n + v].y);
           }
-        n += ptr_lengths[i];
+        n += ptr_lengths[contour_num];
         }
   #endif
       // render the polypolygon onto the bitmap
