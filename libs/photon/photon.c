@@ -995,29 +995,31 @@ static result_t polygon_intersect(const rect_t *clip_rect, const point_t *pts, u
     return result;
     }
 
+  flagged_point_t fp1;
+  flagged_point_t fp2;
+  point_t p1;
+  point_t p2;
+
   // create a list of points and mark them as inside or outside the clipping rectangle
   for(sp = 0; sp < count; sp++)
     {
-    flagged_point_t fpt;
-    fpt.point.x = pts[sp].x;
-    fpt.point.y = pts[sp].y;
-    fpt.flag = point_in_rect(pts + sp, clip_rect);
+    fp1.point.x = pts[sp].x;
+    fp1.point.y = pts[sp].y;
+    fp1.flag = point_in_rect(pts + sp, clip_rect);
 
-	if(fpt.flag)
-		num_inside++;
+	  if(fp1.flag)
+		  num_inside++;
 
-    vector_append(pts, 1, &fpt);
+    vector_push_back(subject_points, &fp1);
     }
 
-  vector_append(clip_points, 1, top_left(clip_rect, &ip));
-  vector_append(clip_points, 1, top_right(clip_rect, &ip));
-  vector_append(clip_points, 1, bottom_right(clip_rect, &ip));
-  vector_append(clip_points, 1, bottom_left(clip_rect, &ip));
-  vector_append(clip_points, 1, top_left(clip_rect, &ip));
+  vector_push_back(clip_points, top_left(clip_rect, &ip));
+  vector_push_back(clip_points, top_right(clip_rect, &ip));
+  vector_push_back(clip_points, bottom_right(clip_rect, &ip));
+  vector_push_back(clip_points, bottom_left(clip_rect, &ip));
+  vector_push_back(clip_points, top_left(clip_rect, &ip));
 
-  flagged_point_t *fpb = flagged_points_begin(subject_points);
   uint16_t fps = flagged_points_size(subject_points);
-  point_t *cpb = points_begin(clip_points);
   uint16_t cps = points_size(clip_points);
 
   for (sp = 0; sp < fps - 1; sp++)
@@ -1030,10 +1032,15 @@ static result_t polygon_intersect(const rect_t *clip_rect, const point_t *pts, u
       {
       // an arc on the polygon can intersect at most 2 edges however we need to know the closest
       // to the arc start.
-      if (intersect_line(&fpb[sp].point, &fpb[sp + 1].point, &cpb[cp], &cpb[cp + 1], &ip))
+      vector_at(subject_points, sp, &fp1);
+      vector_at(subject_points, sp + 1, &fp2);
+      vector_at(clip_points, cp, &p1);
+      vector_at(clip_points, cp + 1, &p2);
+
+      if (intersect_line(&fp1.point, &fp2.point, &p1, &p2, &ip))
         {
         // when we have added an intersection we will find it again
-        if (is_equal(&ip, &fpb[sp].point))
+        if (is_equal(&ip, &fp1.point))
           continue;
 
         if(intersection > 1)
@@ -1053,7 +1060,7 @@ static result_t polygon_intersect(const rect_t *clip_rect, const point_t *pts, u
       {
       // two intersections found for this line
       // make the first one the furthest distance
-      if (distance(&fpb[sp].point, &intersections[0].pt) < distance(&fpb[sp].point, &intersections[1].pt))
+      if (distance(&fp1.point, &intersections[0].pt) < distance(&fp1.point, &intersections[1].pt))
         {
         uint16_t ts;
 
@@ -1069,9 +1076,13 @@ static result_t polygon_intersect(const rect_t *clip_rect, const point_t *pts, u
       {
       copy_point(&intersections[intersection].pt, &ip);
       cp = intersections[intersection].dist;
+
+      vector_at(subject_points, sp, &fp1);
+      vector_at(subject_points, sp + 1, &fp2);
+
       // check for case when points are on the clipping area
-      if (!is_equal(&ip, &fpb[sp].point) && 
-          !is_equal(&ip, &fpb[sp + 1].point))
+      if (!is_equal(&ip, &fp1.point) && 
+          !is_equal(&ip, &fp2.point))
         {
         // we have a clipped line so add it to the result.
         flagged_point_t fpt;
@@ -1079,7 +1090,7 @@ static result_t polygon_intersect(const rect_t *clip_rect, const point_t *pts, u
         fpt.point.y = ip.y;
         fpt.flag = true;
 
-        vector_insert(subject_points, sp+1, &fpt);
+        vector_insert(subject_points, sp + 1, &fpt);
         vector_insert(clip_points, cp + 1, &ip);
 
         if (intersection > 0)
@@ -1103,8 +1114,10 @@ static result_t polygon_intersect(const rect_t *clip_rect, const point_t *pts, u
       // we need to see if the clip rect is inside the subject
       for (cp = 0; cp < points_size(clip_points) - 1; cp++)
         {
-        if (point_in_polygon(&points_begin(clip_points)[cp], subject_points))
+        vector_at(clip_points, cp, &p1);
+        if (point_in_polygon(&p1, subject_points))
           {
+          // copy all of the points
           vector_append(points, points_size(clip_points), points_begin(clip_points));
           break;
           }
@@ -1117,13 +1130,17 @@ static result_t polygon_intersect(const rect_t *clip_rect, const point_t *pts, u
     }
 
   // now we look for the first point on the subject that is inside, last point is first so ignore
-  for (sp = 0; sp < flagged_points_size(subject_points) - 1; sp++)
-    if (flagged_points_begin(subject_points)[sp].flag)
+  fps = flagged_points_size(subject_points);
+  for(sp = 0; sp < fps - 1; sp++)
+    {
+    vector_at(subject_points, sp, &fp1);
+    if(fp1.flag)
       {
-      vector_append(points, 1, &flagged_points_begin(subject_points)[sp].point);
+      vector_push_back(points, &fp1.point);
       sp++;
       break;
       }
+    }
 
   if (succeeded(vector_empty(points)))
     {
@@ -1136,20 +1153,26 @@ static result_t polygon_intersect(const rect_t *clip_rect, const point_t *pts, u
   // walk the list
   do
     {
-    if (flagged_points_begin(subject_points)[sp].flag)
+    vector_at(subject_points, sp, &fp1);
+
+    if (fp1.flag)
       {
       // next point is clipped point
-      copy_point(&flagged_points_begin(subject_points)[sp].point, &ip);
+      copy_point(&fp1.point, &ip);
       }
     else
       {
       // find the point in the clip_points
-      for (cp = 0; cp < points_size(clip_points) - 1; cp++)
-        if (is_equal(&points_begin(clip_points)[cp], &ip))
+      cps = points_size(clip_points);
+      for(cp = 0; cp < cps - 1; cp++)
+        {
+        vector_at(clip_points, cp, &p1);
+        if(is_equal(&p1, &ip))
           break;                  // found last point inserted
+        }
 
       cp++;           // skip next on clipping rectangle
-      if (cp == points_size(clip_points) - 1)
+      if (cp == cps - 1)
         cp = 0;
 
       do
@@ -1158,12 +1181,16 @@ static result_t polygon_intersect(const rect_t *clip_rect, const point_t *pts, u
 
         bool is_clipped = false;
         // see if the next point is on the subject
-        for (sp = 0; sp < flagged_points_size(subject_points) - 1; sp++)
-          if (is_equal(&flagged_points_begin(subject_points)[sp].point, &ip))
+        fps = flagged_points_size(subject_points);
+        for(sp = 0; sp < fps - 1; sp++)
+          {
+          vector_at(subject_points, sp, &fp1);
+          if(is_equal(&fp1.point, &ip))
             {
             is_clipped = true;
             break;
             }
+          }
 
         if (is_clipped)
           break;
@@ -1752,7 +1779,6 @@ result_t polypolygon_impl(canvas_t *canvas, const rect_t *clip_rect, const pen_t
     uint16_t clipped_contour_len;
     for(contour_num = 0; contour_num < count; contour_num++)
       {
-      
       // firstly we clip the contour into a clipped form.
       if(failed(vector_clear(clipped_contour)) ||
          failed(result = polygon_intersect(clip_rect, cp, lengths[contour_num], clipped_contour)))
@@ -1879,29 +1905,30 @@ result_t polypolygon_impl(canvas_t *canvas, const rect_t *clip_rect, const pen_t
           num_edges--;
           i--;
           }
-        if(edge1.p1.y != y - 1)
-          {
-          break;
-          }
         else
           {
-          edge1.fn += edge1.mn;
-          if(edge1.fn < 0)
+          if(edge1.p1.y != y - 1)
+            break;
+          else
             {
-            edge1.p1.x += edge1.fn / edge1.d - 1;
-            edge1.fn %= edge1.d;
-            edge1.fn += edge1.d;
+            edge1.fn += edge1.mn;
+            if(edge1.fn < 0)
+              {
+              edge1.p1.x += edge1.fn / edge1.d - 1;
+              edge1.fn %= edge1.d;
+              edge1.fn += edge1.d;
+              }
+
+            if(edge1.fn >= edge1.d)
+              {
+              edge1.p1.x += edge1.fn / edge1.d;
+              edge1.fn %= edge1.d;
+              }
+
+            edge1.p1.y = y;
+
+            vector_set(edge_table, i, &edge1);
             }
-
-          if(edge1.fn >= edge1.d)
-            {
-            edge1.p1.x += edge1.fn / edge1.d;
-            edge1.fn %= edge1.d;
-            }
-
-          edge1.p1.y = y;
-
-          vector_set(edge_table, i, &edge1);
           }
         }
       vector_count(edge_table, &num_edges);
