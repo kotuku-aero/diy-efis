@@ -400,33 +400,48 @@ static inline void *address_of(vector_impl_t *vec, uint16_t pos)
   return ((uint8_t *)vec->buffer) + (vec->element_size *pos);
   }
 
-static void sort(vector_impl_t *vec, compare_element_fn comp, swap_fn swap, uint16_t begin, uint16_t end)
+static result_t sort(vector_impl_t *vec, compare_element_fn comp, swap_fn swap, uint16_t begin, uint16_t end)
   {
-  if(end > begin)
+  result_t result;
+  if(vec == 0 || comp == 0 || swap == 0)
+    return e_bad_parameter;
+  if(begin >= vec->length || end >= vec->length)
+    return s_ok;
+
+  if(begin < end)
     {
     void *pivot = address_of(vec, begin);
-    uint16_t l = begin;
+    uint16_t l = begin + 1;
     uint16_t r = end;
     while(l < r)
       {
       if((*comp)(address_of(vec, l), pivot) <= 0)
-        {
         l++;
-        }
-      else if((*comp)(address_of(vec, r), pivot) > 0)
-        {
+      else if((*comp)(address_of(vec, r), pivot) >= 0)
         r--;
-        }
-      else if(l < r)
-        {
+      else
         (*swap)(address_of(vec, l), address_of(vec, r));
-        }
       }
-    l--;
-    (*swap)(address_of(vec, begin), address_of(vec, l));
-    sort(vec, comp, swap, begin, l);
-    sort(vec, comp, swap, r, end);
+
+    if((*comp)(address_of(vec, l), pivot) < 0)
+      {
+      (*swap)(address_of(vec, l), address_of(vec, begin));
+      l--;
+      }
+    else
+      {
+      l--;
+      (*swap)(address_of(vec, begin), address_of(vec, l));
+      }
+
+    if(failed(result = sort(vec, comp, swap, begin, l)))
+      return result;
+
+    if(failed(result = sort(vec, comp, swap, r, end)))
+      return result;
     }
+
+  return s_ok;
   }
 
 result_t vector_sort(vector_t hndl, compare_element_fn comp, swap_fn swap)
@@ -453,10 +468,14 @@ result_t vector_erase(handle_t hndl, uint16_t at)
   vector_impl_t *vec = (vector_impl_t *)hndl;
   if(at >= vec->length)
     return e_bad_parameter;
-  // move elements down
-  uint16_t i;
-  for(i = at; i < vec->length; i++)
-    memcpy(calculate_offset(vec, i), calculate_offset(vec, i+1), vec->element_size);
+
+  if(vec->length > 1)
+    {
+    // move elements down
+    uint16_t i;
+    for(i = at; i < (vec->length - 1); i++)
+      memcpy(calculate_offset(vec, i), calculate_offset(vec, i + 1), vec->element_size);
+    }
 
   vec->length--;
 

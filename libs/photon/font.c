@@ -714,6 +714,9 @@ static result_t get_glyph_shape(const fontinfo_t *font, uint16_t glyph_index, gl
         curve_pt.type = contour_vmove;
         }
 
+      start_x = curve_pt.x;
+      start_y = curve_pt.y;
+
       // set the start point
       store_vertex(contour, next_pt++, &curve_pt);
 
@@ -765,9 +768,18 @@ static result_t get_glyph_shape(const fontinfo_t *font, uint16_t glyph_index, gl
       if(contour->num_vertices == next_pt)
         contour->vertices = (glyph_vertex_t *)neutron_realloc(contour->vertices, (next_pt+1) * sizeof(glyph_vertex_t));
 
-      curve_pt.cx = start_x;
-      curve_pt.cy = start_y;
-      curve_pt.type = start_off ? contour_vcurve : contour_vline;
+      if(start_off)
+        {
+        curve_pt.cx = start_x;
+        curve_pt.cy = start_y;
+        curve_pt.type = contour_vcurve;
+        }
+      else
+        {
+        curve_pt.x = start_x;
+        curve_pt.y = start_y;
+        curve_pt.type = contour_vline;
+        }
       store_vertex(contour, next_pt++, &curve_pt);
       contour->num_vertices = next_pt;
       }
@@ -840,7 +852,7 @@ typedef struct _font_canvas_t {
   } font_canvas_t;
 
 #define BITMAP_ANTI_ALIAS_SCALE 15
-#define BITMAP_ANTI_ALIAS_OFFSET (BITMAP_ANTI_ALIAS_SCALE >> 1)
+#define BITMAP_ANTI_ALIAS_OFFSET 8
 #define BITMAP_PEL_WEIGHT (256 / BITMAP_ANTI_ALIAS_SCALE)
 
 static inline result_t as_font_canvas(canvas_t *hndl, font_canvas_t **canvas)
@@ -899,13 +911,23 @@ static void fc_fast_line(canvas_t *hndl, const point_t *p1, const point_t *p2, c
     gdi_dim_t x_pel = (x - BITMAP_ANTI_ALIAS_OFFSET) / BITMAP_ANTI_ALIAS_SCALE;
 
 #ifdef _DEBUG
-    if(x_pel > canvas->glyph->bitmap.width || y_pel > canvas->glyph->bitmap.height)
+    if(x_pel < 0 || y_pel < 0 || x_pel >= canvas->glyph->bitmap.width || y_pel >= canvas->glyph->bitmap.height)
       {
-      trace_debug("Range error\r\n");
+      trace_debug("Bitmap calculation error\r\n");
+      x_pel = 0;
+      y_pel = 0;
       }
 #endif
 
-    canvas->glyph->bitmap.pixels[x + (y_pel * canvas->glyph->bitmap.width)] += 17;
+    // TODO : At present we just use a fixed constant.
+    // should weight the distance:
+    // gdi_dim_t yv = (p1->y - BITMAP_ANTI_ALIAS_OFFSET) % BITMAP_ANTI_ALIAS_SCALE;
+    // gdi_dim_t xv = (x - BITMAP_ANTI_ALIAS_OFFSET) % BITMAP_ANTI_ALIAS_SCALE;
+    // uint32_t v = (yv * yv) * (xv * xv)
+    // v = sqrt(v)
+    // since there are only BITMAP_ANTI_ALIAS_SCALE the sqrt could be done using
+    // a lookup table and integrated
+    canvas->glyph->bitmap.pixels[x_pel + (y_pel * canvas->glyph->bitmap.width)] += BITMAP_PEL_WEIGHT;
     }
   }
 
@@ -987,8 +1009,12 @@ result_t ensure_glyph(sized_font_t *font_info, char ch, const glyph_t **gp)
       }
     }
 
-  gw = (gdi_dim_t)(scale * (shape->x_max - shape->x_min));
-  gh = (gdi_dim_t)(scale * (shape->y_max - shape->y_min));
+  // we have to round up to the next pixel for the anti-alias code to work
+  gdi_dim_t x_extent = (shape->x_max - shape->x_min);
+  gdi_dim_t y_extent = (shape->y_max - shape->y_min);
+
+  gw = (gdi_dim_t)ceil((scale * x_extent));
+  gh = (gdi_dim_t)ceil((scale * y_extent));
 
   uint16_t bitmap_length = sizeof(glyph_t) + (gw * gh);
   glyph = (glyph_t *)neutron_malloc(bitmap_length);
@@ -1031,9 +1057,6 @@ result_t ensure_glyph(sized_font_t *font_info, char ch, const glyph_t **gp)
     uint16_t poly_length;
     uint16_t contour_start = 0;
 
-    // this inverts the shape
-    gdi_dim_t y_offs = shape->y_max - shape->y_min;
-
     // the scale will shrink the curve down to the pixel size
     // however to anti-alias we tell the GDI we are working with
     // a bitmap (n * BITMAP_ANTI_ALIAS_SCALE) + BITMAP_ANTI_ALIAS_SCALE 
@@ -1064,7 +1087,7 @@ result_t ensure_glyph(sized_font_t *font_info, char ch, const glyph_t **gp)
             return result;
             }
           }
-
+        /*
         if(shape->contours[contour_num]->vertices[v].type == contour_vcurve)
           {
           // add points from here to the next point
@@ -1078,7 +1101,7 @@ result_t ensure_glyph(sized_font_t *font_info, char ch, const glyph_t **gp)
             return result;
             }
           }
-
+          */
         prev_pt.x = pt.x;
         prev_pt.y = pt.y;
         }
@@ -1113,15 +1136,15 @@ result_t ensure_glyph(sized_font_t *font_info, char ch, const glyph_t **gp)
     fc.canvas.fast_line = fc_fast_line;
     fc.canvas.get_pixel = fc_get_pixel;
     fc.canvas.set_pixel = fc_set_pixel;
-    fc.canvas.height = (gh * BITMAP_ANTI_ALIAS_SCALE)+ (BITMAP_ANTI_ALIAS_SCALE <<1);
-    fc.canvas.width = (gw * BITMAP_ANTI_ALIAS_SCALE) + (BITMAP_ANTI_ALIAS_SCALE << 1);
+    fc.canvas.height = (gh * BITMAP_ANTI_ALIAS_SCALE);
+    fc.canvas.width = (gw * BITMAP_ANTI_ALIAS_SCALE);
     fc.canvas.version = sizeof(font_canvas_t);
 
     rect_t rect;
     rect.left = 0;
     rect.top = 0;
-    rect.right = (gw * BITMAP_ANTI_ALIAS_SCALE)+ (BITMAP_ANTI_ALIAS_OFFSET << 1);
-    rect.bottom = (gh * BITMAP_ANTI_ALIAS_SCALE) + (BITMAP_ANTI_ALIAS_OFFSET << 1);
+    rect.right = (gw * BITMAP_ANTI_ALIAS_SCALE);
+    rect.bottom = (gh * BITMAP_ANTI_ALIAS_SCALE);
 
     uint16_t *ptr_lengths;
     point_t *ptr_points;
@@ -1142,8 +1165,8 @@ result_t ensure_glyph(sized_font_t *font_info, char ch, const glyph_t **gp)
         // we have to modify all of the points to match our object space
         for(n = 0; n < ptr_lengths[contour_num]; n++)
           {
-          ptr_points[n + start].x = BITMAP_ANTI_ALIAS_OFFSET +(gdi_dim_t)((ptr_points[n + start].x - shape->x_min) * scale);
-          ptr_points[n + start].y = BITMAP_ANTI_ALIAS_OFFSET + (gdi_dim_t)((y_offs - ptr_points[n + start].y - shape->y_min) * scale);
+          ptr_points[n + start].x = (gdi_dim_t)((ptr_points[n + start].x - shape->x_min) * scale);
+          ptr_points[n + start].y = (gdi_dim_t)((y_extent - ptr_points[n + start].y - shape->y_min) * scale);
 
           if(n == 0)
             {

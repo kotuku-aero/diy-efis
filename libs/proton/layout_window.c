@@ -1745,7 +1745,7 @@ static result_t on_cancel(handle_t hwnd, void *parg, const char *func, const can
   }
 
 // we cache the font metrics for the layout window as loading them takes a while
-const char *font_hints = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789- ";
+const char *font_hints = "FABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789- ";
 
 result_t load_layout(handle_t parent, memid_t hive)
   {

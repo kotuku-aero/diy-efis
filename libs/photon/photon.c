@@ -1027,13 +1027,13 @@ static result_t polygon_intersect(const rect_t *clip_rect, const point_t *pts, u
     intersection_t intersections[2];
     uint16_t intersection = 0;
 
+    vector_at(subject_points, sp, &fp1);
+    vector_at(subject_points, sp + 1, &fp2);
     // scan the clipping rectangle
     for (cp = 0; cp < cps - 1; cp++)
       {
       // an arc on the polygon can intersect at most 2 edges however we need to know the closest
       // to the arc start.
-      vector_at(subject_points, sp, &fp1);
-      vector_at(subject_points, sp + 1, &fp2);
       vector_at(clip_points, cp, &p1);
       vector_at(clip_points, cp + 1, &p2);
 
@@ -1077,9 +1077,6 @@ static result_t polygon_intersect(const rect_t *clip_rect, const point_t *pts, u
       copy_point(&intersections[intersection].pt, &ip);
       cp = intersections[intersection].dist;
 
-      vector_at(subject_points, sp, &fp1);
-      vector_at(subject_points, sp + 1, &fp2);
-
       // check for case when points are on the clipping area
       if (!is_equal(&ip, &fp1.point) && 
           !is_equal(&ip, &fp2.point))
@@ -1103,6 +1100,30 @@ static result_t polygon_intersect(const rect_t *clip_rect, const point_t *pts, u
         }
       }
     }
+
+#ifdef _DEBUG
+  {
+  uint16_t i;
+  uint16_t n;
+  trace_debug("There are %d intersections\r\n", num_intersections);
+  trace_debug("Clipping points\r\n");
+  vector_count(clip_points, &n);
+  for(i = 0; i < n; i++)
+    {
+    point_t pt;
+    vector_at(clip_points, i, &pt);
+    trace_debug("Clip point %d, x:%d, y:%d\r\n", i, pt.x, pt.y);
+    }
+  trace_debug("Subject points\r\n");
+  vector_count(subject_points, &n);
+  for(i = 0; i < n; i++)
+    {
+    flagged_point_t pt;
+    vector_at(subject_points, i, &pt);
+    trace_debug("Flagged point %d, x:%d, y:%d, inside:%s\r\n", i, pt.point.x, pt.point.y, pt.flag ? "yes" : "no");
+    }
+  }
+#endif
 
   if (num_intersections == 0)
     {
@@ -1210,6 +1231,13 @@ static result_t polygon_intersect(const rect_t *clip_rect, const point_t *pts, u
     sp++;
     }
   while (!is_equal(&ip, points_begin(points)));
+
+  // ensure we return a closed polygon
+  vector_count(points, &sp);
+  vector_at(points, 0, &p1);
+  vector_at(points, sp-1, &p2);
+  if(!is_equal(&p1, &p2))
+    vector_push_back(points, &p1);  // close the polygon
 
   vector_close(clip_points);
   vector_close(subject_points);
@@ -1797,6 +1825,19 @@ result_t polypolygon_impl(canvas_t *canvas, const rect_t *clip_rect, const pen_t
         vector_close(edge_table);
         return result;
         }
+      //#if 0
+      {
+      point_t ip;
+      uint16_t i;
+      trace_debug("Clipped Polygon\r\n");
+      for(i = 0; i < clipped_contour_len; i++)
+        {
+        vector_at(clipped_contour, i, &ip);
+        trace_debug("Point %d, x:%d, y:%d\r\n", i, ip.x, ip.y);
+        }
+      }
+      //#endif
+
 
       // if the polygon does not have enough points then fail.  Could be outside the
       // clipping area completely.
@@ -1806,6 +1847,8 @@ result_t polypolygon_impl(canvas_t *canvas, const rect_t *clip_rect, const pen_t
         edge_t edge;
         point_t first_point;
         point_t pt;
+
+        bool last_edge = false;
 
         if(failed(result = vector_at(clipped_contour, 0, &first_point)))
           {
@@ -1826,32 +1869,28 @@ result_t polypolygon_impl(canvas_t *canvas, const rect_t *clip_rect, const pen_t
             return result;
             }
 
-          edge.p2.x = pt.x;
-          edge.p2.y = pt.y;
-
-          if(failed(result = add_edge(edge_table, &edge)))
+          if(last_edge)
             {
-            vector_close(clipped_contour);
-            vector_close(edge_table);
-            return result;
+            copy_point(&pt, &first_point);
+            copy_point(&pt, &edge.p1);
+            last_edge = false;
             }
-
-          edge.p1.x = pt.x;
-          edge.p1.y = pt.y;
-          }
-
-        // if the last point != first point, we need to close the polygon
-        if(pt.x != first_point.x || pt.y != first_point.y)
-          {
-          edge.p2.x = first_point.x;
-          edge.p2.y = first_point.y;
-
-
-          if(failed(result = add_edge(edge_table, &edge)))
+          else
             {
-            vector_close(clipped_contour);
-            vector_close(edge_table);
-            return result;
+            // form the end of the edge
+            copy_point(&pt, &edge.p2);
+
+            if(failed(result = add_edge(edge_table, &edge)))
+              {
+              vector_close(clipped_contour);
+              vector_close(edge_table);
+              return result;
+              }
+
+            if(is_equal(&pt, &first_point))
+              last_edge = true;
+            else
+              copy_point(&pt, &edge.p1);
             }
           }
         }
@@ -1861,37 +1900,78 @@ result_t polypolygon_impl(canvas_t *canvas, const rect_t *clip_rect, const pen_t
     vector_close(clipped_contour);
     clipped_contour = 0;
 
-    // now we sort the edges so 
-    vector_sort(edge_table, edge_cmp, edge_swap);
-
-    /* start with the lowest y in the table */
     edge_t edge1;
     edge_t edge2;
+    uint16_t num_edges;
+    uint16_t i;
+
+    //#if 0
+    memory_check();
+    vector_count(edge_table, &num_edges);
+    trace_debug("Unsorted edges\r\n");
+    for(i = 0; i < num_edges; i++)
+      {
+      vector_at(edge_table, i, &edge1);
+      trace_debug("%d,%d,%d,%d\r\n", edge1.p1.x, edge1.p1.y, edge1.p2.x, edge1.p2.y);
+      }
+    //#endif
+
+    // now we sort the edges so
+    if(failed(result = vector_sort(edge_table, edge_cmp, edge_swap)))
+      {
+      vector_close(edge_table);
+      return result;
+      }
+
+    /* start with the lowest y in the table */
     vector_at(edge_table, 0, &edge1);
     gdi_dim_t y = edge1.p1.y;
 
-    uint16_t num_edges;
-    uint16_t i;
-    vector_count(edge_table, &num_edges);
+    if(failed(result = vector_count(edge_table, &num_edges)))
+      {
+      vector_close(edge_table);
+      return result;
+      }
+
+//#if 0
+    memory_check();
+    trace_debug("Sorted edges\r\n");
+    for(i = 0; i < num_edges; i ++)
+      {
+      vector_at(edge_table, i, &edge1);
+      trace_debug("%d,%d,%d,%d\r\n", edge1.p1.x, edge1.p1.y, edge1.p2.x, edge1.p2.y);
+      }
+//#endif
+
     do
       {
       /* using odd parity, render alternating line segments */
       for(i = 1; i < num_edges; i += 2)
         {
-        vector_at(edge_table, i-1, &edge1);
-        vector_at(edge_table, i, &edge2);
+        if(failed(result = vector_at(edge_table, i - 1, &edge1)) ||
+          failed(result = vector_at(edge_table, i, &edge2)))
+          {
+          vector_close(edge_table);
+          return result;
+          }
 
         if(edge1.p1.y != y)
           break;              // not an active edge so we are done.
 
 
+        memory_check();
         // fill the horizontal line
         if(edge2.p1.x > edge1.p1.x)
           (*canvas->fast_line)(canvas, &edge1.p1, &edge2.p1, fill);
+        memory_check();
         }
 
       /* prepare for the next scan line */
-      ++y;
+      if(++y > clip_rect->bottom)
+        {
+        vector_close(edge_table);
+        return e_unexpected;
+        }
 
       /* remove inactive edges from the active edge table */
       /* or update the current x position of active edges */
@@ -1904,6 +1984,7 @@ result_t polypolygon_impl(canvas_t *canvas, const rect_t *clip_rect, const pen_t
           vector_erase(edge_table, i);
           num_edges--;
           i--;
+          memory_check();
           }
         else
           {
@@ -1927,11 +2008,15 @@ result_t polypolygon_impl(canvas_t *canvas, const rect_t *clip_rect, const pen_t
 
             edge1.p1.y = y;
 
-            vector_set(edge_table, i, &edge1);
+            if(failed(result = vector_set(edge_table, i, &edge1)))
+              {
+              vector_close(edge_table);
+              return e_unexpected;
+              }
+            memory_check();
             }
           }
         }
-      vector_count(edge_table, &num_edges);
       /* keep doing this while there are any edges left */
       } while(num_edges > 0);
 
