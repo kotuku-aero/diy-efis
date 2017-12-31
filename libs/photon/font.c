@@ -48,18 +48,22 @@ typedef struct _glyph_t {
   uint16_t offset;            // offset to column 0
   uint16_t width;             // width of the bitmap
   uint16_t height;            // height of the bitmap
-  uint8_t pixels[];           // is width * height
+  // a pixel is a bitmap..  The width of the font is mod 8
+  // so a bitmap 1 x 12 will be 12 bytes
+  // a bitmap 8 x 12 will be 12 bytes
+  // etc.
+  uint8_t pixels[];           // is width * height /8
   } glyph_t;
 
 typedef struct _font_map_t {
   uint16_t start_char;        // first character in the character map
   uint16_t last_char;         // last character in the character map
-  uint16_t glyph_offset[1]    // offset to the glyph records (offset from start of the block)
+  uint16_t glyph_offset[1]    // offset to the glyph records (offset from start of the block) (not including the length) so index +2
                               // size is (last_char - start_char)-1
   } font_map_t;
 
 typedef struct _sized_font_t {
-  uint16_t length;            // size of this sized_font
+  uint16_t length;            // size of this sized_font  // not included in the glyph calculations
   uint16_t size;              // height of the font this bitmap renders
   uint16_t vertical_height;   // height including ascender/descender
   uint16_t baseline;          // where logical 0 is for the font outline.
@@ -73,8 +77,11 @@ typedef struct _sized_font_t {
 typedef struct _font_t {
   uint32_t version;             // "FONT"
   char name[REG_NAME_MAX];      // registered name of the font
+  uint32_t length;              // Length of all of the records that follow including the
+  // version, and name.  The following data can be deflate compressed.
+  // -- Start deflated data --
   uint16_t num_fonts;           // number of fontrecs
-  sized_font_t fonts[];        // vector of sized_font_t, these are the fonts once rendered
+  sized_font_t fonts[];         // vector of sized_font_t, these are the fonts once rendered
   } font_t;
 
 static inline const glyph_t *get_glyph(const sized_font_t *font, char ch)

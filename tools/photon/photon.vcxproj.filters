@@ -41,9 +41,6 @@
     <ClInclude Include="..\..\libs\photon\window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\libs\photon\font.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\libs\photon\tt_font.h">
       <Filter>Header Files</Filter>
     </ClInclude>

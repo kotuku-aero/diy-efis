@@ -28,7 +28,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libs\photon\fixed_font.h" />
-    <ClInclude Include="..\..\libs\photon\font.h" />
     <ClInclude Include="..\..\libs\photon\raster_font.h" />
     <ClInclude Include="..\..\libs\photon\tt_font.h" />
     <ClInclude Include="..\..\libs\photon\window.h" />
