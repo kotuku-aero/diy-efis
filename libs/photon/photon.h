@@ -690,21 +690,19 @@ extern result_t pie(handle_t canvas,
                            gdi_dim_t radii,
                            gdi_dim_t inner);
 /**
- * @function create_font(const char *path, const point_t *char_metrics, const point_t *device_metrics, handle_t  *font)
- * generate a font
+ * @function open_font(const char *path, const point_t *char_metrics, const point_t *device_metrics, handle_t  *font)
+ * open a named font
  * @param name            Name of the font must be registered withe the load_font call
- * @param points          The ref char height in 1/64 points
- * @param hint            optional string of characters to cache in the font cache, makes rendering faster
+ * @param points          The charcater height in pixels
  * @param font            resulting font
  * @return s_ok if the font is loaded
  *
 */
-extern result_t create_font(const char *name, uint16_t points, const char *hint, handle_t *font);
+extern result_t open_font(const char *name, uint16_t points, handle_t *font);
 /**
  * @result_t load_font(const char *name, handle_t stream)
  * Load a font into the font cache
- * @param name      Name of the font
- * @param stream    Stream to read the true type font from
+ * @param stream    Stream to read the font from
  * @return s_ok if the font was loaded into the cache and is available for use.
  * @remark  The handle to the font must remain open till release_font is called
  * the font engine will close the stream handle

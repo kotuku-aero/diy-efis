@@ -1101,7 +1101,7 @@ static result_t polygon_intersect(const rect_t *clip_rect, const point_t *pts, u
       }
     }
 
-#ifdef _DEBUG
+#ifdef _DEBUG_POLYGON
   {
   uint16_t i;
   uint16_t n;
@@ -1825,18 +1825,18 @@ result_t polypolygon_impl(canvas_t *canvas, const rect_t *clip_rect, const pen_t
         vector_close(edge_table);
         return result;
         }
-      //#if 0
-      {
-      point_t ip;
-      uint16_t i;
-      trace_debug("Clipped Polygon\r\n");
-      for(i = 0; i < clipped_contour_len; i++)
-        {
-        vector_at(clipped_contour, i, &ip);
-        trace_debug("Point %d, x:%d, y:%d\r\n", i, ip.x, ip.y);
-        }
-      }
-      //#endif
+#if _DEBUG_POLYGON
+{
+point_t ip;
+uint16_t i;
+trace_debug("Clipped Polygon\r\n");
+for(i = 0; i < clipped_contour_len; i++)
+  {
+  vector_at(clipped_contour, i, &ip);
+  trace_debug("Point %d, x:%d, y:%d\r\n", i, ip.x, ip.y);
+  }
+}
+#endif
 
 
       // if the polygon does not have enough points then fail.  Could be outside the
@@ -1905,16 +1905,16 @@ result_t polypolygon_impl(canvas_t *canvas, const rect_t *clip_rect, const pen_t
     uint16_t num_edges;
     uint16_t i;
 
-    //#if 0
-    memory_check();
-    vector_count(edge_table, &num_edges);
-    trace_debug("Unsorted edges\r\n");
-    for(i = 0; i < num_edges; i++)
-      {
-      vector_at(edge_table, i, &edge1);
-      trace_debug("%d,%d,%d,%d\r\n", edge1.p1.x, edge1.p1.y, edge1.p2.x, edge1.p2.y);
-      }
-    //#endif
+#if _DEBUG_POLYGON
+memory_check();
+vector_count(edge_table, &num_edges);
+trace_debug("Unsorted edges\r\n");
+for(i = 0; i < num_edges; i++)
+  {
+  vector_at(edge_table, i, &edge1);
+  trace_debug("%d,%d,%d,%d\r\n", edge1.p1.x, edge1.p1.y, edge1.p2.x, edge1.p2.y);
+  }
+#endif
 
     // now we sort the edges so
     if(failed(result = vector_sort(edge_table, edge_cmp, edge_swap)))
@@ -1933,7 +1933,7 @@ result_t polypolygon_impl(canvas_t *canvas, const rect_t *clip_rect, const pen_t
       return result;
       }
 
-//#if 0
+#if _DEBUG_POLYGON
     memory_check();
     trace_debug("Sorted edges\r\n");
     for(i = 0; i < num_edges; i ++)
@@ -1941,7 +1941,7 @@ result_t polypolygon_impl(canvas_t *canvas, const rect_t *clip_rect, const pen_t
       vector_at(edge_table, i, &edge1);
       trace_debug("%d,%d,%d,%d\r\n", edge1.p1.x, edge1.p1.y, edge1.p2.x, edge1.p2.y);
       }
-//#endif
+#endif
 
     do
       {
@@ -1958,12 +1958,9 @@ result_t polypolygon_impl(canvas_t *canvas, const rect_t *clip_rect, const pen_t
         if(edge1.p1.y != y)
           break;              // not an active edge so we are done.
 
-
-        memory_check();
         // fill the horizontal line
         if(edge2.p1.x > edge1.p1.x)
           (*canvas->fast_line)(canvas, &edge1.p1, &edge2.p1, fill);
-        memory_check();
         }
 
       /* prepare for the next scan line */
@@ -1984,7 +1981,6 @@ result_t polypolygon_impl(canvas_t *canvas, const rect_t *clip_rect, const pen_t
           vector_erase(edge_table, i);
           num_edges--;
           i--;
-          memory_check();
           }
         else
           {
@@ -2013,7 +2009,6 @@ result_t polypolygon_impl(canvas_t *canvas, const rect_t *clip_rect, const pen_t
               vector_close(edge_table);
               return e_unexpected;
               }
-            memory_check();
             }
           }
         }

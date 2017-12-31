@@ -19,6 +19,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ion", "..\ion\ion.vcxproj",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "photon", "..\photon\photon.vcxproj", "{943F213F-305D-4476-8B00-4E18BC7E0E16}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FontGen", "..\FontGen\FontGen.vcxproj", "{9C884165-DCBF-4262-8754-E59B30088C56}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug Multithreaded|x64 = Debug Multithreaded|x64
@@ -275,6 +277,28 @@ Global
 		{943F213F-305D-4476-8B00-4E18BC7E0E16}.Release|x64.Build.0 = Release|x64
 		{943F213F-305D-4476-8B00-4E18BC7E0E16}.Release|x86.ActiveCfg = Release|Win32
 		{943F213F-305D-4476-8B00-4E18BC7E0E16}.Release|x86.Build.0 = Release|Win32
+		{9C884165-DCBF-4262-8754-E59B30088C56}.Debug Multithreaded|x64.ActiveCfg = Release|Win32
+		{9C884165-DCBF-4262-8754-E59B30088C56}.Debug Multithreaded|x64.Build.0 = Release|Win32
+		{9C884165-DCBF-4262-8754-E59B30088C56}.Debug Multithreaded|x86.ActiveCfg = Debug|Win32
+		{9C884165-DCBF-4262-8754-E59B30088C56}.Debug Multithreaded|x86.Build.0 = Debug|Win32
+		{9C884165-DCBF-4262-8754-E59B30088C56}.Debug Singlethreaded|x64.ActiveCfg = Release|Win32
+		{9C884165-DCBF-4262-8754-E59B30088C56}.Debug Singlethreaded|x64.Build.0 = Release|Win32
+		{9C884165-DCBF-4262-8754-E59B30088C56}.Debug Singlethreaded|x86.ActiveCfg = Debug|Win32
+		{9C884165-DCBF-4262-8754-E59B30088C56}.Debug Singlethreaded|x86.Build.0 = Debug|Win32
+		{9C884165-DCBF-4262-8754-E59B30088C56}.Debug|x64.ActiveCfg = Debug|Win32
+		{9C884165-DCBF-4262-8754-E59B30088C56}.Debug|x86.ActiveCfg = Debug|Win32
+		{9C884165-DCBF-4262-8754-E59B30088C56}.Debug|x86.Build.0 = Debug|Win32
+		{9C884165-DCBF-4262-8754-E59B30088C56}.Release Multithreaded|x64.ActiveCfg = Release|Win32
+		{9C884165-DCBF-4262-8754-E59B30088C56}.Release Multithreaded|x64.Build.0 = Release|Win32
+		{9C884165-DCBF-4262-8754-E59B30088C56}.Release Multithreaded|x86.ActiveCfg = Release|Win32
+		{9C884165-DCBF-4262-8754-E59B30088C56}.Release Multithreaded|x86.Build.0 = Release|Win32
+		{9C884165-DCBF-4262-8754-E59B30088C56}.Release Singlethreaded|x64.ActiveCfg = Release|Win32
+		{9C884165-DCBF-4262-8754-E59B30088C56}.Release Singlethreaded|x64.Build.0 = Release|Win32
+		{9C884165-DCBF-4262-8754-E59B30088C56}.Release Singlethreaded|x86.ActiveCfg = Release|Win32
+		{9C884165-DCBF-4262-8754-E59B30088C56}.Release Singlethreaded|x86.Build.0 = Release|Win32
+		{9C884165-DCBF-4262-8754-E59B30088C56}.Release|x64.ActiveCfg = Release|Win32
+		{9C884165-DCBF-4262-8754-E59B30088C56}.Release|x86.ActiveCfg = Release|Win32
+		{9C884165-DCBF-4262-8754-E59B30088C56}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

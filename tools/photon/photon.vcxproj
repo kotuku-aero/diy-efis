@@ -21,10 +21,16 @@
   <ItemGroup>
     <ClCompile Include="..\..\libs\photon\font.c" />
     <ClCompile Include="..\..\libs\photon\png_canvas.c" />
+    <ClCompile Include="..\..\libs\photon\raster_font.c" />
+    <ClCompile Include="..\..\libs\photon\tt_font.c" />
     <ClCompile Include="..\..\libs\photon\window.c" />
     <ClCompile Include="..\..\libs\photon\photon.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\libs\photon\fixed_font.h" />
+    <ClInclude Include="..\..\libs\photon\font.h" />
+    <ClInclude Include="..\..\libs\photon\raster_font.h" />
+    <ClInclude Include="..\..\libs\photon\tt_font.h" />
     <ClInclude Include="..\..\libs\photon\window.h" />
     <ClInclude Include="..\..\libs\photon\photon.h" />
   </ItemGroup>

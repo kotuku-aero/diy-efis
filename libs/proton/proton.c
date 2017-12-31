@@ -47,9 +47,6 @@ extern result_t load_layout(handle_t canvas, memid_t hive);
 
 handle_t main_window = 0;
 
-// this is a base64 encoded file.
-extern const char *neo_base64;
-
 // if parg is given then is a handle to a stream which will be closed
 void run_proton(void *parg)
   {
@@ -86,8 +83,6 @@ void run_proton(void *parg)
       handle_t neo_stream;
       if(succeeded(result = manifest_create(neo_base64, &neo_stream)))
         load_font("neo", neo_stream);
-
-      // note we don't load hints, just the font so there is always a TTF available
 
       char startup_script[REG_STRING_MAX];
       const char *init_script = 0;
