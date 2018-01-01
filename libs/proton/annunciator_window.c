@@ -247,9 +247,6 @@ static void draw_annunciator(handle_t hwnd,
     value, 0, &origin, &rect, 0, 0);
   }
 
-static const char *hints = "ABCDEFGHIJKLMNOPQRSTUV0123456789 ";
-
-
 result_t create_annunciator_window(handle_t parent, memid_t key, handle_t *hwnd)
   {
   result_t result;
@@ -278,14 +275,14 @@ result_t create_annunciator_window(handle_t parent, memid_t key, handle_t *hwnd)
   if (failed(lookup_font(key, "small-font", wnd->small_font)))
     {
     // we always have the neo font.
-    if (failed(result = create_font("neo", 9, hints, &wnd->small_font)))
+    if (failed(result = open_font("neo", 9, &wnd->small_font)))
       return result;
     }
 
   if (failed(lookup_font(key, "large-font", wnd->large_font)))
     {
     // we always have the neo font.
-    if (failed(result = create_font("neo", 15, hints, &wnd->large_font)))
+    if (failed(result = open_font("neo", 15, &wnd->large_font)))
       return result;
     }
 

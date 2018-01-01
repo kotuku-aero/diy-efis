@@ -28,6 +28,7 @@
     <ClCompile Include="..\..\libs\proton\hsi_window.c" />
     <ClCompile Include="..\..\libs\proton\layout_window.c" />
     <ClCompile Include="..\..\libs\proton\lib_photon.c" />
+    <ClCompile Include="..\..\libs\proton\neo.c" />
     <ClCompile Include="..\..\libs\proton\pens.c" />
     <ClCompile Include="..\..\libs\proton\proton.c" />
     <ClCompile Include="..\..\libs\proton\regex.c" />

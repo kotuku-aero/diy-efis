@@ -1,3 +1,4 @@
+#define _DEBUG_POLYGON
 /*
 diy-efis
 Copyright (C) 2016 Kotuku Aerospace Limited
@@ -77,7 +78,6 @@ static bool msg_hook(const canmsg_t *msg, void *parg)
 
 // this is defined in window.c
 extern result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg);
-extern uint16_t font_t_size;
 
 result_t open_screen(uint16_t orientation, wndproc cb, uint16_t id,
     handle_t *hwnd)
@@ -101,7 +101,7 @@ result_t open_screen(uint16_t orientation, wndproc cb, uint16_t id,
   phys_screen->wnd.previous = 0;
 
   // initialize the font system
-  vector_create(font_t_size, &phys_screen->fonts);
+  vector_create(sizeof(void *), &phys_screen->fonts);
 
   deque_create(sizeof(window_msg_t), WINDOW_QUEUE_SIZE, &phys_screen->event_queue);
 
@@ -1244,12 +1244,9 @@ static result_t polygon_intersect(const rect_t *clip_rect, const point_t *pts, u
   return s_ok;
   }
 
-result_t polyline(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen, uint16_t count, const point_t *points)
+result_t polyline_impl(canvas_t *canvas, const rect_t *clip_rect, const pen_t *pen, uint16_t count, const point_t *points)
   {
   result_t result;
-  canvas_t *canvas;
-  if(failed(result = get_canvas(hwnd, &canvas)))
-    return result;
 
   gdi_dim_t half_width = pen->width >> 1;
   point_t p1;
@@ -1521,6 +1518,16 @@ result_t polyline(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen, uint
   return s_ok;
   }
 
+result_t polyline(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen, uint16_t count, const point_t *points)
+  {
+  result_t result;
+  canvas_t *canvas;
+  if (failed(result = get_canvas(hwnd, &canvas)))
+    return result;
+
+  return polyline_impl(canvas, clip_rect, pen, count, points);
+  }
+
 static result_t fill_rect(canvas_t *canvas, const rect_t *clip_rect, const rect_t *rect,
     color_t color)
   {
@@ -1782,7 +1789,7 @@ static result_t add_edge(handle_t edge_table, edge_t *edge)
   return vector_push_back(edge_table, edge);
   }
 
-result_t polypolygon_impl(canvas_t *canvas, const rect_t *clip_rect, const pen_t *outline, color_t fill, uint16_t count, const uint16_t *lengths, const point_t *pts)
+result_t polypolygon_impl(canvas_t *canvas, const rect_t *clip_rect, color_t fill, uint16_t count, const uint16_t *lengths, const point_t *pts)
   {
   result_t result;
   const point_t *cp = pts;
@@ -1825,7 +1832,7 @@ result_t polypolygon_impl(canvas_t *canvas, const rect_t *clip_rect, const pen_t
         vector_close(edge_table);
         return result;
         }
-#if _DEBUG_POLYGON
+#ifdef _DEBUG_POLYGON
 {
 point_t ip;
 uint16_t i;
@@ -1905,7 +1912,7 @@ for(i = 0; i < clipped_contour_len; i++)
     uint16_t num_edges;
     uint16_t i;
 
-#if _DEBUG_POLYGON
+#ifdef _DEBUG_POLYGON
 memory_check();
 vector_count(edge_table, &num_edges);
 trace_debug("Unsorted edges\r\n");
@@ -1933,7 +1940,7 @@ for(i = 0; i < num_edges; i++)
       return result;
       }
 
-#if _DEBUG_POLYGON
+#ifdef _DEBUG_POLYGON
     memory_check();
     trace_debug("Sorted edges\r\n");
     for(i = 0; i < num_edges; i ++)
@@ -1961,6 +1968,8 @@ for(i = 0; i < num_edges; i++)
         // fill the horizontal line
         if(edge2.p1.x > edge1.p1.x)
           (*canvas->fast_line)(canvas, &edge1.p1, &edge2.p1, fill);
+        else
+          (*canvas->fast_line)(canvas, &edge2.p1, &edge1.p1, fill);
         }
 
       /* prepare for the next scan line */
@@ -2019,10 +2028,6 @@ for(i = 0; i < num_edges; i++)
     vector_close(edge_table);
     }
 
-  // now outline the polygon using the pen
-  if(outline != 0 && outline->color != color_hollow)
-    return polyline(canvas, clip_rect, outline, count, cp);
-
   return s_ok;
   }
 
@@ -2049,7 +2054,24 @@ result_t polypolygon(handle_t hwnd, const rect_t *clip_rect, const pen_t *outlin
   if(failed(result = get_canvas(hwnd, &canvas)))
     return result;
 
-  return polypolygon_impl(canvas, clip_rect, outline, fill, count, lengths, pts);
+  if (failed(result = polypolygon_impl(canvas, clip_rect, fill, count, lengths, pts)))
+    return result;
+
+  // now outline the polygon using the pen
+  if (outline != 0 && outline->color != color_hollow)
+    {
+    uint16_t poly;
+    for (poly = 0; poly < count; poly++)
+      {
+      uint16_t num_pts = lengths[poly];
+      if (failed(result = polyline_impl(canvas, clip_rect, outline, num_pts, pts)))
+        return result;
+
+      pts += num_pts;
+      }
+    }
+
+  return s_ok;
   }
 
 result_t polygon(handle_t canvas, const rect_t *clip_rect, const pen_t *outline,

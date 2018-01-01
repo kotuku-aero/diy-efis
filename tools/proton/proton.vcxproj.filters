@@ -54,6 +54,9 @@
     <ClCompile Include="..\..\libs\proton\lib_photon.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\libs\proton\neo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libs\proton\pens.h">

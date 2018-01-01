@@ -47,6 +47,9 @@ extern result_t load_layout(handle_t canvas, memid_t hive);
 
 handle_t main_window = 0;
 
+extern const uint8_t neo[];
+extern const uint16_t neo_length;
+
 // if parg is given then is a handle to a stream which will be closed
 void run_proton(void *parg)
   {
@@ -80,9 +83,7 @@ void run_proton(void *parg)
         }
 
       // load the neon font.
-      handle_t neo_stream;
-      if(succeeded(result = manifest_create(neo_base64, &neo_stream)))
-        load_font("neo", neo_stream);
+      register_font(neo, neo_length);
 
       char startup_script[REG_STRING_MAX];
       const char *init_script = 0;

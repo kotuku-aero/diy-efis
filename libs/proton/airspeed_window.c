@@ -243,8 +243,6 @@ static result_t on_indicated_airspeed(handle_t hwnd, void *parg, const char *fun
   return s_ok;
   }
 
-static const char *number_hints = "0123456789";
-
 result_t create_airspeed_window(handle_t parent, memid_t key, handle_t *hwnd)
   {
   result_t result;
@@ -277,21 +275,21 @@ result_t create_airspeed_window(handle_t parent, memid_t key, handle_t *hwnd)
   if (failed(lookup_font(key, "font", &wnd->font)))
     {
     // we always have the neo font.
-    if (failed(result = create_font("neo", 8, number_hints, &wnd->font)))
+    if (failed(result = open_font("neo", 9, &wnd->font)))
       return result;
     }
 
   if (failed(lookup_font(key, "large-font", &wnd->large_roller)))
     {
     // we always have the neo font.
-    if (failed(result = create_font("neo", 12, number_hints, &wnd->large_roller)))
+    if (failed(result = open_font("neo", 12, &wnd->large_roller)))
       return result;
     }
 
   if (failed(lookup_font(key, "small-font", &wnd->small_roller)))
     {
     // we always have the neo font.
-    if (failed(result = create_font("neo", 8, number_hints, &wnd->small_roller)))
+    if (failed(result = open_font("neo", 9, &wnd->small_roller)))
       return result;
     }
 

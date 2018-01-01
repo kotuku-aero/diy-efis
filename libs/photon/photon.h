@@ -698,23 +698,23 @@ extern result_t pie(handle_t canvas,
  * @return s_ok if the font is loaded
  *
 */
-extern result_t open_font(const char *name, uint16_t points, handle_t *font);
+extern result_t open_font(const char *name, uint16_t pixels, handle_t *font);
 /**
- * @result_t load_font(const char *name, handle_t stream)
+ * @function load_font(const char *name, handle_t stream)
  * Load a font into the font cache
  * @param stream    Stream to read the font from
  * @return s_ok if the font was loaded into the cache and is available for use.
- * @remark  The handle to the font must remain open till release_font is called
- * the font engine will close the stream handle
  */
-extern result_t load_font(const char *name, handle_t stream);
+extern result_t load_font(handle_t stream);
 /**
- * @function release_font(handle_t  font)
- * release a font and all the resources
- * @param name    Font to release
- * @result s_ok if font released ok
-*/
-extern result_t release_font(const char *name);
+ * @function register_font(const char *name, const uint8_t *buffer, uint16_t length)
+ * Register a font image.  Internal function only.  Used to register a C array as a font
+ * does not copy the data and will never be released
+ * @param buffer  Binary image of the font
+ * @param length  number of bytes in the file
+ * @return s_ok if the point sizes in the font are registered ok
+ */
+extern result_t register_font(const uint8_t *buffer, uint16_t length);
 /**
  * @function draw_text(handle_t canvas, const rect_t *clip_rect, handle_t  font, color_t fg, color_t bg, const char *str, uint16_t count, const point_t *src_pt, const rect_t *txt_clip_rect, text_flags format, uint16_t *char_widths)
  * Draw text

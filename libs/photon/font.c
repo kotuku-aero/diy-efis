@@ -35,19 +35,18 @@ it must be removed as soon as possible after the code fragment is identified.
 */
 #include "window.h"
 #include "../neutron/bsp.h"
-#include <math.h>
-
-#include "font.h"
 
 extern color_t aplha_blend(color_t pixel, color_t back, uint8_t weighting);
 // a glyph is stored as a vector of alpha values (255 = opaque, 0 = transparent)
 // to allow alpha blended font outlines.
+
+// the following strcture is aligned to a 16 byte boundary
 typedef struct _glyph_t {
-  uint16_t advance;           // advance for the glyph
-  uint16_t baseline;          // baseline of the bitmap.
-  uint16_t offset;            // offset to column 0
-  uint16_t width;             // width of the bitmap
-  uint16_t height;            // height of the bitmap
+  uint8_t advance;           // advance for the glyph
+  uint8_t baseline;          // baseline of the bitmap.
+  uint8_t offset;            // offset to column 0
+  uint8_t width;             // width of the bitmap
+  uint8_t height;            // height of the bitmap
   // a pixel is a bitmap..  The width of the font is mod 8
   // so a bitmap 1 x 12 will be 12 bytes
   // a bitmap 8 x 12 will be 12 bytes
@@ -56,128 +55,68 @@ typedef struct _glyph_t {
   } glyph_t;
 
 typedef struct _font_map_t {
-  uint16_t start_char;        // first character in the character map
-  uint16_t last_char;         // last character in the character map
-  uint16_t glyph_offset[1]    // offset to the glyph records (offset from start of the block) (not including the length) so index +2
-                              // size is (last_char - start_char)-1
+  uint8_t start_char;        // first character in the character map
+  uint8_t last_char;         // last character in the character map
+  uint16_t glyph_offset[1];  // offset to the glyph records (offset from start of the block) (not including the length) so index +2
+                             // size is (last_char - start_char)-1
   } font_map_t;
 
 typedef struct _sized_font_t {
-  uint16_t length;            // size of this sized_font  // not included in the glyph calculations
-  uint16_t size;              // height of the font this bitmap renders
-  uint16_t vertical_height;   // height including ascender/descender
-  uint16_t baseline;          // where logical 0 is for the font outline.
-  uint16_t num_maps;          // number of maps
+  uint16_t length;            // size of this sized_font
+  uint8_t size;              // height of the font this bitmap renders
+  uint8_t vertical_height;   // height including ascender/descender
+  uint8_t baseline;          // where logical 0 is for the font outline.
+  uint8_t num_maps;          // number of maps
+  uint16_t reserved;          // ensures next record is aligned on 8 bytes
   font_map_t font_maps[1];    // size is num_maps;
-                              // remainder of record is glyphs.
+  // the above header is 0 packed to a 16 byte boundary
+  // remainder of record is glyphs.
   } sized_font_t;
 
-// We cache the fonts into an array of fonts.
-// this structure holds the name->font mapping
-typedef struct _font_t {
-  uint32_t version;             // "FONT"
+// This is the structure of a font header in a font file.
+typedef struct _fontrec_t {
+  uint32_t version;             // "FONT", or CFNT
   char name[REG_NAME_MAX];      // registered name of the font
-  uint32_t length;              // Length of all of the records that follow including the
-  // version, and name.  The following data can be deflate compressed.
-  // -- Start deflated data --
-  uint16_t num_fonts;           // number of fontrecs
+  uint16_t length;              // Length of all of the records that follow including the
+  // version, and name.  
+  uint8_t num_fonts;            // number of fontrecs
+  uint8_t reserved[9];          // makes the header 32 bytes long
+  // The following data can be deflate compressed. -- Start deflated data --
   sized_font_t fonts[];         // vector of sized_font_t, these are the fonts once rendered
+  } fontrec_t;
+
+typedef struct _font_t {
+  const fontrec_t *fontrec;
+  // this a a const sized_font_t *
+  handle_t fonts;
   } font_t;
 
-static inline const glyph_t *get_glyph(const sized_font_t *font, char ch)
+static inline uint16_t to_small_endian(uint16_t value)
+  {
+  return (value << 8) | (value >> 8);
+  }
+
+static const glyph_t *get_glyph(const sized_font_t *font, char ch)
   {
   uint16_t i;
   uint16_t map_num;
-  font_map_t *map;
+  const font_map_t *map = &font->font_maps[0];
 
-  for(map = &font->font_maps[0], map_num = 0; map_num < font->num_maps; map_num++)
+  for(map_num = 0; map_num < font->num_maps; map_num++)
     {
     if(ch >= map->start_char && ch <= map->last_char)
       {
-      const glyph_t *glyph = (const glyph_t *)(((const uint8_t *)font) + map->glyph_offset[ch - map->start_char]);
+      uint16_t offset = to_small_endian(map->glyph_offset[ch - map->start_char]);
+      const glyph_t *glyph = (const glyph_t *)(((const uint8_t *)font) + offset);
       return glyph;
       }
+
+    // calculate the offset as the maps are variable size;
+    uint16_t map_size = 2 + ((map->last_char - map->start_char + 1) << 1);
+    map = (const font_map_t *)(((const uint8_t *)map) + map_size);
     }
 
   return 0;
-  }
-
-static inline uint8_t read_uint8(handle_t stream)
-  {
-  // change endian
-  uint8_t buffer;
-
-  stream_read(stream, &buffer, 1, 0);
-
-  return buffer;
-  }
-
-static inline uint8_t read_uint8_setpos(handle_t stream, uint16_t offset)
-  {
-  stream_setpos(stream, offset);      // seek
-  return read_uint8(stream);
-  }
-
-static inline uint16_t read_uint16(handle_t stream)
-  {
-  // change endian
-  uint8_t buffer[2];
-
-  stream_read(stream, buffer, 2, 0);
-
-  return (buffer[0] << 8) + buffer[1];
-  }
-
-static inline uint16_t read_uint16_setpos(handle_t stream, uint16_t offset)
-  {
-  stream_setpos(stream, offset);      // seek
-  return read_uint16(stream);
-  }
-
-static inline int16_t read_int16(handle_t stream)
-  {
-  // change endian
-  uint8_t buffer[2];
-
-  stream_read(stream, buffer, 2, 0);
-
-  return (buffer[0] << 8) + buffer[1];
-  }
-
-static inline int16_t read_int16_setpos(handle_t stream, uint16_t offset)
-  {
-  stream_setpos(stream, offset);      // seek
-  return read_int16(stream);
-  }
-
-static inline uint32_t read_uint32(handle_t stream)
-  {
-  uint8_t buffer[4];
-
-  stream_read(stream, buffer, 4, 0);
-
-  return (buffer[0] << 24) + (buffer[1] << 16) + (buffer[2] << 8) + buffer[3];
-  }
-
-static inline uint32_t read_uint32_setpos(handle_t stream, uint16_t offset)
-  {
-  stream_setpos(stream, offset);      // seek
-  return read_uint32(stream);
-  }
-
-static inline int32_t read_int32(handle_t stream)
-  {
-  uint8_t buffer[4];
-
-  stream_read(stream, buffer, 4, 0);
-
-  return (buffer[0] << 24) + (buffer[1] << 16) + (buffer[2] << 8) + buffer[3];
-  }
-
-static inline int32_t read_int32_setpos(handle_t stream, uint16_t offset)
-  {
-  stream_setpos(stream, offset);      // seek
-  return read_int32(stream);
   }
 
 result_t open_font(const char *name, uint16_t pixels, handle_t  *fh)
@@ -203,14 +142,14 @@ result_t open_font(const char *name, uint16_t pixels, handle_t  *fh)
     if (failed(result = vector_at(phys_screen->fonts, font_index, &fr)))
       return result;
 
-    if (strcmp(fr->name, name) == 0)
+    if (strcmp(fr->fontrec->name, name) == 0)
       break;
 
     fr = 0;
     }
 
   if (fr == 0)
-    return e_not_found;
+    return e_not_found;   // no font with that name.
 
   if (failed(result = vector_count(fr->fonts, &count)))
     return result;
@@ -228,13 +167,7 @@ result_t open_font(const char *name, uint16_t pixels, handle_t  *fh)
     }
 
   if (font == 0)
-    {
-    if(failed(result = (*fr->new_sized_font)(fr, pixels, hint, &font)))
-      return result;
-
-    if(failed(result = vector_push_back(fr->fonts, &font)))
-      return result;
-    }
+    return e_not_found;
 
   // the font is loaded, see if the user wants it
   if (fh != 0)
@@ -243,11 +176,98 @@ result_t open_font(const char *name, uint16_t pixels, handle_t  *fh)
   return s_ok;
   }
 
-result_t load_font(const char *name, handle_t stream)
+static inline uint32_t make_type(uint8_t a, uint8_t b, uint8_t c, uint8_t d)
+  {
+  return (((uint32_t)a) << 24) | (((uint32_t)b) << 16) | (((uint32_t)c) << 8) | d;
+  }
+
+result_t register_font(const uint8_t *buffer, uint16_t length)
   {
   result_t result;
 
-  if (name == 0 || stream == 0)
+  if (buffer == 0 || length < sizeof(fontrec_t))
+    return e_bad_parameter;
+
+  const fontrec_t *fontrec = (const fontrec_t *)buffer;
+
+  uint16_t fontrec_length = to_small_endian(fontrec->length);
+  if (length < fontrec_length)
+    return e_bad_parameter;
+
+  // TODO: check the sanity of the font....
+
+  // the buffer is *fontrec
+  font_t *font = (font_t *)neutron_malloc(sizeof(font_t));
+  if (font == 0)
+    return e_not_enough_memory;
+
+  font->fontrec = fontrec;
+
+  if (failed(result = vector_create(sizeof(const sized_font_t *), &font->fonts)))
+    {
+    neutron_free(font);
+    return result;
+    }
+
+  handle_t hscreen;
+  get_screen(&hscreen);
+
+  screen_t *phys_screen;
+  as_screen(hscreen, &phys_screen);
+
+  // TODO: check for duplicate fonts...
+
+  if (failed(result = vector_push_back(phys_screen->fonts, &font)))
+    {
+    neutron_free(font);
+    return result;
+    }
+
+  // work over the decompressed fonts and add them to the font mapper
+  uint16_t font_num;
+  uint16_t font_length;
+  const sized_font_t *pt_font = &font->fontrec->fonts[0];
+  for (font_num = 0; font_num < fontrec->num_fonts; font_num++)
+    {
+    if (failed(result = vector_push_back(font->fonts, &pt_font)))
+      {
+      return result;        // leave font registered but fail.
+      }
+
+    font_length = to_small_endian(pt_font->length);
+    pt_font = (const sized_font_t *)(((const uint8_t *)pt_font) + font_length);
+    }
+
+  return s_ok;
+  }
+
+static result_t get_byte_fontrec(handle_t parg, uint32_t offset, uint8_t *data)
+  {
+  fontrec_t *fr = (fontrec_t *)parg;
+
+  if (offset >= (fr->length - sizeof(fontrec_t)))
+    return e_bad_pointer;
+
+  *data = ((const uint8_t *)&fr->fonts[0])[offset];
+  return s_ok;
+  }
+
+static result_t set_byte_fontrec(handle_t parg, uint32_t offset, uint8_t data)
+  {
+  fontrec_t *fr = (fontrec_t *)parg;
+
+  if (offset >= (fr->length - sizeof(fontrec_t)))
+    return e_bad_pointer;
+
+  ((uint8_t *)&fr->fonts[0])[offset] = data;
+  return s_ok;
+  }
+
+result_t load_font(handle_t stream)
+  {
+  result_t result;
+
+  if (stream == 0)
     return e_bad_parameter;
 
   handle_t hscreen;
@@ -256,11 +276,32 @@ result_t load_font(const char *name, handle_t stream)
   screen_t *phys_screen;
   as_screen(hscreen, &phys_screen);
 
-  font_t *fr;
   uint16_t count;         // will never be many fonts, could convert to a nv map.
   if (failed(result = vector_count(phys_screen->fonts, &count)))
     return result;
 
+  // determine the details
+  fontrec_t *fontrec = (fontrec_t *)neutron_malloc(sizeof(fontrec_t));
+  uint16_t read = 0;
+  if (failed(result = stream_read(stream, fontrec, sizeof(fontrec_t), &read)) ||
+    read != sizeof(fontrec_t))
+    {
+    neutron_free(fontrec);
+    return e_bad_parameter;
+    }
+
+  bool compressed = fontrec->version == make_type('C', 'F', 'N', 'T');
+
+  if (!compressed)
+    {
+    if (fontrec->version != make_type('F', 'O', 'N', 'T'))
+      {
+      neutron_free(fontrec);
+      return e_bad_parameter;
+      }
+    }
+
+  font_t *fr;
   uint16_t i;
   for (i = 0; i < count; i++)
     {
@@ -268,100 +309,49 @@ result_t load_font(const char *name, handle_t stream)
       return result;
 
     // don't load if the font exists
-    if (strcmp(fr->name, name) == 0)
-      return e_exists;
+    if (strcmp(fr->fontrec->name, fontrec->name) == 0)
+      {
+      neutron_free(fr);
+      return e_exists;      // TODO: allow adding point sizes?
+      }
     }
 
+  // allocate a buffer large enough for the font.
+  fontrec = (fontrec_t *)neutron_realloc(fontrec, fontrec->length);
+  if (fontrec == 0)
+    return e_not_enough_memory;
 
-  font_table_t *ft = 0;
-  if(failed(result = find_font(stream, &ft)))
-    return result;
+  uint32_t length = 0;
 
-  // create an empty font list
-  if (failed(result = (*ft->new_font)(stream, &fr)) ||
-    failed(result = vector_create(sizeof(sized_font_t), &fr->fonts)))
+  if (compressed)
+    result = decompress(stream, fontrec, get_byte_fontrec, set_byte_fontrec, &length);
+  else
     {
-    neutron_free(fr);
+    uint16_t read = 0;
+    result = stream_read(stream, fontrec->fonts, fontrec->length - sizeof(fontrec_t), &read);
+    if (read != fontrec->length - sizeof(fontrec_t))
+      result = e_bad_parameter;
+    }
+
+  if (failed(result))
+    {
+    neutron_free(fontrec);
     return result;
     }
 
-  strncpy(fr->name, name, REG_NAME_MAX);
+  // all done, we can now register the font
+  if (failed(result = register_font((const uint8_t *)fontrec, fontrec->length)))
+    neutron_free(fontrec);
 
-  vector_push_back(phys_screen->fonts, &fr);
-
-  return s_ok;
+  return result;
   }
 
-result_t release_font(const char *name)
-  {
-  result_t result;
-  if (name == 0)
-    return e_bad_parameter;
-
-  handle_t hscreen;
-  get_screen(&hscreen);
-
-  screen_t *phys_screen;
-  as_screen(hscreen, &phys_screen);
-
-  font_t *fr = 0;
-  uint16_t count;         // will never be many fonts, could convert to a nv map.
-  if (failed(result = vector_count(phys_screen->fonts, &count)))
-    return result;
-
-  uint16_t font_index;
-  for (font_index = 0; font_index < count; font_index++)
-    {
-    if (failed(result = vector_at(phys_screen->fonts, font_index, &fr)))
-      return result;
-
-    if (strcmp(fr->name, name) == 0)
-      break;
-
-    fr = 0;
-    }
-
-  if (fr == 0)
-    return e_not_found;
-
-  if (failed(result = vector_count(fr->fonts, &count)))
-    return result;
-
-  uint16_t glyph_index;
-  for (glyph_index = count; glyph_index > 0; glyph_index--)
-    {
-    glyph_t *glyph;
-    if (failed(result = vector_at(fr->fonts, glyph_index - 1, &glyph)))
-      return result;
-
-    if (failed(result = vector_erase(fr->fonts, glyph_index - 1)))
-      return result;
-    }
-
-  if (failed(result = vector_close(fr->fonts)))
-    {
-    // todo: this is not good.....
-    fr->fonts = 0;
-    return result;
-    }
-
-  // fontinfo is only stream...
-  if (failed(result = vector_erase(phys_screen->fonts, font_index)))
-    return result;
-
-  neutron_free(fr);
-
-  return s_ok;
-  }
-
-static inline result_t is_valid_font(handle_t hndl, sized_font_t **font)
+static inline result_t is_valid_font(handle_t hndl, const sized_font_t **font)
   {
   if(hndl == 0 || font == 0)
     return e_bad_parameter;
 
-  sized_font_t *f = (sized_font_t *)hndl;
-  if(f->version != sizeof(sized_font_t))
-    return e_bad_handle;
+  const sized_font_t *f = (const sized_font_t *)hndl;
 
   *font = f;
   return s_ok;
@@ -408,51 +398,71 @@ result_t draw_text(handle_t hndl, const rect_t *clip_rect, handle_t  fp,
     // map then we use the default char
     char c = str[ch];
 
-    const glyph_t *glyph = 0;
-    if (failed(result = ensure_glyph(font, c, &glyph)))
-      return result;
+    const glyph_t *glyph = get_glyph(font, c);
+    if (glyph == 0)
+      return e_not_found;
 
     // see if the user wants the widths returned
     if (char_widths != 0)
-      char_widths[ch] = glyph->bitmap.width;
+      char_widths[ch] = glyph->advance;
 
-    gdi_dim_t bitmap_top;
-    // first calculate the bottom of the pixel box
-    bitmap_top = glyph->font_info->vertical_height;
-    bitmap_top += glyph->font_info->baseline;  // baseline of all of the glyphs
-    // now move down by the number of pixels from the baseline to the glyph baseline
-    bitmap_top -= glyph->baseline;            // adjust toward the bottom of the line
-    bitmap_top += pt_pos.y;
+    point_t bitmap_origin;
+    bitmap_origin.x = glyph->offset + pt_pos.x;
+    bitmap_origin.y = pt_pos.y;
 
-    uint16_t row;
-    for (row = 0; row < glyph->bitmap.height; row++)
+    // add the baseline
+    bitmap_origin.y += font->baseline;      // takes to the glyph base reference
+    bitmap_origin.y -= glyph->baseline;
+
+    uint8_t row;
+    uint16_t offset = 0;
+    uint16_t stride = (((glyph->width - 1) | 7) + 1) >> 3;
+    for (row = 0; row < glyph->height; row++)
       {
       // set to the top of the bitmap
-      uint16_t offset = row *  glyph->bitmap.width;
-      uint16_t col;
-      for (col = 0; col < glyph->bitmap.width; col++)
+      uint8_t col;
+      for (col = 0; col < glyph->width; )
         {
         point_t pos;
-        pos.x = (gdi_dim_t)(pt_pos.x + col);
+        pos.x = (gdi_dim_t)(bitmap_origin.x + col);
 
         // position the bitmap relative to the 
-        pos.y = (gdi_dim_t)(bitmap_top + row);
+        pos.y = (gdi_dim_t)(bitmap_origin.y + row);
+        uint8_t bitmap_bits = glyph->pixels[(col >> 3) + offset];
 
-        if (point_in_rect(&pos, clip_rect))
+        uint8_t bit;
+        for (bit = 8; bit > 0; bit--)
           {
-          uint8_t alpha_pel = glyph->bitmap.pixels[offset];
-          color_t bg_color;
+          if (point_in_rect(&pos, clip_rect))
+            {
+            // pick up the column byte
+            uint8_t alpha_pel = ((bitmap_bits >> (bit - 1)) & 0x01) ? 255 : 0;
+            color_t bg_color;
 
-          if (format & eto_opaque)
-            bg_color = bg;
-          else
-            bg_color = (*canvas->get_pixel)(canvas, &pos);
+            if(alpha_pel == 255)
+              (*canvas->set_pixel)(canvas, &pos, fg);
+            else if (alpha_pel > 0)
+              {
+              if (format & eto_opaque)
+                bg_color = bg;
+              else
+                bg_color = (*canvas->get_pixel)(canvas, &pos);
 
-          (*canvas->set_pixel)(canvas, &pos, aplha_blend(fg, bg_color, alpha_pel));
+              (*canvas->set_pixel)(canvas, &pos, aplha_blend(fg, bg_color, alpha_pel));
+              }
+            else if (format & eto_opaque)
+              (*canvas->set_pixel)(canvas, &pos, bg);
+            }
+
+          pos.x++;
+
+          col++;
+          if (col >= glyph->width)
+            break;
           }
-
-        offset++;
         }
+
+      offset += stride;
       }
 
     pt_pos.x += glyph->advance;
@@ -490,9 +500,10 @@ result_t text_extent(handle_t hndl, handle_t fh, const char *str, uint16_t count
       break;              // end of the string
 
 
-    const glyph_t *glyph = 0;
-    if (failed(result = ensure_glyph(fh, c, &glyph)))
-      return result;
+    const glyph_t *glyph = get_glyph(fh, c);
+
+    if(glyph == 0)
+      return e_not_found;
 
     // see if the user wants the widths returned
     ex->dx += glyph->advance;

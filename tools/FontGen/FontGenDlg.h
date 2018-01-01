@@ -57,7 +57,7 @@ protected:
   CArray<UINT8> m_fontFile;
 
   // generate a font file
-  BOOL GenerateFontFile(CArray<int> &sizes);
+  BOOL GenerateFontFile();
   BOOL WriteCOutputFile(CString &fileName);
   BOOL WriteBase64OutputFile(CString &fileName);
   BOOL WriteBinaryOutputFile(CString &fileName);
@@ -76,6 +76,7 @@ public:
   afx_msg void OnBnClickedDefaultSet();
   // Name embeded into the font
   CString m_strFontName;
+  CArray<int> m_sizes;
   };
 
 //{{AFX_INSERT_LOCATION}}

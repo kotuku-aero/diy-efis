@@ -1744,9 +1744,6 @@ static result_t on_cancel(handle_t hwnd, void *parg, const char *func, const can
   return s_ok;
   }
 
-// we cache the font metrics for the layout window as loading them takes a while
-const char *font_hints = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789- ";
-
 result_t load_layout(handle_t parent, memid_t hive)
   {
   // the hive must have series of hives that form windows
@@ -1816,7 +1813,7 @@ result_t load_layout(handle_t parent, memid_t hive)
   if (failed(lookup_font(menu, "font",  &wnd->font)))
     {
     // we always have the neo font.
-    if(failed(result = create_font("neo", 8, font_hints, &wnd->font)))
+    if(failed(result = open_font("neo", 9, &wnd->font)))
       return result;
     }
 

@@ -66,7 +66,6 @@ typedef struct _hsi_window_t {
   } hsi_window_t;
 
 static result_t widget_wndproc(handle_t hwnd, const canmsg_t *data);
-static const char *hints = "ABCDEFGHIJKLMNOPQRSTUV0123456789 ";
 
 result_t create_hsi_window(handle_t parent, memid_t key, handle_t *hwnd)
   {
@@ -90,7 +89,7 @@ result_t create_hsi_window(handle_t parent, memid_t key, handle_t *hwnd)
   if (failed(lookup_font(key, "font", &wnd->font)))
     {
     // we always have the neo font.
-    if (failed(result = create_font("neo", 9, hints, &wnd->font)))
+    if (failed(result = open_font("neo", 9, &wnd->font)))
       return result;
     }
 

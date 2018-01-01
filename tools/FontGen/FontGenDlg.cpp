@@ -60,7 +60,7 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
-static const TCHAR *defaultCharSet = _T("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!\"#$%&'()*+-,./\\[]^_`:;<=>?@~| ");
+static const TCHAR *defaultCharSet = _T("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!\"#$%&'(){}*+-,./\\[]^_`:;<=>?@~| ");
 
 /////////////////////////////////////////////////////////////////////////////
 // CFontGenDlg dialog
@@ -265,16 +265,13 @@ void CFontGenDlg::OnOK()
 	// the file(s) are exported as fontdefintions
 	UpdateData();
 
-  // get the sizes
-  CArray<int> sizes;
-
   // HACK.
-  sizes.Add(9);
-  sizes.Add(12);
-  sizes.Add(15);
-  sizes.Add(18);
+  m_sizes.Add(9);
+  m_sizes.Add(12);
+  m_sizes.Add(15);
+  m_sizes.Add(18);
 
-  if(GenerateFontFile(sizes))
+  if(GenerateFontFile())
     {
     TCHAR baseName[_MAX_PATH];
 
@@ -372,16 +369,16 @@ int CSortCharArray::Compare(const void *arg1, const void *arg2)
 
 // variable length..
 struct glyph_t {
-  uint16_t advance;           // advance for the glyph
-  uint16_t baseline;          // baseline of the bitmap.
-  uint16_t offset;            // offset to first column of bitmap
-  uint16_t width;             // width of the bitmap
-  uint16_t height;            // height of the bitmap
+  uint8_t advance;           // advance for the glyph
+  uint8_t baseline;          // baseline of the bitmap.
+  uint8_t offset;            // offset to first column of bitmap
+  uint8_t width;             // width of the bitmap
+  uint8_t height;            // height of the bitmap
   uint8_t pixels[];
   };
 
 
-BOOL CFontGenDlg::GenerateFontFile(CArray<int> &sizes)
+BOOL CFontGenDlg::GenerateFontFile()
   {
 
   // calc the size of the matrix
@@ -397,10 +394,6 @@ BOOL CFontGenDlg::GenerateFontFile(CArray<int> &sizes)
 
   int nBytes = 0;
 
-  // white is the foreground color
-  COLORREF oldColor = dc.SetTextColor(0xFFFFFF);
-  COLORREF oldBkColor = dc.SetBkColor(0);
-
   // A raster font stream is defined as the following format
   //
   // uint32_t magic	                  // can be:
@@ -408,29 +401,30 @@ BOOL CFontGenDlg::GenerateFontFile(CArray<int> &sizes)
                                       // CFNT - compressed binary image
   // char name[REG_NAME_MAX]          // name of the font. (16 chars)
   // uint16_t file_length;            // un-compressed file length
-  // -- if the file type is CFNT then all that remains is compressed ---
-  // uint16_t num_fonts               // number of fixed size fonts
+  // uint8_t num_fonts               // number of fixed size fonts
+  // uint8_t reserved[9]
   // the following record is repeated for num_fonts
+  // -- if the file type is CFNT then all that remains is compressed ---
   // uint16_t record_size;            // length of this font record.
-  // uint16_t size;                   // height of the font this bitmap renders
-  // uint16_t vertical_height;        // height including ascender/descender
-  // uint16_t baseline;               // where logical 0 is for the font outline.
-  // uint16_t num_maps                // number of character maps
+  // uint8_t size;                   // height of the font this bitmap renders
+  // uint8_t vertical_height;        // height including ascender/descender
+  // uint8_t baseline;               // where logical 0 is for the font outline.
+  // uint8_t num_maps                // number of character maps
   // the character maps then continue for the num_maps
-  // uint16_t start_char              // first character in the character map
-  // uint16_t last_char               // last character in the character map
+  // uint8_t start_char              // first character in the character map
+  // uint8_t last_char               // last character in the character map
   // uint16_t glyphs_offset[]         // offset to the glyph records (offset from start of the block)
   // each glyph is indexed based on this number
   // The glyphs then follow in the following format
-  // uint16_t glyph_advance           // horizontal advance for the glyph
-  // uint16_t glyph_baseline          // baseline of the bitmap, is aligned to the baseline when rendered
-  // uint16_t glyph_offset;           // offset to col 0 of the glyph
-  // uint16_t width                   // width of the actual glyph
-  // uint16_t height                  // height of the glyph
+  // uint8_t glyph_advance           // horizontal advance for the glyph
+  // uint8_t glyph_baseline          // baseline of the bitmap, is aligned to the baseline when rendered
+  // uint8_t glyph_offset;           // offset to col 0 of the glyph
+  // uint8_t width                   // width of the actual glyph
+  // uint8_t height                  // height of the glyph
   // uint8_t bitmap[width * height]   // alpha values of the bitmap
-  // ----- ENd of deflated record
+  // ----- End of deflated record
 
-  UINT16 numFonts = sizes.GetCount();
+  UINT16 numFonts = m_sizes.GetCount();
 
   CSortCharArray chars;
 
@@ -445,10 +439,15 @@ BOOL CFontGenDlg::GenerateFontFile(CArray<int> &sizes)
   nextMap.start = chars[0];
   nextMap.end = chars[0];
 
+  // set the initial offset
+  uint16_t glyphOffset = 8;
+
   for(int c = 1; c < chars.GetSize(); c++)
     {
     if(nextMap.start + c != chars[c])
       {
+      // add the size of this map
+      glyphOffset += 2 + ((nextMap.end - nextMap.start + 1) << 1);
       charMaps.Add(nextMap);
       nextMap.start = chars[c];
       nextMap.end = chars[c];
@@ -459,24 +458,23 @@ BOOL CFontGenDlg::GenerateFontFile(CArray<int> &sizes)
 
   // add the last one
   charMaps.Add(nextMap);
+  // add the size of this map
+  glyphOffset += 2 + ((nextMap.end - nextMap.start + 1) << 1);
 
-  // set the initial offset
-  uint16_t glyphOffset = 8 + (6 * charMaps.GetSize());
+  // now adjust the offset to a 16 byte boundary
+  glyphOffset = ((glyphOffset - 1) | 15) + 1;
 
   CArray<UINT8> fontRec;      // built font record.
   CArray<glyph_t *> glyphs;
   CArray<UINT8> outRec;       // buffer that can me compressed
 
-                              // BIG endian format...
-  outRec.Add(numFonts >> 8);
-  outRec.Add(numFonts);
-
   for(UINT16 fontNum = 0; fontNum < numFonts; fontNum++)
     {
     fontRec.RemoveAll();
+    charMaps[0].glyphOffsets.RemoveAll();
 
     CFont fnt;
-    fnt.CreatePointFont(sizes[fontNum] * 10, m_strFontFace);
+    fnt.CreatePointFont(m_sizes[fontNum] * 10, m_strFontFace);
     dc.SelectObject(fnt);
 
     OUTLINETEXTMETRIC otm;
@@ -488,7 +486,12 @@ BOOL CFontGenDlg::GenerateFontFile(CArray<int> &sizes)
     CBitmap bm;
     bm.CreateCompatibleBitmap(&dc, fontBox.cx, fontBox.cy);
 
-    CBitmap *pOldBitmap = dc.SelectObject(&bm);
+    // white is the foreground color
+    dc.SelectObject(&bm);
+    dc.SetTextColor(0xFFFFFF);
+    dc.SetBkColor(0);
+
+    uint16_t currentGlyphOffset = glyphOffset;
 
     // build the array of variable length glyphs based on the charmaps
     int charMap = 0;
@@ -500,47 +503,52 @@ BOOL CFontGenDlg::GenerateFontFile(CArray<int> &sizes)
         {
         // next map
         charMap++;
+        charMaps[charMap].glyphOffsets.RemoveAll();
         }
+
+      uint16_t advance = w.cx;
+      uint16_t x_offset = 0;
+      uint16_t y_offset = 0;
+      uint16_t stride = 0;
 
       uint16_t numBytes = sizeof(glyph_t);
 
-      if(ch[0] != ' ')
+      // store where we are
+      charMaps[charMap].glyphOffsets.Add(currentGlyphOffset);
+
+      if (ch[0] != ' ')
         {
-        charMaps[charMap].glyphOffsets.Add(glyphOffset);
-        for(int row = 0; row < w.cy; row++)
+        for (int row = 0; row < w.cy; row++)
           {
-          for(int col = 0; col < w.cx; col++)
+          for (int col = 0; col < w.cx; col++)
             {
             dc.SetPixel(col, row, 0);
             }
           }
 
-        if(!dc.ExtTextOut(0, 0, 0, NULL, ch, 1, NULL))
+        if (!dc.ExtTextOut(0, 0, 0, NULL, ch, 1, NULL))
           {
           AfxMessageBox(_T("Cannot render the bitmap"));
           return FALSE;
           }
 
-        uint16_t advance = w.cx;
-        uint16_t x_offset = 0;
-        uint16_t y_offset = 0;
         bool isBlank;
 
         // Scan the generated bitmap.  Columns that are empty
         // to the left are ignored
-        for(int col = 0; col < w.cx; col++)
+        for (int col = 0; col < w.cx; col++)
           {
           isBlank = true;
-          for(int row = 0; row < w.cy; row++)
+          for (int row = 0; row < w.cy; row++)
             {
-            if(dc.GetPixel(col, row) != 0)
+            if (dc.GetPixel(col, row) != 0)
               {
               isBlank = false;
               break;
               }
             }
 
-          if(!isBlank)
+          if (!isBlank)
             break;
 
           x_offset++;
@@ -548,56 +556,56 @@ BOOL CFontGenDlg::GenerateFontFile(CArray<int> &sizes)
 
         // Scan the generated bitmap.  Columns that are empty
         // to the right are ignored
-        for(int col = w.cx; col > 0; col--)
+        for (int col = w.cx; col > 0; col--)
           {
           isBlank = true;
-          for(int row = 0; row < w.cy; row++)
+          for (int row = 0; row < w.cy; row++)
             {
-            if(dc.GetPixel(col -1, row) != 0)
+            if (dc.GetPixel(col - 1, row) != 0)
               {
               isBlank = false;
               break;
               }
             }
 
-          if(!isBlank)
+          if (!isBlank)
             break;
 
           w.cx--;
           }
 
         // Scan the bitmap for empty rows
-        for(int row = 0; row < w.cy; row++)
+        for (int row = 0; row < w.cy; row++)
           {
           isBlank = true;
-          for(int col = x_offset; col < w.cx; col++)
+          for (int col = x_offset; col < w.cx; col++)
             {
-            if(dc.GetPixel(col, row) != 0)
+            if (dc.GetPixel(col, row) != 0)
               {
               isBlank = false;
               break;
               }
             }
 
-          if(!isBlank)
+          if (!isBlank)
             break;
           y_offset++;
           }
 
         // Scan the bitmap for empty rows
-        for(int row = w.cy; row > y_offset; row--)
+        for (int row = w.cy; row > y_offset; row--)
           {
           isBlank = true;
-          for(int col = x_offset; col < advance; col++)
+          for (int col = x_offset; col < advance; col++)
             {
-            if(dc.GetPixel(col, row -1) != 0)
+            if (dc.GetPixel(col, row - 1) != 0)
               {
               isBlank = false;
               break;
               }
             }
 
-          if(!isBlank)
+          if (!isBlank)
             break;
 
           w.cy--;
@@ -607,174 +615,170 @@ BOOL CFontGenDlg::GenerateFontFile(CArray<int> &sizes)
         w.cy -= y_offset;
         w.cx -= x_offset;
 
-        numBytes += w.cx * w.cy;
+        stride = (((w.cx - 1) | 7) + 1) >> 3;
 
-        glyph_t *pGlyph = (glyph_t *)new uint8_t[numBytes];
-        glyphOffset += numBytes;
-        memset(pGlyph, 0, numBytes);
+        numBytes += stride * w.cy;
+        }
 
-        glyphs.Add(pGlyph);
-        pGlyph->advance = advance;
-        pGlyph->baseline = otm.otmAscent;
+      // roung the glyph to the nearest page
+      numBytes = ((numBytes - 1) | 15) + 1;
+      glyph_t *pGlyph = (glyph_t *)malloc(numBytes);
 
+      // round to 16 byte boundary
+      currentGlyphOffset += numBytes;
+
+      memset(pGlyph, 0, numBytes);
+
+      glyphs.Add(pGlyph);
+      pGlyph->advance = advance;
+      pGlyph->baseline = otm.otmTextMetrics.tmAscent;
+
+      if (ch[0] != ' ')
+        {
         // remove the rows at the top that are blank.
         pGlyph->baseline -= y_offset;
 
         pGlyph->width = w.cx;
         pGlyph->height = w.cy;
 
-        for(int row = 0; row < w.cy; row++)
+        for (int row = 0; row < w.cy; row++)
           {
-          for(int col = 0; col < w.cx; col++)
+          for (int col = 0; col < w.cx; col += 8)
             {
             // raster-font
-            /*
-            BYTE b = 0;
-            int pel;
-            int bit = 0;
-            for(pel = (col << 3); bit < 8 && pel < nWidths[n]; pel++, bit++)
-            {
-            b <<= 1;
-            COLORREF cr = dc.GetPixel(pel, row);
-
-            if(cr != 0)
-            b |= 1;
-            }
+            BYTE pixel = 0;
+            int bit;
+            for (bit = 0; bit < 8 && (col + bit) < w.cx; bit++)
+              {
+              pixel <<= 1;
+              if (dc.GetPixel(col + bit + x_offset, row + y_offset) != 0)
+                pixel |= 1;
+              }
 
             // shift the pel's
-            while(bit < 8)
-            {
-            b <<= 1;
-            bit++;
-            }
-            */
-            // anti-alias font.
-            COLORREF cr = dc.GetPixel(col + x_offset, row + y_offset);
-            // the color saturation sets the alpha
-            float r = GetRValue(cr) / 255.0;
-            float b = GetBValue(cr) / 255.0;
-            float g = GetGValue(cr) / 255.0;
-
-            float av = (r + g + b) / 3.0;
-            av *= 255;
-            uint8_t pixel = (uint8_t)round(av);
-            pGlyph->pixels[col + (row * w.cx)] = pixel;
+            while (bit < 8)
+              {
+              pixel <<= 1;
+              bit++;
+              }
+            pGlyph->pixels[(col >> 3) + (row * stride)] = pixel;
             }
           }
-        /*
-#ifdef _DEBUG
+        }
+      
+#ifdef _DEBUG_FONT
+      {
+      static TCHAR buf[256];
+      snprintf(buf, 256, "Character 0x%02.2x\r\n", ch[0]);
+      OutputDebugString(buf);
+      snprintf(buf, 256, "Offset : %d\r\n", currentGlyphOffset - numBytes);
+      OutputDebugString(buf);
+      snprintf(buf, 256, "-------------------\r\n");
+      OutputDebugString(buf);
+      for(int row = 0; row < w.cy; row++)
         {
-        static TCHAR buf[256];
-        snprintf(buf, 256, "Character 0x%02.2x\r\n", ch[0]);
-        OutputDebugString(buf);
-        snprintf(buf, 256, "-------------------\r\n");
-        OutputDebugString(buf);
-        for(int row = 0; row < w.cy; row++)
+        for(int col = 0; col < w.cx; col += 8)
           {
-          for(int col = 0; col < w.cx; col++)
-            {
-            snprintf(buf, 256, "0x%02.2x ", pGlyph->pixels[col + (row * w.cx)]);
-            OutputDebugString(buf);
-            }
-          snprintf(buf, 256, "\r\n");
+          snprintf(buf, 256, "0x%02.2x ", pGlyph->pixels[(col >> 3) + (row * stride)]);
           OutputDebugString(buf);
           }
-        snprintf(buf, 256, "-------------------\r\n");
+        snprintf(buf, 256, "\r\n");
         OutputDebugString(buf);
         }
+      snprintf(buf, 256, "-------------------\r\n");
+      OutputDebugString(buf);
+      }
 #endif
-*/
-        }
-      else
-        {
-        charMaps[charMap].glyphOffsets.Add(0);      // flag this is the space character
-        glyph_t *pGlyph = (glyph_t *)new uint8_t[numBytes];
-        glyphOffset += numBytes;
-        memset(pGlyph, 0, numBytes);
 
-        glyphs.Add(pGlyph);
-        pGlyph->advance = w.cx;
-        pGlyph->baseline = otm.otmAscent;
-        }
       }
 
-    // add the header -- TODO: seems to be wrong 
-    // uint16_t size;                   // height of the font this bitmap renders
-    fontRec.Add(sizes[fontNum] >> 8);
-    fontRec.Add(sizes[fontNum]);
-    // uint16_t vertical_height;        // height including ascender/descender
-    fontRec.Add(fontBox.cy >> 8);
+    // uint8_t size;                   // height of the font this bitmap renders
+    fontRec.Add(m_sizes[fontNum]);
+    // uint8_t vertical_height;        // height including ascender/descender
     fontRec.Add(fontBox.cy);
-    // uint16_t baseline;               // we assume the baseline is same as the height - could be wrong
-    fontRec.Add(otm.otmAscent >> 8);
-    fontRec.Add(otm.otmAscent);
-    // uint16_t num_maps                // number of character maps
-    fontRec.Add(charMaps.GetSize() >> 8);
+    // uint8_t baseline;               // we assume the baseline is same as the height - could be wrong
+    fontRec.Add(otm.otmTextMetrics.tmAscent);
+    // uint8_t num_maps                // number of character maps
     fontRec.Add(charMaps.GetSize());
+    // Reserved
+    fontRec.Add(0);
+    fontRec.Add(0);
 
     int byte = 0;
     // dump the bitmaps.
     for(int n = 0; n < charMaps.GetSize(); n++)
       {
-      // uint16_t start_char              // first character in the character map
-      fontRec.Add(charMaps[n].start >> 8);
-      fontRec.Add(charMaps[n].start);
+      CharMap &map = charMaps[n];
 
-      // uint16_t last_char               // last character in the character map
-      fontRec.Add(charMaps[n].end >> 8);
-      fontRec.Add(charMaps[n].end);
+      // uint_t start_char              // first character in the character map
+      fontRec.Add(map.start);
+      // uint8_t last_char               // last character in the character map
+      fontRec.Add(map.end);
 
       // uint16_t glyphs_offset           // offset to the glyph records (offset from start of the block)
-      uint16_t numGlyphs = charMaps[n].glyphOffsets.GetSize();
+      uint16_t numGlyphs = map.glyphOffsets.GetSize();
+      ASSERT(numGlyphs == (map.end - map.start + 1));
       for(int i = 0; i < numGlyphs; i++)
         {
-        uint16_t offset = charMaps[n].glyphOffsets[i];
+        uint16_t offset = map.glyphOffsets[i];
         fontRec.Add(offset >> 8);
         fontRec.Add(offset);
         }
       }
 
+    // adjust to 16 byte boundary
+    uint16_t pos = fontRec.GetSize();
+    pos += 2;       // adjust for the 2 bytes added when the record length is added
+
+    while ((pos & 0x0f) > 0)
+      {
+      fontRec.Add(0);
+      pos++;
+      }
+
     // dump the glyphs
     for(int n = 0; n < glyphs.GetSize(); n++)
       {
-      
-      // uint16_t glyph_advance           // horizontal advance for the glyph
-      fontRec.Add(glyphs[n]->advance >> 8);
-      fontRec.Add(glyphs[n]->advance);
-      // uint16_t glyph_baseline          // baseline of the bitmap, is aligned to the baseline when rendered
-      fontRec.Add(glyphs[n]->baseline >> 8);
-      fontRec.Add(glyphs[n]->baseline);
-      // uint16_t offset                  // offset to column 0
-      fontRec.Add(glyphs[n]->offset >> 8);
-      fontRec.Add(glyphs[n]->offset);
-      // uint16_t width                   // width of the actual glyph
-      fontRec.Add(glyphs[n]->width >> 8);
-      fontRec.Add(glyphs[n]->width);
-      // uint16_t height                  // height of the glyph
-      fontRec.Add(glyphs[n]->height >> 8);
-      fontRec.Add(glyphs[n]->height);
+      glyph_t *pGlyph = glyphs[n];
+      // uint8_t glyph_advance           // horizontal advance for the glyph
+      fontRec.Add(pGlyph->advance);
+      // uint8_t glyph_baseline          // baseline of the bitmap, is aligned to the baseline when rendered
+      fontRec.Add(pGlyph->baseline);
+      // uint8_t offset                  // offset to column 0
+      fontRec.Add(pGlyph->offset);
+      // uint8_t width                   // width of the actual glyph
+      fontRec.Add(pGlyph->width);
+      // uint8_t height                  // height of the glyph
+      fontRec.Add(pGlyph->height);
+
+      int recLen = 5;
+      uint16_t stride = (((pGlyph->width - 1) | 7) + 1) >> 3;
       // uint8_t bitmap[width * height]   // alpha values of the bitmap
-      for(int row = 0; row < glyphs[n]->height; row++)
+      for(int row = 0; row < pGlyph->height; row++)
         {
-        for(int col = 0; col < glyphs[n]->width; col++)
+        for(int col = 0; col < pGlyph->width; col+=8)
           {
-          fontRec.Add(glyphs[n]->pixels[col + (row * glyphs[n]->width)]);
+          fontRec.Add(pGlyph->pixels[(col >> 3) + (row * stride)]);
+          recLen++;
           }
         }
 
+      int pad;
+      for (pad = recLen; pad < (((recLen - 1) | 15) + 1); pad++)
+        fontRec.Add(0);     // pad to 16 byte boundary
+
       // free the glyph
-      delete[](uint8_t *)glyphs[n];
+      free(pGlyph);
       }
 
     glyphs.RemoveAll();
 
-    dc.SetTextColor(oldColor);
-    dc.SetBkColor(oldBkColor);
-    dc.SelectObject(pOldBitmap);
+    uint16_t len = fontRec.GetSize();
+    len += 2;
 
     // uint16_t record_size;            // length of this font record.
-    outRec.Add(fontRec.GetSize() >> 8);
-    outRec.Add(fontRec.GetSize());
+    outRec.Add(len >> 8);
+    outRec.Add(len);
 
     outRec.Append(fontRec);       // uncompressed font file
     }
@@ -807,12 +811,30 @@ BOOL CFontGenDlg::GenerateFontFile(CArray<int> &sizes)
     i++;
     }
 
-  
-  uint32_t fileLength = outRec.GetSize() + sizeof(uint32_t) + sizeof(uint16_t) + 16;
-  m_fontFile.Add(fileLength >> 24);
-  m_fontFile.Add(fileLength >> 16);
+  uint32_t fileLength = outRec.GetSize();
+  fileLength += 32;
+  if (fileLength > 65535)
+    {
+    AfxMessageBox(_T("The generated font file exceeds the maximumm size.  Must be < 65535 bytes.  Remove pixel sizes or characters"));
+    return FALSE;
+    }
+
+
   m_fontFile.Add(fileLength >> 8);
   m_fontFile.Add(fileLength);
+
+  m_fontFile.Add(numFonts);
+
+  // reserved bytes (9)
+  m_fontFile.Add(0);
+  m_fontFile.Add(0);
+  m_fontFile.Add(0);
+  m_fontFile.Add(0);
+  m_fontFile.Add(0);
+  m_fontFile.Add(0);
+  m_fontFile.Add(0);
+  m_fontFile.Add(0);
+  m_fontFile.Add(0);
 
   if(m_nOutputType == 0)
     m_fontFile.Append(outRec);            // binary file.
@@ -874,6 +896,8 @@ BOOL CFontGenDlg::GenerateFontFile(CArray<int> &sizes)
     // append the compressed record.
     for(SIZE_T n = 0; n < CompressedDataSize; n++)
       m_fontFile.Add(CompressedBuffer[n]);
+
+    free(CompressedBuffer);
     }
 
   return TRUE;
@@ -884,7 +908,21 @@ BOOL CFontGenDlg::WriteCOutputFile(CString &dataName)
   CStdioFile data(dataName, CFile::modeCreate | CFile::modeWrite);
 
   data.WriteString("#include <stdint.h>\n");
-  data.WriteString("// Raster Font file\n");
+  data.WriteString("/* autogenerated file.  Do not edit\n");
+  data.WriteString("Font name: ");
+  data.WriteString(m_strFontName);
+  data.WriteString("\nCharacter set : ");
+  data.WriteString(m_strCharSet);
+  data.WriteString("\nPixel sizes : ");
+
+  for (int i = 0; i < m_sizes.GetSize(); i++)
+    {
+    TCHAR buffer[64];
+    data.WriteString(itoa(m_sizes[i], buffer, 10));
+    data.WriteString(" ");
+    }
+  
+  data.WriteString("\n*/\n\n");
   data.WriteString("const uint8_t ");
   data.WriteString(m_strFontName);
   data.WriteString("[] = {\n");
@@ -902,7 +940,7 @@ BOOL CFontGenDlg::WriteCOutputFile(CString &dataName)
 
   data.WriteString("};\n");
 
-  data.WriteString("const uint32_t ");
+  data.WriteString("const uint16_t ");
   data.WriteString(m_strFontName);
   data.WriteString("_length = ");
   _stprintf(hexBuf, _T("%d"), m_fontFile.GetSize());

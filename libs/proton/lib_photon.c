@@ -929,16 +929,6 @@ static duk_ret_t lib_text_extent(duk_context *ctx)
   return 1;
   }
 
-static duk_ret_t lib_get_transform(duk_context *ctx)
-  {
-  return 1;
-  }
-
-static duk_ret_t lib_set_transform(duk_context *ctx)
-  {
-  return 1;
-  }
-
 static duk_ret_t lib_get_pen(duk_context *ctx)
   {
   return 1;
@@ -1188,12 +1178,12 @@ static duk_ret_t lib_get_orientation(duk_context *ctx)
   return 1;
   }
 
-static duk_ret_t lib_create_font(duk_context *ctx)
+static duk_ret_t lib_open_font(duk_context *ctx)
   {
   return 1;
   }
 
-static duk_ret_t lib_release_font(duk_context *ctx)
+static duk_ret_t lib_load_font(duk_context *ctx)
   {
   return 1;
   }
@@ -1211,10 +1201,7 @@ void register_ion_functions(duk_context *ctx, handle_t co)
   // extern result_t get_orientation(handle_t hwnd, uint16_t *orientation);
   register_function(ctx, lib_get_orientation, "get_orientation", 1);
   // extern result_t create_font(const char *path, const point_t *char_metrics, const point_t *device_metrics, handle_t  *font);
-  register_function(ctx, lib_create_font, "create_font", 1);
+  register_function(ctx, lib_open_font, "open_font", 1);
   // extern result_t release_font(handle_t  font);
-  register_function(ctx, lib_release_font, "release_font", 1);
-
-  register_function(ctx, lib_get_transform, "get_transform", 1);
-  register_function(ctx, lib_set_transform, "set_transform", 2);
+  register_function(ctx, lib_load_font, "load_font", 1);
   }
