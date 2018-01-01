@@ -1,4 +1,4 @@
-#define _DEBUG_POLYGON
+//#define _DEBUG_POLYGON
 /*
 diy-efis
 Copyright (C) 2016 Kotuku Aerospace Limited
