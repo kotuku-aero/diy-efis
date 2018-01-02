@@ -115,7 +115,7 @@ static char *neutron_itox(uint32_t value, char *buf, int len)
   return buf;
 }
 
-result_t stream_printf(handle_t stream, char const *fmt, ...)
+result_t stream_printf(stream_p stream, char const *fmt, ...)
   {
   va_list va;
   va_start(va, fmt);
@@ -131,7 +131,7 @@ static char *ensure_buffer(char **buffer)
   return *buffer;
   }
 
-result_t stream_vprintf(handle_t stream, const char *fmt, va_list ap)
+result_t stream_vprintf(stream_p stream, const char *fmt, va_list ap)
   {
   bool is_long = false;
   bool is_unsigned = false;
@@ -208,7 +208,7 @@ result_t stream_vprintf(handle_t stream, const char *fmt, va_list ap)
   return s_ok;
   }
 
-result_t stream_printf_cb(handle_t stream, const char *fmt, get_arg_fn cb, void *argv)
+result_t stream_printf_cb(stream_p stream, const char *fmt, get_arg_fn cb, void *argv)
   {
 
   int16_t int16_temp;
@@ -322,7 +322,7 @@ result_t stream_printf_cb(handle_t stream, const char *fmt, get_arg_fn cb, void 
   return s_ok;
    }
 
-result_t stream_scanf_cb(handle_t stream, const char *format, get_arg_fn cb, void *argv)
+result_t stream_scanf_cb(stream_p stream, const char *format, get_arg_fn cb, void *argv)
   {
   return e_not_implemented;
   }

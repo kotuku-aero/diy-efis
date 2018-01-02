@@ -122,14 +122,14 @@ typedef struct _published_datapoint_t
   // max length of the filter
   uint16_t filter_length;
   // for all filters this is the filter values, based on time.
-  handle_t values;
+  vector_p values;
   // this is the filter coefficients for iir and fir filters
-  handle_t coefficients;
+  vector_p coefficients;
   // if the filter is an iir or fir then the gain is used to
   // bring the value back to 1.0
   float gain;
 
-  handle_t alarms;              // alarms to be raised based on the datapoint.
+  vector_p alarms;              // alarms to be raised based on the datapoint.
   } published_datapoint_t;
 
 typedef struct _enum_descr {
@@ -137,8 +137,8 @@ typedef struct _enum_descr {
     const char *description;
 } enum_descr ;
 
-static vector_t published_datapoints;
-static handle_t can_publisher_semp;
+static vector_p published_datapoints;
+static semaphore_p can_publisher_semp;
 
 static const char *s_publisher_key = "neutron";
 static const char *s_rate_value = "rate";
@@ -1443,7 +1443,7 @@ extern result_t trace_init();
 
 result_t neutron_init(const neutron_parameters_t *params, bool init_mode)
   {
-  handle_t task_id;
+  task_p task_handle;
   result_t result;
 
   register_msg.canas.data[0] = params->node_id;
@@ -1515,5 +1515,5 @@ result_t neutron_init(const neutron_parameters_t *params, bool init_mode)
                         ? DEFAULT_STACK_SIZE 
                         : params->publisher_stack_length,
                      publish_task, 0,
-                     NORMAL_PRIORITY, &task_id);
+                     NORMAL_PRIORITY, &task_handle);
   }

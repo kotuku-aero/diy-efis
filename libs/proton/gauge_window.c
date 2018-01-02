@@ -102,11 +102,11 @@ typedef struct _gauge_window_t {
   uint16_t width;          // pointer or sweep width
 
   bool draw_value;         // draw the value
-  const handle_t  *value_font;       // what font to draw a value in
+  const handle_t value_font;       // what font to draw a value in
   rect_t value_rect;
 
-  handle_t steps;
-  handle_t ticks;
+  vector_p steps;
+  vector_p ticks;
 
   float scale;
   float offset;

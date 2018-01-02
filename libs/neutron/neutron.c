@@ -35,7 +35,7 @@ it must be removed as soon as possible after the code fragment is identified.
 */
 #include "neutron.h"
 
-static handle_t trace_stream;
+static stream_p trace_stream;
 #ifdef _DEBUG
 static uint16_t trace_level = 7;
 #else

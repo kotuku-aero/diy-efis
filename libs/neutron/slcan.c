@@ -65,16 +65,16 @@ typedef struct _slcan_driver_t {
   // these are the can messages decoded
   handle_t rx_can_queue;
   // message responses are queued here.
-  handle_t response_queue;
+  deque_p response_queue;
   // this holds pointers to response messages.  After a message is read it
   // must be pushed back onto this queue
-  handle_t response_buffers;
+  deque_p response_buffers;
   // this is the serial decoder task
-  handle_t rx_task;
+  task_p rx_task;
   // max delay for send or rx
   uint32_t timeout;
   // serial driver
-  handle_t comm_device;
+  comm_device_p comm_device;
   // buffer to prepare messages in
   char send_buffer[MAX_MSG_LEN];
   // buffer to prepare reply messages in

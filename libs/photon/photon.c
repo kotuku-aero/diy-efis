@@ -972,9 +972,9 @@ typedef struct
 static result_t polygon_intersect(const rect_t *clip_rect, const point_t *pts, uint16_t count, handle_t points)
   {
   // flagged point
-  handle_t subject_points;
+  vector_p subject_points;
   // point
-  handle_t clip_points;
+  vector_p clip_points;
   result_t result;
 
   point_t ip;
@@ -1796,14 +1796,14 @@ result_t polypolygon_impl(canvas_t *canvas, const rect_t *clip_rect, color_t fil
 
   if(fill != color_hollow)
     {
-    handle_t edge_table;
+    vector_p edge_table;
 
     // clip the polygon(s) and ensure the polygons are closed.
     if(failed(result = vector_create(sizeof(edge_t), &edge_table)))
       return result;
 
     // this is the clipped contour
-    handle_t clipped_contour;
+    vector_p clipped_contour;
     if(failed(result = vector_create(sizeof(point_t), &clipped_contour)))
       {
       vector_close(edge_table);

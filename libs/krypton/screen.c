@@ -10,7 +10,7 @@
 
 uint32_t *crcs;
 
-handle_t h_worker;
+task_p h_worker;
 
 static HWND window;
 static bool repaint = false;

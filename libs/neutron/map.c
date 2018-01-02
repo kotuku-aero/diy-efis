@@ -50,9 +50,9 @@ typedef struct _rb_tree_entry_t
   struct _rb_tree_entry_t *left;
   struct _rb_tree_entry_t *right;
   struct _rb_tree_entry_t *parent;
-  } rb_tree_entry_t;
+  } map_entry_t;
 
-typedef struct _rb_tree_t
+typedef struct _map_t
   {
   uint16_t version;
   dup_fn copy_key;
@@ -66,21 +66,21 @@ typedef struct _rb_tree_t
   /*  node which should always be black but has aribtrary children and */
   /*  parent and no key or info.  The point of using these sentinels is so */
   /*  that the root and nil nodes do not require special cases in the code */
-  rb_tree_entry_t* root;
-  rb_tree_entry_t* nil;
-  } rb_tree_t;
+  map_entry_t* root;
+  map_entry_t* nil;
+  } map_t;
 
 result_t map_create(dup_fn copy_key, 
                     dup_fn copy_value,
                     compare_key_fn comp_fn,
                     destroy_key_fn destroy_key,
                     destroy_value_fn destroy_value,
-                    handle_t *handle)
+                    map_p *handle)
   {
-  rb_tree_t* new_tree;
-  rb_tree_entry_t* temp;
+  map_t* new_tree;
+  map_entry_t* temp;
 
-  new_tree = (rb_tree_t*) neutron_malloc(sizeof (rb_tree_t));
+  new_tree = (map_t*) neutron_malloc(sizeof (map_t));
   new_tree->copy_key = copy_key;
   new_tree->copy_value = copy_value;
   new_tree->compare = comp_fn;
@@ -89,11 +89,11 @@ result_t map_create(dup_fn copy_key,
 
   /*  see the comment in the rb_tree_t structure in red_black_tree.h */
   /*  for information on nil and root */
-  temp = new_tree->nil = (rb_tree_entry_t*) neutron_malloc(sizeof (rb_tree_entry_t));
+  temp = new_tree->nil = (map_entry_t*) neutron_malloc(sizeof (map_entry_t));
   temp->parent = temp->left = temp->right = temp;
   temp->red = false;;
   temp->key = 0;
-  temp = new_tree->root = (rb_tree_entry_t*) neutron_malloc(sizeof (rb_tree_entry_t));
+  temp = new_tree->root = (map_entry_t*) neutron_malloc(sizeof (map_entry_t));
   temp->parent = temp->left = temp->right = new_tree->nil;
   temp->key = 0;
   temp->red = false;
@@ -110,7 +110,7 @@ static void copy_str(const void *in, void **out)
 
 result_t map_create_nv(dup_fn copy_fn,
                        destroy_value_fn destroy_value,
-                       handle_t *handle)
+                       map_p *handle)
   {
   return map_create(copy_str,
                     copy_fn,
@@ -137,10 +137,10 @@ result_t map_create_nv(dup_fn copy_fn,
 
 /***********************************************************************/
 
-static void left_rotate(rb_tree_t* tree, rb_tree_entry_t* x)
+static void left_rotate(map_t* tree, map_entry_t* x)
   {
-  rb_tree_entry_t* y;
-  rb_tree_entry_t* nil = tree->nil;
+  map_entry_t* y;
+  map_entry_t* nil = tree->nil;
 
   /*  I originally wrote this function to use the sentinel for */
   /*  nil to avoid checking for nil.  However this introduces a */
@@ -190,10 +190,10 @@ static void left_rotate(rb_tree_t* tree, rb_tree_entry_t* x)
 
 /***********************************************************************/
 
-static void right_rotate(rb_tree_t* tree, rb_tree_entry_t* y)
+static void right_rotate(map_t* tree, map_entry_t* y)
   {
-  rb_tree_entry_t* x;
-  rb_tree_entry_t* nil = tree->nil;
+  map_entry_t* x;
+  map_entry_t* nil = tree->nil;
 
   /*  I originally wrote this function to use the sentinel for */
   /*  nil to avoid checking for nil.  However this introduces a */
@@ -241,12 +241,12 @@ static void right_rotate(rb_tree_t* tree, rb_tree_entry_t* y)
 
 /***********************************************************************/
 
-static void tree_insert_help(rb_tree_t* tree, rb_tree_entry_t* z)
+static void tree_insert_help(map_t* tree, map_entry_t* z)
   {
   /*  This function should only be called by InsertRBTree (see above) */
-  rb_tree_entry_t* x;
-  rb_tree_entry_t* y;
-  rb_tree_entry_t* nil = tree->nil;
+  map_entry_t* x;
+  map_entry_t* y;
+  map_entry_t* nil = tree->nil;
 
   z->left = z->right = nil;
   y = tree->root;
@@ -291,11 +291,11 @@ static void tree_insert_help(rb_tree_t* tree, rb_tree_entry_t* z)
 
 /***********************************************************************/
 
-static rb_tree_entry_t* tree_successor(rb_tree_t* tree, rb_tree_entry_t* x)
+static map_entry_t* tree_successor(map_t* tree, map_entry_t* x)
   {
-  rb_tree_entry_t* y;
-  rb_tree_entry_t* nil = tree->nil;
-  rb_tree_entry_t* root = tree->root;
+  map_entry_t* y;
+  map_entry_t* nil = tree->nil;
+  map_entry_t* root = tree->root;
 
   if (nil != (y = x->right))
     { /* assignment to y is intentional */
@@ -333,10 +333,10 @@ static rb_tree_entry_t* tree_successor(rb_tree_t* tree, rb_tree_entry_t* x)
 
 /***********************************************************************/
 
-static rb_tree_entry_t* exact_query(rb_tree_t* tree, const void* q)
+static map_entry_t* exact_query(map_t *tree, const void* q)
   {
-  rb_tree_entry_t* x = tree->root->left;
-  rb_tree_entry_t* nil = tree->nil;
+  map_entry_t* x = tree->root->left;
+  map_entry_t* nil = tree->nil;
   int compVal;
   if (x == nil)
     return (0);
@@ -378,10 +378,10 @@ static rb_tree_entry_t* exact_query(rb_tree_t* tree, const void* q)
 
 /***********************************************************************/
 
-static void delete_fix_up(rb_tree_t* tree, rb_tree_entry_t* x)
+static void delete_fix_up(map_t* tree, map_entry_t* x)
   {
-  rb_tree_entry_t* root = tree->root->left;
-  rb_tree_entry_t* w;
+  map_entry_t* root = tree->root->left;
+  map_entry_t* w;
 
   while ((!x->red) && (root != x))
     {
@@ -467,9 +467,9 @@ static void delete_fix_up(rb_tree_t* tree, rb_tree_entry_t* x)
 
 /***********************************************************************/
 
-static void tree_destroy_helper(rb_tree_t* tree, rb_tree_entry_t* x)
+static void tree_destroy_helper(map_t* tree, map_entry_t* x)
   {
-  rb_tree_entry_t* nil = tree->nil;
+  map_entry_t* nil = tree->nil;
   if (x != nil)
     {
     tree_destroy_helper(tree, x->left);
@@ -480,20 +480,18 @@ static void tree_destroy_helper(rb_tree_t* tree, rb_tree_entry_t* x)
     }
   }
 
-result_t map_add(handle_t map, const void *key, const void *value)
+result_t map_add(map_p tree, const void *key, const void *value)
   {
-  rb_tree_entry_t * y;
-  rb_tree_entry_t * x;
-  rb_tree_entry_t * new_node;
+  map_entry_t * y;
+  map_entry_t * x;
+  map_entry_t * new_node;
 
-  if (map == 0 ||
+  if (tree == 0 ||
       key == 0 ||
       value == 0)
     return e_bad_parameter;
 
-  rb_tree_t *tree = (rb_tree_t *) map;
-
-  x = (rb_tree_entry_t*) neutron_malloc(sizeof (rb_tree_entry_t));
+  x = (map_entry_t*) neutron_malloc(sizeof (map_entry_t));
   
   (*tree->copy_key)(key, &x->key);
   (*tree->copy_value)(value, &x->value);
@@ -553,23 +551,21 @@ result_t map_add(handle_t map, const void *key, const void *value)
   return s_ok;
   }
 
-result_t map_remove(handle_t map, const void *key)
+result_t map_remove(map_p tree, const void *key)
   {
-  if (map == 0 ||
+  if (tree == 0 ||
       key == 0)
     return e_bad_parameter;
 
-  rb_tree_t *tree = (rb_tree_t *) map;
-  
-  rb_tree_entry_t *z = exact_query(tree, key);
+  map_entry_t *z = exact_query(tree, key);
   
   if(z == 0)
     return e_not_found;
   
-  rb_tree_entry_t* y;
-  rb_tree_entry_t* x;
-  rb_tree_entry_t* nil = tree->nil;
-  rb_tree_entry_t* root = tree->root;
+  map_entry_t* y;
+  map_entry_t* x;
+  map_entry_t* nil = tree->nil;
+  map_entry_t* root = tree->root;
 
   y = ((z->left == nil) || (z->right == nil)) ? z : tree_successor(tree, z);
   x = (y->left == nil) ? y->right : y->left;
@@ -621,12 +617,11 @@ result_t map_remove(handle_t map, const void *key)
   return s_ok;
   }
 
-result_t map_close(handle_t map)
+result_t map_close(map_p tree)
   {
-  if (map == 0)
+  if (tree == 0)
     return e_bad_parameter;
 
-  rb_tree_t *tree = (rb_tree_t *) map;
   tree_destroy_helper(tree, tree->root->left);
   neutron_free(tree->root);
   neutron_free(tree->nil);
@@ -635,14 +630,12 @@ result_t map_close(handle_t map)
   return s_ok;
   }
 
-result_t map_find(handle_t map, const void *key, void *value)
+result_t map_find(map_p tree, const void *key, void **value)
   {
-  if (map == 0 || key == 0 || value == 0)
+  if (tree == 0 || key == 0 || value == 0)
     return e_bad_parameter;
 
-  rb_tree_t *tree = (rb_tree_t *) map;
-  
-  rb_tree_entry_t *z = exact_query(tree, key);
+  map_entry_t *z = exact_query(tree, key);
   
   if(z == 0)
     return e_not_found;

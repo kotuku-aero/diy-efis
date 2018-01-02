@@ -41,7 +41,7 @@ it must be removed as soon as possible after the code fragment is identified.
 
 #include "cli.h"
 
-result_t match_path(cli_t *context, const char * path, bool ignore_wildcard, memid_t *key, vector_t *matches)
+result_t match_path(cli_t *context, const char * path, bool ignore_wildcard, memid_t *key, vector_p *matches)
   {
   result_t result;
   if (matches == 0)
@@ -82,7 +82,7 @@ result_t match_path(cli_t *context, const char * path, bool ignore_wildcard, mem
     search_dir = 0;         // absolute path
 
   // split the path into directories
-  vector_t directories = string_split(path, '/');
+  vector_p directories = string_split(path, '/');
 
   uint16_t num_dirs;
   if (failed(result = vector_count(directories, &num_dirs)))
@@ -298,7 +298,7 @@ result_t cli_match_string(cli_t *context, cli_token_t *token, cli_node_t *node, 
 result_t cli_match_path(cli_t *context, cli_token_t *token, cli_node_t *node, bool *is_complete)
   {
   memid_t dir;
-  vector_t matched_filenames = 0;
+  vector_p matched_filenames = 0;
   result_t result;
     
   if (failed(result = match_path(context, token->token_buffer, true, &dir, &matched_filenames)))
@@ -737,14 +737,14 @@ result_t cli_complete_path(cli_t *context, const cli_node_t *node, cli_token_t *
   const char * match_name = 0;
 
   // match the path name to the first found name
-  vector_t matched_paths = 0;
+  vector_p matched_paths = 0;
   if (failed(result = match_path(context, token->token_buffer, false, &memid, &matched_paths)))
     {
     return result;      // not sure how we got here, just bail...
     }
 
   // find the last part of the path
-  vector_t directories = string_split(token->token_buffer, '/');
+  vector_p directories = string_split(token->token_buffer, '/');
   uint16_t num_matches;
   if (failed(result = vector_count(directories, &num_matches)))
     {

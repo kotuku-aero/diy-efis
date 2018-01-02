@@ -177,7 +177,7 @@ result_t edit_name_action(cli_t *context, const char * name_)
 
   result_t result;
 
-  handle_t stream;
+  stream_p stream;
   if(failed(stream_open(get_context(context), name_, &stream)))
     {
     if(failed(result = stream_create(get_context(context), name_, &stream)))
@@ -195,7 +195,7 @@ result_t cat_name_action(cli_t *context, const char * name)
   if(name == 0)
     return e_bad_parameter;
 
-  handle_t stream;
+  stream_p stream;
 
   if(failed(result = stream_open(get_context(context), name, &stream)))
     return result;

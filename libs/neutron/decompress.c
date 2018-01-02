@@ -499,7 +499,7 @@ static result_t read_uint16(handle_t stream, uint16_t *value)
   }
 
 // read bytes from compressed stream into the buffer
-result_t decompress(handle_t stream, handle_t parg, get_byte_fn getter, set_byte_fn setter, uint32_t *length)
+result_t decompress(stream_p stream, handle_t parg, get_byte_fn getter, set_byte_fn setter, uint32_t *length)
   {
   result_t result;
   uint32_t bp = 0;	/*bit pointer in the "in" data, current byte is bp >> 3, current bit is bp & 0x7 (from lsb to msb of the byte) */

@@ -44,7 +44,7 @@ static uint16_t page_size;
 
 // semaphore used to ensure only 1 thread is using the registry
 // at a time.
-static handle_t mutex;
+static semaphore_p mutex;
 
 void enter_registry()
   {

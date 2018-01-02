@@ -51,8 +51,8 @@ extern "C" {
     memid_t home;                 // home registry key for the script engine
     duk_context *ctx;             // context, used by script engine
     memid_t script;               // handle to the script.  Used to compare running instances
-    handle_t worker;              // worker script
-    handle_t message_queue;       // queue of messages being handled
+    task_p worker;              // worker script
+    deque_p message_queue;       // queue of messages being handled
     } ion_context_t;
 
   extern const char *ion_key;

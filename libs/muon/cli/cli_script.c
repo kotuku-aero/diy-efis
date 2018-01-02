@@ -181,7 +181,7 @@ result_t script_ls_name_action(cli_t *context, const char * path)
       memid_t key;
 
       // we have to stat the file
-      handle_t hndl;
+      stream_p hndl;
       if (failed(stream_open(get_context(context), name, &hndl)))
         continue;
 
@@ -226,7 +226,7 @@ result_t script_ls_name_action(cli_t *context, const char * path)
 result_t script_rm_name_action(cli_t *context, const char * name)
   {
   result_t result;
-  handle_t stream;
+  stream_p stream;
 
   // see if it exists
   if (failed(result = stream_open(get_context(context), name, &stream)))
@@ -275,7 +275,7 @@ result_t script_create_name_action(cli_t *context, const char * name)
 result_t script_edit_name_action(cli_t *context, const char * name)
   {
   result_t result;
-  handle_t stream;
+  stream_p stream;
 
   if(failed(result = stream_open(get_context(context), name, &stream)))
     return result;
@@ -298,7 +298,7 @@ result_t script_edit_name_action(cli_t *context, const char * name)
 result_t script_cat_name_action(cli_t *context, const char * name)
   {
   result_t result;
-  handle_t stream;
+  stream_p stream;
 
   if(failed(result = stream_open(get_context(context), name, &stream)))
     return result;

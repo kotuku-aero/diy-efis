@@ -92,7 +92,7 @@ static void cli_help_print_node(cli_t *parser, cli_node_t *node,
       break;
     case CLI_NODE_PATH :
       {
-      vector_t matches = 0;
+      vector_p matches = 0;
       if (succeeded(match_path(parser, CUR_TOKEN(parser)->token_buffer, false, 0, &matches)))
         {
         uint16_t len;

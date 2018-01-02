@@ -353,7 +353,7 @@ int main(int argc, char **argv)
   memid_t proton_key;
   if(succeeded(reg_open_key(0, "proton", &proton_key)))
     {
-    handle_t stream;
+    stream_p stream;
     manifest_create(splash_base64, &stream);
 
     task_create("PROTON", DEFAULT_STACK_SIZE * 4, run_proton, stream, NORMAL_PRIORITY, 0);

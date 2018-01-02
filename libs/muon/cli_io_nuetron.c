@@ -79,9 +79,9 @@ typedef struct _service_channel_t
   // this is our index, used when we close
   uint16_t can_id;
   // queue of characters from remote device
-  handle_t queue;
+  deque_p queue;
   // this is the thread that is servicing the channel
-  handle_t worker;
+  task_p worker;
   // increment as each message sent
   uint8_t message_code;
   } service_channel_t;

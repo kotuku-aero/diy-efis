@@ -32,7 +32,7 @@ static result_t check_handle(handle_t hndl)
 //
 // Comms driver
 
-result_t comm_create_device(memid_t key, handle_t *device)
+result_t comm_create_device(memid_t key, comm_device_p *device)
   {
   if(device == 0 || key == 0)
     return e_bad_parameter;

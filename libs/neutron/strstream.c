@@ -40,12 +40,12 @@ it must be removed as soon as possible after the code fragment is identified.
 typedef struct _strstream_handle_t
   {
   stream_handle_t stream;
-  handle_t buffer;      // vector...
+  vector_p buffer;      // vector...
   uint16_t offset;      // current offset in the stream.
   uint16_t length;      // length of the stream, can be less than the buffer count
   } strstream_handle_t;
 
-static result_t check_handle(handle_t hndl)
+static result_t check_handle(stream_p hndl)
   {
   if(hndl == 0)
     return e_bad_parameter;
@@ -57,7 +57,7 @@ static result_t check_handle(handle_t hndl)
   return s_ok;
   }
 
-result_t strstream_get(handle_t hndl, const void **lit)
+result_t strstream_get(stream_p hndl, const void **lit)
   {
   result_t result;
   if(lit == 0 || hndl == 0)
@@ -270,7 +270,7 @@ static void init_stream(strstream_handle_t *stream)
   stream->stream.stream_delete = strstream_delete;
   }
 
-result_t strstream_create(const void *lit, uint16_t len, handle_t *hndl)
+result_t strstream_create(const void *lit, uint16_t len, stream_p *hndl)
   {
   if(hndl == 0)
     return e_bad_parameter;

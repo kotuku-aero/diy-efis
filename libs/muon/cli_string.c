@@ -39,12 +39,12 @@ it must be removed as soon as possible after the code fragment is identified.
 #include <string.h>
 #include <ctype.h>
 
-vector_t string_split(const char *s, char sep)
+vector_p string_split(const char *s, char sep)
   {
   if(s == 0 || sep == 0)
     return 0;
 
-  vector_t tokens;
+  vector_p tokens;
   vector_create(sizeof(const char *), &tokens);
   uint16_t len = (uint16_t)strlen(s);
   uint16_t start = 0;
@@ -77,7 +77,7 @@ vector_t string_split(const char *s, char sep)
   return tokens;
   }
 
-void kfree_split(vector_t tokens)
+void kfree_split(vector_p tokens)
   {
   if (tokens == 0)
     return;

@@ -48,7 +48,7 @@ result_t open_key(memid_t current, const char *path, bool create, memid_t *memid
 
   memid_t parent = 0;
 
-  vector_t parts = string_split(path, '/');
+  vector_p parts = string_split(path, '/');
 
   uint16_t num_parts;
   vector_count(parts, &num_parts);

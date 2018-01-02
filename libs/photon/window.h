@@ -91,18 +91,18 @@ typedef struct _window_t
     // the window stream that is stored for the window
     void *wnd_data;
     // Array of event handlers for a window.
-    handle_t events;
+    vector_p events;
   } window_t;
 
 typedef struct _screen_t
   {
   window_t wnd;
   // the event queue for the screen.
-  handle_t event_queue;
+  deque_p event_queue;
   // callback for CAN messages
   msg_hook_t msg_hook;
   // this holds the fonts
-  handle_t fonts;
+  vector_p fonts;
   // ECMA script interpreter for the screen
   ion_context_t *context;
   } screen_t;

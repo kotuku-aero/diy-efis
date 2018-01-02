@@ -147,7 +147,7 @@ typedef struct _keys_t {
 typedef struct _menu_t
   {
   // a list of items in the menu.  is a vector.
-  handle_t menu_items;
+  vector_p menu_items;
   char *name;         // name of the menu
                       // this is the menu item with the current focus.  All ok, cancel is sent
                       // here.  This is not the selected active menu (only a popup)
@@ -201,17 +201,17 @@ typedef struct _layout_window_t
   gdi_dim_t menu_start_y;
 
   memid_t key;            // window key
-                          // map of root menus
-  handle_t key_mappings;
+  // map of root menus
+  map_p key_mappings;
 
   // map of menus
-  handle_t menus;
+  map_p menus;
   // stack of menu's
-  handle_t menu_stack;
+  vector_p menu_stack;
 
   // we hold a reference to all loaded menu items as they need to be informed
   // if a controlling variable changed
-  handle_t menu_items;
+  vector_p menu_items;
 
   color_t background_color;
   color_t selected_background_color;

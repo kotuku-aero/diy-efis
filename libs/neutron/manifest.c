@@ -264,10 +264,10 @@ static void init_stream(manifest_handle_t *stream)
   stream->stream.stream_delete = 0;
   }
 
-result_t manifest_open(memid_t key, const char *path, handle_t *hndl)
+result_t manifest_open(memid_t key, const char *path, stream_p *hndl)
   {
   result_t result;
-  handle_t sh;
+  stream_p sh;
   // open a stream
   if(failed(result = stream_open(key, path, &sh)))
     return result;
@@ -294,7 +294,7 @@ result_t manifest_open(memid_t key, const char *path, handle_t *hndl)
 
   }
 
-result_t manifest_create(const char *literal, handle_t *hndl)
+result_t manifest_create(const char *literal, stream_p *hndl)
   {
   result_t result;
   manifest_handle_t *stream = (manifest_handle_t *)neutron_malloc(sizeof(manifest_handle_t));

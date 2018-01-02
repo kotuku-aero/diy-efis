@@ -10,8 +10,8 @@ extern "C" {
 
 typedef struct _deque
   {
-  handle_t readers;
-  handle_t writers;
+  semaphore_p readers;
+  semaphore_p writers;
   void *buffer;
   void *back;
   void *front;

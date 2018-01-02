@@ -37,7 +37,7 @@ it must be removed as soon as possible after the code fragment is identified.
 #include "registry.h"
 #include <string.h>
 
-static result_t check_handle(handle_t hndl)
+static result_t check_handle(stream_p hndl)
   {
   if(hndl == 0)
     return e_bad_parameter;
@@ -49,7 +49,7 @@ static result_t check_handle(handle_t hndl)
   return s_ok;
   }
 
-result_t stream_close(handle_t hndl)
+result_t stream_close(stream_p hndl)
   {
   result_t result;
   if(failed(result = check_handle(hndl)))
@@ -63,7 +63,7 @@ result_t stream_close(handle_t hndl)
   return (*stream->stream_close)(stream);
   }
 
-result_t stream_delete(handle_t hndl)
+result_t stream_delete(stream_p hndl)
   {
   result_t result;
   if(failed(result = check_handle(hndl)))
@@ -77,7 +77,7 @@ result_t stream_delete(handle_t hndl)
   return (*stream->stream_delete)(stream);
   }
 
-result_t stream_eof(handle_t hndl)
+result_t stream_eof(stream_p hndl)
   {
   result_t result;
   if(failed(result = check_handle(hndl)))
@@ -91,7 +91,7 @@ result_t stream_eof(handle_t hndl)
   return (*stream->stream_eof)(stream);
   }
 
-result_t stream_read(handle_t hndl, void *buffer, uint16_t size, uint16_t *read)
+result_t stream_read(stream_p hndl, void *buffer, uint16_t size, uint16_t *read)
   {
   result_t result;
   if(failed(result = check_handle(hndl)))
@@ -108,7 +108,7 @@ result_t stream_read(handle_t hndl, void *buffer, uint16_t size, uint16_t *read)
   return (*stream->stream_read)(stream, buffer, size, read);
   }
 
-result_t stream_write(handle_t hndl, const void *buffer, uint16_t size)
+result_t stream_write(stream_p hndl, const void *buffer, uint16_t size)
   {
   result_t result;
   if(failed(result = check_handle(hndl)))
@@ -125,7 +125,7 @@ result_t stream_write(handle_t hndl, const void *buffer, uint16_t size)
   return (*stream->stream_write)(stream, buffer, size);
   }
 
-result_t stream_copy(handle_t from, handle_t to)
+result_t stream_copy(stream_p from, stream_p to)
   {
   result_t result;
   if(failed(result = check_handle(from)) ||
@@ -156,7 +156,7 @@ result_t stream_copy(handle_t from, handle_t to)
   return result;
   }
 
-result_t stream_getpos(handle_t hndl, uint16_t *pos)
+result_t stream_getpos(stream_p hndl, uint16_t *pos)
   {
   result_t result;
   if(failed(result = check_handle(hndl)))
@@ -173,7 +173,7 @@ result_t stream_getpos(handle_t hndl, uint16_t *pos)
   return (*stream->stream_getpos)(stream, pos);
   }
 
-result_t stream_setpos(handle_t hndl, uint16_t pos)
+result_t stream_setpos(stream_p hndl, uint16_t pos)
   {
   result_t result;
   if(failed(result = check_handle(hndl)))
@@ -187,7 +187,7 @@ result_t stream_setpos(handle_t hndl, uint16_t pos)
   return (*stream->stream_setpos)(stream, pos);
   }
 
-result_t stream_length(handle_t hndl, uint16_t *length)
+result_t stream_length(stream_p hndl, uint16_t *length)
   {
   result_t result;
   if(failed(result = check_handle(hndl)))
@@ -201,7 +201,7 @@ result_t stream_length(handle_t hndl, uint16_t *length)
   return (*stream->stream_length)(stream, length);
   }
 
-result_t stream_truncate(handle_t hndl, uint16_t length)
+result_t stream_truncate(stream_p hndl, uint16_t length)
   {
   result_t result;
   if(failed(result = check_handle(hndl)))
@@ -215,7 +215,7 @@ result_t stream_truncate(handle_t hndl, uint16_t length)
   return (*stream->stream_truncate)(stream, length);
   }
 
-result_t stream_path(handle_t hndl, bool full_path, uint16_t len, char *path)
+result_t stream_path(stream_p hndl, bool full_path, uint16_t len, char *path)
   {
   result_t result;
   if (failed(result = check_handle(hndl)))
@@ -229,7 +229,7 @@ result_t stream_path(handle_t hndl, bool full_path, uint16_t len, char *path)
   return (*stream->stream_path)(hndl, full_path, len, path);
   }
 
-result_t stream_getc(handle_t hndl, char *ch)
+result_t stream_getc(stream_p hndl, char *ch)
   {
   result_t result;
   if(failed(result = check_handle(hndl)))
@@ -243,7 +243,7 @@ result_t stream_getc(handle_t hndl, char *ch)
   return (*stream->stream_read)(stream, ch, 1, 0);
   }
 
-result_t stream_putc(handle_t hndl, char ch)
+result_t stream_putc(stream_p hndl, char ch)
   {
   result_t result;
   if(failed(result = check_handle(hndl)))
@@ -257,7 +257,7 @@ result_t stream_putc(handle_t hndl, char ch)
   return (*stream->stream_write)(stream, &ch, 1);
   }
 
-result_t stream_puts(handle_t hndl, const char *str)
+result_t stream_puts(stream_p hndl, const char *str)
   {
   result_t result;
   if(failed(result = check_handle(hndl)))
@@ -272,7 +272,7 @@ result_t stream_puts(handle_t hndl, const char *str)
   return (*stream->stream_write)(stream, str, len);
   }
 
-result_t stream_gets(handle_t hndl, char *buffer, uint16_t len)
+result_t stream_gets(stream_p hndl, char *buffer, uint16_t len)
   {
   result_t result;
   if(failed(result = check_handle(hndl)))

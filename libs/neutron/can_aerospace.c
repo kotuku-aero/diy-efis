@@ -370,9 +370,8 @@ void matrix_multiply(matrix_t mat, const matrix_t a, const matrix_t b)
     }
   }
 
-static handle_t can_tx_queue;
-static handle_t can_rx_queue;
-static handle_t can_rpc_queue;
+static deque_p can_tx_queue;
+static deque_p can_rx_queue;
 static uint8_t message_code;
 
 /**
@@ -608,7 +607,7 @@ extern result_t neutron_init(const neutron_parameters_t *params, bool init_mode)
 
 result_t can_aerospace_init(const neutron_parameters_t *params, bool init_mode)
   {
-  handle_t task_id;
+  task_p task_handle;
   result_t result;
 
   hardware_revision = params->hardware_revision;
@@ -638,7 +637,7 @@ result_t can_aerospace_init(const neutron_parameters_t *params, bool init_mode)
   if (failed(result = task_create("CAN_TX",
     params->tx_stack_length,
     can_tx_task, 0,
-    NORMAL_PRIORITY, &task_id)))
+    NORMAL_PRIORITY, &task_handle)))
     {
     trace_error("Cannot create the can_tx task");
     return result;
@@ -647,7 +646,7 @@ result_t can_aerospace_init(const neutron_parameters_t *params, bool init_mode)
   if (failed(result = task_create("CAN_RX",
     params->rx_stack_length,
     can_rx_task, 0,
-    NORMAL_PRIORITY + 1, &task_id)))
+    NORMAL_PRIORITY + 1, &task_handle)))
     {
     trace_error("Cannot create the can_rx task");
     return result;

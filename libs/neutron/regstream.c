@@ -150,12 +150,12 @@ static result_t create_handle(memid_t parent, const char *name, bool create, han
   return exit_registry(s_ok);
   }
 
-result_t stream_open(memid_t parent, const char *path, handle_t *stream)
+result_t stream_open(memid_t parent, const char *path, stream_p *stream)
   {
   return create_handle(parent, path, false, stream);
   }
 
-result_t stream_create(memid_t parent, const char *path, handle_t *stream)
+result_t stream_create(memid_t parent, const char *path, stream_p *stream)
   {
   return create_handle(parent, path, true, stream);
   }

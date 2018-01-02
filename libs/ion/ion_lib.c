@@ -886,7 +886,7 @@ static duk_ret_t lib_stream_create(duk_context *ctx)
   memid_t memid = duk_get_uint(ctx, 0);
   const char *name = duk_get_string(ctx, 1);
 
-  handle_t value;
+  stream_p value;
   if (failed(stream_create(memid, name, &value)))
     return DUK_RET_TYPE_ERROR;
 
@@ -1086,7 +1086,7 @@ static duk_ret_t ion_load_script(ion_context_t *ion, const char *id)
   if (failed(ion_split_path(id, &parent, name)))
     return DUK_RET_TYPE_ERROR;
 
-  handle_t stream;
+  stream_p stream;
   if (failed(stream_open(parent, name, &stream)))
     return DUK_RET_TYPE_ERROR;
 

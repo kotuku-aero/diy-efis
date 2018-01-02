@@ -35,19 +35,19 @@ it must be removed as soon as possible after the code fragment is identified.
 */
 #include "neutron.h"
 
-typedef struct _vector_impl_t {
+typedef struct _vector_t {
   size_t version;
   uint16_t element_size;  // how large each element is
   byte_t *buffer;      // buffer of data
   uint16_t length;      // how much data allocated
   uint16_t end;         // end of the vector
 
-} vector_impl_t;
+} vector_t;
 
 static inline result_t is_valid_vector(handle_t hndl)
   {
   if(hndl == 0 ||
-      ((vector_impl_t *)hndl)->version != sizeof(vector_impl_t))
+      ((vector_t *)hndl)->version != sizeof(vector_t))
     return e_bad_handle;
 
   return s_ok;
@@ -58,7 +58,7 @@ static inline uint16_t alloc_size(uint16_t size)
   return ((size-1)|31)+1;
   }
 
-static result_t ensure_space(vector_impl_t *vec, uint16_t length)
+static result_t ensure_space(vector_t *vec, uint16_t length)
   {
   if(vec->buffer != 0 &&
       vec->end >= length)
@@ -89,31 +89,31 @@ static result_t ensure_space(vector_impl_t *vec, uint16_t length)
   return s_ok;
   }
 
-static inline byte_t *calculate_offset(vector_impl_t *vec, uint16_t at)
+static inline byte_t *calculate_offset(vector_t *vec, uint16_t at)
   {
   return &vec->buffer[at * vec->element_size];
   }
 
-result_t vector_create(uint16_t element_size, handle_t *hndl)
+result_t vector_create(uint16_t element_size, vector_p *hndl)
   {
   if(element_size == 0 ||
       hndl == 0)
     return e_bad_parameter;
 
-  vector_impl_t *vec = (vector_impl_t *)neutron_malloc(sizeof(vector_impl_t));
+  vector_t *vec = (vector_t *)neutron_malloc(sizeof(vector_t));
 
   if(vec == 0)
     return e_no_space;
 
-  memset(vec, 0, sizeof(vector_impl_t));
-  vec->version = sizeof(vector_impl_t);
+  memset(vec, 0, sizeof(vector_t));
+  vec->version = sizeof(vector_t);
   vec->element_size = element_size;
 
   *hndl = vec;
   return s_ok;
   }
 
-result_t vector_copy(uint16_t element_size, uint16_t length, const void *elements, handle_t *hndl)
+result_t vector_copy(uint16_t element_size, uint16_t length, const void *elements, vector_p *hndl)
   {
   result_t result;
 
@@ -123,14 +123,14 @@ result_t vector_copy(uint16_t element_size, uint16_t length, const void *element
       hndl == 0)
     return e_bad_parameter;
 
-  vector_impl_t *vec = (vector_impl_t *)neutron_malloc(sizeof(vector_impl_t));
+  vector_t *vec = (vector_t *)neutron_malloc(sizeof(vector_t));
 
   if(vec == 0)
     return e_no_space;
 
 
-  memset(vec, 0, sizeof(vector_impl_t));
-  vec->version = sizeof(vector_impl_t);
+  memset(vec, 0, sizeof(vector_t));
+  vec->version = sizeof(vector_t);
   vec->element_size = element_size;
 
   if(failed(result = ensure_space(vec, length)))
@@ -146,13 +146,13 @@ result_t vector_copy(uint16_t element_size, uint16_t length, const void *element
   return s_ok;
   }
 
-result_t vector_close(handle_t hndl)
+result_t vector_close(vector_p hndl)
   {
   result_t result;
   if(failed(result = is_valid_vector(hndl)))
     return result;
 
-  vector_impl_t *vec = (vector_impl_t *)hndl;
+  vector_t *vec = (vector_t *)hndl;
   if(vec->buffer != 0)
     neutron_free(vec->buffer);
 
@@ -161,7 +161,7 @@ result_t vector_close(handle_t hndl)
   return s_ok;
   }
 
-result_t vector_expand(handle_t hndl, uint16_t size, incarnate_element_fn callback, void *parg)
+result_t vector_expand(vector_p hndl, uint16_t size, incarnate_element_fn callback, void *parg)
   {
   result_t result;
   
@@ -171,7 +171,7 @@ result_t vector_expand(handle_t hndl, uint16_t size, incarnate_element_fn callba
   if(failed(result = is_valid_vector(hndl)))
     return result;
 
-  vector_impl_t *vec = (vector_impl_t *)hndl;
+  vector_t *vec = (vector_t *)hndl;
   if(failed(result = ensure_space(vec, vec->length + size)))
     return result;
 
@@ -190,7 +190,7 @@ result_t vector_expand(handle_t hndl, uint16_t size, incarnate_element_fn callba
   return s_ok;
   }
 
-result_t vector_push_back(handle_t hndl, const void *element)
+result_t vector_push_back(vector_p hndl, const void *element)
   {
   result_t result;
   
@@ -200,7 +200,7 @@ result_t vector_push_back(handle_t hndl, const void *element)
   if(failed(result = is_valid_vector(hndl)))
     return result;
 
-  vector_impl_t *vec = (vector_impl_t *)hndl;
+  vector_t *vec = (vector_t *)hndl;
   if(failed(result = ensure_space(vec, vec->length +1)))
     return result;
 
@@ -210,7 +210,7 @@ result_t vector_push_back(handle_t hndl, const void *element)
   return s_ok;
   }
 
-result_t vector_pop_back(handle_t hndl, void *element)
+result_t vector_pop_back(vector_p hndl, void *element)
   {
   result_t result;
   
@@ -220,7 +220,7 @@ result_t vector_pop_back(handle_t hndl, void *element)
   if(failed(result = is_valid_vector(hndl)))
     return result;
 
-  vector_impl_t *vec = (vector_impl_t *)hndl;
+  vector_t *vec = (vector_t *)hndl;
   if(vec->length == 0)
     return e_not_found;
   
@@ -233,7 +233,7 @@ result_t vector_pop_back(handle_t hndl, void *element)
   }
 
 
-result_t vector_count(handle_t hndl, uint16_t *value)
+result_t vector_count(vector_p hndl, uint16_t *value)
   {
   result_t result;
   if(hndl == 0 ||
@@ -243,13 +243,13 @@ result_t vector_count(handle_t hndl, uint16_t *value)
   if(failed(result = is_valid_vector(hndl)))
     return result;
 
-  vector_impl_t *vec = (vector_impl_t *)hndl;
+  vector_t *vec = (vector_t *)hndl;
   *value = vec->length;
 
   return s_ok;
   }
 
-result_t vector_truncate(handle_t hndl, uint16_t length)
+result_t vector_truncate(vector_p hndl, uint16_t length)
   {
   result_t result;
   if (hndl == 0)
@@ -258,7 +258,7 @@ result_t vector_truncate(handle_t hndl, uint16_t length)
   if (failed(result = is_valid_vector(hndl)))
     return result;
 
-  vector_impl_t *vec = (vector_impl_t *)hndl;
+  vector_t *vec = (vector_t *)hndl;
 
   if(vec->length < length)
     return e_bad_parameter;
@@ -269,7 +269,7 @@ result_t vector_truncate(handle_t hndl, uint16_t length)
   return s_ok;
   }
 
-result_t vector_at(handle_t hndl, uint16_t pos, void *element)
+result_t vector_at(vector_p hndl, uint16_t pos, void *element)
   {
   result_t result;
   if(hndl == 0 ||
@@ -279,7 +279,7 @@ result_t vector_at(handle_t hndl, uint16_t pos, void *element)
   if(failed(result = is_valid_vector(hndl)))
     return result;
 
-  vector_impl_t *vec = (vector_impl_t *)hndl;
+  vector_t *vec = (vector_t *)hndl;
   if(pos >= vec->length)
     return e_bad_parameter;
 
@@ -288,7 +288,7 @@ result_t vector_at(handle_t hndl, uint16_t pos, void *element)
   return s_ok;
   }
 
-result_t vector_set(handle_t hndl, uint16_t pos, const void *element)
+result_t vector_set(vector_p hndl, uint16_t pos, const void *element)
   {
   result_t result;
   if(hndl == 0 ||
@@ -298,7 +298,7 @@ result_t vector_set(handle_t hndl, uint16_t pos, const void *element)
   if(failed(result = is_valid_vector(hndl)))
     return result;
 
-  vector_impl_t *vec = (vector_impl_t *)hndl;
+  vector_t *vec = (vector_t *)hndl;
   if(pos >= vec->length)
     return e_bad_parameter;
 
@@ -307,7 +307,7 @@ result_t vector_set(handle_t hndl, uint16_t pos, const void *element)
   return s_ok;
   }
 
-result_t vector_begin(handle_t hndl, void **it)
+result_t vector_begin(vector_p hndl, void **it)
   {
   result_t result;
   if(hndl == 0 ||
@@ -317,14 +317,14 @@ result_t vector_begin(handle_t hndl, void **it)
   if(failed(result = is_valid_vector(hndl)))
     return result;
 
-  vector_impl_t *vec = (vector_impl_t *)hndl;
+  vector_t *vec = (vector_t *)hndl;
   if(failed(result = ensure_space(vec, 32)))
     return result;
 
   *it = vec->buffer;
   return s_ok;
   }
-result_t vector_end(handle_t hndl, void **it)
+result_t vector_end(vector_p hndl, void **it)
   {
   result_t result;
   if(hndl == 0 ||
@@ -334,7 +334,7 @@ result_t vector_end(handle_t hndl, void **it)
   if(failed(result = is_valid_vector(hndl)))
     return result;
 
-  vector_impl_t *vec = (vector_impl_t *)hndl;
+  vector_t *vec = (vector_t *)hndl;
   if(failed(result = ensure_space(vec, 32)))
     return result;
 
@@ -342,39 +342,39 @@ result_t vector_end(handle_t hndl, void **it)
   return s_ok;
   }
 
-result_t vector_empty(handle_t hndl)
+result_t vector_empty(vector_p hndl)
   {
   result_t result;
 
   if(failed(result = is_valid_vector(hndl)))
     return result;
 
-  vector_impl_t *vec = (vector_impl_t *)hndl;
+  vector_t *vec = (vector_t *)hndl;
 
   return vec->length == 0 ? s_ok : s_false;
   }
 
-result_t vector_clear(handle_t hndl)
+result_t vector_clear(vector_p hndl)
   {
   result_t result;
 
   if(failed(result = is_valid_vector(hndl)))
     return result;
 
-  vector_impl_t *vec = (vector_impl_t *)hndl;
+  vector_t *vec = (vector_t *)hndl;
   vec->length = 0;
 
   return s_ok;
   }
 
-result_t vector_insert(handle_t hndl, uint16_t at, const void *element)
+result_t vector_insert(vector_p hndl, uint16_t at, const void *element)
   {
   result_t result;
 
   if(failed(result = is_valid_vector(hndl)))
     return result;
 
-  vector_impl_t *vec = (vector_impl_t *)hndl;
+  vector_t *vec = (vector_t *)hndl;
   if(at > vec->length)
     return e_bad_parameter;
 
@@ -395,12 +395,12 @@ result_t vector_insert(handle_t hndl, uint16_t at, const void *element)
   return s_ok;
   }
 
-static inline void *address_of(vector_impl_t *vec, uint16_t pos)
+static inline void *address_of(vector_t *vec, uint16_t pos)
   {
   return ((uint8_t *)vec->buffer) + (vec->element_size *pos);
   }
 
-static result_t sort(vector_impl_t *vec, compare_element_fn comp, swap_fn swap, uint16_t begin, uint16_t end)
+static result_t sort(vector_t *vec, compare_element_fn comp, swap_fn swap, uint16_t begin, uint16_t end)
   {
   result_t result;
   if(vec == 0 || comp == 0 || swap == 0)
@@ -444,28 +444,28 @@ static result_t sort(vector_impl_t *vec, compare_element_fn comp, swap_fn swap, 
   return s_ok;
   }
 
-result_t vector_sort(vector_t hndl, compare_element_fn comp, swap_fn swap)
+result_t vector_sort(vector_p hndl, compare_element_fn comp, swap_fn swap)
   {
   result_t result;
 
   if(failed(result = is_valid_vector(hndl)))
     return result;
 
-  vector_impl_t *vec = (vector_impl_t *)hndl;
+  vector_t *vec = (vector_t *)hndl;
 
   sort(vec, comp, swap, 0, vec->length-1);
 
   return s_ok;
   }
 
-result_t vector_erase(handle_t hndl, uint16_t at)
+result_t vector_erase(vector_p hndl, uint16_t at)
   {
   result_t result;
 
   if(failed(result = is_valid_vector(hndl)))
     return result;
 
-  vector_impl_t *vec = (vector_impl_t *)hndl;
+  vector_t *vec = (vector_t *)hndl;
   if(at >= vec->length)
     return e_bad_parameter;
 
@@ -482,7 +482,7 @@ result_t vector_erase(handle_t hndl, uint16_t at)
   return s_ok;
   }
 
-result_t vector_assign(handle_t hndl, uint16_t length, const void *elements)
+result_t vector_assign(vector_p hndl, uint16_t length, const void *elements)
   {
   result_t result;
   if(hndl == 0 ||
@@ -493,7 +493,7 @@ result_t vector_assign(handle_t hndl, uint16_t length, const void *elements)
   if(failed(result = is_valid_vector(hndl)))
     return result;
 
-  vector_impl_t *vec = (vector_impl_t *)hndl;
+  vector_t *vec = (vector_t *)hndl;
 
   if(failed(result = vector_clear(hndl)))
     return result;
@@ -508,7 +508,7 @@ result_t vector_assign(handle_t hndl, uint16_t length, const void *elements)
   return s_ok;
   }
 
-result_t vector_append(handle_t hndl, uint16_t length, const void *elements)
+result_t vector_append(vector_p hndl, uint16_t length, const void *elements)
   {
   result_t result;
   if(hndl == 0 ||
@@ -519,7 +519,7 @@ result_t vector_append(handle_t hndl, uint16_t length, const void *elements)
   if(failed(result = is_valid_vector(hndl)))
     return result;
 
-  vector_impl_t *vec = (vector_impl_t *)hndl;
+  vector_t *vec = (vector_t *)hndl;
 
   if(failed(result = ensure_space(vec, vec->length + length)))
     return result;

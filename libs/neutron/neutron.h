@@ -1089,39 +1089,40 @@ extern void *neutron_realloc(void *mem, size_t new_size);
  */
 extern char *neutron_strdup(const char *str);
 
-
+struct _semaphore_t;
+typedef struct _semaphore_t *semaphore_p;
 typedef uint16_t memid_t;
 
 typedef void (*task_callback)(void *parg);
 /**
- * @function emaphore_create(handle_t *semp)
+ * @function emaphore_create(semaphore_p *semp)
  * Create a new semaphore
  * @param semp newly constructed semaphore
  * @return s_ok if resources available to create the semaphore
  */
-extern result_t semaphore_create(handle_t *semp);
+extern result_t semaphore_create(semaphore_p *semp);
 /**
- * @function semaphore_close(handle_t hndl)
+ * @function semaphore_close(semaphore_p hndl)
  * Close a semaphore and release all resources
  * @param hndl semaphore to close
  * @return s_ok if all closed
  */
-extern result_t semaphore_close(handle_t hndl);
+extern result_t semaphore_close(semaphore_p hndl);
 /**
- * @function semaphore_signal(handle_t semaphore)
+ * @function semaphore_signal(semaphore_p semaphore)
  * signal that an event is set.  Should be called from an interrupt service
  * routine.
  * @param event_mask
  * @return s_ok if signaled ok
  */
-extern result_t semaphore_signal(handle_t semaphore);
+extern result_t semaphore_signal(semaphore_p semaphore);
 /**
- * @function semaphore_wait(handle_t semaphore, uint32_t ticks)
+ * @function semaphore_wait(semaphore_p semaphore, uint32_t ticks)
  * Suspend the calling task, waiting for an event
  * @param event_mask  event to wait on.
  * @returns s_ok if the event was signaled, s_false if timeout
  */
-extern result_t semaphore_wait(handle_t semaphore, uint32_t ticks);
+extern result_t semaphore_wait(semaphore_p semaphore, uint32_t ticks);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1135,8 +1136,12 @@ extern result_t semaphore_wait(handle_t semaphore, uint32_t ticks);
 
 #define IDLE_STACK_SIZE 128
 #define DEFAULT_STACK_SIZE 256
+
+struct _task_t;
+typedef struct _task_t *task_p;
+
 /**
- * @function task_create(const char *name, uint16_t stack_size, task_callback callback, void *parg, uint8_t priority, handle_t *task)
+ * @function task_create(const char *name, uint16_t stack_size, task_callback callback, void *parg, uint8_t priority, task_p *task)
  * Create a new scheduled task
  * @param name          name of the task
  * @param stack_size    size of stack to allocate (words)
@@ -1151,44 +1156,44 @@ extern result_t task_create(const char *name,
                            task_callback callback,
                            void *parg,
                            uint8_t priority,
-                           handle_t *task);
+                           task_p *task);
 
 /**
  * @function get_current_task()
  * return the handle to the currently executing task
  * @return task handle
  */
-extern handle_t get_current_task();
+extern task_p get_current_task();
 /**
- * @function set_task_priority(handle_t task, uint8_t priority)
+ * @function set_task_priority(task_p task, uint8_t priority)
  * Change the priority of a scheduled task
  * @param task        task to change
  * @param priority    priority to set
  * @return s_ok if priority set
  */
-extern result_t set_task_priority(handle_t task, uint8_t priority);
+extern result_t set_task_priority(task_p task, uint8_t priority);
 /**
- * @function get_task_priority(handle_t task, uint8_t *priority)
+ * @function get_task_priority(task_p task, uint8_t *priority)
  * Return the priority for a task
  * @param task        task to query
  * @param priority    assigned priority
  * @return s_ok if task is valid
  */
-extern result_t get_task_priority(handle_t task, uint8_t *priority);
+extern result_t get_task_priority(task_p task, uint8_t *priority);
 /**
- * @function task_suspend(handle_t task)
+ * @function task_suspend(task_p task)
  * Suspend a task
  * @param task
  * @return s_ok if suspended
  */
-extern result_t task_suspend(handle_t task);
+extern result_t task_suspend(task_p task);
 /**
- * @function task_resume(handle_t task)
+ * @function task_resume(task_p task)
  * Resume a suspended task
  * @param task  task to resume
  * @return s_ok if task resumed ok
  */
-extern result_t task_resume(handle_t task);
+extern result_t task_resume(task_p task);
 /**
  * @function task_sleep(uint32_t n)
  * Suspend the current task
@@ -1197,12 +1202,12 @@ extern result_t task_resume(handle_t task);
  */
 extern result_t task_sleep(uint32_t n);
 /**
- * @function close_task(handle_t h)
+ * @function close_task(task_p h)
  * Close a task
  * @param h   Handle to the task
  * @return s_ok if task is closed
  */
-extern result_t close_task(handle_t h);
+extern result_t close_task(task_p h);
 /**
  * @function ticks()
  * return the 1khz tick counter
@@ -1218,19 +1223,20 @@ extern void yield();
 //
 // Vector functions
 
-typedef handle_t vector_t;
+struct _vector_t;
+typedef struct _vector_t *vector_p;
 
 /**
- * @function vector_create(uint16_t element_size, vector_t *hndl)
+ * @function vector_create(uint16_t element_size, vector_p *hndl)
  * Create a dynamic vector
  * @param element_size  size of the elements
  * @param length        number of elements
  * @param vector        resulting vector
  * @return s_ok if vector created ok
  */
-extern result_t vector_create(uint16_t element_size, vector_t *hndl);
+extern result_t vector_create(uint16_t element_size, vector_p *hndl);
 /**
- * @function vector_copy(uint16_t element_size, uint16_t length, const void *elements, vector_t *hndl)
+ * @function vector_copy(uint16_t element_size, uint16_t length, const void *elements, vector_p *hndl)
  * Create a new vector and copy the elements into it
  * @param element_size  size of the element
  * @param length        number of elements
@@ -1238,17 +1244,17 @@ extern result_t vector_create(uint16_t element_size, vector_t *hndl);
  * @param hndl          resulting vector
  * @return s_ok if created ok
  */
-extern result_t vector_copy(uint16_t element_size, uint16_t length, const void *elements, vector_t *hndl);
+extern result_t vector_copy(uint16_t element_size, uint16_t length, const void *elements, vector_p *hndl);
 /**
- * @function vector_close(vector_t hndl)
+ * @function vector_close(vector_p hndl)
  * Release a vector
  * @param hndl vector to release
  * @return s_ok if released ok
  */
-extern result_t vector_close(vector_t hndl);
+extern result_t vector_close(vector_p hndl);
 typedef void (*incarnate_element_fn)(void *element, void *parg);
 /**
- * @function vector_expand(vector_t vector, uint16_t size, incarnate_element_fn callback, void *parg)
+ * @function vector_expand(vector_p vector, uint16_t size, incarnate_element_fn callback, void *parg)
  * Expand the vector to a minimum size and call-back to construct each element
  * @param vector      vector to expand
  * @param size        number of
@@ -1256,135 +1262,135 @@ typedef void (*incarnate_element_fn)(void *element, void *parg);
  * @param parg        optional argument
  * @return s_ok if expanded ok
  */
-extern result_t vector_expand(vector_t vector, uint16_t size, incarnate_element_fn callback, void *parg);
+extern result_t vector_expand(vector_p vector, uint16_t size, incarnate_element_fn callback, void *parg);
 //
 typedef int(*compare_element_fn)(const void *left, const void *right);
 typedef void(*swap_fn)(void *left, void *right);
 /**
- * @function vector_compare(vector_t vector, compare_element_fn comp, swap_fn swap)
+ * @function vector_compare(vector_p vector, compare_element_fn comp, swap_fn swap)
  * Sort the vector using the passed in compare function
  * @param vector        Handle to the vector
  * @param comp          Comparison function
  * @param swap          Swap elements function
  * @return s_ok if a valid vector
  */
-extern result_t vector_sort(vector_t vector, compare_element_fn comp, swap_fn swap);
+extern result_t vector_sort(vector_p vector, compare_element_fn comp, swap_fn swap);
 /**
- * @function vector_push_back(vector_t hndl, const void *element)
+ * @function vector_push_back(vector_p hndl, const void *element)
  * Push an element to the back of the vector
  * @param hndl    Vector to append to
  * @param element element to append
  * @return s_ok if appended ok
  */
-extern result_t vector_push_back(vector_t hndl, const void *element);
+extern result_t vector_push_back(vector_p hndl, const void *element);
 /**
- * @function vector_pop_back(vector_t hndl, void *element)
+ * @function vector_pop_back(vector_p hndl, void *element)
  * Return the last element from the vector and remove it
  * @param hndl      Vector to change
  * @param element   Element removed
  * @return s_ok if there is an element available
  */
-extern result_t vector_pop_back(vector_t hndl, void *element);
+extern result_t vector_pop_back(vector_p hndl, void *element);
 /**
- * @function vector_count(vector_t hndl, uint16_t *value)
+ * @function vector_count(vector_p hndl, uint16_t *value)
  * Return the number of elements in the vector
  * @param hndl    Vector to query
  * @param value   Number of elements
  * @return s_ok if a valid vector
  */
-extern result_t vector_count(vector_t hndl, uint16_t *value);
+extern result_t vector_count(vector_p hndl, uint16_t *value);
 /**
- * @function vector_at(vector_t hndl, uint16_t pos, void *element)
+ * @function vector_at(vector_p hndl, uint16_t pos, void *element)
  * Retrieve an element at a position
  * @param hndl      Vector to query
  * @param pos       Position to query
  * @param element   Copy of element at a position
  * @return s_ok if a valid position and the element was copied
  */
-extern result_t vector_at(vector_t hndl, uint16_t pos, void *element);
+extern result_t vector_at(vector_p hndl, uint16_t pos, void *element);
 /**
- * @function vector_set(vector_t hndl, uint16_t pos, const void *element)
+ * @function vector_set(vector_p hndl, uint16_t pos, const void *element)
  * Set an element at a position
  * @param hndl      Vector to query
  * @param pos       Position to query
  * @param element   Element at a position
  * @return s_ok if a valid position and the element was copied
  */
-extern result_t vector_set(vector_t hndl, uint16_t pos, const void *element);
+extern result_t vector_set(vector_p hndl, uint16_t pos, const void *element);
 /**
- * @function vector_begin(vector_t hndl, void **it)
+ * @function vector_begin(vector_p hndl, void **it)
  * Return a pointer to the start of the vector
  * @param hndl      Vector to query
  * @param it        Pointer to the start of the vector storage
  * @return s_ok if the vaector is valid
  */
-extern result_t vector_begin(vector_t hndl, void **it);
+extern result_t vector_begin(vector_p hndl, void **it);
 /**
- * @function vector_end(vector_t hndl, void **it)
+ * @function vector_end(vector_p hndl, void **it)
  * Return a pointer to the end of the vector +1 i.e. vector_begin[vector_count]
  * @param hndl      Vector to query
  * @param it        Pointer to the start of the vector storage
  * @return s_ok if the vaector is valid
  */
-extern result_t vector_end(vector_t hndl, void **it);
+extern result_t vector_end(vector_p hndl, void **it);
 /**
- * @function vector_empty(vector_t hndl)
+ * @function vector_empty(vector_p hndl)
  * Return s_ok if the vector is empty (0 elements)
  * @param hndl  Handle to the vector
  * @return s_ok if empty, s_false if not
  */
-extern result_t vector_empty(vector_t hndl);
+extern result_t vector_empty(vector_p hndl);
 /**
- * @function vector_clear(vector_t hndl)
+ * @function vector_clear(vector_p hndl)
  * Remove all elements from a vector
  * @param hndl  Vector to clear
  * @return s_ok if a valid vector
  */
-extern result_t vector_clear(vector_t hndl);
+extern result_t vector_clear(vector_p hndl);
 /**
- * @function vector_insert(vector_t hndl, uint16_t at, const void *element)
+ * @function vector_insert(vector_p hndl, uint16_t at, const void *element)
  * Insert an element into a vector
  * @param hndl      Vector to change
  * @param at        position in the vector, must be less than vector_count
  * @param element   element to copy into the vector
  * @return s_ok if copied ok
  */
-extern result_t vector_insert(vector_t hndl, uint16_t at, const void *element);
+extern result_t vector_insert(vector_p hndl, uint16_t at, const void *element);
 /**
- * @function vector_assign(vector_t hndl, uint16_t len, const void *elements)
+ * @function vector_assign(vector_p hndl, uint16_t len, const void *elements)
  * Assign content as the vector
  * @param hndl      Handle to a created contained
  * @param len       Number of elements to assign
  * @param elements  Elements
  * @return s_ok if assigned ok
  */
-extern result_t vector_assign(vector_t hndl, uint16_t len, const void *elements);
+extern result_t vector_assign(vector_p hndl, uint16_t len, const void *elements);
 /**
- * @function vector_erase(vector_t hndl, uint16_t at)
+ * @function vector_erase(vector_p hndl, uint16_t at)
  * Remove an element from a vector
  * @param hndl  Vector to change
  * @param at    Element to remove
  * @return s_ok if removed ok
  */
-extern result_t vector_erase(vector_t hndl, uint16_t at);
+extern result_t vector_erase(vector_p hndl, uint16_t at);
 /**
- * @function vector_append(vector_t hndl, uint16_t length, const void *elements)
+ * @function vector_append(vector_p hndl, uint16_t length, const void *elements)
  * Append the elements to a vector
  * @param hndl      Vector to change
  * @param length    Number of elements to append
  * @param elements  Elements to add to the vector
  * @return s_ok if elements appended ok
  */
-extern result_t vector_append(vector_t hndl, uint16_t length, const void *elements);
+extern result_t vector_append(vector_p hndl, uint16_t length, const void *elements);
 /**
-* @function vector_truncate(vector_t hndl, uint16_t length)
+* @function vector_truncate(vector_p hndl, uint16_t length)
 * set the length of the vector to the requested length
 * @param hndl      Vector to change
 * @param length    Number of elements to append
 * @return s_ok if vector truncated to size, if the size of the vector is less
 * than the length then e_invalid_argument is returned
 */
-extern result_t vector_truncate(vector_t hndl, uint16_t length);
+extern result_t vector_truncate(vector_p hndl, uint16_t length);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1395,8 +1401,11 @@ typedef int (*compare_key_fn)(const void *left, const void *right);
 typedef void (*destroy_key_fn)(void *key);
 typedef void (*destroy_value_fn)(void *);
 
+struct _map_t;
+typedef struct _map_t *map_p;
+
 /**
- * @function map_create(dup_fn copy_key, dup_fn copy_value, compare_key_fn comp_fn, destroy_key_fn destroy_key, destroy_value_fn destroy_value, handle_t *handle)
+ * @function map_create(dup_fn copy_key, dup_fn copy_value, compare_key_fn comp_fn, destroy_key_fn destroy_key, destroy_value_fn destroy_value, map_p *handle)
  * Create a map of key:value pairs
  * @param comp_fn       Compare two keys
  * @param destroy_key   Destroy a key
@@ -1409,9 +1418,9 @@ extern result_t map_create(dup_fn copy_key,
                            compare_key_fn comp_fn,
                            destroy_key_fn destroy_key,
                            destroy_value_fn destroy_value,
-                           handle_t *handle);
+                           map_p *handle);
 /**
- * @function map_create_nv(dup_fn copy_value, destroy_value_fn destroy_value, handle_t *handle)
+ * @function map_create_nv(dup_fn copy_value, destroy_value_fn destroy_value, map_p *handle)
  * Create a string:value map to store named values
  * @param value_size      Size of value stored
  * @param destroy_value   Function to destroy a value, can be 0
@@ -1420,96 +1429,98 @@ extern result_t map_create(dup_fn copy_key,
  */
 extern result_t map_create_nv(dup_fn copy_value,
                               destroy_value_fn destroy_value,
-                              handle_t *handle);
+                              map_p *handle);
 /**
- * @function map_add(handle_t map, const void *key, const void *value)
+ * @function map_add(map_p map, const void *key, const void *value)
  * Add a value to a map
  * @param key     key value
  * @param value   data to store
  * @return s_ok if added
  */
-extern result_t map_add(handle_t map, const void *key, const void *value);
+extern result_t map_add(map_p map, const void *key, const void *value);
 /**
- * @function map_remove(handle_t map, const void *key)
+ * @function map_remove(map_p map, const void *key)
  * Remove and destroy an item from the map
  * @param map     Map to remove from
  * @param key     Key to use
  * @return s_ok if removed ok
  */
-extern result_t map_remove(handle_t map, const void *key);
+extern result_t map_remove(map_p map, const void *key);
 /**
- * @function map_close(handle_t map)
+ * @function map_close(map_p map)
  * Close and release all resources
  * @param map     Map to release
  * @return        s_ok if released ok
  */
-extern result_t map_close(handle_t map);
+extern result_t map_close(map_p map);
 /**
- * @function map_find(handle_t map, const void *key, void **value)
+ * @function map_find(map_p map, const void *key, void **value)
  * Find an item in the map
  * @param map     Map to lookup
  * @param key     Key to match
  * @param value   Value if found
  * @return s_ok if value found
  */
-extern result_t map_find(handle_t map, const void *key, void **value);
+extern result_t map_find(map_p map, const void *key, void **value);
 
 //////////////////////////////////////////////////////////////////////////////
 //
 //  Queue Functions
+struct _deque_t;
+typedef struct _deque_t *deque_p;
 /**
- * @function deque_create(uint16_t element_size, uint16_t length, handle_t *deque)
+ * @function deque_create(uint16_t element_size, uint16_t length, deque_p *deque)
  * Create a queue and initialize it
  * @param element_size  Size of elements in the deque
  * @param length        Number of elements in the deque
  * @param deque         handle to the deque
  * @return s_ok if created ok
  */
-extern result_t deque_create(uint16_t element_size, uint16_t length, handle_t *deque);
+extern result_t deque_create(uint16_t element_size, uint16_t length, deque_p *deque);
 /**
- * @function deque_close(handle_t deque)
+ * @function deque_close(deque_p deque)
  * Release a deque and return all resources
  * @param deque Deque to release
  * @return s_ok if released ok
  */
-extern result_t deque_close(handle_t deque);
+extern result_t deque_close(deque_p deque);
 /**
- * @function can_pop(handle_t deque)
+ * @function can_pop(deque_p deque)
  * return true if there is an item on the queue
  * @param   queue to pop
  * @return  s_true if an item available, s_false if not
  */
-extern result_t can_pop(handle_t deque);
+extern result_t can_pop(deque_p deque);
 /**
- * @function count(handle_t deque, uint16_t *value)
+ * @function count(deque_p deque, uint16_t *value)
  * Number of items in the deque
  * @param deque  deque to query
  * @param value  number of items in the deque
  * @result s_ok if a valid queue
  */
-extern result_t count(handle_t deque, uint16_t *value);
+extern result_t count(deque_p deque, uint16_t *value);
 /**
- * @function push_back(handle_t deque, const void *item, uint32_t max_wait)
+ * @function push_back(deque_p deque, const void *item, uint32_t max_wait)
  * Push an item onto the deque.  will block if no space
  * @param deque   queue to push onto
  * @param item    item to copy onto queue
  */
-extern result_t push_back(handle_t deque, const void *item, uint32_t max_wait);
+extern result_t push_back(deque_p deque, const void *item, uint32_t max_wait);
 /**
- * @function pop_front(handle_t deque, void *item, uint32_t max_wait)
+ * @function pop_front(deque_p deque, void *item, uint32_t max_wait)
  * Remove an item from a queue
  * @param deque deque to pop from
  * @param item  if non 0 copy of item
  */
-extern result_t pop_front(handle_t deque, void *item, uint32_t max_wait);
+extern result_t pop_front(deque_p deque, void *item, uint32_t max_wait);
 /**
- * @function capacity(handle_t deque, uint16_t *value)
+ * @function capacity(deque_p deque, uint16_t *value)
  * Return the number of items that can be in a deque
  * @param deque   Queue to query
  * @param value   number of items that can be added to the queue
  * @return s_ok if a valid deque
  */
-extern result_t capacity(handle_t deque, uint16_t *value);
+extern result_t capacity(deque_p deque, uint16_t *value);
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -1866,24 +1877,26 @@ extern result_t reg_set_bool(memid_t parent, const char *name, bool value);
 //
 //  Serial port communications functions
 //
+struct _comm_device_t;
+typedef struct _comm_device_t *comm_device_p;
 /**
- * @function comm_create_device(memid_t key, handle_t *device)
+ * @function comm_create_device(memid_t key, comm_device_p *device)
  * Open a new comms device
  * @param key       Registry key that holds the setup information
  * @param worker    Semaphore used to block calling thread on
  * @param device    resulting comms device
  * @return s_ok if device is opened ok
  */
-extern result_t comm_create_device(memid_t key, handle_t *device);
+extern result_t comm_create_device(memid_t key, comm_device_p *device);
 /**
- * @function comm_close_device(handle_t device)
+ * @function comm_close_device(comm_device_p device)
  * Close a communications device
  * @param device  Device to close
  * @return s_ok if closed ok
  */
-extern result_t comm_close_device(handle_t device);
+extern result_t comm_close_device(comm_device_p device);
 /**
- * @function comm_write(handle_t device, const byte_t *data, uint16_t len, uint32_t timeout)
+ * @function comm_write(comm_device_p device, const byte_t *data, uint16_t len, uint32_t timeout)
  * Write a string to the comms device
  * @param device  Device to write to
  * @param data    Character string to write
@@ -1893,9 +1906,9 @@ extern result_t comm_close_device(handle_t device);
  * @remark this is a blocking call and will only return when the timeout is reached or
  * all characters are sent
  */
-extern result_t comm_write(handle_t device, const byte_t *data, uint16_t len, uint32_t timeout);
+extern result_t comm_write(comm_device_p device, const byte_t *data, uint16_t len, uint32_t timeout);
 /**
- * @function comm_read(handle_t device, byte_t *data, uint16_t len, uint16_t *bytes_read, uint32_t timeout)
+ * @function comm_read(comm_device_p device, byte_t *data, uint16_t len, uint16_t *bytes_read, uint32_t timeout)
  * Read bytes from the comms device
  * @param device      Device to read from
  * @param data        Data to read
@@ -1904,7 +1917,7 @@ extern result_t comm_write(handle_t device, const byte_t *data, uint16_t len, ui
  * @param timeout     Max milliseconds to wait for each character
  * @return s_ok if bytes were read
  */
-extern result_t comm_read(handle_t device, byte_t *data, uint16_t len, uint16_t *bytes_read, uint32_t timeout);
+extern result_t comm_read(comm_device_p device, byte_t *data, uint16_t len, uint16_t *bytes_read, uint32_t timeout);
 
 typedef enum _ioctl_type
   {
@@ -1912,7 +1925,7 @@ typedef enum _ioctl_type
   get_device_ctl
     } ioctl_type;
 /**
- * @function comm_ioctl(handle_t device, ioctl_type type, const void *in_buffer,
+ * @function comm_ioctl(comm_device_p device, ioctl_type type, const void *in_buffer,
     uint16_t in_buffer_size, void *out_buffer, uint16_t out_buffer_size,
                uint16_t *size_returned)
  * Perform an IOCTL on the device
@@ -1925,7 +1938,7 @@ typedef enum _ioctl_type
  * @param size_returned     Actual result size
  * @return s_ok if IOCTL performed.
  */
-extern result_t comm_ioctl(handle_t device, ioctl_type type, const void *in_buffer,
+extern result_t comm_ioctl(comm_device_p device, ioctl_type type, const void *in_buffer,
     uint16_t in_buffer_size, void *out_buffer, uint16_t out_buffer_size,
                uint16_t *size_returned);
 
@@ -2084,7 +2097,7 @@ typedef struct _comms_event_mask_ioctl_t
   {
   comms_ioctl_t ioctl;
 
-  handle_t notification_event;
+  semaphore_p notification_event;
   event_mask_t mask;
   } comms_event_mask_ioctl_t;
 
@@ -2148,26 +2161,28 @@ typedef struct _comms_timeouts_ioctl_t
 // The registry supports a stream object which can be treated as a bufferred
 // stream.  The size of a stream is limited to
 // 32 kBytes only
+struct _stream_t;
+typedef struct _stream_t *stream_p;
 /**
- * @function stream_open(memid_t parent, const char *path, handle_t *stream)
+ * @function stream_open(memid_t parent, const char *path, stream_p *stream)
  * Open a stream given a path.
  * @param parent    registry key the path is relative to, 0 for root
  * @param path      path to the stream
  * @param stream    opened stream
  * @return s_ok if the stream exists.
  */
-extern result_t stream_open(memid_t parent, const char *path, handle_t *stream);
+extern result_t stream_open(memid_t parent, const char *path, stream_p *stream);
 /**
- * @function stream_create(memid_t parent, const char *path, handle_t *stream)
+ * @function stream_create(memid_t parent, const char *path, stream_p *stream)
  * Create a new stream.
  * @param parent    registry key the path is relative to.  The key path must exist
  * @param path      path to the stream.
  * @param stream    newly created stream
  * @return s_ok if the stream created ok.
  */
-extern result_t stream_create(memid_t parent, const char *path, handle_t *stream);
+extern result_t stream_create(memid_t parent, const char *path, stream_p *stream);
 /**
- * @function manifest_open(const char *path, handle_t *stream)
+ * @function manifest_open(const char *path, stream_p *stream)
  * Open a manifest stream.  
  * @param key       Key to open resource from
  * @param path      Path to the stream. see remarks
@@ -2178,9 +2193,9 @@ extern result_t stream_create(memid_t parent, const char *path, handle_t *stream
  * the CLI to store resources (images and fonts) in the registry
  * or in code.  The resource is read-only
  */
-extern result_t manifest_open(memid_t key, const char *path, handle_t *stream);
+extern result_t manifest_open(memid_t key, const char *path, stream_p *stream);
 /**
- * @function manifest_create(const char *path, handle_t *stream)
+ * @function manifest_create(const char *path, stream_p *stream)
  * Open a manifest stream.  
  * @param literal   Base64 encoded binary image
  * @param stream    opened stream
@@ -2190,30 +2205,30 @@ extern result_t manifest_open(memid_t key, const char *path, handle_t *stream);
  * the CLI to store resources (images and fonts) in the registry
  * or in code.  The resource is read only
  */
-extern result_t manifest_create(const char *literal, handle_t *stream);
+extern result_t manifest_create(const char *literal, stream_p *stream);
 /**
- * @function stream_close(handle_t stream)
+ * @function stream_close(stream_p stream)
  * Close the stream handle and release all resources
  * @param stream    stream
  * @return s_ok if closed.  The handle is no longer valid
  */
-extern result_t stream_close(handle_t stream);
+extern result_t stream_close(stream_p stream);
 /**
- * @function stream_delete(handle_t stream)
+ * @function stream_delete(stream_p stream)
  * Close the stream, and delete the entire persistent state
  * @param stream    stream to close
  * @return s_ok if closed ok.
  */
-extern result_t stream_delete(handle_t stream);
+extern result_t stream_delete(stream_p stream);
 /**
- * @function stream_eof(handle_t stream)
+ * @function stream_eof(stream_p stream)
  * Detect end of read pointer on stream
  * @param stream    stream to check
  * @return s_ok if at eof, s_false if not.
  */
-extern result_t stream_eof(handle_t stream);
+extern result_t stream_eof(stream_p stream);
 /**
- * @function stream_read(handle_t stream, void *buffer, uint16_t size, uint16_t *read)
+ * @function stream_read(stream_p stream, void *buffer, uint16_t size, uint16_t *read)
  * Read from a stream
  * @param stream    Stream to read from
  * @param buffer    Buffer to read bytes into
@@ -2221,26 +2236,26 @@ extern result_t stream_eof(handle_t stream);
  * @param read      Number of bytes read into the buffer
  * @return s_ok if read ok.
  */
-extern result_t stream_read(handle_t stream, void *buffer, uint16_t size, uint16_t *read);
+extern result_t stream_read(stream_p stream, void *buffer, uint16_t size, uint16_t *read);
 /**
- * @function stream_write(handle_t stream, const void *buffer, uint16_t size)
+ * @function stream_write(stream_p stream, const void *buffer, uint16_t size)
  * Write bytes to a stream
  * @param stream    Stream to write to
  * @param buffer    Buffer of bytes to write
  * @param size      Number of bytes to write
  * @return s_ok if the buffer was written to the stream
  */
-extern result_t stream_write(handle_t stream, const void *buffer, uint16_t size);
+extern result_t stream_write(stream_p stream, const void *buffer, uint16_t size);
 /**
- * @function stream_getpos(handle_t stream, uint16_t *pos)
+ * @function stream_getpos(stream_p stream, uint16_t *pos)
  * Get the position of the stream for the next operation
  * @param stream    Stream to query
  * @param pos       Position of the stream for the next read or write
  * @return s_ok if a valid stream
  */
-extern result_t stream_getpos(handle_t stream, uint16_t *pos);
+extern result_t stream_getpos(stream_p stream, uint16_t *pos);
 /**
- * @function stream_setpos(handle_t stream, uint16_t pos)
+ * @function stream_setpos(stream_p stream, uint16_t pos)
  * Move the stream offset
  * @param stream    Stream to query
  * @param pos       Position to set
@@ -2248,73 +2263,73 @@ extern result_t stream_getpos(handle_t stream, uint16_t *pos);
  * or within the stream.  setting to UINT16_MAX will move the pointer to the
  * end of the stream.
  */
-extern result_t stream_setpos(handle_t stream, uint16_t pos);
+extern result_t stream_setpos(stream_p stream, uint16_t pos);
 /**
- * @function stream_length(handle_t stream, uint16_t *length)
+ * @function stream_length(stream_p stream, uint16_t *length)
  * Return the number of bytes in a stream
  * @param stream    Stream to query
  * @param length    Length of the stream, max is 32768
  * @return s+ok if the handle is a valid stream
  */
-extern result_t stream_length(handle_t stream, uint16_t *length);
+extern result_t stream_length(stream_p stream, uint16_t *length);
 /**
- * @function stream_truncate(handle_t stream, uint16_t length)
+ * @function stream_truncate(stream_p stream, uint16_t length)
  * Set the stream length
  * @param stream    Stream to set
  * @param length    Length to truncate to.  This must be at or less than the
  * stream length
  * @return s_ok if truncated ok
  */
-extern result_t stream_truncate(handle_t stream, uint16_t length);
+extern result_t stream_truncate(stream_p stream, uint16_t length);
 /**
- * @function stream_copy(handle_t from, handle_t to)
+ * @function stream_copy(stream_p from, stream_p to)
  * Copy betrween two streams
  * @param from      Stream to copy from
  * @param to        Stream to copy to
  * @return s_ok if truncated ok
  */
-extern result_t stream_copy(handle_t from, handle_t to);
+extern result_t stream_copy(stream_p from, stream_p to);
 /**
- * @function stream_path(handle_t stream, bool full_path, uint16_t path_length, char *path)
+ * @function stream_path(stream_p stream, bool full_path, uint16_t path_length, char *path)
 * Return the name of a stream
 * @param stream    Stream to get name of
 * @param full_path True if the full path of the stream is needed
 * @param path      Resulting path
 * @return s_ok if truncated ok
 */
-extern result_t stream_path(handle_t stream, bool full_path, uint16_t path_length, char *path);
+extern result_t stream_path(stream_p stream, bool full_path, uint16_t path_length, char *path);
 /**
  * Current ASCII input stream.  May be a persistent stream or a
  * console.
  */
-extern handle_t console_in;
+extern stream_p console_in;
 /**
  * Current ASCII output stream.  May be a persistent stream or console
  */
-extern handle_t console_out;
+extern stream_p console_out;
 /**
  * Current ASCII error stream.  Generally always a console
  */
-extern handle_t console_err;
+extern stream_p console_err;
 /**
- * @function strstream_create(const char *lit, handle_t *stream)
+ * @function strstream_create(const char *lit, stream_p *stream)
  * Create an in-memory stream.  Should be deleted when done.
  * @param lit     Optional literal to copy into the stream
  * @param len     Length of the literal
  * @param stream  Resulting stream
  * @return s_ok if created ok
  */
-extern result_t strstream_create(const void *buffer, uint16_t len, handle_t *stream);
+extern result_t strstream_create(const void *buffer, uint16_t len, stream_p *stream);
 /**
- * @function strstream_get(handle_t stream, const char **lit)
+ * @function strstream_get(stream_p stream, const char **lit)
  * Return the underlying character buffer of the stream
  * @param stream  Stream to query
  * @param lit     Resulting buffer
  * @return s_ok if stream is a string stream.
  */
-extern result_t strstream_get(handle_t stream, const void **lit);
+extern result_t strstream_get(stream_p stream, const void **lit);
 /**
- * @function stream_printf(handle_t stream, const char *format, ...)
+ * @function stream_printf(stream_p stream, const char *format, ...)
  * Print a formatted string.
  * @param stream    Stream to print to
  * @param format    Format to print as
@@ -2322,16 +2337,16 @@ extern result_t strstream_get(handle_t stream, const void **lit);
  * @param argv      Pointer to arguments
  * @return s_ok if printed ok
  */
-extern result_t stream_printf(handle_t stream, const char *format, ...); // __attribute__((format(printf, 2, 3)));
+extern result_t stream_printf(stream_p stream, const char *format, ...); // __attribute__((format(printf, 2, 3)));
 /**
- * @function stream_vprintf(handle_t stream, const char *fmt, va_list ap)
+ * @function stream_vprintf(stream_p stream, const char *fmt, va_list ap)
  * print a formatted stream
  * @param stream
  * @param fmt
  * @param ap
  * @return
  */
-extern result_t stream_vprintf(handle_t stream, const char *fmt, va_list ap);
+extern result_t stream_vprintf(stream_p stream, const char *fmt, va_list ap);
 
 typedef enum _scan_type
   {
@@ -2355,7 +2370,7 @@ typedef enum _scan_type
  */
 typedef result_t (*get_arg_fn)(uint16_t arg, void *argv, scan_type dt, void *value);
 /**
- * @function stream_printf_cb(handle_t stream, const char *format, get_arg_fn cb, void *argv)
+ * @function stream_printf_cb(stream_p stream, const char *format, get_arg_fn cb, void *argv)
  * Print a formatted string.
  * @param stream    Stream to print to
  * @param format    Format to print as
@@ -2363,9 +2378,9 @@ typedef result_t (*get_arg_fn)(uint16_t arg, void *argv, scan_type dt, void *val
  * @param argv      Pointer to arguments
  * @return s_ok if printed ok
  */
-extern result_t stream_printf_cb(handle_t stream, const char *format, get_arg_fn cb, void *argv);
+extern result_t stream_printf_cb(stream_p stream, const char *format, get_arg_fn cb, void *argv);
 /**
- * @function stream_scanf_cb(handle_t stream, const char *format, get_arg_fn cb, void *argv)
+ * @function stream_scanf_cb(stream_p stream, const char *format, get_arg_fn cb, void *argv)
  * Scan arguments from a string.
  * @param stream    Stream to scan from
  * @param format    Format of the arguments
@@ -2373,9 +2388,9 @@ extern result_t stream_printf_cb(handle_t stream, const char *format, get_arg_fn
  * @param argv      Pointer to arguments
  * @return s_ok if scanned ok
  */
-extern result_t stream_scanf_cb(handle_t stream, const char *format, get_arg_fn cb, void *argv);
+extern result_t stream_scanf_cb(stream_p stream, const char *format, get_arg_fn cb, void *argv);
 /**
- * @function stream_scanf(handle_t stream, const char *format, ...)
+ * @function stream_scanf(stream_p stream, const char *format, ...)
  * Scan arguments from a stream.
  * @param stream    Stream to scan from
  * @param format    Format of the arguments
@@ -2383,42 +2398,42 @@ extern result_t stream_scanf_cb(handle_t stream, const char *format, get_arg_fn 
  * @param argv      Pointer to arguments
  * @return s_ok if scanned ok
  */
-extern result_t stream_scanf(handle_t stream, const char *format, ...); //  __attribute__((format(scanf, 2, 3)));
+extern result_t stream_scanf(stream_p stream, const char *format, ...); //  __attribute__((format(scanf, 2, 3)));
 /**
- * @function stream_vscanf(handle_t stream, const char *fmt, va_list ap)
+ * @function stream_vscanf(stream_p stream, const char *fmt, va_list ap)
  * Scan arguments from a stream
  * @param stream    Stream to scan from
  * @param fmt       Format of the arguments
  * @param ap        Varargs list
  * @return s_ok if scanned ok
  */
-extern result_t stream_vscanf(handle_t stream, const char *fmt, va_list ap);
+extern result_t stream_vscanf(stream_p stream, const char *fmt, va_list ap);
 /**
- * @function stream_getc(handle_t stream, char *ch)
+ * @function stream_getc(stream_p stream, char *ch)
  * Read one character from the stream
  * @param stream    Stream to read from
  * @param ch        character read
  * @return s_ok if character available, or e_end_of_file if no characters
  */
-extern result_t stream_getc(handle_t stream, char *ch);
+extern result_t stream_getc(stream_p stream, char *ch);
 /**
- * @function stream_putc(handle_t stream, char ch)
+ * @function stream_putc(stream_p stream, char ch)
  * Send one character to the stream
  * @param stream    Stream to write to
  * @param ch        character to write
  * @return s_ok if written ok
  */
-extern result_t stream_putc(handle_t stream, char ch);
+extern result_t stream_putc(stream_p stream, char ch);
 /**
- * @function stream_ungetc(handle_t stream, char ch
+ * @function stream_ungetc(stream_p stream, char ch
  * Push the character ch onto the end of the stream.
  * @param stream    Stream to write to
  * @param ch        character to append
  * @return s_ok if the stream position was rewound
  */
-extern result_t stream_ungetc(handle_t stream, char ch);
+extern result_t stream_ungetc(stream_p stream, char ch);
 /**
- * @function stream_gets(handle_t stream, char *buffer, uint16_t len)
+ * @function stream_gets(stream_p stream, char *buffer, uint16_t len)
  * Read an ascii line of characters from the stream.
  * @param stream    Stream to read from
  * @param buffer    Buffer to read into
@@ -2429,15 +2444,15 @@ extern result_t stream_ungetc(handle_t stream, char ch);
  * stream implementation this may be translated to a \r character
  * the bytes read will always be len-1 so the trailing \0 can be appended
  */
-extern result_t stream_gets(handle_t stream, char *buffer, uint16_t len);
+extern result_t stream_gets(stream_p stream, char *buffer, uint16_t len);
 /**
- * @function stream_puts(handle_t stream, const char *str)
+ * @function stream_puts(stream_p stream, const char *str)
  * Write a string to a stream
  * @param stream    Stream to write to
  * @param str       string to send
  * @return s_ok if written ok.
  */
-extern result_t stream_puts(handle_t stream, const char *str);
+extern result_t stream_puts(stream_p stream, const char *str);
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -2465,7 +2480,7 @@ typedef result_t (*get_byte_fn)(handle_t parg, uint32_t offset, uint8_t *data);
 */
 typedef result_t (*set_byte_fn)(handle_t parg, uint32_t offset, uint8_t data);
 /**
- * @function result_t decompress(handle_t stream, handle_t parg, get_byte_fn getter, set_byte_fn setter, uint32_t *length)
+ * @function result_t decompress(stream_p stream, handle_t parg, get_byte_fn getter, set_byte_fn setter, uint32_t *length)
  * Decompress a stream into a user defined buffer
  * @param stream    Source stream to read from.  Must be a valid DEFLATE format stream
  * @param parg      User defined callback argument
@@ -2474,7 +2489,7 @@ typedef result_t (*set_byte_fn)(handle_t parg, uint32_t offset, uint8_t data);
  * @param length    Optional value that counts the number of bytes decompressed
  * @return s_ok if the stream was decoded ok.
  */
-extern result_t decompress(handle_t stream, handle_t parg, get_byte_fn getter, set_byte_fn setter, uint32_t *length);
+extern result_t decompress(stream_p stream, handle_t parg, get_byte_fn getter, set_byte_fn setter, uint32_t *length);
 
 ////////////////////////////////////////////////////////////////////////////////
 //

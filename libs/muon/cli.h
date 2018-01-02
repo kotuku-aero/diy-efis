@@ -58,13 +58,13 @@ extern "C" {
 * @param sep   separator to split string
 * @return a vector of the strings as split.
 */
-extern vector_t string_split(const char *s, char sep);
+extern vector_p string_split(const char *s, char sep);
 /**
 * Free the result returned by string_split_len(), or do nothing if 'tokens' is 0.
 * @param tokens
 * @param count
 */
-extern void kfree_split(vector_t tokens);
+extern void kfree_split(vector_p tokens);
 
 /**
  * Maximum number of nested sub-mode levels.
@@ -485,7 +485,7 @@ extern result_t cli_complete_keyword(cli_t *parser, const cli_node_t *node, cli_
 extern result_t cli_complete_enum(cli_t *parser, const cli_node_t *node, cli_token_t *token);
 extern result_t cli_complete_path(cli_t *parser, const cli_node_t *node, cli_token_t *token);
 
-extern result_t match_path(cli_t *context, const char * path, bool ignore_wildcard, memid_t *key, vector_t *matches);
+extern result_t match_path(cli_t *context, const char * path, bool ignore_wildcard, memid_t *key, vector_p *matches);
 
 /********** Token get functions **********/
 extern result_t cli_get_string(const cli_token_t *token, const char * *value);

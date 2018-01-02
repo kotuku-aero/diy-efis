@@ -9,7 +9,7 @@ static uint8_t *reg_buffer;
 
 uint8_t *fb_buffer;
 
-static handle_t mutex;
+static semaphore_p mutex;
 
 void enter_critical()
   {
@@ -23,7 +23,7 @@ void exit_critical()
 
 handle_t bsp_thread_mutex()
   {
-  handle_t tls_mutex = TlsGetValue(0);
+  semaphore_p tls_mutex = TlsGetValue(0);
   if (tls_mutex == 0)
     {
     // create our thread specific handle
@@ -176,7 +176,7 @@ typedef struct _semaphore_t {
   volatile LONG cnt;
   } semaphore_t;
 
-result_t semaphore_create(handle_t *handle)
+result_t semaphore_create(semaphore_p *handle)
   {
   semaphore_t *semp = (semaphore_t *)neutron_malloc(sizeof(semaphore_t));
 
@@ -188,7 +188,7 @@ result_t semaphore_create(handle_t *handle)
   return s_ok;
   }
 
-result_t semaphore_close(handle_t hndl)
+result_t semaphore_close(semaphore_p hndl)
   {
   semaphore_t *semp = (semaphore_t *)hndl;
   CloseHandle(semp->handle);
@@ -197,7 +197,7 @@ result_t semaphore_close(handle_t hndl)
   return s_ok;
   }
 
-result_t semaphore_signal(handle_t hndl)
+result_t semaphore_signal(semaphore_p hndl)
   {
   semaphore_t *semp = (semaphore_t *)hndl;
   InterlockedDecrement(&semp->cnt);
@@ -207,7 +207,7 @@ result_t semaphore_signal(handle_t hndl)
 
   }
 
-result_t semaphore_wait(handle_t hndl, uint32_t ticks)
+result_t semaphore_wait(semaphore_p hndl, uint32_t ticks)
   {
   semaphore_t *semp = (semaphore_t *)hndl;
   InterlockedIncrement(&semp->cnt);
@@ -236,11 +236,12 @@ void platform_trace(uint16_t level, const char *msg, va_list va)
   }
 #endif
 
-bool has_wait_tasks(handle_t hndl)
+bool has_wait_tasks(semaphore_p hndl)
   {
   semaphore_t *semp = (semaphore_t *)hndl;
   return semp->cnt > 0;
   }
+
 uint32_t ticks()
   {
   return GetTickCount();
@@ -267,7 +268,7 @@ result_t task_create(const char *name,
   task_callback pfn,
   void *param,
   uint8_t priority,
-  handle_t *task)
+  task_p *task)
   {
   tw_t *tw = (tw_t *)neutron_malloc(sizeof(tw_t));
   tw->cb = pfn;
@@ -283,35 +284,35 @@ result_t task_create(const char *name,
   return s_ok;
   }
 
-result_t set_task_priority(handle_t h, uint8_t p)
+result_t set_task_priority(task_p h, uint8_t p)
   {
   SetThreadPriority(h, p);
 
   return s_ok;
   }
 
-result_t get_task_priority(handle_t h, uint8_t *p)
+result_t get_task_priority(task_p h, uint8_t *p)
   {
   *p = GetThreadPriority(h);
 
   return s_ok;
   }
 
-result_t close_task(handle_t h)
+result_t close_task(task_p h)
   {
   TerminateThread(h, 0);
 
   return s_ok;
   }
 
-result_t task_suspend(handle_t h)
+result_t task_suspend(task_p h)
   {
   SuspendThread(h);
 
   return s_ok;
   }
 
-result_t task_resume(handle_t h)
+result_t task_resume(task_p h)
   {
   ResumeThread(h);
 

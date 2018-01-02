@@ -88,7 +88,7 @@ typedef struct _fontrec_t {
 typedef struct _font_t {
   const fontrec_t *fontrec;
   // this a a const sized_font_t *
-  handle_t fonts;
+  vector_p fonts;
   } font_t;
 
 static inline uint16_t to_small_endian(uint16_t value)

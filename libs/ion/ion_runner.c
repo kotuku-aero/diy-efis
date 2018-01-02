@@ -46,7 +46,7 @@ typedef struct _ion_request {
 #define NUM_SCRIPTS 8
 static uint16_t num_scripts;
 static ion_context_t **scripts = 0;
-static handle_t ion_mutex;
+static semaphore_p ion_mutex;
 
 extern void register_ion_functions(duk_context *ctx, handle_t co);
 extern result_t ion_split_path(const char *id, memid_t *parent, char *filename);
@@ -292,7 +292,7 @@ result_t ion_create_worker(memid_t home,
   if (name != 0)
     {
     // load the script.
-    handle_t script;
+    stream_p script;
     if (failed(result = stream_open(parent, name, &script)))
       {
       // release the context..
@@ -362,7 +362,7 @@ result_t ion_create(memid_t home, const char *path,
   }
 
 #define WORKER_QUEUE_LENGTH 32
-static handle_t ion_queue;
+static deque_p ion_queue;
 
 static bool ion_hook_handler(const canmsg_t *msg, void *parg)
   {
@@ -380,8 +380,8 @@ static bool ion_hook_handler(const canmsg_t *msg, void *parg)
 static msg_hook_t ion_hook = { 0, 0, ion_hook_handler };
 
 // pool of all names that can be used.  often just ev_msg
-handle_t atoms;
-handle_t handlers;
+vector_p atoms;
+map_p handlers;
 
 typedef struct _handler_t {
   const char *handler;        // held in the string pool
@@ -502,7 +502,7 @@ result_t ion_run()
         }
 
       // we have the handler, now we see if the map holds a key to the value
-      handle_t event_handlers;
+      vector_p event_handlers;
       if (failed(map_find(handlers, (void *)event_id, &event_handlers)))
         {
         // create a vector to hold the handlers for this id
