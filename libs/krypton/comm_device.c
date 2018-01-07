@@ -85,7 +85,7 @@ result_t comm_create_device(memid_t key, comm_device_p *device)
   return comm_ioctl(dev, set_device_ctl, &ioctl, sizeof(comms_state_ioctl_t), 0, 0, 0);
   }
 
-result_t comm_close_device(handle_t hndl)
+result_t comm_close_device(comm_device_p hndl)
   {
   result_t result;
   if(failed(result = check_handle(hndl)))
@@ -100,7 +100,7 @@ result_t comm_close_device(handle_t hndl)
 
    }
 
-result_t comm_write(handle_t hndl, const byte_t *data, uint16_t len, uint32_t timeout)
+result_t comm_write(comm_device_p hndl, const byte_t *data, uint16_t len, uint32_t timeout)
   {
   result_t result;
   if(failed(result = check_handle(hndl)))
@@ -120,7 +120,7 @@ result_t comm_write(handle_t hndl, const byte_t *data, uint16_t len, uint32_t ti
   return s_ok;
     }
 
-result_t comm_read(handle_t hndl, byte_t *data, uint16_t len, uint16_t *bytes_read, uint32_t timeout)
+result_t comm_read(comm_device_p hndl, byte_t *data, uint16_t len, uint16_t *bytes_read, uint32_t timeout)
   {
   result_t result;
   if(failed(result = check_handle(hndl)))
@@ -150,7 +150,7 @@ result_t comm_read(handle_t hndl, byte_t *data, uint16_t len, uint16_t *bytes_re
   return s_ok;
   }
 
-result_t comm_ioctl(handle_t hndl, ioctl_type type, const void *in_buffer,
+result_t comm_ioctl(comm_device_p hndl, ioctl_type type, const void *in_buffer,
     uint16_t in_buffer_size, void *out_buffer, uint16_t out_buffer_size,
                uint16_t *size_returned)
   {

@@ -374,7 +374,7 @@ int main(int argc, char **argv)
   return cli_run(&channel.parser);
   }
 
-static handle_t driver;
+static comm_device_p driver;
 
 #ifdef __linux__
 static const char *bsp_hive = "electron";

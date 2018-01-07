@@ -105,7 +105,7 @@ static result_t verify_slcan(handle_t hndl)
   return s_ok;
   }
 
-result_t slcan_create(memid_t key, handle_t msg_rx_queue, handle_t *hndl)
+result_t slcan_create(memid_t key, handle_t msg_rx_queue, comm_device_p *hndl)
   {
   result_t result;
   int i;
@@ -198,7 +198,7 @@ result_t slcan_create(memid_t key, handle_t msg_rx_queue, handle_t *hndl)
   return s_ok;
   }
 
-result_t slcan_close(handle_t hndl)
+result_t slcan_close(comm_device_p hndl)
   {
   result_t result;
   if(failed(result = verify_slcan(hndl)))
@@ -210,7 +210,7 @@ result_t slcan_close(handle_t hndl)
   return s_ok;
   }
 
-result_t slcan_send(handle_t hndl, const canmsg_t *msg)
+result_t slcan_send(comm_device_p hndl, const canmsg_t *msg)
   {
   result_t result;
   if(failed(result = verify_slcan(hndl)))

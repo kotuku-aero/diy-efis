@@ -536,7 +536,7 @@ static result_t open_png_stream(handle_t stream, png_stream_t **hndl)
   // but will handle chunking of the file
   /* we require two bytes for the zlib data header */
   uint8_t hdr[2];
-  if (failed(stream_read(png_stream, hdr, 2, 0)) ||
+  if (failed(stream_read((stream_p)png_stream, hdr, 2, 0)) ||
     ((hdr[0] * 256 + hdr[1]) % 31 != 0) ||                /* 256 * in[0] + in[1] must be left multiple of 31, the FCHECK value is supposed to be made that way */
     ((hdr[0] & 15) != 8 || ((hdr[0] >> 4) & 15) > 7) ||   /*error: only compression method 8: inflate with sliding window of 32k is supported by the PNG spec */
     (((hdr[1] >> 5) & 1) != 0))                            /* the specification of PNG says about the zlib stream: "The additional flags shall not specify left preset dictionary." */
@@ -840,7 +840,7 @@ static result_t render_png(png_stream_t *png_stream)
   uint32_t current_scanline = 0;
 
   // decompress all scanlines, and store them in the bitmap (un-filtered)
-  if (failed(result = decompress(png_stream, png_stream, get_byte, set_byte, 0)))
+  if (failed(result = decompress((stream_p)png_stream, png_stream, get_byte, set_byte, 0)))
     return result;
 
   uint8_t v1;
@@ -1055,7 +1055,7 @@ result_t load_png(handle_t canvas, handle_t stream, const point_t *pt)
       result = e_buffer_too_small;
     }
 
-  stream_close(png_stream);
+  stream_close((stream_p)png_stream);
   return result;
   }
 
@@ -1077,7 +1077,7 @@ result_t create_png_canvas(handle_t stream, handle_t *hndl)
   handle_t canvas;
   if (failed(result = create_rect_canvas(&dim, &canvas)))
     {
-    stream_close(png_stream);
+    stream_close((stream_p)png_stream);
     return result;
     }
 
@@ -1088,6 +1088,6 @@ result_t create_png_canvas(handle_t stream, handle_t *hndl)
   else
     canvas_close(canvas);
 
-  stream_close(png_stream);
+  stream_close((stream_p)png_stream);
   return result;
   }

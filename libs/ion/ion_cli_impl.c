@@ -233,7 +233,7 @@ result_t ion_rm_name_action(cli_t *context, const char * name)
     if (result != e_path_not_found)
       return result;        // other error.
 
-    stream_printf("Unknown stream %s\r\n", name);
+    stream_printf(stderr, "Unknown stream %s\r\n", name);
     return result;
     }
 
@@ -243,7 +243,7 @@ result_t ion_rm_name_action(cli_t *context, const char * name)
 result_t ion_create_name_content_action(cli_t *context, const char * name, const char * content)
   {
   result_t result;
-  handle_t stream;
+  stream_p stream;
 
   // see if it exists
   if (failed(result = stream_open(get_context(context), name, &stream)))
