@@ -82,7 +82,8 @@ result_t comm_create_device(memid_t key, comm_device_p *device)
   ioctl.stop_bits = two_stop_bit;
   ioctl.eof_char = '\n';
 
-  return comm_ioctl(dev, set_device_ctl, &ioctl, sizeof(comms_state_ioctl_t), 0, 0, 0);
+  comm_ioctl(dev, set_device_ctl, &ioctl, sizeof(comms_state_ioctl_t), 0, 0, 0);
+  return s_ok;
   }
 
 result_t comm_close_device(comm_device_p hndl)

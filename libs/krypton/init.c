@@ -71,6 +71,15 @@ static void create_or_open_mmap(const char *filename, uint32_t size, HANDLE *hnd
 
 extern void start_fb(uint16_t x, uint16_t y, uint8_t *);
 
+
+static neutron_parameters_t init_params = {
+  .hardware_revision = 1,
+  .software_revision = 1,
+  .node_type = unit_mfd,
+  .node_id = mfd_node_id_last
+  };
+
+
 extern result_t electron_init(const char *reg_path, bool factory_reset)
   {
   result_t result;
@@ -83,8 +92,11 @@ extern result_t electron_init(const char *reg_path, bool factory_reset)
 
   reg_size >>= 5;         // make number of blocks
 
-  // and init the registry
   if (failed(result = bsp_reg_init(factory_reset, (uint16_t)reg_size, 128)))
+    return result;
+
+  // start the can systems
+  if (failed(result = can_aerospace_init(&init_params, factory_reset)))
     return result;
 
   // see if we have a screen defined
@@ -105,6 +117,7 @@ extern result_t electron_init(const char *reg_path, bool factory_reset)
       start_fb(x, y, fb_buffer);
       }
     }
+
 
   return s_ok;
   }
