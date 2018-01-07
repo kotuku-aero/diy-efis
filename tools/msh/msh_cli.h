@@ -125,6 +125,8 @@ extern result_t ion_exit_action(cli_t *context);
 
 extern result_t ion_action(cli_t *context);
 
+extern result_t recv_can_id_type_session_val1_val2_val3_val4_action(cli_t *context, uint16_t recv_can_id_, uint16_t recv_can_id_type_, uint16_t recv_can_id_type_session_, const char * recv_can_id_type_session_val1_, const char * recv_can_id_type_session_val1_val2_, const char * recv_can_id_type_session_val1_val2_val3_, const char * recv_can_id_type_session_val1_val2_val3_val4_);
+
 extern result_t exit_action(cli_t *context);
 
 #ifdef __cplusplus

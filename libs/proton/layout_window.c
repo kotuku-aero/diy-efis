@@ -62,14 +62,14 @@ extern result_t create_hsi_window(handle_t parent, memid_t section, handle_t *hw
     };
 
 static const char *layout_names[] = {
-    "airspeed_window",      // vertical ticker-tape airspeed window
-    "hsi_window",           // rectangular gyro position and heading
-    "attitude_window",      // rectangular attitude window
-    "altitude_window",      // vertical ticker tape altitude and vertical speed indicator window
-    "gauge_window",         // general purpose round or bar gauge
-    "annunciator_window",   // time, oat etc.
-    "gps_window",           // gps route map window
-    "alert_window",         // vertical alert window
+    "airspeed",      // vertical ticker-tape airspeed window
+    "hsi",           // rectangular gyro position and heading
+    "attitude",      // rectangular attitude window
+    "altitude",      // vertical ticker tape altitude and vertical speed indicator window
+    "gauge",         // general purpose round or bar gauge
+    "annunciator",   // time, oat etc.
+    "gps",           // gps route map window
+    "alert",         // vertical alert window
     "widget",               // a generic widget
 };
 

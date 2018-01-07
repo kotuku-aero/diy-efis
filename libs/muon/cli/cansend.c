@@ -107,18 +107,18 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
   // char,char2,char3,char4,uchar,uchar2,uchar3,uchar4,short,short2,ushort,ushort2,long,ulong,float,nodata
   switch (type)
     {
-    case 0:    // char
+    case CANAS_DATATYPE_CHAR:    // char
       if (val4 != 0 ||
         val3 != 0 ||
         val2 != 0 ||
         val1 == 0)
         return e_bad_parameter;
 
-      msg->canas.data_type = CANAS_DATATYPE_UCHAR;
+      msg->canas.data_type = CANAS_DATATYPE_CHAR;
       *(char *)(&msg->canas.data[0]) = (char)get_int32(val1);
       msg->length = 5;
       break;
-    case 1:    // char2
+    case CANAS_DATATYPE_CHAR2:    // char2
       if (val4 != 0 ||
         val3 != 0 ||
         val2 == 0 ||
@@ -130,7 +130,7 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
       *(char *)(&msg->canas.data[1]) = (char)get_int32(val2);
       msg->length = 6;
       break;
-    case 2:    // char3
+    case CANAS_DATATYPE_CHAR3:    // char3
       if (val4 != 0 ||
         val3 == 0 ||
         val2 == 0 ||
@@ -143,7 +143,7 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
       *(char *)(&msg->canas.data[2]) = (char)get_int32(val3);
       msg->length = 7;
       break;
-    case 3:    // char4
+    case CANAS_DATATYPE_CHAR4:    // char4
       if (val4 == 0 ||
         val3 == 0 ||
         val2 == 0 ||
@@ -157,7 +157,7 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
       *(char *)(&msg->canas.data[3]) = (char)get_int32(val4);
       msg->length = 8;
       break;
-    case 4:    // uchar
+    case CANAS_DATATYPE_UCHAR:    // uchar
       if (val4 != 0 ||
         val3 != 0 ||
         val2 != 0 ||
@@ -168,7 +168,7 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
       msg->canas.data[0] = (uint8_t)get_uint32(val1);
       msg->length = 5;
       break;
-    case 5:    // uchar2
+    case CANAS_DATATYPE_UCHAR2:    // uchar2
       if (val4 != 0 ||
         val3 != 0 ||
         val2 == 0 ||
@@ -180,7 +180,7 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
       msg->canas.data[1] = (uint8_t)get_uint32(val2);
       msg->length = 6;
       break;
-    case 6:    // uchar3
+    case CANAS_DATATYPE_UCHAR3:    // uchar3
       if (val4 != 0 ||
         val3 == 0 ||
         val2 == 0 ||
@@ -193,7 +193,7 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
       msg->canas.data[2] = (uint8_t)get_uint32(val3);
       msg->length = 7;
       break;
-    case 7:    // uchar4
+    case CANAS_DATATYPE_UCHAR4:    // uchar4
       if (val4 == 0 ||
         val3 == 0 ||
         val2 == 0 ||
@@ -207,7 +207,7 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
       msg->canas.data[3] = (uint8_t)get_uint32(val4);
       msg->length = 8;
       break;
-    case 8:    // short
+    case CANAS_DATATYPE_SHORT:    // short
       if (val4 != 0 ||
         val3 != 0 ||
         val2 != 0 ||
@@ -217,11 +217,11 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
       int_val = get_int32(val1);
 
       msg->canas.data_type = CANAS_DATATYPE_SHORT;
-      msg->canas.data[0] = extract_int(int_val, 1);
-      msg->canas.data[1] = extract_int(int_val, 0);
+      msg->canas.data[0] = (uint8_t)(int_val >> 8);
+      msg->canas.data[1] = (uint8_t)int_val;
       msg->length = 6;
       break;
-    case 9:    // short2
+    case CANAS_DATATYPE_SHORT2:    // short2
       if (val4 != 0 ||
         val3 != 0 ||
         val2 == 0 ||
@@ -231,15 +231,15 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
       int_val = get_int32(val1);
 
       msg->canas.data_type = CANAS_DATATYPE_SHORT2;
-      msg->canas.data[0] = extract_int(int_val, 1);
-      msg->canas.data[1] = extract_int(int_val, 0);
+      msg->canas.data[0] = (uint8_t)(int_val >> 8);
+      msg->canas.data[1] = (uint8_t)int_val;
 
       int_val = get_int32(val2);
-      msg->canas.data[2] = extract_int(int_val, 1);
-      msg->canas.data[3] = extract_int(int_val, 0);
+      msg->canas.data[2] = (uint8_t)(int_val >> 8);
+      msg->canas.data[3] = (uint8_t)int_val;
       msg->length = 8;
       break;
-    case 10:    // ushort
+    case CANAS_DATATYPE_USHORT:    // ushort
       if (val4 != 0 ||
         val3 != 0 ||
         val2 != 0 ||
@@ -249,11 +249,11 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
       uint_val = get_uint32(val1);
 
       msg->canas.data_type = CANAS_DATATYPE_USHORT;
-      msg->canas.data[0] = extract_uint(uint_val, 1);
-      msg->canas.data[1] = extract_uint(uint_val, 0);
+      msg->canas.data[0] = (uint8_t)(int_val >> 8);
+      msg->canas.data[1] = (uint8_t)int_val;
       msg->length = 6;
       break;
-    case 11:    // ushort2
+    case CANAS_DATATYPE_USHORT2:    // ushort2
       if (val4 != 0 ||
         val3 != 0 ||
         val2 == 0 ||
@@ -263,15 +263,15 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
       uint_val = get_uint32(val1);
 
       msg->canas.data_type = CANAS_DATATYPE_USHORT2;
-      msg->canas.data[0] = extract_uint(uint_val, 1);
-      msg->canas.data[1] = extract_uint(uint_val, 0);
+      msg->canas.data[0] = (uint8_t)(int_val >> 8);
+      msg->canas.data[1] = (uint8_t)int_val;
 
       int_val = get_int32(val2);
-      msg->canas.data[2] = extract_uint(uint_val, 1);
-      msg->canas.data[3] = extract_uint(uint_val, 0);
+      msg->canas.data[2] = (uint8_t)(int_val >> 8);
+      msg->canas.data[3] = (uint8_t)int_val;
       msg->length = 8;
       break;
-    case 12:    // long
+    case CANAS_DATATYPE_INT32:    // long
       if (val4 != 0 ||
         val3 != 0 ||
         val2 != 0 ||
@@ -281,13 +281,13 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
       int_val = get_int32(val1);
 
       msg->canas.data_type = CANAS_DATATYPE_INT32;
-      msg->canas.data[0] = extract_int(int_val, 3);
-      msg->canas.data[1] = extract_int(int_val, 2);
-      msg->canas.data[2] = extract_int(int_val, 1);
-      msg->canas.data[3] = extract_int(int_val, 0);
+      msg->canas.data[0] = (uint8_t)(int_val >> 24);
+      msg->canas.data[1] = (uint8_t)(int_val >> 16);
+      msg->canas.data[2] = (uint8_t)(int_val >> 8);
+      msg->canas.data[3] = (uint8_t)int_val;
       msg->length = 8;
       break;
-    case 13:    // ulong
+    case CANAS_DATATYPE_UINT32:    // ulong
       if (val4 != 0 ||
         val3 != 0 ||
         val2 != 0 ||
@@ -297,13 +297,13 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
       uint_val = get_uint32(val1);
 
       msg->canas.data_type = CANAS_DATATYPE_UINT32;
-      msg->canas.data[0] = extract_uint(uint_val, 3);
-      msg->canas.data[1] = extract_uint(uint_val, 2);
-      msg->canas.data[2] = extract_uint(uint_val, 1);
-      msg->canas.data[3] = extract_uint(uint_val, 0);
+      msg->canas.data[0] = (uint8_t)(int_val >> 24);
+      msg->canas.data[1] = (uint8_t)(int_val >> 16);
+      msg->canas.data[2] = (uint8_t)(int_val >> 8);
+      msg->canas.data[3] = (uint8_t)int_val;
       msg->length = 8;
       break;
-    case 14:    // float
+    case CANAS_DATATYPE_FLOAT:    // float
       if (val4 != 0 ||
         val3 != 0 ||
         val2 != 0 ||
@@ -313,14 +313,14 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
       float_val = get_float(val1);
 
       msg->canas.data_type = CANAS_DATATYPE_FLOAT;
-      msg->canas.data[0] = extract_float(float_val, 3);
-      msg->canas.data[1] = extract_float(float_val, 2);
-      msg->canas.data[2] = extract_float(float_val, 1);
-      msg->canas.data[3] = extract_float(float_val, 0);
+      msg->canas.data[0] = (uint8_t)((*((uint32_t *)&float_val)) >> 24);
+      msg->canas.data[1] = (uint8_t)((*((uint32_t *)&float_val)) >> 16);
+      msg->canas.data[2] = (uint8_t)((*((uint32_t *)&float_val)) >> 8);
+      msg->canas.data[3] = (uint8_t)(*((uint32_t *)&float_val));
       msg->length = 8;
       break;
     default:
-    case 15:    // nodata
+    case CANAS_DATATYPE_NODATA:    // nodata
       if (val4 != 0 ||
         val3 != 0 ||
         val2 != 0 ||

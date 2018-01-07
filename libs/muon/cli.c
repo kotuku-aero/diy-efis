@@ -76,7 +76,7 @@ static void cli_help_print_node(cli_t *parser, cli_node_t *node,
       {
       const enum_t *lnode = (const enum_t *)node->param;
       const char * token = CUR_TOKEN(parser)->token_buffer;
-      uint16_t len = strlen(token);
+      uint16_t len = token != 0 ? strlen(token) : 0;
 
       while (lnode->name != 0)
         {

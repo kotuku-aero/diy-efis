@@ -172,7 +172,7 @@ result_t bsp_reg_init(bool factory_reset, uint16_t _size, uint16_t _page_size)
   semaphore_create(&mutex);
   semaphore_signal(mutex);
   
-  max_offset = _size;
+  max_offset = get_block_offset(_size);
 
   num_bitmap_bytes = _size >> 3;  // this is the number of bytes that make a bitmap
   if (_size == 0)

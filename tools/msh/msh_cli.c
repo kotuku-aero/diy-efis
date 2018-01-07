@@ -820,6 +820,49 @@ static result_t cli_ion (cli_t *parser)
   }
 
 
+static result_t cli_recv_can_id_type_session_val1_val2_val3_val4 (cli_t *parser)
+  {
+  result_t result;
+  uint16_t recv_can_id_;
+  uint16_t recv_can_id_type_;
+  uint16_t recv_can_id_type_session_;
+  const char * recv_can_id_type_session_val1_ = 0;
+  const char * recv_can_id_type_session_val1_val2_ = 0;
+  const char * recv_can_id_type_session_val1_val2_val3_ = 0;
+  const char * recv_can_id_type_session_val1_val2_val3_val4_ = 0;
+
+  if(failed(result = cli_get_enum(&parser->tokens[1], can_ids, &recv_can_id_)))
+    return result;
+
+  if(failed(result = cli_get_enum(&parser->tokens[2], can_types, &recv_can_id_type_)))
+    return result;
+
+  if(failed(result = cli_get_uint16(&parser->tokens[3], &recv_can_id_type_session_)))
+    return result;
+
+  if(parser->tokens[4].token_length > 0 &&
+    failed(result = cli_get_string(&parser->tokens[4], &recv_can_id_type_session_val1_)))
+    return result;
+
+  if(parser->tokens[5].token_length > 0 &&
+    failed(result = cli_get_string(&parser->tokens[5], &recv_can_id_type_session_val1_val2_)))
+    return result;
+
+  if(parser->tokens[6].token_length > 0 &&
+    failed(result = cli_get_string(&parser->tokens[6], &recv_can_id_type_session_val1_val2_val3_)))
+    return result;
+
+  if(parser->tokens[7].token_length > 0 &&
+    failed(result = cli_get_string(&parser->tokens[7], &recv_can_id_type_session_val1_val2_val3_val4_)))
+    return result;
+
+  result = recv_can_id_type_session_val1_val2_val3_val4_action(parser, recv_can_id_, recv_can_id_type_, recv_can_id_type_session_, ((parser->tokens[4].token_length > 0) ? recv_can_id_type_session_val1_ : 0), ((parser->tokens[5].token_length > 0) ? recv_can_id_type_session_val1_val2_ : 0), ((parser->tokens[6].token_length > 0) ? recv_can_id_type_session_val1_val2_val3_ : 0), ((parser->tokens[7].token_length > 0) ? recv_can_id_type_session_val1_val2_val3_val4_ : 0));
+
+
+  return result;
+  }
+
+
 static result_t cli_exit (cli_t *parser)
   {
   result_t result;
@@ -1163,6 +1206,24 @@ static cli_node_t node_ion_exit;
 static cli_node_t node_ion_end;
 
 static cli_node_t node_ion;
+
+static cli_node_t node_recv_can_id_type_session_val1_val2_val3_val4_end;
+
+static cli_node_t node_recv_can_id_type_session_val1_val2_val3_val4;
+
+static cli_node_t node_recv_can_id_type_session_val1_val2_val3;
+
+static cli_node_t node_recv_can_id_type_session_val1_val2;
+
+static cli_node_t node_recv_can_id_type_session_val1;
+
+static cli_node_t node_recv_can_id_type_session;
+
+static cli_node_t node_recv_can_id_type;
+
+static cli_node_t node_recv_can_id;
+
+static cli_node_t node_recv_can;
 
 static cli_node_t node_exit_end;
 
@@ -2833,8 +2894,98 @@ static cli_node_t node_ion = {
   0,
   "ion",
   0,
-  &node_exit,
+  &node_recv_can,
   &node_ion_end
+  };
+
+
+static cli_node_t node_recv_can_id_type_session_val1_val2_val3_val4_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_recv_can_id_type_session_val1_val2_val3_val4,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_recv_can_id_type_session_val1_val2_val3_val4 = {
+  CLI_NODE_STRING,
+  CLI_NODE_FLAGS_OPT_START | CLI_NODE_FLAGS_OPT_END | CLI_NODE_FLAGS_OPT_PARTIAL,
+  "STRING:val4",
+  0,
+  0,
+  &node_recv_can_id_type_session_val1_val2_val3_val4_end
+  };
+
+
+static cli_node_t node_recv_can_id_type_session_val1_val2_val3 = {
+  CLI_NODE_STRING,
+  CLI_NODE_FLAGS_OPT_START | CLI_NODE_FLAGS_OPT_PARTIAL,
+  "STRING:val3",
+  0,
+  0,
+  &node_recv_can_id_type_session_val1_val2_val3_val4
+  };
+
+
+static cli_node_t node_recv_can_id_type_session_val1_val2 = {
+  CLI_NODE_STRING,
+  CLI_NODE_FLAGS_OPT_START | CLI_NODE_FLAGS_OPT_PARTIAL,
+  "STRING:val2",
+  0,
+  0,
+  &node_recv_can_id_type_session_val1_val2_val3
+  };
+
+
+static cli_node_t node_recv_can_id_type_session_val1 = {
+  CLI_NODE_STRING,
+  CLI_NODE_FLAGS_OPT_START | CLI_NODE_FLAGS_OPT_PARTIAL,
+  "STRING:val1",
+  0,
+  0,
+  &node_recv_can_id_type_session_val1_val2
+  };
+
+
+static cli_node_t node_recv_can_id_type_session = {
+  CLI_NODE_UINT16,
+  0,
+  "UINT16:session",
+  0,
+  0,
+  &node_recv_can_id_type_session_val1
+  };
+
+
+static cli_node_t node_recv_can_id_type = {
+  CLI_NODE_ENUM,
+  0,
+  &can_types,
+  0,
+  0,
+  &node_recv_can_id_type_session
+  };
+
+
+static cli_node_t node_recv_can_id = {
+  CLI_NODE_ENUM,
+  0,
+  &can_ids,
+  0,
+  0,
+  &node_recv_can_id_type
+  };
+
+
+static cli_node_t node_recv_can = {
+  CLI_NODE_KEYWORD,
+  0,
+  "recv_can",
+  0,
+  &node_exit,
+  &node_recv_can_id
   };
 
 

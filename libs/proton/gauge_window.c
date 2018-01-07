@@ -77,6 +77,7 @@ typedef struct _gauge_window_t {
   bool draw_name;
   
   color_t background_color;
+  pen_t border_pen;
   bool draw_border;
   handle_t  font;
 
@@ -160,7 +161,7 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
   rectangle(hwnd, &wnd_rect, 0, wnd->background_color, &wnd_rect);
 
   if (wnd->draw_border)
-    round_rect(hwnd, &wnd_rect, &gray_pen, color_hollow, &wnd_rect, 12);
+    round_rect(hwnd, &wnd_rect, &wnd->border_pen, color_hollow, &wnd_rect, 12);
 
   if(is_bar_style(wnd))
     update_bar_gauge(hwnd, wnd, &wnd_rect);
@@ -171,10 +172,10 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
   return s_ok;
   }
 
-static result_t on_reset_label(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_reset_label(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
   bool changed = false;
-  gauge_window_t *wnd = (gauge_window_t *)parg;
+  gauge_window_t *wnd = (gauge_window_t *)proxy->parg;
 
   size_t i;
   for (i = 0; i < 4; i++)
@@ -190,23 +191,34 @@ static result_t on_reset_label(handle_t hwnd, void *parg, const char *func, cons
   return s_ok;
   }
 
-static result_t on_value_label(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_value_label(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
   bool changed = false;
-  gauge_window_t *wnd = (gauge_window_t *)parg;
+  gauge_window_t *wnd = (gauge_window_t *)proxy->parg;
 
   size_t i;
   for (i = 0; i < wnd->num_values; i++)
     {
     if (msg->id == wnd->labels[i])
       {
-      float msg_value;
-      get_param_float(msg, &msg_value);
-      msg_value *= wnd->scale;
-      msg_value += wnd->offset;
+      float float_value;
+      int16_t short_value;
 
-      changed = wnd->values[i] != msg_value;
-      wnd->values[i] = msg_value;
+      switch (msg->canas.data_type)
+        {
+        case CANAS_DATATYPE_FLOAT :
+          get_param_float(msg, &float_value);
+          break;
+        case CANAS_DATATYPE_SHORT :
+          get_param_int16(msg, 0, &short_value);
+          float_value = short_value;
+          break;
+        }
+      float_value *= wnd->scale;
+      float_value += wnd->offset;
+
+      changed = wnd->values[i] != float_value;
+      wnd->values[i] = float_value;
 
       wnd->min_values[i] = min(wnd->min_values[i], wnd->values[i]);
       wnd->max_values[i] = max(wnd->max_values[i], wnd->values[i]);
@@ -1030,14 +1042,6 @@ result_t create_gauge_window(handle_t parent, memid_t key, handle_t *hwnd)
 
       if (succeeded(reg_open_key(step_key, temp_name, &child_key)))
         {
-
-        // the step is a series of settings in the form:
-        // step-0=15, color_orange, 5, ps_solid , color_light_blue
-        // param1 -> step level
-        // param2 -> pen color
-        // param3 -> pen width
-        // param4 -> pen style
-        // param5 -> pointer color
         step_t new_step;
         memset(&new_step, 0, sizeof(new_step));
 
@@ -1093,6 +1097,9 @@ result_t create_gauge_window(handle_t parent, memid_t key, handle_t *hwnd)
     wnd->background_color = color_black;
 
   reg_get_bool(key, "draw-border", &wnd->draw_border);
+
+  if (failed(lookup_pen(key, "border-pen", &wnd->border_pen)))
+    memcpy(&wnd->border_pen, &gray_pen, sizeof(pen_t));
 
   // store the parameters for the window
   set_wnddata(*hwnd, wnd);

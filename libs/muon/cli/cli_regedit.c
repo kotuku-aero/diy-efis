@@ -290,7 +290,7 @@ result_t ls_path_recursive_action(cli_t *context, const char * path)
   memid_t key;
   handle_t matches = 0;
 
-  bool recursive = strlen(context->tokens[2].token_buffer) != 0;
+  bool recursive = context->tokens[2].token_buffer != 0 && strlen(context->tokens[2].token_buffer) != 0;
 
   if (strlen(path) == 0)
     {

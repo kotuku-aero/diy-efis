@@ -325,9 +325,6 @@ int main(int argc, char **argv)
   SetConsoleMode(co, dwMode);
 #endif
 
-  // start the canbus stuff working
-  neutron_init(&init_params, factory_reset);
-
   service_channel_t channel;
   memset(&channel, 0, sizeof(service_channel_t));
 
@@ -398,4 +395,23 @@ result_t bsp_send_can(const canmsg_t *msg)
     return e_bad_parameter;
 
   return slcan_send(driver, msg);
+  }
+
+// these are internal routines
+extern result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t session, const char * val1, const char * val2, const char * val3, const char * val4);
+extern void publish_local(const canmsg_t *msg);
+
+// special command to simulate a message from the can bus.
+result_t recv_can_id_type_session_val1_val2_val3_val4_action(cli_t *context,
+  uint16_t can_id, uint16_t type, uint16_t session, const char * val1, const char * val2, const char * val3, const char * val4)
+  {
+  canmsg_t msg;
+  result_t result;
+
+  if (failed(result = create_can_msg(&msg, can_id, type, session, val1, val2, val3, val4)))
+    return result;
+
+  // enqueue the message onto the can bus.
+  publish_local(&msg);
+  return s_ok;
   }
