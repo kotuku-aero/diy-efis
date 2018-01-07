@@ -226,6 +226,20 @@ static result_t css_stream_close(stream_handle_t *hndl)
   return s_ok;
   }
 
+static void fb_sync(void *parg)
+  {
+  semaphore_p sync;
+  semaphore_create(&sync);
+
+  while(true)
+    {
+    // this simulates the hardware.  We only sync every 500msec
+    // as this is a test harness
+    semaphore_wait(sync, 500);
+    bsp_sync();
+    }
+  }
+
 
 int main(int argc, char **argv)
   {
@@ -241,7 +255,11 @@ int main(int argc, char **argv)
   // TODO: handle this better
   bool factory_reset = false;
 
-  electron_init(ini_path, factory_reset);
+  if(failed(electron_init(ini_path, factory_reset)))
+    {
+    printf("Unable to initialize the krypton library.");
+    return -1;
+    }
 
   uint16_t node_id;
   if(failed(reg_get_uint16(0, "node-id", &node_id)))
@@ -367,6 +385,8 @@ int main(int argc, char **argv)
     stream_printf(&channel.stream, "Unable to start muon\r\n");
     return -1;
     }
+
+  task_create("FBSYNC", DEFAULT_STACK_SIZE, fb_sync, 0, BELOW_NORMAL, 0);
 
   return cli_run(&channel.parser);
   }

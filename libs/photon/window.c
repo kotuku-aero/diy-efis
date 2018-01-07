@@ -317,8 +317,19 @@ result_t defwndproc(handle_t hwnd, const canmsg_t *msg)
       for (item = 0; item < count; item++)
         {
         vector_at(window->events, item, &proxy);
-        if (proxy != 0 && proxy->msg_id == msg->id)
-          (*proxy->callback)(hwnd, proxy, msg);
+        if(proxy != 0 && proxy->msg_id == msg->id)
+          {
+          if(msg->id == id_paint)
+            {
+            if(window->invalid)
+              {
+              (*proxy->callback)(hwnd, proxy, msg);
+              window->invalid = false;
+              }
+            }
+          else
+            (*proxy->callback)(hwnd, proxy, msg);
+          }
         }
       }
     }
@@ -344,6 +355,7 @@ static result_t make_window(handle_t hwnd_parent, const rect_t *bounds, wndproc 
   wnd->canvas = canvas;
   wnd->window_proc = cb;
   wnd->id = id;
+  wnd->invalid = true;
 
   // attach the default event handlers to the window
   add_event(hwnd, id_paint, wnd, 0, on_paint);

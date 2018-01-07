@@ -92,11 +92,13 @@ extern result_t electron_init(const char *reg_path, bool factory_reset)
 
   reg_size >>= 5;         // make number of blocks
 
-  if (failed(result = bsp_reg_init(factory_reset, (uint16_t)reg_size, 128)))
+  if (failed(result = bsp_reg_init(factory_reset, (uint16_t)reg_size, 128)) &&
+    result != e_not_initialized)
     return result;
 
   // start the can systems
-  if (failed(result = can_aerospace_init(&init_params, factory_reset)))
+  if (failed(result = can_aerospace_init(&init_params, factory_reset)) &&
+    result != e_path_not_found)
     return result;
 
   // see if we have a screen defined

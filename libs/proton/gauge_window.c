@@ -508,17 +508,17 @@ void update_dial_gauge(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rec
       break;
     case gs_pointer:
       draw_pointer(hwnd, wnd, wnd_rect,
-                   calculate_pen(wnd, 3, wnd->values[0], &pointer_pen),
+                   calculate_pen(wnd, wnd->width, wnd->values[0], &pointer_pen),
                    calculate_rotation(wnd, wnd->values[0]));
       break;
     case gs_sweep:
       draw_sweep(hwnd, wnd, wnd_rect,
-                 calculate_pen(wnd, 3, wnd->values[0], &pointer_pen),
+                 calculate_pen(wnd, wnd->width, wnd->values[0], &pointer_pen),
                  calculate_color(wnd, wnd->values[0]), calculate_rotation(wnd, wnd->values[0]));
       break;
     case gs_bar:
       draw_bar(hwnd, wnd, wnd_rect,
-               calculate_pen(wnd, 3, wnd->values[0], &pointer_pen),
+               calculate_pen(wnd, wnd->width, wnd->values[0], &pointer_pen),
                calculate_rotation(wnd, wnd->values[0]));
       break;
     case gs_point_minmax:
@@ -700,17 +700,17 @@ static const pen_t *calculate_pen(gauge_window_t *wnd,
   vector_count(wnd->steps, &count);
   if(count == 0)
     return pen;
-  
-  vector_at(wnd->steps, 0, &step);
  
   size_t i;
+  // step 0 is only used to set the minimum value for the gauge
+  // so it is ignored
   for (i = 1; i < count; i++)
     {
-    // assume this is our color.
-    pen->color = step.gauge_color;
     // get the next one, and see if we are done.
     vector_at(wnd->steps, i, &step);
-    if(value >= step.value)
+    // assume this is our color.
+    pen->color = step.gauge_color;
+    if(value <= step.value)
       break;    
     }
 

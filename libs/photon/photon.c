@@ -2785,9 +2785,8 @@ result_t invalidate_rect(handle_t hwnd, const rect_t *rect)
   if(failed(result = get_canvas(hwnd, &canvas)))
     return result;
 
-  if(canvas->own_buffer)
-    wnd->invalid = true;
-  else
+  wnd->invalid = true;
+  if(!canvas->own_buffer)
     {
     // keep going up the tree
     window_t *parent = wnd->parent;
@@ -2880,6 +2879,8 @@ result_t bsp_queue_empty(handle_t hwnd)       // the queue is empty
       result = s_ok;                  // send a paint message
       break;
     case fbds_in_paint :
+      state = fbds_painting;
+      result = s_ok;
       break;
     case fbds_painting :
       break;
