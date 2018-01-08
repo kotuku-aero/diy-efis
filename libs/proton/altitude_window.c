@@ -271,9 +271,9 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
   end_paint(hwnd);
 	}
 
-static result_t on_baro_corrected_altitude(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_baro_corrected_altitude(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
-  altitude_window_t *wnd = (altitude_window_t *)parg;
+  altitude_window_t *wnd = (altitude_window_t *)proxy->parg;
   bool changed = false;
   
   float v;
@@ -288,9 +288,9 @@ static result_t on_baro_corrected_altitude(handle_t hwnd, void *parg, const char
 	return s_ok;
 	}
 
-static result_t on_altitude_rate(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_altitude_rate(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
-  altitude_window_t *wnd = (altitude_window_t *)parg;
+  altitude_window_t *wnd = (altitude_window_t *)proxy->parg;
   bool changed = false;
 
   float v;
@@ -305,9 +305,9 @@ static result_t on_altitude_rate(handle_t hwnd, void *parg, const char *func, co
   return s_ok;
   }
 
-static result_t on_qnh(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_qnh(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
-  altitude_window_t *wnd = (altitude_window_t *)parg;
+  altitude_window_t *wnd = (altitude_window_t *)proxy->parg;
   bool changed = false;
 
   uint16_t value;

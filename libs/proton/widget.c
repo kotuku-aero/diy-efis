@@ -156,7 +156,7 @@ result_t lookup_enum(memid_t key,
   return e_not_found;
   }
 
-result_t lookup_font(memid_t key, const char *name, handle_t  *font)
+result_t lookup_font(memid_t key, const char *name, handle_t *font)
   {
   result_t result;
   if(name == 0 ||

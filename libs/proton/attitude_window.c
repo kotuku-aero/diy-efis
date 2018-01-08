@@ -448,9 +448,9 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
   return s_ok;
   }
 
-static result_t on_yaw_angle(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_yaw_angle(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
-  attitude_window_t *wnd = (attitude_window_t *)parg;
+  attitude_window_t *wnd = (attitude_window_t *)proxy->parg;
   bool changed = false;
 
   float v;
@@ -471,9 +471,9 @@ static result_t on_yaw_angle(handle_t hwnd, void *parg, const char *func, const 
   return s_ok;
   }
 
-static result_t on_roll_angle(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_roll_angle(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
-  attitude_window_t *wnd = (attitude_window_t *)parg;
+  attitude_window_t *wnd = (attitude_window_t *)proxy->parg;
   bool changed = false;
 
   float v;
@@ -502,9 +502,9 @@ static result_t on_roll_angle(handle_t hwnd, void *parg, const char *func, const
   return s_ok;
   }
 
-static result_t on_pitch_angle(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_pitch_angle(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
-  attitude_window_t *wnd = (attitude_window_t *)parg;
+  attitude_window_t *wnd = (attitude_window_t *)proxy->parg;
   bool changed = false;
 
   float v;

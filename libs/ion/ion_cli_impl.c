@@ -233,7 +233,7 @@ result_t ion_rm_name_action(cli_t *context, const char * name)
     if (result != e_path_not_found)
       return result;        // other error.
 
-    stream_printf(stderr, "Unknown stream %s\r\n", name);
+    stream_printf(context->cfg.console_err, "Unknown stream %s\r\n", name);
     return result;
     }
 

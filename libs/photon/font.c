@@ -346,12 +346,12 @@ result_t load_font(handle_t stream)
   return result;
   }
 
-static inline result_t is_valid_font(handle_t hndl, const sized_font_t **font)
+static inline result_t is_valid_font(handle_t hndl, sized_font_t **font)
   {
   if(hndl == 0 || font == 0)
     return e_bad_parameter;
 
-  const sized_font_t *f = (const sized_font_t *)hndl;
+  sized_font_t *f = (sized_font_t *)hndl;
 
   *font = f;
   return s_ok;

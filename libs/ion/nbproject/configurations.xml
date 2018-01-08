@@ -146,6 +146,7 @@
         <property key="kseg-origin" value=""/>
         <property key="linker-symbols" value=""/>
         <property key="map-file" value="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map"/>
+        <property key="no-device-startup-code" value="false"/>
         <property key="no-startup-files" value="false"/>
         <property key="oXC32ld-extra-opts" value=""/>
         <property key="optimization-level" value=""/>
@@ -408,6 +409,7 @@
         <property key="kseg-origin" value=""/>
         <property key="linker-symbols" value=""/>
         <property key="map-file" value="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map"/>
+        <property key="no-device-startup-code" value="false"/>
         <property key="no-startup-files" value="false"/>
         <property key="oXC32ld-extra-opts" value=""/>
         <property key="optimization-level" value=""/>
@@ -462,6 +464,7 @@
         <property key="wpo-lto" value="false"/>
       </C32Global>
       <ICD3PlatformTool>
+        <property key="ADC" value="true"/>
         <property key="AutoSelectMemRanges" value="auto"/>
         <property key="CAN1" value="true"/>
         <property key="CAN2" value="true"/>
@@ -560,10 +563,10 @@
         <property key="voltagevalue" value="3.25"/>
       </ICD3PlatformTool>
     </conf>
-    <conf name="debug_pic32MZ2048ECH144" type="3">
+    <conf name="debug_pic32MZ2048EFH144" type="3">
       <toolsSet>
         <developmentServer>localhost</developmentServer>
-        <targetDevice>PIC32MZ2048ECH144</targetDevice>
+        <targetDevice>PIC32MZ2048EFH144</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
         <platformTool>ICD3PlatformTool</platformTool>
@@ -669,6 +672,7 @@
         <property key="kseg-origin" value=""/>
         <property key="linker-symbols" value=""/>
         <property key="map-file" value="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map"/>
+        <property key="no-device-startup-code" value="false"/>
         <property key="no-startup-files" value="false"/>
         <property key="oXC32ld-extra-opts" value=""/>
         <property key="optimization-level" value=""/>
@@ -723,6 +727,7 @@
         <property key="wpo-lto" value="false"/>
       </C32Global>
       <ICD3PlatformTool>
+        <property key="ADC" value="true"/>
         <property key="AutoSelectMemRanges" value="auto"/>
         <property key="CAN1" value="true"/>
         <property key="CAN2" value="true"/>
@@ -828,10 +833,10 @@
         <property key="voltagevalue" value="3.25"/>
       </ICD3PlatformTool>
     </conf>
-    <conf name="release_pic32MZ2048ECH144" type="3">
+    <conf name="release_pic32MZ2048EFH144" type="3">
       <toolsSet>
         <developmentServer>localhost</developmentServer>
-        <targetDevice>PIC32MZ2048ECH144</targetDevice>
+        <targetDevice>PIC32MZ2048EFH144</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
         <platformTool>ICD3PlatformTool</platformTool>
@@ -937,6 +942,7 @@
         <property key="kseg-origin" value=""/>
         <property key="linker-symbols" value=""/>
         <property key="map-file" value="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map"/>
+        <property key="no-device-startup-code" value="false"/>
         <property key="no-startup-files" value="false"/>
         <property key="oXC32ld-extra-opts" value=""/>
         <property key="optimization-level" value=""/>
@@ -991,6 +997,7 @@
         <property key="wpo-lto" value="false"/>
       </C32Global>
       <ICD3PlatformTool>
+        <property key="ADC" value="true"/>
         <property key="AutoSelectMemRanges" value="auto"/>
         <property key="CAN1" value="true"/>
         <property key="CAN2" value="true"/>

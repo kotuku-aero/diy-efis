@@ -30553,10 +30553,7 @@ DUK_INTERNAL duk_int_t duk_bi_date_get_local_tzoffset_gmtime(duk_double_t d) {
 	 * a lot of code.  Direct subtraction is not portable, however.
 	 * XXX: allow direct subtraction on known platforms.
 	 */
-#if 0
 	return (duk_int_t) (t2 - t1);
-#endif
-	return (duk_int_t) difftime(t2, t1);
 
  mktime_error:
 	/* XXX: return something more useful, so that caller can throw? */

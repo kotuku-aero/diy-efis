@@ -108,10 +108,10 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ca
   return s_ok;
   }
 
-static result_t on_def_utc(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_def_utc(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
   bool changed = false;
-  annunciator_window_t *wnd = (annunciator_window_t *)parg;
+  annunciator_window_t *wnd = (annunciator_window_t *)proxy->parg;
 
   uint8_t v;
   uint16_t minutes;
@@ -129,10 +129,10 @@ static result_t on_def_utc(handle_t hwnd, void *parg, const char *func, const ca
   return s_ok;
   }
 
-static result_t on_qnh(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_qnh(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
   bool changed = false;
-  annunciator_window_t *wnd = (annunciator_window_t *)parg;
+  annunciator_window_t *wnd = (annunciator_window_t *)proxy->parg;
 
   uint16_t value;
   get_param_uint16(msg, 0, &value);
@@ -145,10 +145,10 @@ static result_t on_qnh(handle_t hwnd, void *parg, const char *func, const canmsg
   return s_ok;
   }
 
-static result_t on_true_airspeed(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_true_airspeed(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
   bool changed = false;
-  annunciator_window_t *wnd = (annunciator_window_t *)parg;
+  annunciator_window_t *wnd = (annunciator_window_t *)proxy->parg;
 
   uint16_t value;
   get_param_uint16(msg, 0, &value);
@@ -161,10 +161,10 @@ static result_t on_true_airspeed(handle_t hwnd, void *parg, const char *func, co
   return s_ok;
   }
 
-static result_t on_outside_air_temperature(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_outside_air_temperature(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
   bool changed = false;
-  annunciator_window_t *wnd = (annunciator_window_t *)parg;
+  annunciator_window_t *wnd = (annunciator_window_t *)proxy->parg;
 
   int16_t value;
   get_param_int16(msg, 0, &value);
@@ -177,10 +177,10 @@ static result_t on_outside_air_temperature(handle_t hwnd, void *parg, const char
   return s_ok;
   }
 
-static result_t on_air_time(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_air_time(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
   bool changed = false;
-  annunciator_window_t *wnd = (annunciator_window_t *)parg;
+  annunciator_window_t *wnd = (annunciator_window_t *)proxy->parg;
 
   uint32_t value;
   get_param_uint32(msg, &value);
@@ -202,7 +202,7 @@ static void draw_annunciator(handle_t hwnd,
   {
   // calculate the size of the label
   rect_t clip_rect = { pt->x, pt->y, pt->x + 75, pt->y + 50 };
-  //  font(&arial_9_font);
+ 
   size_t text_len = strlen(label);
 
   rect_t rect;

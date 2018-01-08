@@ -57,7 +57,7 @@ typedef struct _gps_window_t {
   
   extent_t font_cell_size;
   
-  const handle_t  *font;
+  handle_t font;
 
   // current waypoint we are heading to.
   uint16_t dist_to_waypoint;

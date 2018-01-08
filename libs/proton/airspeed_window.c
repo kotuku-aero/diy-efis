@@ -444,11 +444,11 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
   return s_ok;
   }
 
-static result_t on_indicated_airspeed(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_indicated_airspeed(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
   bool changed = false;
 
-  airspeed_window_t *wnd = (airspeed_window_t *)parg;
+  airspeed_window_t *wnd = (airspeed_window_t *)proxy->parg;
   
   // airspeed is in m/s convert to display value (knots, km, m/h etc.)
   float v;

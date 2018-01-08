@@ -1337,11 +1337,11 @@ static void draw_menu_item(handle_t hwnd,
   }
 
 // these are the attached event handlers
-static result_t on_key0(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_key0(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
   bool changed = false;
-  layout_window_t *wnd = (layout_window_t *)parg;
-  const rect_t *wnd_rect;
+  layout_window_t *wnd = (layout_window_t *)proxy->parg;
+  rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
 
   uint16_t id = msg->id;
@@ -1372,11 +1372,11 @@ static result_t on_key0(handle_t hwnd, void *parg, const char *func, const canms
   return s_ok;
   }
 
-static result_t on_key1(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_key1(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
   bool changed = false;
-  layout_window_t *wnd = (layout_window_t *)parg;
-  const rect_t *wnd_rect;
+  layout_window_t *wnd = (layout_window_t *)proxy->parg;
+  rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
 
   uint16_t id = msg->id;
@@ -1409,11 +1409,11 @@ static result_t on_key1(handle_t hwnd, void *parg, const char *func, const canms
   return s_ok;
   }
 
-static result_t on_key2(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_key2(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
   bool changed = false;
-  layout_window_t *wnd = (layout_window_t *)parg;
-  const rect_t *wnd_rect;
+  layout_window_t *wnd = (layout_window_t *)proxy->parg;
+  rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
 
   uint16_t id = msg->id;
@@ -1446,11 +1446,11 @@ static result_t on_key2(handle_t hwnd, void *parg, const char *func, const canms
   return s_ok;
   }
 
-static result_t on_key3(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_key3(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
   bool changed = false;
-  layout_window_t *wnd = (layout_window_t *)parg;
-  const rect_t *wnd_rect;
+  layout_window_t *wnd = (layout_window_t *)proxy->parg;
+  rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
 
   uint16_t id = msg->id;
@@ -1483,11 +1483,11 @@ static result_t on_key3(handle_t hwnd, void *parg, const char *func, const canms
   return s_ok;
   }
 
-static result_t on_key4(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_key4(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
   bool changed = false;
-  layout_window_t *wnd = (layout_window_t *)parg;
-  const rect_t *wnd_rect;
+  layout_window_t *wnd = (layout_window_t *)proxy->parg;
+  rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
 
   uint16_t id = msg->id;
@@ -1519,11 +1519,11 @@ static result_t on_key4(handle_t hwnd, void *parg, const char *func, const canms
   return s_ok;
   }
 
-static result_t on_decka(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_decka(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
   bool changed = false;
-  layout_window_t *wnd = (layout_window_t *)parg;
-  const rect_t *wnd_rect;
+  layout_window_t *wnd = (layout_window_t *)proxy->parg;
+  rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
 
   uint16_t id = msg->id;
@@ -1560,11 +1560,11 @@ static result_t on_decka(handle_t hwnd, void *parg, const char *func, const canm
   return s_ok;
   }
 
-static result_t on_deckb(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_deckb(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
   bool changed = false;
-  layout_window_t *wnd = (layout_window_t *)parg;
-  const rect_t *wnd_rect;
+  layout_window_t *wnd = (layout_window_t *)proxy->parg;
+  rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
 
   uint16_t id = msg->id;
@@ -1601,11 +1601,11 @@ static result_t on_deckb(handle_t hwnd, void *parg, const char *func, const canm
   return s_ok;
   }
 
-static result_t on_menu_up(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_menu_up(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
   bool changed = false;
-  layout_window_t *wnd = (layout_window_t *)parg;
-  const rect_t *wnd_rect;
+  layout_window_t *wnd = (layout_window_t *)proxy->parg;
+  rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
 
   uint16_t id = msg->id;
@@ -1629,11 +1629,11 @@ static result_t on_menu_up(handle_t hwnd, void *parg, const char *func, const ca
   return s_ok;
   }
 
-static result_t on_menu_dn(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_menu_dn(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
   bool changed = false;
-  layout_window_t *wnd = (layout_window_t *)parg;
-  const rect_t *wnd_rect;
+  layout_window_t *wnd = (layout_window_t *)proxy->parg;
+  rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
 
   uint16_t id = msg->id;
@@ -1653,11 +1653,11 @@ static result_t on_menu_dn(handle_t hwnd, void *parg, const char *func, const ca
   return s_ok;
   }
 
-static result_t on_menu_left(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_menu_left(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
   bool changed = false;
-  layout_window_t *wnd = (layout_window_t *)parg;
-  const rect_t *wnd_rect;
+  layout_window_t *wnd = (layout_window_t *)proxy->parg;
+  rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
 
   uint16_t id = msg->id;
@@ -1680,11 +1680,11 @@ static result_t on_menu_left(handle_t hwnd, void *parg, const char *func, const 
   return s_ok;
   }
 
-static result_t on_menu_right(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_menu_right(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
   bool changed = false;
-  layout_window_t *wnd = (layout_window_t *)parg;
-  const rect_t *wnd_rect;
+  layout_window_t *wnd = (layout_window_t *)proxy->parg;
+  rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
 
   uint16_t id = msg->id;
@@ -1710,11 +1710,11 @@ static result_t on_menu_right(handle_t hwnd, void *parg, const char *func, const
   return s_ok;
   }
 
-static result_t on_ok(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_ok(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
   bool changed = false;
-  layout_window_t *wnd = (layout_window_t *)parg;
-  const rect_t *wnd_rect;
+  layout_window_t *wnd = (layout_window_t *)proxy->parg;
+  rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
 
   uint16_t id = msg->id;
@@ -1735,9 +1735,9 @@ static result_t on_ok(handle_t hwnd, void *parg, const char *func, const canmsg_
   return s_ok;
   }
 
-static result_t on_cancel(handle_t hwnd, void *parg, const char *func, const canmsg_t *msg)
+static result_t on_cancel(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
-  layout_window_t *wnd = (layout_window_t *)parg;
+  layout_window_t *wnd = (layout_window_t *)proxy->parg;
 
   close_menu(wnd);
 

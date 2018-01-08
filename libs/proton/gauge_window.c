@@ -103,7 +103,7 @@ typedef struct _gauge_window_t {
   uint16_t width;          // pointer or sweep width
 
   bool draw_value;         // draw the value
-  const handle_t value_font;       // what font to draw a value in
+  handle_t value_font;       // what font to draw a value in
   rect_t value_rect;
 
   vector_p steps;
@@ -1098,7 +1098,9 @@ result_t create_gauge_window(handle_t parent, memid_t key, handle_t *hwnd)
 
   reg_get_bool(key, "draw-border", &wnd->draw_border);
 
-  if (failed(lookup_pen(key, "border-pen", &wnd->border_pen)))
+  memid_t pen_key;
+  if(failed(reg_open_key(key, "border-pen", &pen_key)) ||
+     failed(lookup_pen(pen_key, &wnd->border_pen)))
     memcpy(&wnd->border_pen, &gray_pen, sizeof(pen_t));
 
   // store the parameters for the window
