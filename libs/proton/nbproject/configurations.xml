@@ -25,7 +25,6 @@
       <itemPath>gps_window.c</itemPath>
       <itemPath>hsi_window.c</itemPath>
       <itemPath>layout_window.c</itemPath>
-      <itemPath>menu_window.c</itemPath>
       <itemPath>pens.c</itemPath>
       <itemPath>regex.c</itemPath>
       <itemPath>widget.c</itemPath>
