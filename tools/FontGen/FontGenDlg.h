@@ -62,6 +62,7 @@ protected:
   BOOL WriteBase64OutputFile(CString &fileName);
   BOOL WriteBinaryOutputFile(CString &fileName);
 
+
 public:
   // Type of output, 0=c, 1=base64, 2=binary
   int m_nOutputType;
@@ -76,7 +77,11 @@ public:
   afx_msg void OnBnClickedDefaultSet();
   // Name embeded into the font
   CString m_strFontName;
+  BOOL m_bItalic;
+  BOOL m_bUnderline;
+  LONG m_nFontWeight;
   CArray<int> m_sizes;
+  CListBox m_lbFontSizes;
   };
 
 //{{AFX_INSERT_LOCATION}}

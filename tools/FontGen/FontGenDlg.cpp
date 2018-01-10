@@ -99,8 +99,21 @@ void CFontGenDlg::DoDataExchange(CDataExchange* pDX)
   m_btnOk.EnableWindow(!m_strFilename.IsEmpty());
   DDX_Text(pDX, IDC_CHARACTER_SET, m_strCharSet);
   DDX_Text(pDX, IDC_FONT_NAME, m_strFontName);
-  	DDV_MaxChars(pDX, m_strFontName, 16);
-}
+  DDV_MaxChars(pDX, m_strFontName, 16);
+  DDX_Control(pDX, IDC_FONTSIZES, m_lbFontSizes);
+
+  m_sizes.RemoveAll();
+
+  int count = m_lbFontSizes.GetCount();
+  for(int i = 0; i < count; i++)
+    {
+    CString item;
+    m_lbFontSizes.GetText(i, item);
+    
+    m_sizes.Add(atoi(item));
+    }
+
+  }
 
 BEGIN_MESSAGE_MAP(CFontGenDlg, CDialog)
 	//{{AFX_MSG_MAP(CFontGenDlg)
@@ -126,7 +139,9 @@ END_MESSAGE_MAP()
 static LPCTSTR szFont = _T("Font");
 static LPCTSTR szName = _T("Name");
 static LPCTSTR szFilename = _T("Filename");
-
+static LPCTSTR szItalic = _T("Italic");
+static LPCTSTR szUnderline = _T("Underline");
+static LPCTSTR szWeight = _T("Weight");
 static LPCTSTR szParams = _T("Params");
 
 BOOL CFontGenDlg::OnInitDialog()
@@ -159,13 +174,37 @@ BOOL CFontGenDlg::OnInitDialog()
 	m_strFontFace = AfxGetApp()->GetProfileString(szParams, szFont, _T("Neo Sans Arabic"));
   m_strFontName = AfxGetApp()->GetProfileString(szParams, szName, _T("Neo"));
 	m_strFilename = AfxGetApp()->GetProfileString(szParams, szFilename, _T(""));
+  m_bItalic = AfxGetApp()->GetProfileIntA(szParams, szItalic, 0);
+  m_bUnderline = AfxGetApp()->GetProfileIntA(szParams, szUnderline, 0);
+  m_nFontWeight = AfxGetApp()->GetProfileIntA(szParams, szWeight, 0);
 
 	UpdateData(FALSE);
 
-	m_cbSize.AddString(_T("9"));
-	m_cbSize.AddString(_T("12"));
-	m_cbSize.AddString(_T("15"));
-	m_cbSize.AddString(_T("18"));
+  m_cbSize.AddString(_T("5"));
+  m_cbSize.AddString(_T("6"));
+  m_cbSize.AddString(_T("7"));
+  m_cbSize.AddString(_T("8"));
+  m_cbSize.AddString(_T("9"));
+  m_cbSize.AddString(_T("10"));
+  m_cbSize.AddString(_T("11"));
+  m_cbSize.AddString(_T("12"));
+  m_cbSize.AddString(_T("13"));
+  m_cbSize.AddString(_T("14"));
+  m_cbSize.AddString(_T("15"));
+  m_cbSize.AddString(_T("16"));
+  m_cbSize.AddString(_T("17"));
+  m_cbSize.AddString(_T("18"));
+  m_cbSize.AddString(_T("19"));
+  m_cbSize.AddString(_T("20"));
+  m_cbSize.AddString(_T("21"));
+  m_cbSize.AddString(_T("22"));
+  m_cbSize.AddString(_T("23"));
+  m_cbSize.AddString(_T("24"));
+
+  m_lbFontSizes.AddString("9");
+  m_lbFontSizes.AddString("12");
+  m_lbFontSizes.AddString("15");
+  m_lbFontSizes.AddString("18");
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 	}
@@ -238,6 +277,9 @@ void CFontGenDlg::OnBrowse()
 void CFontGenDlg::OnSelect() 
 	{
 	CFontDialog dlg;
+  dlg.m_cf.Flags |= CF_NOSCRIPTSEL;
+  dlg.m_cf.Flags |= CF_NOSIZESEL;
+  dlg.m_cf.Flags |= CF_SCALABLEONLY;
 	UpdateData();
 
 	if(!m_strFontFace.IsEmpty())
@@ -252,7 +294,9 @@ void CFontGenDlg::OnSelect()
 	if(dlg.DoModal() == IDOK)
 		{
 		m_strFontFace = dlg.m_cf.lpLogFont->lfFaceName;
-		m_strSize.Format(_T("%d"), dlg.m_cf.iPointSize / 10);
+    m_bItalic = dlg.m_cf.lpLogFont->lfItalic;
+    m_bUnderline = dlg.m_cf.lpLogFont->lfUnderline;
+    m_nFontWeight = dlg.m_cf.lpLogFont->lfWeight;
 
 		UpdateData(FALSE);
 		}
@@ -302,6 +346,9 @@ void CFontGenDlg::OnOK()
 
     AfxGetApp()->WriteProfileString(szParams, szName, m_strFontName);
     AfxGetApp()->WriteProfileString(szParams, szFont, m_strFontFace);
+    AfxGetApp()->WriteProfileInt(szParams, szItalic, m_bItalic);
+    AfxGetApp()->WriteProfileInt(szParams, szUnderline, m_bUnderline);
+    AfxGetApp()->WriteProfileInt(szParams, szWeight, m_nFontWeight);
     AfxGetApp()->WriteProfileString(szParams, szFilename, m_strFilename);
     }
 
@@ -474,7 +521,10 @@ BOOL CFontGenDlg::GenerateFontFile()
     charMaps[0].glyphOffsets.RemoveAll();
 
     CFont fnt;
-    fnt.CreatePointFont(m_sizes[fontNum] * 10, m_strFontFace);
+    fnt.CreateFont(m_sizes[fontNum], 0, 0, 0, m_nFontWeight, m_bItalic, m_bUnderline,
+      0, 0, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE | DEFAULT_PITCH,
+      m_strFontFace);
+    //fnt.CreatePointFont(m_sizes[fontNum] * 10, m_strFontFace);
     dc.SelectObject(fnt);
 
     OUTLINETEXTMETRIC otm;
@@ -989,13 +1039,37 @@ void CFontGenDlg::OnLbnSelchangeFontsizes()
 
 void CFontGenDlg::OnBnClickedAdd()
   {
-  // TODO: Add your control notification handler code here
+  UpdateData();
+  if(m_strSize.GetLength() > 0)
+    {
+    int count = m_lbFontSizes.GetCount();
+    for(int i = 0; i < count; i++)
+      {
+      CString item;
+      m_lbFontSizes.GetText(i, item);
+      if(item == m_strSize)
+        return;
+      }
+
+    m_lbFontSizes.AddString(m_strSize);
+    }
   }
 
 
 void CFontGenDlg::OnBnClickedRemove()
   {
-  // TODO: Add your control notification handler code here
+  UpdateData();
+  int count = m_lbFontSizes.GetSelCount();
+  if(count < 1)
+    return;
+
+  CArray< int, int > arrayListSel;
+  arrayListSel.SetSize(count);
+
+  m_lbFontSizes.GetSelItems(count, arrayListSel.GetData());
+
+  for(; count > 0; count--)
+    m_lbFontSizes.DeleteString(arrayListSel[count - 1]);
   }
 
 
