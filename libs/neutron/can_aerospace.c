@@ -261,16 +261,61 @@ canmsg_t *create_can_msg_uint8_4(canmsg_t *msg, uint16_t message_id, uint8_t ser
   return msg;
   }
 
+static float get_float(const canmsg_t *msg)
+  {
+  uint32_t value = (((uint32_t)msg->canas.data[0]) << 24) |
+    (((uint32_t)msg->canas.data[1]) << 16) |
+    (((uint32_t)msg->canas.data[2]) << 8) |
+    ((uint32_t)msg->canas.data[3]);
+  return  *(float *)(&value);
+  }
+
+static uint16_t get_uint16(const canmsg_t *msg)
+  {
+  return  ((((uint16_t)msg->canas.data[0]) << 8) |
+    ((uint16_t)msg->canas.data[1]));
+  }
+
+static uint32_t get_uint32(const canmsg_t *msg)
+  {
+  return (((uint32_t)msg->canas.data[0]) << 24) |
+    (((uint32_t)msg->canas.data[1]) << 16) |
+    (((uint32_t)msg->canas.data[2]) << 8) |
+    ((uint32_t)msg->canas.data[3]);
+  }
+
 result_t get_param_float(const canmsg_t *msg, float *v)
   {
   if (msg == 0 || v == 0)
     return e_bad_parameter;
 
-  uint32_t value = (((uint32_t) msg->canas.data[0]) << 24) |
-                        (((uint32_t) msg->canas.data[1]) << 16) |
-                        (((uint32_t) msg->canas.data[2]) << 8) |
-                        ((uint32_t) msg->canas.data[3]);
-  *v = *(float *)(&value);
+  switch (msg->canas.data_type)
+    {
+    default:
+      return e_bad_type;
+    case CANAS_DATATYPE_UCHAR:
+      *v = (float)msg->canas.data[0];
+      break;
+    case CANAS_DATATYPE_CHAR:
+      *v = (float)(int8_t)msg->canas.data[0];
+      break;
+    case CANAS_DATATYPE_FLOAT:
+      *v = get_float(msg);
+      break;
+    case CANAS_DATATYPE_INT32:
+      *v = (float)get_uint32(msg);
+      break;
+    case CANAS_DATATYPE_UINT32:
+      *v = (float)get_uint32(msg);
+      break;
+    case CANAS_DATATYPE_SHORT:
+      *v = (float)get_uint16(msg);
+      break;
+    case CANAS_DATATYPE_USHORT:
+      *v = (float)get_uint16(msg);
+      break;
+    }
+
   return s_ok;
   }
 
@@ -279,7 +324,33 @@ result_t get_param_int8(const canmsg_t *msg, uint16_t index, int8_t *v)
   if (index > 3 || msg == 0 || v == 0)
     return e_bad_parameter;
 
-  *v = (int8_t) msg->canas.data[index];
+  switch (msg->canas.data_type)
+    {
+    default:
+      return e_bad_type;
+    case CANAS_DATATYPE_UCHAR:
+      *v = (int8_t)msg->canas.data[0];
+      break;
+    case CANAS_DATATYPE_CHAR:
+      *v = (int8_t)msg->canas.data[0];
+      break;
+    case CANAS_DATATYPE_FLOAT:
+      *v = (int8_t)get_float(msg);
+      break;
+    case CANAS_DATATYPE_INT32:
+      *v = (int8_t)get_uint32(msg);
+      break;
+    case CANAS_DATATYPE_UINT32:
+      *v = (int8_t)get_uint32(msg);
+      break;
+    case CANAS_DATATYPE_SHORT:
+      *v = (int8_t)get_uint16(msg);
+      break;
+    case CANAS_DATATYPE_USHORT:
+      *v = (int8_t)get_uint16(msg);
+      break;
+    }
+
   return s_ok;
   }
 
@@ -288,7 +359,32 @@ result_t get_param_uint8(const canmsg_t *msg, uint16_t index, uint8_t *v)
   if (index > 3 || msg == 0 || v == 0)
     return e_bad_parameter;
 
-  *v = msg->canas.data[index];
+  switch (msg->canas.data_type)
+    {
+    default:
+      return e_bad_type;
+    case CANAS_DATATYPE_UCHAR:
+      *v = (uint8_t)msg->canas.data[0];
+      break;
+    case CANAS_DATATYPE_CHAR:
+      *v = (uint8_t)msg->canas.data[0];
+      break;
+    case CANAS_DATATYPE_FLOAT:
+      *v = (uint8_t)get_float(msg);
+      break;
+    case CANAS_DATATYPE_INT32:
+      *v = (uint8_t)get_uint32(msg);
+      break;
+    case CANAS_DATATYPE_UINT32:
+      *v = (uint8_t)get_uint32(msg);
+      break;
+    case CANAS_DATATYPE_SHORT:
+      *v = (uint8_t)get_uint16(msg);
+      break;
+    case CANAS_DATATYPE_USHORT:
+      *v = (uint8_t)get_uint16(msg);
+      break;
+    }
   return s_ok;
   }
 
@@ -297,8 +393,32 @@ result_t get_param_int16(const canmsg_t *msg, uint16_t index, int16_t *v)
   if (index > 1 || msg == 0 || v == 0)
     return e_bad_parameter;
 
-  *v = (int16_t)((((uint16_t) msg->canas.data[index << 1]) << 8) |
-    ((uint16_t) msg->canas.data[(index << 1)+1]));
+  switch (msg->canas.data_type)
+    {
+    default:
+      return e_bad_type;
+    case CANAS_DATATYPE_UCHAR:
+      *v = (int16_t)msg->canas.data[0];
+      break;
+    case CANAS_DATATYPE_CHAR:
+      *v = (int16_t)msg->canas.data[0];
+      break;
+    case CANAS_DATATYPE_FLOAT:
+      *v = (int16_t)get_float(msg);
+      break;
+    case CANAS_DATATYPE_INT32:
+      *v = (int16_t)get_uint32(msg);
+      break;
+    case CANAS_DATATYPE_UINT32:
+      *v = (int16_t)get_uint32(msg);
+      break;
+    case CANAS_DATATYPE_SHORT:
+      *v = (int16_t)get_uint16(msg);
+      break;
+    case CANAS_DATATYPE_USHORT:
+      *v = (int16_t)get_uint16(msg);
+      break;
+    }
 
   return s_ok;
   }
@@ -308,9 +428,33 @@ result_t get_param_uint16(const canmsg_t *msg, uint16_t index, uint16_t *v)
   if (index > 1 || msg == 0 || v == 0)
     return e_bad_parameter;
 
-  *v = ((((uint16_t)msg->canas.data[index << 1]) << 8) |
-    ((uint16_t)msg->canas.data[(index << 1) + 1]));
 
+  switch (msg->canas.data_type)
+    {
+    default:
+      return e_bad_type;
+    case CANAS_DATATYPE_UCHAR:
+      *v = (uint16_t)msg->canas.data[0];
+      break;
+    case CANAS_DATATYPE_CHAR:
+      *v = (uint16_t)msg->canas.data[0];
+      break;
+    case CANAS_DATATYPE_FLOAT:
+      *v = (uint16_t)get_float(msg);
+      break;
+    case CANAS_DATATYPE_INT32:
+      *v = (uint16_t)get_uint32(msg);
+      break;
+    case CANAS_DATATYPE_UINT32:
+      *v = (uint16_t)get_uint32(msg);
+      break;
+    case CANAS_DATATYPE_SHORT:
+      *v = (uint16_t)get_uint16(msg);
+      break;
+    case CANAS_DATATYPE_USHORT:
+      *v = (uint16_t)get_uint16(msg);
+      break;
+    }
   return s_ok;
   }
 
@@ -319,11 +463,32 @@ result_t get_param_int32(const canmsg_t *msg, int32_t *v)
   if (msg == 0 || v == 0)
     return e_bad_parameter;
 
-  *v = (int32_t)(
-    (((uint32_t) msg->canas.data[0]) << 24) |
-    (((uint32_t) msg->canas.data[1]) << 16) | 
-    (((uint32_t) msg->canas.data[2]) << 8) | 
-     ((uint32_t) msg->canas.data[3]));
+  switch (msg->canas.data_type)
+    {
+    default:
+      return e_bad_type;
+    case CANAS_DATATYPE_UCHAR:
+      *v = (int32_t)msg->canas.data[0];
+      break;
+    case CANAS_DATATYPE_CHAR:
+      *v = (int32_t)msg->canas.data[0];
+      break;
+    case CANAS_DATATYPE_FLOAT:
+      *v = (int32_t)get_float(msg);
+      break;
+    case CANAS_DATATYPE_INT32:
+      *v = (int32_t)get_uint32(msg);
+      break;
+    case CANAS_DATATYPE_UINT32:
+      *v = (int32_t)get_uint32(msg);
+      break;
+    case CANAS_DATATYPE_SHORT:
+      *v = (int32_t)get_uint16(msg);
+      break;
+    case CANAS_DATATYPE_USHORT:
+      *v = (int32_t)get_uint16(msg);
+      break;
+    }
 
   return s_ok;
   }
@@ -333,11 +498,32 @@ result_t get_param_uint32(const canmsg_t *msg, uint32_t *v)
   if (msg == 0 || v == 0)
     return e_bad_parameter;
 
-  *v =
-    (((uint32_t) msg->canas.data[0]) << 24) |
-    (((uint32_t) msg->canas.data[1]) << 16) | 
-    (((uint32_t) msg->canas.data[2]) << 8) | 
-     ((uint32_t) msg->canas.data[3]);
+  switch (msg->canas.data_type)
+    {
+    default:
+      return e_bad_type;
+    case CANAS_DATATYPE_UCHAR:
+      *v = (uint32_t)msg->canas.data[0];
+      break;
+    case CANAS_DATATYPE_CHAR:
+      *v = (uint32_t)msg->canas.data[0];
+      break;
+    case CANAS_DATATYPE_FLOAT:
+      *v = (uint32_t)get_float(msg);
+      break;
+    case CANAS_DATATYPE_INT32:
+      *v = (uint32_t)get_uint32(msg);
+      break;
+    case CANAS_DATATYPE_UINT32:
+      *v = (uint32_t)get_uint32(msg);
+      break;
+    case CANAS_DATATYPE_SHORT:
+      *v = (uint32_t)get_uint16(msg);
+      break;
+    case CANAS_DATATYPE_USHORT:
+      *v = (uint32_t)get_uint16(msg);
+      break;
+    }
 
   return s_ok;
   }

@@ -202,26 +202,18 @@ static result_t on_value_label(handle_t hwnd, event_proxy_t *proxy, const canmsg
     if (msg->id == wnd->labels[i])
       {
       float float_value;
-      int16_t short_value;
-
-      switch (msg->canas.data_type)
+      if (succeeded(get_param_float(msg, &float_value)))
         {
-        case CANAS_DATATYPE_FLOAT :
-          get_param_float(msg, &float_value);
-          break;
-        case CANAS_DATATYPE_SHORT :
-          get_param_int16(msg, 0, &short_value);
-          float_value = short_value;
-          break;
+
+        float_value *= wnd->scale;
+        float_value += wnd->offset;
+
+        changed = wnd->values[i] != float_value;
+        wnd->values[i] = float_value;
+
+        wnd->min_values[i] = min(wnd->min_values[i], wnd->values[i]);
+        wnd->max_values[i] = max(wnd->max_values[i], wnd->values[i]);
         }
-      float_value *= wnd->scale;
-      float_value += wnd->offset;
-
-      changed = wnd->values[i] != float_value;
-      wnd->values[i] = float_value;
-
-      wnd->min_values[i] = min(wnd->min_values[i], wnd->values[i]);
-      wnd->max_values[i] = max(wnd->max_values[i], wnd->values[i]);
 
       break;
       }
