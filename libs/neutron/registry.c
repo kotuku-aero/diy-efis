@@ -66,7 +66,6 @@ typedef struct _eeprom_root_t {
 
 static eeprom_root_t *root;        // this is dynamically allocated
 static uint32_t max_offset = 0;
-static const char *root_name = "/";
 
 static inline uint32_t get_block_offset(memid_t memid)
   {

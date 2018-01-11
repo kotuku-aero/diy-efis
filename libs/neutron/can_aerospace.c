@@ -673,8 +673,6 @@ static bool publish_ids(const canmsg_t *service_msg, void *parg)
   return false;
   }
 
-static msg_hook_t ids_hook = { 0, 0, publish_ids, 0 };
-
 static canmsg_t rx_msg;
 
 static msg_hook_t *services[num_services];
