@@ -40,17 +40,23 @@ it must be removed as soon as possible after the code fragment is identified.
 typedef struct _strstream_handle_t
   {
   stream_handle_t stream;
-  vector_p buffer;      // vector...
-  uint16_t offset;      // current offset in the stream.
-  uint16_t length;      // length of the stream, can be less than the buffer count
+  
+  // if the stream.stream_write function is 0 then this is a readonly
+  // buffer
+  union {
+    vector_p rw_buffer;      // vector... if 0 then a readonly stream
+    const uint8_t *ro_buffer; // readonly vector
+    };
+  
+  uint32_t offset;      // current offset in the stream.
+  uint32_t length;      // length of the stream, can be less than the buffer count
   } strstream_handle_t;
 
-static result_t check_handle(stream_p hndl)
+static result_t check_handle(stream_handle_t *stream)
   {
-  if(hndl == 0)
+  if(stream == 0)
     return e_bad_parameter;
   
-  stream_handle_t *stream = (stream_handle_t *) hndl;
   if (stream->version != sizeof (strstream_handle_t))
     return e_bad_parameter;
 
@@ -63,12 +69,18 @@ result_t strstream_get(stream_p hndl, const void **lit)
   if(lit == 0 || hndl == 0)
     return e_bad_parameter;
   
-  if(failed(result = check_handle(hndl)))
+  if(failed(result = check_handle((stream_handle_t *)hndl)))
     return result;
   
   strstream_handle_t *stream = (strstream_handle_t *)hndl;
   
-  return vector_begin(stream->buffer, (void **)lit);
+  if(stream->stream.stream_write == 0)
+    {
+    *lit = stream->ro_buffer;
+    return s_ok;
+    }
+  
+  return vector_begin(stream->rw_buffer, (void **)lit);
   }
 
 static result_t strstream_eof(stream_handle_t *hndl)
@@ -96,7 +108,7 @@ static result_t strstream_read(stream_handle_t *hndl, void *buffer, uint16_t siz
   
   strstream_handle_t *stream = (strstream_handle_t *)hndl;
   
-  uint16_t num_to_read = stream->length - stream->offset;
+  uint32_t num_to_read = stream->length - stream->offset;
   
   if(num_to_read == 0)
     return e_no_more_information;
@@ -104,9 +116,14 @@ static result_t strstream_read(stream_handle_t *hndl, void *buffer, uint16_t siz
   if(num_to_read > size)
     num_to_read = size;
   
-  uint8_t *src;
-  if(failed(result = vector_begin(stream->buffer, (void **)&src)))
-    return result;
+  const uint8_t *src;
+  if(stream->stream.stream_write == 0)
+    src = stream->ro_buffer;
+  else
+    {
+    if(failed(result = vector_begin(stream->rw_buffer, (void **)&src)))
+      return result;
+    }
   
   src += stream->offset;
   stream->offset += num_to_read;
@@ -130,13 +147,13 @@ static result_t strstream_write(stream_handle_t *hndl, const void *buffer, uint1
   strstream_handle_t *stream = (strstream_handle_t *)hndl;
   
   uint16_t length;
-  if(failed(result = vector_count(stream->buffer, &length)))
+  if(failed(result = vector_count(stream->rw_buffer, &length)))
     return result;
   
   // see if this is an assignment.  in that case update the section of the stream
   for(; stream->offset < length && size > 0; stream->offset++, size--)
     {
-    if(failed(result = vector_set(stream->buffer, stream->offset, buffer)))
+    if(failed(result = vector_set(stream->rw_buffer, stream->offset, buffer)))
       return result;
     
     buffer = ((const uint8_t *)buffer) +1;
@@ -146,7 +163,7 @@ static result_t strstream_write(stream_handle_t *hndl, const void *buffer, uint1
   if(size != 0)
     {  
     // append what is left
-    if(failed(result = vector_append(stream->buffer, size, buffer)))
+    if(failed(result = vector_append(stream->rw_buffer, size, buffer)))
       return result;
   
     // seek to the new end of the file
@@ -159,7 +176,7 @@ static result_t strstream_write(stream_handle_t *hndl, const void *buffer, uint1
   return s_ok;
   }
 
-static result_t strstream_getpos(stream_handle_t *hndl, uint16_t *pos)
+static result_t strstream_getpos(stream_handle_t *hndl, uint32_t *pos)
   {
   result_t result;
   if(hndl == 0 || pos == 0)
@@ -174,7 +191,7 @@ static result_t strstream_getpos(stream_handle_t *hndl, uint16_t *pos)
   return s_ok;
   }
 
-static result_t strstream_setpos(stream_handle_t *hndl, uint16_t pos)
+static result_t strstream_setpos(stream_handle_t *hndl, uint32_t pos)
   {
   result_t result;
   if(hndl == 0)
@@ -193,7 +210,7 @@ static result_t strstream_setpos(stream_handle_t *hndl, uint16_t pos)
   return s_ok;
   }
 
-static result_t strstream_length(stream_handle_t *hndl, uint16_t *length)
+static result_t strstream_length(stream_handle_t *hndl, uint32_t *length)
   {
   result_t result;
   if(hndl == 0 || length == 0)
@@ -208,7 +225,7 @@ static result_t strstream_length(stream_handle_t *hndl, uint16_t *length)
   return s_ok;
   }
 
-static result_t strstream_truncate(stream_handle_t *hndl, uint16_t length)
+static result_t strstream_truncate(stream_handle_t *hndl, uint32_t length)
   {
   result_t result;
   if(hndl == 0)
@@ -232,7 +249,7 @@ static result_t strstream_truncate(stream_handle_t *hndl, uint16_t length)
 
 static result_t strstream_close(stream_handle_t *hndl)
   {
-  return stream_delete(hndl);
+  return stream_delete((stream_p)hndl);
   }
 
 static result_t strstream_delete(stream_handle_t *hndl)
@@ -246,15 +263,23 @@ static result_t strstream_delete(stream_handle_t *hndl)
   
   strstream_handle_t *stream = (strstream_handle_t *)hndl;
   
-  if(failed(result = vector_close(stream->buffer)))
+  if(stream->stream.stream_write != 0 &&
+     failed(result = vector_close(stream->rw_buffer)))
     return result;
   
   neutron_free(stream);
   return s_ok;
   }
 
-static void init_stream(strstream_handle_t *stream)
+result_t strstream_create(const uint8_t *lit, uint32_t len, bool read_only, stream_p *hndl)
   {
+  if(hndl == 0 ||
+     (read_only && lit == 0) ||
+     (read_only && len == 0))
+    return e_bad_parameter;
+  
+  strstream_handle_t *stream = (strstream_handle_t *)neutron_malloc(sizeof(strstream_handle_t));
+  
   memset(stream, 0, sizeof (strstream_handle_t));
 
   // set up the callbacks
@@ -265,27 +290,28 @@ static void init_stream(strstream_handle_t *stream)
   stream->stream.stream_read = strstream_read;
   stream->stream.stream_setpos = strstream_setpos;
   stream->stream.stream_truncate = strstream_truncate;
-  stream->stream.stream_write = strstream_write;
   stream->stream.stream_close = strstream_close;
   stream->stream.stream_delete = strstream_delete;
-  }
-
-result_t strstream_create(const void *lit, uint16_t len, stream_p *hndl)
-  {
-  if(hndl == 0)
-    return e_bad_parameter;
   
-  strstream_handle_t *stream = (strstream_handle_t *)neutron_malloc(sizeof(strstream_handle_t));
-  
-  init_stream(stream);
-  
-  if(lit != 0)
-    vector_copy(sizeof(uint8_t), len, lit, &stream->buffer);
+  if(read_only)
+    {
+    stream->length = len;
+    stream->ro_buffer = lit;
+    }
   else
-    vector_create(sizeof(uint8_t), &stream->buffer);
-  
-  vector_count(stream->buffer, &stream->length);
+    {
+    stream->stream.stream_write = strstream_write;
+
+    if(lit != 0)
+      vector_copy(sizeof(uint8_t), len, lit, &stream->rw_buffer);
+    else
+      vector_create(sizeof(uint8_t), &stream->rw_buffer);
+
+    uint16_t len;
+    vector_count(stream->rw_buffer, &len);
+    stream->length = len;
+    }
     
-  *hndl = stream;
+  *hndl = (stream_p)stream;
   return s_ok;
   }

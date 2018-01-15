@@ -42,7 +42,7 @@ typedef struct _regstream_handle_t
   {
   stream_handle_t stream;
   field_stream_t field;     // descriptor in the registry
-  uint16_t offset;          // current offset in the stream.
+  uint32_t offset;          // current offset in the stream.
   memid_t cluster[16];      // cached cluster.
   memid_t cluster_id;       // if of cached cluster
   } regstream_handle_t;
@@ -62,10 +62,10 @@ static result_t check_handle(handle_t hndl)
 static result_t regstream_eof(stream_handle_t *stream);
 static result_t regstream_read(stream_handle_t *stream, void *buffer, uint16_t size, uint16_t *read);
 static result_t regstream_write(stream_handle_t *stream, const void *buffer, uint16_t size);
-static result_t regstream_getpos(stream_handle_t *stream, uint16_t *pos);
-static result_t regstream_setpos(stream_handle_t *stream, uint16_t pos);
-static result_t regstream_length(stream_handle_t *stream, uint16_t *length);
-static result_t regstream_truncate(stream_handle_t *stream, uint16_t length);
+static result_t regstream_getpos(stream_handle_t *stream, uint32_t *pos);
+static result_t regstream_setpos(stream_handle_t *stream, uint32_t pos);
+static result_t regstream_length(stream_handle_t *stream, uint32_t *length);
+static result_t regstream_truncate(stream_handle_t *stream, uint32_t length);
 static result_t regstream_close(stream_handle_t *stream);
 static result_t regstream_delete(stream_handle_t *stream);
 static result_t regstream_path(stream_handle_t *hndl, bool full_path, uint16_t len, char *path);
@@ -514,7 +514,7 @@ static result_t regstream_write(stream_handle_t *hndl, const void *buffer, uint1
     sizeof(regstream_handle_t) - sizeof(field_definition_t), &stream->field.length, 0));
   }
 
-static result_t regstream_getpos(stream_handle_t *hndl, uint16_t *pos)
+static result_t regstream_getpos(stream_handle_t *hndl, uint32_t *pos)
   {
   regstream_handle_t *stream = (regstream_handle_t *)hndl;
 
@@ -522,7 +522,7 @@ static result_t regstream_getpos(stream_handle_t *hndl, uint16_t *pos)
   return s_ok;
   }
 
-static result_t regstream_setpos(stream_handle_t *hndl, uint16_t pos)
+static result_t regstream_setpos(stream_handle_t *hndl, uint32_t pos)
   {
   result_t result;
 
@@ -538,7 +538,7 @@ static result_t regstream_setpos(stream_handle_t *hndl, uint16_t pos)
   return s_ok;
   }
 
-static result_t regstream_length(stream_handle_t *hndl, uint16_t *length)
+static result_t regstream_length(stream_handle_t *hndl, uint32_t *length)
   {
   result_t result;
 
@@ -546,12 +546,12 @@ static result_t regstream_length(stream_handle_t *hndl, uint16_t *length)
     return result;
 
   regstream_handle_t *stream = (regstream_handle_t *)hndl;
-  *length = (uint16_t) stream->field.length;
+  *length = (uint32_t) stream->field.length;
 
   return s_ok;
   }
 
-static result_t regstream_truncate(stream_handle_t *hndl, uint16_t length)
+static result_t regstream_truncate(stream_handle_t *hndl, uint32_t length)
   {
   result_t result;
 

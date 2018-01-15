@@ -42,8 +42,17 @@ it must be removed as soon as possible after the code fragment is identified.
 extern "C" {
 #endif
   struct _ion_context_t;
+  
+  /**
+   * @function ion_register_fn(duk_context *ctx, handle_t co)
+   * callback to register application specific library functions
+   * @param ctx   Context of the newly created script engine
+   * @param co    Optional console output to log function output to
+   * @return s_ok if functions registered ok
+   */
+  typedef result_t (*ion_register_fn)(duk_context *ctx, handle_t co);
 
-  extern result_t ion_init();
+  extern result_t ion_init(ion_register_fn lib_funcs);
   /**
    * Setup the ECMA Script 5 interpreter
    * @param home      home key to refer all load funcs to
@@ -51,15 +60,20 @@ extern "C" {
    * @param ci        console in
    * @param co        console out handler
    * @param cerr      console error
+   * @param lib_funcs Optional library function
    * @param ion       resulting interactive interpreter
    * @return 
    */
   extern result_t ion_create(memid_t home, const char *path,
-    handle_t ci, handle_t co, handle_t cerr, struct _ion_context_t **ion);
+                             handle_t ci,
+                             handle_t co,
+                             handle_t cerr,
+                             ion_register_fn lib_funcs,
+                             struct _ion_context_t **ion);
   /**
    * Queue a message to the worker to process.
    * @param ion     Context for the interpreter
-   * @param handler Registered handler for the message
+   * @param handler Registered name for the message (MUST be static variable)
    * @param msg     Message to queue
   */
   extern result_t ion_queue_message(struct _ion_context_t *ion, const char *handler, const canmsg_t *msg);
@@ -71,10 +85,15 @@ extern "C" {
 
   extern result_t ion_close(struct _ion_context_t *ion);
   
+  
   /**
+   * @function ion_run(ion_register_fn lib_funcs)
    * Run the ion event handler code.  Usually the last thing to do
+   * Never returns
+   * @param lib_funcs Optional library functions to register
+   * 
    */
-  extern result_t ion_run();
+  extern result_t ion_run(ion_register_fn lib_funcs);
   
 #ifdef __cplusplus
   }

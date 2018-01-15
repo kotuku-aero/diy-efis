@@ -197,7 +197,7 @@ void reset_undo(editor_t *ed)
 
 result_t load_file(editor_t *ed, handle_t stream)
   {
-  uint16_t length;
+  uint32_t length;
   int f;
   result_t result;
 
@@ -242,7 +242,7 @@ result_t save_file(editor_t *ed)
      return result;
 
   // and set the size of the stream
-  uint16_t pos;
+  uint32_t pos;
 
   if (failed(result = stream_getpos(ed->stream, &pos)) ||
     failed(result = stream_truncate(ed->stream, pos)))

@@ -184,7 +184,7 @@ result_t ion_ls_name_action(cli_t *context, const char * path)
       if (failed(stream_open(get_context(context), name, &hndl)))
         continue;
 
-      uint16_t length;
+      uint32_t length;
       stream_length(hndl, &length);
       stream_close(hndl);
 

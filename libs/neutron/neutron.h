@@ -2253,7 +2253,7 @@ extern result_t stream_write(stream_p stream, const void *buffer, uint16_t size)
  * @param pos       Position of the stream for the next read or write
  * @return s_ok if a valid stream
  */
-extern result_t stream_getpos(stream_p stream, uint16_t *pos);
+extern result_t stream_getpos(stream_p stream, uint32_t *pos);
 /**
  * @function stream_setpos(stream_p stream, uint16_t pos)
  * Move the stream offset
@@ -2263,7 +2263,7 @@ extern result_t stream_getpos(stream_p stream, uint16_t *pos);
  * or within the stream.  setting to UINT16_MAX will move the pointer to the
  * end of the stream.
  */
-extern result_t stream_setpos(stream_p stream, uint16_t pos);
+extern result_t stream_setpos(stream_p stream, uint32_t pos);
 /**
  * @function stream_length(stream_p stream, uint16_t *length)
  * Return the number of bytes in a stream
@@ -2271,7 +2271,7 @@ extern result_t stream_setpos(stream_p stream, uint16_t pos);
  * @param length    Length of the stream, max is 32768
  * @return s+ok if the handle is a valid stream
  */
-extern result_t stream_length(stream_p stream, uint16_t *length);
+extern result_t stream_length(stream_p stream, uint32_t *length);
 /**
  * @function stream_truncate(stream_p stream, uint16_t length)
  * Set the stream length
@@ -2280,7 +2280,7 @@ extern result_t stream_length(stream_p stream, uint16_t *length);
  * stream length
  * @return s_ok if truncated ok
  */
-extern result_t stream_truncate(stream_p stream, uint16_t length);
+extern result_t stream_truncate(stream_p stream, uint32_t length);
 /**
  * @function stream_copy(stream_p from, stream_p to)
  * Copy betrween two streams
@@ -2316,10 +2316,12 @@ extern stream_p console_err;
  * Create an in-memory stream.  Should be deleted when done.
  * @param lit     Optional literal to copy into the stream
  * @param len     Length of the literal
+ * @param read_only If set then the stream will be created read-only and the
+ * buffer will not be copied into a dynamic memory
  * @param stream  Resulting stream
  * @return s_ok if created ok
  */
-extern result_t strstream_create(const void *buffer, uint16_t len, stream_p *stream);
+extern result_t strstream_create(const uint8_t *buffer, uint32_t len, bool read_only, stream_p *stream);
 /**
  * @function strstream_get(stream_p stream, const char **lit)
  * Return the underlying character buffer of the stream

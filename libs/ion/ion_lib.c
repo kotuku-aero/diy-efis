@@ -965,7 +965,7 @@ static duk_ret_t lib_stream_getpos(duk_context *ctx)
   {
   handle_t stream = duk_get_pointer(ctx, 0);
 
-  uint16_t pos;
+  uint32_t pos;
   if (failed(stream_getpos(stream, &pos)))
     return DUK_RET_TYPE_ERROR;
 
@@ -976,7 +976,7 @@ static duk_ret_t lib_stream_getpos(duk_context *ctx)
 static duk_ret_t lib_stream_setpos(duk_context *ctx)
   {
   handle_t stream = duk_get_pointer(ctx, 0);
-  uint16_t pos = (uint16_t)duk_get_uint(ctx, 1);
+  uint32_t pos = (uint32_t)duk_get_uint(ctx, 1);
 
   if (failed(stream_setpos(stream, pos)))
     return DUK_RET_TYPE_ERROR;
@@ -987,7 +987,7 @@ static duk_ret_t lib_stream_setpos(duk_context *ctx)
 static duk_ret_t lib_stream_length(duk_context *ctx)
   {
   handle_t stream = duk_get_pointer(ctx, 0);
-  uint16_t pos;
+  uint32_t pos;
   if (failed(stream_length(stream, &pos)))
     return DUK_RET_TYPE_ERROR;
 
@@ -998,7 +998,7 @@ static duk_ret_t lib_stream_length(duk_context *ctx)
 static duk_ret_t lib_stream_truncate(duk_context *ctx)
   {
   handle_t stream = duk_get_pointer(ctx, 0);
-  uint16_t pos = (uint16_t)duk_get_uint(ctx, 1);
+  uint32_t pos = (uint32_t)duk_get_uint(ctx, 1);
 
   if (failed(stream_truncate(stream, pos)))
     return DUK_RET_TYPE_ERROR;
@@ -1090,7 +1090,7 @@ static duk_ret_t ion_load_script(ion_context_t *ion, const char *id)
   if (failed(stream_open(parent, name, &stream)))
     return DUK_RET_TYPE_ERROR;
 
-  uint16_t len;
+  uint32_t len;
   if (failed(stream_length(stream, &len)))
     {
     stream_close(stream);
@@ -1303,7 +1303,7 @@ static void duk_console_init(duk_context *ctx, duk_uint_t flags)
     }
   }
 
-void register_ion_functions(duk_context *ctx, handle_t co)
+result_t register_ion_functions(duk_context *ctx, handle_t co)
   {
   add_function(ctx, lib_publish_float, "publish_float", 2);
   add_function(ctx, lib_publish_int8, " publish_int8", 2);
@@ -1387,4 +1387,6 @@ void register_ion_functions(duk_context *ctx, handle_t co)
 
   if (co != 0)
     duk_console_init(ctx, DUK_CONSOLE_PROXY_WRAPPER);
+  
+  return s_ok;
   }

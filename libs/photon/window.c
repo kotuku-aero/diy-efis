@@ -35,6 +35,8 @@ it must be removed as soon as possible after the code fragment is identified.
 */
 #include "window.h"
 
+// TODO: we can now attach global functions to the script using a callback.
+// expose the window specific JS functions
 result_t attach_ion(handle_t hndl, memid_t key, const char *startup_script)
   {
   result_t result;
@@ -43,7 +45,7 @@ result_t attach_ion(handle_t hndl, memid_t key, const char *startup_script)
   if(failed(result = as_screen(hndl, &screen)))
     return result;
 
-  if(failed(result = ion_create(key, startup_script, 0, 0, 0, &screen->context)))
+  if(failed(result = ion_create(key, startup_script, 0, 0, 0, 0, &screen->context)))
     return result;
 
   return s_ok;

@@ -137,11 +137,11 @@ result_t stream_copy(stream_p from, stream_p to)
   if(buffer == 0)
     return e_not_enough_memory;
 
-  uint16_t len;
+  uint32_t len;
   if (failed(stream_length(from, &len)))
     return result;
 
-  uint16_t chunk = min(128, len);
+  uint32_t chunk = min(128, len);
 
   while (chunk > 0 &&
     succeeded(result = stream_read(from, buffer, chunk, &read)) &&
@@ -156,7 +156,7 @@ result_t stream_copy(stream_p from, stream_p to)
   return result;
   }
 
-result_t stream_getpos(stream_p hndl, uint16_t *pos)
+result_t stream_getpos(stream_p hndl, uint32_t *pos)
   {
   result_t result;
   if(failed(result = check_handle(hndl)))
@@ -173,7 +173,7 @@ result_t stream_getpos(stream_p hndl, uint16_t *pos)
   return (*stream->stream_getpos)(stream, pos);
   }
 
-result_t stream_setpos(stream_p hndl, uint16_t pos)
+result_t stream_setpos(stream_p hndl, uint32_t pos)
   {
   result_t result;
   if(failed(result = check_handle(hndl)))
@@ -187,7 +187,7 @@ result_t stream_setpos(stream_p hndl, uint16_t pos)
   return (*stream->stream_setpos)(stream, pos);
   }
 
-result_t stream_length(stream_p hndl, uint16_t *length)
+result_t stream_length(stream_p hndl, uint32_t *length)
   {
   result_t result;
   if(failed(result = check_handle(hndl)))
@@ -201,7 +201,7 @@ result_t stream_length(stream_p hndl, uint16_t *length)
   return (*stream->stream_length)(stream, length);
   }
 
-result_t stream_truncate(stream_p hndl, uint16_t length)
+result_t stream_truncate(stream_p hndl, uint32_t length)
   {
   result_t result;
   if(failed(result = check_handle(hndl)))
