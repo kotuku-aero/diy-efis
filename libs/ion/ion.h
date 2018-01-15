@@ -55,6 +55,12 @@ extern "C" {
     deque_p message_queue;       // queue of messages being handled
     } ion_context_t;
 
+  // this is the type of message passed to the callback functions.
+  typedef struct _ion_request {
+    const char function_name;
+    canmsg_t msg;
+    } ion_request_t;
+
   extern const char *ion_key;
   extern const char *event_key;
   extern const char *ion_name;

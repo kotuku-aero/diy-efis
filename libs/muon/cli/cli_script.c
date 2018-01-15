@@ -185,7 +185,7 @@ result_t script_ls_name_action(cli_t *context, const char * path)
       if (failed(stream_open(get_context(context), name, &hndl)))
         continue;
 
-      uint16_t length;
+      uint32_t length;
       stream_length(hndl, &length);
       stream_close(hndl);
 
@@ -234,7 +234,7 @@ result_t script_rm_name_action(cli_t *context, const char * name)
     if (result != e_path_not_found)
       return result;        // other error.
 
-    stream_printf("Unknown stream %s\r\n", name);
+    stream_printf(context->cfg.console_err, "Unknown stream %s\r\n", name);
     return result;
     }
 
@@ -244,7 +244,7 @@ result_t script_rm_name_action(cli_t *context, const char * name)
 result_t script_create_name_action(cli_t *context, const char * name)
   {
   result_t result;
-  handle_t stream;
+  stream_p stream;
 
   // see if it exists
   if (failed(result = stream_open(get_context(context), name, &stream)))

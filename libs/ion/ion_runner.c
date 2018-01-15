@@ -38,17 +38,13 @@ it must be removed as soon as possible after the code fragment is identified.
 #include <ctype.h>
 
 #define ION_QUEUE_SIZE 16
-typedef struct _ion_request {
-  char function_name[REG_NAME_MAX + 1];
-  canmsg_t msg;
-  } ion_request_t;
 
 #define NUM_SCRIPTS 8
 static uint16_t num_scripts;
 static ion_context_t **scripts = 0;
 static semaphore_p ion_mutex;
 
-extern void register_ion_functions(duk_context *ctx, handle_t co);
+extern result_t register_ion_functions(duk_context *ctx, handle_t co);
 extern result_t ion_split_path(const char *id, memid_t *parent, char *filename);
 
 static void ion_worker(void *parg)
@@ -128,8 +124,7 @@ result_t ion_queue_message(struct _ion_context_t *ion, const char *handler, cons
     return e_bad_parameter;
 
   ion_request_t request;
-  strncpy(request.function_name, handler, REG_NAME_MAX);
-  request.function_name[REG_NAME_MAX] = 0;
+  request.function_name = handler;
   memcpy(&request.msg, msg, sizeof(canmsg_t));
 
   return push_back(ion->message_queue, &request, INDEFINITE_WAIT);
@@ -173,13 +168,14 @@ static void neutron_fatal_function(void *udata, const char *msg)
 
 // create a context to run a script within and load it
 result_t ion_create_worker(memid_t home,
-  const char *name,
-  handle_t ci,
-  handle_t co,
-  handle_t cerr,
-  bool create_worker,
-  uint8_t priority,
-  ion_context_t **ion)
+                           const char *name,
+                           handle_t ci,
+                           handle_t co,
+                           handle_t cerr,
+                           ion_register_fn lib_funcs,
+                           bool create_worker,
+                           uint8_t priority,
+                           ion_context_t **ion)
   {
   result_t result;
 
@@ -286,7 +282,18 @@ result_t ion_create_worker(memid_t home,
 
   *ion = ion_ctx;
 
-  register_ion_functions(ctx, co);
+  if(failed(result = register_ion_functions(ctx, co)))
+    {
+      ion_close(ion_ctx);
+      return result;
+    }
+  
+  if(lib_funcs != 0 &&
+     failed(result = (*lib_funcs)(ctx, co)))
+    {
+    ion_close(ion_ctx);
+    return result;
+    }
 
   // load the script if labeled
   if (name != 0)
@@ -300,7 +307,7 @@ result_t ion_create_worker(memid_t home,
       return result;
       }
 
-    uint16_t len;
+    uint32_t len;
     if (failed(result = stream_length(script, &len)))
       {
       stream_close(script);
@@ -318,7 +325,8 @@ result_t ion_create_worker(memid_t home,
       return e_not_enough_memory;
       }
 
-    if (failed(result = stream_read(script, text, len, &len)))
+    uint16_t read;
+    if (failed(result = stream_read(script, text, len, &read)))
       {
       neutron_free(text);
       stream_close(script);
@@ -327,9 +335,9 @@ result_t ion_create_worker(memid_t home,
       return result;
       }
 
-    text[len] = 0;
+    text[read] = 0;
 
-    duk_push_lstring(ctx, text, (duk_size_t)len);
+    duk_push_lstring(ctx, text, (duk_size_t)read);
     neutron_free(text);
     stream_close(script);
 
@@ -355,10 +363,15 @@ result_t ion_create_worker(memid_t home,
   return s_ok;
   }
 
-result_t ion_create(memid_t home, const char *path,
-    handle_t ci, handle_t co, handle_t cerr, struct _ion_context_t **ion)
+result_t ion_create(memid_t home,
+                    const char *path,
+                    handle_t ci,
+                    handle_t co,
+                    handle_t cerr,
+                    ion_register_fn lib_funcs,
+                    struct _ion_context_t **ion)
   {
-  return ion_create_worker(home, path, ci, co, cerr, false, 0, ion);
+  return ion_create_worker(home, path, ci, co, cerr, lib_funcs, false, 0, ion);
   }
 
 #define WORKER_QUEUE_LENGTH 32
@@ -421,7 +434,7 @@ static void destroy_value(void *value)
   vector_close(value);
   }
 
-result_t ion_run()
+result_t ion_run(ion_register_fn lib_funcs)
   {
   result_t result;
   
@@ -495,7 +508,12 @@ result_t ion_run()
       // firstly we try to load the handler.
       // TODO: js errors to trace log?????
       struct _ion_context_t *ctx;
-      if (failed(result = ion_create_worker(ion_home, handler_name, 0, 0, 0, true, BELOW_NORMAL, &ctx)))
+      if (failed(result = ion_create_worker(ion_home,
+                                            handler_name,
+                                            0, 0, 0,
+                                            lib_funcs,
+                                            true, BELOW_NORMAL,
+                                            &ctx)))
         {
         trace_error("Cannot create ion worker for script %s : %d", handler_name, result);
         continue;
@@ -503,7 +521,7 @@ result_t ion_run()
 
       // we have the handler, now we see if the map holds a key to the value
       vector_p event_handlers;
-      if (failed(map_find(handlers, (void *)event_id, &event_handlers)))
+      if (failed(map_find(handlers, (void *)event_id, (void **)&event_handlers)))
         {
         // create a vector to hold the handlers for this id
         if (failed(result = vector_create(sizeof(handler_t), &event_handlers)))

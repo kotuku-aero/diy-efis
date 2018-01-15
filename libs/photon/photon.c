@@ -852,14 +852,14 @@ typedef struct _flagged_point_t
     bool flag;
   } flagged_point_t;
 
-static flagged_point_t *flagged_points_begin(handle_t *pts)
+static flagged_point_t *flagged_points_begin(vector_p pts)
   {
   flagged_point_t *buffer;
   vector_begin(pts, (void **) &buffer);
   return buffer;
   }
 
-static uint16_t flagged_points_size(handle_t pts)
+static uint16_t flagged_points_size(vector_p pts)
   {
   uint16_t size;
   result_t result = vector_count(pts, &size);
@@ -867,7 +867,7 @@ static uint16_t flagged_points_size(handle_t pts)
   return failed(result) ? 0 : size;
   }
 
-static inline uint16_t points_size(handle_t pts)
+static inline uint16_t points_size(vector_p pts)
   {
   uint16_t size;
   vector_count(pts, &size);
@@ -875,7 +875,7 @@ static inline uint16_t points_size(handle_t pts)
   return size;
   }
 
-static inline point_t *points_begin(handle_t pts)
+static inline point_t *points_begin(vector_p pts)
   {
   point_t *buffer;
   vector_begin(pts, (void **) &buffer);

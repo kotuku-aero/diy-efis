@@ -111,10 +111,10 @@ typedef struct _png_stream_t
   handle_t source;        // source stream if not 0
   uint16_t chunk0;        // start of the linked list of chunks.
                           // if 0 then has not been set yet.
-  uint16_t chunk_start;   // where the chunk starts in the file
-  uint16_t chunk_offset;  // current offset in the stream.
-  uint16_t chunk_length;  // length of the current chunk
-  uint16_t source_offset; // current source position in the decoder.
+  uint32_t chunk_start;   // where the chunk starts in the file
+  uint32_t chunk_offset;  // current offset in the stream.
+  uint32_t chunk_length;  // length of the current chunk
+  uint32_t source_offset; // current source position in the decoder.
   // canvas details
   handle_t canvas;
   point_t origin;
@@ -249,7 +249,7 @@ static result_t png_stream_read(stream_handle_t *hndl, void *buffer, uint16_t si
   return s_ok;
   }
 
-static result_t png_stream_getpos(stream_handle_t *hndl, uint16_t *pos)
+static result_t png_stream_getpos(stream_handle_t *hndl, uint32_t *pos)
   {
   result_t result;
   if (hndl == 0 || pos == 0)
@@ -264,7 +264,7 @@ static result_t png_stream_getpos(stream_handle_t *hndl, uint16_t *pos)
   return s_ok;
   }
 
-static result_t png_stream_setpos(stream_handle_t *hndl, uint16_t pos)
+static result_t png_stream_setpos(stream_handle_t *hndl, uint32_t pos)
   {
   result_t result;
   if (hndl == 0)
@@ -347,7 +347,7 @@ static uint16_t upng_get_bpp(const png_stream_t* decoder)
   return decoder->color_depth * upng_get_components(decoder);
   }
 
-static result_t png_stream_length(stream_handle_t *hndl, uint16_t *length)
+static result_t png_stream_length(stream_handle_t *hndl, uint32_t *length)
   {
   result_t result;
   if (hndl == 0 || length == 0)
@@ -381,7 +381,7 @@ static result_t open_png_stream(handle_t stream, png_stream_t **hndl)
   result_t result;
   /*read the information from the header and store it in the upng_Info. return value is error*/
 
-  uint16_t len;
+  uint32_t len;
   if (failed(result = stream_length(stream, &len)))
     return result;
 
