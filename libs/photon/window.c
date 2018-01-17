@@ -796,7 +796,7 @@ result_t get_window_rect(handle_t hwnd, rect_t *rect)
   return s_ok;
   }
 
-result_t get_window_rect(handle_t hwnd, rect_t *rect)
+result_t set_window_rect(handle_t hwnd, rect_t *rect)
   {
   result_t result;
 
@@ -814,12 +814,12 @@ result_t get_window_rect(handle_t hwnd, rect_t *rect)
 
   if (rect->top >= window->canvas->height ||
     rect->top < 0 ||
-    rect->bottom > window->canvas->height \\
+    rect->bottom > window->canvas->height ||
     rect->bottom < 0 ||
     rect->bottom <= rect->top)
     return e_bad_parameter;
 
-  memcpy(window->position, rect, sizeof(rect_t));
+  memcpy(&window->position, rect, sizeof(rect_t));
 
   return s_ok;
   }

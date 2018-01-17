@@ -119,6 +119,123 @@ static result_t set_x(handle_t hwnd, const char *property_name, void *parg, cons
   return s_ok;
   }
 
+static result_t get_y(handle_t hwnd, const char *property_name, void *parg, variant_t *value)
+  {
+  value->dt = field_int16;
+  rect_t rect;
+  get_window_rect(hwnd, &rect);
+
+  value->v_int16 = rect.top;
+
+  return s_ok;
+  }
+
+static result_t set_y(handle_t hwnd, const char *property_name, void *parg, const variant_t *value)
+  {
+  if (value->dt != field_int16)
+    return e_bad_type;
+
+  rect_t rect;
+  get_window_rect(hwnd, &rect);
+
+  bool changed = rect.top != value->v_int16;
+  if (changed)
+    {
+    rect.top = value->v_int16;
+    return set_window_rect(hwnd, &rect);
+    }
+
+  return s_ok;
+  }
+
+static result_t get_width(handle_t hwnd, const char *property_name, void *parg, variant_t *value)
+  {
+  value->dt = field_int16;
+  rect_t rect;
+  get_window_rect(hwnd, &rect);
+
+  value->v_int16 = rect_width(&rect);
+
+  return s_ok;
+  }
+
+static result_t set_width(handle_t hwnd, const char *property_name, void *parg, const variant_t *value)
+  {
+  if (value->dt != field_int16)
+    return e_bad_type;
+
+  rect_t rect;
+  get_window_rect(hwnd, &rect);
+
+  bool changed = rect_width(&rect) != value->v_int16;
+  if (changed)
+    {
+    rect.right = rect.left + value->v_int16;
+    return set_window_rect(hwnd, &rect);
+    }
+
+  return s_ok;
+  }
+
+static result_t get_height(handle_t hwnd, const char *property_name, void *parg, variant_t *value)
+  {
+  value->dt = field_int16;
+  rect_t rect;
+  get_window_rect(hwnd, &rect);
+
+  value->v_int16 = rect_height(&rect);
+
+  return s_ok;
+  }
+
+static result_t set_height(handle_t hwnd, const char *property_name, void *parg, const variant_t *value)
+  {
+  if (value->dt != field_int16)
+    return e_bad_type;
+
+  rect_t rect;
+  get_window_rect(hwnd, &rect);
+
+  bool changed = rect_height(&rect) != value->v_int16;
+  if (changed)
+    {
+    rect.bottom = rect.top + value->v_int16;
+    return set_window_rect(hwnd, &rect);
+    }
+
+  return s_ok;
+  }
+
+static result_t get_zorder(handle_t hwnd, const char *property_name, void *parg, variant_t *value)
+  {
+  value->dt = field_uint16;
+  uint8_t order;
+  get_z_order(hwnd, &order);
+
+  value->v_uint16 = order;
+
+  return s_ok;
+  }
+
+static result_t set_zorder(handle_t hwnd, const char *property_name, void *parg, const variant_t *value)
+  {
+  if (value->dt != field_uint16)
+    return e_bad_type;
+
+  if (value->v_uint16 > 255)
+    return e_bad_parameter;
+
+  uint8_t order;
+  get_z_order(hwnd, &order);
+
+
+  bool changed = order != value->v_uint16;
+  if (changed)
+    return set_z_order(hwnd, (uint8_t)value->v_uint16);
+
+  return s_ok;
+  }
+
 result_t create_child_widget(handle_t parent, memid_t key, wndproc cb, handle_t *hwnd)
   {
   result_t result;
