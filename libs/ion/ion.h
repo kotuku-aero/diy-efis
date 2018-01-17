@@ -57,7 +57,7 @@ extern "C" {
 
   // this is the type of message passed to the callback functions.
   typedef struct _ion_request {
-    const char function_name;
+    const char *function_name;
     canmsg_t msg;
     } ion_request_t;
 

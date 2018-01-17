@@ -37,6 +37,7 @@ it must be removed as soon as possible after the code fragment is identified.
 #define __interpreter_h__
 
 #include "../neutron/neutron.h"
+#include "duktape.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -52,7 +53,7 @@ extern "C" {
    */
   typedef result_t (*ion_register_fn)(duk_context *ctx, handle_t co);
 
-  extern result_t ion_init(ion_register_fn lib_funcs);
+  extern result_t ion_init();
   /**
    * Setup the ECMA Script 5 interpreter
    * @param home      home key to refer all load funcs to

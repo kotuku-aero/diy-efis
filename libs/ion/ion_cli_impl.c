@@ -393,7 +393,7 @@ result_t ion_exec_name_action(cli_t *context, const char * name)
 
   struct _ion_context_t *ion;
   if (failed(ion_create(parent, name, context->cfg.console_in, context->cfg.console_out,
-    context->cfg.console_err, &ion)))
+    context->cfg.console_err, 0, &ion)))
     {
     stream_printf(context->cfg.console_err, "Error when loading ion in interactive mode\r\n");
     return result;

@@ -374,7 +374,7 @@ int main(int argc, char **argv)
     task_create("PROTON", DEFAULT_STACK_SIZE * 4, run_proton, stream, NORMAL_PRIORITY, 0);
     }
 
-  if (failed(ion_init()))
+  if (failed(ion_init(register_photon_functions)))
     {
     stream_printf(&channel.stream, "Unable to start ion\r\n");
     return - 1;

@@ -555,7 +555,7 @@ static duk_ret_t lib_round_rect(duk_context *ctx)
     return DUK_RET_TYPE_ERROR;
     }
 
-  if (failed(round_rectangle(canvas, &clip_rect, &pen, fill_color, &rect, (gdi_dim_t) duk_get_int(ctx, 4))))
+  if (failed(round_rect(canvas, &clip_rect, &pen, fill_color, &rect, (gdi_dim_t) duk_get_int(ctx, 4))))
     {
     duk_pop(ctx);
     return DUK_RET_TYPE_ERROR;
@@ -619,7 +619,8 @@ static duk_ret_t lib_bit_blt(duk_context *ctx)
 
   if (failed(get_clip_rect(ctx, -2, -2, &src_rect)))
     {
-    duk_pop2(ctx);
+    duk_pop(ctx);
+    duk_pop(ctx);
     return DUK_RET_TYPE_ERROR;
     }
   
@@ -629,7 +630,8 @@ static duk_ret_t lib_bit_blt(duk_context *ctx)
   if (failed(bit_blt(canvas, &clip_rect, &rect, src_canvas, &src_rect, &src_pt)))
     retval = DUK_RET_TYPE_ERROR;
 
-  duk_pop2(ctx);
+  duk_pop(ctx);
+  duk_pop(ctx);
 
   return retval;
   }
@@ -1189,19 +1191,21 @@ static duk_ret_t lib_load_font(duk_context *ctx)
   }
 
 
-//////////////////////////////////////////////////////////////////////////////
-void register_ion_functions(duk_context *ctx, handle_t co)
+static void register_function(duk_context *ctx, duk_c_function fn, const char *name, duk_idx_t nargs)
   {
-  //extern result_t create_window(handle_t parent, const rect_t *bounds, wndproc cb, uint16_t id, handle_t *hwnd);
+  duk_push_c_function(ctx, fn, nargs);
+  duk_put_global_string(ctx, name);
+  }
+
+//////////////////////////////////////////////////////////////////////////////
+result_t register_photon_functions(duk_context *ctx, handle_t co)
+  {
   register_function(ctx, lib_create_window, "create_window", 6);
-  // extern result_t create_rect_canvas(int x, int y, handle_t *hndl);
   register_function(ctx, lib_create_rect_canvas, "create_rect_canvas", 1);
-  // extern result_t create_bitmap_canvas(const bitmap_t *bitmap, handle_t *hndl);
   register_function(ctx, lib_create_bitmap_canvas, "create_bitmap_canvas", 1);
-  // extern result_t get_orientation(handle_t hwnd, uint16_t *orientation);
   register_function(ctx, lib_get_orientation, "get_orientation", 1);
-  // extern result_t create_font(const char *path, const point_t *char_metrics, const point_t *device_metrics, handle_t  *font);
   register_function(ctx, lib_open_font, "open_font", 1);
-  // extern result_t release_font(handle_t  font);
   register_function(ctx, lib_load_font, "load_font", 1);
+
+  return s_ok;
   }

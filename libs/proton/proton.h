@@ -36,6 +36,8 @@ it must be removed as soon as possible after the code fragment is identified.
 #ifndef __proton_h__
 #define	__proton_h__
 
+#include "../ion/ion.h"
+
 #ifdef	__cplusplus
 extern "C"
   {
@@ -61,7 +63,11 @@ extern "C"
  * @return s_ok if loaded ok
  */
 extern result_t load_layout(handle_t canvas, memid_t hive);
-  extern handle_t main_window;
+extern handle_t main_window;
+
+// call this to register the ION script functions.
+// normally passed in on ion_run()
+extern result_t register_photon_functions(duk_context *ctx, handle_t co);
 
 #ifdef	__cplusplus
   }
