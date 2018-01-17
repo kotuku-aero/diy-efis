@@ -186,6 +186,162 @@ result_t find_event(handle_t hwnd, uint16_t id, event_proxy_t **details)
   return *details == 0 ? e_not_found : s_ok;
   }
 
+static duk_ret_t lib_window_dtor(duk_context *ctx)
+  {
+  handle_t hwnd = (handle_t)duk_get_magic(ctx, 0);
+
+  return 0;
+  }
+
+static duk_ret_t lib_window_ctor(duk_context *ctx)
+  {
+  if (!duk_is_constructor_call(ctx))
+    return DUK_RET_TYPE_ERROR;
+
+  // in case we are released...
+  duk_set_magic(ctx, 0, 0);
+  return 0;
+  }
+
+extern const duk_function_list_entry lib_window_funcs[];
+
+static result_t attach_ion_to_window(handle_t hwnd)
+  {
+  // create the object
+  result_t result;
+  handle_t hscreen;
+  screen_t *screen;
+  if (failed(result = get_screen(&hscreen)) ||
+    failed(result = as_screen(hscreen, &screen)))
+    return result;
+
+  duk_context *ctx = screen->context->ctx;
+
+  // store the object in the heap stash @-1
+  duk_push_heap_stash(ctx);
+  // store the handle @-2
+  duk_push_pointer(ctx, hwnd);
+
+  // Push special this binding to the function being constructed
+  //duk_push_c_function(ctx, lib_window_ctor, 0);
+  duk_idx_t obj_idx = duk_push_object(ctx);
+  // Store the function destructor
+  duk_push_c_function(ctx, lib_window_dtor, 0);
+  duk_set_finalizer(ctx, obj_idx);
+
+  // add the methods
+  duk_put_function_list(ctx, obj_idx, lib_window_funcs);
+
+  // add the handle property
+  duk_set_magic(ctx, obj_idx, (duk_int_t)hwnd);
+
+  // this associates the object with the window
+  duk_put_prop(ctx, -1);
+
+  return s_ok;
+  }
+
+static result_t detach_ion_from_window(handle_t hwnd)
+  {
+  result_t result;
+  handle_t hscreen;
+  screen_t *screen;
+  if (failed(result = get_screen(&hscreen)) ||
+    failed(result = as_screen(hscreen, &screen)))
+    return result;
+
+  duk_context *ctx = screen->context->ctx;
+
+  // store the object in the heap stash @-1
+  duk_push_heap_stash(ctx);
+  // store the handle @-2
+  duk_push_pointer(ctx, hwnd);
+
+  result = s_ok;
+  if (duk_has_prop(ctx, -1))
+    {
+    duk_push_pointer(ctx, hwnd);
+    if (!duk_del_prop(ctx, -1))
+      result = e_unexpected;
+    }
+
+  // remove the stash
+  duk_pop(ctx);
+  return s_ok;
+  }
+
+// get the object associated with a window.
+static result_t get_duk_window(handle_t hwnd)
+  {
+  result_t result;
+  handle_t hscreen;
+  screen_t *screen;
+  if (failed(result = get_screen(&hscreen)) ||
+    failed(result = as_screen(hscreen, &screen)))
+    return result;
+
+  duk_context *ctx = screen->context->ctx;
+  // store the object in the heap stash @-1
+  duk_push_heap_stash(ctx);
+  // store the handle @-2
+  duk_push_pointer(ctx, hwnd);
+
+  if (duk_get_prop(ctx, -1))
+    {
+    // put the 'this' pointer at -1
+    duk_swap(ctx, -1, -2);
+    duk_pop(ctx);
+
+    return s_ok;
+    }
+
+  duk_pop_2(ctx);
+  return e_not_found;
+  }
+
+result_t compile_function(handle_t hwnd, const char *func, stream_p stream)
+  {
+  result_t result;
+  handle_t hscreen;
+  screen_t *screen;
+  if (failed(result = get_screen(&hscreen)) ||
+    failed(result = as_screen(hscreen, &screen)))
+    return result;
+
+  duk_context *ctx = screen->context->ctx;
+  // compile a function to be called
+
+  // read the stream
+  uint32_t len;
+  if (failed(result = stream_length(stream, &len)))
+    return result;
+
+  char *code = (char *)neutron_malloc(len + 1);
+  if (code == 0)
+    return e_not_enough_memory;
+
+  if (failed(result = stream_read(stream, code, len, 0)))
+    {
+    neutron_free(code);
+    return result;
+    }
+  code[len] = 0;
+
+  if (failed(result = get_duk_window(ctx, hwnd)))
+    {
+    neutron_free(code);
+    return result;
+    }
+
+  duk_push_string(ctx, func);
+  duk_compile_lstring(ctx, DUK_COMPILE_FUNCTION, code, len);
+
+  duk_put_prop(ctx, -1);
+  neutron_free(code);
+
+  return s_ok;
+  }
+
 static result_t ion_handler(handle_t hwnd, const event_proxy_t *proxy, const canmsg_t *msg)
   {
   result_t result;
@@ -196,24 +352,24 @@ static result_t ion_handler(handle_t hwnd, const event_proxy_t *proxy, const can
     return result;
 
   ion_context_t *context = (ion_context_t *)screen->context;
+  duk_context *ctx = context->ctx;
 
-  // get the function
-  if(!duk_get_global_string(context->ctx, proxy->func))
-    return e_not_found;
+  // get the 'this' pointer
+  if (failed(result = get_duk_window(hwnd)))
+    return result;
+
+  duk_push_string(ctx, proxy->func);
 
   duk_push_pointer(context->ctx, (void *)msg);
-  duk_int_t rc = duk_pcall(context->ctx, 1);
-  if (rc == DUK_EXEC_SUCCESS)
-    {
-    result = duk_get_int(context->ctx, -1);
-    }
-  else
-    {
-    result = e_unexpected;
-    }
-  duk_pop(context->ctx);
+  duk_call_method(ctx, 1);
 
-  if (result == s_false && proxy->previous != 0)
+  // returns 1 if processed
+  duk_bool_t processed = duk_get_boolean(ctx, -1);
+
+  // ignore the value
+  duk_pop(ctx);
+
+  if (!processed && proxy->previous != 0)
     {
     // was not processed so call the previous event
     return (*proxy->previous->callback)(hwnd, proxy->previous, msg);
@@ -372,6 +528,52 @@ static result_t make_window(handle_t hwnd_parent, const rect_t *bounds, wndproc 
   return s_ok;
   }
 
+static canmsg_t close_msg = {
+  .id = id_close
+  };
+
+result_t close_window(handle_t hwnd)
+  {
+  result_t result;
+  
+  window_t *window;
+  if (failed(result = as_window(hwnd, &window)))
+    return result;
+
+  if (failed(detach_ion_from_window(hwnd)))
+    return result;
+
+  // send an id_close to the window so it can remove all of the
+  // data from the window
+  if (failed(result = send_message(hwnd, &close_msg)))
+    return result;
+
+  if (window->parent->child == window)
+    {
+    if (window->previous != 0)
+      window->parent->child = window->previous;
+    else if (window->next != 0)
+      window->parent->child = window->next;
+    else
+      window->parent->child = 0;
+    }
+
+  if (window->previous != 0)
+    window->previous->next = window->next;
+
+  if (window->next != 0)
+    window->next->previous = window->previous;
+
+  canvas_t *canvas = window->canvas;
+
+  neutron_free(window);
+
+  // and delete the canvas
+  canvas_close(canvas);
+
+  return s_ok;
+  }
+
 result_t create_window(handle_t hwnd_parent, const rect_t *bounds, wndproc cb, uint16_t id, handle_t *hwnd)
   {
   result_t result;
@@ -388,7 +590,10 @@ result_t create_window(handle_t hwnd_parent, const rect_t *bounds, wndproc cb, u
   if (failed(result = bsp_canvas_create_rect(&size, &canvas)))
     return result;
 
-  return make_window(hwnd_parent, bounds, cb, id, canvas, hwnd);
+  if (failed(result = make_window(hwnd_parent, bounds, cb, id, canvas, hwnd)))
+    return result;
+
+  return attach_ion_to_window(*hwnd);
   }
 
 result_t create_child_window(handle_t hwnd_parent, const rect_t *bounds,
@@ -412,7 +617,10 @@ result_t create_child_window(handle_t hwnd_parent, const rect_t *bounds,
   if (failed(result = bsp_canvas_create_child(parent_canvas, bounds, &canvas)))
     return result;
 
-  return make_window(hwnd_parent, bounds, cb, id, canvas, hwnd);
+  if (failed(result = make_window(hwnd_parent, bounds, cb, id, canvas, hwnd)))
+    return result;
+
+  return attach_ion_to_window(*hwnd);
   }
 
 result_t get_parent(handle_t window, handle_t *parent)
@@ -528,7 +736,6 @@ result_t get_previous_sibling(handle_t wnd, handle_t *sibling)
   if (failed(result = as_window(wnd, &window)))
     return result;
 
-
   *sibling = window->previous;
 
   if (window->next == 0)
@@ -565,7 +772,6 @@ result_t insert_after(handle_t wnd, handle_t sibling)
   if (failed(result = as_window(wnd, &child)) || failed(result = as_window(sibling, &previous)))
     return result;
 
-
   child->next = previous->next;
 
   if (previous->next != 0)
@@ -585,11 +791,35 @@ result_t get_window_rect(handle_t hwnd, rect_t *rect)
   if (failed(result = as_window(hwnd, &window)))
     return result;
 
+  memcpy(rect, &window->position, sizeof(rect_t));
 
-  rect->left = 0;
-  rect->top = 0;
-  rect->right = rect_width(&window->position);
-  rect->bottom = rect_height(&window->position);
+  return s_ok;
+  }
+
+result_t get_window_rect(handle_t hwnd, rect_t *rect)
+  {
+  result_t result;
+
+  window_t *window;
+  if (failed(result = as_window(hwnd, &window)))
+    return result;
+
+  // check that the rect fits on the canvas
+  if (rect->left >= window->canvas->width ||
+     rect->left < 0 ||
+     rect->right > window->canvas->width ||
+    rect->right < 0 ||
+    rect->right <= rect->left)
+    return e_bad_parameter;
+
+  if (rect->top >= window->canvas->height ||
+    rect->top < 0 ||
+    rect->bottom > window->canvas->height \\
+    rect->bottom < 0 ||
+    rect->bottom <= rect->top)
+    return e_bad_parameter;
+
+  memcpy(window->position, rect, sizeof(rect_t));
 
   return s_ok;
   }

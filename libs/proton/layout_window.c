@@ -46,6 +46,7 @@ extern result_t create_attitude_window(handle_t parent, memid_t section, handle_
 extern result_t create_gauge_window(handle_t parent, memid_t section, handle_t *hwnd);
 extern result_t create_gps_window(handle_t parent, memid_t section, handle_t *hwnd);
 extern result_t create_hsi_window(handle_t parent, memid_t section, handle_t *hwnd);
+extern result_t create_widget(handle_t parent, memid_t section, handle_t *hwnd);
 
   enum window_type
     {
@@ -1879,7 +1880,7 @@ result_t load_layout(handle_t parent, memid_t hive)
 
         break;
       case widget:
-        //create_widget(parent, child, &hwnd);
+        create_widget(parent, child, &hwnd);
         break;
 
       default:

@@ -35,6 +35,7 @@ it must be removed as soon as possible after the code fragment is identified.
 */
 #include "../photon/photon.h"
 #include "../ion/ion.h"
+#include "../photon/window.h"
 
 /*
 create and return a duktape object that is a window.
@@ -155,7 +156,6 @@ static result_t get_clip_rect(duk_context *ctx, duk_int_t stk_bot, duk_int_t obj
 */
 static result_t get_rect(duk_context *ctx, duk_int_t obj_idx, rect_t *rect)
   {
-  // the clip_rect is an array of integers on the this pointer called clip_rect
   rect->left = duk_get_int(ctx, obj_idx);
   rect->top = duk_get_int(ctx, obj_idx+1);
   rect->right = duk_get_int(ctx, obj_idx+2);
@@ -228,13 +228,6 @@ static result_t get_points(duk_context *ctx, duk_int_t stk_bot, duk_int_t obj_id
   return s_ok;
   }
 
-// return the pen array and its values
-static result_t get_pen(duk_context *ctx, duk_int_t stk_bot, duk_int_t obj_idx, pen_t *pen)
-  {
-
-  return s_ok;
-  }
-
 // return the currently selected font
 static result_t get_font(duk_context *ctx, duk_int_t stk_bot, duk_int_t obj_idx, handle_t *font)
   {
@@ -253,11 +246,11 @@ or
 static const char *prop_color = "color";
 static const char *prop_background = "background";
 
-static color_t get_color(duk_context *ctx, duk_int_t stk_bot, duk_int_t obj_idx, bool get_bg)
+static color_t get_color(duk_context *ctx, duk_int_t stk_bot, duk_int_t obj_idx, const char *prop_name)
   {
   color_t result = color_hollow;
   // return the foreground color, or background color
-  duk_push_string(ctx, get_bg ? prop_background : prop_color);
+  duk_push_string(ctx, prop_name);
   if (duk_get_prop(ctx, -1) > 0)
     {
     duk_size_t color_len = 0;
@@ -349,6 +342,33 @@ static color_t get_color(duk_context *ctx, duk_int_t stk_bot, duk_int_t obj_idx,
 
   return result;
   }
+
+// return the pen array and its values
+static result_t get_pen(duk_context *ctx, duk_int_t stk_bot, duk_int_t obj_idx, pen_t *pen)
+{
+  // obj is color : value, width: value
+  duk_push_lstring(ctx, prop_pen_width, 0);
+  if (!duk_get_prop(ctx, obj_idx))
+  {
+    duk_pop(ctx);
+    return s_ok;
+  }
+  pen->width = (gdi_dim_t)duk_get_int(ctx, stk_bot - 1);
+  duk_pop(ctx);
+
+  duk_push_string(ctx, prop_pen_style, 0);
+  if (!duk_get_prop(ctx, obj_idx))
+  {
+    duk_pop(ctx);
+    return s_ok;
+  }
+  pen->style = (gdi_dim_t)duk_get_int(ctx, -2);
+  duk_pop(ctx);
+
+  pen->color = get_color(ctx, stk_bot, obj_idx, prop_pen_color);
+
+  return s_ok;
+}
 
 static duk_ret_t lib_polyline(duk_context *ctx)
   {
@@ -459,7 +479,7 @@ static duk_ret_t lib_polygon(duk_context *ctx)
     return DUK_RET_TYPE_ERROR;
   }
 
-  color_t fill_color = get_color(ctx, -1, -1, true);
+  color_t fill_color = get_color(ctx, -1, -1, prop_background);
 
   point_t *pts = 0;
   uint16_t len = 0;
@@ -503,7 +523,7 @@ static duk_ret_t lib_rectangle(duk_context *ctx)
     return DUK_RET_TYPE_ERROR;
     }
 
-  color_t fill_color = get_color(ctx, -1, -1, true);
+  color_t fill_color = get_color(ctx, -1, -1, prop_background);
 
   rect_t rect;
   if (failed(get_rect(ctx, 0, &rect)))
@@ -546,7 +566,7 @@ static duk_ret_t lib_round_rect(duk_context *ctx)
     return DUK_RET_TYPE_ERROR;
     }
 
-  color_t fill_color = get_color(ctx, -1, -1, true);
+  color_t fill_color = get_color(ctx, -1, -1, prop_background);
 
   rect_t rect;
   if (failed(get_rect(ctx, 0, &rect)))
@@ -597,7 +617,7 @@ static duk_ret_t lib_bit_blt(duk_context *ctx)
     return DUK_RET_TYPE_ERROR;
     }
 
-  color_t fill_color = get_color(ctx, -1, -1, true);
+  color_t fill_color = get_color(ctx, -1, -1, prop_background);
 
   rect_t rect;
   if (failed(get_rect(ctx, 0, &rect)))
@@ -782,7 +802,7 @@ static duk_ret_t lib_pie(duk_context *ctx)
     return DUK_RET_TYPE_ERROR;
   }
 
-  color_t fill = get_color(ctx, -1, -1, true);
+  color_t fill = get_color(ctx, -1, -1, prop_background);
 
   point_t pt;
   get_point(ctx, -1, 0, &pt);
@@ -829,7 +849,7 @@ static duk_ret_t lib_draw_text(duk_context *ctx)
     return DUK_RET_TYPE_ERROR;
     }
 
-  color_t fill = get_color(ctx, -1, -1, true);
+  color_t fill = get_color(ctx, -1, -1, prop_background);
 
   point_t pt;
   if (failed(get_point(ctx, -1, 1, &pt)))
@@ -856,8 +876,8 @@ static duk_ret_t lib_draw_text(duk_context *ctx)
     return DUK_RET_TYPE_ERROR;
     }
 
-  color_t fg = get_color(ctx, -1, -1, false);
-  color_t bg = get_color(ctx, -1, -1, true);
+  color_t fg = get_color(ctx, -1, -1, prop_color);
+  color_t bg = get_color(ctx, -1, -1, prop_background);
 
   rect_t text_clip_rect;
   rect_t *p_tcr = 0;
@@ -931,56 +951,51 @@ static duk_ret_t lib_text_extent(duk_context *ctx)
   return 1;
   }
 
-static duk_ret_t lib_get_pen(duk_context *ctx)
-  {
-  return 1;
-  }
-
-static duk_ret_t lib_set_pen(duk_context *ctx)
-  {
-  return 1;
-  }
-
-static duk_ret_t lib_get_color(duk_context *ctx)
-  {
-  return 1;
-  }
-
-static duk_ret_t lib_set_color(duk_context *ctx)
-  {
-  return 1;
-  }
-
-static duk_ret_t lib_get_background(duk_context *ctx)
-  {
-  return 1;
-  }
-
-static duk_ret_t lib_set_background(duk_context *ctx)
-  {
-  return 1;
-  }
-
-static duk_ret_t lib_get_clip_rect(duk_context *ctx)
-  {
-  return 1;
-  }
-
-static duk_ret_t lib_set_clip_rect(duk_context *ctx)
-  {
-   
-  return 1;
-  }
-
 static duk_ret_t lib_get_canvas_width(duk_context *ctx)
   {
+  if (duk_get_top(ctx) != 1)
+    return DUK_RET_TYPE_ERROR;
+
+  // get our context
+  duk_push_this(ctx);
+  // and get the magic number
+  handle_t canvas = (handle_t)duk_get_magic(ctx, 0);
+
+  extent_t ex;
+  if (failed(get_canvas_extents(canvas, &ex)))
+    {
+    duk_pop(ctx);
+    return DUK_RET_TYPE_ERROR;
+    }
+  duk_pop(ctx);
+
+  duk_push_int(ctx, ex.dx);
+
   return 1;
   }
 
 static duk_ret_t lib_get_canvas_height(duk_context *ctx)
   {
-  return 1;
+  if (duk_get_top(ctx) != 1)
+    return DUK_RET_TYPE_ERROR;
+
+  // get our context
+  duk_push_this(ctx);
+  // and get the magic number
+  handle_t canvas = (handle_t)duk_get_magic(ctx, 0);
+
+  extent_t ex;
+  if (failed(get_canvas_extents(canvas, &ex)))
+  {
+    duk_pop(ctx);
+    return DUK_RET_TYPE_ERROR;
   }
+  duk_pop(ctx);
+
+  duk_push_int(ctx, ex.dy);
+
+  return 1;
+}
 
 static const duk_function_list_entry lib_canvas_funcs[] = {
     { "polyline", lib_polyline, 0 },
@@ -997,12 +1012,6 @@ static const duk_function_list_entry lib_canvas_funcs[] = {
     { "text_extent", lib_text_extent, 0 },
     { "width", lib_get_canvas_width, 0 },
     { "height", lib_get_canvas_height, 0 },
-    { "color", lib_get_color, 0 },
-    { "color", lib_set_color, 1 },
-    { "background_color", lib_get_background, 0 },
-    { "background_color", lib_set_background, 1 },
-    { "clip_rect", lib_get_clip_rect, 0 },
-    { "clip_rect", lib_set_clip_rect, 1 },
     { NULL, NULL, 0 }
   };
 
@@ -1115,7 +1124,7 @@ static duk_ret_t lib_end_paint(duk_context *ctx)
   return 1;
   }
 
-static const duk_function_list_entry lib_window_funcs[] = {
+const duk_function_list_entry lib_window_funcs[] = {
     { "begin_paint", lib_begin_paint, 0 },
     { "end_paint", lib_end_paint, 0 },
     // create_child_window(x, y, width, height, id)
@@ -1129,45 +1138,6 @@ static const duk_function_list_entry lib_window_funcs[] = {
     { "previous_sibling", lib_get_previous_sibling, 0 },
     { NULL, NULL, 0 }
   };
-
-static duk_ret_t lib_window_dtor(duk_context *ctx)
-  {
-  handle_t hwnd = (handle_t)duk_get_magic(ctx, 0);
-
-  window_close(hwnd);
-
-  return 0;
-  }
-
-static duk_ret_t lib_window_ctor(duk_context *ctx)
-  {
-  if (!duk_is_constructor_call(ctx))
-    return DUK_RET_TYPE_ERROR;
-
-  // in case we are released...
-  duk_set_magic(ctx, 0, 0);
-  return 0;
-  }
-
-static duk_ret_t create_duk_window(duk_context *ctx, handle_t hwnd)
-  {
-  // create the object
-  // Push special this binding to the function being constructed
-  duk_push_c_function(ctx, lib_window_ctor, 0);
-  duk_push_object(ctx);
-  // Store the function destructor
-  duk_push_c_function(ctx, lib_window_dtor, 0);
-  duk_set_finalizer(ctx, -2);
-
-  // add the methods
-  duk_put_function_list(ctx, -1, lib_window_funcs);
-
-  // add the handle property
-  duk_set_magic(ctx, 0, (duk_int_t)hwnd);
-
-
-  return 1;
-  }
 
 // var wnd = create_window(parent, left, top, right, bottom, id);
 static duk_ret_t lib_create_window(duk_context *ctx)

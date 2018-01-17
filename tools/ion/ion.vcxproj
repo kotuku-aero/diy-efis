@@ -41,7 +41,7 @@
     <ProjectGuid>{3424CA68-F0AF-48A9-80A3-E441C11DE3E9}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>ion</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

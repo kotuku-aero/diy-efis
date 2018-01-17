@@ -33,7 +33,7 @@
     <ProjectGuid>{943F213F-305D-4476-8B00-4E18BC7E0E16}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>photon</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

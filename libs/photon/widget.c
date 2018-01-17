@@ -90,6 +90,35 @@ int strcasecmp(const char *s1, const char *s2)
   return (cm[*us1] - cm[*--us2]);
   }
 
+static result_t get_x(handle_t hwnd, const char *property_name, void *parg, variant_t *value)
+  {
+  value->dt = field_int16;
+  rect_t rect;
+  get_window_rect(hwnd, &rect);
+
+  value->v_int16 = rect.left;
+
+  return s_ok;
+  }
+
+static result_t set_x(handle_t hwnd, const char *property_name, void *parg, const variant_t *value)
+  {
+  if (value->dt != field_int16)
+    return e_bad_type;
+
+  rect_t rect;
+  get_window_rect(hwnd, &rect);
+
+  bool changed = rect.left != value->v_int16;
+  if (changed)
+    {
+    rect.left = value->v_int16;
+    set_window_rect(hwnd, &rect);
+    }
+
+  return s_ok;
+  }
+
 result_t create_child_widget(handle_t parent, memid_t key, wndproc cb, handle_t *hwnd)
   {
   result_t result;
@@ -97,19 +126,19 @@ result_t create_child_widget(handle_t parent, memid_t key, wndproc cb, handle_t 
   uint16_t id = 0;
 
   int16_t value;
-  if (failed(result = reg_get_int16(key, "origin-x", &value)))
+  if (failed(result = reg_get_int16(key, "x", &value)))
     return result;
   rect.left = (gdi_dim_t) value;
 
-  if (failed(result = reg_get_int16(key, "origin-y", &value)))
+  if (failed(result = reg_get_int16(key, "y", &value)))
     return result;
   rect.top = (gdi_dim_t) value;
 
-  if (failed(result = reg_get_int16(key, "extent-x", &value)))
+  if (failed(result = reg_get_int16(key, "width", &value)))
     return result;
   rect.right = rect.left + (gdi_dim_t) value;
 
-  if (failed(result = reg_get_int16(key, "extent-y", &value)))
+  if (failed(result = reg_get_int16(key, "height", &value)))
     return result;
   rect.bottom = rect.top + (gdi_dim_t) value;
 
@@ -119,12 +148,79 @@ result_t create_child_widget(handle_t parent, memid_t key, wndproc cb, handle_t 
     return result;
   
   // set the z-order
-  if(succeeded(result= reg_get_uint16(key, "z-order", &id)))
+  if(succeeded(result= reg_get_uint16(key, "zorder", &id)))
     {
     if(id < 256)
       set_z_order(*hwnd, (uint8_t)id);
     }
 
+  add_property(*hwnd, "x", *hwnd, get_x, set_x, field_int16, 0);
+  add_property(*hwnd, "y", *hwnd, get_y, set_y, field_int16, 0);
+  add_property(*hwnd, "width", *hwnd, get_width, set_width, field_int16, 0);
+  add_property(*hwnd, "height", *hwnd, get_height, set_height, field_int16, 0);
+  add_property(*hwnd, "zorder", *hwnd, get_zorder, set_zorder, field_uint16, 0);
+
+  // The widget properties are loaded ok, now we can register them
+
+  // see if any scriptlets are loadable
+  memid_t handlers;
+  if (succeeded(reg_open_key(key, "scripts", &handlers)))
+    {
+    // enumerate the keys
+    field_datatype dt = field_stream;
+    char name[REG_NAME_MAX];
+
+    memid_t child = 0;
+    while (succeeded(reg_enum_key(handlers, &dt, 0, 0, REG_NAME_MAX, name, &child)))
+      {
+      stream_p stream;
+      if (succeeded(stream_open(handlers, name, &stream)))
+        {
+        if (failed(result = compile_function(*hwnd, name, stream)))
+          {
+          trace_debug("Cannot compile scriptlet %s when loading window\r\n", name);
+          }
+
+        dt = field_stream;
+        }
+      }
+
+    // all of the scripts should be attached to the window.  Now we attach the events
+    memid_t events;
+    if (succeeded(reg_open_key(key, "events", &events)))
+      {
+      // enumerate the keys
+      field_datatype dt = field_key;
+      char name[REG_NAME_MAX];
+      char event_fn[REG_STRING_MAX];
+
+      memid_t child = 0;
+
+      while (succeeded(reg_enum_key(key, &dt, 0, 0, REG_NAME_MAX, name, &child)))
+        {
+        uint16_t can_id = (uint16_t)strtoul(name, 0, 10);
+
+        if (can_id > 0)
+          {
+
+          // now enumerate the strings in it
+          memid_t handler = 0;
+          dt = field_string;
+
+          while (succeeded(reg_enum_key(child, &dt, 0, 0, REG_NAME_MAX, name, &handler)))
+            {
+            if (succeeded(reg_get_string(child, name, event_fn, 0)))
+              add_handler(*hwnd, can_id, event_fn);
+
+            dt = field_string;
+            }
+
+          dt = field_key;
+          }
+        }
+      }
+    }
+  
   return s_ok;
   }
 
@@ -419,6 +515,22 @@ result_t display_roller(handle_t hwnd,
 
   draw_text(hwnd, bounds, large_font, fg_color, bg_color,
             str, len, &pt, bounds, eto_clipped, 0);
+
+  return s_ok;
+  }
+
+// create a generic widget
+result_t create_widget(handle_t parent, memid_t key, handle_t *hwnd)
+  {
+  result_t result;
+
+  // create our window
+  if (failed(result = create_child_widget(parent, key, defwndproc, hwnd)))
+    return result;
+
+  rect_t rect;
+  get_window_rect(*hwnd, &rect);
+  invalidate_rect(*hwnd, &rect);
 
   return s_ok;
   }

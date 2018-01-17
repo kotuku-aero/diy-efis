@@ -180,25 +180,24 @@ typedef result_t (*wndproc)(handle_t hwnd, const canmsg_t *msg);
 #define HWND_BROADCAST  (handle_t)(0xffffffff)
   
 // specific window messages
-
-// user defined messages
-#define id_paint id_user_defined_start
-#define id_key0 id_user_defined_start + 100
-#define id_key1 id_user_defined_start + 101
-#define id_key2 id_user_defined_start + 102
-#define id_key3 id_user_defined_start + 103
-#define id_key4 id_user_defined_start + 104
-#define id_decka id_user_defined_start + 105
-#define id_deckb id_user_defined_start + 106
-#define id_menu_up id_user_defined_start + 107
-#define id_menu_dn id_user_defined_start + 108
-#define id_menu_left id_user_defined_start + 109
-#define id_menu_right id_user_defined_start + 110
-#define id_menu_ok id_user_defined_start + 111
-#define id_menu_cancel id_user_defined_start + 112
-#define id_menu_select id_user_defined_start + 115
-#define id_timer id_user_defined_start + 116
-#define id_buttonpress id_user_defined_start + 117
+#define id_paint (id_user_defined_start -1)
+#define id_close (id_user_defined_start -2)
+#define id_key0 (id_user_defined_start -3)
+#define id_key1 (id_user_defined_start -4)
+#define id_key2 (id_user_defined_start -5)
+#define id_key3 (id_user_defined_start -6)
+#define id_key4 (id_user_defined_start -7)
+#define id_decka (id_user_defined_start -8)
+#define id_deckb (id_user_defined_start -9)
+#define id_menu_up (id_user_defined_start -10)
+#define id_menu_dn (id_user_defined_start -11)
+#define id_menu_left (id_user_defined_start -12)
+#define id_menu_right (id_user_defined_start -13)
+#define id_menu_ok (id_user_defined_start -14)
+#define id_menu_cancel (id_user_defined_start -15)
+#define id_menu_select (id_user_defined_start -16)
+#define id_timer (id_user_defined_start -17)
+#define id_buttonpress (id_user_defined_start -18)
 
 /**
  * @function open_screen(uint16_t orientation, wndproc cb, uint16_t id, handle_t *hwnd)
@@ -257,13 +256,28 @@ extern result_t create_window(handle_t parent, const rect_t *bounds, wndproc cb,
  */
 extern result_t create_child_window(handle_t parent, const rect_t *bounds, wndproc cb, uint16_t id, handle_t *hwnd);
 /**
+ * @function close_window(handle_t hwnd);
+ * Close a window and release all resources
+ * @param hwnd    window to close
+ * @return s_ok if resources are released
+ */
+extern result_t close_window(handle_t hwnd);
+/**
  * @function get_window_rect(handle_t window, rect_t *rect)
  * Return the window rectangle in relation to the parent window
  * @param window  Window to return
- * @param rect    pointer to the rectable
+ * @param rect    pointer to the rectangle
  * @return s_ok if returned
  */
 extern result_t get_window_rect(handle_t window, rect_t *rect);
+/**
+* @function set_window_rect(handle_t window, rect_t *rect)
+* set the window rectangle in relation to the parent window
+* @param window  window to move
+* @param rect    pointer to the rectangle
+* @return s_ok if returned
+*/
+extern result_t set_window_rect(handle_t window, rect_t *rect);
 /**
  * @function get_wnddata(handle_t window, void **wnd_data)
  * Get stream associated with a window
@@ -429,33 +443,15 @@ extern result_t add_handler(handle_t hwnd, uint16_t id, const char *func);
  */
 extern result_t remove_handler(handle_t hwnd, uint16_t id);
 /**
- * @function attach_script(handle_t screen, memid_t key, const char *name)
- * Attach a scriptlet to the screen.  The script must exist at the specified registry
- * hive, given the path.  Also the ion_attach call must have been made.
- * @param screen      Screen to attach to.  Can be obtained using the get_screen function
- * @param key         Registry hive that contains the scriptlet
- * @param name        Name of the script to attach
- * @return s_ok if the script can be attached, e_exists if already attached
- * @remark  As is common to all javascript code there is no namespacing.  to allow
- * for this is it recommended all scripts are modules with the module name
- * being unique.
+ * @function compile_function(handle_t hwnd, const char *func, stream_p stream)
+ * Compile a method and associate it with a window
+ * @param hwnd      window to associate script with
+ * @param func      function to create
+ * @param stream    source code for the function
+ * @return s_ok if the function is compiled as attached ok
  */
-extern result_t attach_script(handle_t screen, memid_t key, const char *name);
-/**
- * @function detach_script(handle_t screen, memid_t key, const char *name)
- * Detach a previously attached script from a screen
- * @param screen        Screen to detach from
- * @param key           Registry key that contains the scriptlet
- * @param name          Name of the script to detach
- * @return s_ok if the script can be attached
-*/
-extern result_t detach_script(handle_t screen, memid_t key, const char *name);
-/**
- * @function detach_all_scripts(handle_t screen)
- * Remove all scripts attached to a screen
- * @param screen        Screen to detach from
-*/
-extern result_t detach_all_scripts(handle_t screen);
+extern result_t compile_function(handle_t hwnd, const char *func, stream_p stream);
+
 /**
  * @function canvas_close(handle_t hwnd)
  * Close a canvas.
