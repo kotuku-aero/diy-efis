@@ -27,19 +27,16 @@
     <ClCompile Include="..\..\libs\proton\gps_window.c" />
     <ClCompile Include="..\..\libs\proton\hsi_window.c" />
     <ClCompile Include="..\..\libs\proton\layout_window.c" />
-    <ClCompile Include="..\..\libs\proton\lib_photon.c" />
     <ClCompile Include="..\..\libs\proton\neo.c" />
     <ClCompile Include="..\..\libs\proton\pens.c" />
     <ClCompile Include="..\..\libs\proton\proton.c" />
     <ClCompile Include="..\..\libs\proton\regex.c" />
-    <ClCompile Include="..\..\libs\proton\widget.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libs\proton\pens.h" />
     <ClInclude Include="..\..\libs\proton\proton.h" />
     <ClInclude Include="..\..\libs\proton\regex.h" />
     <ClInclude Include="..\..\libs\proton\spatial.h" />
-    <ClInclude Include="..\..\libs\proton\widget.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\libs\proton\proton.cli" />
