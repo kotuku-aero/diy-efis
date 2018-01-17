@@ -34,7 +34,7 @@ If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
 #include <math.h>
-#include "widget.h"
+#include "../photon/widget.h"
 #include "../photon/window.h"
 #include "spatial.h"
 #include "pens.h"
@@ -67,18 +67,26 @@ typedef struct _airspeed_window_t {
   handle_t small_roller;
 } airspeed_window_t;
 
-static result_t get_vs0(handle_t hwnd, const char *property_name, void *parg, variant_t *value)
+static airspeed_window_t *get_wnd(handle_t hwnd)
   {
-  airspeed_window_t *wnd = (airspeed_window_t *)parg;
+  airspeed_window_t *window;
+  get_wnddata(hwnd, &window);
+
+  return window;
+  }
+
+static result_t get_vs0(handle_t hwnd, variant_t *value)
+  {
+  airspeed_window_t *wnd = get_wnd(hwnd);
   value->dt = field_uint16;
   value->v_uint16 = wnd->vs0;
 
   return s_ok;
   }
 
-static result_t set_vs0(handle_t hwnd, const char *property_name, void *parg, const variant_t *value)
+static result_t set_vs0(handle_t hwnd, const variant_t *value)
   {
-  airspeed_window_t *wnd = (airspeed_window_t *)parg;
+  airspeed_window_t *wnd = get_wnd(hwnd);
   if (value->dt != field_uint16)
     return e_bad_type;
 
@@ -92,18 +100,18 @@ static result_t set_vs0(handle_t hwnd, const char *property_name, void *parg, co
   return s_ok;
   }
 
-static result_t get_vs1(handle_t hwnd, const char *property_name, void *parg, variant_t *value)
+static result_t get_vs1(handle_t hwnd, variant_t *value)
   {
-  airspeed_window_t *wnd = (airspeed_window_t *)parg;
+  airspeed_window_t *wnd = get_wnd(hwnd);
   value->dt = field_uint16;
   value->v_uint16 = wnd->vs1;
 
   return s_ok;
   }
 
-static result_t set_vs1(handle_t hwnd, const char *property_name, void *parg, const variant_t *value)
+static result_t set_vs1(handle_t hwnd, const variant_t *value)
   {
-  airspeed_window_t *wnd = (airspeed_window_t *)parg;
+  airspeed_window_t *wnd = get_wnd(hwnd);
   if (value->dt != field_uint16)
     return e_bad_type;
 
@@ -117,18 +125,18 @@ static result_t set_vs1(handle_t hwnd, const char *property_name, void *parg, co
   return s_ok;
   }
 
-static result_t get_vfe(handle_t hwnd, const char *property_name, void *parg, variant_t *value)
+static result_t get_vfe(handle_t hwnd, variant_t *value)
   {
-  airspeed_window_t *wnd = (airspeed_window_t *)parg;
+  airspeed_window_t *wnd = get_wnd(hwnd);
   value->dt = field_uint16;
   value->v_uint16 = wnd->vfe;
 
   return s_ok;
   }
 
-static result_t set_vfe(handle_t hwnd, const char *property_name, void *parg, const variant_t *value)
+static result_t set_vfe(handle_t hwnd, const variant_t *value)
   {
-  airspeed_window_t *wnd = (airspeed_window_t *)parg;
+  airspeed_window_t *wnd = get_wnd(hwnd);
   if (value->dt != field_uint16)
     return e_bad_type;
 
@@ -142,18 +150,18 @@ static result_t set_vfe(handle_t hwnd, const char *property_name, void *parg, co
   return s_ok;
   }
 
-static result_t get_vno(handle_t hwnd, const char *property_name, void *parg, variant_t *value)
+static result_t get_vno(handle_t hwnd, variant_t *value)
   {
-  airspeed_window_t *wnd = (airspeed_window_t *)parg;
+  airspeed_window_t *wnd = get_wnd(hwnd);
   value->dt = field_uint16;
   value->v_uint16 = wnd->vno;
 
   return s_ok;
   }
 
-static result_t set_vno(handle_t hwnd, const char *property_name, void *parg, const variant_t *value)
+static result_t set_vno(handle_t hwnd, const variant_t *value)
   {
-  airspeed_window_t *wnd = (airspeed_window_t *)parg;
+  airspeed_window_t *wnd = get_wnd(hwnd);
   if (value->dt != field_uint16)
     return e_bad_type;
 
@@ -167,18 +175,18 @@ static result_t set_vno(handle_t hwnd, const char *property_name, void *parg, co
   return s_ok;
   }
 
-static result_t get_vne(handle_t hwnd, const char *property_name, void *parg, variant_t *value)
+static result_t get_vne(handle_t hwnd,  variant_t *value)
   {
-  airspeed_window_t *wnd = (airspeed_window_t *)parg;
+  airspeed_window_t *wnd = get_wnd(hwnd);
   value->dt = field_uint16;
   value->v_uint16 = wnd->vne;
 
   return s_ok;
   }
 
-static result_t set_vne(handle_t hwnd, const char *property_name, void *parg, const variant_t *value)
+static result_t set_vne(handle_t hwnd, const variant_t *value)
   {
-  airspeed_window_t *wnd = (airspeed_window_t *)parg;
+  airspeed_window_t *wnd = get_wnd(hwnd);
   if (value->dt != field_uint16)
     return e_bad_type;
 
@@ -192,18 +200,18 @@ static result_t set_vne(handle_t hwnd, const char *property_name, void *parg, co
   return s_ok;
   }
 
-static result_t get_va(handle_t hwnd, const char *property_name, void *parg, variant_t *value)
+static result_t get_va(handle_t hwnd, variant_t *value)
   {
-  airspeed_window_t *wnd = (airspeed_window_t *)parg;
+  airspeed_window_t *wnd = get_wnd(hwnd);
   value->dt = field_uint16;
   value->v_uint16 = wnd->va;
 
   return s_ok;
   }
 
-static result_t set_va(handle_t hwnd, const char *property_name, void *parg, const variant_t *value)
+static result_t set_va(handle_t hwnd, const variant_t *value)
   {
-  airspeed_window_t *wnd = (airspeed_window_t *)parg;
+  airspeed_window_t *wnd = get_wnd(hwnd);
   if (value->dt != field_uint16)
     return e_bad_type;
 
@@ -217,18 +225,18 @@ static result_t set_va(handle_t hwnd, const char *property_name, void *parg, con
   return s_ok;
   }
 
-static result_t get_vx(handle_t hwnd, const char *property_name, void *parg, variant_t *value)
+static result_t get_vx(handle_t hwnd, variant_t *value)
   {
-  airspeed_window_t *wnd = (airspeed_window_t *)parg;
+  airspeed_window_t *wnd = get_wnd(hwnd);
   value->dt = field_uint16;
   value->v_uint16 = wnd->vx;
 
   return s_ok;
   }
 
-static result_t set_vx(handle_t hwnd, const char *property_name, void *parg, const variant_t *value)
+static result_t set_vx(handle_t hwnd, const variant_t *value)
   {
-  airspeed_window_t *wnd = (airspeed_window_t *)parg;
+  airspeed_window_t *wnd = get_wnd(hwnd);
   if (value->dt != field_uint16)
     return e_bad_type;
 
@@ -242,18 +250,18 @@ static result_t set_vx(handle_t hwnd, const char *property_name, void *parg, con
   return s_ok;
   }
 
-static result_t get_vy(handle_t hwnd, const char *property_name, void *parg, variant_t *value)
+static result_t get_vy(handle_t hwnd, variant_t *value)
   {
-  airspeed_window_t *wnd = (airspeed_window_t *)parg;
+  airspeed_window_t *wnd = get_wnd(hwnd);
   value->dt = field_uint16;
   value->v_uint16 = wnd->vy;
 
   return s_ok;
   }
 
-static result_t set_vy(handle_t hwnd, const char *property_name, void *parg, const variant_t *value)
+static result_t set_vy(handle_t hwnd, const variant_t *value)
   {
-  airspeed_window_t *wnd = (airspeed_window_t *)parg;
+  airspeed_window_t *wnd = get_wnd(hwnd);
   if (value->dt != field_uint16)
     return e_bad_type;
 
@@ -267,18 +275,18 @@ static result_t set_vy(handle_t hwnd, const char *property_name, void *parg, con
   return s_ok;
   }
 
-static result_t get_scale(handle_t hwnd, const char *property_name, void *parg, variant_t *value)
+static result_t get_scale(handle_t hwnd, variant_t *value)
   {
-  airspeed_window_t *wnd = (airspeed_window_t *)parg;
+  airspeed_window_t *wnd = get_wnd(hwnd);
   value->dt = field_float;
   value->v_float = wnd->scale;
 
   return s_ok;
   }
 
-static result_t set_scale(handle_t hwnd, const char *property_name, void *parg, const variant_t *value)
+static result_t set_scale(handle_t hwnd, const variant_t *value)
   {
-  airspeed_window_t *wnd = (airspeed_window_t *)parg;
+  airspeed_window_t *wnd = get_wnd(hwnd);
   if (value->dt != field_float)
     return e_bad_type;
 
@@ -292,18 +300,18 @@ static result_t set_scale(handle_t hwnd, const char *property_name, void *parg, 
   return s_ok;
   }
 
-static result_t get_offset(handle_t hwnd, const char *property_name, void *parg, variant_t *value)
+static result_t get_offset(handle_t hwnd, variant_t *value)
   {
-  airspeed_window_t *wnd = (airspeed_window_t *)parg;
+  airspeed_window_t *wnd = get_wnd(hwnd);
   value->dt = field_float;
   value->v_float = wnd->offset;
 
   return s_ok;
   }
 
-static result_t set_offset(handle_t hwnd, const char *property_name, void *parg, const variant_t *value)
+static result_t set_offset(handle_t hwnd, const variant_t *value)
   {
-  airspeed_window_t *wnd = (airspeed_window_t *)parg;
+  airspeed_window_t *wnd = get_wnd(hwnd);
   if (value->dt != field_float)
     return e_bad_type;
 
@@ -536,16 +544,16 @@ result_t create_airspeed_window(handle_t parent, memid_t key, handle_t *hwnd)
   // store the parameters for the window
   set_wnddata(*hwnd, wnd);
 
-  add_property(*hwnd, "vs0", wnd, get_vs0, set_vs0, field_uint16, 0);
-  add_property(*hwnd, "vs1", wnd, get_vs1, set_vs1, field_uint16, 0);
-  add_property(*hwnd, "vfe", wnd, get_vfe, set_vfe, field_uint16, 0);
-  add_property(*hwnd, "vno", wnd, get_vno, set_vno, field_uint16, 0);
-  add_property(*hwnd, "vne", wnd, get_vne, set_vne, field_uint16, 0);
-  add_property(*hwnd, "va", wnd, get_va, set_va, field_uint16, 0);
-  add_property(*hwnd, "vx", wnd, get_vx, set_vx, field_uint16, 0);
-  add_property(*hwnd, "vy", wnd, get_vy, set_vy, field_uint16, 0);
-  add_property(*hwnd, "scale", wnd, get_scale, set_scale, field_float, 0);
-  add_property(*hwnd, "offset", wnd, get_offset, set_offset, field_float, 0);
+  add_property(*hwnd, "vs0", get_vs0, set_vs0, field_uint16);
+  add_property(*hwnd, "vs1", get_vs1, set_vs1, field_uint16);
+  add_property(*hwnd, "vfe", get_vfe, set_vfe, field_uint16);
+  add_property(*hwnd, "vno", get_vno, set_vno, field_uint16);
+  add_property(*hwnd, "vne", get_vne, set_vne, field_uint16);
+  add_property(*hwnd, "va", get_va, set_va, field_uint16);
+  add_property(*hwnd, "vx", get_vx, set_vx, field_uint16);
+  add_property(*hwnd, "vy", get_vy, set_vy, field_uint16);
+  add_property(*hwnd, "scale", get_scale, set_scale, field_float);
+  add_property(*hwnd, "offset", get_offset, set_offset, field_float);
 
   add_event(*hwnd, id_paint, wnd, 0, on_paint);
   add_event(*hwnd, id_indicated_airspeed, wnd, 0, on_indicated_airspeed);

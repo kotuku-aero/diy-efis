@@ -90,7 +90,7 @@ int strcasecmp(const char *s1, const char *s2)
   return (cm[*us1] - cm[*--us2]);
   }
 
-static result_t get_x(handle_t hwnd, const char *property_name, void *parg, variant_t *value)
+static result_t get_x(handle_t hwnd, variant_t *value)
   {
   value->dt = field_int16;
   rect_t rect;
@@ -101,7 +101,7 @@ static result_t get_x(handle_t hwnd, const char *property_name, void *parg, vari
   return s_ok;
   }
 
-static result_t set_x(handle_t hwnd, const char *property_name, void *parg, const variant_t *value)
+static result_t set_x(handle_t hwnd, const variant_t *value)
   {
   if (value->dt != field_int16)
     return e_bad_type;
@@ -119,7 +119,7 @@ static result_t set_x(handle_t hwnd, const char *property_name, void *parg, cons
   return s_ok;
   }
 
-static result_t get_y(handle_t hwnd, const char *property_name, void *parg, variant_t *value)
+static result_t get_y(handle_t hwnd, variant_t *value)
   {
   value->dt = field_int16;
   rect_t rect;
@@ -130,7 +130,7 @@ static result_t get_y(handle_t hwnd, const char *property_name, void *parg, vari
   return s_ok;
   }
 
-static result_t set_y(handle_t hwnd, const char *property_name, void *parg, const variant_t *value)
+static result_t set_y(handle_t hwnd, const variant_t *value)
   {
   if (value->dt != field_int16)
     return e_bad_type;
@@ -148,7 +148,7 @@ static result_t set_y(handle_t hwnd, const char *property_name, void *parg, cons
   return s_ok;
   }
 
-static result_t get_width(handle_t hwnd, const char *property_name, void *parg, variant_t *value)
+static result_t get_width(handle_t hwnd, variant_t *value)
   {
   value->dt = field_int16;
   rect_t rect;
@@ -159,7 +159,7 @@ static result_t get_width(handle_t hwnd, const char *property_name, void *parg, 
   return s_ok;
   }
 
-static result_t set_width(handle_t hwnd, const char *property_name, void *parg, const variant_t *value)
+static result_t set_width(handle_t hwnd, const variant_t *value)
   {
   if (value->dt != field_int16)
     return e_bad_type;
@@ -177,7 +177,7 @@ static result_t set_width(handle_t hwnd, const char *property_name, void *parg, 
   return s_ok;
   }
 
-static result_t get_height(handle_t hwnd, const char *property_name, void *parg, variant_t *value)
+static result_t get_height(handle_t hwnd, variant_t *value)
   {
   value->dt = field_int16;
   rect_t rect;
@@ -188,7 +188,7 @@ static result_t get_height(handle_t hwnd, const char *property_name, void *parg,
   return s_ok;
   }
 
-static result_t set_height(handle_t hwnd, const char *property_name, void *parg, const variant_t *value)
+static result_t set_height(handle_t hwnd, const variant_t *value)
   {
   if (value->dt != field_int16)
     return e_bad_type;
@@ -206,7 +206,7 @@ static result_t set_height(handle_t hwnd, const char *property_name, void *parg,
   return s_ok;
   }
 
-static result_t get_zorder(handle_t hwnd, const char *property_name, void *parg, variant_t *value)
+static result_t get_zorder(handle_t hwnd, variant_t *value)
   {
   value->dt = field_uint16;
   uint8_t order;
@@ -217,7 +217,7 @@ static result_t get_zorder(handle_t hwnd, const char *property_name, void *parg,
   return s_ok;
   }
 
-static result_t set_zorder(handle_t hwnd, const char *property_name, void *parg, const variant_t *value)
+static result_t set_zorder(handle_t hwnd, const variant_t *value)
   {
   if (value->dt != field_uint16)
     return e_bad_type;
@@ -271,11 +271,11 @@ result_t create_child_widget(handle_t parent, memid_t key, wndproc cb, handle_t 
       set_z_order(*hwnd, (uint8_t)id);
     }
 
-  add_property(*hwnd, "x", *hwnd, get_x, set_x, field_int16, 0);
-  add_property(*hwnd, "y", *hwnd, get_y, set_y, field_int16, 0);
-  add_property(*hwnd, "width", *hwnd, get_width, set_width, field_int16, 0);
-  add_property(*hwnd, "height", *hwnd, get_height, set_height, field_int16, 0);
-  add_property(*hwnd, "zorder", *hwnd, get_zorder, set_zorder, field_uint16, 0);
+  add_property(*hwnd, "x", get_x, set_x, field_int16);
+  add_property(*hwnd, "y", get_y, set_y, field_int16);
+  add_property(*hwnd, "width", get_width, set_width, field_int16);
+  add_property(*hwnd, "height",get_height, set_height, field_int16);
+  add_property(*hwnd, "zorder", get_zorder, set_zorder, field_uint16);
 
   // The widget properties are loaded ok, now we can register them
 

@@ -829,8 +829,149 @@ void free_variant(variant_t *value)
 
   }
 
-result_t add_property(handle_t hwnd, const char *property_name, void *parg, getter_fn getter, setter_fn setter, field_datatype dt, free_fn variant_free)
+static const char *datatype_prop = "datatype";
+static const char *func_prop = "func";
+
+static duk_ret_t photon_setter(duk_context *ctx)
   {
+  // get the 'this' pointer
+  duk_push_this(ctx);
+  // and get the magic number
+  handle_t hwnd = (handle_t)duk_get_magic(ctx, 0);
+
+  duk_push_current_function(ctx);
+
+  // get the datatype
+  duk_get_prop_string(ctx, -1, datatype_prop);
+  field_datatype dt = (field_datatype)duk_require_int(ctx, -1);
+
+  // get the function
+  duk_get_prop_string(ctx, -1, func_prop);
+  setter_fn setter = (setter_fn)duk_require_pointer(ctx, -1);
+
+  // the value is at top of stack
+  variant_t value;
+  value.dt = dt;
+  switch (dt)
+    {
+    case field_bool :
+      value.v_bool = duk_require_boolean(ctx, 0);
+      break;
+    case field_int16 :
+      value.v_int16 = (int16_t)duk_require_int(ctx, 0);
+      break;
+    case field_int32 :
+      value.v_int32 = duk_require_int(ctx, 0);
+      break;
+    case field_uint16 :
+      value.v_uint16 = (uint16_t)duk_require_uint(ctx, 0);
+      break;
+    case field_uint32:
+      value.v_uint32 = duk_require_uint(ctx, 0);
+      break;
+    case field_string :
+      value.v_string = duk_require_string(ctx, 0);
+      break;
+    case field_float :
+      value.v_float = duk_require_number(ctx, 0);
+      break;
+    default :
+      return DUK_RET_TYPE_ERROR;
+    }
+
+  if (failed((*setter)(hwnd, &value)))
+    return DUK_RET_TYPE_ERROR;
+
+  return 0;
+  }
+
+static duk_ret_t photon_getter(duk_context *ctx)
+  {
+  // get the 'this' pointer
+  duk_push_this(ctx);
+  // and get the magic number
+  handle_t hwnd = (handle_t)duk_get_magic(ctx, 0);
+
+  duk_push_current_function(ctx);
+
+  // get the datatype
+  duk_get_prop_string(ctx, -1, datatype_prop);
+  field_datatype dt = (field_datatype)duk_require_int(ctx, -1);
+
+  // get the function
+  duk_get_prop_string(ctx, -1, func_prop);
+  getter_fn getter = (getter_fn)duk_require_pointer(ctx, -1);
+
+  // the value is at top of stack
+  variant_t value;
+
+  if (failed((*getter)(hwnd, &value)))
+    return DUK_RET_TYPE_ERROR;
+
+  switch (value.dt)
+    {
+    case field_bool:
+      duk_push_boolean(ctx, value.v_bool);
+      break;
+    case field_int16:
+      duk_push_int(ctx, value.v_int16);
+      break;
+    case field_int32:
+      duk_push_int(ctx, value.v_int32);
+      break;
+    case field_uint16:
+      duk_push_uint(ctx, value.v_uint16);
+      break;
+    case field_uint32:
+      duk_push_uint(ctx, value.v_uint32);
+      break;
+    case field_string:
+      duk_push_string(ctx, value.v_string);
+      break;
+    case field_float:
+      duk_push_number(ctx, value.v_float);
+      break;
+    default:
+      return DUK_RET_TYPE_ERROR;
+    }
+
+  return 1;
+  }
+
+result_t add_property(handle_t hwnd, const char *property_name, void *parg, getter_fn getter, setter_fn setter, field_datatype dt)
+  {
+  result_t result;
+  handle_t hscreen;
+  screen_t *screen;
+  if (failed(result = get_screen(&hscreen)) ||
+    failed(result = as_screen(hscreen, &screen)))
+    return result;
+
+  // pushes the 'this' pointer
+  if (failed(result = get_duk_window(hwnd)))
+    return result;
+
+  duk_context *ctx = screen->context->ctx;
+
+  // add the property
+  duk_push_string(ctx, property_name);
+
+  // create the getter
+  duk_idx_t getter_idx = duk_push_c_function(ctx, photon_getter, 0);
+  duk_push_int(ctx, dt);
+  duk_put_prop_string(ctx, getter_idx, datatype_prop);
+  duk_push_pointer(ctx, getter);
+  duk_put_prop_string(ctx, getter_idx, func_prop);
+
+  // create the setter
+  duk_idx_t setter_idx = duk_push_c_function(ctx, photon_setter, 1);
+  duk_push_int(ctx, dt);
+  duk_put_prop_string(ctx, setter_idx, datatype_prop);
+  duk_push_pointer(ctx, setter);
+  duk_put_prop_string(ctx, setter_idx, func_prop);
+
+  // add the property to the object (should be -1 index)
+  duk_def_prop(ctx, -1, DUK_DEFPROP_HAVE_GETTER | DUK_DEFPROP_HAVE_SETTER | DUK_DEFPROP_SET_ENUMERABLE);
 
   return s_ok;
   }

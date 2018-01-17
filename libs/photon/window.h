@@ -186,10 +186,8 @@ typedef struct _variant_t {
 
 typedef void (*free_fn)(variant_t *value);
 
-typedef result_t (*getter_fn)(handle_t hwnd, const char *property_name, void *parg, variant_t *value);
-typedef result_t (*setter_fn)(handle_t hwnd, const char *property_name, void *parg, const variant_t *value);
-
-extern void free_variant(variant_t *value);
+typedef result_t (*getter_fn)(handle_t hwnd, variant_t *value);
+typedef result_t (*setter_fn)(handle_t hwnd, const variant_t *value);
 
 /**
  * @function result_t add_property(handle_t hwnd, const char *property_name, void *parg, getter_fn getter, setter_fn setter)
@@ -202,7 +200,7 @@ extern void free_variant(variant_t *value);
  * @param setter  Callback to set the value of a property
  * @return s_ok if the property added ok.
 */
-extern result_t add_property(handle_t hwnd, const char *property_name, void *parg, getter_fn getter, setter_fn setter, field_datatype dt, free_fn variant_free);
+extern result_t add_property(handle_t hwnd, const char *property_name, getter_fn getter, setter_fn setter, field_datatype dt);
 
 extern result_t get_canvas(handle_t hwnd, canvas_t **canvas);
 
