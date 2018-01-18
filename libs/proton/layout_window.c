@@ -1085,7 +1085,7 @@ static void item_checklist_event(layout_window_t *wnd,
     vector_count(checklist->popup->menu->menu_items, &count);
 
     uint16_t i;
-    for (i == 0; i < count; i++)
+    for (i = 0; i < count; i++)
       {
       menu_item_t *item;
       vector_at(checklist->popup->menu->menu_items, i, &item);

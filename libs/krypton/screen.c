@@ -140,5 +140,5 @@ void start_fb(uint16_t x, uint16_t y, uint8_t *buffer)
   dimy = y;
   fb_buffer = (const uint32_t *)buffer;
 
-  task_create("wnd", DEFAULT_STACK_SIZE, worker, 0, BELOW_NORMAL, &h_worker);
+  task_create("wnd", DEFAULT_STACK_SIZE * 4, worker, 0, BELOW_NORMAL, &h_worker);
   }

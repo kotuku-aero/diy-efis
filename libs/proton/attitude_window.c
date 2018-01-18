@@ -538,7 +538,7 @@ static result_t on_pitch_angle(handle_t hwnd, event_proxy_t *proxy, const canmsg
     result_t result;
 
     // create our window
-    if (failed(create_child_widget(parent, key, defwndproc, hwnd)))
+    if (failed(result = create_child_widget(parent, key, defwndproc, hwnd)))
       return result;
 
     // create the window data.

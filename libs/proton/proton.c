@@ -34,6 +34,7 @@ If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
 #include "../neutron/bsp.h"
+#include "proton.h"
 
 extern result_t layout_wndproc(handle_t hwnd, const canmsg_t *msg);
 
@@ -51,10 +52,11 @@ extern const uint8_t neo[];
 extern const uint16_t neo_length;
 
 // if parg is given then is a handle to a stream which will be closed
-void run_proton(void *parg)
+void run_proton(proton_args_t *args)
   {
   result_t result;
   memid_t key;
+
 
   if(succeeded(reg_open_key(0, "proton", &key)))
     {
@@ -76,10 +78,10 @@ void run_proton(void *parg)
 
     if(succeeded(result = open_screen(orientation, layout_wndproc, 0, &main_window)))
       {
-      if (parg != 0)
+      if (args->stream != 0)
         {
-        load_png(main_window, parg, 0);
-        stream_close(parg);
+        load_png(main_window, args->stream, 0);
+        stream_close(args->stream);
         }
 
       // load the neon font.
@@ -91,7 +93,7 @@ void run_proton(void *parg)
         init_script = startup_script;
 
       // attach the ion interpreter to the screen
-      attach_ion(main_window, key, init_script);
+      attach_ion(main_window, key, init_script, args->ci, args->co, args->cerr);
 
       // finally load the layout
       load_layout(main_window, layout_key);

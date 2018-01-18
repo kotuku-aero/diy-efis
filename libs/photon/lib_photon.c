@@ -110,7 +110,7 @@ static const char *prop_y = "y";
  @param obj_idx   index of this on the stack
  @param rect      where to get the clip rect into
 */
-static result_t get_clip_rect(duk_context *ctx, duk_int_t stk_bot, duk_int_t obj_idx, rect_t *rect)
+static result_t duk_get_clip_rect(duk_context *ctx, duk_int_t stk_bot, duk_int_t obj_idx, rect_t *rect)
   {
   // the clip_rect is an array of integers on the this pointer called clip_rect
   duk_push_lstring(ctx, prop_clip_rect, 0);
@@ -376,12 +376,14 @@ static duk_ret_t lib_polyline(duk_context *ctx)
   // get our context
   duk_push_this(ctx);
   // and get the magic number
-  handle_t canvas = (handle_t) duk_get_magic(ctx, 0);
+  handle_t canvas; 
+  if(failed(get_hwnd(ctx, -1, &canvas)))
+    return DUK_RET_TYPE_ERROR;
 
   // get the clipping rectangle.
   rect_t clip_rect;
 
-  if (failed(get_clip_rect(ctx, -1, -1, &clip_rect)))
+  if (failed(duk_get_clip_rect(ctx, -1, -1, &clip_rect)))
     {
     duk_pop(ctx);
     return DUK_RET_TYPE_ERROR;
@@ -418,12 +420,14 @@ static duk_ret_t lib_ellipse(duk_context *ctx)
   // get our context
   duk_push_this(ctx);
   // and get the magic number
-  handle_t canvas = (handle_t)duk_get_magic(ctx, 0);
-
+  handle_t canvas;
+  if (failed(get_hwnd(ctx, -1, &canvas)))
+    return DUK_RET_TYPE_ERROR;
+ 
   // get the clipping rectangle.
   rect_t clip_rect;
 
-  if (failed(get_clip_rect(ctx, -1, -1, &clip_rect)))
+  if (failed(duk_get_clip_rect(ctx, -1, -1, &clip_rect)))
     {
     duk_pop(ctx);
     return DUK_RET_TYPE_ERROR;
@@ -466,7 +470,7 @@ static duk_ret_t lib_polygon(duk_context *ctx)
   // get the clipping rectangle.
   rect_t clip_rect;
 
-  if (failed(get_clip_rect(ctx, -1, -1, &clip_rect)))
+  if (failed(duk_get_clip_rect(ctx, -1, -1, &clip_rect)))
     {
     duk_pop(ctx);
     return DUK_RET_TYPE_ERROR;
@@ -505,12 +509,15 @@ static duk_ret_t lib_rectangle(duk_context *ctx)
   // get our context
   duk_push_this(ctx);
   // and get the magic number
-  handle_t canvas = (handle_t)duk_get_magic(ctx, 0);
+  handle_t canvas;
+  if (failed(get_hwnd(ctx, -1, &canvas)))
+    return DUK_RET_TYPE_ERROR;
+
 
   // get the clipping rectangle.
   rect_t clip_rect;
 
-  if (failed(get_clip_rect(ctx, -1, -1, &clip_rect)))
+  if (failed(duk_get_clip_rect(ctx, -1, -1, &clip_rect)))
     {
     duk_pop(ctx);
     return DUK_RET_TYPE_ERROR;
@@ -548,12 +555,15 @@ static duk_ret_t lib_round_rect(duk_context *ctx)
   // get our context
   duk_push_this(ctx);
   // and get the magic number
-  handle_t canvas = (handle_t)duk_get_magic(ctx, 0);
+  handle_t canvas;
+  if (failed(get_hwnd(ctx, -1, &canvas)))
+    return DUK_RET_TYPE_ERROR;
+
 
   // get the clipping rectangle.
   rect_t clip_rect;
 
-  if (failed(get_clip_rect(ctx, -1, -1, &clip_rect)))
+  if (failed(duk_get_clip_rect(ctx, -1, -1, &clip_rect)))
     {
     duk_pop(ctx);
     return DUK_RET_TYPE_ERROR;
@@ -599,12 +609,15 @@ static duk_ret_t lib_bit_blt(duk_context *ctx)
   // get our context
   duk_push_this(ctx);
   // and get the magic number
-  handle_t canvas = (handle_t)duk_get_magic(ctx, 0);
+  handle_t canvas;
+  if (failed(get_hwnd(ctx, -1, &canvas)))
+    return DUK_RET_TYPE_ERROR;
+
 
   // get the clipping rectangle.
   rect_t clip_rect;
 
-  if (failed(get_clip_rect(ctx, -1, -1, &clip_rect)))
+  if (failed(duk_get_clip_rect(ctx, -1, -1, &clip_rect)))
     {
     duk_pop(ctx);
     return DUK_RET_TYPE_ERROR;
@@ -637,7 +650,7 @@ static duk_ret_t lib_bit_blt(duk_context *ctx)
     return DUK_RET_TYPE_ERROR;
     }
 
-  if (failed(get_clip_rect(ctx, -2, -2, &src_rect)))
+  if (failed(duk_get_clip_rect(ctx, -2, -2, &src_rect)))
     {
     duk_pop(ctx);
     duk_pop(ctx);
@@ -666,12 +679,15 @@ static duk_ret_t lib_get_pixel(duk_context *ctx)
   // get our context
   duk_push_this(ctx);
   // and get the magic number
-  handle_t canvas = (handle_t)duk_get_magic(ctx, 0);
+  handle_t canvas;
+  if (failed(get_hwnd(ctx, -1, &canvas)))
+    return DUK_RET_TYPE_ERROR;
+
 
   // get the clipping rectangle.
   rect_t clip_rect;
 
-  if (failed(get_clip_rect(ctx, -1, -1, &clip_rect)))
+  if (failed(duk_get_clip_rect(ctx, -1, -1, &clip_rect)))
     {
     duk_pop(ctx);
     return DUK_RET_TYPE_ERROR;
@@ -704,12 +720,15 @@ static duk_ret_t lib_set_pixel(duk_context *ctx)
   // get our context
   duk_push_this(ctx);
   // and get the magic number
-  handle_t canvas = (handle_t)duk_get_magic(ctx, 0);
+  handle_t canvas;
+  if (failed(get_hwnd(ctx, -1, &canvas)))
+    return DUK_RET_TYPE_ERROR;
+
 
   // get the clipping rectangle.
   rect_t clip_rect;
 
-  if (failed(get_clip_rect(ctx, -1, -1, &clip_rect)))
+  if (failed(duk_get_clip_rect(ctx, -1, -1, &clip_rect)))
     {
     duk_pop(ctx);
     return DUK_RET_TYPE_ERROR;
@@ -740,12 +759,15 @@ static duk_ret_t lib_arc(duk_context *ctx)
   // get our context
   duk_push_this(ctx);
   // and get the magic number
-  handle_t canvas = (handle_t)duk_get_magic(ctx, 0);
+  handle_t canvas;
+  if (failed(get_hwnd(ctx, -1, &canvas)))
+    return DUK_RET_TYPE_ERROR;
+
 
   // get the clipping rectangle.
   rect_t clip_rect;
 
-  if (failed(get_clip_rect(ctx, -1, -1, &clip_rect)))
+  if (failed(duk_get_clip_rect(ctx, -1, -1, &clip_rect)))
     {
     duk_pop(ctx);
     return DUK_RET_TYPE_ERROR;
@@ -784,12 +806,15 @@ static duk_ret_t lib_pie(duk_context *ctx)
   // get our context
   duk_push_this(ctx);
   // and get the magic number
-  handle_t canvas = (handle_t)duk_get_magic(ctx, 0);
+  handle_t canvas;
+  if (failed(get_hwnd(ctx, -1, &canvas)))
+    return DUK_RET_TYPE_ERROR;
+
 
   // get the clipping rectangle.
   rect_t clip_rect;
 
-  if (failed(get_clip_rect(ctx, -1, -1, &clip_rect)))
+  if (failed(duk_get_clip_rect(ctx, -1, -1, &clip_rect)))
     {
     duk_pop(ctx);
     return DUK_RET_TYPE_ERROR;
@@ -831,12 +856,15 @@ static duk_ret_t lib_draw_text(duk_context *ctx)
   // get our context
   duk_push_this(ctx);
   // and get the magic number
-  handle_t canvas = (handle_t)duk_get_magic(ctx, 0);
+  handle_t canvas;
+  if (failed(get_hwnd(ctx, -1, &canvas)))
+    return DUK_RET_TYPE_ERROR;
+
 
   // get the clipping rectangle.
   rect_t clip_rect;
 
-  if (failed(get_clip_rect(ctx, -1, -1, &clip_rect)))
+  if (failed(duk_get_clip_rect(ctx, -1, -1, &clip_rect)))
     {
     duk_pop(ctx);
     return DUK_RET_TYPE_ERROR;
@@ -913,7 +941,10 @@ static duk_ret_t lib_text_extent(duk_context *ctx)
   // get our context
   duk_push_this(ctx);
   // and get the magic number
-  handle_t canvas = (handle_t)duk_get_magic(ctx, 0);
+  handle_t canvas;
+  if (failed(get_hwnd(ctx, -1, &canvas)))
+    return DUK_RET_TYPE_ERROR;
+
 
   handle_t font = 0;
 
@@ -959,7 +990,10 @@ static duk_ret_t lib_get_canvas_width(duk_context *ctx)
   // get our context
   duk_push_this(ctx);
   // and get the magic number
-  handle_t canvas = (handle_t)duk_get_magic(ctx, 0);
+  handle_t canvas;
+  if (failed(get_hwnd(ctx, -1, &canvas)))
+    return DUK_RET_TYPE_ERROR;
+
 
   extent_t ex;
   if (failed(get_canvas_extents(canvas, &ex)))
@@ -982,7 +1016,10 @@ static duk_ret_t lib_get_canvas_height(duk_context *ctx)
   // get our context
   duk_push_this(ctx);
   // and get the magic number
-  handle_t canvas = (handle_t)duk_get_magic(ctx, 0);
+  handle_t canvas;
+  if (failed(get_hwnd(ctx, -1, &canvas)))
+    return DUK_RET_TYPE_ERROR;
+
 
   extent_t ex;
   if (failed(get_canvas_extents(canvas, &ex)))
@@ -997,7 +1034,7 @@ static duk_ret_t lib_get_canvas_height(duk_context *ctx)
   return 1;
 }
 
-static const duk_function_list_entry lib_canvas_funcs[] = {
+const duk_function_list_entry lib_canvas_funcs[] = {
     { "polyline", lib_polyline, 0 },
     { "ellipse", lib_ellipse, 0 },
     { "polygon", lib_polygon, 0 },

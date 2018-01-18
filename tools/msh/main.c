@@ -364,20 +364,21 @@ int main(int argc, char **argv)
   channel.parser.cfg.console_out = &channel.stream;
   channel.parser.cfg.console_err = &channel.stream;
 
+  proton_args_t args;
+
+  ion_init();
+
   // start proton if the key exists
   memid_t proton_key;
   if(succeeded(reg_open_key(0, "proton", &proton_key)))
     {
-    stream_p stream;
-    manifest_create(splash_base64, &stream);
+    manifest_create(splash_base64, &args.stream);
 
-    task_create("PROTON", DEFAULT_STACK_SIZE * 4, run_proton, stream, NORMAL_PRIORITY, 0);
-    }
+    args.ci = &channel.stream;
+    args.co = &channel.stream;
+    args.cerr = &channel.stream;
 
-  if (failed(ion_init(register_photon_functions)))
-    {
-    stream_printf(&channel.stream, "Unable to start ion\r\n");
-    return - 1;
+    task_create("PROTON", DEFAULT_STACK_SIZE * 4, run_proton, &args, NORMAL_PRIORITY, 0);
     }
 
   if (failed(cli_init(&channel.parser.cfg, &channel.parser)))

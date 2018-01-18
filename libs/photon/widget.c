@@ -94,7 +94,7 @@ static result_t get_x(handle_t hwnd, variant_t *value)
   {
   value->dt = field_int16;
   rect_t rect;
-  get_window_rect(hwnd, &rect);
+  get_window_pos(hwnd, &rect);
 
   value->v_int16 = rect.left;
 
@@ -107,13 +107,13 @@ static result_t set_x(handle_t hwnd, const variant_t *value)
     return e_bad_type;
 
   rect_t rect;
-  get_window_rect(hwnd, &rect);
+  get_window_pos(hwnd, &rect);
 
   bool changed = rect.left != value->v_int16;
   if (changed)
     {
     rect.left = value->v_int16;
-    set_window_rect(hwnd, &rect);
+    set_window_pos(hwnd, &rect);
     }
 
   return s_ok;
@@ -123,7 +123,7 @@ static result_t get_y(handle_t hwnd, variant_t *value)
   {
   value->dt = field_int16;
   rect_t rect;
-  get_window_rect(hwnd, &rect);
+  get_window_pos(hwnd, &rect);
 
   value->v_int16 = rect.top;
 
@@ -136,13 +136,13 @@ static result_t set_y(handle_t hwnd, const variant_t *value)
     return e_bad_type;
 
   rect_t rect;
-  get_window_rect(hwnd, &rect);
+  get_window_pos(hwnd, &rect);
 
   bool changed = rect.top != value->v_int16;
   if (changed)
     {
     rect.top = value->v_int16;
-    return set_window_rect(hwnd, &rect);
+    return set_window_pos(hwnd, &rect);
     }
 
   return s_ok;
@@ -152,7 +152,7 @@ static result_t get_width(handle_t hwnd, variant_t *value)
   {
   value->dt = field_int16;
   rect_t rect;
-  get_window_rect(hwnd, &rect);
+  get_window_pos(hwnd, &rect);
 
   value->v_int16 = rect_width(&rect);
 
@@ -165,13 +165,13 @@ static result_t set_width(handle_t hwnd, const variant_t *value)
     return e_bad_type;
 
   rect_t rect;
-  get_window_rect(hwnd, &rect);
+  get_window_pos(hwnd, &rect);
 
   bool changed = rect_width(&rect) != value->v_int16;
   if (changed)
     {
     rect.right = rect.left + value->v_int16;
-    return set_window_rect(hwnd, &rect);
+    return set_window_pos(hwnd, &rect);
     }
 
   return s_ok;
@@ -181,7 +181,7 @@ static result_t get_height(handle_t hwnd, variant_t *value)
   {
   value->dt = field_int16;
   rect_t rect;
-  get_window_rect(hwnd, &rect);
+  get_window_pos(hwnd, &rect);
 
   value->v_int16 = rect_height(&rect);
 
@@ -194,13 +194,13 @@ static result_t set_height(handle_t hwnd, const variant_t *value)
     return e_bad_type;
 
   rect_t rect;
-  get_window_rect(hwnd, &rect);
+  get_window_pos(hwnd, &rect);
 
   bool changed = rect_height(&rect) != value->v_int16;
   if (changed)
     {
     rect.bottom = rect.top + value->v_int16;
-    return set_window_rect(hwnd, &rect);
+    return set_window_pos(hwnd, &rect);
     }
 
   return s_ok;
@@ -307,33 +307,21 @@ result_t create_child_widget(handle_t parent, memid_t key, wndproc cb, handle_t 
     if (succeeded(reg_open_key(key, "events", &events)))
       {
       // enumerate the keys
-      field_datatype dt = field_key;
+      field_datatype dt = field_string;
       char name[REG_NAME_MAX];
       char event_fn[REG_STRING_MAX];
 
       memid_t child = 0;
-
-      while (succeeded(reg_enum_key(key, &dt, 0, 0, REG_NAME_MAX, name, &child)))
+      while (succeeded(reg_enum_key(events, &dt, 0, 0, REG_NAME_MAX, name, &child)))
         {
         uint16_t can_id = (uint16_t)strtoul(name, 0, 10);
 
         if (can_id > 0)
           {
-
-          // now enumerate the strings in it
-          memid_t handler = 0;
-          dt = field_string;
-
-          while (succeeded(reg_enum_key(child, &dt, 0, 0, REG_NAME_MAX, name, &handler)))
-            {
-            if (succeeded(reg_get_string(child, name, event_fn, 0)))
-              add_handler(*hwnd, can_id, event_fn);
-
-            dt = field_string;
-            }
-
-          dt = field_key;
+          if (succeeded(reg_get_string(events, name, event_fn, 0)))
+            add_handler(*hwnd, can_id, event_fn);
           }
+        dt = field_string;
         }
       }
     }

@@ -35,9 +35,17 @@ it must be removed as soon as possible after the code fragment is identified.
 */
 #include "window.h"
 
+// call this to register the ION script functions.
+// normally passed in on ion_run()
+extern result_t register_photon_functions(duk_context *ctx, handle_t co);
+
+static const char *datatype_prop = "datatype";
+static const char *func_prop = "func";
+static const char *hwnd_prop = "hwnd";
+
 // TODO: we can now attach global functions to the script using a callback.
 // expose the window specific JS functions
-result_t attach_ion(handle_t hndl, memid_t key, const char *startup_script)
+result_t attach_ion(handle_t hndl, memid_t key, const char *startup_script, handle_t ci, handle_t co, handle_t cerr)
   {
   result_t result;
   screen_t *screen;
@@ -45,7 +53,7 @@ result_t attach_ion(handle_t hndl, memid_t key, const char *startup_script)
   if(failed(result = as_screen(hndl, &screen)))
     return result;
 
-  if(failed(result = ion_create(key, startup_script, 0, 0, 0, 0, &screen->context)))
+  if(failed(result = ion_create(key, startup_script, ci, co, cerr, register_photon_functions, &screen->context)))
     return result;
 
   return s_ok;
@@ -89,12 +97,20 @@ result_t add_event(handle_t hwnd, uint16_t id, void *parg, const char *func, eve
       }
     }
 
-  event_proxy_t *proxy = (event_proxy_t *)neutron_malloc(sizeof(event_proxy_t));
+  size_t len = 0;
+  
+  if(func != 0)
+    len = strlen(func);
+
+  event_proxy_t *proxy = (event_proxy_t *)neutron_malloc(sizeof(event_proxy_t) + len);
+  memset(proxy, 0, sizeof(event_proxy_t) + len);
   proxy->callback = callback;
-  proxy->func = func;
   proxy->parg = parg;
   proxy->msg_id = id;
   proxy->previous = previous;
+
+  if (func != 0)
+    strcpy(&proxy->func[0], func);
 
   if(previous != 0)
     {
@@ -188,7 +204,6 @@ result_t find_event(handle_t hwnd, uint16_t id, event_proxy_t **details)
 
 static duk_ret_t lib_window_dtor(duk_context *ctx)
   {
-  handle_t hwnd = (handle_t)duk_get_magic(ctx, 0);
 
   return 0;
   }
@@ -199,11 +214,11 @@ static duk_ret_t lib_window_ctor(duk_context *ctx)
     return DUK_RET_TYPE_ERROR;
 
   // in case we are released...
-  duk_set_magic(ctx, 0, 0);
   return 0;
   }
 
 extern const duk_function_list_entry lib_window_funcs[];
+extern const duk_function_list_entry lib_canvas_funcs[];
 
 static result_t attach_ion_to_window(handle_t hwnd)
   {
@@ -217,26 +232,44 @@ static result_t attach_ion_to_window(handle_t hwnd)
 
   duk_context *ctx = screen->context->ctx;
 
-  // store the object in the heap stash @-1
+  // store the object in the heap stash
   duk_push_heap_stash(ctx);
-  // store the handle @-2
+  // store the handle
   duk_push_pointer(ctx, hwnd);
 
   // Push special this binding to the function being constructed
-  //duk_push_c_function(ctx, lib_window_ctor, 0);
   duk_idx_t obj_idx = duk_push_object(ctx);
   // Store the function destructor
   duk_push_c_function(ctx, lib_window_dtor, 0);
   duk_set_finalizer(ctx, obj_idx);
 
+  // put the hwnd property
+  duk_push_pointer(ctx, hwnd);
+  duk_put_prop_string(ctx, obj_idx, hwnd_prop);
+
   // add the methods
   duk_put_function_list(ctx, obj_idx, lib_window_funcs);
-
-  // add the handle property
-  duk_set_magic(ctx, obj_idx, (duk_int_t)hwnd);
+  duk_put_function_list(ctx, obj_idx, lib_canvas_funcs);
 
   // this associates the object with the window
-  duk_put_prop(ctx, -1);
+  // and puts it in the stash.  The stash has the key of the hwnd
+  duk_put_prop(ctx, 0);
+
+  duk_pop(ctx);       // pop the heap stash
+
+  return s_ok;
+  }
+
+result_t get_hwnd(duk_context *ctx, duk_int_t obj_idx, handle_t *phwnd)
+  {
+  if (ctx == 0 || phwnd == 0)
+    return e_bad_parameter;
+  
+  if (!duk_get_prop_string(ctx, obj_idx, hwnd_prop))
+    return e_not_found;
+
+  *phwnd = duk_get_pointer(ctx, -1);
+  duk_pop(ctx);
 
   return s_ok;
   }
@@ -252,16 +285,16 @@ static result_t detach_ion_from_window(handle_t hwnd)
 
   duk_context *ctx = screen->context->ctx;
 
-  // store the object in the heap stash @-1
+  // store the object in the heap stash
   duk_push_heap_stash(ctx);
-  // store the handle @-2
+  // store the handle
   duk_push_pointer(ctx, hwnd);
 
   result = s_ok;
-  if (duk_has_prop(ctx, -1))
+  if (duk_has_prop(ctx, -2))
     {
     duk_push_pointer(ctx, hwnd);
-    if (!duk_del_prop(ctx, -1))
+    if (!duk_del_prop(ctx, -2))
       result = e_unexpected;
     }
 
@@ -281,16 +314,16 @@ static result_t get_duk_window(handle_t hwnd)
     return result;
 
   duk_context *ctx = screen->context->ctx;
-  // store the object in the heap stash @-1
+  // store the object in the heap stash
   duk_push_heap_stash(ctx);
-  // store the handle @-2
+  // store the handle
   duk_push_pointer(ctx, hwnd);
 
-  if (duk_get_prop(ctx, -1))
+  if (duk_get_prop(ctx, -2))
     {
     // put the 'this' pointer at -1
     duk_swap(ctx, -1, -2);
-    duk_pop(ctx);
+    duk_pop(ctx);       // pop the stash
 
     return s_ok;
     }
@@ -327,7 +360,7 @@ result_t compile_function(handle_t hwnd, const char *func, stream_p stream)
     }
   code[len] = 0;
 
-  if (failed(result = get_duk_window(ctx, hwnd)))
+  if (failed(result = get_duk_window(hwnd)))
     {
     neutron_free(code);
     return result;
@@ -336,8 +369,10 @@ result_t compile_function(handle_t hwnd, const char *func, stream_p stream)
   duk_push_string(ctx, func);
   duk_compile_lstring(ctx, DUK_COMPILE_FUNCTION, code, len);
 
-  duk_put_prop(ctx, -1);
+  duk_put_prop(ctx, -3);    // store the function on the object
+
   neutron_free(code);
+  duk_pop(ctx);         // pop the context from the top of the stack
 
   return s_ok;
   }
@@ -359,8 +394,17 @@ static result_t ion_handler(handle_t hwnd, const event_proxy_t *proxy, const can
     return result;
 
   duk_push_string(ctx, proxy->func);
+  // get the function property
+  if (!duk_get_prop(ctx, -2))
+    {
+    duk_pop_2(ctx);     // this and undefined
+    return e_not_found;
+    }
+
+  duk_swap(ctx, -1, -2);    // sort so func, this, arg
 
   duk_push_pointer(context->ctx, (void *)msg);
+  // assumes func, this, arg on stack
   duk_call_method(ctx, 1);
 
   // returns 1 if processed
@@ -791,12 +835,28 @@ result_t get_window_rect(handle_t hwnd, rect_t *rect)
   if (failed(result = as_window(hwnd, &window)))
     return result;
 
+  rect->left = 0;
+  rect->top = 0;
+  rect->right = rect_width(&window->position);
+  rect->bottom = rect_height(&window->position);
+
+  return s_ok;
+  }
+
+result_t get_window_pos(handle_t hwnd, rect_t *rect)
+  {
+  result_t result;
+
+  window_t *window;
+  if (failed(result = as_window(hwnd, &window)))
+    return result;
+
   memcpy(rect, &window->position, sizeof(rect_t));
 
   return s_ok;
   }
 
-result_t set_window_rect(handle_t hwnd, rect_t *rect)
+result_t set_window_pos(handle_t hwnd, rect_t *rect)
   {
   result_t result;
 
@@ -829,25 +889,24 @@ void free_variant(variant_t *value)
 
   }
 
-static const char *datatype_prop = "datatype";
-static const char *func_prop = "func";
-
 static duk_ret_t photon_setter(duk_context *ctx)
   {
   // get the 'this' pointer
   duk_push_this(ctx);
   // and get the magic number
-  handle_t hwnd = (handle_t)duk_get_magic(ctx, 0);
+  handle_t hwnd;
+  if (failed(get_hwnd(ctx, -1, &hwnd)))
+    return DUK_RET_TYPE_ERROR;
 
   duk_push_current_function(ctx);
 
   // get the datatype
   duk_get_prop_string(ctx, -1, datatype_prop);
-  field_datatype dt = (field_datatype)duk_require_int(ctx, -1);
+  field_datatype dt = (field_datatype)duk_require_int(ctx, -2);
 
   // get the function
   duk_get_prop_string(ctx, -1, func_prop);
-  setter_fn setter = (setter_fn)duk_require_pointer(ctx, -1);
+  setter_fn setter = (setter_fn)duk_require_pointer(ctx, -3);
 
   // the value is at top of stack
   variant_t value;
@@ -873,11 +932,13 @@ static duk_ret_t photon_setter(duk_context *ctx)
       value.v_string = duk_require_string(ctx, 0);
       break;
     case field_float :
-      value.v_float = duk_require_number(ctx, 0);
+      value.v_float = (float)duk_require_number(ctx, 0);
       break;
     default :
       return DUK_RET_TYPE_ERROR;
     }
+
+  duk_pop_3(ctx);
 
   if (failed((*setter)(hwnd, &value)))
     return DUK_RET_TYPE_ERROR;
@@ -890,23 +951,25 @@ static duk_ret_t photon_getter(duk_context *ctx)
   // get the 'this' pointer
   duk_push_this(ctx);
   // and get the magic number
-  handle_t hwnd = (handle_t)duk_get_magic(ctx, 0);
+  handle_t hwnd;
+  if (failed(get_hwnd(ctx, -1, &hwnd)))
+    return DUK_RET_TYPE_ERROR;
 
   duk_push_current_function(ctx);
 
-  // get the datatype
-  duk_get_prop_string(ctx, -1, datatype_prop);
-  field_datatype dt = (field_datatype)duk_require_int(ctx, -1);
-
   // get the function
   duk_get_prop_string(ctx, -1, func_prop);
-  getter_fn getter = (getter_fn)duk_require_pointer(ctx, -1);
+  getter_fn getter = (getter_fn)duk_require_pointer(ctx, -2);
+
+  duk_pop_2(ctx);
 
   // the value is at top of stack
   variant_t value;
 
   if (failed((*getter)(hwnd, &value)))
+    {
     return DUK_RET_TYPE_ERROR;
+    }
 
   switch (value.dt)
     {
@@ -938,7 +1001,7 @@ static duk_ret_t photon_getter(duk_context *ctx)
   return 1;
   }
 
-result_t add_property(handle_t hwnd, const char *property_name, void *parg, getter_fn getter, setter_fn setter, field_datatype dt)
+result_t add_property(handle_t hwnd, const char *property_name, getter_fn getter, setter_fn setter, field_datatype dt)
   {
   result_t result;
   handle_t hscreen;
@@ -958,8 +1021,6 @@ result_t add_property(handle_t hwnd, const char *property_name, void *parg, gett
 
   // create the getter
   duk_idx_t getter_idx = duk_push_c_function(ctx, photon_getter, 0);
-  duk_push_int(ctx, dt);
-  duk_put_prop_string(ctx, getter_idx, datatype_prop);
   duk_push_pointer(ctx, getter);
   duk_put_prop_string(ctx, getter_idx, func_prop);
 
@@ -972,6 +1033,8 @@ result_t add_property(handle_t hwnd, const char *property_name, void *parg, gett
 
   // add the property to the object (should be -1 index)
   duk_def_prop(ctx, -1, DUK_DEFPROP_HAVE_GETTER | DUK_DEFPROP_HAVE_SETTER | DUK_DEFPROP_SET_ENUMERABLE);
+
+  duk_pop(ctx);       // remove the object
 
   return s_ok;
   }

@@ -140,6 +140,7 @@ result_t bsp_reg_write_block(uint32_t offset, uint16_t bytes_to_write, const voi
   return s_ok;
   }
 
+#ifdef _DEBUG
 void memory_check()
   {
   if (_heapchk() != _HEAPOK)
@@ -148,6 +149,9 @@ void memory_check()
     DebugBreak();
     }
   }
+#else
+#define memory_check()
+#endif
 
 void *neutron_calloc(size_t count, size_t size)
   {
@@ -167,7 +171,8 @@ void neutron_free(void *mem)
   {
   memory_check();
 
-  free(mem);
+  if(mem != 0)
+    free(mem);
   }
 
 void *neutron_realloc(void *mem, size_t new_size)

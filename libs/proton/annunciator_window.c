@@ -252,7 +252,7 @@ result_t create_annunciator_window(handle_t parent, memid_t key, handle_t *hwnd)
   result_t result;
 
   // create our window
-  if (failed(create_child_widget(parent, key, defwndproc, hwnd)))
+  if (failed(result = create_child_widget(parent, key, defwndproc, hwnd)))
     return result;
 
   // create the window data.

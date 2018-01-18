@@ -269,6 +269,8 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
            &vsi_rect, 0, 0);
 
   end_paint(hwnd);
+
+  return s_ok;
 	}
 
 static result_t on_baro_corrected_altitude(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)

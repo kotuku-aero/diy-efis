@@ -48,12 +48,20 @@ extern "C"
  * Proton widget library definitions
  */
 
+
+typedef struct _proton_args_t {
+  stream_p stream;
+  handle_t ci;
+  handle_t co;
+  handle_t cerr;
+  } proton_args_t;
+
   /**
-   * @function run_proton(void *parg)
+   * @function run_proton(void *parg, handle_t ci, handle_t co, handle_t cerr)
    * Run the main window application loop
    * @param parg  Argument to pass
    */
-  extern void run_proton(void *parg);
+  extern void run_proton(proton_args_t *args);
 
 /**
  * @function load_layout(handle_t canvas, memid_t hive)
@@ -64,10 +72,6 @@ extern "C"
  */
 extern result_t load_layout(handle_t canvas, memid_t hive);
 extern handle_t main_window;
-
-// call this to register the ION script functions.
-// normally passed in on ion_run()
-extern result_t register_photon_functions(duk_context *ctx, handle_t co);
 
 #ifdef	__cplusplus
   }

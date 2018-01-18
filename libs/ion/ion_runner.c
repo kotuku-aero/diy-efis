@@ -138,17 +138,33 @@ result_t ion_queue_message(struct _ion_context_t *ion, const char *handler, cons
 
 static void *neutron_alloc_function(void *udata, duk_size_t size)
   {
+  if (size == 0)
+    return 0;
+
   return neutron_malloc(size);
   }
 
 static void *neutron_realloc_function(void *udata, void *ptr, duk_size_t size)
   {
+  if (ptr == 0)
+    {
+    if (size == 0)
+      return 0;
+    return neutron_malloc(size);
+    }
+
+  if (ptr != 0 && size == 0)
+    {
+    neutron_free(ptr);
+    return 0;
+    }
   return neutron_realloc(ptr, size);
   }
 
 static void neutron_free_function(void *udata, void *ptr)
   {
-  neutron_free(ptr);
+  if(ptr != 0)
+    neutron_free(ptr);
   }
 
 static void neutron_fatal_function(void *udata, const char *msg)
@@ -157,7 +173,7 @@ static void neutron_fatal_function(void *udata, const char *msg)
   ion_context_t *ion = (ion_context_t *)udata;
 
   if (ion->console_err != 0)
-    stream_printf("ION terminates with error: %s", msg);
+    stream_printf(ion->console_err, "ION terminates with error: %s", msg);
 
   // terminate the calling thread.  Should call thread_terminate()
   //
@@ -246,7 +262,7 @@ result_t ion_create_worker(memid_t home,
     }
 
   ion_ctx = (ion_context_t *)neutron_malloc(sizeof(ion_context_t));
-  if (*ion == 0)
+  if (ion_ctx == 0)
     {
     semaphore_signal(ion_mutex);
     return e_not_enough_memory;

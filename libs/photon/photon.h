@@ -223,9 +223,12 @@ extern result_t get_screen(handle_t *screen);
  * @param screen        Screen to attach to
  * @param key           Root registry key for the screen
  * @param startup_script  Script to execute
+ * @param ci            Optional console in
+ * @param co            Optional console out
+ * @param cerr          Optional console error
  * @return s_ok if the interpreter was started ok.
  */
-extern result_t attach_ion(handle_t screen, memid_t key, const char *startup_script);
+extern result_t attach_ion(handle_t screen, memid_t key, const char *startup_script, handle_t ci, handle_t co, handle_t cerr);
 /**
  * @function detach_ion(handle_t screen)
  * Detach an interpreter and release all resources.  Will call on_detach if
@@ -264,20 +267,28 @@ extern result_t create_child_window(handle_t parent, const rect_t *bounds, wndpr
 extern result_t close_window(handle_t hwnd);
 /**
  * @function get_window_rect(handle_t window, rect_t *rect)
- * Return the window rectangle in relation to the parent window
+ * Return the window rectangle 
  * @param window  Window to return
  * @param rect    pointer to the rectangle
  * @return s_ok if returned
  */
 extern result_t get_window_rect(handle_t window, rect_t *rect);
 /**
-* @function set_window_rect(handle_t window, rect_t *rect)
+* @function get_window_pos(handle_t window, rect_t *rect)
+* Return the window rectangle in relation to the parent window
+* @param window  Window to return
+* @param rect    pointer to the rectangle
+* @return s_ok if returned
+*/
+extern result_t get_window_pos(handle_t window, rect_t *rect);
+/**
+* @function set_window_pos(handle_t window, rect_t *rect)
 * set the window rectangle in relation to the parent window
 * @param window  window to move
 * @param rect    pointer to the rectangle
 * @return s_ok if returned
 */
-extern result_t set_window_rect(handle_t window, rect_t *rect);
+extern result_t set_window_pos(handle_t window, rect_t *rect);
 /**
  * @function get_wnddata(handle_t window, void **wnd_data)
  * Get stream associated with a window
