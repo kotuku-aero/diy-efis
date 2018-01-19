@@ -236,6 +236,10 @@ static result_t set_zorder(handle_t hwnd, const variant_t *value)
   return s_ok;
   }
 
+static canmsg_t create_msg = {
+  .id = id_create
+  };
+
 result_t create_child_widget(handle_t parent, memid_t key, wndproc cb, handle_t *hwnd)
   {
   result_t result;
@@ -326,7 +330,7 @@ result_t create_child_widget(handle_t parent, memid_t key, wndproc cb, handle_t 
       }
     }
   
-  return s_ok;
+  return send_message(*hwnd, &create_msg);
   }
 
 result_t lookup_enum(memid_t key,

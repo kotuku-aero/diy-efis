@@ -576,10 +576,6 @@ static canmsg_t close_msg = {
   .id = id_close
   };
 
-static canmsg_t create_msg = {
-  .id = id_create
-  };
-
 result_t close_window(handle_t hwnd)
   {
   result_t result;
@@ -641,10 +637,7 @@ result_t create_window(handle_t hwnd_parent, const rect_t *bounds, wndproc cb, u
   if (failed(result = make_window(hwnd_parent, bounds, cb, id, canvas, hwnd)))
     return result;
 
-  if (failed(result = attach_ion_to_window(*hwnd)))
-    return result;
-
-  return send_message(*hwnd, &create_msg);
+  return attach_ion_to_window(*hwnd);
   }
 
 result_t create_child_window(handle_t hwnd_parent, const rect_t *bounds,
@@ -671,12 +664,7 @@ result_t create_child_window(handle_t hwnd_parent, const rect_t *bounds,
   if (failed(result = make_window(hwnd_parent, bounds, cb, id, canvas, hwnd)))
     return result;
 
-  if (failed(result = attach_ion_to_window(*hwnd)))
-    return result;
-
-  send_message(*hwnd, &create_msg);
-
-  return s_ok;
+  return attach_ion_to_window(*hwnd);
   }
 
 result_t get_parent(handle_t window, handle_t *parent)
