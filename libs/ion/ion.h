@@ -65,6 +65,23 @@ extern "C" {
   extern const char *event_key;
   extern const char *ion_name;
 
+typedef struct _event_registration_t {
+  uint16_t can_id;
+  const char *function_name;
+} event_registration_t;
+/**
+ * @function add_event_handler(const char *script, const uint16_t *ids, uint16_t num_ids)
+ * Utility function to register an event handler that will be processed by the ion engine.
+ * @param name      Name of the javascript file.
+ * @param script    Text of the javascript to be stored.
+ * @param ids       Array of can-id's and function names to be registered
+ * @param num_ids   Number of events to be hooked
+ * @return s_ok if the events can be registered ok
+ * @remark This is primarily used by embedded devices to register their default event scripts
+ */
+extern result_t add_event_handler(const char *name, const char *script, const event_registration_t *ids, uint16_t num_ids);
+
+
 #ifdef __cplusplus
   }
 #endif

@@ -88,6 +88,21 @@ result_t ion_init()
   memset(scripts, 0, sizeof(ion_context_t *) * NUM_SCRIPTS);
   num_scripts = NUM_SCRIPTS;
 
+  // create the ion keys
+  memid_t ion_home;
+  if (failed(result = reg_open_key(0, ion_key, &ion_home)))
+    {
+    if (failed(result = reg_create_key(0, ion_key, &ion_home)))
+      return result;
+    }
+
+  memid_t parent;
+  if (failed(result = reg_open_key(ion_home, event_key, &parent)))
+    {
+    if (failed(result = reg_create_key(ion_home, event_key, &parent)))
+      return result;
+    }
+
   return s_ok;
   }
 
@@ -467,17 +482,11 @@ result_t ion_run(ion_register_fn lib_funcs)
   // enumerate the ion keys
   memid_t ion_home;
   if(failed(result = reg_open_key(0, ion_key, &ion_home)))
-    {
-    if(failed(result = reg_create_key(0, ion_key, &ion_home)))
-      return result;
-    }
+    return result;
   
   memid_t parent;
   if(failed(result = reg_open_key(ion_home, event_key, &parent)))
-    {
-    if(failed(result = reg_create_key(ion_home, event_key, &parent)))
-      return result;
-    }
+    return result;
   
   field_datatype dt = field_key;
   char event_name[REG_NAME_MAX+1];
@@ -612,3 +621,40 @@ result_t ion_run(ion_register_fn lib_funcs)
   return s_ok;
   }
 
+result_t add_event_handler(const char *name, const char *script, const event_registration_t *ids, uint16_t num_ids)
+  {
+  result_t result;
+  memid_t ion_home;
+  if (failed(result = reg_open_key(0, ion_key, &ion_home)))
+    return result;
+
+  memid_t parent;
+  if (failed(result = reg_open_key(ion_home, event_key, &parent)))
+    return result;
+
+  stream_p stream;
+  // store the script
+  if (failed(result = stream_create(ion_home, name, &stream)))
+    return result;
+
+  // write the script to the stream.
+  if (failed(result = stream_write(stream, script, strlen(script) + 1)))
+    return result;
+
+  // now hook the handlers
+  while (num_ids--)
+    {
+    char event_name[REG_NAME_MAX];
+    snprintf(event_name, REG_NAME_MAX, "%d", ids->can_id);
+
+    char path[REG_STRING_MAX];
+    snprintf(path, REG_STRING_MAX, "../%s", name);
+
+    if (failed(result = reg_set_string(parent, event_name, path)))
+      return result;
+
+    ids++;
+    }
+
+  return s_ok;
+  }

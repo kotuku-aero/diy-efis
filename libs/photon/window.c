@@ -41,7 +41,7 @@ extern result_t register_photon_functions(duk_context *ctx, handle_t co);
 
 static const char *datatype_prop = "datatype";
 static const char *func_prop = "func";
-static const char *hwnd_prop = "hwnd";
+const char *handle_prop = "handle";
 
 // TODO: we can now attach global functions to the script using a callback.
 // expose the window specific JS functions
@@ -245,7 +245,7 @@ static result_t attach_ion_to_window(handle_t hwnd)
 
   // put the hwnd property
   duk_push_pointer(ctx, hwnd);
-  duk_put_prop_string(ctx, obj_idx, hwnd_prop);
+  duk_put_prop_string(ctx, obj_idx, handle_prop);
 
   // add the methods
   duk_put_function_list(ctx, obj_idx, lib_window_funcs);
@@ -260,12 +260,12 @@ static result_t attach_ion_to_window(handle_t hwnd)
   return s_ok;
   }
 
-result_t get_hwnd(duk_context *ctx, duk_int_t obj_idx, handle_t *phwnd)
+result_t get_handle(duk_context *ctx, duk_int_t obj_idx, handle_t *phwnd)
   {
   if (ctx == 0 || phwnd == 0)
     return e_bad_parameter;
   
-  if (!duk_get_prop_string(ctx, obj_idx, hwnd_prop))
+  if (!duk_get_prop_string(ctx, obj_idx, handle_prop))
     return e_not_found;
 
   *phwnd = duk_get_pointer(ctx, -1);
@@ -895,7 +895,7 @@ static duk_ret_t photon_setter(duk_context *ctx)
   duk_push_this(ctx);
   // and get the magic number
   handle_t hwnd;
-  if (failed(get_hwnd(ctx, -1, &hwnd)))
+  if (failed(get_handle(ctx, -1, &hwnd)))
     return DUK_RET_TYPE_ERROR;
 
   duk_push_current_function(ctx);
@@ -952,7 +952,7 @@ static duk_ret_t photon_getter(duk_context *ctx)
   duk_push_this(ctx);
   // and get the magic number
   handle_t hwnd;
-  if (failed(get_hwnd(ctx, -1, &hwnd)))
+  if (failed(get_handle(ctx, -1, &hwnd)))
     return DUK_RET_TYPE_ERROR;
 
   duk_push_current_function(ctx);

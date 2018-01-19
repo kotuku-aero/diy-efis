@@ -1517,3 +1517,51 @@ result_t neutron_init(const neutron_parameters_t *params, bool init_mode)
                      publish_task, 0,
                      NORMAL_PRIORITY, &task_handle);
   }
+
+result_t define_datapoint(uint16_t can_id, uint16_t rate, uint16_t type, uint16_t boxcar_length, bool loopback, bool publish)
+  {
+  result_t result;
+  memid_t publisher_key;
+  result = reg_open_key(0, s_publisher_key, &publisher_key);
+
+  if(result == e_path_not_found)
+    result = reg_create_key(0, s_publisher_key, &publisher_key);
+
+  if (failed(result))
+    return result;
+
+  char name[REG_NAME_MAX + 1];
+  snprintf(name, REG_NAME_MAX, "%d", can_id);
+
+  // see if the datapoint exists
+  memid_t datapoint_key;
+  if (succeeded(reg_open_key(publisher_key, name, &datapoint_key)))
+    return e_exists;
+
+  // create the key
+  if (failed(result = reg_create_key(publisher_key, name, &datapoint_key)))
+    return result;
+
+  if (failed(result = reg_set_uint16(datapoint_key, s_rate_value, rate)))
+    return result;
+
+  if (failed(result = reg_set_uint16(datapoint_key, s_sample_type_value, type)))
+    return result;
+
+  // just average the values published
+  if (failed(result = reg_set_uint16(datapoint_key, s_filter_type_value, boxcar_length > 0 ? ft_boxcar : ft_none)))
+    return result;
+
+  if (boxcar_length > 0 &&
+    failed(result = reg_set_uint16(datapoint_key, s_filter_length_value, boxcar_length)))
+    return result;
+
+  if (failed(result = reg_set_bool(datapoint_key, s_loopback_value, loopback)))
+    return result;
+
+  if (failed(result = reg_set_bool(datapoint_key, s_publish_value, publish)))
+    return result;
+
+  // and start the datapoint running
+  return load_datapoint(published_datapoints, can_id, datapoint_key);
+  }

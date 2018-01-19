@@ -1043,6 +1043,21 @@ extern result_t get_datapoint_uint32(uint16_t id, uint32_t *value);
  */
 extern result_t get_datapoint_float(uint16_t id, float *value);
 
+/**
+ * @function define_datapoint(uint16_t can_id, uint16_t rate, uint16_t type, uint16_t boxcar_length, bool loopback, bool publish)
+ * Utility function to create a published datapoint.  Primarily used by embedded devices to quickly set
+ * up the registry to publish simple data.
+ * @param can_id      Id to publish.
+ * @param rate        Milli-seconds between published data
+ * @param type        One of the CANAS_DATATYPE_ constants, generally only the simple numeric ones are supported (FLOAT, SHORT...)
+ * @param boxcar_length Optional (if > 0) simple boxcar filter length.  Allows for simple filtering.
+ * @param loopback    True if the datapoint is also published internally
+ * @param publish     True if the datapoint is published to the can-bus
+ * @return s_ok if the datapoint is published.
+ * @remark If the datapoint can be created, the publisher is notified immediately of the new datapoint
+ */
+extern result_t define_datapoint(uint16_t can_id, uint16_t rate, uint16_t type, uint16_t boxcar_length, bool loopback, bool publish);
+
 #define numelements(a) (sizeof(a) / sizeof(a[0]))
 
 #define NO_WAIT 0

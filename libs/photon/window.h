@@ -204,7 +204,7 @@ extern result_t add_property(handle_t hwnd, const char *property_name, getter_fn
 
 extern result_t get_canvas(handle_t hwnd, canvas_t **canvas);
 
-extern result_t get_hwnd(duk_context *ctx, duk_int_t obj_idx, handle_t *phwnd);
+extern result_t get_handle(duk_context *ctx, duk_int_t obj_idx, handle_t *phwnd);
 
 #ifdef __cplusplus
 }

@@ -50,7 +50,7 @@ The window has properties:
   next
   previous
   z_order
-  canvas
+  handle
 
 also has methods
   invalidate
@@ -84,7 +84,7 @@ the following methods can be over-ridden
 typical structure of a duk photon application.
 
   function on_menu_show(this) {
-    this.canvas.rectangle(this.left, this.top. this.right, this.bottom, color.black);
+    this.handle.rectangle(this.left, this.top. this.right, this.bottom, color.black);
     -- more rendering here --
   }
   var menu = create_window(screen, screen.left, screen.top, screen.right, screen.bottom);
@@ -94,13 +94,13 @@ typical structure of a duk photon application.
 
 /////////////////////////////////////////////////////////////////
 //
-// canvas object
+// handle object
 
 static const char *prop_clip_rect = "clip_rect";
 static const char *prop_pen = "pen";
-static const char *prop_pen_color = "color";
-static const char *prop_pen_width = "width";
-static const char *prop_pen_style = "style";
+static const char *prop_color = "color";
+static const char *prop_width = "width";
+static const char *prop_style = "style";
 static const char *prop_x = "x";
 static const char *prop_y = "y";
 
@@ -171,53 +171,54 @@ static result_t get_rect(duk_context *ctx, duk_int_t obj_idx, rect_t *rect)
  @param obj_idx index of the object
  @param pt        resulting point
  */
-static result_t get_point(duk_context *ctx, duk_int_t stk_bot, duk_int_t obj_idx, point_t *pt)
+
+static result_t get_point(duk_context *ctx, duk_int_t obj_idx, point_t *pt)
   {
   pt->x = 0;
   pt->y = 0;
 
   // obj is x : value, y: value
-  duk_push_lstring(ctx, prop_x, 0);
-  if (!duk_get_prop(ctx, obj_idx))
-    {
-    duk_pop(ctx);
-    return s_ok;
-    }
-  pt->x = (gdi_dim_t)duk_get_int(ctx, stk_bot -1);
+  if (!duk_get_prop_string(ctx, obj_idx, prop_x))
+    return e_bad_parameter;
+
+  pt->x = (gdi_dim_t)duk_get_int(ctx, -1);
   duk_pop(ctx);
 
-  duk_push_string(ctx, prop_y, 0);
-  if (!duk_get_prop(ctx, obj_idx))
-    {
-    duk_pop(ctx);
-    return s_ok;
-    }
-  pt->y = (gdi_dim_t)duk_get_int(ctx, -2);
+  if (!duk_get_prop_string(ctx, obj_idx, prop_y))
+    return e_bad_parameter;
+
+  pt->y = (gdi_dim_t)duk_get_int(ctx, -1);
   duk_pop(ctx);
 
   return s_ok;
   }
 
-// TODO figure this out
-static result_t get_points(duk_context *ctx, duk_int_t stk_bot, duk_int_t obj_idx, point_t **pts, uint16_t *len)
+static result_t get_points(duk_context *ctx, duk_int_t param, point_t **pts, uint16_t *len)
   {
+  if (ctx == 0 || pts == 0 || len == 0)
+    return e_bad_parameter;
+
   *pts = 0;
   *len = 0;
   // first determine how many points;
+  *len = duk_get_length(ctx, param);
 
   // allocate space
-  *pts = neutron_malloc(sizeof(point_t) * *len);
+  *pts = (point_t *)neutron_malloc(sizeof(point_t) * *len);
+
+  memset(*pts, 0, sizeof(point_t) * *len);
 
   // read the points from the property.
   uint16_t idx;
   for (idx = 0; idx < *len; idx++)
     {
     // read the array value
-    if (!duk_get_prop_index(ctx, obj_idx, idx))
+    if (!duk_get_prop_index(ctx, param, idx))
       continue;
 
+    // should be an object with x: and y:
     // get the point
-    if (failed(get_point(ctx, stk_bot, stk_bot -1, &(*pts)[idx])))
+    if (failed(get_point(ctx, -1, &(*pts)[idx])))
       {
       neutron_free(*pts);
       *pts = 0;
@@ -228,8 +229,8 @@ static result_t get_points(duk_context *ctx, duk_int_t stk_bot, duk_int_t obj_id
   return s_ok;
   }
 
-// return the currently selected font
-static result_t get_font(duk_context *ctx, duk_int_t stk_bot, duk_int_t obj_idx, handle_t *font)
+// return the currently selected font as name, size
+static result_t get_font(duk_context *ctx, duk_int_t param, handle_t *font)
   {
 
   return s_ok;
@@ -243,18 +244,17 @@ a constant is:
 or
 #AARRGGBB
 */
-static const char *prop_color = "color";
-static const char *prop_background = "background";
 
-static color_t get_color(duk_context *ctx, duk_int_t stk_bot, duk_int_t obj_idx, const char *prop_name)
+static result_t get_color(duk_context *ctx, duk_int_t param, color_t *color)
   {
+  if (ctx == 0 || color == 0)
+    return e_bad_parameter;
+
   color_t result = color_hollow;
-  // return the foreground color, or background color
-  duk_push_string(ctx, prop_name);
-  if (duk_get_prop(ctx, -1) > 0)
+  if (duk_is_string(ctx, param))
     {
     duk_size_t color_len = 0;
-    const char *color = duk_get_lstring(ctx, obj_idx, &color_len);
+    const char *color = duk_get_lstring(ctx, param, &color_len);
     if (color_len > 0 && color != 0)
       {
       // see what color it is
@@ -337,269 +337,249 @@ static color_t get_color(duk_context *ctx, duk_int_t stk_bot, duk_int_t obj_idx,
         result = color_hollow;
       }
     }
+  else if (duk_is_number(ctx, param))
+    result = duk_require_int(ctx, param);
+  else
+    return e_bad_type;
 
-  duk_pop(ctx);
-
-  return result;
+  *color = result;
+  return s_ok;
   }
 
 // return the pen array and its values
-static result_t get_pen(duk_context *ctx, duk_int_t stk_bot, duk_int_t obj_idx, pen_t *pen)
-{
+static result_t get_pen(duk_context *ctx, duk_int_t param, pen_t *pen)
+  {
+  result_t result;
   // obj is color : value, width: value
-  duk_push_lstring(ctx, prop_pen_width, 0);
-  if (!duk_get_prop(ctx, obj_idx))
-  {
-    duk_pop(ctx);
-    return s_ok;
-  }
-  pen->width = (gdi_dim_t)duk_get_int(ctx, stk_bot - 1);
-  duk_pop(ctx);
+  if (ctx == 0 || pen == 0 || !duk_is_object(ctx, param))
+    return e_bad_parameter;
 
-  duk_push_string(ctx, prop_pen_style, 0);
-  if (!duk_get_prop(ctx, obj_idx))
-  {
-    duk_pop(ctx);
-    return s_ok;
-  }
-  pen->style = (gdi_dim_t)duk_get_int(ctx, -2);
-  duk_pop(ctx);
+  // get the object that is passed
+  if (!duk_is_object(ctx, param))
+    return e_bad_parameter;
 
-  pen->color = get_color(ctx, stk_bot, obj_idx, prop_pen_color);
+  // two params
+  if (duk_has_prop_string(ctx, param, prop_color))
+    {
+    duk_get_prop_string(ctx, param, prop_color);
+    result = get_color(ctx, -1, &pen->color);
+    duk_pop(ctx);
+    if (failed(result))
+      return result;
+    }
+  else
+    pen->color = color_hollow;
+
+  if (duk_has_prop_string(ctx, param, prop_width))
+    {
+    duk_get_prop_string(ctx, param, prop_width);
+    pen->width = duk_get_int(ctx, -1);
+    duk_pop(ctx);
+    }
+  else
+    pen->width = 1;
+
+  pen->style = ps_solid;
 
   return s_ok;
 }
 
+// passed in: array[](object x:, y:), object(width: , color:)
 static duk_ret_t lib_polyline(duk_context *ctx)
   {
   duk_ret_t retval = 0;
   // get our context
   duk_push_this(ctx);
+  result_t result;
   // and get the magic number
-  handle_t canvas; 
-  if(failed(get_hwnd(ctx, -1, &canvas)))
+  handle_t handle; 
+  result = get_handle(ctx, -1, &handle);
+  duk_pop(ctx);
+
+  if (failed(result))
     return DUK_RET_TYPE_ERROR;
 
   // get the clipping rectangle.
   rect_t clip_rect;
-
-  if (failed(duk_get_clip_rect(ctx, -1, -1, &clip_rect)))
-    {
-    duk_pop(ctx);
+  if (failed(get_window_rect(handle, &clip_rect)))
     return DUK_RET_TYPE_ERROR;
-    }
 
   pen_t pen;
-  if (failed(get_pen(ctx, -1, -1, &pen)))
-    {
-    duk_pop(ctx);
+  if (failed(get_pen(ctx, 1, &pen)))
     return DUK_RET_TYPE_ERROR;
-    }
 
   point_t *pts = 0;
   uint16_t len = 0;
-  if (failed(get_points(ctx, -1, -1, &pts, &len)))
-    {
-    duk_pop(ctx);
+  if (failed(get_points(ctx, 0, &pts, &len)))
     return DUK_RET_TYPE_ERROR;
-    }
 
-  if (failed(polyline(canvas, &clip_rect, &pen, len, pts)))
+  if (failed(polyline(handle, &clip_rect, &pen, len, pts)))
     retval = DUK_RET_TYPE_ERROR;
 
-  duk_pop(ctx);
   neutron_free(pts);
 
   return retval;
   }
 
-// this.ellipse(left, top, right, bottom)
+// this.ellipse(left, top, right, bottom, fill_color, pen)
 static duk_ret_t lib_ellipse(duk_context *ctx)
   {
-  duk_ret_t retval = 0;
   // get our context
   duk_push_this(ctx);
+  result_t result;
   // and get the magic number
-  handle_t canvas;
-  if (failed(get_hwnd(ctx, -1, &canvas)))
+  handle_t handle;
+  result = get_handle(ctx, -1, &handle);
+  duk_pop(ctx);
+
+  if (failed(result))
     return DUK_RET_TYPE_ERROR;
- 
+
   // get the clipping rectangle.
   rect_t clip_rect;
 
-  if (failed(duk_get_clip_rect(ctx, -1, -1, &clip_rect)))
-    {
-    duk_pop(ctx);
+  if (failed(get_window_rect(handle, &clip_rect)))
     return DUK_RET_TYPE_ERROR;
-    }
 
   pen_t pen;
-  if (failed(get_pen(ctx, -1, -1, &pen)))
-    {
-    duk_pop(ctx);
+  if (failed(get_pen(ctx, 2, &pen)))
     return DUK_RET_TYPE_ERROR;
-    }
 
-  color_t fill_color = get_color(ctx, -1, -1, true);
+  color_t fill_color;
+  
+  if (failed(get_color(ctx, 2, &fill_color)))
+    fill_color = color_hollow;
 
   rect_t rect;
   if (failed(get_rect(ctx, 0, &rect)))
-    {
-    duk_pop(ctx);
     return DUK_RET_TYPE_ERROR;
-    }
 
-  if (failed(ellipse(canvas, &clip_rect, &pen, fill_color, &rect)))
-    {
-    duk_pop(ctx);
+  if (failed(ellipse(handle, &clip_rect, &pen, fill_color, &rect)))
     return DUK_RET_TYPE_ERROR;
+
+  return 0;
   }
 
-  return retval;
-  }
-
-// this.polygon([[x:0,y:0],[x:100,y:0],[x:100,y:100],[x:0,y:100],[x:0,y:0]]) 
+// this.polygon([[x:0,y:0],[x:100,y:0],[x:100,y:100],[x:0,y:100],[x:0,y:0]], color, pen) 
 static duk_ret_t lib_polygon(duk_context *ctx)
   {
   duk_ret_t retval = 0;
   // get our context
   duk_push_this(ctx);
+  result_t result;
   // and get the magic number
-  handle_t canvas = (handle_t)duk_get_magic(ctx, 0);
+  handle_t handle;
+  result = get_handle(ctx, -1, &handle);
+  duk_pop(ctx);
+
+  if (failed(result))
+    return DUK_RET_TYPE_ERROR;
 
   // get the clipping rectangle.
   rect_t clip_rect;
 
-  if (failed(duk_get_clip_rect(ctx, -1, -1, &clip_rect)))
-    {
-    duk_pop(ctx);
+  if (failed(get_window_rect(handle, &clip_rect)))
     return DUK_RET_TYPE_ERROR;
-    }
 
   pen_t pen;
-  if (failed(get_pen(ctx, -1, -1, &pen)))
-    {
-    duk_pop(ctx);
+  if (failed(get_pen(ctx, 2, &pen)))
     return DUK_RET_TYPE_ERROR;
-  }
 
-  color_t fill_color = get_color(ctx, -1, -1, prop_background);
+  color_t fill_color;
+  
+  if (failed(get_color(ctx, 1, &fill_color)))
+    fill_color = color_hollow;
 
   point_t *pts = 0;
   uint16_t len = 0;
   if (failed(get_points(ctx, -1, 0, &pts, &len)))
-    {
-    duk_pop(ctx);
     return DUK_RET_TYPE_ERROR;
-    }
 
-  if (failed(polygon(canvas, &clip_rect, &pen, fill_color, len, pts)))
+  if (failed(polygon(handle, &clip_rect, &pen, fill_color, len, pts)))
     retval = DUK_RET_TYPE_ERROR;
 
-  duk_pop(ctx);
   neutron_free(pts);
 
   return retval;
   }
 
-// this.rectangle(left, top, right, bottom)
+// this.rectangle(left, top, right, bottom, fill_color)
 static duk_ret_t lib_rectangle(duk_context *ctx)
   {
   duk_ret_t retval = 0;
   // get our context
   duk_push_this(ctx);
+  result_t result;
   // and get the magic number
-  handle_t canvas;
-  if (failed(get_hwnd(ctx, -1, &canvas)))
-    return DUK_RET_TYPE_ERROR;
-
+  handle_t handle;
+  result = get_handle(ctx, -1, &handle);
+  duk_pop(ctx);
 
   // get the clipping rectangle.
   rect_t clip_rect;
 
-  if (failed(duk_get_clip_rect(ctx, -1, -1, &clip_rect)))
+  if (failed(get_window_rect(handle, &clip_rect)))
     {
     duk_pop(ctx);
     return DUK_RET_TYPE_ERROR;
   }
 
-  pen_t pen;
-  if (failed(get_pen(ctx, -1, -1, &pen)))
-    {
-    duk_pop(ctx);
-    return DUK_RET_TYPE_ERROR;
-    }
-
-  color_t fill_color = get_color(ctx, -1, -1, prop_background);
+  color_t fill_color;
+  
+  if (failed(get_color(ctx, 4, &fill_color)))
+    fill_color = color_hollow;
 
   rect_t rect;
   if (failed(get_rect(ctx, 0, &rect)))
-    {
-    duk_pop(ctx);
     return DUK_RET_TYPE_ERROR;
-    }
 
-  if (failed(rectangle(canvas, &clip_rect, &pen, fill_color, &rect)))
-    {
-    duk_pop(ctx);
+  if (failed(rectangle(handle, &clip_rect, 0, fill_color, &rect)))
     return DUK_RET_TYPE_ERROR;
-    }
 
-  return retval;
+  return 0;
   }
 
-// this.round_rect(left, top, right, bottom, radius)
+// this.round_rect(left, top, right, bottom, radius, fill_color, outline_pen)
 static duk_ret_t lib_round_rect(duk_context *ctx)
   {
-  duk_ret_t retval = 0;
   // get our context
   duk_push_this(ctx);
+  result_t result;
   // and get the magic number
-  handle_t canvas;
-  if (failed(get_hwnd(ctx, -1, &canvas)))
-    return DUK_RET_TYPE_ERROR;
+  handle_t handle;
+  result = get_handle(ctx, -1, &handle);
+  duk_pop(ctx);
 
+  if (failed(result))
+    return DUK_RET_TYPE_ERROR;
 
   // get the clipping rectangle.
   rect_t clip_rect;
 
-  if (failed(duk_get_clip_rect(ctx, -1, -1, &clip_rect)))
-    {
-    duk_pop(ctx);
+  if (failed(get_window_rect(handle, &clip_rect)))
     return DUK_RET_TYPE_ERROR;
-    }
 
   pen_t pen;
-  if (failed(get_pen(ctx, -1, -1, &pen)))
-    {
-    duk_pop(ctx);
+  if (failed(get_pen(ctx, 6, &pen)))
     return DUK_RET_TYPE_ERROR;
-    }
 
-  color_t fill_color = get_color(ctx, -1, -1, prop_background);
+  color_t fill_color;
+  if (failed(get_color(ctx, 5, &fill_color)))
+    fill_color = color_hollow;
 
   rect_t rect;
   if (failed(get_rect(ctx, 0, &rect)))
-    {
-    duk_pop(ctx);
     return DUK_RET_TYPE_ERROR;
-    }
 
-  if (failed(round_rect(canvas, &clip_rect, &pen, fill_color, &rect, (gdi_dim_t) duk_get_int(ctx, 4))))
-    {
-    duk_pop(ctx);
+  if (failed(round_rect(handle, &clip_rect, &pen, fill_color, &rect, (gdi_dim_t) duk_get_int(ctx, 4))))
     return DUK_RET_TYPE_ERROR;
+
+  return 0;
   }
 
-  return retval;
-  }
-
-// bit_blt(handle_t canvas, const rect_t *clip_rect, const rect_t *dest_rect, handle_t src_canvas, const rect_t *src_clip_rect, const point_t *src_pt)
 // this.bit_blt(left, top, right, bottom, canvas, [x:0, y:0])
 static duk_ret_t lib_bit_blt(duk_context *ctx)
   {
-  duk_ret_t retval = 0;
-
   if (duk_get_top(ctx) < 5)
     return DUK_RET_TYPE_ERROR;
 
@@ -608,29 +588,29 @@ static duk_ret_t lib_bit_blt(duk_context *ctx)
 
   // get our context
   duk_push_this(ctx);
+  result_t result;
   // and get the magic number
-  handle_t canvas;
-  if (failed(get_hwnd(ctx, -1, &canvas)))
-    return DUK_RET_TYPE_ERROR;
+  handle_t handle;
+  result = get_handle(ctx, -1, &handle);
+  duk_pop(ctx);
 
+  if (failed(result))
+    return DUK_RET_TYPE_ERROR;
 
   // get the clipping rectangle.
   rect_t clip_rect;
 
-  if (failed(duk_get_clip_rect(ctx, -1, -1, &clip_rect)))
-    {
-    duk_pop(ctx);
+  if (failed(get_window_rect(handle, &clip_rect)))
     return DUK_RET_TYPE_ERROR;
-    }
 
-  pen_t pen;
-  if (failed(get_pen(ctx, -1, -1, &pen)))
-    {
-    duk_pop(ctx);
+  // get the source canvas
+  duk_get_prop(ctx, 4);
+  handle_t src_canvas;
+  result = get_handle(ctx, -1, &src_canvas);
+  duk_pop(ctx);
+
+  if (failed(result))
     return DUK_RET_TYPE_ERROR;
-    }
-
-  color_t fill_color = get_color(ctx, -1, -1, prop_background);
 
   rect_t rect;
   if (failed(get_rect(ctx, 0, &rect)))
@@ -639,72 +619,56 @@ static duk_ret_t lib_bit_blt(duk_context *ctx)
     return DUK_RET_TYPE_ERROR;
     }
 
-  handle_t src_canvas;
   rect_t src_rect;
+  extent_t ex;
+  get_canvas_extents(src_canvas, &ex);
+  src_rect.left = 0;
+  src_rect.top = 0;
+  src_rect.right = ex.dx;
+  src_rect.bottom = ex.dy;
+
   point_t src_pt = { 0, 0 };
-
-  // get the property that is the canvas
-  if (failed(duk_get_prop(ctx, 4)))
-    {
-    duk_pop(ctx);
-    return DUK_RET_TYPE_ERROR;
-    }
-
-  if (failed(duk_get_clip_rect(ctx, -2, -2, &src_rect)))
-    {
-    duk_pop(ctx);
-    duk_pop(ctx);
-    return DUK_RET_TYPE_ERROR;
-    }
   
-  if (duk_get_top(ctx) >= 6)
-    get_point(ctx, -2, 5, &src_pt);
+  get_point(ctx, 5, &src_pt);
   
-  if (failed(bit_blt(canvas, &clip_rect, &rect, src_canvas, &src_rect, &src_pt)))
-    retval = DUK_RET_TYPE_ERROR;
+  if (failed(bit_blt(handle, &clip_rect, &rect, src_canvas, &src_rect, &src_pt)))
+    return DUK_RET_TYPE_ERROR;
 
-  duk_pop(ctx);
-  duk_pop(ctx);
-
-  return retval;
+  return 0;
   }
 
 static duk_ret_t lib_get_pixel(duk_context *ctx)
   {
   duk_ret_t retval = 0;
 
-  if (duk_get_top(ctx) < 1)
+  if (duk_get_top(ctx) != 1)
     return DUK_RET_TYPE_ERROR;
 
   // get our context
   duk_push_this(ctx);
+  result_t result;
   // and get the magic number
-  handle_t canvas;
-  if (failed(get_hwnd(ctx, -1, &canvas)))
-    return DUK_RET_TYPE_ERROR;
+  handle_t handle;
+  result = get_handle(ctx, -1, &handle);
+  duk_pop(ctx);
 
+  if (failed(result))
+    return DUK_RET_TYPE_ERROR;
 
   // get the clipping rectangle.
   rect_t clip_rect;
 
-  if (failed(duk_get_clip_rect(ctx, -1, -1, &clip_rect)))
-    {
-    duk_pop(ctx);
+  if (failed(get_window_rect(handle, &clip_rect)))
     return DUK_RET_TYPE_ERROR;
-    }
 
   point_t pt;
-  get_point(ctx, -1, 0, &pt);
+  get_point(ctx, 0, &pt);
 
   color_t color;
 
-  if (failed(get_pixel(canvas, &clip_rect, &pt, &color)))
-    {
-    duk_pop(ctx);
+  if (failed(get_pixel(handle, &clip_rect, &pt, &color)))
     return DUK_RET_TYPE_ERROR;
-    }
 
-  duk_pop(ctx);
   duk_push_uint(ctx, color);
 
   return 1;
@@ -712,351 +676,295 @@ static duk_ret_t lib_get_pixel(duk_context *ctx)
 
 static duk_ret_t lib_set_pixel(duk_context *ctx)
   {
-  duk_ret_t retval = 0;
-
   if (duk_get_top(ctx) < 2)
     return DUK_RET_TYPE_ERROR;
 
   // get our context
   duk_push_this(ctx);
+  result_t result;
   // and get the magic number
-  handle_t canvas;
-  if (failed(get_hwnd(ctx, -1, &canvas)))
-    return DUK_RET_TYPE_ERROR;
+  handle_t handle;
+  result = get_handle(ctx, -1, &handle);
+  duk_pop(ctx);
 
+  if (failed(result))
+    return DUK_RET_TYPE_ERROR;
 
   // get the clipping rectangle.
   rect_t clip_rect;
 
-  if (failed(duk_get_clip_rect(ctx, -1, -1, &clip_rect)))
-    {
-    duk_pop(ctx);
+  if (failed(get_window_rect(handle, &clip_rect)))
     return DUK_RET_TYPE_ERROR;
-  }
 
   point_t pt;
-  get_point(ctx, -1, 0, &pt);
+  get_point(ctx, 0, &pt);
 
   color_t color = (color_t)duk_get_uint(ctx, 1);
 
-  if (failed(get_pixel(canvas, &clip_rect, &pt, &color)))
-    retval = DUK_RET_TYPE_ERROR;
+  if (failed(get_pixel(handle, &clip_rect, &pt, &color)))
+    return DUK_RET_TYPE_ERROR;
 
-  duk_pop(ctx);
-
-  return retval;
+  return 0;
   }
 
-// arc(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, const point_t *pt, gdi_dim_t radius, int start, int end)
-// this.arc(center_pt, radius, start, end)
+// arc(handle_t handle, const rect_t *clip_rect, const pen_t *pen, const point_t *pt, gdi_dim_t radius, int start, int end)
+// this.arc(center_pt, radius, start, end, pen)
 static duk_ret_t lib_arc(duk_context *ctx)
   {
-  duk_ret_t retval = 0;
-
-  if (duk_get_top(ctx) != 4)
-    return DUK_RET_TYPE_ERROR;
-
-  // get our context
-  duk_push_this(ctx);
-  // and get the magic number
-  handle_t canvas;
-  if (failed(get_hwnd(ctx, -1, &canvas)))
-    return DUK_RET_TYPE_ERROR;
-
-
-  // get the clipping rectangle.
-  rect_t clip_rect;
-
-  if (failed(duk_get_clip_rect(ctx, -1, -1, &clip_rect)))
-    {
-    duk_pop(ctx);
-    return DUK_RET_TYPE_ERROR;
-    }
-
-  pen_t pen;
-  if (failed(get_pen(ctx, -1, -1, &pen)))
-    {
-    duk_pop(ctx);
-    return DUK_RET_TYPE_ERROR;
-    }
-
-  point_t pt;
-  get_point(ctx, -1, 0, &pt);
-  gdi_dim_t radius = (gdi_dim_t)duk_get_int(ctx, 1);
-  int start = duk_get_int(ctx, 2);
-  int end = duk_get_int(ctx, 3);
-
-  if (failed(arc(canvas, &clip_rect, &pen, &pt, radius, start, end)))
-    retval = DUK_RET_TYPE_ERROR;
-
-  duk_pop(ctx);
-
-  return retval;
-  }
-
-// pie(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, const point_t *pt, int start, int end, gdi_dim_t radii, gdi_dim_t inner)
-// this.pie(centre_pt, start, end, radius, inner)
-static duk_ret_t lib_pie(duk_context *ctx)
-  {
-  duk_ret_t retval = 0;
-
   if (duk_get_top(ctx) != 5)
     return DUK_RET_TYPE_ERROR;
 
   // get our context
   duk_push_this(ctx);
+  result_t result;
   // and get the magic number
-  handle_t canvas;
-  if (failed(get_hwnd(ctx, -1, &canvas)))
-    return DUK_RET_TYPE_ERROR;
+  handle_t handle;
+  result = get_handle(ctx, -1, &handle);
+  duk_pop(ctx);
 
+  if (failed(result))
+    return DUK_RET_TYPE_ERROR;
 
   // get the clipping rectangle.
   rect_t clip_rect;
 
-  if (failed(duk_get_clip_rect(ctx, -1, -1, &clip_rect)))
-    {
-    duk_pop(ctx);
+  if (failed(get_window_rect(handle, &clip_rect)))
     return DUK_RET_TYPE_ERROR;
-    }
 
   pen_t pen;
-  if (failed(get_pen(ctx, -1, -1, &pen)))
-    {
-    duk_pop(ctx);
+  if (failed(get_pen(ctx, 4, &pen)))
     return DUK_RET_TYPE_ERROR;
-  }
-
-  color_t fill = get_color(ctx, -1, -1, prop_background);
 
   point_t pt;
-  get_point(ctx, -1, 0, &pt);
+  get_point(ctx, 0, &pt);
+  gdi_dim_t radius = (gdi_dim_t)duk_get_int(ctx, 1);
+  int start = duk_get_int(ctx, 2);
+  int end = duk_get_int(ctx, 3);
+
+  if (failed(arc(handle, &clip_rect, &pen, &pt, radius, start, end)))
+    return DUK_RET_TYPE_ERROR;
+
+  return 0;
+  }
+
+// pie(handle_t handle, const rect_t *clip_rect, const pen_t *pen, color_t color, const point_t *pt, int start, int end, gdi_dim_t radii, gdi_dim_t inner)
+// this.pie(centre_pt, start, end, radius, inner, fill_color, pen)
+static duk_ret_t lib_pie(duk_context *ctx)
+  {
+  if (duk_get_top(ctx) < 5)
+    return DUK_RET_TYPE_ERROR;
+
+  // get our context
+  duk_push_this(ctx);
+  result_t result;
+  // and get the magic number
+  handle_t handle;
+  result = get_handle(ctx, -1, &handle);
+  duk_pop(ctx);
+
+  if (failed(result))
+    return DUK_RET_TYPE_ERROR;
+
+  // get the clipping rectangle.
+  rect_t clip_rect;
+
+  if (failed(get_window_rect(handle, &clip_rect)))
+    return DUK_RET_TYPE_ERROR;
+
+  pen_t pen;
+  pen_t *outline_pen = 0;
+  if (duk_get_top(ctx) == 7)
+    {
+    if (failed(get_pen(ctx, -1, -1, &pen)))
+      return DUK_RET_TYPE_ERROR;
+    outline_pen = &pen;
+    }  
+
+  color_t fill = color_hollow;
+  if (duk_get_top(ctx) > 5)
+    {
+    if (failed(get_color(ctx, 5, &fill)))
+      return DUK_RET_TYPE_ERROR;
+    }
+
+  point_t pt;
+  get_point(ctx, 0, &pt);
   int start = duk_get_int(ctx, 1);
   int end = duk_get_int(ctx, 2);
   gdi_dim_t radius = (gdi_dim_t)duk_get_int(ctx, 3);
   gdi_dim_t inner = (gdi_dim_t)duk_get_int(ctx, 4);
 
-  if (failed(pie(canvas, &clip_rect, &pen, &pt, fill, start, end, radius, inner)))
-    retval = DUK_RET_TYPE_ERROR;
+  if (failed(pie(handle, &clip_rect, outline_pen, &pt, fill, start, end, radius, inner)))
+    return DUK_RET_TYPE_ERROR;
 
-  duk_pop(ctx);
-
-  return retval;
+  return 0;
   }
 
-// draw_text(handle_t canvas, const rect_t *clip_rect, handle_t  font, color_t fg, color_t bg, const char *str, uint16_t count, const point_t *src_pt, const rect_t *txt_clip_rect, text_flags format, uint16_t *char_widths)
-// this.text(str, point, clip_rect)
+// draw_text(handle_t handle, const rect_t *clip_rect, handle_t  font, color_t fg, color_t bg, const char *str,
+// uint16_t count, const point_t *src_pt, const rect_t *txt_clip_rect, text_flags format, uint16_t *char_widths)
+// this.text(str, font, size, fg, bg, left, top, right, bottom, x, y)
+//
+// str      text to render
+// font     name of font to render
+// size     pixel size of font
+// fg       forground color
+// bg       background color
+// left, top, right, bottom     bounding rectange
+// x, y     point to render from (top left)
 static duk_ret_t lib_draw_text(duk_context *ctx)
   {
-  duk_ret_t retval = 0;
+  if (duk_get_top(ctx) != 11)
+    return DUK_RET_TYPE_ERROR;
 
-  if (duk_get_top(ctx) < 2)
+  if (duk_get_top(ctx) < 5)
     return DUK_RET_TYPE_ERROR;
 
   // get our context
   duk_push_this(ctx);
+  result_t result;
   // and get the magic number
-  handle_t canvas;
-  if (failed(get_hwnd(ctx, -1, &canvas)))
-    return DUK_RET_TYPE_ERROR;
+  handle_t handle;
+  result = get_handle(ctx, -1, &handle);
+  duk_pop(ctx);
 
+  if (failed(result))
+    return DUK_RET_TYPE_ERROR;
 
   // get the clipping rectangle.
   rect_t clip_rect;
 
-  if (failed(duk_get_clip_rect(ctx, -1, -1, &clip_rect)))
-    {
-    duk_pop(ctx);
+  if (failed(get_window_rect(handle, &clip_rect)))
     return DUK_RET_TYPE_ERROR;
-    }
 
-  pen_t pen;
-  if (failed(get_pen(ctx, -1, -1, &pen)))
-    {
-    duk_pop(ctx);
+  color_t fg;
+  if (failed(get_color(ctx, 3, &fg)))
     return DUK_RET_TYPE_ERROR;
-    }
 
-  color_t fill = get_color(ctx, -1, -1, prop_background);
+  color_t bg;
+  if(failed(get_color(ctx, 4, &bg)))
+    return DUK_RET_TYPE_ERROR;
 
   point_t pt;
-  if (failed(get_point(ctx, -1, 1, &pt)))
-    {
-    duk_pop(ctx);
+  if (failed(get_point(ctx, 9, &pt)))
     return DUK_RET_TYPE_ERROR;
-    }
 
   duk_size_t len = 0;
   const char *str = duk_get_lstring(ctx, 0, &len);
 
-  if (len == 0 || str == 0)
-    {
-    duk_pop(ctx);
+  rect_t rect;
+  if(failed(get_rect(ctx, 5, &rect)))
     return DUK_RET_TYPE_ERROR;
-  }
+
+  const char *font_name = duk_get_string(ctx, 1);
+  uint16_t font_size = (uint16_t)duk_get_uint(ctx, 2);
 
   handle_t font = 0;
-
-  if (failed(get_font(ctx, -1, -1, &font)) ||
-    font == 0)
-    {
-    duk_pop(ctx);
+  if(failed(open_font(font_name, font_size, &font)))
     return DUK_RET_TYPE_ERROR;
-    }
 
-  color_t fg = get_color(ctx, -1, -1, prop_color);
-  color_t bg = get_color(ctx, -1, -1, prop_background);
+  text_flags flags = (bg != color_hollow ? eto_opaque : 0);
 
-  rect_t text_clip_rect;
-  rect_t *p_tcr = 0;
-  if (duk_get_top(ctx) > 2)
-    {
-    if (failed(get_rect(ctx, 2, &text_clip_rect)))
-      {
-      duk_pop(ctx);
-      return DUK_RET_TYPE_ERROR;
-      }
-    p_tcr = &text_clip_rect;
-    }
+  if (failed(draw_text(handle, &clip_rect, font, fg, bg, str, len, &pt, &rect, flags, 0)))
+    return DUK_RET_TYPE_ERROR;
 
-  text_flags flags = (bg != color_hollow ? eto_opaque : 0) | (p_tcr != 0 ? eto_clipped : 0);
-
-  if (failed(draw_text(canvas, &clip_rect, font, fg, bg, str, len, &pt, p_tcr, flags, 0)))
-    retval = DUK_RET_TYPE_ERROR;
-
-  duk_pop(ctx);
-
-  return retval;
+  return 0;
   }
 
-// text_extent(handle_t canvas, handle_t  font, const char *str, uint16_t count, extent_t *extent)
-// json ext = this.extent(str)
+// text_extent(handle_t handle, handle_t  font, const char *str, uint16_t count, extent_t *extent)
+// object = this.extent(str, font, pixels)
 static duk_ret_t lib_text_extent(duk_context *ctx)
   {
-  duk_ret_t retval = 0;
-
-  if (duk_get_top(ctx) != 1)
+  if (duk_get_top(ctx) != 3)
     return DUK_RET_TYPE_ERROR;
 
-  // get our context
-  duk_push_this(ctx);
-  // and get the magic number
-  handle_t canvas;
-  if (failed(get_hwnd(ctx, -1, &canvas)))
-    return DUK_RET_TYPE_ERROR;
-
+  const char *font_name = duk_get_string(ctx, 1);
+  uint16_t font_size = (uint16_t)duk_get_uint(ctx, 2);
 
   handle_t font = 0;
-
-  if (failed(get_font(ctx, -1, -1, &font)) ||
-    font == 0)
-    {
-    duk_pop(ctx);
+  if (failed(open_font(font_name, font_size, &font)))
     return DUK_RET_TYPE_ERROR;
-    }
 
-  duk_size_t len = 0;
+  duk_size_t len;
   const char *str = duk_get_lstring(ctx, 0, &len);
 
-  if (len == 0 || str == 0)
-    {
-    duk_pop(ctx);
-    return DUK_RET_TYPE_ERROR;
-    }
-
-  extent_t ex;
-
-  if (failed(text_extent(canvas, font, str, len, &ex)))
-    {
-    duk_pop(ctx);
-    return DUK_RET_TYPE_ERROR;
-    }
-
-  duk_pop(ctx);
-
-  char buf[32];
-  snprintf(buf, 32, "{ dx: %d, dy: %d }", ex.dx, ex.dy);
-
-  duk_push_string(ctx, buf);
-
-  return 1;
-  }
-
-static duk_ret_t lib_get_canvas_width(duk_context *ctx)
-  {
-  if (duk_get_top(ctx) != 1)
-    return DUK_RET_TYPE_ERROR;
-
   // get our context
   duk_push_this(ctx);
+  result_t result;
   // and get the magic number
-  handle_t canvas;
-  if (failed(get_hwnd(ctx, -1, &canvas)))
+  handle_t handle;
+  result = get_handle(ctx, -1, &handle);
+  duk_pop(ctx);
+
+  if (failed(result))
     return DUK_RET_TYPE_ERROR;
 
+  if (len == 0 || str == 0)
+    return DUK_RET_TYPE_ERROR;
 
   extent_t ex;
-  if (failed(get_canvas_extents(canvas, &ex)))
-    {
-    duk_pop(ctx);
+
+  if (failed(text_extent(handle, font, str, len, &ex)))
     return DUK_RET_TYPE_ERROR;
-    }
-  duk_pop(ctx);
+
+  duk_push_object(ctx);
 
   duk_push_int(ctx, ex.dx);
+  duk_put_prop_string(ctx, -2, "dx");
+  duk_push_int(ctx, ex.dy);
+  duk_put_prop_string(ctx, -2, "dy");
 
   return 1;
   }
 
-static duk_ret_t lib_get_canvas_height(duk_context *ctx)
+static duk_ret_t lib_get_extents(duk_context *ctx)
   {
   if (duk_get_top(ctx) != 1)
     return DUK_RET_TYPE_ERROR;
 
   // get our context
   duk_push_this(ctx);
+  result_t result;
   // and get the magic number
-  handle_t canvas;
-  if (failed(get_hwnd(ctx, -1, &canvas)))
-    return DUK_RET_TYPE_ERROR;
-
-
-  extent_t ex;
-  if (failed(get_canvas_extents(canvas, &ex)))
-  {
-    duk_pop(ctx);
-    return DUK_RET_TYPE_ERROR;
-  }
+  handle_t handle;
+  result = get_handle(ctx, -1, &handle);
   duk_pop(ctx);
 
+  extent_t ex;
+  if (failed(get_canvas_extents(handle, &ex)))
+    return DUK_RET_TYPE_ERROR;
+
+  duk_push_object(ctx);
+
+  duk_push_int(ctx, ex.dx);
+  duk_put_prop_string(ctx, -2, "dx");
   duk_push_int(ctx, ex.dy);
+  duk_put_prop_string(ctx, -2, "dy");
 
   return 1;
-}
+  }
 
 const duk_function_list_entry lib_canvas_funcs[] = {
-    { "polyline", lib_polyline, 0 },
-    { "ellipse", lib_ellipse, 0 },
-    { "polygon", lib_polygon, 0 },
-    { "rectangle", lib_rectangle, 0 },
-    { "round_rect", lib_round_rect, 0 },
-    { "bit_blt", lib_bit_blt, 0 },
-    { "get_pixel", lib_get_pixel, 0 },
-    { "set_pixel", lib_set_pixel, 0 },
-    { "arc", lib_arc, 0 },
-    { "pie", lib_pie, 0 },
-    { "draw_text", lib_draw_text, 0 },
-    { "text_extent", lib_text_extent, 0 },
-    { "width", lib_get_canvas_width, 0 },
-    { "height", lib_get_canvas_height, 0 },
+    { "polyline", lib_polyline, 2 },
+    { "ellipse", lib_ellipse, 6 },
+    { "polygon", lib_polygon, 3 },
+    { "rectangle", lib_rectangle, 5 },
+    { "round_rect", lib_round_rect, 7 },
+    { "bit_blt", lib_bit_blt, 6 },
+    { "get_pixel", lib_get_pixel, 1 },
+    { "set_pixel", lib_set_pixel, 2 },
+    { "arc", lib_arc, 5 },
+    { "pie", lib_pie, 7 },
+    { "draw_text", lib_draw_text, 11 },
+    { "text_extent", lib_text_extent, 3 },
+    { "extents", lib_get_extents, 0 },
     { NULL, NULL, 0 }
   };
 
 static duk_ret_t lib_canvas_dtor(duk_context *ctx)
   {
-  handle_t canvas = (handle_t)duk_get_magic(ctx, 0);
+  handle_t handle = (handle_t)duk_get_magic(ctx, 0);
 
-  canvas_close(canvas);
+  canvas_close(handle);
 
   return 0;
   }
@@ -1071,12 +979,14 @@ static duk_ret_t lib_canvas_ctor(duk_context *ctx)
   return 0;
   }
 
-static duk_ret_t create_canvas(duk_context *ctx, handle_t canvas)
+extern const char *handle_prop;
+
+static duk_ret_t create_canvas(duk_context *ctx, handle_t handle)
   {
   // create the object
   // Push special this binding to the function being constructed
   duk_push_c_function(ctx, lib_canvas_ctor, 0);
-  duk_push_object(ctx);
+  duk_idx_t obj_idx = duk_push_object(ctx);
   // Store the function destructor
   duk_push_c_function(ctx, lib_canvas_dtor, 0);
   duk_set_finalizer(ctx, -2);
@@ -1085,7 +995,8 @@ static duk_ret_t create_canvas(duk_context *ctx, handle_t canvas)
   duk_put_function_list(ctx, -1, lib_canvas_funcs);
 
   // add the handle property
-  duk_set_magic(ctx, 0, (duk_int_t)canvas);
+  duk_push_pointer(ctx, handle);
+  duk_put_prop_string(ctx, obj_idx, handle_prop);
 
   return 1;
   }
@@ -1100,15 +1011,15 @@ static duk_ret_t lib_create_rect_canvas(duk_context *ctx)
   ex.dx = duk_get_uint(ctx, 0);
   ex.dy = duk_get_uint(ctx, 1);
 
-  handle_t canvas;
+  handle_t handle;
   result_t result;
-  if (failed(result = create_rect_canvas(&ex, &canvas)))
+  if (failed(result = create_rect_canvas(&ex, &handle)))
     {
     // TODO: throw an exception
     return 0;
     }
 
-  return create_canvas(ctx, canvas);
+  return create_canvas(ctx, handle);
   }
 
 static duk_ret_t lib_create_bitmap_canvas(duk_context *ctx)
@@ -1119,7 +1030,7 @@ static duk_ret_t lib_create_bitmap_canvas(duk_context *ctx)
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Create a canvas
+// Create a handle
 
 static duk_ret_t lib_create_child_window(duk_context *ctx)
   {
