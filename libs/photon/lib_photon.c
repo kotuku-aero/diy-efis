@@ -263,77 +263,77 @@ static result_t get_color(duk_context *ctx, duk_int_t param, color_t *color)
         // is an RGBA value
         result = (color_t)strtoul(color + 1, 0, 16);
         }
-      else if (strcmp(color, "white"))
+      else if (strcmp(color, "white") == 0)
         result = color_white;
-      else if (strcmp(color, "black"))
+      else if (strcmp(color, "black") == 0)
+        result = color_black;
+      else if (strcmp(color, "gray") == 0)
         result = color_gray;
-      else if (strcmp(color, "gray"))
+      else if (strcmp(color, "lightgray") == 0)
         result = color_light_gray;
-      else if (strcmp(color, "lightgray"))
+      else if (strcmp(color, "darkgray") == 0)
         result = color_dark_gray;
-      else if (strcmp(color, "darkgray"))
-        result = color_dark_gray;
-      else if (strcmp(color, "red"))
+      else if (strcmp(color, "red") == 0)
         result = color_red;
-      else if (strcmp(color, "pink"))
+      else if (strcmp(color, "pink") == 0)
         result = color_pink;
-      else if (strcmp(color, "blue"))
+      else if (strcmp(color, "blue") == 0)
         result = color_blue;
-      else if (strcmp(color, "green"))
+      else if (strcmp(color, "green") == 0)
         result = color_green;
-      else if (strcmp(color, "lightgreen"))
+      else if (strcmp(color, "lightgreen") == 0)
         result = color_lightgreen;
-      else if (strcmp(color, "yellow"))
+      else if (strcmp(color, "yellow") == 0)
         result = color_yellow;
-      else if (strcmp(color, "magenta"))
+      else if (strcmp(color, "magenta") == 0)
         result = color_magenta;
-      else if (strcmp(color, "cyan"))
+      else if (strcmp(color, "cyan") == 0)
         result = color_cyan;
-      else if (strcmp(color, "paleyellow"))
+      else if (strcmp(color, "paleyellow") == 0)
         result = color_pale_yellow;
-      else if (strcmp(color, "lightyellow"))
+      else if (strcmp(color, "lightyellow") == 0)
         result = color_light_yellow;
-      else if (strcmp(color, "limegreen"))
+      else if (strcmp(color, "limegreen") == 0)
         result = color_lime_green;
-      else if (strcmp(color, "teal"))
+      else if (strcmp(color, "teal") == 0)
         result = color_teal;
-      else if (strcmp(color, "dark_green"))
+      else if (strcmp(color, "dark_green") == 0)
         result = color_dark_green;
-      else if (strcmp(color, "maroon"))
+      else if (strcmp(color, "maroon") == 0)
         result = color_maroon;
-      else if (strcmp(color, "purple"))
+      else if (strcmp(color, "purple") == 0)
         result = color_purple;
-      else if (strcmp(color, "orange"))
+      else if (strcmp(color, "orange") == 0)
         result = color_orange;
-      else if (strcmp(color, "khaki"))
+      else if (strcmp(color, "khaki") == 0)
         result = color_khaki;
-      else if (strcmp(color, "olive"))
+      else if (strcmp(color, "olive") == 0)
         result = color_olive;
-      else if (strcmp(color, "brown"))
+      else if (strcmp(color, "brown") == 0)
         result = color_brown;
-      else if (strcmp(color, "navy"))
+      else if (strcmp(color, "navy") == 0)
         result = color_navy;
-      else if (strcmp(color, "lightblue"))
+      else if (strcmp(color, "lightblue") == 0)
         result = color_light_blue;
-      else if (strcmp(color, "fadedblue"))
+      else if (strcmp(color, "fadedblue") == 0)
         result = color_faded_blue;
-      else if (strcmp(color, "lightgrey"))
+      else if (strcmp(color, "lightgrey") == 0)
         result = color_lightgrey;
-      else if (strcmp(color, "darkgrey"))
+      else if (strcmp(color, "darkgrey") == 0)
         result = color_darkgrey;
-      else if (strcmp(color, "paleyellow"))
+      else if (strcmp(color, "paleyellow") == 0)
         result = color_paleyellow;
-      else if (strcmp(color, "lightyellow"))
+      else if (strcmp(color, "lightyellow") == 0)
         result = color_lightyellow;
-      else if (strcmp(color, "limegreen"))
+      else if (strcmp(color, "limegreen") == 0)
         result = color_limegreen;
-      else if (strcmp(color, "darkgreen"))
+      else if (strcmp(color, "darkgreen") == 0)
         result = color_darkgreen;
-      else if (strcmp(color, "lightblue"))
+      else if (strcmp(color, "lightblue") == 0)
         result = color_lightblue;
-      else if (strcmp(color, "fadedblue"))
+      else if (strcmp(color, "fadedblue") == 0)
         result = color_fadedblue;
-      else if (strcmp(color, "hollow"))
+      else if (strcmp(color, "hollow") == 0)
         result = color_hollow;
       }
     }
