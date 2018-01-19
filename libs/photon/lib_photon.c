@@ -1034,54 +1034,72 @@ static duk_ret_t lib_create_bitmap_canvas(duk_context *ctx)
 
 static duk_ret_t lib_create_child_window(duk_context *ctx)
   {
-  return 1;
-  }
-
-static duk_ret_t lib_get_parent(duk_context *ctx)
-  {
-  return 1;
+  return DUK_RET_TYPE_ERROR;
   }
 
 static duk_ret_t lib_get_window_by_id(duk_context *ctx)
   {
-  return 1;
-  }
-
-static duk_ret_t lib_get_first_child(duk_context *ctx)
-  {
-  return 1;
+  return DUK_RET_TYPE_ERROR;
   }
 
 static duk_ret_t lib_get_next_sibling(duk_context *ctx)
   {
-  return 1;
+  return DUK_RET_TYPE_ERROR;
   }
 
 static duk_ret_t lib_get_previous_sibling(duk_context *ctx)
   {
-  return 1;
+  return DUK_RET_TYPE_ERROR;
   }
 
 static duk_ret_t lib_begin_paint(duk_context *ctx)
   {
-  return 1;
+  // get our context
+  duk_push_this(ctx);
+  result_t result;
+  // and get the magic number
+  handle_t handle;
+  result = get_handle(ctx, -1, &handle);
+  duk_pop(ctx);
+
+  begin_paint(handle);
+  return 0;
+  return 0;
   }
 
 static duk_ret_t lib_end_paint(duk_context *ctx)
   {
-  return 1;
+  // get our context
+  duk_push_this(ctx);
+  result_t result;
+  // and get the magic number
+  handle_t handle;
+  result = get_handle(ctx, -1, &handle);
+  duk_pop(ctx);
+
+  end_paint(handle);
+  }
+
+static duk_ret_t lib_invalidate(duk_context *ctx)
+  {
+  // get our context
+  duk_push_this(ctx);
+  result_t result;
+  // and get the magic number
+  handle_t handle;
+  result = get_handle(ctx, -1, &handle);
+  duk_pop(ctx);
+
+  invalidate_rect(handle, 0);
+  return 0;
   }
 
 const duk_function_list_entry lib_window_funcs[] = {
+    { "invalidate", lib_invalidate, 0 },
     { "begin_paint", lib_begin_paint, 0 },
     { "end_paint", lib_end_paint, 0 },
-    // create_child_window(x, y, width, height, id)
     { "create_child_window", lib_create_child_window, 5 },
-    // should be a property...
-    { "parent", lib_get_parent, 0},
     { "get_window_by_id", lib_get_window_by_id, 1 },
-    // should be a property
-    { "first_child", lib_get_first_child, 0 },
     { "next_sibling", lib_get_next_sibling, 0 },
     { "previous_sibling", lib_get_previous_sibling, 0 },
     { NULL, NULL, 0 }
