@@ -788,8 +788,8 @@
 #include <stdarg.h>  /* varargs */
 #include <setjmp.h>
 #include <stddef.h>  /* e.g. ptrdiff_t */
-//#include <math.h>
-#include "../gluon/gluon.h"
+#include <math.h>
+//#include "../gluon/gluon.h"
 #include <limits.h>
 
 /* date.h is omitted, and included per platform */
@@ -2333,9 +2333,11 @@ typedef struct duk_hthread duk_context;
 #if !defined(DUK_SQRT)
 #define DUK_SQRT             sqrt
 #endif
+/*
 #if !defined(DUK_LOG2)
 #define DUK_LOG2             log2
 #endif
+ */
 #if !defined(DUK_LOG10)
 #define DUK_LOG10            log10
 #endif

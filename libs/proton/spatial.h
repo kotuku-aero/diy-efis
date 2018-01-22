@@ -37,8 +37,8 @@ it must be removed as soon as possible after the code fragment is identified.
 #define __spatial_h__
 
 #include "../photon/photon.h"
-//#include <math.h>
-#include "../gluon/gluon.h"
+#include <math.h>
+//#include "../gluon/gluon.h"
 
 // this is the external form of a lat/long tuple.
 // always in radians & meters.
