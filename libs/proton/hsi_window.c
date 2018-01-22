@@ -36,7 +36,6 @@ it must be removed as soon as possible after the code fragment is identified.
 #include "../photon/widget.h"
 #include "pens.h"
 #include "spatial.h"
-#include <math.h>
 
 const pen_t track_pen = { color_gray, 1, ps_dot };
 

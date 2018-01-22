@@ -36,7 +36,6 @@ it must be removed as soon as possible after the code fragment is identified.
 */
 
 #include "window.h"
-#include <math.h>
 
 /**
 * @struct window_msg_t
@@ -1246,8 +1245,6 @@ static result_t polygon_intersect(const rect_t *clip_rect, const point_t *pts, u
 
 result_t polyline_impl(canvas_t *canvas, const rect_t *clip_rect, const pen_t *pen, uint16_t count, const point_t *points)
   {
-  result_t result;
-
   gdi_dim_t half_width = pen->width >> 1;
   point_t p1;
   point_t p2;

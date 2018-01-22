@@ -788,7 +788,8 @@
 #include <stdarg.h>  /* varargs */
 #include <setjmp.h>
 #include <stddef.h>  /* e.g. ptrdiff_t */
-#include <math.h>
+//#include <math.h>
+#include "../gluon/gluon.h"
 #include <limits.h>
 
 /* date.h is omitted, and included per platform */
@@ -2284,6 +2285,8 @@ typedef struct duk_hthread duk_context;
 /* These functions don't currently need replacement but are wrapped for
  * completeness.  Because these are used as function pointers, they need
  * to be defined as concrete C functions (not macros).
+ *
+ * use muon ieee754 functions which are compatible with duktape
  */
 #if !defined(DUK_FABS)
 #define DUK_FABS             fabs
@@ -2330,6 +2333,12 @@ typedef struct duk_hthread duk_context;
 #if !defined(DUK_SQRT)
 #define DUK_SQRT             sqrt
 #endif
+#if !defined(DUK_LOG2)
+#define DUK_LOG2             log2
+#endif
+#if !defined(DUK_LOG10)
+#define DUK_LOG10            log10
+#endif
 
 /* The functions below exist only in C99/C++11 or later and need a workaround
  * for platforms that don't include them.  MSVC isn't detected as C99, but
@@ -2340,12 +2349,6 @@ typedef struct duk_hthread duk_context;
     !defined(DUK_F_ANDROID) && !defined(DUK_F_MINT)
 #if !defined(DUK_CBRT)
 #define DUK_CBRT             cbrt
-#endif
-#if !defined(DUK_LOG2)
-#define DUK_LOG2             log2
-#endif
-#if !defined(DUK_LOG10)
-#define DUK_LOG10            log10
 #endif
 #if !defined(DUK_TRUNC)
 #define DUK_TRUNC            trunc

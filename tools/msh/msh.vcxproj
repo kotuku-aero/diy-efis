@@ -27,6 +27,9 @@
     <ProjectReference Include="..\..\libs\krypton\krypton.vcxproj">
       <Project>{8ad714bb-ef78-441b-bc81-0b5abdb41fa5}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\gluon\gluon.vcxproj">
+      <Project>{9ead2275-597a-4672-a837-987b63e9ded0}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\ion\ion.vcxproj">
       <Project>{3424ca68-f0af-48a9-80a3-e441c11de3e9}</Project>
     </ProjectReference>

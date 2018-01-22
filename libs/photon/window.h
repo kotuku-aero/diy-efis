@@ -41,7 +41,6 @@ it must be removed as soon as possible after the code fragment is identified.
 extern "C" {
 #endif
 
-#include <math.h>
 #include <string.h>
 
 #include "../neutron/bsp.h"
