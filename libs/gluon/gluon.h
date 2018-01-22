@@ -1,8 +1,6 @@
 #ifndef __gluon_h__
 #define __gluon_h__
 
-#include "fenv.h"
-
 
 #define	M_E		2.7182818284590452354	/* e */
 #define	M_LOG2E		1.4426950408889634074	/* log 2e */

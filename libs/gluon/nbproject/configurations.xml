@@ -4,11 +4,10 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>pens.h</itemPath>
-      <itemPath>regex.h</itemPath>
-      <itemPath>spatial.h</itemPath>
-      <itemPath>widget.h</itemPath>
-      <itemPath>proton.h</itemPath>
+      <itemPath>gluon.h</itemPath>
+      <itemPath>gluon_private.h</itemPath>
+      <itemPath>k_log.h</itemPath>
+      <itemPath>k_logf.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -17,18 +16,137 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>airspeed_window.c</itemPath>
-      <itemPath>altitude_window.c</itemPath>
-      <itemPath>annunciator_window.c</itemPath>
-      <itemPath>attitude_window.c</itemPath>
-      <itemPath>gauge_window.c</itemPath>
-      <itemPath>gps_window.c</itemPath>
-      <itemPath>hsi_window.c</itemPath>
-      <itemPath>layout_window.c</itemPath>
-      <itemPath>pens.c</itemPath>
-      <itemPath>regex.c</itemPath>
-      <itemPath>widget.c</itemPath>
-      <itemPath>proton.c</itemPath>
+      <itemPath>acos.c</itemPath>
+      <itemPath>acosf.c</itemPath>
+      <itemPath>acosh.c</itemPath>
+      <itemPath>acoshf.c</itemPath>
+      <itemPath>asin.c</itemPath>
+      <itemPath>asinf.c</itemPath>
+      <itemPath>asinh.c</itemPath>
+      <itemPath>asinhf.c</itemPath>
+      <itemPath>atan.c</itemPath>
+      <itemPath>atan2.c</itemPath>
+      <itemPath>atan2f.c</itemPath>
+      <itemPath>atanf.c</itemPath>
+      <itemPath>atanh.c</itemPath>
+      <itemPath>atanhf.c</itemPath>
+      <itemPath>b_exp.c</itemPath>
+      <itemPath>b_log.c</itemPath>
+      <itemPath>b_tgamma.c</itemPath>
+      <itemPath>ceil.c</itemPath>
+      <itemPath>ceilf.c</itemPath>
+      <itemPath>common.c</itemPath>
+      <itemPath>copysign.c</itemPath>
+      <itemPath>copysignf.c</itemPath>
+      <itemPath>cos.c</itemPath>
+      <itemPath>cosf.c</itemPath>
+      <itemPath>cosh.c</itemPath>
+      <itemPath>coshf.c</itemPath>
+      <itemPath>erf.c</itemPath>
+      <itemPath>erff.c</itemPath>
+      <itemPath>exp.c</itemPath>
+      <itemPath>expf.c</itemPath>
+      <itemPath>expm1.c</itemPath>
+      <itemPath>expm1f.c</itemPath>
+      <itemPath>fabs.c</itemPath>
+      <itemPath>fabsf.c</itemPath>
+      <itemPath>fdim.c</itemPath>
+      <itemPath>floor.c</itemPath>
+      <itemPath>floorf.c</itemPath>
+      <itemPath>fma.c</itemPath>
+      <itemPath>fmaf.c</itemPath>
+      <itemPath>fmax.c</itemPath>
+      <itemPath>fmaxf.c</itemPath>
+      <itemPath>fmin.c</itemPath>
+      <itemPath>fminf.c</itemPath>
+      <itemPath>fmod.c</itemPath>
+      <itemPath>fmodf.c</itemPath>
+      <itemPath>fpclassify.c</itemPath>
+      <itemPath>frexp.c</itemPath>
+      <itemPath>frexpf.c</itemPath>
+      <itemPath>hypot.c</itemPath>
+      <itemPath>hypotf.c</itemPath>
+      <itemPath>ilogb.c</itemPath>
+      <itemPath>ilogbf.c</itemPath>
+      <itemPath>isfinite.c</itemPath>
+      <itemPath>isinf.c</itemPath>
+      <itemPath>isnan.c</itemPath>
+      <itemPath>isnormal.c</itemPath>
+      <itemPath>j0.c</itemPath>
+      <itemPath>j0f.c</itemPath>
+      <itemPath>j1.c</itemPath>
+      <itemPath>j1f.c</itemPath>
+      <itemPath>jn.c</itemPath>
+      <itemPath>jnf.c</itemPath>
+      <itemPath>k_cos.c</itemPath>
+      <itemPath>k_cosf.c</itemPath>
+      <itemPath>k_exp.c</itemPath>
+      <itemPath>k_expf.c</itemPath>
+      <itemPath>k_rem_pio2.c</itemPath>
+      <itemPath>k_sin.c</itemPath>
+      <itemPath>k_sinf.c</itemPath>
+      <itemPath>k_tan.c</itemPath>
+      <itemPath>k_tanf.c</itemPath>
+      <itemPath>lgamma.c</itemPath>
+      <itemPath>lgamma_r.c</itemPath>
+      <itemPath>lgammaf.c</itemPath>
+      <itemPath>lgammaf_r.c</itemPath>
+      <itemPath>llrint.c</itemPath>
+      <itemPath>llrintf.c</itemPath>
+      <itemPath>llround.c</itemPath>
+      <itemPath>llroundf.c</itemPath>
+      <itemPath>log.c</itemPath>
+      <itemPath>log10.c</itemPath>
+      <itemPath>log10f.c</itemPath>
+      <itemPath>log1p.c</itemPath>
+      <itemPath>log1pf.c</itemPath>
+      <itemPath>log2.c</itemPath>
+      <itemPath>log2f.c</itemPath>
+      <itemPath>logb.c</itemPath>
+      <itemPath>logbf.c</itemPath>
+      <itemPath>logf.c</itemPath>
+      <itemPath>lrint.c</itemPath>
+      <itemPath>lrintf.c</itemPath>
+      <itemPath>lround.c</itemPath>
+      <itemPath>lroundf.c</itemPath>
+      <itemPath>modf.c</itemPath>
+      <itemPath>modff.c</itemPath>
+      <itemPath>nan.c</itemPath>
+      <itemPath>nearbyint.c</itemPath>
+      <itemPath>nextafter.c</itemPath>
+      <itemPath>nextafterf.c</itemPath>
+      <itemPath>pow.c</itemPath>
+      <itemPath>powf.c</itemPath>
+      <itemPath>rem_pio2.c</itemPath>
+      <itemPath>rem_pio2f.c</itemPath>
+      <itemPath>remainder.c</itemPath>
+      <itemPath>remainderf.c</itemPath>
+      <itemPath>remquo.c</itemPath>
+      <itemPath>remquof.c</itemPath>
+      <itemPath>rint.c</itemPath>
+      <itemPath>rintf.c</itemPath>
+      <itemPath>round.c</itemPath>
+      <itemPath>roundf.c</itemPath>
+      <itemPath>scalbln.c</itemPath>
+      <itemPath>scalbn.c</itemPath>
+      <itemPath>scalbnf.c</itemPath>
+      <itemPath>signbit.c</itemPath>
+      <itemPath>signgam.c</itemPath>
+      <itemPath>sin.c</itemPath>
+      <itemPath>sincos.c</itemPath>
+      <itemPath>sincosf.c</itemPath>
+      <itemPath>sinf.c</itemPath>
+      <itemPath>sinh.c</itemPath>
+      <itemPath>sinhf.c</itemPath>
+      <itemPath>sqrt.c</itemPath>
+      <itemPath>sqrtf.c</itemPath>
+      <itemPath>tan.c</itemPath>
+      <itemPath>tanf.c</itemPath>
+      <itemPath>tanh.c</itemPath>
+      <itemPath>tanhf.c</itemPath>
+      <itemPath>tgammaf.c</itemPath>
+      <itemPath>trunc.c</itemPath>
+      <itemPath>truncf.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -41,10 +159,10 @@
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
-    <conf name="release_pic32mz2048EFH144" type="2">
+    <conf name="debug_PIC32MZ2048EFH064" type="3">
       <toolsSet>
         <developmentServer>localhost</developmentServer>
-        <targetDevice>PIC32MZ2048EFH144</targetDevice>
+        <targetDevice>PIC32MZ2048EFH064</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
         <platformTool>ICD3PlatformTool</platformTool>
@@ -89,7 +207,7 @@
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="false"/>
         <property key="make-warnings-into-errors" value="false"/>
-        <property key="optimization-level" value="-O3"/>
+        <property key="optimization-level" value=""/>
         <property key="place-data-into-section" value="false"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
@@ -181,7 +299,7 @@
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="false"/>
         <property key="make-warnings-into-errors" value="false"/>
-        <property key="optimization-level" value="-O3"/>
+        <property key="optimization-level" value=""/>
         <property key="place-data-into-section" value="false"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
@@ -195,7 +313,7 @@
         <property key="use-indirect-calls" value="false"/>
       </C32CPP>
       <C32Global>
-        <property key="common-include-directories" value="..\ion"/>
+        <property key="common-include-directories" value=""/>
         <property key="gp-relative-option" value=""/>
         <property key="legacy-libc" value="true"/>
         <property key="mdtcm" value=""/>
@@ -210,22 +328,17 @@
         <property key="AutoSelectMemRanges" value="auto"/>
         <property key="CAN1" value="true"/>
         <property key="CAN2" value="true"/>
-        <property key="CHANGE NOTICE A" value="true"/>
         <property key="CHANGE NOTICE B" value="true"/>
         <property key="CHANGE NOTICE C" value="true"/>
         <property key="CHANGE NOTICE D" value="true"/>
         <property key="CHANGE NOTICE E" value="true"/>
         <property key="CHANGE NOTICE F" value="true"/>
         <property key="CHANGE NOTICE G" value="true"/>
-        <property key="CHANGE NOTICE H" value="true"/>
-        <property key="CHANGE NOTICE J" value="true"/>
-        <property key="CHANGE NOTICE K" value="true"/>
         <property key="COMPARATOR" value="true"/>
         <property key="DMA" value="true"/>
         <property key="ETHERNET CONTROLLER" value="true"/>
         <property key="Freeze All Other Peripherals" value="true"/>
         <property key="I2C 1" value="true"/>
-        <property key="I2C 2" value="true"/>
         <property key="I2C 3" value="true"/>
         <property key="I2C 4" value="true"/>
         <property key="I2C 5" value="true"/>
@@ -258,8 +371,6 @@
         <property key="SPI/I2S 2" value="true"/>
         <property key="SPI/I2S 3" value="true"/>
         <property key="SPI/I2S 4" value="true"/>
-        <property key="SPI/I2S 5" value="true"/>
-        <property key="SPI/I2S 6" value="true"/>
         <property key="SecureSegment.SegmentProgramming" value="FullChipProgramming"/>
         <property key="TIMER1" value="true"/>
         <property key="TIMER2" value="true"/>
@@ -312,10 +423,10 @@
         <property key="voltagevalue" value="3.25"/>
       </ICD3PlatformTool>
     </conf>
-    <conf name="debug_pic32mz2048EFH144" type="3">
+    <conf name="release_PIC32MZ2048EFH064" type="3">
       <toolsSet>
         <developmentServer>localhost</developmentServer>
-        <targetDevice>PIC32MZ2048EFH144</targetDevice>
+        <targetDevice>PIC32MZ2048EFH064</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
         <platformTool>ICD3PlatformTool</platformTool>
@@ -360,11 +471,11 @@
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="false"/>
         <property key="make-warnings-into-errors" value="false"/>
-        <property key="optimization-level" value=""/>
+        <property key="optimization-level" value="-O3"/>
         <property key="place-data-into-section" value="false"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
-        <property key="preprocessor-macros" value="_DEBUG;_NO_TRACE"/>
+        <property key="preprocessor-macros" value=""/>
         <property key="strict-ansi" value="false"/>
         <property key="support-ansi" value="false"/>
         <property key="toplevel-reordering" value=""/>
@@ -456,7 +567,7 @@
         <property key="place-data-into-section" value="false"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
-        <property key="preprocessor-macros" value="_DEBUG;_NO_TRACE"/>
+        <property key="preprocessor-macros" value=""/>
         <property key="rtti" value="true"/>
         <property key="strict-ansi" value="false"/>
         <property key="toplevel-reordering" value=""/>
@@ -481,22 +592,17 @@
         <property key="AutoSelectMemRanges" value="auto"/>
         <property key="CAN1" value="true"/>
         <property key="CAN2" value="true"/>
-        <property key="CHANGE NOTICE A" value="true"/>
         <property key="CHANGE NOTICE B" value="true"/>
         <property key="CHANGE NOTICE C" value="true"/>
         <property key="CHANGE NOTICE D" value="true"/>
         <property key="CHANGE NOTICE E" value="true"/>
         <property key="CHANGE NOTICE F" value="true"/>
         <property key="CHANGE NOTICE G" value="true"/>
-        <property key="CHANGE NOTICE H" value="true"/>
-        <property key="CHANGE NOTICE J" value="true"/>
-        <property key="CHANGE NOTICE K" value="true"/>
         <property key="COMPARATOR" value="true"/>
         <property key="DMA" value="true"/>
         <property key="ETHERNET CONTROLLER" value="true"/>
         <property key="Freeze All Other Peripherals" value="true"/>
         <property key="I2C 1" value="true"/>
-        <property key="I2C 2" value="true"/>
         <property key="I2C 3" value="true"/>
         <property key="I2C 4" value="true"/>
         <property key="I2C 5" value="true"/>
@@ -529,8 +635,6 @@
         <property key="SPI/I2S 2" value="true"/>
         <property key="SPI/I2S 3" value="true"/>
         <property key="SPI/I2S 4" value="true"/>
-        <property key="SPI/I2S 5" value="true"/>
-        <property key="SPI/I2S 6" value="true"/>
         <property key="SecureSegment.SegmentProgramming" value="FullChipProgramming"/>
         <property key="TIMER1" value="true"/>
         <property key="TIMER2" value="true"/>

@@ -47,18 +47,19 @@
  */
 static const type dtype_min = DTYPE_MIN - 0.5;
 static const type dtype_max = DTYPE_MAX + 0.5;
-#define	INRANGE(x)	(dtype_max - DTYPE_MAX != 0.5 || \
-			 ((x) > dtype_min && (x) < dtype_max))
+#define	INRANGE(x)	(dtype_max - DTYPE_MAX != 0.5 ||  ((x) > dtype_min && (x) < dtype_max))
 
 dtype fn(type x)
   {
 
-  if (INRANGE(x)) {
+  if (INRANGE(x))
+    {
     x = roundit(x);
     return ((dtype)x);
     }
-  else {
-    feraiseexcept(FE_INVALID);
+  else 
+    {
+    //feraiseexcept(FE_INVALID);
     return (DTYPE_MAX);
     }
   }

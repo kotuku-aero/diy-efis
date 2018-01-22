@@ -1,8 +1,8 @@
 #define type		double
 #define	roundit		round
-#define dtype		long long
-#define	DTYPE_MIN	LLONG_MIN
-#define	DTYPE_MAX	LLONG_MAX
+#define dtype		int64_t
+#define	DTYPE_MIN	INT64_MIN
+#define	DTYPE_MAX	INT64_MAX
 #define	fn		llround
 
 #include "lround.c"

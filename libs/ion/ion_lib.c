@@ -1105,16 +1105,18 @@ static duk_ret_t ion_load_script(ion_context_t *ion, const char *id)
     return DUK_RET_TYPE_ERROR;
     }
 
-  if (failed(stream_read(stream, script, len, &len)))
+  // TODO: handle scripts > 64k
+  uint16_t read_len;
+  if (failed(stream_read(stream, script, len, &read_len)))
     {
     neutron_free(script);
     stream_close(stream);
     return DUK_RET_TYPE_ERROR;
     }
 
-  script[len] = 0;
+  script[read_len] = 0;
 
-  duk_push_lstring(ion->ctx, script, len);
+  duk_push_lstring(ion->ctx, script, read_len);
   neutron_free(script);
   stream_close(stream);
 
