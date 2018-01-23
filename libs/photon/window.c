@@ -1038,3 +1038,84 @@ result_t add_property(handle_t hwnd, const char *property_name, getter_fn getter
 
   return s_ok;
   }
+
+result_t invalidate_rect(handle_t hwnd, const rect_t *rect)
+  {
+  result_t result;
+  window_t *wnd;
+
+  if (failed(result = as_window(hwnd, &wnd)))
+    return result;
+
+  // see if the canvas is a parent draw canvas
+  canvas_t *canvas;
+  if (failed(result = get_canvas(hwnd, &canvas)))
+    return result;
+
+  wnd->invalid = true;
+
+  // now we need to invalidate our children
+  handle_t child = 0;
+  if(succeeded(get_first_child(hwnd, &child)))
+    while (child != 0)
+      {
+      if(failed(is_invalid(child)))
+        invalidate_rect(child, 0);      // don't yet clip the rect.  TODO
+
+      if (failed(get_next_sibling(child, &child)))
+        break;
+
+      }
+
+  // if this canvas is not our own we need to tell the owner about this
+  if (!canvas->own_buffer)
+    {
+    // keep going up the tree
+    window_t *parent = wnd->parent;
+    if (parent == 0)
+      return e_unexpected;
+
+    rect_t rect_p;
+    rect_p.left = canvas->offset.x + ((rect != 0) ? rect->left : 0);
+    rect_p.top = canvas->offset.y + ((rect != 0) ? rect->top : 0);
+    rect_p.right = canvas->offset.x + ((rect != 0) ? rect->right : canvas->width);
+    rect_p.bottom = canvas->offset.y + ((rect != 0) ? rect->bottom : canvas->height);
+
+    // ask the parent to redraw, it will then pass the message down
+    // based on the correct z-order
+    return invalidate_rect(parent, &rect_p);
+    }
+
+  return s_ok;
+  }
+
+result_t get_z_order(handle_t hwnd, uint8_t *z_order)
+  {
+  result_t result;
+  if (hwnd == 0 || z_order == 0)
+    return e_bad_parameter;
+
+  window_t *wnd;
+  if (failed(result = as_window(hwnd, &wnd)))
+    return result;
+
+
+  *z_order = wnd->z_order;
+
+  return s_ok;
+  }
+
+result_t set_z_order(handle_t hwnd, uint8_t z_order)
+  {
+  result_t result;
+
+  window_t *wnd;
+  if (failed(result = as_window(hwnd, &wnd)))
+    return result;
+
+
+  wnd->z_order = z_order;
+
+  return s_ok;
+  }
+

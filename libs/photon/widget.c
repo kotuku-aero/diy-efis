@@ -330,7 +330,9 @@ result_t create_child_widget(handle_t parent, memid_t key, wndproc cb, handle_t 
       }
     }
   
-  return send_message(*hwnd, &create_msg);
+  send_message(*hwnd, &create_msg);
+
+  return s_ok;
   }
 
 result_t lookup_enum(memid_t key,
