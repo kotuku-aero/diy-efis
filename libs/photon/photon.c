@@ -379,15 +379,21 @@ result_t end_paint(handle_t hwnd)
   return (*wnd->canvas->end_paint)(wnd);
   }
 
-result_t get_canvas_extents(handle_t hwnd, extent_t *extent)
+result_t get_canvas_extents(handle_t hwnd, extent_t *extent, uint16_t *bpp)
   {
   result_t result;
   canvas_t *canvas;
   if(failed(result = get_canvas(hwnd, &canvas)))
     return result;
 
-  extent->dx = canvas->width;
-  extent->dy = canvas->height;
+  if (extent != 0)
+    {
+    extent->dx = canvas->width;
+    extent->dy = canvas->height;
+    }
+
+  if (bpp != 0)
+    *bpp = canvas->bits_per_pixel;
 
   return s_ok;
   }

@@ -976,9 +976,12 @@ result_t load_png(handle_t canvas, handle_t stream, const point_t *pt)
 
   // make sure the canvas is valid
   extent_t ex;
-  if (succeeded(result = get_canvas_extents(canvas, &ex)))
+  uint16_t bpp;
+  if (succeeded(result = get_canvas_extents(canvas, &ex, &bpp)))
     {
-    if(dim.dx <= ex.dx && dim.dy <= ex.dy )
+    if (bpp < 32)
+      result = e_bad_parameter;
+    else if(dim.dx <= ex.dx && dim.dy <= ex.dy )
       {
       png_stream->canvas = canvas;
       if (pt != 0)

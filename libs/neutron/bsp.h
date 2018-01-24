@@ -122,7 +122,7 @@ typedef struct _canvas_t
   // dimensions of the canvas
   gdi_dim_t width;          // width of the buffer
   gdi_dim_t height;         // hight of the buffer
-  size_t bits_per_pixel;    // number of bits in a pixel
+  uint16_t bits_per_pixel;  // number of bits in a pixel
   uint16_t orientation;     // 0, 90, 180, 270
   point_t offset;           // if non-0 is the physical pixel offset
                             // of the canvas 0,0

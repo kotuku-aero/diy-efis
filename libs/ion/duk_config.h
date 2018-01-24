@@ -789,7 +789,6 @@
 #include <setjmp.h>
 #include <stddef.h>  /* e.g. ptrdiff_t */
 #include <math.h>
-//#include "../gluon/gluon.h"
 #include <limits.h>
 
 /* date.h is omitted, and included per platform */

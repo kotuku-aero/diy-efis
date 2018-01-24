@@ -6,6 +6,7 @@
                    projectFiles="true">
       <itemPath>photon.h</itemPath>
       <itemPath>window.h</itemPath>
+      <itemPath>widget.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -18,6 +19,8 @@
       <itemPath>font.c</itemPath>
       <itemPath>png_canvas.c</itemPath>
       <itemPath>window.c</itemPath>
+      <itemPath>lib_photon.c</itemPath>
+      <itemPath>widget.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -93,7 +96,6 @@
         <property key="use-cci" value="false"/>
         <property key="use-iar" value="false"/>
         <property key="use-indirect-calls" value="false"/>
-        <appendMe value="-fno-short-double"/>
       </C32>
       <C32-AR>
         <property key="additional-options-chop-files" value="false"/>
@@ -364,7 +366,6 @@
         <property key="use-cci" value="false"/>
         <property key="use-iar" value="false"/>
         <property key="use-indirect-calls" value="false"/>
-        <appendMe value="-fno-short-double"/>
       </C32>
       <C32-AR>
         <property key="additional-options-chop-files" value="false"/>

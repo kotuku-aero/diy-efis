@@ -51,7 +51,7 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>ICD3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
-        <languageToolchainVersion>1.32</languageToolchainVersion>
+        <languageToolchainVersion>1.33</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <compileType>
@@ -253,7 +253,7 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>ICD3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
-        <languageToolchainVersion>1.32</languageToolchainVersion>
+        <languageToolchainVersion>1.33</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <compileType>
@@ -455,7 +455,7 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>ICD3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
-        <languageToolchainVersion>1.32</languageToolchainVersion>
+        <languageToolchainVersion>1.33</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <compileType>
@@ -657,7 +657,7 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>ICD3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
-        <languageToolchainVersion>1.32</languageToolchainVersion>
+        <languageToolchainVersion>1.33</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <compileType>
@@ -859,7 +859,7 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>ICD3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
-        <languageToolchainVersion>1.32</languageToolchainVersion>
+        <languageToolchainVersion>1.33</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <compileType>
@@ -1061,7 +1061,7 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>ICD3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
-        <languageToolchainVersion>1.32</languageToolchainVersion>
+        <languageToolchainVersion>1.33</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <compileType>
@@ -1315,7 +1315,6 @@
         <property key="use-cci" value="false"/>
         <property key="use-iar" value="false"/>
         <property key="use-indirect-calls" value="false"/>
-        <appendMe value="-fno-short-double"/>
       </C32>
       <C32-AR>
         <property key="additional-options-chop-files" value="false"/>
@@ -1586,7 +1585,6 @@
         <property key="use-cci" value="false"/>
         <property key="use-iar" value="false"/>
         <property key="use-indirect-calls" value="false"/>
-        <appendMe value="-fno-short-double"/>
       </C32>
       <C32-AR>
         <property key="additional-options-chop-files" value="false"/>
@@ -2120,7 +2118,6 @@
         <property key="use-cci" value="false"/>
         <property key="use-iar" value="false"/>
         <property key="use-indirect-calls" value="false"/>
-        <appendMe value="-fno-short-double"/>
       </C32>
       <C32-AR>
         <property key="additional-options-chop-files" value="false"/>

@@ -360,7 +360,6 @@
         <property key="use-cci" value="false"/>
         <property key="use-iar" value="false"/>
         <property key="use-indirect-calls" value="false"/>
-        <appendMe value="-fno-short-double"/>
       </C32>
       <C32-AR>
         <property key="additional-options-chop-files" value="false"/>
@@ -624,7 +623,6 @@
         <property key="use-cci" value="false"/>
         <property key="use-iar" value="false"/>
         <property key="use-indirect-calls" value="false"/>
-        <appendMe value="-fno-short-double"/>
       </C32>
       <C32-AR>
         <property key="additional-options-chop-files" value="false"/>
@@ -895,7 +893,6 @@
         <property key="use-cci" value="false"/>
         <property key="use-iar" value="false"/>
         <property key="use-indirect-calls" value="false"/>
-        <appendMe value="-fno-short-double"/>
       </C32>
       <C32-AR>
         <property key="additional-options-chop-files" value="false"/>

@@ -7,7 +7,6 @@
       <itemPath>pens.h</itemPath>
       <itemPath>regex.h</itemPath>
       <itemPath>spatial.h</itemPath>
-      <itemPath>widget.h</itemPath>
       <itemPath>proton.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -27,7 +26,6 @@
       <itemPath>layout_window.c</itemPath>
       <itemPath>pens.c</itemPath>
       <itemPath>regex.c</itemPath>
-      <itemPath>widget.c</itemPath>
       <itemPath>proton.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -101,7 +99,6 @@
         <property key="use-cci" value="false"/>
         <property key="use-iar" value="false"/>
         <property key="use-indirect-calls" value="false"/>
-        <appendMe value="-fno-short-double"/>
       </C32>
       <C32-AR>
         <property key="additional-options-chop-files" value="false"/>
@@ -372,7 +369,6 @@
         <property key="use-cci" value="false"/>
         <property key="use-iar" value="false"/>
         <property key="use-indirect-calls" value="false"/>
-        <appendMe value="-fno-short-double"/>
       </C32>
       <C32-AR>
         <property key="additional-options-chop-files" value="false"/>

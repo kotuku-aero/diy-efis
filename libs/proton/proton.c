@@ -58,12 +58,12 @@ void run_proton(proton_args_t *args)
   memid_t key;
 
 
-  if(succeeded(reg_open_key(0, "proton", &key)))
+  if (succeeded(reg_open_key(0, "proton", &key)))
     {
     // create the root window
     uint16_t orientation;
 
-    if(failed(reg_get_uint16(key, "orientation", &orientation)))
+    if (failed(reg_get_uint16(key, "orientation", &orientation)))
       orientation = 0;
 
     // load and cache the neo font
@@ -76,11 +76,33 @@ void run_proton(proton_args_t *args)
       failed(result = reg_open_key(key, layout_name, &layout_key)))
       return;
 
-    if(succeeded(result = open_screen(orientation, layout_wndproc, 0, &main_window)))
+    if (succeeded(result = open_screen(orientation, layout_wndproc, 0, &main_window)))
       {
       if (args->stream != 0)
         {
-        load_png(main_window, args->stream, 0);
+        // determine if the destination window is suitable for
+        // expanding the PNG.  We must have a colorref that
+        // is 32 bits.  If not we create a canvas that is
+        // guaranteed to be 32 bits
+        extent_t ex;
+        uint16_t bpp;
+        if (succeeded(get_canvas_extents(main_window, &ex, &bpp)) &&
+          bpp < 32)
+          {
+          handle_t canvas = 0;
+          if (succeeded(create_rect_canvas(&ex, &canvas)) &&
+            succeeded(load_png(canvas, args->stream, 0)))
+            {
+            rect_t wnd_rect = { 0, 0, ex.dx, ex.dy };
+            point_t pt = { 0, 0 };
+
+            // copy the rendered bitmap over
+            bit_blt(main_window, &wnd_rect, &wnd_rect, canvas, &wnd_rect, &pt);
+            }
+          canvas_close(canvas);
+          }
+        else
+          load_png(main_window, args->stream, 0);
         stream_close(args->stream);
         }
 

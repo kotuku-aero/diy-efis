@@ -492,7 +492,7 @@ static duk_ret_t lib_polygon(duk_context *ctx)
 
   point_t *pts = 0;
   uint16_t len = 0;
-  if (failed(get_points(ctx, -1, 0, &pts, &len)))
+  if (failed(get_points(ctx, 0, &pts, &len)))
     return DUK_RET_TYPE_ERROR;
 
   if (failed(polygon(handle, &clip_rect, &pen, fill_color, len, pts)))
@@ -621,7 +621,7 @@ static duk_ret_t lib_bit_blt(duk_context *ctx)
 
   rect_t src_rect;
   extent_t ex;
-  get_canvas_extents(src_canvas, &ex);
+  get_canvas_extents(src_canvas, &ex, 0);
   src_rect.left = 0;
   src_rect.top = 0;
   src_rect.right = ex.dx;
@@ -775,7 +775,7 @@ static duk_ret_t lib_pie(duk_context *ctx)
   pen_t *outline_pen = 0;
   if (duk_get_top(ctx) == 7)
     {
-    if (failed(get_pen(ctx, -1, -1, &pen)))
+    if (failed(get_pen(ctx, 6, &pen)))
       return DUK_RET_TYPE_ERROR;
     outline_pen = &pen;
     }  
@@ -794,7 +794,7 @@ static duk_ret_t lib_pie(duk_context *ctx)
   gdi_dim_t radius = (gdi_dim_t)duk_get_int(ctx, 3);
   gdi_dim_t inner = (gdi_dim_t)duk_get_int(ctx, 4);
 
-  if (failed(pie(handle, &clip_rect, outline_pen, &pt, fill, start, end, radius, inner)))
+  if (failed(pie(handle, &clip_rect, outline_pen, fill, &pt, start, end, radius, inner)))
     return DUK_RET_TYPE_ERROR;
 
   return 0;
@@ -930,7 +930,7 @@ static duk_ret_t lib_get_extents(duk_context *ctx)
   duk_pop(ctx);
 
   extent_t ex;
-  if (failed(get_canvas_extents(handle, &ex)))
+  if (failed(get_canvas_extents(handle, &ex, 0)))
     return DUK_RET_TYPE_ERROR;
 
   duk_push_object(ctx);

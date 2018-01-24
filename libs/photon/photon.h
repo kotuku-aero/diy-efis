@@ -509,9 +509,10 @@ extern result_t load_png(handle_t canvas, handle_t stream, const point_t *pt);
  * Get the length of a canvas
  * @param canvas  Canvas to query
  * @param extent  extents of the canvas
+ * @param bpp     optional bits per pixel for canvas
  * @return s_ok if a valid canvas
  */
-extern result_t get_canvas_extents(handle_t canvas, extent_t *extent);
+extern result_t get_canvas_extents(handle_t canvas, extent_t *extent, uint16_t *bpp);
 /**
  * @function get_orientation(handle_t hwnd, uint16_t *orientation)
  * Return the orientation of the window
@@ -975,40 +976,6 @@ static inline const extent_t *rect_extents(const rect_t *from, extent_t *ex)
   
   return ex;
   }
-
-///////////////////////////////////////////////////////////////////////////////
-//
-// Photon initialization functions
-//
-
-/**
- * @function display_init(int orientation)
- * Initialize the display.  Must be called before any other operations.
- * @param orientation orientation to use
- * @return s_ok if display can be used.
- */
-extern result_t display_init(int orientation);
-/**
- * @function get_display_orientation()
- * Get the display orientation of the screen
- * @return orientation
- */
-extern int get_display_orientation();
-/**
- * @function set_display_orientation(int orientation)
- * Set the screen orientation
- * @param orientation orientation to use
- * @return s_ok if can be switched, e_invalidarg if screens open
- */
-extern result_t set_display_orientation(int orientation);
-/**
- * @function canvas_open(handle_t *hndl)
- * Open the root display canvas
- * @param name  number of the screen to open
- * @param hndl  canvas handle
- * @return s_ok if the screen can be opened.
- */
-extern result_t canvas_open(handle_t *hndl);
 
 #define RESULT_DEFINED
 #define HANDLE_DEFINED
