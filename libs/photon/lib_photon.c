@@ -103,6 +103,8 @@ static const char *prop_width = "width";
 static const char *prop_style = "style";
 static const char *prop_x = "x";
 static const char *prop_y = "y";
+static const char *prop_font = "font";
+static const char *prop_pixels = "pixels";
 
 /**
  @param ctx       duktape context
@@ -383,6 +385,48 @@ static result_t get_pen(duk_context *ctx, duk_int_t param, pen_t *pen)
 
   return s_ok;
 }
+
+typedef struct _fontinfo_t {
+  char name[REG_STRING_MAX];
+  uint16_t pixels;
+  } fontinfo_t;
+
+// return the pen array and its values
+static result_t get_fontinfo(duk_context *ctx, duk_int_t param, fontinfo_t *fi)
+  {
+  result_t result;
+  // obj is color : value, width: value
+  if (ctx == 0 || fi == 0 || !duk_is_object(ctx, param))
+    return e_bad_parameter;
+
+  // get the object that is passed
+  if (!duk_is_object(ctx, param))
+    return e_bad_parameter;
+
+  // two params
+  if (duk_has_prop_string(ctx, param, prop_font))
+    {
+    duk_get_prop_string(ctx, param, prop_font);
+    const char *font_name = duk_get_string(ctx, -1);
+    strncpy(fi->name, font_name, REG_STRING_MAX - 1);
+    fi->name[REG_STRING_MAX - 1] = 0;
+
+    duk_pop(ctx);
+    }
+  else
+    return e_bad_parameter;
+
+  if (duk_has_prop_string(ctx, param, prop_pixels))
+    {
+    duk_get_prop_string(ctx, param, prop_pixels);
+    fi->pixels = duk_get_int(ctx, -1);
+    duk_pop(ctx);
+    }
+  else
+    return e_bad_parameter;
+
+  return s_ok;
+  }
 
 // passed in: array[](object x:, y:), object(width: , color:)
 static duk_ret_t lib_polyline(duk_context *ctx)
@@ -802,21 +846,17 @@ static duk_ret_t lib_pie(duk_context *ctx)
 
 // draw_text(handle_t handle, const rect_t *clip_rect, handle_t  font, color_t fg, color_t bg, const char *str,
 // uint16_t count, const point_t *src_pt, const rect_t *txt_clip_rect, text_flags format, uint16_t *char_widths)
-// this.text(str, font, size, fg, bg, left, top, right, bottom, x, y)
+// this.text(str, font, fg, bg, left, top, right, bottom, x, y)
 //
 // str      text to render
-// font     name of font to render
-// size     pixel size of font
+// font     name and size of font to render
 // fg       forground color
 // bg       background color
 // left, top, right, bottom     bounding rectange
 // x, y     point to render from (top left)
 static duk_ret_t lib_draw_text(duk_context *ctx)
   {
-  if (duk_get_top(ctx) != 11)
-    return DUK_RET_TYPE_ERROR;
-
-  if (duk_get_top(ctx) < 5)
+  if (duk_get_top(ctx) != 10)
     return DUK_RET_TYPE_ERROR;
 
   // get our context
@@ -837,29 +877,30 @@ static duk_ret_t lib_draw_text(duk_context *ctx)
     return DUK_RET_TYPE_ERROR;
 
   color_t fg;
-  if (failed(get_color(ctx, 3, &fg)))
+  if (failed(get_color(ctx, 2, &fg)))
     return DUK_RET_TYPE_ERROR;
 
   color_t bg;
-  if(failed(get_color(ctx, 4, &bg)))
+  if(failed(get_color(ctx, 3, &bg)))
     return DUK_RET_TYPE_ERROR;
 
   point_t pt;
-  if (failed(get_point(ctx, 9, &pt)))
+  if (failed(get_point(ctx, 8, &pt)))
     return DUK_RET_TYPE_ERROR;
 
   duk_size_t len = 0;
   const char *str = duk_get_lstring(ctx, 0, &len);
 
   rect_t rect;
-  if(failed(get_rect(ctx, 5, &rect)))
+  if(failed(get_rect(ctx, 4, &rect)))
     return DUK_RET_TYPE_ERROR;
 
-  const char *font_name = duk_get_string(ctx, 1);
-  uint16_t font_size = (uint16_t)duk_get_uint(ctx, 2);
+  fontinfo_t fi;
+  if (failed(get_fontinfo(ctx, 1, &fi)))
+    return DUK_RET_TYPE_ERROR;
 
   handle_t font = 0;
-  if(failed(open_font(font_name, font_size, &font)))
+  if(failed(open_font(fi.name, fi.pixels, &font)))
     return DUK_RET_TYPE_ERROR;
 
   text_flags flags = (bg != color_hollow ? eto_opaque : 0);
@@ -871,17 +912,18 @@ static duk_ret_t lib_draw_text(duk_context *ctx)
   }
 
 // text_extent(handle_t handle, handle_t  font, const char *str, uint16_t count, extent_t *extent)
-// object = this.extent(str, font, pixels)
+// object = this.extent(str, font)
 static duk_ret_t lib_text_extent(duk_context *ctx)
   {
-  if (duk_get_top(ctx) != 3)
+  if (duk_get_top(ctx) != 2)
     return DUK_RET_TYPE_ERROR;
 
-  const char *font_name = duk_get_string(ctx, 1);
-  uint16_t font_size = (uint16_t)duk_get_uint(ctx, 2);
+  fontinfo_t fi;
+  if (failed(get_fontinfo(ctx, 1, &fi)))
+    return DUK_RET_TYPE_ERROR;
 
   handle_t font = 0;
-  if (failed(open_font(font_name, font_size, &font)))
+  if (failed(open_font(fi.name, fi.pixels, &font)))
     return DUK_RET_TYPE_ERROR;
 
   duk_size_t len;
@@ -1098,7 +1140,7 @@ const duk_function_list_entry lib_window_funcs[] = {
     { "invalidate", lib_invalidate, 0 },
     { "begin_paint", lib_begin_paint, 0 },
     { "end_paint", lib_end_paint, 0 },
-    { "create_child_window", lib_create_child_window, 5 },
+    { "create_child_window", lib_create_child_window, 6 },
     { "get_window_by_id", lib_get_window_by_id, 1 },
     { "next_sibling", lib_get_next_sibling, 0 },
     { "previous_sibling", lib_get_previous_sibling, 0 },

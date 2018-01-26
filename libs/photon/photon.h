@@ -255,10 +255,12 @@ extern result_t create_window(handle_t parent, const rect_t *bounds, wndproc cb,
  * @param parent  Parent window.  if 0 then the top level window is created
  * @param bounds  Bounds of window.  if parant != 0 then relative to parent window
  * @param cb      Callback to receive messages
+ * @param key     Optional registry key with config values
+ * @param prototype Optional name of the prototype for the ECMA script object
  * @param hwnd    resulting handle
  * @return s_ok if window created ok
  */
-extern result_t create_child_window(handle_t parent, const rect_t *bounds, wndproc cb, uint16_t id, handle_t *hwnd);
+extern result_t create_child_window(handle_t parent, const rect_t *bounds, wndproc cb, uint16_t id, memid_t key, const char *prototype, handle_t *hwnd);
 /**
  * @function close_window(handle_t hwnd);
  * Close a window and release all resources

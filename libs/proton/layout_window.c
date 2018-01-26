@@ -62,17 +62,6 @@ extern result_t create_widget(handle_t parent, memid_t section, handle_t *hwnd);
     last_layout_enum
     };
 
-static const char *layout_names[] = {
-    "airspeed",      // vertical ticker-tape airspeed window
-    "hsi",           // rectangular gyro position and heading
-    "attitude",      // rectangular attitude window
-    "altitude",      // vertical ticker tape altitude and vertical speed indicator window
-    "gauge",         // general purpose round or bar gauge
-    "annunciator",   // time, oat etc.
-    "gps",           // gps route map window
-    "alert",         // vertical alert window
-    "widget",               // a generic widget
-};
 
 typedef enum
   {
@@ -1289,6 +1278,11 @@ static result_t find_menu(layout_window_t *wnd, const char *name, menu_t **menu)
       // add the menu item to the mix
       vector_push_back(popup->menu_items, item);
       }
+
+    // we now load the keys
+    char keys[REG_STRING_MAX];
+    if (succeeded(reg_get_string(key, "keys", keys, 0)))
+      find_keys(wnd, keys, &popup->keys);
     }
 
   *menu = popup;
@@ -1838,54 +1832,28 @@ result_t load_layout(handle_t parent, memid_t hive)
 
   while (succeeded(result = reg_enum_key(hive, &type, 0, 0, REG_NAME_MAX, name, &child)))
     {
-    // we create a widget and pickup the widget defined settings.
-    // these are:
-    // font -> name of the font to load
-    // color -> foreground color
-    // background -> back
-    int ordinal;
-    if (failed(lookup_enum(child, "type", layout_names, last_layout_enum, &ordinal)))
-      {
+    char widget_type[REG_NAME_MAX];
+    if (failed(reg_get_string(child, "type", widget_type, 0)))
       continue;
-      }
-
-    trace_info("Create widget %s\n", name);
 
     handle_t hwnd;
-
-    switch (ordinal)
-      {
-      case airspeed_window:
-        create_airspeed_window(parent, child, &hwnd);
-        break;
-      case hsi_window:
-        create_hsi_window(parent, child, &hwnd);
-        break;
-      case attitude_window:
-        create_attitude_window(parent, child, &hwnd);
-        break;
-      case altitude_window:
-        create_altitude_window(parent, child, &hwnd);
-        break;
-      case gauge_window:
-        create_gauge_window(parent, child, &hwnd);
-        break;
-      case annunciator_window:
-        create_annunciator_window(parent, child, &hwnd);
-        break;
-      case gps_window:
-        create_gps_window(parent, child, &hwnd);
-        break;
-      case alert_window:
-
-        break;
-      case widget:
-        create_widget(parent, child, &hwnd);
-        break;
-
-      default:
-        break;
-      }
+    // TODO: these will go
+    if(strcmp(widget_type, "airspeed")== 0)
+      create_airspeed_window(parent, child, &hwnd);
+    else if(strcmp(widget_type, "hsi")== 0)
+      create_hsi_window(parent, child, &hwnd);
+    else if(strcmp(widget_type, "attitude")== 0)
+      create_attitude_window(parent, child, &hwnd);
+    else if(strcmp(widget_type, "altitude")== 0)
+      create_altitude_window(parent, child, &hwnd);
+    else if(strcmp(widget_type, "gauge")== 0)
+      create_gauge_window(parent, child, &hwnd);
+    else if(strcmp(widget_type, "annunciator")== 0)
+      create_annunciator_window(parent, child, &hwnd);
+    else if(strcmp(widget_type, "gps")== 0)
+      create_gps_window(parent, child, &hwnd);
+    else
+      create_widget(parent, child, &hwnd);
 
     // field_datatype has the field type, name is the child name
     type = field_key;

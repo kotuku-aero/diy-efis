@@ -338,11 +338,6 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
   
   rect_t rect;
 
-  rectangle(hwnd, &wnd_rect, 0, color_hollow,  make_rect(0, 0, ex.dx, 8, &rect));
-  rectangle(hwnd, &wnd_rect, 0, color_hollow,  make_rect(0, 8, 8, ex.dy, &rect));
-  rectangle(hwnd, &wnd_rect, 0, color_hollow,  make_rect(0, ex.dy-8, ex.dx, ex.dy, &rect));
-  rectangle(hwnd, &wnd_rect, 0, color_hollow,  make_rect(ex.dx-9, 8, ex.dx, ex.dy-8, &rect));
-
   rectangle(hwnd, &wnd_rect, 0, wnd->background_color,  make_rect(8, 8, ex.dx-9, ex.dy-8, &rect));
 
   gdi_dim_t median = ex.dy >> 1;
