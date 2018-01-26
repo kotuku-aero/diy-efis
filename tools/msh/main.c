@@ -136,6 +136,44 @@ static result_t css_read_clipboard(stream_handle_t *hndl, void *buffer, uint16_t
   return s_ok;
   }
 
+typedef struct _escape_seq_t {
+  const char *sequence;
+  int numChar;
+  uint16_t can_id;
+  int16_t value;
+  } escape_sequence_t;
+
+static const escape_sequence_t sequences[] = {
+    { "OP", 3, id_key0, 0 }, // F1
+    { "OQ", 3, id_key1, 0 }, // F2
+    { "OR", 3, id_key2, 0 }, // F3
+    { "OS", 3, id_key3, 0 }, // F4
+    { "[15~", 5, id_key4, 0 }, // F5
+    { "[17~", 5, id_decka, -1 }, // F6
+    { "[18~", 5,  id_decka, 1 }, // F7
+    { "[19~", 5, id_decka, -1 }, // F8
+    { "[20~", 5,  id_decka, 1 }, // F9
+    { 0, 0, 0, 0 }
+  };
+
+static uint16_t numSeq = 0;
+static char escapeSeq[16] = { 0 };
+
+static void send_escape(uint16_t can_id, uint16_t value)
+  {
+  canmsg_t msg;
+  memset(&msg, 0, sizeof(canmsg_t));
+  msg.id = can_id;
+  msg.canas.data_type = CANAS_DATATYPE_SHORT;
+  msg.length = 6;
+  msg.canas.service_code = 1;
+  msg.canas.data[0] = value >> 8;
+  msg.canas.data[1] = value;
+
+  // send to the message queue.  handle 0 means top window
+  post_message(0, &msg, 0);
+  }
+
   static result_t css_stream_read(stream_handle_t *hndl, void *buffer, uint16_t size, uint16_t *read)
     {
     if(hndl == 0 || buffer == 0 || size == 0)
@@ -168,34 +206,121 @@ static result_t css_read_clipboard(stream_handle_t *hndl, void *buffer, uint16_t
     if(clipdata != 0 && succeeded(css_read_clipboard(hndl, buffer, size, read)))
       return s_ok;
 
-    if(size > 0 )
-      ReadFile(ci, buffer, size, &bytesRead, NULL);
+    bool inEscape = false;
+    
 
-    if (read != 0)
-      *read = (uint16_t)bytesRead;
-
-    while (bytesRead--)
+    do
       {
-      size--;
-      switch(*str)
+      if (size > 0)
         {
-        case '\r' :
-          *str = '\n';
-          break;
-        case  0x16 :  // windows CTRL-V
-          if (clipdata == NULL)
+        // if we have an escape sequence in the buffer then we process it.
+        char *bp = (char *)buffer;
+        while (!inEscape && escapeSeq[0] != 0 && size > 0)
+          {
+          *bp++ = escapeSeq[0];
+
+          uint16_t i;
+          for (i = 1; i < 16 && escapeSeq[i-1] != 0; i++)
+            escapeSeq[i - 1] = escapeSeq[i];
+          size--;
+          }
+
+        buffer = bp;
+
+        if (size > 0)
+          ReadFile(ci, buffer, size, &bytesRead, NULL);
+        else
+          bytesRead = 0;
+        }
+
+      if (inEscape)
+        {
+        char ch = *str;
+        escapeSeq[numSeq++] = ch;
+        escapeSeq[numSeq] = 0;
+        // get the next and match
+        // must be numerically ascending...
+        const escape_sequence_t *sequence = sequences;
+        bool partialMatch = false;
+
+        while (inEscape && sequence->sequence != 0)
+          {
+          uint16_t cp;
+          for (cp = 0; cp < sequence->numChar; cp++)
             {
-            if(!OpenClipboard(GetShellWindow()))
-              continue;
-            clipdata = GetClipboardData(CF_TEXT);
-            offset = 0;
-            size++;
-            return css_read_clipboard(hndl, str, size, read);
+            if (escapeSeq[cp] == 0 && sequence->sequence[cp] == 0)
+              {
+              inEscape = false;
+              send_escape(sequence->can_id, sequence->value);
+              numSeq = 0;
+              escapeSeq[0] = 0;
+              break;
+              }
+
+            if (sequence->sequence[cp] == 0 ||
+              escapeSeq[cp] != sequence->sequence[cp] ||
+              escapeSeq[cp] == 0)
+              {
+              // no match
+              sequence++;
+              break;
+              }
+            else if (escapeSeq[cp+1] == 0)
+              partialMatch = true;
+            }
+          }
+
+        if (!partialMatch)
+          {
+          inEscape = false;     // just stop processing
+
+          // push escape into the buffer
+          uint16_t chnum = numSeq;
+          escapeSeq[chnum + 1] = 0;
+          while (chnum > 0)
+            {
+            escapeSeq[chnum] = escapeSeq[chnum - 1];
+            chnum--;
             }
 
-          break;
+          escapeSeq[0] = 0x1b;
+          numSeq = 0;
+          }
         }
-      }
+      else
+        {
+        if (read != 0)
+          *read = (uint16_t)bytesRead;
+
+        while (bytesRead--)
+          {
+          size--;
+          switch (*str)
+            {
+            case 0x1b:
+              inEscape = true;
+              size = 1;
+              break;
+            case '\r':
+              *str = '\n';
+              break;
+            case  0x16:  // windows CTRL-V
+              if (clipdata == NULL)
+                {
+                if (!OpenClipboard(GetShellWindow()))
+                  continue;
+                clipdata = GetClipboardData(CF_TEXT);
+                offset = 0;
+                size++;
+                return css_read_clipboard(hndl, str, size, read);
+                }
+
+              break;
+            }
+          }
+        }
+      } while (inEscape || size > 0);
+       
       //if (*str == '\r')
       //  *str = '\n';
 #endif

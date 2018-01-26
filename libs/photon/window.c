@@ -220,7 +220,7 @@ static duk_ret_t lib_window_ctor(duk_context *ctx)
 extern const duk_function_list_entry lib_window_funcs[];
 extern const duk_function_list_entry lib_canvas_funcs[];
 
-static result_t attach_ion_to_window(handle_t hwnd)
+static result_t attach_ion_to_window(const char *prototype, memid_t key, handle_t hwnd)
   {
   // create the object
   result_t result;
@@ -238,10 +238,36 @@ static result_t attach_ion_to_window(handle_t hwnd)
   duk_push_pointer(ctx, hwnd);
 
   // Push special this binding to the function being constructed
-  duk_idx_t obj_idx = duk_push_object(ctx);
-  // Store the function destructor
-  duk_push_c_function(ctx, lib_window_dtor, 0);
-  duk_set_finalizer(ctx, obj_idx);
+  duk_idx_t obj_idx;
+  
+  if (prototype == 0)
+    {
+    obj_idx = duk_push_object(ctx);
+    // Store the function destructor
+    duk_push_c_function(ctx, lib_window_dtor, 0);
+    duk_set_finalizer(ctx, obj_idx);
+    }
+  else
+    {
+    // the string is the name of a constructor function
+    duk_eval_string(ctx, prototype);
+    duk_push_pointer(ctx, (void *)key);
+
+    if (duk_pnew(ctx, 1) != 0)
+      {
+      // cannot locate the prototype
+      if (screen->context->console_err != 0)
+        stream_printf(screen->context->console_err, "Cannot construct object using prototype %s\r\n", prototype);
+
+      // just create an empty object
+      obj_idx = duk_push_object(ctx);
+      // Store the function destructor
+      duk_push_c_function(ctx, lib_window_dtor, 0);
+      duk_set_finalizer(ctx, obj_idx);
+      }
+    else
+      obj_idx = duk_get_top(ctx);     // object is the top of the stack
+    }
 
   // put the hwnd property
   duk_push_pointer(ctx, hwnd);
@@ -637,11 +663,14 @@ result_t create_window(handle_t hwnd_parent, const rect_t *bounds, wndproc cb, u
   if (failed(result = make_window(hwnd_parent, bounds, cb, id, canvas, hwnd)))
     return result;
 
-  return attach_ion_to_window(*hwnd);
+  return attach_ion_to_window(0, 0, *hwnd);
   }
 
-result_t create_child_window(handle_t hwnd_parent, const rect_t *bounds,
-  wndproc cb, uint16_t id, handle_t *hwnd)
+result_t create_child_window(handle_t hwnd_parent,
+  const rect_t *bounds,
+  wndproc cb, uint16_t id,
+  memid_t key,
+  const char *prototype, handle_t *hwnd)
   {
   result_t result;
   canvas_t *canvas;
@@ -664,7 +693,7 @@ result_t create_child_window(handle_t hwnd_parent, const rect_t *bounds,
   if (failed(result = make_window(hwnd_parent, bounds, cb, id, canvas, hwnd)))
     return result;
 
-  return attach_ion_to_window(*hwnd);
+  return attach_ion_to_window(prototype, key, *hwnd);
   }
 
 result_t get_parent(handle_t window, handle_t *parent)

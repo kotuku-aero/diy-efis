@@ -265,7 +265,15 @@ result_t create_child_widget(handle_t parent, memid_t key, wndproc cb, handle_t 
 
   reg_get_uint16(key, "id", &id);
 
-  if(failed(result = create_child_window(parent, &rect, cb, id, hwnd)))
+  char type[REG_NAME_MAX];
+  const char *prototype = 0;
+  if (succeeded(reg_get_string(key, "type", &type, 0)))
+    {
+    // testing hack.  Until we remove all of the native code
+    //prototype = type;
+    }
+
+  if(failed(result = create_child_window(parent, &rect, cb, id, key, prototype, hwnd)))
     return result;
   
   // set the z-order
@@ -283,7 +291,8 @@ result_t create_child_widget(handle_t parent, memid_t key, wndproc cb, handle_t 
 
   // The widget properties are loaded ok, now we can register them
 
-  // see if any scriptlets are loadable
+  // see if any scriptlets are loadable.  These are used to decorate
+  // the prototype
   memid_t handlers;
   if (succeeded(reg_open_key(key, "scripts", &handlers)))
     {
@@ -635,7 +644,7 @@ result_t create_widget(handle_t parent, memid_t key, handle_t *hwnd)
   {
   result_t result;
 
-  // create our window
+  // create our window.  This does not 
   if (failed(result = create_child_widget(parent, key, defwndproc, hwnd)))
     return result;
 

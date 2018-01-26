@@ -115,7 +115,37 @@ void run_proton(proton_args_t *args)
         init_script = startup_script;
 
       // attach the ion interpreter to the screen
-      attach_ion(main_window, key, init_script, args->ci, args->co, args->cerr);
+      if (failed(result = attach_ion(main_window, key, init_script, args->ci, args->co, args->cerr)))
+        return result;
+
+      // we now need to see if there are any widgets defined.
+      // they are located in a key called widgets
+      memid_t widgets;
+      if (succeeded(reg_open_key(key, "widgets", &widgets)))
+        {
+        field_datatype dt = field_stream;
+
+        memid_t child;
+        char name[REG_NAME_MAX];
+        while (succeeded(result = reg_enum_key(widgets, &dt, 0, 0, REG_NAME_MAX, name, &child)))
+          {
+          // open the script
+          stream_p widget;
+          if (failed(result = stream_open(widgets, name, &widget)))
+            {
+            if (args->cerr != 0)
+              stream_printf(args->cerr, "Cannot open widget %s\r\n", name);
+
+            continue;
+            }
+
+          if (failed(result = compile_function(main_window, name, widget)))
+            {
+            if (args->cerr != 0)
+              stream_printf(args->cerr, "Cannot compile widget definition as a constructor %s\r\n", name);
+            }
+          }
+        }
 
       // finally load the layout
       load_layout(main_window, layout_key);
