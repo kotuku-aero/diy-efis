@@ -50,6 +50,8 @@ typedef struct _airspeed_window_t {
   uint16_t va;
   uint16_t vx;
   uint16_t vy;
+
+  uint16_t pixels_per_unit;
   
   float scale;
   float offset;
@@ -349,19 +351,21 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
 
   // the vertical tape displays 28 knots around the current position
   // as there are 240 pixels.  We calc the upper one first
-  gdi_dim_t top_asi = ((gdi_dim_t)wnd->airspeed * 10) + median -10;
+  gdi_dim_t top_asi = ((gdi_dim_t)wnd->airspeed * wnd->pixels_per_unit) + median - wnd->pixels_per_unit;
 
   // assign the first line airspeed
   gdi_dim_t asi_line =(top_asi / 25) * 25;
   gdi_dim_t marker_line;
+  gdi_dim_t width = rect_width(&wnd_rect);
   // work out how many lines to the next lowest marker
-  for(marker_line =(top_asi - asi_line)+ 10; marker_line < ex.dy; marker_line += 25)
+  for(marker_line =(top_asi - asi_line)+ wnd->pixels_per_unit; marker_line < ex.dy; marker_line += 25)
     {
     // draw a line from 10 pixels to 30 pixels then the text.
     // lines at 25 are shorter
-    point_t pts[2] = {
-      { asi_line ==((asi_line / 50) * 50) ? 50 : 55, marker_line },
-      { 65, marker_line }
+    point_t pts[2] =
+      {
+      { asi_line ==((asi_line / 50) * 50) ? width-20 : width-18, marker_line },
+      { width-13, marker_line }
       };
 
     polyline(hwnd, &wnd_rect, &wnd->pen, 2, pts);
@@ -369,7 +373,7 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
     if(asi_line ==((asi_line / 100) * 100))
       {
       char str[64];
-      sprintf(str, "%d",(int)asi_line / 10);
+      sprintf(str, "%d",(int)asi_line / wnd->pixels_per_unit);
 
       uint16_t len = strlen(str);
       extent_t size;
@@ -377,7 +381,7 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
       point_t pt;
 
       draw_text(hwnd, &wnd_rect, wnd->font, wnd->text_color, wnd->background_color,
-                str, len, make_point(47 - size.dx, marker_line -(size.dy >> 1), &pt),
+                str, len, make_point(width-20 - size.dx, marker_line -(size.dy >> 1), &pt),
                 0, 0, 0);
       }
 
@@ -387,65 +391,70 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
       break;
     }
 
-  point_t roller[8] = 
-    {
-    { 47,  median },
-    { 40,  median+7 },
-    { 40,  median+20 },
-    { 0,  median+20 },
-    { 0,  median-20 },
-    { 40,  median-20 },
-    { 40,  median-7 },
-    { 47,  median }
-    };
-
-  polygon(hwnd, &wnd_rect, &white_pen, color_black, 8, roller);
-
-  // now we draw the roller
-  display_roller(hwnd, make_rect(1, median-19, 39, median+19, &rect), 
-                 wnd->airspeed, 1, color_black, color_white,
-                 wnd->large_roller, wnd->small_roller);
-
   // finally draw the markers that indicate the v-speeds
   // each knot is 10 pixels in the y direction
   // the scale is 240 pixels high. 
 
-  gdi_dim_t vne_pixels = top_asi - wnd->vne + 10;
-  gdi_dim_t vno_pixels = top_asi - wnd->vno + 10;
-  gdi_dim_t va_pixels = top_asi - wnd->va + 10;
-  gdi_dim_t vfe_pixels = top_asi - wnd->vfe + 10;
-  gdi_dim_t vs0_pixels = top_asi - wnd->vs0 + 10;      // stall flaps extended
-  gdi_dim_t vs1_pixels = top_asi - wnd->vs1 + 10;      // stall flaps up
-  gdi_dim_t vx_pixels = top_asi - wnd->vx + 10;        // best angle of climb
-  gdi_dim_t vy_pixels = top_asi - wnd->vy + 10;        // best rate of climb
+  gdi_dim_t vne_pixels = (top_asi - wnd->vne + wnd->pixels_per_unit);
+  gdi_dim_t vno_pixels = (top_asi - wnd->vno + wnd->pixels_per_unit);
+  gdi_dim_t va_pixels = (top_asi - wnd->va + wnd->pixels_per_unit);
+  gdi_dim_t vfe_pixels = (top_asi - wnd->vfe + wnd->pixels_per_unit);
+  gdi_dim_t vs0_pixels = (top_asi - wnd->vs0 + wnd->pixels_per_unit);      // stall flaps extended
+  gdi_dim_t vs1_pixels = (top_asi - wnd->vs1 + wnd->pixels_per_unit);      // stall flaps up
+  gdi_dim_t vx_pixels = (top_asi - wnd->vx + wnd->pixels_per_unit);        // best angle of climb
+  gdi_dim_t vy_pixels = (top_asi - wnd->vy + wnd->pixels_per_unit);        // best rate of climb
+
+  gdi_dim_t bar0 = width - 12;
+  gdi_dim_t bar1 = width - 8;
+  gdi_dim_t bar2 =width - 4;
 
   // draw vne exceeded
   if(vne_pixels >= 8)
-    rectangle(hwnd, &wnd_rect, 0, color_red, make_rect(75, 8, 79, min((gdi_dim_t)ex.dy-8, vne_pixels), &rect));
+    rectangle(hwnd, &wnd_rect, 0, color_red, make_rect(bar2, 8, bar2+4, min((gdi_dim_t)ex.dy-8, vne_pixels), &rect));
 
   // draw vne->vno
   if(vno_pixels >= (gdi_dim_t)8 && vne_pixels < (gdi_dim_t)ex.dy-8)
     rectangle(hwnd, &wnd_rect, 0, color_yellow,
-              make_rect(75, max((gdi_dim_t)8, vne_pixels), 79,
+              make_rect(bar2, max((gdi_dim_t)8, vne_pixels), bar2+4,
                         min((gdi_dim_t)ex.dy-8, vno_pixels), &rect));
 
   // draw vno->vs1
   if(vs1_pixels >= 8 && vno_pixels < 232)
     rectangle(hwnd, &wnd_rect, 0, color_green,
-              make_rect(75, max((gdi_dim_t)8, vno_pixels),
-                        79, min((gdi_dim_t)ex.dy-8, vs1_pixels), &rect));
+              make_rect(bar2, max((gdi_dim_t)8, vno_pixels),
+                        bar2+4, min((gdi_dim_t)ex.dy-8, vs1_pixels), &rect));
 
   // draw vfe->vs0
   if(vs0_pixels >= 8 && vfe_pixels < 232)
     rectangle(hwnd, &wnd_rect, 0, color_white,
-              make_rect(71, max((gdi_dim_t)8, vfe_pixels),
-                        75, min((gdi_dim_t)ex.dy-8, vs0_pixels), &rect));
+              make_rect(bar1, max((gdi_dim_t)8, vfe_pixels),
+                        bar1+4, min((gdi_dim_t)ex.dy-8, vs0_pixels), &rect));
 
   // draw vy -> vx
   if(vx_pixels >= 8 && vy_pixels < 232)
     rectangle(hwnd, &wnd_rect, 0, color_blue,
-              make_rect(67, max((gdi_dim_t)8, vy_pixels), 71,
+              make_rect(bar0, max((gdi_dim_t)8, vy_pixels), bar0 + 4,
                         min((gdi_dim_t)ex.dy-8, vx_pixels), &rect));
+
+
+  point_t roller[8] =
+    {
+        { width - 13,  median },
+        { width - 20,  median + 7 },
+        { width - 20,  median + 20 },
+        { 0,  median + 20 },
+        { 0,  median - 20 },
+        { width - 20,  median - 20 },
+        { width - 20,  median - 7 },
+        { width - 13,  median }
+    };
+
+  polygon(hwnd, &wnd_rect, &white_pen, color_black, 8, roller);
+
+  // now we draw the roller
+  display_roller(hwnd, make_rect(1, median - 19, width - 20, median + 19, &rect),
+    wnd->airspeed, 1, color_black, color_white,
+    wnd->large_roller, wnd->small_roller);
 
   end_paint(hwnd);
   return s_ok;
@@ -489,18 +498,31 @@ result_t create_airspeed_window(handle_t parent, memid_t key, handle_t *hwnd)
 
   wnd->version = sizeof(airspeed_window_t);
 
+  if (failed(reg_get_uint16(key, "pix-per-unit", &wnd->pixels_per_unit)))
+    wnd->pixels_per_unit = 10;
+
   reg_get_uint16(key, "vs0", &wnd->vs0);
+  wnd->vs0 *= wnd->pixels_per_unit;
   reg_get_uint16(key, "vs1", &wnd->vs1);
+  wnd->vs1 *= wnd->pixels_per_unit;
   reg_get_uint16(key, "vfe", &wnd->vfe);
+  wnd->vfe *= wnd->pixels_per_unit;
   reg_get_uint16(key, "vno", &wnd->vno);
+  wnd->vno *= wnd->pixels_per_unit;
   reg_get_uint16(key, "vne", &wnd->vne);
+  wnd->vne *= wnd->pixels_per_unit;
   reg_get_uint16(key, "va", &wnd->va);
+  wnd->va *= wnd->pixels_per_unit;
   reg_get_uint16(key, "vx", &wnd->vx);
+  wnd->vx *= wnd->pixels_per_unit;
   reg_get_uint16(key, "vy", &wnd->vy);
+  wnd->vy *= wnd->pixels_per_unit;
 
   // this conversion factor is for knots
   if (failed(reg_get_float(key, "scale", &wnd->scale)))
-    wnd->scale = 1 / 0.5144444445610519f;
+    wnd->scale = 0.5144444445610519f;
+
+  wnd->scale = 1 / wnd->scale;
 
   reg_get_float(key, "offset", &wnd->offset);
 

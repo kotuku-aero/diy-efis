@@ -47,6 +47,8 @@ typedef struct _altitude_window_t {
   uint16_t version;
   int16_t altitude;
   int16_t vertical_speed;
+  float scale;
+  float offset;
 
   uint16_t qnh;
   color_t background_color;
@@ -280,6 +282,9 @@ static result_t on_baro_corrected_altitude(handle_t hwnd, event_proxy_t *proxy, 
   
   float v;
   get_param_float(msg, &v);
+  v *= wnd->scale;
+  v += wnd->offset;
+
   int16_t value = (int16_t)roundf(v);
   changed = wnd->altitude != value;
   wnd->altitude = value;
@@ -297,6 +302,9 @@ static result_t on_altitude_rate(handle_t hwnd, event_proxy_t *proxy, const canm
 
   float v;
   get_param_float(msg, &v);
+  v *= wnd->scale / 60;
+  v += wnd->offset;
+
   int16_t value = (int16_t)roundf(v);
   changed = wnd->vertical_speed != value;
   wnd->vertical_speed = value;
@@ -314,7 +322,7 @@ static result_t on_qnh(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
 
   uint16_t value;
   get_param_uint16(msg, 0, &value);
-  changed = wnd->vertical_speed != value;
+  changed = wnd->qnh != value;
   wnd->qnh = value;
 
   if (changed)
@@ -336,6 +344,12 @@ result_t create_altitude_window(handle_t parent, memid_t key, handle_t *hwnd)
   memset(wnd, 0, sizeof(altitude_window_t));
 
   wnd->version = sizeof(altitude_window_t);
+
+  if (failed(reg_get_float(key, "scale", &wnd->scale)))
+    wnd->scale = 1.0;
+
+  if (failed(reg_get_float(key, "offset", &wnd->offset)))
+    wnd->offset = 0.0;
 
   if (failed(lookup_font(key, "font", &wnd->font)))
     {
