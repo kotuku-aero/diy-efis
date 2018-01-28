@@ -144,15 +144,15 @@ typedef struct _escape_seq_t {
   } escape_sequence_t;
 
 static const escape_sequence_t sequences[] = {
-    { "OP", 3, id_key0, 0 }, // F1
-    { "OQ", 3, id_key1, 0 }, // F2
-    { "OR", 3, id_key2, 0 }, // F3
-    { "OS", 3, id_key3, 0 }, // F4
-    { "[15~", 5, id_key4, 0 }, // F5
-    { "[17~", 5, id_decka, -1 }, // F6
-    { "[18~", 5,  id_decka, 1 }, // F7
-    { "[19~", 5, id_decka, -1 }, // F8
-    { "[20~", 5,  id_decka, 1 }, // F9
+    { "OP", 3, id_key0, 1 }, // F1
+    { "OQ", 3, id_key1, 1 }, // F2
+    { "OR", 3, id_key2, 1 }, // F3
+    { "OS", 3, id_key3, 1 }, // F4
+    { "[15~", 5, id_key4, 1 }, // F5
+    { "[17~", 5, id_decka, 1 }, // F6
+    { "[18~", 5,  id_decka, -1 }, // F7
+    { "[19~", 5, id_decka, 1 }, // F8
+    { "[20~", 5,  id_decka, -1 }, // F9
     { 0, 0, 0, 0 }
   };
 

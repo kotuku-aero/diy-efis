@@ -83,7 +83,7 @@ typedef enum
 
 struct _layout_window_t;
 struct _menu_item_t;
-typedef void(*item_paint_fn)(handle_t hwnd, struct _layout_window_t *wnd, const rect_t *wnd_rect, struct _menu_item_t *item, const rect_t *rect);
+typedef void(*item_paint_fn)(handle_t hwnd, struct _layout_window_t *wnd, const rect_t *wnd_rect, struct _menu_item_t *item, const rect_t *rect, bool is_highlighted);
 typedef menu_item_action_result(*item_evaluate_fn)(struct _layout_window_t *wnd, struct _menu_item_t *item, const canmsg_t *msg);
 typedef void(*item_edit_fn)(struct _layout_window_t *wnd, struct _menu_item_t *item, const canmsg_t *msg);
 typedef bool(*item_is_enabled_fn)(struct _layout_window_t *wnd, struct _menu_item_t *item, const canmsg_t *msg);
@@ -387,8 +387,6 @@ static void copy_ptr(const void *src, void **dst)
   *dst = (void *)src;
   }
 
-static void paint(handle_t hwnd, layout_window_t *wnd, const rect_t *wnd_rect, menu_item_t *item, const rect_t *rect);
-
 static void update_window(handle_t hwnd, layout_window_t *wnd)
   {
   rect_t wnd_rect;
@@ -414,31 +412,25 @@ static void update_window(handle_t hwnd, layout_window_t *wnd)
     // determine how menu items to draw from the item
     uint16_t items_avail = wnd->menu_start_y / item_height;
 
-    uint16_t top_item = wnd->current_menu->selected_index - items_avail + 1;
-
-    if (top_item < 0)
-      top_item = items_avail;
-
     uint16_t num_items = menu_count(wnd->current_menu);
+    uint16_t drawing_item = 0;
+    uint16_t index = 0;
 
-    if (wnd->current_menu->selected_index >= num_items)
-      wnd->current_menu->selected_index = num_items - 1;
+    if (num_items > items_avail)
+      index = wnd->current_menu->selected_index;  // start drawing at the selected index
 
-    uint16_t index;
     // draw the visible items
-    for (index = wnd->current_menu->selected_index; index >= top_item; index--)
+    for (; index < num_items && drawing_item < items_avail; drawing_item++, index++)
       {
       menu_item_t *item = menu_item_at(wnd->current_menu, index);
       (*item->paint)(hwnd, wnd, &wnd_rect, item,
-        make_rect(menu_pt.x, menu_pt.y,
-          menu_pt.x + item_extents.dx,
-          menu_pt.y + item_extents.dy, &rect));
+        make_rect(menu_pt.x, menu_pt.y, menu_pt.x + item_extents.dx, menu_pt.y + item_extents.dy, &rect),
+        index == wnd->current_menu->selected_index);
 
       point_t pt;
       // now ask the item to draw if it is selected
       if (item->is_selected)
-        draw_menu_item(hwnd, wnd, &wnd_rect, item,
-          make_point(menu_pt.x + item_width, menu_pt.y, &pt));
+        draw_menu_item(hwnd, wnd, &wnd_rect, item, make_point(menu_pt.x + item_width, menu_pt.y, &pt));
 
       // skip up one.
       menu_pt.y -= item_height;
@@ -450,6 +442,7 @@ static void show_menu(layout_window_t *wnd, menu_t *menu)
   {
   // assign the menu
   wnd->current_menu = menu;
+  menu->selected_index = 0;         // always start at first item
   // and set the keys
   wnd->active_keys = menu->keys;
   }
@@ -506,146 +499,144 @@ static const char *to_string(const canmsg_t *msg, const char *format, char *buff
       strcpy(buffer, "error");
       break;;
     case CANAS_DATATYPE_FLOAT:
-    {
-    float value;
-    get_param_float(msg, &value);
-    snprintf(buffer, len, format, value);
-    }
-    break;
+      {
+      float value;
+      get_param_float(msg, &value);
+      snprintf(buffer, len, format, value);
+      }
+      break;
     case CANAS_DATATYPE_INT32:
-    {
-    int32_t value;
-    get_param_int32(msg, &value);
-    snprintf(buffer, len, format, value);
-    }
-    break;
+      {
+      int32_t value;
+      get_param_int32(msg, &value);
+      snprintf(buffer, len, format, value);
+      }
+      break;
     case CANAS_DATATYPE_UINT32:
-    {
-    uint32_t value;
-    get_param_uint32(msg, &value);
-    snprintf(buffer, len, format, value);
-    }
-    break;
+      {
+      uint32_t value;
+      get_param_uint32(msg, &value);
+      snprintf(buffer, len, format, value);
+      }
+      break;
     case CANAS_DATATYPE_SHORT:
-    {
-    int16_t value;
-    get_param_int16(msg, 0, &value);
-    snprintf(buffer, len, format, value);
-    }
-    break;
+      {
+      int16_t value;
+      get_param_int16(msg, 0, &value);
+      snprintf(buffer, len, format, value);
+      }
+      break;
     case CANAS_DATATYPE_USHORT:
-    {
-    int16_t value;
-    get_param_uint16(msg, 0, &value);
-    snprintf(buffer, len, format, value);
-    }
-    break;
+      {
+      int16_t value;
+      get_param_uint16(msg, 0, &value);
+      snprintf(buffer, len, format, value);
+      }
+      break;
     case CANAS_DATATYPE_CHAR:
-    {
-    int8_t value;
-    get_param_int8(msg, 0, &value);
-    snprintf(buffer, len, format, value);
-    }
-    break;
+      {
+      int8_t value;
+      get_param_int8(msg, 0, &value);
+      snprintf(buffer, len, format, value);
+      }
+      break;
     case CANAS_DATATYPE_UCHAR:
-    {
-    uint8_t value;
-    get_param_uint8(msg, 0, &value);
-    snprintf(buffer, len, format, value);
-    }
-    break;
+      {
+      uint8_t value;
+      get_param_uint8(msg, 0, &value);
+      snprintf(buffer, len, format, value);
+      }
+      break;
     case CANAS_DATATYPE_SHORT2:
-    {
-    int16_t v1;
-    get_param_int16(msg, 0, &v1);
-    int16_t v2;
-    get_param_int16(msg, 1, &v2);
-    snprintf(buffer, len, format, v1, v2);
-    }
-    break;
+      {
+      int16_t v1;
+      get_param_int16(msg, 0, &v1);
+      int16_t v2;
+      get_param_int16(msg, 1, &v2);
+      snprintf(buffer, len, format, v1, v2);
+      }
+      break;
     case CANAS_DATATYPE_USHORT2:
-    {
-    uint16_t v1;
-    get_param_uint16(msg, 0, &v1);
-    uint16_t v2;
-    get_param_uint16(msg, 1, &v2);
-    snprintf(buffer, len, format, v1, v2);
-    }
-    break;
+      {
+      uint16_t v1;
+      get_param_uint16(msg, 0, &v1);
+      uint16_t v2;
+      get_param_uint16(msg, 1, &v2);
+      snprintf(buffer, len, format, v1, v2);
+      }
+      break;
     case CANAS_DATATYPE_CHAR4:
-    {
-    int8_t v1;
-    get_param_int8(msg, 0, &v1);
-    int8_t v2;
-    get_param_int8(msg, 1, &v2);
-    int8_t v3;
-    get_param_int8(msg, 2, &v3);
-    int8_t v4;
-    get_param_int8(msg, 3, &v4);
-    snprintf(buffer, len, format, v1, v2, v3, v4);
-    }
-    break;
+      {
+      int8_t v1;
+      get_param_int8(msg, 0, &v1);
+      int8_t v2;
+      get_param_int8(msg, 1, &v2);
+      int8_t v3;
+      get_param_int8(msg, 2, &v3);
+      int8_t v4;
+      get_param_int8(msg, 3, &v4);
+      snprintf(buffer, len, format, v1, v2, v3, v4);
+      }
+      break;
     case CANAS_DATATYPE_UCHAR4:
-    {
-    uint8_t v1;
-    get_param_uint8(msg, 0, &v1);
-    uint8_t v2;
-    get_param_uint8(msg, 1, &v2);
-    uint8_t v3;
-    get_param_uint8(msg, 2, &v3);
-    uint8_t v4;
-    get_param_uint8(msg, 3, &v4);
-    snprintf(buffer, len, format, v1, v2, v3, v4);
-    }
-    break;
+      {
+      uint8_t v1;
+      get_param_uint8(msg, 0, &v1);
+      uint8_t v2;
+      get_param_uint8(msg, 1, &v2);
+      uint8_t v3;
+      get_param_uint8(msg, 2, &v3);
+      uint8_t v4;
+      get_param_uint8(msg, 3, &v4);
+      snprintf(buffer, len, format, v1, v2, v3, v4);
+      }
+      break;
     case CANAS_DATATYPE_CHAR2:
-    {
-    int8_t v1;
-    get_param_int8(msg, 0, &v1);
-    int8_t v2;
-    get_param_int8(msg, 1, &v2);
-    snprintf(buffer, len, format, v1, v2);
-    }
-    break;
+      {
+      int8_t v1;
+      get_param_int8(msg, 0, &v1);
+      int8_t v2;
+      get_param_int8(msg, 1, &v2);
+      snprintf(buffer, len, format, v1, v2);
+      }
+      break;
     case CANAS_DATATYPE_UCHAR2:
-    {
-    uint8_t v1;
-    get_param_uint8(msg, 0, &v1);
-    uint8_t v2;
-    get_param_uint8(msg, 1, &v2);
-    snprintf(buffer, len, format, v1, v2);
-    }
-    break;
+      {
+      uint8_t v1;
+      get_param_uint8(msg, 0, &v1);
+      uint8_t v2;
+      get_param_uint8(msg, 1, &v2);
+      snprintf(buffer, len, format, v1, v2);
+      }
+      break;
     case CANAS_DATATYPE_CHAR3:
-    {
-    int8_t v1;
-    get_param_int8(msg, 0, &v1);
-    int8_t v2;
-    get_param_int8(msg, 1, &v2);
-    int8_t v3;
-    get_param_int8(msg, 2, &v3);
-    snprintf(buffer, len, format, v1, v2, v3);
-    }
-    break;
+      {
+      int8_t v1;
+      get_param_int8(msg, 0, &v1);
+      int8_t v2;
+      get_param_int8(msg, 1, &v2);
+      int8_t v3;
+      get_param_int8(msg, 2, &v3);
+      snprintf(buffer, len, format, v1, v2, v3);
+      }
+      break;
     case CANAS_DATATYPE_UCHAR3:
-    {
-    uint8_t v1;
-    get_param_uint8(msg, 0, &v1);
-    uint8_t v2;
-    get_param_uint8(msg, 1, &v2);
-    uint8_t v3;
-    get_param_uint8(msg, 2, &v3);
-    snprintf(buffer, len, format, v1, v2, v3);
-    }
-    break;
+      {
+      uint8_t v1;
+      get_param_uint8(msg, 0, &v1);
+      uint8_t v2;
+      get_param_uint8(msg, 1, &v2);
+      uint8_t v3;
+      get_param_uint8(msg, 2, &v3);
+      snprintf(buffer, len, format, v1, v2, v3);
+      }
+      break;
     }
 
   return buffer;
   }
 
-static bool default_enable_handler(layout_window_t *wnd,
-  menu_item_t *item,
-  const canmsg_t *msg)
+static bool default_enable_handler(layout_window_t *wnd, menu_item_t *item, const canmsg_t *msg)
   {
   if (item->controlling_param == 0 ||
     item->enable_regex == 0)
@@ -674,7 +665,8 @@ static void default_paint_handler(handle_t hwnd,
   layout_window_t *wnd,
   const rect_t *wnd_rect,
   menu_item_t *item,
-  const rect_t *area)
+  const rect_t *area,
+  bool is_selected)
   {
   point_t center_pt = {
     (rect_width(area) >> 1) + area->left,
@@ -682,7 +674,7 @@ static void default_paint_handler(handle_t hwnd,
     };
 
   rectangle(hwnd, wnd_rect, &wnd->border_pen,
-    item->is_selected ? wnd->selected_background_color : wnd->background_color, area);
+    is_selected ? wnd->selected_background_color : wnd->background_color, area);
 
   // calculate the text extents
   extent_t ex;
@@ -693,7 +685,7 @@ static void default_paint_handler(handle_t hwnd,
   center_pt.y -= ex.dy >> 1;
 
   draw_text(hwnd, wnd_rect, wnd->font,
-    item->is_selected ? wnd->selected_color : wnd->text_color,
+    is_selected ? wnd->selected_color : wnd->text_color,
     wnd->background_color,
     item->caption, 0, &center_pt, 0, 0, 0);
   }
@@ -756,7 +748,7 @@ typedef struct _menu_item_menu_t {
   uint16_t value;
 
   // if a checklist item then this has no value
-  char menu_name[REG_STRING_MAX];
+  char caption[REG_STRING_MAX];
   menu_t *menu;
   } menu_item_menu_t;
 
@@ -767,8 +759,6 @@ static menu_item_action_result item_menu_evaluate(layout_window_t *wnd,
   menu_item_menu_t *menu = (menu_item_menu_t *)item;
 
   show_menu(wnd, menu->menu);
-
-  return mia_nothing;
 
   return mia_nothing;
   }
@@ -787,15 +777,17 @@ static menu_item_t *item_menu_load(layout_window_t *wnd,
 
   load_item_defaults(wnd, &item->item, key);
 
-  reg_get_string(key, "menu", item->menu_name, 0);
+  reg_get_string(key, "caption", item->caption, 0);
+  char popup_name[REG_STRING_MAX];
+  reg_get_string(key, "menu", popup_name, 0);
   // load the popup menu
-  find_menu(wnd, item->menu_name, &item->menu);
+  find_menu(wnd, popup_name, &item->menu);
 
   if (is_checklist)
     reg_get_uint16(key, "value", &item->value);
 
   // save the new item
-  vector_push_back(wnd->menu_items, item);
+  vector_push_back(wnd->menu_items, &item);
   return &item->item;
   }
 
@@ -809,9 +801,7 @@ typedef struct _menu_item_cancel_t {
   uint16_t value;     // cancel value
   } menu_item_cancel_t;
 
-static menu_item_action_result item_cancel_evaluate(layout_window_t *wnd,
-  menu_item_t *item,
-  const canmsg_t *msg)
+static menu_item_action_result item_cancel_evaluate(layout_window_t *wnd, menu_item_t *item, const canmsg_t *msg)
   {
   /*
   msg_t cancel_msg(id_menu_cancel);
@@ -836,7 +826,7 @@ static menu_item_t *item_cancel_load(layout_window_t *wnd, memid_t key)
     item->value = id_menu_cancel;
 
   // save the new item
-  vector_push_back(wnd->menu_items, item);
+  vector_push_back(wnd->menu_items, &item);
   return &item->item;
   }
 
@@ -854,6 +844,12 @@ static menu_item_action_result item_enter_evaluate(layout_window_t *wnd,
   menu_item_t *item,
   const canmsg_t *msg)
   {
+  // get the current menu and select the item
+  menu_item_t *mi;
+  if (succeeded(vector_at(wnd->current_menu->menu_items, wnd->current_menu->selected_index, &mi)) &&
+    (*mi->is_enabled)(wnd, mi, msg))
+    (*mi->evaluate)(wnd, mi, msg);
+
   return mia_enter;
   }
 
@@ -872,7 +868,7 @@ static menu_item_t *item_enter_load(layout_window_t *wnd,
     item->value = id_menu_ok;
 
   // save the new item
-  vector_push_back(wnd->menu_items, item);
+  vector_push_back(wnd->menu_items, &item);
   return &item->item;
   }
 
@@ -885,12 +881,15 @@ typedef struct _menu_item_event_t {
   canmsg_t msg;
   } menu_item_event_t;
 
-static menu_item_action_result item_event_evaluate(layout_window_t *wnd,
-  menu_item_t *item,
-  const canmsg_t *msg)
+static menu_item_action_result item_event_evaluate(layout_window_t *wnd, menu_item_t *item, const canmsg_t *msg)
   {
   menu_item_event_t *mi = (menu_item_event_t *)item;
-  can_send(&mi->msg);
+
+  // see if the event is an internal menu one
+  if (msg->id >= id_first_internal_msg && msg->id <= id_last_internal_msg)
+    send_message(wnd->window, &mi->msg);
+  else
+    can_send(&mi->msg);
 
   return mia_nothing;
   }
@@ -910,7 +909,7 @@ static menu_item_t *item_event_load(layout_window_t *wnd,
   load_can_msg(key, &item->msg);
 
   // save the new item
-  vector_push_back(wnd->menu_items, item);
+  vector_push_back(wnd->menu_items, &item);
   return &item->item;
   }
 
@@ -940,7 +939,8 @@ static void item_edit_paint(handle_t hwnd,
   layout_window_t *wnd,
   const rect_t *wnd_rect,
   menu_item_t *item,
-  const rect_t *rect)
+  const rect_t *rect,
+  bool is_selected)
   {
 
   }
@@ -1005,7 +1005,7 @@ static menu_item_t *item_edit_load(layout_window_t *wnd,
   reg_get_uint16(key, "digits", &item->digits);
 
   // save the new item
-  vector_push_back(wnd->menu_items, item);
+  vector_push_back(wnd->menu_items, &item);
   return &item->item;
   }
 /*
@@ -1054,9 +1054,7 @@ static menu_item_action_result item_checklist_evaluate(layout_window_t *wnd,
   return mia_nothing;
   }
 
-static void item_checklist_event(layout_window_t *wnd,
-  menu_item_t *item,
-  const canmsg_t *msg)
+static void item_checklist_event(layout_window_t *wnd, menu_item_t *item, const canmsg_t *msg)
   {
   // check the enabler
   default_enable_handler(wnd, item, msg);
@@ -1090,7 +1088,6 @@ static menu_item_t *item_checklist_load(layout_window_t *wnd,
   menu_item_checklist_t *item = (menu_item_checklist_t *)neutron_malloc(sizeof(menu_item_checklist_t));
   memset(item, 0, sizeof(menu_item_checklist_t));
 
-
   item->item.item_type = mi_checklist;
 
   load_item_defaults(wnd, &item->item, key);
@@ -1103,46 +1100,10 @@ static menu_item_t *item_checklist_load(layout_window_t *wnd,
   item->popup = (menu_item_menu_t *)item_menu_load(wnd, key, true);
 
   // save the new item
-  vector_push_back(wnd->menu_items, item);
+  vector_push_back(wnd->menu_items, &item);
   return &item->item;
   }
-/*
-menu_item_checklist_t::menu_item_checklist_t(layout_window_t *parent, const char *options, const char *expr)
-: menu_item_t(parent)
-{
-// if the parser determines we have an enable expression in the form menu(<expr>): then
-// pass it to the base class.
-if(expr != 0)
-assign_enabler(expr);
 
-// the string is composed of a tuple of 3 attributes.  The first is the
-//
-attributes_t attributes;
-split_tuple(options, attributes, ',');
-
-if(attributes[0][0] == '"')
-caption(attributes[0].substr(1, attributes[0][attributes[0].size()-1]== '"' ? attributes[0].size()-2 : attributes[0].size()-1));
-else
-caption(attributes[0]);
-}
-
-menu_item_checklist_t::~menu_item_checklist_t()
-{
-}
-
-menu_item_type menu_item_checklist_t::item_type() const
-{
-return mi_checklist;
-}
-
-menu_item_action_result menu_item_checklist_t::evaluate(const canmsg_t &) const
-{
-return mia_nothing;
-}
-*/
-////////////////////////////////////////////////////////////////////////////////
-//
-//
 /**
 * Load a menu item from the registry
 * @param value     String to parse
@@ -1189,6 +1150,11 @@ static result_t find_keys(layout_window_t *wnd, const char *name, keys_t **pmenu
 
   if (failed(map_find(wnd->key_mappings, name, (void **)&menu)))
     {
+    // see if the key is found
+    memid_t menu_key;
+    if (failed(result = reg_open_key(wnd->key, name, &menu_key)))
+      return result;
+
     menu = (keys_t *)neutron_malloc(sizeof(keys_t));
     *pmenu = menu;
 
@@ -1203,31 +1169,31 @@ static result_t find_keys(layout_window_t *wnd, const char *name, keys_t **pmenu
       }
 
     memid_t child;
-    if (succeeded(reg_open_key(wnd->key, "key0", &child)))
+    if (succeeded(reg_open_key(menu_key, "key0", &child)))
       menu->key0 = parse_item(wnd, child);
 
-    if (succeeded(reg_open_key(wnd->key, "key1", &child)))
+    if (succeeded(reg_open_key(menu_key, "key1", &child)))
       menu->key1 = parse_item(wnd, child);
 
-    if (succeeded(reg_open_key(wnd->key, "key2", &child)))
+    if (succeeded(reg_open_key(menu_key, "key2", &child)))
       menu->key2 = parse_item(wnd, child);
 
-    if (succeeded(reg_open_key(wnd->key, "key3", &child)))
+    if (succeeded(reg_open_key(menu_key, "key3", &child)))
       menu->key3 = parse_item(wnd, child);
 
-    if (succeeded(reg_open_key(wnd->key, "key4", &child)))
+    if (succeeded(reg_open_key(menu_key, "key4", &child)))
       menu->key4 = parse_item(wnd, child);
 
-    if (succeeded(reg_open_key(wnd->key, "decka-up", &child)))
+    if (succeeded(reg_open_key(menu_key, "decka-up", &child)))
       menu->decka_up = parse_item(wnd, child);
 
-    if (succeeded(reg_open_key(wnd->key, "decka-dn", &child)))
+    if (succeeded(reg_open_key(menu_key, "decka-dn", &child)))
       menu->decka_dn = parse_item(wnd, child);
 
-    if (succeeded(reg_open_key(wnd->key, "deckb-up", &child)))
+    if (succeeded(reg_open_key(menu_key, "deckb-up", &child)))
       menu->deckb_up = parse_item(wnd, child);
 
-    if (succeeded(reg_open_key(wnd->key, "deckb-dn", &child)))
+    if (succeeded(reg_open_key(menu_key, "deckb-dn", &child)))
       menu->deckb_dn = parse_item(wnd, child);
     }
 
@@ -1276,7 +1242,7 @@ static result_t find_menu(layout_window_t *wnd, const char *name, menu_t **menu)
       // the protocol assumes all child keys are menu items
       menu_item_t *item = parse_item(wnd, item_key);
       // add the menu item to the mix
-      vector_push_back(popup->menu_items, item);
+      vector_push_back(popup->menu_items, &item);
       }
 
     // we now load the keys
@@ -1314,10 +1280,13 @@ result_t layout_wndproc(handle_t hwnd, const canmsg_t *msg)
       vector_at(wnd->menu_items, item, &mi);
 
       // update the controlling variable if it is being watched.
-      if (mi->event != 0)
+      if (mi != 0 && mi->event != 0)
         (*mi->event)(wnd, mi, msg);
       }
     }
+
+  // finally update the menu if it is there so it draws on top
+  update_window(hwnd, wnd);
 
   return s_ok;
   }
@@ -1384,8 +1353,7 @@ static result_t on_key1(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg
       value > 0 &&
       (*wnd->active_keys->key1->is_enabled)(wnd, wnd->active_keys->key1, msg))
       {
-      if (wnd->menu_timer != 0)
-        (*wnd->active_keys->key1->evaluate)(wnd, wnd->active_keys->key1, msg);
+      (*wnd->active_keys->key1->evaluate)(wnd, wnd->active_keys->key1, msg);
 
       wnd->menu_timer = menu_timeout;
       changed = true;
@@ -1739,20 +1707,43 @@ static result_t on_cancel(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *m
   return s_ok;
   }
 
+result_t release_layout(layout_window_t *wnd)
+  {
+  // clear the layout window
+  return s_ok;
+  }
+
+result_t build_layout(layout_window_t *wnd, memid_t hive)
+  {
+  return s_ok;
+  }
+
 result_t load_layout(handle_t parent, memid_t hive)
   {
+  // if the window exists then release all resources
+  layout_window_t *wnd = 0;
+  if (succeeded(get_wnddata(parent, (void **)&wnd)) &&
+    wnd != 0)
+    {
+    release_layout(wnd);
+    }
+  else
+    {
+    // first call, create an empty layout
+    wnd = (layout_window_t *)neutron_malloc(sizeof(layout_window_t));
+    memset(wnd, 0, sizeof(layout_window_t));
+
+    // attach the window to the screen
+    wnd->window = parent;
+    wnd->version = sizeof(layout_window_t);
+    }
+
   // the hive must have series of hives that form windows
   result_t result;
-  char name[REG_NAME_MAX +1];
+  char name[REG_NAME_MAX + 1];
   uint16_t length = REG_NAME_MAX + 1;
   field_datatype type = field_key;
 
-  layout_window_t *wnd = (layout_window_t *)neutron_malloc(sizeof(layout_window_t));
-  memset(wnd, 0, sizeof(layout_window_t));
-
-  // attach the window to the screen
-  wnd->window = parent;
-  wnd->version = sizeof(layout_window_t);
 
   memid_t menu = 0;
   if (succeeded(reg_open_key(hive, "menu", &menu)))
@@ -1785,7 +1776,11 @@ result_t load_layout(handle_t parent, memid_t hive)
   char menu_name[REG_STRING_MAX];
 
   if (succeeded(reg_get_string(menu, "root-keys", menu_name, 0)))
+    {
     find_keys(wnd, menu_name, &wnd->root_keys);
+    wnd->active_keys = wnd->root_keys;
+    wnd->menu_timer = 0;
+    }
 
   if (failed(lookup_color(menu, "bk-color", &wnd->background_color)))
     wnd->background_color = color_black;

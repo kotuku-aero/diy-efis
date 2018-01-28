@@ -744,7 +744,7 @@ result_t cli_init(cli_cfg_t *cfg, cli_t *parser)
   parser->root_level = 0;
 
   parser->root[0] = parser->cfg.root;       // root node
-  strncpy(parser->prompt[0], parser->cfg.prompt, MAX_PROMPT_LENGTH);   // root prompt
+  strncpy(parser->prompt[0], "/", MAX_PROMPT_LENGTH);   // root prompt
   parser->current[0] = 0;                   // root memid in the registry
 
   for(n = 1; n < CLI_MAX_NESTED_LEVELS; n++)

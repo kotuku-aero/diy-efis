@@ -38,6 +38,34 @@ it must be removed as soon as possible after the code fragment is identified.
 extern const char *node_name;
 static const char *cr_lf = "\r\n";
 
+static void make_prompt(char *prompt, size_t maxlen, const char *dirname)
+  {
+  // the prompt is either the full path or ...\<dirname>\<dirname>
+  size_t dirlen = strlen(dirname);
+
+  *prompt = 0;
+  const char *dirp = dirname;
+
+  if (dirlen > (maxlen - 2))
+    {
+    // this is the case where we have to prepend an elipsis
+    strcpy(prompt, ".../");
+    maxlen -= 4;
+
+    // work backward on the dirname looking for the first directry marker
+    dirp += dirlen - maxlen;
+
+    while (*dirp != '/' && *dirp != 0)
+      dirp++;
+    }
+  else
+    strcpy(prompt, "/");
+
+  strncat(prompt, dirp, maxlen);
+
+  neutron_free((void *)dirname);
+  }
+
 static void show_key(handle_t dest, memid_t key, bool full_path, bool recursive, uint16_t *indent)
   {
   char name[REG_NAME_MAX + 1];
@@ -246,14 +274,7 @@ result_t mkdir_path_action(cli_t *context, const char * name_)
     }
 
   // update the submode
-  const char * dirname = get_full_path(memid);
-
-  char prompt[MAX_PROMPT_LENGTH];
-  snprintf(prompt, MAX_PROMPT_LENGTH, "%s %s ", node_name, dirname);
-
-  neutron_free((void *)dirname);
-
-  strncpy(context->prompt[context->root_level], prompt, MAX_PROMPT_LENGTH);
+  make_prompt(context->prompt[context->root_level], MAX_PROMPT_LENGTH, get_full_path(memid));
   context->current[context->root_level] = memid;
 
   return s_ok;
@@ -266,18 +287,12 @@ result_t cd_path_action(cli_t *context, const char * name_)
   memid_t memid = 0;
   if(failed(result = open_key(get_context(context), name_, false, &memid)))
     {
-    stream_puts(context->cfg.console_err, "Error when creating key\r\n");
+    stream_puts(context->cfg.console_err, "Error when changine to key\r\n");
     return result;
     }
 
   // update the submode
-  const char * dirname = get_full_path(memid);
-
-  char prompt[MAX_PROMPT_LENGTH];
-  snprintf(prompt, MAX_PROMPT_LENGTH, "%s %s ", node_name, dirname);
-  neutron_free((void *)dirname);
-
-  strncpy(context->prompt[context->root_level], prompt, MAX_PROMPT_LENGTH);
+  make_prompt(context->prompt[context->root_level], MAX_PROMPT_LENGTH, get_full_path(memid));
   context->current[context->root_level] = memid;
 
   return s_ok;
@@ -388,18 +403,5 @@ result_t exit_action(cli_t *context)
   if(context->current[context->root_level] == 0)
     return cli_quit(context);
 
-  memid_t parent;
-  if(failed(reg_query_memid(context->current[context->root_level], 0, 0, 0, &parent)))
-    parent = 0;
-
-  context->current[context->root_level] = parent;
-  // update the submode
-  const char * dirname = get_full_path(parent);
-
-  char prompt[MAX_PROMPT_LENGTH];
-  snprintf(prompt, MAX_PROMPT_LENGTH, "%s %s ", node_name, dirname);
-  neutron_free((void *)dirname);
-
-  strncpy(context->prompt[context->root_level], prompt, MAX_PROMPT_LENGTH);
   return s_ok;
   }
