@@ -180,6 +180,68 @@ result_t string_name_value_action(cli_t *context, const char * name_, const char
   return reg_set_string(get_context(context), name_, value_);
   }
 
+static result_t stream_cb(cli_t *parser, stream_p stream, vector_p buffer)
+  {
+  result_t result;
+  // the parg is a stream_p
+  char *str;
+  uint16_t len;
+
+  if (failed(result = vector_begin(buffer, (void **)&str)) ||
+    failed(result = vector_count(buffer, &len)) ||
+    failed(result = stream_write(stream, str, len)))
+    return result;
+
+  vector_close(buffer);
+  stream_close(stream);
+
+  return s_ok;
+  }
+
+result_t script_name_value_action(cli_t *context, const char * name, const char *value)
+  {
+  // determine if the value exists.. If so and it ends with a \ then we enter
+  // into user input mode for the stream
+  if (name == 0 || value == 0)
+    return e_bad_parameter;
+
+
+  result_t result;
+  vector_p buffer;
+  stream_p stream;
+  if (failed(result = stream_create(get_context(context), name, &stream)))
+    return result;
+
+  if (failed(result = vector_create(sizeof(char), &buffer)))
+    {
+    stream_close(stream);
+    return result;
+    }
+
+
+  // see if the value ends with a 
+  size_t len = strlen(value);
+  size_t pos;
+  for (pos = 0; pos < len; pos++)
+    {
+    if (pos == len - 1 && value[pos] == '\\')
+      {
+      if (failed(result = cli_user_input(context, "", true, stream, buffer, stream_cb)))
+        {
+        stream_close(stream);
+        vector_close(buffer);
+        return result;
+        }
+
+      return s_ok;
+      }
+    vector_push_back(buffer, &value[pos]);
+    }
+
+  // means was a string without a continuation
+  return stream_cb(context, stream, buffer);
+  }
+
 result_t bool_name_value_action(cli_t *context, const char * name_, uint16_t value_)
   {
   if(name_ == 0)

@@ -5,6 +5,7 @@ int32 <STRING:name> <INT32:value>
 xyz <STRING:name> <XYZ:value>
 matrix <STRING:name> <MATRIX:value>
 string <STRING:name> <STRING:value>
+script <STRING:name> <STRING:value>
 bool <STRING:name> <ENUM:booleans:value>
 float <STRING:name> <FLOAT:value>
 edit <STRING:name>

@@ -156,9 +156,6 @@ static void cli_print_error(cli_t *parser, const char *msg)
  */
 static void cli_input_reset(cli_t *parser)
   {
-  if(parser->user_buf != 0)
-    neutron_free((void *)parser->user_buf);
-
   parser->user_buf = 0;
   parser->user_input_cb = 0;
   }
@@ -483,7 +480,7 @@ result_t cli_input(cli_t *parser, char ch, cli_char_t ch_type)
 
   if (parser == 0)
     return e_bad_parameter;
-/*
+
   // check to see if the characters are user input
   if (cli_is_user_input(parser, &do_echo))
     {
@@ -491,8 +488,8 @@ result_t cli_input(cli_t *parser, char ch, cli_char_t ch_type)
     if (CLI_CHAR_REGULAR != ch_type)
       return s_ok;
 
-    const char *str;
-    vector_begin(parser->user_buf, &str);
+    char *str;
+    vector_begin(parser->user_buf, (void **) &str);
     uint16_t len;
     vector_count(parser->user_buf, &len);
 
@@ -506,7 +503,7 @@ result_t cli_input(cli_t *parser, char ch, cli_char_t ch_type)
         vector_push_back(parser->user_buf,  &eol);
 
         if(parser->user_input_cb != 0)
-          rc = parser->user_input_cb(parser, parser->user_buf);
+          rc = parser->user_input_cb(parser, parser->stream, parser->user_buf);
 
         cli_input_reset(parser);
         cli_print_prompt(parser);
@@ -538,7 +535,7 @@ result_t cli_input(cli_t *parser, char ch, cli_char_t ch_type)
       }
     return s_ok;
     }
-*/
+
   switch (ch_type)
     {
     case CLI_CHAR_REGULAR:
@@ -1030,11 +1027,12 @@ result_t cli_help_cmd(cli_t *parser, char *str)
                   cli_help_post_walker, &help_stack);
   }
 
-result_t cli_user_input(cli_t *parser, const char *prompt, int do_echo, cli_input_cb cb)
+result_t cli_user_input(cli_t *parser, const char *prompt,
+  bool do_echo, stream_p stream, vector_p buffer, cli_input_cb cb)
   {
   bool tmp_do_echo;
 
-  if (!parser)
+  if (parser == 0 || buffer == 0 || cb == 0)
     {
     return e_bad_parameter;
     }
@@ -1049,7 +1047,8 @@ result_t cli_user_input(cli_t *parser, const char *prompt, int do_echo, cli_inpu
     stream_puts(parser->cfg.console_out, prompt);
 
   /* Save the state */
-  parser->user_buf = 0;
+  parser->stream = stream;
+  parser->user_buf = buffer;
   parser->user_input_cb = cb;
   parser->user_do_echo = do_echo;
 

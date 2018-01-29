@@ -148,10 +148,7 @@ result_t edit_script(cli_t *context, const char *title, handle_t stream)
   // get the stream
   result_t result;
 
-  if (failed(result = muon_edit(context->cfg.console_in,
-    context->cfg.console_out,
-    title,
-    stream)))
+  if (failed(result = muon_edit(context->cfg.console_in, context->cfg.console_out, title, stream)))
     {
     stream_close(stream);
     return result;

@@ -134,6 +134,26 @@ static result_t cli_string_name_value (cli_t *parser)
   }
 
 
+static result_t cli_stream_name_value (cli_t *parser)
+  {
+  result_t result;
+  const char * stream_name_ = 0;
+  const char * stream_name_value_ = 0;
+
+  if(failed(result = cli_get_string(&parser->tokens[1], &stream_name_)))
+    return result;
+
+  if(parser->tokens[2].token_length > 0 &&
+    failed(result = cli_get_string(&parser->tokens[2], &stream_name_value_)))
+    return result;
+
+  result = stream_name_value_action(parser, stream_name_, ((parser->tokens[2].token_length > 0) ? stream_name_value_ : 0));
+
+
+  return result;
+  }
+
+
 static result_t cli_bool_name_value (cli_t *parser)
   {
   result_t result;
@@ -277,478 +297,325 @@ static result_t cli_ls_path_recursive (cli_t *parser)
   }
 
 
-static result_t cli_publisher_ls_id (cli_t *parser)
+static result_t cli_neutron_ls_id (cli_t *parser)
   {
   result_t result;
-  uint16_t publisher_ls_id_;
+  uint16_t neutron_ls_id_;
 
-  if((parser->tokens[1].token_length) > 0 &&
-    failed(result = cli_get_enum(&parser->tokens[1], can_ids, &publisher_ls_id_)))
+  if(parser->tokens[1].token_length > 0 &&
+    failed(result = cli_get_enum(&parser->tokens[1], can_ids, &neutron_ls_id_)))
     return result;
 
-  result = publisher_ls_id_action(parser, (((parser->tokens[1].token_length) > 0) ? &publisher_ls_id_ : 0));
+  result = neutron_ls_id_action(parser, ((parser->tokens[1].token_length > 0) ? &neutron_ls_id_ : 0));
 
 
   return result;
   }
 
 
-static result_t cli_publisher_rm_id (cli_t *parser)
+static result_t cli_neutron_rm_id (cli_t *parser)
   {
   result_t result;
-  uint16_t publisher_rm_id_;
+  uint16_t neutron_rm_id_;
 
-  if(failed(result = cli_get_enum(&parser->tokens[1], can_ids, &publisher_rm_id_)))
+  if(failed(result = cli_get_enum(&parser->tokens[1], can_ids, &neutron_rm_id_)))
     return result;
 
-  result = publisher_rm_id_action(parser, publisher_rm_id_);
+  result = neutron_rm_id_action(parser, neutron_rm_id_);
 
 
   return result;
   }
 
 
-static result_t cli_publisher_publish_id_rate_rate (cli_t *parser)
+static result_t cli_neutron_publish_id_rate_rate (cli_t *parser)
   {
   result_t result;
-  uint16_t publisher_publish_id_rate_rate_;
+  uint16_t neutron_publish_id_rate_rate_;
 
-  if(failed(result = cli_get_uint16(&parser->tokens[1], &publisher_publish_id_rate_rate_)))
+  if(failed(result = cli_get_uint16(&parser->tokens[1], &neutron_publish_id_rate_rate_)))
     return result;
 
-  result = publisher_publish_id_rate_rate_action(parser, publisher_publish_id_rate_rate_);
+  result = neutron_publish_id_rate_rate_action(parser, neutron_publish_id_rate_rate_);
 
 
   return result;
   }
 
 
-static result_t cli_publisher_publish_id_type_type (cli_t *parser)
+static result_t cli_neutron_publish_id_type_type (cli_t *parser)
   {
   result_t result;
-  uint16_t publisher_publish_id_type_type_;
+  uint16_t neutron_publish_id_type_type_;
 
-  if(failed(result = cli_get_enum(&parser->tokens[1], publish_types, &publisher_publish_id_type_type_)))
+  if(failed(result = cli_get_enum(&parser->tokens[1], publish_types, &neutron_publish_id_type_type_)))
     return result;
 
-  result = publisher_publish_id_type_type_action(parser, publisher_publish_id_type_type_);
+  result = neutron_publish_id_type_type_action(parser, neutron_publish_id_type_type_);
 
 
   return result;
   }
 
 
-static result_t cli_publisher_publish_id_sample_sample (cli_t *parser)
+static result_t cli_neutron_publish_id_sample_sample (cli_t *parser)
   {
   result_t result;
-  uint16_t publisher_publish_id_sample_sample_;
+  uint16_t neutron_publish_id_sample_sample_;
 
-  if(failed(result = cli_get_enum(&parser->tokens[1], sample_types, &publisher_publish_id_sample_sample_)))
+  if(failed(result = cli_get_enum(&parser->tokens[1], sample_types, &neutron_publish_id_sample_sample_)))
     return result;
 
-  result = publisher_publish_id_sample_sample_action(parser, publisher_publish_id_sample_sample_);
+  result = neutron_publish_id_sample_sample_action(parser, neutron_publish_id_sample_sample_);
 
 
   return result;
   }
 
 
-static result_t cli_publisher_publish_id_publish_is_published (cli_t *parser)
+static result_t cli_neutron_publish_id_publish_is_published (cli_t *parser)
   {
   result_t result;
-  bool publisher_publish_id_publish_is_published_;
+  bool neutron_publish_id_publish_is_published_;
 
-  if(failed(result = cli_get_bool(&parser->tokens[1], booleans, &publisher_publish_id_publish_is_published_)))
+  if(failed(result = cli_get_bool(&parser->tokens[1], booleans, &neutron_publish_id_publish_is_published_)))
     return result;
 
-  result = publisher_publish_id_publish_is_published_action(parser, publisher_publish_id_publish_is_published_);
+  result = neutron_publish_id_publish_is_published_action(parser, neutron_publish_id_publish_is_published_);
 
 
   return result;
   }
 
 
-static result_t cli_publisher_publish_id_loopback_loopback (cli_t *parser)
+static result_t cli_neutron_publish_id_loopback_loopback (cli_t *parser)
   {
   result_t result;
-  bool publisher_publish_id_loopback_loopback_;
+  bool neutron_publish_id_loopback_loopback_;
 
-  if(failed(result = cli_get_bool(&parser->tokens[1], booleans, &publisher_publish_id_loopback_loopback_)))
+  if(failed(result = cli_get_bool(&parser->tokens[1], booleans, &neutron_publish_id_loopback_loopback_)))
     return result;
 
-  result = publisher_publish_id_loopback_loopback_action(parser, publisher_publish_id_loopback_loopback_);
+  result = neutron_publish_id_loopback_loopback_action(parser, neutron_publish_id_loopback_loopback_);
 
 
   return result;
   }
 
 
-static result_t cli_publisher_publish_id_filter_filter_type_length_value (cli_t *parser)
+static result_t cli_neutron_publish_id_filter_filter_type_length_value (cli_t *parser)
   {
   result_t result;
-  uint16_t publisher_publish_id_filter_filter_type_length_value_;
+  uint16_t neutron_publish_id_filter_filter_type_length_value_;
 
-  if(failed(result = cli_get_uint16(&parser->tokens[1], &publisher_publish_id_filter_filter_type_length_value_)))
+  if(failed(result = cli_get_uint16(&parser->tokens[1], &neutron_publish_id_filter_filter_type_length_value_)))
     return result;
 
-  result = publisher_publish_id_filter_filter_type_length_value_action(parser, publisher_publish_id_filter_filter_type_length_value_);
+  result = neutron_publish_id_filter_filter_type_length_value_action(parser, neutron_publish_id_filter_filter_type_length_value_);
 
 
   return result;
   }
 
 
-static result_t cli_publisher_publish_id_filter_filter_type_coeff_index_value (cli_t *parser)
+static result_t cli_neutron_publish_id_filter_filter_type_coeff_index_value (cli_t *parser)
   {
   result_t result;
-  uint16_t publisher_publish_id_filter_filter_type_coeff_index_;
-  float publisher_publish_id_filter_filter_type_coeff_index_value_;
+  uint16_t neutron_publish_id_filter_filter_type_coeff_index_;
+  float neutron_publish_id_filter_filter_type_coeff_index_value_;
 
-  if(failed(result = cli_get_uint16(&parser->tokens[1], &publisher_publish_id_filter_filter_type_coeff_index_)))
+  if(failed(result = cli_get_uint16(&parser->tokens[1], &neutron_publish_id_filter_filter_type_coeff_index_)))
     return result;
 
-  if(failed(result = cli_get_float(&parser->tokens[2], &publisher_publish_id_filter_filter_type_coeff_index_value_)))
+  if(failed(result = cli_get_float(&parser->tokens[2], &neutron_publish_id_filter_filter_type_coeff_index_value_)))
     return result;
 
-  result = publisher_publish_id_filter_filter_type_coeff_index_value_action(parser, publisher_publish_id_filter_filter_type_coeff_index_, publisher_publish_id_filter_filter_type_coeff_index_value_);
+  result = neutron_publish_id_filter_filter_type_coeff_index_value_action(parser, neutron_publish_id_filter_filter_type_coeff_index_, neutron_publish_id_filter_filter_type_coeff_index_value_);
 
 
   return result;
   }
 
 
-static result_t cli_publisher_publish_id_filter_filter_type_gain_value (cli_t *parser)
+static result_t cli_neutron_publish_id_filter_filter_type_gain_value (cli_t *parser)
   {
   result_t result;
-  float publisher_publish_id_filter_filter_type_gain_value_;
+  float neutron_publish_id_filter_filter_type_gain_value_;
 
-  if(failed(result = cli_get_float(&parser->tokens[1], &publisher_publish_id_filter_filter_type_gain_value_)))
+  if(failed(result = cli_get_float(&parser->tokens[1], &neutron_publish_id_filter_filter_type_gain_value_)))
     return result;
 
-  result = publisher_publish_id_filter_filter_type_gain_value_action(parser, publisher_publish_id_filter_filter_type_gain_value_);
+  result = neutron_publish_id_filter_filter_type_gain_value_action(parser, neutron_publish_id_filter_filter_type_gain_value_);
 
 
   return result;
   }
 
 
-static result_t cli_publisher_publish_id_filter_filter_type_exit (cli_t *parser)
+static result_t cli_neutron_publish_id_filter_filter_type_exit (cli_t *parser)
   {
   result_t result;
-  result = publisher_publish_id_filter_filter_type_exit_action(parser);
+  result = neutron_publish_id_filter_filter_type_exit_action(parser);
 
 
   return result;
   }
 
 
-static result_t cli_publisher_publish_id_filter_filter_type (cli_t *parser)
+static result_t cli_neutron_publish_id_filter_filter_type (cli_t *parser)
   {
   result_t result;
-  uint16_t publisher_publish_id_filter_filter_type_;
+  uint16_t neutron_publish_id_filter_filter_type_;
 
-  if(failed(result = cli_get_enum(&parser->tokens[1], filter_types, &publisher_publish_id_filter_filter_type_)))
+  if(failed(result = cli_get_enum(&parser->tokens[1], filter_types, &neutron_publish_id_filter_filter_type_)))
     return result;
 
-  result = publisher_publish_id_filter_filter_type_action(parser, publisher_publish_id_filter_filter_type_);
+  result = neutron_publish_id_filter_filter_type_action(parser, neutron_publish_id_filter_filter_type_);
 
 
   return result;
   }
 
 
-static result_t cli_publisher_publish_id_alarm_alarm_id_type_alarm_type (cli_t *parser)
+static result_t cli_neutron_publish_id_alarm_alarm_id_type_alarm_type (cli_t *parser)
   {
   result_t result;
-  uint16_t publisher_publish_id_alarm_alarm_id_type_alarm_type_;
+  uint16_t neutron_publish_id_alarm_alarm_id_type_alarm_type_;
 
-  if(failed(result = cli_get_enum(&parser->tokens[1], alarm_types, &publisher_publish_id_alarm_alarm_id_type_alarm_type_)))
+  if(failed(result = cli_get_enum(&parser->tokens[1], alarm_types, &neutron_publish_id_alarm_alarm_id_type_alarm_type_)))
     return result;
 
-  result = publisher_publish_id_alarm_alarm_id_type_alarm_type_action(parser, publisher_publish_id_alarm_alarm_id_type_alarm_type_);
+  result = neutron_publish_id_alarm_alarm_id_type_alarm_type_action(parser, neutron_publish_id_alarm_alarm_id_type_alarm_type_);
 
 
   return result;
   }
 
 
-static result_t cli_publisher_publish_id_alarm_alarm_id_period_length (cli_t *parser)
+static result_t cli_neutron_publish_id_alarm_alarm_id_period_length (cli_t *parser)
   {
   result_t result;
-  uint16_t publisher_publish_id_alarm_alarm_id_period_length_;
+  uint16_t neutron_publish_id_alarm_alarm_id_period_length_;
 
-  if(failed(result = cli_get_uint16(&parser->tokens[1], &publisher_publish_id_alarm_alarm_id_period_length_)))
+  if(failed(result = cli_get_uint16(&parser->tokens[1], &neutron_publish_id_alarm_alarm_id_period_length_)))
     return result;
 
-  result = publisher_publish_id_alarm_alarm_id_period_length_action(parser, publisher_publish_id_alarm_alarm_id_period_length_);
+  result = neutron_publish_id_alarm_alarm_id_period_length_action(parser, neutron_publish_id_alarm_alarm_id_period_length_);
 
 
   return result;
   }
 
 
-static result_t cli_publisher_publish_id_alarm_alarm_id_max_max_value (cli_t *parser)
+static result_t cli_neutron_publish_id_alarm_alarm_id_max_max_value (cli_t *parser)
   {
   result_t result;
-  float publisher_publish_id_alarm_alarm_id_max_max_value_;
+  float neutron_publish_id_alarm_alarm_id_max_max_value_;
 
-  if(failed(result = cli_get_float(&parser->tokens[1], &publisher_publish_id_alarm_alarm_id_max_max_value_)))
+  if(failed(result = cli_get_float(&parser->tokens[1], &neutron_publish_id_alarm_alarm_id_max_max_value_)))
     return result;
 
-  result = publisher_publish_id_alarm_alarm_id_max_max_value_action(parser, publisher_publish_id_alarm_alarm_id_max_max_value_);
+  result = neutron_publish_id_alarm_alarm_id_max_max_value_action(parser, neutron_publish_id_alarm_alarm_id_max_max_value_);
 
 
   return result;
   }
 
 
-static result_t cli_publisher_publish_id_alarm_alarm_id_min_min_value (cli_t *parser)
+static result_t cli_neutron_publish_id_alarm_alarm_id_min_min_value (cli_t *parser)
   {
   result_t result;
-  float publisher_publish_id_alarm_alarm_id_min_min_value_;
+  float neutron_publish_id_alarm_alarm_id_min_min_value_;
 
-  if(failed(result = cli_get_float(&parser->tokens[1], &publisher_publish_id_alarm_alarm_id_min_min_value_)))
+  if(failed(result = cli_get_float(&parser->tokens[1], &neutron_publish_id_alarm_alarm_id_min_min_value_)))
     return result;
 
-  result = publisher_publish_id_alarm_alarm_id_min_min_value_action(parser, publisher_publish_id_alarm_alarm_id_min_min_value_);
+  result = neutron_publish_id_alarm_alarm_id_min_min_value_action(parser, neutron_publish_id_alarm_alarm_id_min_min_value_);
 
 
   return result;
   }
 
 
-static result_t cli_publisher_publish_id_alarm_alarm_id_reset_reset_id (cli_t *parser)
+static result_t cli_neutron_publish_id_alarm_alarm_id_reset_reset_id (cli_t *parser)
   {
   result_t result;
-  uint16_t publisher_publish_id_alarm_alarm_id_reset_reset_id_;
+  uint16_t neutron_publish_id_alarm_alarm_id_reset_reset_id_;
 
-  if(failed(result = cli_get_enum(&parser->tokens[1], can_ids, &publisher_publish_id_alarm_alarm_id_reset_reset_id_)))
+  if(failed(result = cli_get_enum(&parser->tokens[1], can_ids, &neutron_publish_id_alarm_alarm_id_reset_reset_id_)))
     return result;
 
-  result = publisher_publish_id_alarm_alarm_id_reset_reset_id_action(parser, publisher_publish_id_alarm_alarm_id_reset_reset_id_);
+  result = neutron_publish_id_alarm_alarm_id_reset_reset_id_action(parser, neutron_publish_id_alarm_alarm_id_reset_reset_id_);
 
 
   return result;
   }
 
 
-static result_t cli_publisher_publish_id_alarm_alarm_id_exit (cli_t *parser)
+static result_t cli_neutron_publish_id_alarm_alarm_id_exit (cli_t *parser)
   {
   result_t result;
-  result = publisher_publish_id_alarm_alarm_id_exit_action(parser);
+  result = neutron_publish_id_alarm_alarm_id_exit_action(parser);
 
 
   return result;
   }
 
 
-static result_t cli_publisher_publish_id_alarm_alarm_id (cli_t *parser)
+static result_t cli_neutron_publish_id_alarm_alarm_id (cli_t *parser)
   {
   result_t result;
-  uint16_t publisher_publish_id_alarm_alarm_id_;
+  uint16_t neutron_publish_id_alarm_alarm_id_;
 
-  if(failed(result = cli_get_uint16(&parser->tokens[1], &publisher_publish_id_alarm_alarm_id_)))
+  if(failed(result = cli_get_uint16(&parser->tokens[1], &neutron_publish_id_alarm_alarm_id_)))
     return result;
 
-  result = publisher_publish_id_alarm_alarm_id_action(parser, publisher_publish_id_alarm_alarm_id_);
+  result = neutron_publish_id_alarm_alarm_id_action(parser, neutron_publish_id_alarm_alarm_id_);
 
 
   return result;
   }
 
 
-static result_t cli_publisher_publish_id_exit (cli_t *parser)
+static result_t cli_neutron_publish_id_exit (cli_t *parser)
   {
   result_t result;
-  result = publisher_publish_id_exit_action(parser);
+  result = neutron_publish_id_exit_action(parser);
 
 
   return result;
   }
 
 
-static result_t cli_publisher_publish_id (cli_t *parser)
+static result_t cli_neutron_publish_id (cli_t *parser)
   {
   result_t result;
-  uint16_t publisher_publish_id_;
+  uint16_t neutron_publish_id_;
 
-  if(failed(result = cli_get_enum(&parser->tokens[1], can_ids, &publisher_publish_id_)))
+  if(failed(result = cli_get_enum(&parser->tokens[1], can_ids, &neutron_publish_id_)))
     return result;
 
-  result = publisher_publish_id_action(parser, publisher_publish_id_);
+  result = neutron_publish_id_action(parser, neutron_publish_id_);
 
 
   return result;
   }
 
 
-static result_t cli_publisher_exit (cli_t *parser)
+static result_t cli_neutron_exit (cli_t *parser)
   {
   result_t result;
-  result = publisher_exit_action(parser);
+  result = neutron_exit_action(parser);
 
 
   return result;
   }
 
 
-static result_t cli_publisher (cli_t *parser)
+static result_t cli_neutron (cli_t *parser)
   {
   result_t result;
-  result = publisher_action(parser);
-
-
-  return result;
-  }
-
-
-static result_t cli_script_add_id_name_msg_handler (cli_t *parser)
-  {
-  result_t result;
-  uint16_t script_add_id_;
-  const char * script_add_id_name_ = 0;
-  const char * script_add_id_name_msg_handler_ = 0;
-
-  if(failed(result = cli_get_enum(&parser->tokens[1], can_ids, &script_add_id_)))
-    return result;
-
-  if(failed(result = cli_get_string(&parser->tokens[2], &script_add_id_name_)))
-    return result;
-
-  if(failed(result = cli_get_string(&parser->tokens[3], &script_add_id_name_msg_handler_)))
-    return result;
-
-  result = script_add_id_name_msg_handler_action(parser, script_add_id_, script_add_id_name_, script_add_id_name_msg_handler_);
-
-
-  return result;
-  }
-
-
-static result_t cli_script_del_id_name (cli_t *parser)
-  {
-  result_t result;
-  uint16_t script_del_id_;
-  const char * script_del_id_name_ = 0;
-
-  if(failed(result = cli_get_enum(&parser->tokens[1], can_ids, &script_del_id_)))
-    return result;
-
-  if(failed(result = cli_get_string(&parser->tokens[2], &script_del_id_name_)))
-    return result;
-
-  result = script_del_id_name_action(parser, script_del_id_, script_del_id_name_);
-
-
-  return result;
-  }
-
-
-static result_t cli_script_cat_name (cli_t *parser)
-  {
-  result_t result;
-  const char * script_cat_name_ = 0;
-
-  if(failed(result = cli_get_string(&parser->tokens[1], &script_cat_name_)))
-    return result;
-
-  result = script_cat_name_action(parser, script_cat_name_);
-
-
-  return result;
-  }
-
-
-static result_t cli_script_edit_name (cli_t *parser)
-  {
-  result_t result;
-  const char * script_edit_name_ = 0;
-
-  if(failed(result = cli_get_string(&parser->tokens[1], &script_edit_name_)))
-    return result;
-
-  result = script_edit_name_action(parser, script_edit_name_);
-
-
-  return result;
-  }
-
-
-static result_t cli_script_create_name (cli_t *parser)
-  {
-  result_t result;
-  const char * script_create_name_ = 0;
-
-  if(failed(result = cli_get_string(&parser->tokens[1], &script_create_name_)))
-    return result;
-
-  result = script_create_name_action(parser, script_create_name_);
-
-
-  return result;
-  }
-
-
-static result_t cli_script_rm_name (cli_t *parser)
-  {
-  result_t result;
-  const char * script_rm_name_ = 0;
-
-  if(failed(result = cli_get_string(&parser->tokens[1], &script_rm_name_)))
-    return result;
-
-  result = script_rm_name_action(parser, script_rm_name_);
-
-
-  return result;
-  }
-
-
-static result_t cli_script_ls_name (cli_t *parser)
-  {
-  result_t result;
-  const char * script_ls_name_ = 0;
-
-  if((parser->tokens[1].token_length) > 0 &&
-    failed(result = cli_get_string(&parser->tokens[1], &script_ls_name_)))
-    return result;
-
-  result = script_ls_name_action(parser, (((parser->tokens[1].token_length) > 0) ? script_ls_name_ : 0));
-
-
-  return result;
-  }
-
-
-static result_t cli_script_debug_name (cli_t *parser)
-  {
-  result_t result;
-  const char * script_debug_name_ = 0;
-
-  if(failed(result = cli_get_string(&parser->tokens[1], &script_debug_name_)))
-    return result;
-
-  result = script_debug_name_action(parser, script_debug_name_);
-
-
-  return result;
-  }
-
-
-static result_t cli_script_exit (cli_t *parser)
-  {
-  result_t result;
-  result = script_exit_action(parser);
-
-
-  return result;
-  }
-
-
-static result_t cli_script (cli_t *parser)
-  {
-  result_t result;
-  result = script_action(parser);
+  result = neutron_action(parser);
 
 
   return result;
@@ -775,33 +642,23 @@ static result_t cli_send_can_id_type_session_val1_val2_val3_val4 (cli_t *parser)
   if(failed(result = cli_get_uint16(&parser->tokens[3], &send_can_id_type_session_)))
     return result;
 
-  if((parser->tokens[4].token_length) > 0 &&
+  if(parser->tokens[4].token_length > 0 &&
     failed(result = cli_get_string(&parser->tokens[4], &send_can_id_type_session_val1_)))
     return result;
 
-  if((parser->tokens[5].token_length) > 0 &&
+  if(parser->tokens[5].token_length > 0 &&
     failed(result = cli_get_string(&parser->tokens[5], &send_can_id_type_session_val1_val2_)))
     return result;
 
-  if((parser->tokens[6].token_length) > 0 &&
+  if(parser->tokens[6].token_length > 0 &&
     failed(result = cli_get_string(&parser->tokens[6], &send_can_id_type_session_val1_val2_val3_)))
     return result;
 
-  if((parser->tokens[7].token_length) > 0 &&
+  if(parser->tokens[7].token_length > 0 &&
     failed(result = cli_get_string(&parser->tokens[7], &send_can_id_type_session_val1_val2_val3_val4_)))
     return result;
 
-  result = send_can_id_type_session_val1_val2_val3_val4_action(parser, send_can_id_, send_can_id_type_, send_can_id_type_session_, (((parser->tokens[4].token_length) > 0) ? send_can_id_type_session_val1_ : 0), (((parser->tokens[5].token_length) > 0) ? send_can_id_type_session_val1_val2_ : 0), (((parser->tokens[6].token_length) > 0) ? send_can_id_type_session_val1_val2_val3_ : 0), (((parser->tokens[7].token_length) > 0) ? send_can_id_type_session_val1_val2_val3_val4_ : 0));
-
-
-  return result;
-  }
-
-
-static result_t cli_exit (cli_t *parser)
-  {
-  result_t result;
-  result = exit_action(parser);
+  result = send_can_id_type_session_val1_val2_val3_val4_action(parser, send_can_id_, send_can_id_type_, send_can_id_type_session_, ((parser->tokens[4].token_length > 0) ? send_can_id_type_session_val1_ : 0), ((parser->tokens[5].token_length > 0) ? send_can_id_type_session_val1_val2_ : 0), ((parser->tokens[6].token_length > 0) ? send_can_id_type_session_val1_val2_val3_ : 0), ((parser->tokens[7].token_length > 0) ? send_can_id_type_session_val1_val2_val3_val4_ : 0));
 
 
   return result;
@@ -864,6 +721,14 @@ static cli_node_t node_string_name;
 
 static cli_node_t node_string;
 
+static cli_node_t node_stream_name_value_end;
+
+static cli_node_t node_stream_name_value;
+
+static cli_node_t node_stream_name;
+
+static cli_node_t node_stream;
+
 static cli_node_t node_bool_name_value_end;
 
 static cli_node_t node_bool_name_value;
@@ -924,197 +789,135 @@ static cli_node_t node_ls_path;
 
 static cli_node_t node_ls;
 
-static cli_node_t node_publisher_ls_id_end;
+static cli_node_t node_neutron_ls_id_end;
 
-static cli_node_t node_publisher_ls_id;
+static cli_node_t node_neutron_ls_id;
 
-static cli_node_t node_publisher_ls;
+static cli_node_t node_neutron_ls;
 
-static cli_node_t node_publisher_rm_id_end;
+static cli_node_t node_neutron_rm_id_end;
 
-static cli_node_t node_publisher_rm_id;
+static cli_node_t node_neutron_rm_id;
 
-static cli_node_t node_publisher_rm;
+static cli_node_t node_neutron_rm;
 
-static cli_node_t node_publisher_publish_id_rate_rate_end;
+static cli_node_t node_neutron_publish_id_rate_rate_end;
 
-static cli_node_t node_publisher_publish_id_rate_rate;
+static cli_node_t node_neutron_publish_id_rate_rate;
 
-static cli_node_t node_publisher_publish_id_rate;
+static cli_node_t node_neutron_publish_id_rate;
 
-static cli_node_t node_publisher_publish_id_type_type_end;
+static cli_node_t node_neutron_publish_id_type_type_end;
 
-static cli_node_t node_publisher_publish_id_type_type;
+static cli_node_t node_neutron_publish_id_type_type;
 
-static cli_node_t node_publisher_publish_id_type;
+static cli_node_t node_neutron_publish_id_type;
 
-static cli_node_t node_publisher_publish_id_sample_sample_end;
+static cli_node_t node_neutron_publish_id_sample_sample_end;
 
-static cli_node_t node_publisher_publish_id_sample_sample;
+static cli_node_t node_neutron_publish_id_sample_sample;
 
-static cli_node_t node_publisher_publish_id_sample;
+static cli_node_t node_neutron_publish_id_sample;
 
-static cli_node_t node_publisher_publish_id_publish_is_published_end;
+static cli_node_t node_neutron_publish_id_publish_is_published_end;
 
-static cli_node_t node_publisher_publish_id_publish_is_published;
+static cli_node_t node_neutron_publish_id_publish_is_published;
 
-static cli_node_t node_publisher_publish_id_publish;
+static cli_node_t node_neutron_publish_id_publish;
 
-static cli_node_t node_publisher_publish_id_loopback_loopback_end;
+static cli_node_t node_neutron_publish_id_loopback_loopback_end;
 
-static cli_node_t node_publisher_publish_id_loopback_loopback;
+static cli_node_t node_neutron_publish_id_loopback_loopback;
 
-static cli_node_t node_publisher_publish_id_loopback;
+static cli_node_t node_neutron_publish_id_loopback;
 
-static cli_node_t node_publisher_publish_id_filter_filter_type_length_value_end;
+static cli_node_t node_neutron_publish_id_filter_filter_type_length_value_end;
 
-static cli_node_t node_publisher_publish_id_filter_filter_type_length_value;
+static cli_node_t node_neutron_publish_id_filter_filter_type_length_value;
 
-static cli_node_t node_publisher_publish_id_filter_filter_type_length;
+static cli_node_t node_neutron_publish_id_filter_filter_type_length;
 
-static cli_node_t node_publisher_publish_id_filter_filter_type_coeff_index_value_end;
+static cli_node_t node_neutron_publish_id_filter_filter_type_coeff_index_value_end;
 
-static cli_node_t node_publisher_publish_id_filter_filter_type_coeff_index_value;
+static cli_node_t node_neutron_publish_id_filter_filter_type_coeff_index_value;
 
-static cli_node_t node_publisher_publish_id_filter_filter_type_coeff_index;
+static cli_node_t node_neutron_publish_id_filter_filter_type_coeff_index;
 
-static cli_node_t node_publisher_publish_id_filter_filter_type_coeff;
+static cli_node_t node_neutron_publish_id_filter_filter_type_coeff;
 
-static cli_node_t node_publisher_publish_id_filter_filter_type_gain_value_end;
+static cli_node_t node_neutron_publish_id_filter_filter_type_gain_value_end;
 
-static cli_node_t node_publisher_publish_id_filter_filter_type_gain_value;
+static cli_node_t node_neutron_publish_id_filter_filter_type_gain_value;
 
-static cli_node_t node_publisher_publish_id_filter_filter_type_gain;
+static cli_node_t node_neutron_publish_id_filter_filter_type_gain;
 
-static cli_node_t node_publisher_publish_id_filter_filter_type_exit_end;
+static cli_node_t node_neutron_publish_id_filter_filter_type_exit_end;
 
-static cli_node_t node_publisher_publish_id_filter_filter_type_exit;
+static cli_node_t node_neutron_publish_id_filter_filter_type_exit;
 
-static cli_node_t node_publisher_publish_id_filter_filter_type_end;
+static cli_node_t node_neutron_publish_id_filter_filter_type_end;
 
-static cli_node_t node_publisher_publish_id_filter_filter_type;
+static cli_node_t node_neutron_publish_id_filter_filter_type;
 
-static cli_node_t node_publisher_publish_id_filter;
+static cli_node_t node_neutron_publish_id_filter;
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_type_alarm_type_end;
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_type_alarm_type_end;
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_type_alarm_type;
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_type_alarm_type;
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_type;
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_type;
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_period_length_end;
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_period_length_end;
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_period_length;
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_period_length;
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_period;
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_period;
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_max_max_value_end;
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_max_max_value_end;
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_max_max_value;
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_max_max_value;
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_max;
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_max;
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_min_min_value_end;
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_min_min_value_end;
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_min_min_value;
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_min_min_value;
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_min;
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_min;
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_reset_reset_id_end;
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_reset_reset_id_end;
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_reset_reset_id;
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_reset_reset_id;
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_reset;
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_reset;
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_exit_end;
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_exit_end;
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_exit;
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_exit;
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_end;
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_end;
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id;
+static cli_node_t node_neutron_publish_id_alarm_alarm_id;
 
-static cli_node_t node_publisher_publish_id_alarm;
+static cli_node_t node_neutron_publish_id_alarm;
 
-static cli_node_t node_publisher_publish_id_exit_end;
+static cli_node_t node_neutron_publish_id_exit_end;
 
-static cli_node_t node_publisher_publish_id_exit;
+static cli_node_t node_neutron_publish_id_exit;
 
-static cli_node_t node_publisher_publish_id_end;
+static cli_node_t node_neutron_publish_id_end;
 
-static cli_node_t node_publisher_publish_id;
+static cli_node_t node_neutron_publish_id;
 
-static cli_node_t node_publisher_publish;
+static cli_node_t node_neutron_publish;
 
-static cli_node_t node_publisher_exit_end;
+static cli_node_t node_neutron_exit_end;
 
-static cli_node_t node_publisher_exit;
+static cli_node_t node_neutron_exit;
 
-static cli_node_t node_publisher_end;
+static cli_node_t node_neutron_end;
 
-static cli_node_t node_publisher;
-
-static cli_node_t node_script_add_id_name_msg_handler_end;
-
-static cli_node_t node_script_add_id_name_msg_handler;
-
-static cli_node_t node_script_add_id_name;
-
-static cli_node_t node_script_add_id;
-
-static cli_node_t node_script_add;
-
-static cli_node_t node_script_del_id_name_end;
-
-static cli_node_t node_script_del_id_name;
-
-static cli_node_t node_script_del_id;
-
-static cli_node_t node_script_del;
-
-static cli_node_t node_script_cat_name_end;
-
-static cli_node_t node_script_cat_name;
-
-static cli_node_t node_script_cat;
-
-static cli_node_t node_script_edit_name_end;
-
-static cli_node_t node_script_edit_name;
-
-static cli_node_t node_script_edit;
-
-static cli_node_t node_script_create_name_end;
-
-static cli_node_t node_script_create_name;
-
-static cli_node_t node_script_create;
-
-static cli_node_t node_script_rm_name_end;
-
-static cli_node_t node_script_rm_name;
-
-static cli_node_t node_script_rm;
-
-static cli_node_t node_script_ls_name_end;
-
-static cli_node_t node_script_ls_name;
-
-static cli_node_t node_script_ls;
-
-static cli_node_t node_script_debug_name_end;
-
-static cli_node_t node_script_debug_name;
-
-static cli_node_t node_script_debug;
-
-static cli_node_t node_script_exit_end;
-
-static cli_node_t node_script_exit;
-
-static cli_node_t node_script_end;
-
-static cli_node_t node_script;
+static cli_node_t node_neutron;
 
 static cli_node_t node_send_can_id_type_session_val1_val2_val3_val4_end;
 
@@ -1133,10 +936,6 @@ static cli_node_t node_send_can_id_type;
 static cli_node_t node_send_can_id;
 
 static cli_node_t node_send_can;
-
-static cli_node_t node_exit_end;
-
-static cli_node_t node_exit;
 
 static cli_node_t node_uint16_name_value_end = {
   CLI_NODE_END,
@@ -1413,8 +1212,48 @@ static cli_node_t node_string = {
   0,
   "string",
   0,
-  &node_bool,
+  &node_stream,
   &node_string_name
+  };
+
+
+static cli_node_t node_stream_name_value_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_stream_name_value,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_stream_name_value = {
+  CLI_NODE_STRING,
+  CLI_NODE_FLAGS_OPT_START | CLI_NODE_FLAGS_OPT_END | CLI_NODE_FLAGS_OPT_PARTIAL,
+  "STRING:value",
+  0,
+  0,
+  &node_stream_name_value_end
+  };
+
+
+static cli_node_t node_stream_name = {
+  CLI_NODE_STRING,
+  0,
+  "STRING:name",
+  0,
+  0,
+  &node_stream_name_value
+  };
+
+
+static cli_node_t node_stream = {
+  CLI_NODE_KEYWORD,
+  0,
+  "stream",
+  0,
+  &node_bool,
+  &node_stream_name
   };
 
 
@@ -1713,968 +1552,658 @@ static cli_node_t node_ls = {
   0,
   "ls",
   0,
-  &node_publisher,
+  &node_neutron,
   &node_ls_path
   };
 
 
-static cli_node_t node_publisher_ls_id_end = {
+static cli_node_t node_neutron_ls_id_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_publisher_ls_id,
+  cli_neutron_ls_id,
   0,
   0,
   0
   };
 
 
-static cli_node_t node_publisher_ls_id = {
+static cli_node_t node_neutron_ls_id = {
   CLI_NODE_ENUM,
   CLI_NODE_FLAGS_OPT_START | CLI_NODE_FLAGS_OPT_END | CLI_NODE_FLAGS_OPT_PARTIAL,
   &can_ids,
   0,
   0,
-  &node_publisher_ls_id_end
+  &node_neutron_ls_id_end
   };
 
 
-static cli_node_t node_publisher_ls = {
+static cli_node_t node_neutron_ls = {
   CLI_NODE_KEYWORD,
   0,
   "ls",
   0,
-  &node_publisher_rm,
-  &node_publisher_ls_id
+  &node_neutron_rm,
+  &node_neutron_ls_id
   };
 
 
-static cli_node_t node_publisher_rm_id_end = {
+static cli_node_t node_neutron_rm_id_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_publisher_rm_id,
+  cli_neutron_rm_id,
   0,
   0,
   0
   };
 
 
-static cli_node_t node_publisher_rm_id = {
+static cli_node_t node_neutron_rm_id = {
   CLI_NODE_ENUM,
   0,
   &can_ids,
   0,
   0,
-  &node_publisher_rm_id_end
+  &node_neutron_rm_id_end
   };
 
 
-static cli_node_t node_publisher_rm = {
+static cli_node_t node_neutron_rm = {
   CLI_NODE_KEYWORD,
   0,
   "rm",
   0,
-  &node_publisher_publish,
-  &node_publisher_rm_id
+  &node_neutron_publish,
+  &node_neutron_rm_id
   };
 
 
-static cli_node_t node_publisher_publish_id_rate_rate_end = {
+static cli_node_t node_neutron_publish_id_rate_rate_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_publisher_publish_id_rate_rate,
+  cli_neutron_publish_id_rate_rate,
   0,
   0,
   0
   };
 
 
-static cli_node_t node_publisher_publish_id_rate_rate = {
+static cli_node_t node_neutron_publish_id_rate_rate = {
   CLI_NODE_UINT16,
   0,
   "UINT16:rate",
   0,
   0,
-  &node_publisher_publish_id_rate_rate_end
+  &node_neutron_publish_id_rate_rate_end
   };
 
 
-static cli_node_t node_publisher_publish_id_rate = {
+static cli_node_t node_neutron_publish_id_rate = {
   CLI_NODE_KEYWORD,
   0,
   "rate",
   0,
-  &node_publisher_publish_id_type,
-  &node_publisher_publish_id_rate_rate
+  &node_neutron_publish_id_type,
+  &node_neutron_publish_id_rate_rate
   };
 
 
-static cli_node_t node_publisher_publish_id_type_type_end = {
+static cli_node_t node_neutron_publish_id_type_type_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_publisher_publish_id_type_type,
+  cli_neutron_publish_id_type_type,
   0,
   0,
   0
   };
 
 
-static cli_node_t node_publisher_publish_id_type_type = {
+static cli_node_t node_neutron_publish_id_type_type = {
   CLI_NODE_ENUM,
   0,
   &publish_types,
   0,
   0,
-  &node_publisher_publish_id_type_type_end
+  &node_neutron_publish_id_type_type_end
   };
 
 
-static cli_node_t node_publisher_publish_id_type = {
+static cli_node_t node_neutron_publish_id_type = {
   CLI_NODE_KEYWORD,
   0,
   "type",
   0,
-  &node_publisher_publish_id_sample,
-  &node_publisher_publish_id_type_type
+  &node_neutron_publish_id_sample,
+  &node_neutron_publish_id_type_type
   };
 
 
-static cli_node_t node_publisher_publish_id_sample_sample_end = {
+static cli_node_t node_neutron_publish_id_sample_sample_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_publisher_publish_id_sample_sample,
+  cli_neutron_publish_id_sample_sample,
   0,
   0,
   0
   };
 
 
-static cli_node_t node_publisher_publish_id_sample_sample = {
+static cli_node_t node_neutron_publish_id_sample_sample = {
   CLI_NODE_ENUM,
   0,
   &sample_types,
   0,
   0,
-  &node_publisher_publish_id_sample_sample_end
+  &node_neutron_publish_id_sample_sample_end
   };
 
 
-static cli_node_t node_publisher_publish_id_sample = {
+static cli_node_t node_neutron_publish_id_sample = {
   CLI_NODE_KEYWORD,
   0,
   "sample",
   0,
-  &node_publisher_publish_id_publish,
-  &node_publisher_publish_id_sample_sample
+  &node_neutron_publish_id_publish,
+  &node_neutron_publish_id_sample_sample
   };
 
 
-static cli_node_t node_publisher_publish_id_publish_is_published_end = {
+static cli_node_t node_neutron_publish_id_publish_is_published_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_publisher_publish_id_publish_is_published,
+  cli_neutron_publish_id_publish_is_published,
   0,
   0,
   0
   };
 
 
-static cli_node_t node_publisher_publish_id_publish_is_published = {
+static cli_node_t node_neutron_publish_id_publish_is_published = {
   CLI_NODE_ENUM,
   0,
   &booleans,
   0,
   0,
-  &node_publisher_publish_id_publish_is_published_end
+  &node_neutron_publish_id_publish_is_published_end
   };
 
 
-static cli_node_t node_publisher_publish_id_publish = {
+static cli_node_t node_neutron_publish_id_publish = {
   CLI_NODE_KEYWORD,
   0,
   "publish",
   0,
-  &node_publisher_publish_id_loopback,
-  &node_publisher_publish_id_publish_is_published
+  &node_neutron_publish_id_loopback,
+  &node_neutron_publish_id_publish_is_published
   };
 
 
-static cli_node_t node_publisher_publish_id_loopback_loopback_end = {
+static cli_node_t node_neutron_publish_id_loopback_loopback_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_publisher_publish_id_loopback_loopback,
+  cli_neutron_publish_id_loopback_loopback,
   0,
   0,
   0
   };
 
 
-static cli_node_t node_publisher_publish_id_loopback_loopback = {
+static cli_node_t node_neutron_publish_id_loopback_loopback = {
   CLI_NODE_ENUM,
   0,
   &booleans,
   0,
   0,
-  &node_publisher_publish_id_loopback_loopback_end
+  &node_neutron_publish_id_loopback_loopback_end
   };
 
 
-static cli_node_t node_publisher_publish_id_loopback = {
+static cli_node_t node_neutron_publish_id_loopback = {
   CLI_NODE_KEYWORD,
   0,
   "loopback",
   0,
-  &node_publisher_publish_id_filter,
-  &node_publisher_publish_id_loopback_loopback
+  &node_neutron_publish_id_filter,
+  &node_neutron_publish_id_loopback_loopback
   };
 
 
-static cli_node_t node_publisher_publish_id_filter_filter_type_length_value_end = {
+static cli_node_t node_neutron_publish_id_filter_filter_type_length_value_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_publisher_publish_id_filter_filter_type_length_value,
+  cli_neutron_publish_id_filter_filter_type_length_value,
   0,
   0,
   0
   };
 
 
-static cli_node_t node_publisher_publish_id_filter_filter_type_length_value = {
+static cli_node_t node_neutron_publish_id_filter_filter_type_length_value = {
   CLI_NODE_UINT16,
   0,
   "UINT16:value",
   0,
   0,
-  &node_publisher_publish_id_filter_filter_type_length_value_end
+  &node_neutron_publish_id_filter_filter_type_length_value_end
   };
 
 
-static cli_node_t node_publisher_publish_id_filter_filter_type_length = {
+static cli_node_t node_neutron_publish_id_filter_filter_type_length = {
   CLI_NODE_KEYWORD,
   0,
   "length",
   0,
-  &node_publisher_publish_id_filter_filter_type_coeff,
-  &node_publisher_publish_id_filter_filter_type_length_value
+  &node_neutron_publish_id_filter_filter_type_coeff,
+  &node_neutron_publish_id_filter_filter_type_length_value
   };
 
 
-static cli_node_t node_publisher_publish_id_filter_filter_type_coeff_index_value_end = {
+static cli_node_t node_neutron_publish_id_filter_filter_type_coeff_index_value_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_publisher_publish_id_filter_filter_type_coeff_index_value,
+  cli_neutron_publish_id_filter_filter_type_coeff_index_value,
   0,
   0,
   0
   };
 
 
-static cli_node_t node_publisher_publish_id_filter_filter_type_coeff_index_value = {
+static cli_node_t node_neutron_publish_id_filter_filter_type_coeff_index_value = {
   CLI_NODE_FLOAT,
   0,
   "FLOAT:value",
   0,
   0,
-  &node_publisher_publish_id_filter_filter_type_coeff_index_value_end
+  &node_neutron_publish_id_filter_filter_type_coeff_index_value_end
   };
 
 
-static cli_node_t node_publisher_publish_id_filter_filter_type_coeff_index = {
+static cli_node_t node_neutron_publish_id_filter_filter_type_coeff_index = {
   CLI_NODE_UINT16,
   0,
   "UINT16:index",
   0,
   0,
-  &node_publisher_publish_id_filter_filter_type_coeff_index_value
+  &node_neutron_publish_id_filter_filter_type_coeff_index_value
   };
 
 
-static cli_node_t node_publisher_publish_id_filter_filter_type_coeff = {
+static cli_node_t node_neutron_publish_id_filter_filter_type_coeff = {
   CLI_NODE_KEYWORD,
   0,
   "coeff",
   0,
-  &node_publisher_publish_id_filter_filter_type_gain,
-  &node_publisher_publish_id_filter_filter_type_coeff_index
+  &node_neutron_publish_id_filter_filter_type_gain,
+  &node_neutron_publish_id_filter_filter_type_coeff_index
   };
 
 
-static cli_node_t node_publisher_publish_id_filter_filter_type_gain_value_end = {
+static cli_node_t node_neutron_publish_id_filter_filter_type_gain_value_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_publisher_publish_id_filter_filter_type_gain_value,
+  cli_neutron_publish_id_filter_filter_type_gain_value,
   0,
   0,
   0
   };
 
 
-static cli_node_t node_publisher_publish_id_filter_filter_type_gain_value = {
+static cli_node_t node_neutron_publish_id_filter_filter_type_gain_value = {
   CLI_NODE_FLOAT,
   0,
   "FLOAT:value",
   0,
   0,
-  &node_publisher_publish_id_filter_filter_type_gain_value_end
+  &node_neutron_publish_id_filter_filter_type_gain_value_end
   };
 
 
-static cli_node_t node_publisher_publish_id_filter_filter_type_gain = {
+static cli_node_t node_neutron_publish_id_filter_filter_type_gain = {
   CLI_NODE_KEYWORD,
   0,
   "gain",
   0,
-  &node_publisher_publish_id_filter_filter_type_exit,
-  &node_publisher_publish_id_filter_filter_type_gain_value
+  &node_neutron_publish_id_filter_filter_type_exit,
+  &node_neutron_publish_id_filter_filter_type_gain_value
   };
 
 
-static cli_node_t node_publisher_publish_id_filter_filter_type_exit_end = {
+static cli_node_t node_neutron_publish_id_filter_filter_type_exit_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_publisher_publish_id_filter_filter_type_exit,
+  cli_neutron_publish_id_filter_filter_type_exit,
   0,
   0,
   0
   };
 
 
-static cli_node_t node_publisher_publish_id_filter_filter_type_exit = {
+static cli_node_t node_neutron_publish_id_filter_filter_type_exit = {
   CLI_NODE_KEYWORD,
   0,
   "exit",
   0,
   0,
-  &node_publisher_publish_id_filter_filter_type_exit_end
+  &node_neutron_publish_id_filter_filter_type_exit_end
   };
 
 
-static cli_node_t node_publisher_publish_id_filter_filter_type_end = {
+static cli_node_t node_neutron_publish_id_filter_filter_type_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_publisher_publish_id_filter_filter_type,
+  cli_neutron_publish_id_filter_filter_type,
   0,
   0,
-  &node_publisher_publish_id_filter_filter_type_length
+  &node_neutron_publish_id_filter_filter_type_length
   };
 
 
-static cli_node_t node_publisher_publish_id_filter_filter_type = {
+static cli_node_t node_neutron_publish_id_filter_filter_type = {
   CLI_NODE_ENUM,
   0,
   &filter_types,
   0,
   0,
-  &node_publisher_publish_id_filter_filter_type_end
+  &node_neutron_publish_id_filter_filter_type_end
   };
 
 
-static cli_node_t node_publisher_publish_id_filter = {
+static cli_node_t node_neutron_publish_id_filter = {
   CLI_NODE_KEYWORD,
   0,
   "filter",
   0,
-  &node_publisher_publish_id_alarm,
-  &node_publisher_publish_id_filter_filter_type
+  &node_neutron_publish_id_alarm,
+  &node_neutron_publish_id_filter_filter_type
   };
 
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_type_alarm_type_end = {
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_type_alarm_type_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_publisher_publish_id_alarm_alarm_id_type_alarm_type,
+  cli_neutron_publish_id_alarm_alarm_id_type_alarm_type,
   0,
   0,
   0
   };
 
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_type_alarm_type = {
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_type_alarm_type = {
   CLI_NODE_ENUM,
   0,
   &alarm_types,
   0,
   0,
-  &node_publisher_publish_id_alarm_alarm_id_type_alarm_type_end
+  &node_neutron_publish_id_alarm_alarm_id_type_alarm_type_end
   };
 
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_type = {
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_type = {
   CLI_NODE_KEYWORD,
   0,
   "type",
   0,
-  &node_publisher_publish_id_alarm_alarm_id_period,
-  &node_publisher_publish_id_alarm_alarm_id_type_alarm_type
+  &node_neutron_publish_id_alarm_alarm_id_period,
+  &node_neutron_publish_id_alarm_alarm_id_type_alarm_type
   };
 
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_period_length_end = {
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_period_length_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_publisher_publish_id_alarm_alarm_id_period_length,
+  cli_neutron_publish_id_alarm_alarm_id_period_length,
   0,
   0,
   0
   };
 
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_period_length = {
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_period_length = {
   CLI_NODE_UINT16,
   0,
   "UINT16:length",
   0,
   0,
-  &node_publisher_publish_id_alarm_alarm_id_period_length_end
+  &node_neutron_publish_id_alarm_alarm_id_period_length_end
   };
 
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_period = {
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_period = {
   CLI_NODE_KEYWORD,
   0,
   "period",
   0,
-  &node_publisher_publish_id_alarm_alarm_id_max,
-  &node_publisher_publish_id_alarm_alarm_id_period_length
+  &node_neutron_publish_id_alarm_alarm_id_max,
+  &node_neutron_publish_id_alarm_alarm_id_period_length
   };
 
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_max_max_value_end = {
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_max_max_value_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_publisher_publish_id_alarm_alarm_id_max_max_value,
+  cli_neutron_publish_id_alarm_alarm_id_max_max_value,
   0,
   0,
   0
   };
 
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_max_max_value = {
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_max_max_value = {
   CLI_NODE_FLOAT,
   0,
   "FLOAT:max_value",
   0,
   0,
-  &node_publisher_publish_id_alarm_alarm_id_max_max_value_end
+  &node_neutron_publish_id_alarm_alarm_id_max_max_value_end
   };
 
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_max = {
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_max = {
   CLI_NODE_KEYWORD,
   0,
   "max",
   0,
-  &node_publisher_publish_id_alarm_alarm_id_min,
-  &node_publisher_publish_id_alarm_alarm_id_max_max_value
+  &node_neutron_publish_id_alarm_alarm_id_min,
+  &node_neutron_publish_id_alarm_alarm_id_max_max_value
   };
 
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_min_min_value_end = {
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_min_min_value_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_publisher_publish_id_alarm_alarm_id_min_min_value,
+  cli_neutron_publish_id_alarm_alarm_id_min_min_value,
   0,
   0,
   0
   };
 
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_min_min_value = {
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_min_min_value = {
   CLI_NODE_FLOAT,
   0,
   "FLOAT:min_value",
   0,
   0,
-  &node_publisher_publish_id_alarm_alarm_id_min_min_value_end
+  &node_neutron_publish_id_alarm_alarm_id_min_min_value_end
   };
 
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_min = {
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_min = {
   CLI_NODE_KEYWORD,
   0,
   "min",
   0,
-  &node_publisher_publish_id_alarm_alarm_id_reset,
-  &node_publisher_publish_id_alarm_alarm_id_min_min_value
+  &node_neutron_publish_id_alarm_alarm_id_reset,
+  &node_neutron_publish_id_alarm_alarm_id_min_min_value
   };
 
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_reset_reset_id_end = {
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_reset_reset_id_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_publisher_publish_id_alarm_alarm_id_reset_reset_id,
+  cli_neutron_publish_id_alarm_alarm_id_reset_reset_id,
   0,
   0,
   0
   };
 
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_reset_reset_id = {
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_reset_reset_id = {
   CLI_NODE_ENUM,
   0,
   &can_ids,
   0,
   0,
-  &node_publisher_publish_id_alarm_alarm_id_reset_reset_id_end
+  &node_neutron_publish_id_alarm_alarm_id_reset_reset_id_end
   };
 
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_reset = {
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_reset = {
   CLI_NODE_KEYWORD,
   0,
   "reset",
   0,
-  &node_publisher_publish_id_alarm_alarm_id_exit,
-  &node_publisher_publish_id_alarm_alarm_id_reset_reset_id
+  &node_neutron_publish_id_alarm_alarm_id_exit,
+  &node_neutron_publish_id_alarm_alarm_id_reset_reset_id
   };
 
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_exit_end = {
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_exit_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_publisher_publish_id_alarm_alarm_id_exit,
+  cli_neutron_publish_id_alarm_alarm_id_exit,
   0,
   0,
   0
   };
 
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_exit = {
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_exit = {
   CLI_NODE_KEYWORD,
   0,
   "exit",
   0,
   0,
-  &node_publisher_publish_id_alarm_alarm_id_exit_end
+  &node_neutron_publish_id_alarm_alarm_id_exit_end
   };
 
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id_end = {
+static cli_node_t node_neutron_publish_id_alarm_alarm_id_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_publisher_publish_id_alarm_alarm_id,
+  cli_neutron_publish_id_alarm_alarm_id,
   0,
   0,
-  &node_publisher_publish_id_alarm_alarm_id_type
+  &node_neutron_publish_id_alarm_alarm_id_type
   };
 
 
-static cli_node_t node_publisher_publish_id_alarm_alarm_id = {
+static cli_node_t node_neutron_publish_id_alarm_alarm_id = {
   CLI_NODE_UINT16,
   0,
   "UINT16:alarm_id",
   0,
   0,
-  &node_publisher_publish_id_alarm_alarm_id_end
+  &node_neutron_publish_id_alarm_alarm_id_end
   };
 
 
-static cli_node_t node_publisher_publish_id_alarm = {
+static cli_node_t node_neutron_publish_id_alarm = {
   CLI_NODE_KEYWORD,
   0,
   "alarm",
   0,
-  &node_publisher_publish_id_exit,
-  &node_publisher_publish_id_alarm_alarm_id
+  &node_neutron_publish_id_exit,
+  &node_neutron_publish_id_alarm_alarm_id
   };
 
 
-static cli_node_t node_publisher_publish_id_exit_end = {
+static cli_node_t node_neutron_publish_id_exit_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_publisher_publish_id_exit,
+  cli_neutron_publish_id_exit,
   0,
   0,
   0
   };
 
 
-static cli_node_t node_publisher_publish_id_exit = {
+static cli_node_t node_neutron_publish_id_exit = {
   CLI_NODE_KEYWORD,
   0,
   "exit",
   0,
   0,
-  &node_publisher_publish_id_exit_end
+  &node_neutron_publish_id_exit_end
   };
 
 
-static cli_node_t node_publisher_publish_id_end = {
+static cli_node_t node_neutron_publish_id_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_publisher_publish_id,
+  cli_neutron_publish_id,
   0,
   0,
-  &node_publisher_publish_id_rate
+  &node_neutron_publish_id_rate
   };
 
 
-static cli_node_t node_publisher_publish_id = {
+static cli_node_t node_neutron_publish_id = {
   CLI_NODE_ENUM,
   0,
   &can_ids,
   0,
   0,
-  &node_publisher_publish_id_end
+  &node_neutron_publish_id_end
   };
 
 
-static cli_node_t node_publisher_publish = {
+static cli_node_t node_neutron_publish = {
   CLI_NODE_KEYWORD,
   0,
   "publish",
   0,
-  &node_publisher_exit,
-  &node_publisher_publish_id
+  &node_neutron_exit,
+  &node_neutron_publish_id
   };
 
 
-static cli_node_t node_publisher_exit_end = {
+static cli_node_t node_neutron_exit_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_publisher_exit,
+  cli_neutron_exit,
   0,
   0,
   0
   };
 
 
-static cli_node_t node_publisher_exit = {
+static cli_node_t node_neutron_exit = {
   CLI_NODE_KEYWORD,
   0,
   "exit",
   0,
   0,
-  &node_publisher_exit_end
+  &node_neutron_exit_end
   };
 
 
-static cli_node_t node_publisher_end = {
+static cli_node_t node_neutron_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_publisher,
+  cli_neutron,
   0,
   0,
-  &node_publisher_ls
+  &node_neutron_ls
   };
 
 
-static cli_node_t node_publisher = {
+static cli_node_t node_neutron = {
   CLI_NODE_KEYWORD,
   0,
-  "publisher",
-  0,
-  &node_script,
-  &node_publisher_end
-  };
-
-
-static cli_node_t node_script_add_id_name_msg_handler_end = {
-  CLI_NODE_END,
-  CLI_NODE_FLAGS_OPT_END,
-  cli_script_add_id_name_msg_handler,
-  0,
-  0,
-  0
-  };
-
-
-static cli_node_t node_script_add_id_name_msg_handler = {
-  CLI_NODE_STRING,
-  0,
-  "STRING:msg_handler",
-  0,
-  0,
-  &node_script_add_id_name_msg_handler_end
-  };
-
-
-static cli_node_t node_script_add_id_name = {
-  CLI_NODE_STRING,
-  0,
-  "STRING:name",
-  0,
-  0,
-  &node_script_add_id_name_msg_handler
-  };
-
-
-static cli_node_t node_script_add_id = {
-  CLI_NODE_ENUM,
-  0,
-  &can_ids,
-  0,
-  0,
-  &node_script_add_id_name
-  };
-
-
-static cli_node_t node_script_add = {
-  CLI_NODE_KEYWORD,
-  0,
-  "add",
-  0,
-  &node_script_del,
-  &node_script_add_id
-  };
-
-
-static cli_node_t node_script_del_id_name_end = {
-  CLI_NODE_END,
-  CLI_NODE_FLAGS_OPT_END,
-  cli_script_del_id_name,
-  0,
-  0,
-  0
-  };
-
-
-static cli_node_t node_script_del_id_name = {
-  CLI_NODE_STRING,
-  0,
-  "STRING:name",
-  0,
-  0,
-  &node_script_del_id_name_end
-  };
-
-
-static cli_node_t node_script_del_id = {
-  CLI_NODE_ENUM,
-  0,
-  &can_ids,
-  0,
-  0,
-  &node_script_del_id_name
-  };
-
-
-static cli_node_t node_script_del = {
-  CLI_NODE_KEYWORD,
-  0,
-  "del",
-  0,
-  &node_script_cat,
-  &node_script_del_id
-  };
-
-
-static cli_node_t node_script_cat_name_end = {
-  CLI_NODE_END,
-  CLI_NODE_FLAGS_OPT_END,
-  cli_script_cat_name,
-  0,
-  0,
-  0
-  };
-
-
-static cli_node_t node_script_cat_name = {
-  CLI_NODE_STRING,
-  0,
-  "STRING:name",
-  0,
-  0,
-  &node_script_cat_name_end
-  };
-
-
-static cli_node_t node_script_cat = {
-  CLI_NODE_KEYWORD,
-  0,
-  "cat",
-  0,
-  &node_script_edit,
-  &node_script_cat_name
-  };
-
-
-static cli_node_t node_script_edit_name_end = {
-  CLI_NODE_END,
-  CLI_NODE_FLAGS_OPT_END,
-  cli_script_edit_name,
-  0,
-  0,
-  0
-  };
-
-
-static cli_node_t node_script_edit_name = {
-  CLI_NODE_STRING,
-  0,
-  "STRING:name",
-  0,
-  0,
-  &node_script_edit_name_end
-  };
-
-
-static cli_node_t node_script_edit = {
-  CLI_NODE_KEYWORD,
-  0,
-  "edit",
-  0,
-  &node_script_create,
-  &node_script_edit_name
-  };
-
-
-static cli_node_t node_script_create_name_end = {
-  CLI_NODE_END,
-  CLI_NODE_FLAGS_OPT_END,
-  cli_script_create_name,
-  0,
-  0,
-  0
-  };
-
-
-static cli_node_t node_script_create_name = {
-  CLI_NODE_STRING,
-  0,
-  "STRING:name",
-  0,
-  0,
-  &node_script_create_name_end
-  };
-
-
-static cli_node_t node_script_create = {
-  CLI_NODE_KEYWORD,
-  0,
-  "create",
-  0,
-  &node_script_rm,
-  &node_script_create_name
-  };
-
-
-static cli_node_t node_script_rm_name_end = {
-  CLI_NODE_END,
-  CLI_NODE_FLAGS_OPT_END,
-  cli_script_rm_name,
-  0,
-  0,
-  0
-  };
-
-
-static cli_node_t node_script_rm_name = {
-  CLI_NODE_STRING,
-  0,
-  "STRING:name",
-  0,
-  0,
-  &node_script_rm_name_end
-  };
-
-
-static cli_node_t node_script_rm = {
-  CLI_NODE_KEYWORD,
-  0,
-  "rm",
-  0,
-  &node_script_ls,
-  &node_script_rm_name
-  };
-
-
-static cli_node_t node_script_ls_name_end = {
-  CLI_NODE_END,
-  CLI_NODE_FLAGS_OPT_END,
-  cli_script_ls_name,
-  0,
-  0,
-  0
-  };
-
-
-static cli_node_t node_script_ls_name = {
-  CLI_NODE_STRING,
-  CLI_NODE_FLAGS_OPT_START | CLI_NODE_FLAGS_OPT_END | CLI_NODE_FLAGS_OPT_PARTIAL,
-  "STRING:name",
-  0,
-  0,
-  &node_script_ls_name_end
-  };
-
-
-static cli_node_t node_script_ls = {
-  CLI_NODE_KEYWORD,
-  0,
-  "ls",
-  0,
-  &node_script_debug,
-  &node_script_ls_name
-  };
-
-
-static cli_node_t node_script_debug_name_end = {
-  CLI_NODE_END,
-  CLI_NODE_FLAGS_OPT_END,
-  cli_script_debug_name,
-  0,
-  0,
-  0
-  };
-
-
-static cli_node_t node_script_debug_name = {
-  CLI_NODE_STRING,
-  0,
-  "STRING:name",
-  0,
-  0,
-  &node_script_debug_name_end
-  };
-
-
-static cli_node_t node_script_debug = {
-  CLI_NODE_KEYWORD,
-  0,
-  "debug",
-  0,
-  &node_script_exit,
-  &node_script_debug_name
-  };
-
-
-static cli_node_t node_script_exit_end = {
-  CLI_NODE_END,
-  CLI_NODE_FLAGS_OPT_END,
-  cli_script_exit,
-  0,
-  0,
-  0
-  };
-
-
-static cli_node_t node_script_exit = {
-  CLI_NODE_KEYWORD,
-  0,
-  "exit",
-  0,
-  0,
-  &node_script_exit_end
-  };
-
-
-static cli_node_t node_script_end = {
-  CLI_NODE_END,
-  CLI_NODE_FLAGS_OPT_END,
-  cli_script,
-  0,
-  0,
-  &node_script_add
-  };
-
-
-static cli_node_t node_script = {
-  CLI_NODE_KEYWORD,
-  0,
-  "script",
+  "neutron",
   0,
   &node_send_can,
-  &node_script_end
+  &node_neutron_end
   };
 
 
@@ -2763,32 +2292,12 @@ static cli_node_t node_send_can = {
   0,
   "send_can",
   0,
-  &node_exit,
+  0,
   &node_send_can_id
   };
 
 
-static cli_node_t node_exit_end = {
-  CLI_NODE_END,
-  CLI_NODE_FLAGS_OPT_END,
-  cli_exit,
-  0,
-  0,
-  0
-  };
-
-
-static cli_node_t node_exit = {
-  CLI_NODE_KEYWORD,
-  0,
-  "exit",
-  0,
-  0,
-  &node_exit_end
-  };
-
-
-cli_node_t cli_root = {
+cli_node_t neutron_cli_root = {
   CLI_NODE_ROOT,
   0,
   0,

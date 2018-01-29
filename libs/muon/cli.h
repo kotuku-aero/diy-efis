@@ -196,7 +196,7 @@ typedef struct {
  * User input callback. This function is called after a user input 
  * is completed.
  */
-typedef result_t (*cli_input_cb)(struct _cli_t *context, const char * buffer);
+typedef result_t (*cli_input_cb)(struct _cli_t *context, stream_p stream, vector_p buffer);
 
 /**
  * \struct   cli_cfg_
@@ -263,11 +263,12 @@ typedef struct _cli_t {
     bool               done;   
 
     /********** User input **********/
-    /** Pointer to the buffer provided by user for input */
-    const char * user_buf;
+    /** OS vector for User data */
+    vector_p user_buf;
     /** Whether to echo user input */
-    bool               user_do_echo;
+    bool user_do_echo;
     /** Callback function when the input is complete */
+    stream_p stream;
     cli_input_cb  user_input_cb;
 
     /********** Last executed command **********/
@@ -425,7 +426,7 @@ extern result_t cli_submode_exit(cli_t *parser);
  *           e_bad_parameter if the input parameters are invalid.
  */
 extern result_t cli_user_input(cli_t *parser, const char *prompt,
-                                    int echoed, cli_input_cb cb);
+                                    bool echoed, stream_p stream, vector_p buffer, cli_input_cb cb);
 /**
  * \brief    Match function pointer.
  * \details  This function pointer is the prototype of all
