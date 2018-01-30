@@ -1412,26 +1412,29 @@ static void alarm_hook(const canmsg_t *msg)
     {
     published_datapoint_t *dp = &datapoints[dpi];
     
-    // work over the alarms next.
-    alarm_t *alarms;
-    uint16_t num_alarms;
-
-    // get our alarms vector
-    vector_begin(dp->alarms, (void **) &alarms);
-    vector_count(dp->alarms, &num_alarms);
-    
-    uint16_t ai;
-    for(ai = 0; ai < num_alarms; ai++)
+    if(dp->alarms != 0)
       {
-      alarm_t *alarm = &alarms[ai];
-      
-      if(alarm->type == level_alarm &&
-         alarm->reset_id == msg->id)
+      // work over the alarms next.
+      alarm_t *alarms;
+      uint16_t num_alarms;
+
+      // get our alarms vector
+      vector_begin(dp->alarms, (void **) &alarms);
+      vector_count(dp->alarms, &num_alarms);
+
+      uint16_t ai;
+      for(ai = 0; ai < num_alarms; ai++)
         {
-        alarm->event_time = 0;
-        int16_t value = 0;
-        // reset the alarm
-        publish_int16(alarm->alarm_id, &value, 1);
+        alarm_t *alarm = &alarms[ai];
+
+        if(alarm->type == level_alarm &&
+           alarm->reset_id == msg->id)
+          {
+          alarm->event_time = 0;
+          int16_t value = 0;
+          // reset the alarm
+          publish_int16(alarm->alarm_id, &value, 1);
+          }
         }
       }
     }
