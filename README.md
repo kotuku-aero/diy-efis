@@ -38,7 +38,7 @@ Facebook page
 
 https://www.facebook.com/diyefis/
 
-We are working actively on RELEASE_2017 which is now the default branch of the repository.
+We are working actively on ALPHA_1 which is now the default branch of the repository.
 
 The repository branch RELEASE_2016 holds the complete designs as of 2016.
 

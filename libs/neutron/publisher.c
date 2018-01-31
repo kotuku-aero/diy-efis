@@ -580,19 +580,19 @@ static result_t publish_value(const void *value, uint8_t type, uint16_t id)
           datapoint->accum = sample_value.uint32_value;
         break;
       case CANAS_DATATYPE_SHORT :
-        if(sample_value.int16_value < convert_to_int16(&datapoint->accum, CANAS_DATATYPE_FLOAT))
+        if(sample_value.int16_value[0] < convert_to_int16(&datapoint->accum, CANAS_DATATYPE_FLOAT))
           datapoint->accum = sample_value.int16_value[0];
         break;
       case CANAS_DATATYPE_USHORT :
-        if(sample_value.uint16_value < convert_to_uint16(&datapoint->accum, CANAS_DATATYPE_FLOAT))
+        if(sample_value.uint16_value[0] < convert_to_uint16(&datapoint->accum, CANAS_DATATYPE_FLOAT))
           datapoint->accum = sample_value.uint16_value[0];
         break;
       case CANAS_DATATYPE_CHAR :
-        if(sample_value.int8_value < convert_to_int8(&datapoint->accum, CANAS_DATATYPE_FLOAT))
+        if(sample_value.int8_value[0] < convert_to_int8(&datapoint->accum, CANAS_DATATYPE_FLOAT))
           datapoint->accum = sample_value.int8_value[0];
         break;
       case CANAS_DATATYPE_UCHAR :
-        if(sample_value.uint8_value < convert_to_uint8(&datapoint->accum, CANAS_DATATYPE_FLOAT))
+        if(sample_value.uint8_value[0] < convert_to_uint8(&datapoint->accum, CANAS_DATATYPE_FLOAT))
           datapoint->accum = sample_value.uint8_value[0];
         break;
       }
@@ -613,19 +613,19 @@ static result_t publish_value(const void *value, uint8_t type, uint16_t id)
           datapoint->accum = sample_value.uint32_value;
         break;
       case CANAS_DATATYPE_SHORT :
-        if(sample_value.int16_value > convert_to_int16(&datapoint->accum, CANAS_DATATYPE_FLOAT))
+        if(sample_value.int16_value[0] > convert_to_int16(&datapoint->accum, CANAS_DATATYPE_FLOAT))
           datapoint->accum = sample_value.int16_value[0];
         break;
       case CANAS_DATATYPE_USHORT :
-        if(sample_value.uint16_value > convert_to_uint16(&datapoint->accum, CANAS_DATATYPE_FLOAT))
+        if(sample_value.uint16_value[0] > convert_to_uint16(&datapoint->accum, CANAS_DATATYPE_FLOAT))
           datapoint->accum = sample_value.uint16_value[0];
         break;
       case CANAS_DATATYPE_CHAR :
-        if(sample_value.int8_value > convert_to_int8(&datapoint->accum, CANAS_DATATYPE_FLOAT))
+        if(sample_value.int8_value[0] > convert_to_int8(&datapoint->accum, CANAS_DATATYPE_FLOAT))
           datapoint->accum = sample_value.int8_value[0];
         break;
       case CANAS_DATATYPE_UCHAR :
-        if(sample_value.uint8_value > convert_to_uint8(&datapoint->accum, CANAS_DATATYPE_FLOAT))
+        if(sample_value.uint8_value[0] > convert_to_uint8(&datapoint->accum, CANAS_DATATYPE_FLOAT))
           datapoint->accum = sample_value.uint8_value[0];
         break;
       }
@@ -701,7 +701,7 @@ result_t publish_int8(uint16_t id, const int8_t *value, uint16_t len)
 result_t get_datapoint_int8(uint16_t id, int8_t *value, uint16_t *len)
   {
   if (value == 0 || len == 0 ||
-    *len < 0 || *len > 4)
+    *len == 0 || *len > 4)
     return e_bad_parameter;
 
   published_datapoint_t *datapoint = find_datapoint(id);
@@ -714,19 +714,21 @@ result_t get_datapoint_int8(uint16_t id, int8_t *value, uint16_t *len)
       *value = datapoint->value.int8_value[0];
       break;
     case CANAS_DATATYPE_CHAR2 :
-      if (len < 3)
+      if (*len < 2)
         return e_bad_parameter;
       value[0] = datapoint->value.int8_value[0];
       value[1] = datapoint->value.int8_value[1];
       break;
     case CANAS_DATATYPE_CHAR3 :
-      if (len < 4)
+      if (*len < 3)
         return e_bad_parameter;
       value[0] = datapoint->value.int8_value[0];
       value[1] = datapoint->value.int8_value[1];
       value[2] = datapoint->value.int8_value[2];
       break;
     case CANAS_DATATYPE_CHAR4 :
+      if (*len < 4)
+        return e_bad_parameter;
       value[0] = datapoint->value.int8_value[0];
       value[1] = datapoint->value.int8_value[1];
       value[2] = datapoint->value.int8_value[2];
@@ -759,7 +761,7 @@ result_t publish_uint8(uint16_t id, const uint8_t *value, uint16_t len)
 result_t get_datapoint_uint8(uint16_t id, uint8_t *value, uint16_t *len)
   {
   if (value == 0 || len == 0 ||
-    *len < 0 || *len > 4)
+    *len == 0 || *len > 4)
     return e_bad_parameter;
 
   published_datapoint_t *datapoint = find_datapoint(id);
@@ -772,13 +774,13 @@ result_t get_datapoint_uint8(uint16_t id, uint8_t *value, uint16_t *len)
       *value = datapoint->value.uint8_value[0];
       break;
     case CANAS_DATATYPE_UCHAR2:
-      if (len < 3)
+      if (*len < 2)
         return e_bad_parameter;
       value[0] = datapoint->value.uint8_value[0];
       value[1] = datapoint->value.uint8_value[1];
       break;
     case CANAS_DATATYPE_UCHAR3:
-      if (len < 4)
+      if (*len < 3)
         return e_bad_parameter;
       value[0] = datapoint->value.uint8_value[0];
       value[1] = datapoint->value.uint8_value[1];
@@ -815,7 +817,7 @@ result_t publish_int16(uint16_t id, const int16_t *value, uint16_t len)
 result_t get_datapoint_int16(uint16_t id, int16_t *value, uint16_t *len)
   {
   if (value == 0 || len == 0 ||
-    *len < 0 || *len > 2)
+    *len == 0 || *len > 2)
     return e_bad_parameter;
 
   published_datapoint_t *datapoint = find_datapoint(id);
@@ -828,7 +830,7 @@ result_t get_datapoint_int16(uint16_t id, int16_t *value, uint16_t *len)
       *value = datapoint->value.int16_value[0];
       break;
     case CANAS_DATATYPE_SHORT2:
-      if (len < 2)
+      if (*len < 2)
         return e_bad_parameter;
       value[0] = datapoint->value.int16_value[0];
       value[1] = datapoint->value.int16_value[1];
@@ -855,7 +857,7 @@ result_t publish_uint16(uint16_t id, const uint16_t *value, uint16_t len)
 result_t get_datapoint_uint16(uint16_t id, uint16_t *value, uint16_t *len)
   {
   if (value == 0 || len == 0 ||
-    *len < 0 || *len > 2)
+    *len == 0 || *len > 2)
     return e_bad_parameter;
 
   published_datapoint_t *datapoint = find_datapoint(id);
@@ -868,7 +870,7 @@ result_t get_datapoint_uint16(uint16_t id, uint16_t *value, uint16_t *len)
       *value = datapoint->value.int16_value[0];
       break;
     case CANAS_DATATYPE_USHORT2:
-      if (len < 2)
+      if (*len < 2)
         return e_bad_parameter;
       value[0] = datapoint->value.uint16_value[0];
       value[1] = datapoint->value.uint16_value[1];
@@ -1079,7 +1081,6 @@ static void publish_task(void *parg)
   semaphore_create(&can_publisher_semp);
   
   uint32_t last_tick = ticks();
-  uint8_t i;
   uint32_t dispatch_tick;
   uint32_t ticks_changed;
   
@@ -1119,7 +1120,6 @@ static void publish_task(void *parg)
     uint16_t  i;
 
     float index_value;
-    float filtered_value;
 
     // do each datapoint we have registered
     for(i = 0; i < num_datapoints; i++)
@@ -1396,16 +1396,16 @@ static void publish_task(void *parg)
     }
   }
 
-static void alarm_hook(const canmsg_t *msg)
+static bool alarm_hook(const canmsg_t *msg, void *parg)
   {
   uint16_t num_datapoints;
 
   if(failed(vector_count(published_datapoints, &num_datapoints)))
-    return;
+    return false;
 
   published_datapoint_t *datapoints;
   if(failed(vector_begin(published_datapoints, (void *)&datapoints)))
-      return;
+      return false;
   
   uint16_t dpi;
   for(dpi = 0; dpi < num_datapoints; dpi++)
@@ -1438,6 +1438,8 @@ static void alarm_hook(const canmsg_t *msg)
         }
       }
     }
+
+  return true;
   }
 
 static msg_hook_t alarm_cb = { 0, 0, alarm_hook };

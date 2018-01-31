@@ -1292,12 +1292,16 @@ result_t layout_wndproc(handle_t hwnd, const canmsg_t *msg)
   }
 
 static void draw_menu_item(handle_t hwnd,
-  struct _layout_window_t *wnd,
+  layout_window_t *wnd,
   const rect_t *wnd_rect,
   menu_item_t *selected_item,
   const point_t *menu_origin)
   {
-
+  rect_t menu_rect;
+  // depending on the type of item the rendering will be different
+  // TODO: this is a hack....
+  (*selected_item->paint)(hwnd, wnd, wnd_rect, selected_item,
+    make_rect(menu_origin->x, menu_origin->y, menu_origin->x + 80, menu_origin->y + 20, &menu_rect), true);
   }
 
 // these are the attached event handlers
