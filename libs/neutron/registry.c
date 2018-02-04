@@ -920,7 +920,8 @@ result_t reg_get_value(memid_t parent,
 
   while(memid != 0)
     {
-    reg_read_bytes(get_block_offset(memid), sizeof(field_definition_t), &defn);
+    if(failed(result = reg_read_bytes(get_block_offset(memid), sizeof(field_definition_t), &defn)))
+      return result;
 
     if(strcmp(name, defn.name)== 0)
       break;
@@ -961,7 +962,8 @@ result_t reg_get_value(memid_t parent,
       if(*data_length < defn.length)
         return e_buffer_too_small;
 
-      reg_read_bytes(get_block_offset(memid), defn.length, data);
+      if(failed(result = reg_read_bytes(get_block_offset(memid), defn.length, data)))
+        return result;
       }
     }
   return s_ok;

@@ -1553,6 +1553,9 @@ result_t define_datapoint(uint16_t can_id, uint16_t rate, uint16_t type, uint16_
   if (failed(result = reg_set_uint16(datapoint_key, s_sample_type_value, type)))
     return result;
 
+  if (failed(result = reg_set_uint16(datapoint_key, s_type_value, type)))
+    return result;
+
   // just average the values published
   if (failed(result = reg_set_uint16(datapoint_key, s_filter_type_value, boxcar_length > 0 ? ft_boxcar : ft_none)))
     return result;
