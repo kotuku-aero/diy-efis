@@ -61,8 +61,8 @@ extern "C" {
     canmsg_t msg;
     } ion_request_t;
 
-  extern const char *ion_key;
-  extern const char *event_key;
+  extern const char *ion_s;
+  extern const char *event_s;
   extern const char *ion_name;
 
 typedef struct _event_registration_t {

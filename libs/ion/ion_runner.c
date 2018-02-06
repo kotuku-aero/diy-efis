@@ -90,16 +90,16 @@ result_t ion_init()
 
   // create the ion keys
   memid_t ion_home;
-  if (failed(result = reg_open_key(0, ion_key, &ion_home)))
+  if (failed(result = reg_open_key(0, ion_s, &ion_home)))
     {
-    if (failed(result = reg_create_key(0, ion_key, &ion_home)))
+    if (failed(result = reg_create_key(0, ion_s, &ion_home)))
       return result;
     }
 
   memid_t parent;
-  if (failed(result = reg_open_key(ion_home, event_key, &parent)))
+  if (failed(result = reg_open_key(ion_home, event_s, &parent)))
     {
-    if (failed(result = reg_create_key(ion_home, event_key, &parent)))
+    if (failed(result = reg_create_key(ion_home, event_s, &parent)))
       return result;
     }
 
@@ -195,6 +195,39 @@ static void neutron_fatal_function(void *udata, const char *msg)
   // not sure about memory leaks!
 
   // kill the process...
+  }
+
+result_t load_script(ion_context_t *ctx, stream_p script)
+  {
+  result_t result;
+  uint32_t len;
+  if (failed(result = stream_length(script, &len)))
+    return result;
+
+  char *text = (char *)neutron_malloc(len + 1);
+  if (text == 0)
+    return e_not_enough_memory;
+
+  uint16_t read;
+  if (failed(result = stream_read(script, text, len, &read)))
+    {
+    neutron_free(text);
+    return result;
+    }
+
+  text[read] = 0;
+
+  duk_push_lstring(ctx->ctx, text, (duk_size_t)read);
+  neutron_free(text);
+
+  if (duk_peval(ctx->ctx) != 0)
+    {
+    stream_printf(ctx->console_err, "%s\r\n", duk_safe_to_string(ctx->ctx, -1));
+     return e_unexpected;
+    }
+  duk_pop(ctx->ctx);  /* ignore result */
+
+  return s_ok;  
   }
 
 // create a context to run a script within and load it
@@ -337,48 +370,14 @@ result_t ion_create_worker(memid_t home,
       ion_close(ion_ctx);
       return result;
       }
-
-    uint32_t len;
-    if (failed(result = stream_length(script, &len)))
+    
+    if(failed(result = load_script(ion_ctx, script)))
       {
       stream_close(script);
       // release the context..
       ion_close(ion_ctx);
       return result;
       }
-
-    char *text = (char *)neutron_malloc(len + 1);
-    if (text == 0)
-      {
-      stream_close(script);
-      // release the context..
-      ion_close(ion_ctx);
-      return e_not_enough_memory;
-      }
-
-    uint16_t read;
-    if (failed(result = stream_read(script, text, len, &read)))
-      {
-      neutron_free(text);
-      stream_close(script);
-      // release the context..
-      ion_close(ion_ctx);
-      return result;
-      }
-
-    text[read] = 0;
-
-    duk_push_lstring(ctx, text, (duk_size_t)read);
-    neutron_free(text);
-    stream_close(script);
-
-    if (duk_peval(ctx) != 0)
-      {
-      stream_printf(cerr, "%s\r\n", duk_safe_to_string(ctx, -1));
-      ion_close(ion_ctx);
-      return e_unexpected;
-      }
-    duk_pop(ctx);  /* ignore result */
     }
 
   // create the worker thread
@@ -481,18 +480,46 @@ result_t ion_run(ion_register_fn lib_funcs)
   
   // enumerate the ion keys
   memid_t ion_home;
-  if(failed(result = reg_open_key(0, ion_key, &ion_home)))
+  if(failed(result = reg_open_key(0, ion_s, &ion_home)))
     return result;
   
-  memid_t parent;
-  if(failed(result = reg_open_key(ion_home, event_key, &parent)))
+  // firstly we try to load the handler.
+  // TODO: js errors to trace log?????
+  struct _ion_context_t *ctx;
+  if (failed(result = ion_create_worker(ion_home,
+                                        0, 0, 0, 0,
+                                        lib_funcs,
+                                        true, BELOW_NORMAL,
+                                        &ctx)))
+    {
+    trace_error("Cannot create ion worker : %d", result);
     return result;
+    }
   
-  field_datatype dt = field_key;
+  field_datatype dt = field_stream;
   char event_name[REG_NAME_MAX+1];
   memid_t child = 0;
 
-  while (succeeded(reg_enum_key(parent, &dt, 0, 0, REG_NAME_MAX, event_name, &child)))
+  
+  // iterate over all of the streams and try to load them
+  while (succeeded(reg_enum_key(ion_home, &dt, 0, 0, REG_NAME_MAX, event_name, &child)))
+    {
+    // open the stream
+    stream_p script;
+    if(succeeded(stream_open(ion_home, event_name, &script)))
+      {
+      load_script(ctx, script);
+      stream_close(script);
+      }
+    }  
+  
+  memid_t event_key;
+  if(failed(result = reg_open_key(ion_home, event_s, &event_key)))
+    return result;
+  
+  dt = field_key;
+  
+  while (succeeded(reg_enum_key(event_key, &dt, 0, 0, REG_NAME_MAX, event_name, &child)))
     {
     event_name[REG_NAME_MAX] = 0;
     // check for errors
@@ -516,34 +543,9 @@ result_t ion_run(ion_register_fn lib_funcs)
     // iterate over the handlers.
     field_datatype str_type = field_string;
     memid_t str_child = 0;
-    char handler_name[REG_NAME_MAX + 1];
-    while (succeeded(reg_enum_key(child, &str_type, 0, 0, REG_NAME_MAX, handler_name, &str_child)))
+    char func_name[REG_NAME_MAX + 1];
+    while (succeeded(reg_enum_key(child, &str_type, 0, 0, REG_NAME_MAX, func_name, &str_child)))
       {
-      handler_name[REG_NAME_MAX] = 0;
-      char func_name[REG_STRING_MAX + 1];
-
-      if (failed(reg_get_string(str_child, handler_name, func_name, 0)) ||
-        func_name[0] == 0)
-        {
-        trace_error("Ion event handler %s does not have a function", handler_name);
-        continue;
-        }
-      func_name[REG_STRING_MAX] = 0;
-
-      // firstly we try to load the handler.
-      // TODO: js errors to trace log?????
-      struct _ion_context_t *ctx;
-      if (failed(result = ion_create_worker(ion_home,
-                                            handler_name,
-                                            0, 0, 0,
-                                            lib_funcs,
-                                            true, BELOW_NORMAL,
-                                            &ctx)))
-        {
-        trace_error("Cannot create ion worker for script %s : %d", handler_name, result);
-        continue;
-        }
-
       // we have the handler, now we see if the map holds a key to the value
       vector_p event_handlers;
       if (failed(map_find(handlers, (void *)event_id, (void **)&event_handlers)))
@@ -625,12 +627,18 @@ result_t add_event_handler(const char *name, const char *script, const event_reg
   {
   result_t result;
   memid_t ion_home;
-  if (failed(result = reg_open_key(0, ion_key, &ion_home)))
-    return result;
+  if (failed(result = reg_open_key(0, ion_s, &ion_home)))
+    {
+    if(failed(result = reg_create_key(0, ion_s, &ion_home)))
+      return result;
+    }
 
   memid_t parent;
-  if (failed(result = reg_open_key(ion_home, event_key, &parent)))
-    return result;
+  if (failed(result = reg_open_key(ion_home, event_s, &parent)))
+    {
+    if(failed(result = reg_create_key(ion_home, event_s, &parent)))
+      return result;
+    }
 
   stream_p stream;
   // store the script
@@ -647,10 +655,7 @@ result_t add_event_handler(const char *name, const char *script, const event_reg
     char event_name[REG_NAME_MAX];
     snprintf(event_name, REG_NAME_MAX, "%d", ids->can_id);
 
-    char path[REG_STRING_MAX];
-    snprintf(path, REG_STRING_MAX, "../%s", name);
-
-    if (failed(result = reg_set_string(parent, event_name, path)))
+    if (failed(result = reg_set_string(parent, event_name, ids->function_name)))
       return result;
 
     ids++;

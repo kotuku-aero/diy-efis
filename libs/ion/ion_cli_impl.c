@@ -38,8 +38,8 @@ it must be removed as soon as possible after the code fragment is identified.
 #include "interpreter.h"
 #include "../muon/cli/neutron_cli_impl.h"
 
-const char *ion_key = "ion";
-const char *event_key = "events";
+const char *ion_s = "ion";
+const char *event_s = "events";
 const char *ion_name = "ion";
 extern const char * get_full_path(memid_t key);
 
@@ -49,17 +49,17 @@ result_t ion_action(cli_t *context)
   result_t result;
   memid_t key;
 
-  if(failed(result = reg_open_key(0, ion_key, &key)))
+  if(failed(result = reg_open_key(0, ion_s, &key)))
     {
     if(result != e_path_not_found)
       return result;
 
-    if(failed(result = reg_create_key(0, ion_key, &key)))
+    if(failed(result = reg_create_key(0, ion_s, &key)))
       return result;
 
     memid_t events;
     // create the events key
-    if(failed(result = reg_create_key(key, event_key, &events)))
+    if(failed(result = reg_create_key(key, event_s, &events)))
       {
       // remove the new key
       reg_delete_key(key);
@@ -90,11 +90,11 @@ result_t ion_ls_name_action(cli_t *context, const char * path)
   char name[REG_NAME_MAX + 1];
   char buffer[32];  
 
-  if (path != 0 && strcmp(path, event_key)== 0)
+  if (path != 0 && strcmp(path, event_s)== 0)
     {
     memid_t key;
 
-    if (failed(result = reg_open_key(get_context(context), event_key, &key)))
+    if (failed(result = reg_open_key(get_context(context), event_s, &key)))
         return result;
 
     // enumerate the keys
@@ -323,12 +323,12 @@ result_t ion_add_id_name_msg_handler_action(cli_t *context, uint16_t event_id, c
   memid_t key;
   result_t result;
 
-  if (failed(result = reg_open_key(get_context(context), event_key, &key)))
+  if (failed(result = reg_open_key(get_context(context), event_s, &key)))
     {
     if (result != e_path_not_found)
       return result;
 
-    if (failed(result = reg_create_key(get_context(context), event_key, &key)))
+    if (failed(result = reg_create_key(get_context(context), event_s, &key)))
       return result;
     }
 
@@ -362,7 +362,7 @@ result_t ion_del_id_name_action(cli_t *context, uint16_t del_id, const char * io
   result_t result;
   memid_t key;
 
-  if (failed(result = reg_open_key(get_context(context), event_key, &key)))
+  if (failed(result = reg_open_key(get_context(context), event_s, &key)))
     return result;
 
   char id_str[32];
@@ -388,7 +388,7 @@ result_t ion_exec_name_action(cli_t *context, const char * name)
   memid_t parent = 0;
 
   if (name != 0 &&
-    failed(result = reg_open_key(0, ion_key, &parent)))
+    failed(result = reg_open_key(0, ion_s, &parent)))
       return result;
 
   struct _ion_context_t *ion;
