@@ -1336,55 +1336,58 @@ static void publish_task(void *parg)
         // it is quite valid not not have any publish or local flags.  In this
         // case the publisher is just used as a filter/store for can values.
         
-        // work over the alarms next.
-        alarm_t *alarms;
-        uint16_t num_alarms;
-        
-        // get our alarms vector
-        vector_begin(dp->alarms, (void **)&alarms);
-        vector_count(dp->alarms, &num_alarms);
-        
-        uint32_t now = ticks();
-        uint16_t i;
-        for(i = 0; i < num_alarms; i++)
+        if(dp->alarms != 0)
           {
-          alarm_t *alarm = &alarms[i];
-          
-          bool send_alarm = false;
-          
-          if(alarm->check_maximum &&
-             dp->accum > alarm->max_value)
+          // work over the alarms next.
+          alarm_t *alarms;
+          uint16_t num_alarms;
+        
+          // get our alarms vector
+          vector_begin(dp->alarms, (void **)&alarms);
+          vector_count(dp->alarms, &num_alarms);
+        
+          uint32_t now = ticks();
+          uint16_t i;
+          for (i = 0; i < num_alarms; i++)
             {
-            // check length
-            if(alarm->event_time == 0)
-              alarm->event_time = now;
-            
-            if((alarm->event_time + alarm->period) <= now)
-              send_alarm = true;
-            }
-          
-          if(!send_alarm &&
-             alarm->check_minimum &&
-             dp->accum < alarm->min_value)
-            {
-            // check length
-            if(alarm->event_time == 0)
-              alarm->event_time = now;
-            
-            if((alarm->event_time + alarm->period) <= now)
-              send_alarm = true;
-            }
-          
-          if(send_alarm)
-            {
-            int16_t value = 1;
-            publish_int16(alarm->alarm_id, &value, 1);
-            alarm->event_time = 0;
-            }
-          else if(alarm->type == event_alarm)       // event alarm, otherwise manual reset
-            {
-            int16_t value = 0;
-            publish_int16(alarm->alarm_id, &value, 1);
+            alarm_t *alarm = &alarms[i];
+
+            bool send_alarm = false;
+
+            if (alarm->check_maximum &&
+              dp->accum > alarm->max_value)
+              {
+              // check length
+              if (alarm->event_time == 0)
+                alarm->event_time = now;
+
+              if ((alarm->event_time + alarm->period) <= now)
+                send_alarm = true;
+              }
+
+            if (!send_alarm &&
+              alarm->check_minimum &&
+              dp->accum < alarm->min_value)
+              {
+              // check length
+              if (alarm->event_time == 0)
+                alarm->event_time = now;
+
+              if ((alarm->event_time + alarm->period) <= now)
+                send_alarm = true;
+              }
+
+            if (send_alarm)
+              {
+              int16_t value = 1;
+              publish_int16(alarm->alarm_id, &value, 1);
+              alarm->event_time = 0;
+              }
+            else if (alarm->type == event_alarm)       // event alarm, otherwise manual reset
+              {
+              int16_t value = 0;
+              publish_int16(alarm->alarm_id, &value, 1);
+              }
             }
           }
         
