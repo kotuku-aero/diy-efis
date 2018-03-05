@@ -931,6 +931,24 @@ extern result_t unsubscribe(msg_hook_t *handler);
  */
 extern result_t publish_float(uint16_t id, float value);
 /**
+ * @function publish_int8(uint16_t id, const int8_t *value, uint16_t len)
+ * Update the datapoint with a series of 8 bit integers
+ * @param id        Can ID to publish
+ * @param value     values to publish
+ * @param len       number to publish (1..4)
+ * @return  s_ok if the datapoint is registered with the publisher
+ */
+extern result_t publish_int8(uint16_t id, const int8_t *value, uint16_t len);
+/**
+ * @function publish_uint8(uint16_t id, const uint8_t *value, uint16_t len)
+ * Update the datapoint with a series of 8 bit unsigned integers
+ * @param id        Can ID to publish
+ * @param value     values to publish
+ * @param len       number to publish (1..4)
+ * @return  s_ok if the datapoint is registered with the publisher
+ */
+extern result_t publish_uint8(uint16_t id, const uint8_t *value, uint16_t len);
+/**
  * @function publish_int16(uint16_t id, const int16_t *value, uint16_t len)
  * Update the datapoint with a series of 16 bit integers
  * @param id        Can ID to publish

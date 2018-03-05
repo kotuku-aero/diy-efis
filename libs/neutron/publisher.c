@@ -1019,7 +1019,14 @@ void publish_task(void *parg)
           {
           case ft_none :
             // just send the value
-            dp.value.float_value = dp.accum;
+            // If the capture type is an average of the samples we
+            // always store the value as a floating point.
+            if(dp.capture_type == ct_avg)
+              {
+              switch(dp.value_type)
+                {
+                case CANAS_DATATYPE_FLOAT :
+                  dp.value.float_value = dp.accum;
                   break;
                 case CANAS_DATATYPE_INT32 :
                   dp.value.int32_value = convert_to_int32(&dp.accum, CANAS_DATATYPE_FLOAT);
