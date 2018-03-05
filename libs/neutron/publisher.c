@@ -158,38 +158,33 @@ static const char *s_alarm_reset_value = "reset";
 
 static canmsg_t register_msg;
 
-static const char *lookup_enum(enum_descr *descr, uint16_t num, uint16_t value)
-  {
-  uint16_t i;
-  for(i = 0; i < num; i++)
-    {
-    if(descr[i].value == value)
-      return descr[i].description;
-    }
-
-  return "invalid";
-  }
-
-static published_datapoint_t *find_datapoint(uint16_t id)
+/**
+ * Find the index of a datapoint in the published datapoints
+ * @param id
+ * @return 
+ */
+static result_t find_datapoint(uint16_t id, published_datapoint_t *dp, uint16_t *index)
   {
   uint16_t i;
   uint16_t len;
+  result_t result;
 
-  if(failed(vector_count(published_datapoints, &len)))
-    return 0;
+  if(failed(result = vector_count(published_datapoints, &len)))
+    return result;
+  
+  if(index == 0)
+    index = &i;
 
-  published_datapoint_t *dp;
-  if(failed(vector_begin(published_datapoints, (void **)&dp)))
-    return 0;
-
-  for(i = 0; i < len; i++)
+  for(*index = 0; *index < len; *index++)
     {
-
-    if(dp[i].can_id == id)
-      return dp + i;
+    if(failed(result = vector_at(published_datapoints, *index, dp)))
+      return result;
+    
+    if(dp->can_id == id)
+      return s_ok;
     }
   
-  return 0;
+  return e_not_found;
   }
 
 static int8_t convert_to_int8(const void *value, uint8_t dt)
@@ -493,175 +488,45 @@ static float convert_to_float(const void *value, uint8_t dt)
   return 0;
   }
 
-static void assign_variant(variant_t *dest, float value, uint8_t dt)
-  {
-  switch(dt)
-    {
-    case CANAS_DATATYPE_FLOAT :
-       dest->float_value = value;
-       break;
-    case CANAS_DATATYPE_INT32 :
-      dest->int32_value = convert_to_int32(&value, CANAS_DATATYPE_FLOAT);
-      break;
-    case CANAS_DATATYPE_UINT32 :
-      dest->uint32_value = convert_to_uint32(&value, CANAS_DATATYPE_FLOAT);
-      break;
-    case CANAS_DATATYPE_SHORT :
-      dest->int16_value[0] = convert_to_int16(&value, CANAS_DATATYPE_FLOAT);
-      break;
-    case CANAS_DATATYPE_USHORT :
-      dest->uint16_value[0] = convert_to_uint16(&value, CANAS_DATATYPE_FLOAT);
-      break;
-    case CANAS_DATATYPE_CHAR :
-      dest->int8_value[0] = convert_to_int8(&value, CANAS_DATATYPE_FLOAT);
-      break;
-    case CANAS_DATATYPE_UCHAR :
-      dest->uint8_value[0] = convert_to_uint8(&value, CANAS_DATATYPE_FLOAT);
-      break;
-    }
-  }
-
 extern void publish_local(const canmsg_t *msg);
 
 static result_t publish_value(const void *value, uint8_t type, uint16_t id)
   {
-  published_datapoint_t *datapoint = find_datapoint(id);
-  if(datapoint == 0)
-    return e_not_found;
+  result_t result;
+  uint16_t index;
+  published_datapoint_t datapoint;
   
-  variant_t sample_value;
+  if(failed(result = find_datapoint(id, &datapoint, &index)))
+    return result;
+  
+  float f_value = convert_to_float(value, type);
 
-  switch(datapoint->value_type)
-    {
-    case CANAS_DATATYPE_FLOAT :
-      sample_value.float_value =  convert_to_float(value, type);
-      break;
-    case CANAS_DATATYPE_INT32 :
-      sample_value.int32_value = convert_to_int32(value, type);
-      break;
-    case CANAS_DATATYPE_UINT32 :
-      sample_value.uint32_value = convert_to_uint32(&value, type);
-      break;
-    case CANAS_DATATYPE_SHORT :
-      sample_value.int16_value[0] = convert_to_int16(&value, type);
-      break;
-    case CANAS_DATATYPE_USHORT :
-      sample_value.uint16_value[0] = convert_to_uint16(&value, type);
-      break;
-    case CANAS_DATATYPE_CHAR :
-      sample_value.int8_value[0] = convert_to_int8(&value, type);
-      break;
-    case CANAS_DATATYPE_UCHAR :
-      sample_value.uint8_value[0] = convert_to_uint8(&value, type);
-      break;
-    }
-
-  switch(datapoint->capture_type)
+  // decide what pre-filter algorithm is applied to the sample.
+  switch(datapoint.capture_type)
     {
   case ct_fifo :
-    if(datapoint->num_samples != 0)
+    if(datapoint.num_samples != 0)
       break;
   case ct_lifo :
-    assign_variant(&sample_value, datapoint->accum, datapoint->value_type);
+    datapoint.accum = f_value;
     break;
   case ct_min :
-    switch(datapoint->value_type)
-      {
-      case CANAS_DATATYPE_FLOAT :
-        if(sample_value.float_value < datapoint->accum)
-          datapoint->accum = sample_value.float_value;
-        break;
-      case CANAS_DATATYPE_INT32 :
-        if(sample_value.int32_value < convert_to_int32(&datapoint->accum, CANAS_DATATYPE_FLOAT))
-          datapoint->accum = sample_value.int32_value;
-        break;
-      case CANAS_DATATYPE_UINT32 :
-        if(sample_value.uint32_value < convert_to_uint32(&datapoint->accum, CANAS_DATATYPE_FLOAT))
-          datapoint->accum = sample_value.uint32_value;
-        break;
-      case CANAS_DATATYPE_SHORT :
-        if(sample_value.int16_value[0] < convert_to_int16(&datapoint->accum, CANAS_DATATYPE_FLOAT))
-          datapoint->accum = sample_value.int16_value[0];
-        break;
-      case CANAS_DATATYPE_USHORT :
-        if(sample_value.uint16_value[0] < convert_to_uint16(&datapoint->accum, CANAS_DATATYPE_FLOAT))
-          datapoint->accum = sample_value.uint16_value[0];
-        break;
-      case CANAS_DATATYPE_CHAR :
-        if(sample_value.int8_value[0] < convert_to_int8(&datapoint->accum, CANAS_DATATYPE_FLOAT))
-          datapoint->accum = sample_value.int8_value[0];
-        break;
-      case CANAS_DATATYPE_UCHAR :
-        if(sample_value.uint8_value[0] < convert_to_uint8(&datapoint->accum, CANAS_DATATYPE_FLOAT))
-          datapoint->accum = sample_value.uint8_value[0];
-        break;
-      }
+    if(f_value < datapoint.accum)
+      datapoint.accum = f_value;
     break;
   case ct_max :
-    switch(datapoint->value_type)
-      {
-      case CANAS_DATATYPE_FLOAT :
-        if(sample_value.float_value > datapoint->accum)
-          datapoint->accum = sample_value.float_value;
-        break;
-      case CANAS_DATATYPE_INT32 :
-        if(sample_value.int32_value > convert_to_int32(&datapoint->accum, CANAS_DATATYPE_FLOAT))
-          datapoint->accum = sample_value.int32_value;
-        break;
-      case CANAS_DATATYPE_UINT32 :
-        if(sample_value.uint32_value > convert_to_uint32(&datapoint->accum, CANAS_DATATYPE_FLOAT))
-          datapoint->accum = sample_value.uint32_value;
-        break;
-      case CANAS_DATATYPE_SHORT :
-        if(sample_value.int16_value[0] > convert_to_int16(&datapoint->accum, CANAS_DATATYPE_FLOAT))
-          datapoint->accum = sample_value.int16_value[0];
-        break;
-      case CANAS_DATATYPE_USHORT :
-        if(sample_value.uint16_value[0] > convert_to_uint16(&datapoint->accum, CANAS_DATATYPE_FLOAT))
-          datapoint->accum = sample_value.uint16_value[0];
-        break;
-      case CANAS_DATATYPE_CHAR :
-        if(sample_value.int8_value[0] > convert_to_int8(&datapoint->accum, CANAS_DATATYPE_FLOAT))
-          datapoint->accum = sample_value.int8_value[0];
-        break;
-      case CANAS_DATATYPE_UCHAR :
-        if(sample_value.uint8_value[0] > convert_to_uint8(&datapoint->accum, CANAS_DATATYPE_FLOAT))
-          datapoint->accum = sample_value.uint8_value[0];
-        break;
-      }
+    if(f_value > datapoint.accum)
+      datapoint.accum = f_value;
     break;
   case ct_avg :
-    // avaerage always uses floating point (which can overflow!)
-    switch(datapoint->value_type)
-      {
-      case CANAS_DATATYPE_FLOAT :
-        datapoint->accum += sample_value.float_value;
-        break;
-      case CANAS_DATATYPE_INT32 :
-        datapoint->accum += sample_value.int32_value;
-        break;
-      case CANAS_DATATYPE_UINT32 :
-        datapoint->accum += sample_value.uint32_value;
-        break;
-      case CANAS_DATATYPE_SHORT :
-        datapoint->accum += sample_value.int16_value[0];
-        break;
-      case CANAS_DATATYPE_USHORT :
-        datapoint->accum += sample_value.uint16_value[0];
-        break;
-      case CANAS_DATATYPE_CHAR :
-        datapoint->accum += sample_value.int8_value[0];
-        break;
-      case CANAS_DATATYPE_UCHAR :
-        datapoint->accum += sample_value.uint8_value[0];
-        break;
-      }
+    datapoint.accum += f_value;
     break;
     }
 
-  datapoint->num_samples ++;
-
-  return s_ok;
+  // this is used when an average value is needed
+  datapoint.num_samples ++;
+  
+  return vector_set(published_datapoints, index, &datapoint);
   }
 
 result_t publish_float(uint16_t id, float value)
@@ -674,11 +539,13 @@ result_t get_datapoint_float(uint16_t id, float *value)
   if (value == 0)
     return e_bad_parameter;
 
-  published_datapoint_t *datapoint = find_datapoint(id);
-  if (datapoint == 0)
-    return e_not_found;
+  result_t result;
+   published_datapoint_t datapoint;
+  
+  if(failed(result = find_datapoint(id, &datapoint, 0)))
+    return result;
 
-  *value = convert_to_float(&datapoint->value, datapoint->value_type);
+  *value = convert_to_float(&datapoint.value, datapoint.value_type);
   return s_ok;
   }
 
@@ -704,38 +571,40 @@ result_t get_datapoint_int8(uint16_t id, int8_t *value, uint16_t *len)
     *len == 0 || *len > 4)
     return e_bad_parameter;
 
-  published_datapoint_t *datapoint = find_datapoint(id);
-  if (datapoint == 0)
-    return e_not_found;
+  result_t result;
+  published_datapoint_t datapoint;
+  
+  if(failed(result = find_datapoint(id, &datapoint, 0)))
+    return result;
 
-  switch (datapoint->value_type)
+  switch (datapoint.value_type)
     {
     case CANAS_DATATYPE_CHAR :
-      *value = datapoint->value.int8_value[0];
+      *value = datapoint.value.int8_value[0];
       break;
     case CANAS_DATATYPE_CHAR2 :
       if (*len < 2)
         return e_bad_parameter;
-      value[0] = datapoint->value.int8_value[0];
-      value[1] = datapoint->value.int8_value[1];
+      value[0] = datapoint.value.int8_value[0];
+      value[1] = datapoint.value.int8_value[1];
       break;
     case CANAS_DATATYPE_CHAR3 :
       if (*len < 3)
         return e_bad_parameter;
-      value[0] = datapoint->value.int8_value[0];
-      value[1] = datapoint->value.int8_value[1];
-      value[2] = datapoint->value.int8_value[2];
+      value[0] = datapoint.value.int8_value[0];
+      value[1] = datapoint.value.int8_value[1];
+      value[2] = datapoint.value.int8_value[2];
       break;
     case CANAS_DATATYPE_CHAR4 :
       if (*len < 4)
         return e_bad_parameter;
-      value[0] = datapoint->value.int8_value[0];
-      value[1] = datapoint->value.int8_value[1];
-      value[2] = datapoint->value.int8_value[2];
-      value[3] = datapoint->value.int8_value[3];
+      value[0] = datapoint.value.int8_value[0];
+      value[1] = datapoint.value.int8_value[1];
+      value[2] = datapoint.value.int8_value[2];
+      value[3] = datapoint.value.int8_value[3];
       break;
     default :
-      *value = convert_to_int8(&datapoint->value, datapoint->value_type);
+      *value = convert_to_int8(&datapoint.value, datapoint.value_type);
       *len = 1;
       break;
     }
@@ -764,36 +633,38 @@ result_t get_datapoint_uint8(uint16_t id, uint8_t *value, uint16_t *len)
     *len == 0 || *len > 4)
     return e_bad_parameter;
 
-  published_datapoint_t *datapoint = find_datapoint(id);
-  if (datapoint == 0)
-    return e_not_found;
+  result_t result;
+  published_datapoint_t datapoint;
+  
+  if(failed(result = find_datapoint(id, &datapoint, 0)))
+    return result;
 
-  switch (datapoint->value_type)
+  switch (datapoint.value_type)
     {
     case CANAS_DATATYPE_UCHAR:
-      *value = datapoint->value.uint8_value[0];
+      *value = datapoint.value.uint8_value[0];
       break;
     case CANAS_DATATYPE_UCHAR2:
       if (*len < 2)
         return e_bad_parameter;
-      value[0] = datapoint->value.uint8_value[0];
-      value[1] = datapoint->value.uint8_value[1];
+      value[0] = datapoint.value.uint8_value[0];
+      value[1] = datapoint.value.uint8_value[1];
       break;
     case CANAS_DATATYPE_UCHAR3:
       if (*len < 3)
         return e_bad_parameter;
-      value[0] = datapoint->value.uint8_value[0];
-      value[1] = datapoint->value.uint8_value[1];
-      value[2] = datapoint->value.uint8_value[2];
+      value[0] = datapoint.value.uint8_value[0];
+      value[1] = datapoint.value.uint8_value[1];
+      value[2] = datapoint.value.uint8_value[2];
       break;
     case CANAS_DATATYPE_UCHAR4:
-      value[0] = datapoint->value.uint8_value[0];
-      value[1] = datapoint->value.uint8_value[1];
-      value[2] = datapoint->value.uint8_value[2];
-      value[3] = datapoint->value.uint8_value[3];
+      value[0] = datapoint.value.uint8_value[0];
+      value[1] = datapoint.value.uint8_value[1];
+      value[2] = datapoint.value.uint8_value[2];
+      value[3] = datapoint.value.uint8_value[3];
       break;
     default:
-      *value = convert_to_uint8(&datapoint->value, datapoint->value_type);
+      *value = convert_to_uint8(&datapoint.value, datapoint.value_type);
       *len = 1;
       break;
     }
@@ -820,23 +691,25 @@ result_t get_datapoint_int16(uint16_t id, int16_t *value, uint16_t *len)
     *len == 0 || *len > 2)
     return e_bad_parameter;
 
-  published_datapoint_t *datapoint = find_datapoint(id);
-  if (datapoint == 0)
-    return e_not_found;
+  result_t result;
+  published_datapoint_t datapoint;
+  
+  if(failed(result = find_datapoint(id, &datapoint, 0)))
+    return result;
 
-  switch (datapoint->value_type)
+  switch (datapoint.value_type)
     {
     case CANAS_DATATYPE_SHORT:
-      *value = datapoint->value.int16_value[0];
+      *value = datapoint.value.int16_value[0];
       break;
     case CANAS_DATATYPE_SHORT2:
       if (*len < 2)
         return e_bad_parameter;
-      value[0] = datapoint->value.int16_value[0];
-      value[1] = datapoint->value.int16_value[1];
+      value[0] = datapoint.value.int16_value[0];
+      value[1] = datapoint.value.int16_value[1];
       break;
     default:
-      *value = convert_to_int16(&datapoint->value, datapoint->value_type);
+      *value = convert_to_int16(&datapoint.value, datapoint.value_type);
       *len = 1;
       break;
     }
@@ -860,23 +733,25 @@ result_t get_datapoint_uint16(uint16_t id, uint16_t *value, uint16_t *len)
     *len == 0 || *len > 2)
     return e_bad_parameter;
 
-  published_datapoint_t *datapoint = find_datapoint(id);
-  if (datapoint == 0)
-    return e_not_found;
+  result_t result;
+  published_datapoint_t datapoint;
+  
+  if(failed(result = find_datapoint(id, &datapoint, 0)))
+    return result;
 
-  switch (datapoint->value_type)
+  switch (datapoint.value_type)
     {
     case CANAS_DATATYPE_USHORT:
-      *value = datapoint->value.int16_value[0];
+      *value = datapoint.value.int16_value[0];
       break;
     case CANAS_DATATYPE_USHORT2:
       if (*len < 2)
         return e_bad_parameter;
-      value[0] = datapoint->value.uint16_value[0];
-      value[1] = datapoint->value.uint16_value[1];
+      value[0] = datapoint.value.uint16_value[0];
+      value[1] = datapoint.value.uint16_value[1];
       break;
     default:
-      *value = convert_to_uint16(&datapoint->value, datapoint->value_type);
+      *value = convert_to_uint16(&datapoint.value, datapoint.value_type);
       *len = 1;
       break;
     }
@@ -893,11 +768,13 @@ result_t get_datapoint_int32(uint16_t id, int32_t *value)
   if (value == 0)
     return e_bad_parameter;
 
-  published_datapoint_t *datapoint = find_datapoint(id);
-  if (datapoint == 0)
-    return e_not_found;
+  result_t result;
+  published_datapoint_t datapoint;
+  
+  if(failed(result = find_datapoint(id, &datapoint, 0)))
+    return result;
 
-  *value = convert_to_int32(&datapoint->value, datapoint->value_type);
+  *value = convert_to_int32(&datapoint.value, datapoint.value_type);
   return s_ok;
   }
 
@@ -911,11 +788,13 @@ result_t get_datapoint_uint32(uint16_t id, uint32_t *value)
   if (value == 0)
     return e_bad_parameter;
 
-  published_datapoint_t *datapoint = find_datapoint(id);
-  if(datapoint == 0)
-    return e_not_found;
+  result_t result;
+  published_datapoint_t datapoint;
   
-  *value = convert_to_uint32(&datapoint->value, datapoint->value_type);
+  if(failed(result = find_datapoint(id, &datapoint, 0)))
+    return result;
+
+  *value = convert_to_uint32(&datapoint.value, datapoint.value_type);
   return s_ok;
   }
 
@@ -1074,7 +953,7 @@ static result_t load_datapoint(handle_t datapoints, uint16_t can_id, memid_t key
   return s_ok;
   }
 
-static void publish_task(void *parg)
+void publish_task(void *parg)
   {
   int nis_timeout = 100;
 
@@ -1111,11 +990,7 @@ static void publish_task(void *parg)
     if(failed(vector_count(published_datapoints, &num_datapoints)))
       continue;
 
-    published_datapoint_t *datapoints;
-    if(failed(vector_begin(published_datapoints, (void *)&datapoints)))
-        continue;
-
-    published_datapoint_t *dp;
+    published_datapoint_t dp;
     canmsg_t msg;
     uint16_t  i;
 
@@ -1124,277 +999,287 @@ static void publish_task(void *parg)
     // do each datapoint we have registered
     for(i = 0; i < num_datapoints; i++)
       {
-      dp = &datapoints[i];
+      vector_at(published_datapoints, i, &dp);
       
-      bool publish = dp->flags.publish &&
-         dp->next_publish_tick <= ticks_changed;
+      bool publish = dp.flags.publish &&
+         dp.next_publish_tick <= ticks_changed;
 
       if(publish)
         {
-        dp->next_publish_tick = dp->publish_rate;
+        dp.next_publish_tick = dp.publish_rate;
         
         // see if the accumulator is an average,
-        if(dp->capture_type == ct_avg)
-          dp->accum /= dp->num_samples;
+        if(dp.capture_type == ct_avg)
+          dp.accum /= dp.num_samples;
         
-        dp->num_samples = 0;
+        dp.num_samples = 0;
         
         // determine the filter type
-        switch(dp->filter_type)
+        switch(dp.filter_type)
           {
           case ft_none :
             // just send the value
-            // If the capture type is an average of the samples we
-            // always store the value as a floating point.
-            if(dp->capture_type == ct_avg)
-              {
-              switch(dp->value_type)
-                {
-                case CANAS_DATATYPE_FLOAT :
-                  dp->value.float_value = dp->accum;
+            dp.value.float_value = dp.accum;
                   break;
                 case CANAS_DATATYPE_INT32 :
-                  dp->value.int32_value = convert_to_int32(&dp->accum, CANAS_DATATYPE_FLOAT);
+                  dp.value.int32_value = convert_to_int32(&dp.accum, CANAS_DATATYPE_FLOAT);
                   break;
                 case CANAS_DATATYPE_UINT32 :
-                  dp->value.uint32_value = convert_to_uint32(&dp->accum, CANAS_DATATYPE_FLOAT);
+                  dp.value.uint32_value = convert_to_uint32(&dp.accum, CANAS_DATATYPE_FLOAT);
                   break;
                 case CANAS_DATATYPE_SHORT :
-                  dp->value.int16_value[0] = convert_to_int16(&dp->accum, CANAS_DATATYPE_FLOAT);
+                  dp.value.int16_value[0] = convert_to_int16(&dp.accum, CANAS_DATATYPE_FLOAT);
                   break;
                 case CANAS_DATATYPE_USHORT :
-                  dp->value.uint16_value[0] = convert_to_uint16(&dp->accum, CANAS_DATATYPE_FLOAT);
+                  dp.value.uint16_value[0] = convert_to_uint16(&dp.accum, CANAS_DATATYPE_FLOAT);
                   break;
                 case CANAS_DATATYPE_CHAR :
-                  dp->value.int8_value[0] = convert_to_int8(&dp->accum, CANAS_DATATYPE_FLOAT);
+                  dp.value.int8_value[0] = convert_to_int8(&dp.accum, CANAS_DATATYPE_FLOAT);
                   break;
                 case CANAS_DATATYPE_UCHAR :
-                  dp->value.uint8_value[0] = convert_to_uint8(&dp->accum, CANAS_DATATYPE_FLOAT);
+                  dp.value.uint8_value[0] = convert_to_uint8(&dp.accum, CANAS_DATATYPE_FLOAT);
                   break;
                   }
               }
             else
               // otherwise a integer type so we just copy the value.
-              memcpy(&dp->value, &dp->accum, sizeof(variant_t));
+              memcpy(&dp.value, &dp.accum, sizeof(variant_t));
             break;
           case ft_boxcar :
-            vector_erase(dp->values, 0);
+            vector_erase(dp.values, 0);
 
             // get the accumulated value.
             // TODO: handle min max etc
-            index_value =  convert_to_float(&dp->accum, dp->value_type);
-            vector_push_back(dp->values, &index_value);
+            index_value =  convert_to_float(&dp.accum, dp.value_type);
+            vector_push_back(dp.values, &index_value);
             
-            dp->accum = 0;
+            dp.accum = 0;
 
             // must be a float type for this to work....
-            for(i = 0; i < dp->filter_length; i++)
+            for(i = 0; i < dp.filter_length; i++)
               {
-              vector_at(dp->values, i, &index_value);
-              dp->accum += index_value;
+              vector_at(dp.values, i, &index_value);
+              dp.accum += index_value;
               }
 
             // calculate the average value
-            dp->accum /= dp->filter_length;
+            dp.accum /= dp.filter_length;
             
-            switch(dp->value_type)
+            switch(dp.value_type)
               {
               case CANAS_DATATYPE_FLOAT :
-                dp->value.float_value = dp->accum;
+                dp.value.float_value = dp.accum;
                 break;
               case CANAS_DATATYPE_INT32 :
-                dp->value.int32_value = convert_to_int32(&dp->accum, CANAS_DATATYPE_FLOAT);
+                dp.value.int32_value = convert_to_int32(&dp.accum, CANAS_DATATYPE_FLOAT);
                 break;
               case CANAS_DATATYPE_UINT32 :
-                dp->value.uint32_value = convert_to_uint32(&dp->accum, CANAS_DATATYPE_FLOAT);
+                dp.value.uint32_value = convert_to_uint32(&dp.accum, CANAS_DATATYPE_FLOAT);
                 break;
               case CANAS_DATATYPE_SHORT :
-                dp->value.int16_value[0] = convert_to_int16(&dp->accum, CANAS_DATATYPE_FLOAT);
+                dp.value.int16_value[0] = convert_to_int16(&dp.accum, CANAS_DATATYPE_FLOAT);
                 break;
               case CANAS_DATATYPE_USHORT :
-                dp->value.uint16_value[0] = convert_to_uint16(&dp->accum, CANAS_DATATYPE_FLOAT);
+                dp.value.uint16_value[0] = convert_to_uint16(&dp.accum, CANAS_DATATYPE_FLOAT);
                 break;
               case CANAS_DATATYPE_CHAR :
-                dp->value.int8_value[0] = convert_to_int8(&dp->accum, CANAS_DATATYPE_FLOAT);
+                dp.value.int8_value[0] = convert_to_int8(&dp.accum, CANAS_DATATYPE_FLOAT);
                 break;
               case CANAS_DATATYPE_UCHAR :
-                dp->value.uint8_value[0] = convert_to_uint8(&dp->accum, CANAS_DATATYPE_FLOAT);
+                dp.value.uint8_value[0] = convert_to_uint8(&dp.accum, CANAS_DATATYPE_FLOAT);
                 break;
               }
             break;
           default : // iir or fir
             {
             // todo: this should use the dsp fir code (MAC)
-            vector_erase(dp->values, 0);
+            vector_erase(dp.values, 0);
 
             // get the accumulated value.
-            index_value =  convert_to_float(&dp->value, dp->value_type);
-            vector_insert(dp->values, 0, &index_value);
+            index_value =  convert_to_float(&dp.value, dp.value_type);
+            vector_insert(dp.values, 0, &index_value);
 
             float *coeff;
-            vector_begin(dp->coefficients, (void *)&coeff);
+            vector_begin(dp.coefficients, (void *)&coeff);
 
             float *values;
-            vector_begin(dp->values, (void *) &values);
+            vector_begin(dp.values, (void *) &values);
 
-            dp->accum = 0;
+            dp.accum = 0;
 
             // must be a float type for this to work....
-            for(i = 0; i < dp->filter_length; i++)
-               dp->accum += coeff[i] * values[i];
+            for(i = 0; i < dp.filter_length; i++)
+               dp.accum += coeff[i] * values[i];
             
             // multiply by the gain if set
-            if(dp->gain != 1.0)
-              dp->accum *= dp->gain;
+            if(dp.gain != 1.0)
+              dp.accum *= dp.gain;
 
             // now convert back to the actual type
-            switch(dp->value_type)
+            switch(dp.value_type)
               {
               case CANAS_DATATYPE_FLOAT :
                 break;
               case CANAS_DATATYPE_INT32 :
-                dp->value.int32_value = convert_to_int32(&dp->accum, CANAS_DATATYPE_FLOAT);
+                dp.value.int32_value = convert_to_int32(&dp.accum, CANAS_DATATYPE_FLOAT);
                 break;
               case CANAS_DATATYPE_UINT32 :
-                dp->value.uint32_value = convert_to_uint32(&dp->accum, CANAS_DATATYPE_FLOAT);
+                dp.value.uint32_value = convert_to_uint32(&dp.accum, CANAS_DATATYPE_FLOAT);
                 break;
               case CANAS_DATATYPE_SHORT :
-                dp->value.int16_value[0] = convert_to_int16(&dp->accum, CANAS_DATATYPE_FLOAT);
+                dp.value.int16_value[0] = convert_to_int16(&dp.accum, CANAS_DATATYPE_FLOAT);
                 break;
               case CANAS_DATATYPE_USHORT :
-                dp->value.uint16_value[0] = convert_to_uint16(&dp->accum, CANAS_DATATYPE_FLOAT);
+                dp.value.uint16_value[0] = convert_to_uint16(&dp.accum, CANAS_DATATYPE_FLOAT);
                 break;
               case CANAS_DATATYPE_CHAR :
-                dp->value.int8_value[0] = convert_to_int8(&dp->accum, CANAS_DATATYPE_FLOAT);
+                dp.value.int8_value[0] = convert_to_int8(&dp.accum, CANAS_DATATYPE_FLOAT);
                 break;
               case CANAS_DATATYPE_UCHAR :
-                dp->value.uint8_value[0] = convert_to_uint8(&dp->accum, CANAS_DATATYPE_FLOAT);
+                dp.value.uint8_value[0] = convert_to_uint8(&dp.accum, CANAS_DATATYPE_FLOAT);
                 break;
               }
             }
             break;
             }
 
-        switch(dp->value_type)
+        switch(dp.value_type)
           {
           case CANAS_DATATYPE_FLOAT :
-            create_can_msg_float(&msg, 0, 0, dp->value.float_value);
+            create_can_msg_float(&msg, dp.can_id, 0, dp.value.float_value);
             break;
           case CANAS_DATATYPE_INT32 :
-            create_can_msg_int32(&msg, 0, 0, dp->value.int32_value);
+            create_can_msg_int32(&msg, dp.can_id, 0, dp.value.int32_value);
             break;
           case CANAS_DATATYPE_UINT32 :
-            create_can_msg_uint32(&msg, 0, 0, dp->value.uint32_value);
+            create_can_msg_uint32(&msg, dp.can_id, 0, dp.value.uint32_value);
             break;
           case CANAS_DATATYPE_SHORT :
-            create_can_msg_int16(&msg, 0, 0, dp->value.int16_value[0]);
+            create_can_msg_int16(&msg, dp.can_id, 0, dp.value.int16_value[0]);
             break;
           case CANAS_DATATYPE_SHORT2:
-            create_can_msg_int16_2(&msg, 0, 0, dp->value.int16_value[0], dp->value.int16_value[2]);
+            create_can_msg_int16_2(&msg, dp.can_id, 0, dp.value.int16_value[0], dp.value.int16_value[2]);
             break;
           case CANAS_DATATYPE_USHORT :
-            create_can_msg_uint16(&msg, 0, 0, dp->value.uint16_value[0]);
+            create_can_msg_uint16(&msg, dp.can_id, 0, dp.value.uint16_value[0]);
             break;
           case CANAS_DATATYPE_USHORT2 :
-            create_can_msg_uint16_2(&msg, 0, 0, dp->value.uint16_value[0], dp->value.uint16_value[1]);
+            create_can_msg_uint16_2(&msg, dp.can_id, 0, dp.value.uint16_value[0], dp.value.uint16_value[1]);
             break;
           case CANAS_DATATYPE_CHAR :
-            create_can_msg_int8(&msg, 0, 0, dp->value.int8_value[0]);
+            create_can_msg_int8(&msg, dp.can_id, 0, dp.value.int8_value[0]);
             break;
           case CANAS_DATATYPE_CHAR2:
-            create_can_msg_int8_2(&msg, 0, 0, dp->value.int8_value[0], dp->value.int8_value[1]);
+            create_can_msg_int8_2(&msg, dp.can_id, 0, dp.value.int8_value[0], dp.value.int8_value[1]);
             break;
           case CANAS_DATATYPE_CHAR3:
-            create_can_msg_int8_3(&msg, 0, 0, dp->value.int8_value[0], dp->value.int8_value[1], dp->value.int8_value[2]);
+            create_can_msg_int8_3(&msg, dp.can_id, 0, dp.value.int8_value[0], dp.value.int8_value[1], dp.value.int8_value[2]);
             break;
           case CANAS_DATATYPE_CHAR4:
-            create_can_msg_int8_4(&msg, 0, 0, dp->value.int8_value[0], dp->value.int8_value[1], dp->value.int8_value[2], dp->value.int8_value[3]);
+            create_can_msg_int8_4(&msg, dp.can_id, 0, dp.value.int8_value[0], dp.value.int8_value[1], dp.value.int8_value[2], dp.value.int8_value[3]);
             break;
           case CANAS_DATATYPE_UCHAR :
-            create_can_msg_uint8(&msg, 0, 0, dp->value.uint8_value[0]);
+            create_can_msg_uint8(&msg, dp.can_id, 0, dp.value.uint8_value[0]);
             break;
           case CANAS_DATATYPE_UCHAR2:
-            create_can_msg_uint8_2(&msg, 0, 0, dp->value.uint8_value[0], dp->value.uint8_value[1]);
+            create_can_msg_uint8_2(&msg, dp.can_id, 0, dp.value.uint8_value[0], dp.value.uint8_value[1]);
             break;
           case CANAS_DATATYPE_UCHAR3:
-            create_can_msg_uint8_3(&msg, 0, 0, dp->value.uint8_value[0], dp->value.uint8_value[1], dp->value.uint8_value[2]);
+            create_can_msg_uint8_3(&msg, dp.can_id, 0, dp.value.uint8_value[0], dp.value.uint8_value[1], dp.value.uint8_value[2]);
             break;
           case CANAS_DATATYPE_UCHAR4:
-            create_can_msg_uint8_4(&msg, 0, 0, dp->value.uint8_value[0], dp->value.uint8_value[1], dp->value.uint8_value[2], dp->value.uint8_value[3]);
+            create_can_msg_uint8_4(&msg, dp.can_id, 0, dp.value.uint8_value[0], dp.value.uint8_value[1], dp.value.uint8_value[2], dp.value.uint8_value[3]);
             break;
           }
         
         // send the message to the can queue.  This will decorate it as
         // well
-        if(dp->flags.publish)
+        if(dp.flags.publish)
           can_send(&msg);
 
         // if we loop back the message then it is published internally as well
-        if(dp->flags.loopback)
+        if(dp.flags.loopback)
           publish_local(&msg);
 
         // it is quite valid not not have any publish or local flags.  In this
         // case the publisher is just used as a filter/store for can values.
         
-        if(dp->alarms != 0)
+        if(dp.alarms != 0)
           {
           // work over the alarms next.
-          alarm_t *alarms;
           uint16_t num_alarms;
         
           // get our alarms vector
-          vector_begin(dp->alarms, (void **)&alarms);
-          vector_count(dp->alarms, &num_alarms);
+          vector_count(dp.alarms, &num_alarms);
         
           uint32_t now = ticks();
           uint16_t i;
           for (i = 0; i < num_alarms; i++)
             {
-            alarm_t *alarm = &alarms[i];
+            alarm_t alarm;
+            vector_at(dp.alarms, i, &alarm);
 
             bool send_alarm = false;
+            bool update_alarm = false;
 
-            if (alarm->check_maximum &&
-              dp->accum > alarm->max_value)
+            if (alarm.check_maximum &&
+              dp.accum > alarm.max_value)
               {
               // check length
-              if (alarm->event_time == 0)
-                alarm->event_time = now;
+              if (alarm.event_time == 0)
+                {
+                alarm.event_time = now;
+                update_alarm = true;
+                }
 
-              if ((alarm->event_time + alarm->period) <= now)
+              if ((alarm.event_time + alarm.period) <= now)
                 send_alarm = true;
               }
 
             if (!send_alarm &&
-              alarm->check_minimum &&
-              dp->accum < alarm->min_value)
+              alarm.check_minimum &&
+              dp.accum < alarm.min_value)
               {
               // check length
-              if (alarm->event_time == 0)
-                alarm->event_time = now;
+              if (alarm.event_time == 0)
+                {
+                alarm.event_time = now;
+                update_alarm = true;
+                }
 
-              if ((alarm->event_time + alarm->period) <= now)
+              if ((alarm.event_time + alarm.period) <= now)
                 send_alarm = true;
               }
 
             if (send_alarm)
               {
               int16_t value = 1;
-              publish_int16(alarm->alarm_id, &value, 1);
-              alarm->event_time = 0;
+              publish_int16(alarm.alarm_id, &value, 1);
+              
+              // update the alarm
+              alarm.event_time = 0;
+              update_alarm = true;
               }
-            else if (alarm->type == event_alarm)       // event alarm, otherwise manual reset
+            else if (alarm.type == event_alarm)       // event alarm, otherwise manual reset
               {
               int16_t value = 0;
-              publish_int16(alarm->alarm_id, &value, 1);
+              publish_int16(alarm.alarm_id, &value, 1);
               }
+            
+            if(update_alarm)
+              vector_set(dp.alarms, i, &alarm);
             }
           }
         
-        dp->accum = 0;           // reset the accumulator
+        dp.accum = 0;           // reset the accumulator
         }
 
-      dp->next_publish_tick -= ticks_changed;
+      if(dp.next_publish_tick < ticks_changed)
+        dp.next_publish_tick = 0;
+      else
+        dp.next_publish_tick -= ticks_changed;
+      
+      vector_set(published_datapoints, i, &dp);
       }
     }
   }
@@ -1406,37 +1291,35 @@ static bool alarm_hook(const canmsg_t *msg, void *parg)
   if(failed(vector_count(published_datapoints, &num_datapoints)))
     return false;
 
-  published_datapoint_t *datapoints;
-  if(failed(vector_begin(published_datapoints, (void *)&datapoints)))
-      return false;
-  
+  published_datapoint_t dp;
   uint16_t dpi;
   for(dpi = 0; dpi < num_datapoints; dpi++)
     {
-    published_datapoint_t *dp = &datapoints[dpi];
+    vector_at(published_datapoints, dpi, &dp);
     
-    if(dp->alarms != 0)
+    if(dp.alarms != 0)
       {
       // work over the alarms next.
-      alarm_t *alarms;
+      alarm_t alarm;
       uint16_t num_alarms;
 
       // get our alarms vector
-      vector_begin(dp->alarms, (void **) &alarms);
-      vector_count(dp->alarms, &num_alarms);
+      vector_count(dp.alarms, &num_alarms);
 
       uint16_t ai;
       for(ai = 0; ai < num_alarms; ai++)
         {
-        alarm_t *alarm = &alarms[ai];
+        vector_at(dp.alarms, ai, &alarm);
 
-        if(alarm->type == level_alarm &&
-           alarm->reset_id == msg->id)
+        if(alarm.type == level_alarm &&
+           alarm.reset_id == msg->id)
           {
-          alarm->event_time = 0;
+          alarm.event_time = 0;
+          vector_set(dp.alarms, ai, &alarm);
+          
           int16_t value = 0;
           // reset the alarm
-          publish_int16(alarm->alarm_id, &value, 1);
+          publish_int16(alarm.alarm_id, &value, 1);
           }
         }
       }
@@ -1449,7 +1332,7 @@ static msg_hook_t alarm_cb = { 0, 0, alarm_hook };
 
 extern result_t trace_init();
 
-result_t neutron_init(const neutron_parameters_t *params, bool init_mode)
+result_t neutron_init(const neutron_parameters_t *params, bool init_mode, bool create_worker)
   {
   task_p task_handle;
   result_t result;
@@ -1493,7 +1376,6 @@ result_t neutron_init(const neutron_parameters_t *params, bool init_mode)
       }
 
     bool is_valid = true;
-    uint16_t can_id = 0;
     // ensure the name is a can-id
     for(i = 0; i < REG_NAME_MAX; i++)
       {
@@ -1517,13 +1399,16 @@ result_t neutron_init(const neutron_parameters_t *params, bool init_mode)
 
   subscribe(&alarm_cb);
 
-  // create the publisher schedule
-  return task_create("CAN_PUBLISHER",
-                     params->publisher_stack_length == 0 
-                        ? DEFAULT_STACK_SIZE 
-                        : params->publisher_stack_length,
-                     publish_task, 0,
-                     NORMAL_PRIORITY, &task_handle);
+  if(create_worker)
+    // create the publisher schedule
+    return task_create("CAN_PUBLISHER",
+                       params->publisher_stack_length == 0 
+                          ? DEFAULT_STACK_SIZE 
+                          : params->publisher_stack_length,
+                       publish_task, 0,
+                       NORMAL_PRIORITY, &task_handle);
+  
+  return s_ok;
   }
 
 result_t define_datapoint(uint16_t can_id, uint16_t rate, uint16_t type, uint16_t boxcar_length, bool loopback, bool publish)
@@ -1553,7 +1438,7 @@ result_t define_datapoint(uint16_t can_id, uint16_t rate, uint16_t type, uint16_
   if (failed(result = reg_set_uint16(datapoint_key, s_rate_value, rate)))
     return result;
 
-  if (failed(result = reg_set_uint16(datapoint_key, s_sample_type_value, type)))
+  if (failed(result = reg_set_uint16(datapoint_key, s_sample_type_value, ct_lifo)))
     return result;
 
   if (failed(result = reg_set_uint16(datapoint_key, s_type_value, type)))

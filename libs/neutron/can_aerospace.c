@@ -787,9 +787,9 @@ void can_rx_task(void *parg)
     }
   }
 
-extern result_t neutron_init(const neutron_parameters_t *params, bool init_mode);
+extern result_t neutron_init(const neutron_parameters_t *params, bool init_mode, bool create_worker);
 
-result_t can_aerospace_init(const neutron_parameters_t *params, bool init_mode)
+result_t can_aerospace_init(const neutron_parameters_t *params, bool init_mode, bool create_publish_task)
   {
   task_p task_handle;
   result_t result;
@@ -836,7 +836,7 @@ result_t can_aerospace_init(const neutron_parameters_t *params, bool init_mode)
     return result;
     }
   
-  if(failed(result = neutron_init(params, init_mode)))
+  if(failed(result = neutron_init(params, init_mode, create_publish_task)))
     return result;
 
   // start the can driver running.

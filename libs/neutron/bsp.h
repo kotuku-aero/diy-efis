@@ -232,13 +232,27 @@ typedef struct _neutron_parameters_t
   } neutron_parameters_t;
 
 /**
+ * Initialize the can-aerospace subsystem, then initialize neutron
+ * @param params
+ * @param init_mode
+ * @param create_publish_task
+ * @return 
+ */  
+extern result_t can_aerospace_init(const neutron_parameters_t *params, bool init_mode, bool create_publish_task);
+
+/**
  * Initialize Neutron
  * @param params      setup and memory parameters
  * @param init_mode   true if a factory reset
  * @param worker      Mutual exclusion semaphore.
  * @return s_ok if started ok
  */
-extern result_t neutron_init(const neutron_parameters_t *params, bool init_mode);
+extern result_t neutron_init(const neutron_parameters_t *params, bool init_mode, bool create_worker);
+/**
+ * Worker process
+ * @param pargs Arguments
+ */
+extern void publish_task(void *pargs);
 
 /////////////////////////////////////////////////////////////////////////////
 //
