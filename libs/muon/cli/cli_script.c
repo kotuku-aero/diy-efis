@@ -125,7 +125,6 @@ result_t script_ls_name_action(cli_t *context, const char * path)
 
       while (succeeded(reg_enum_key(child, &dt, 0, 0, REG_NAME_MAX, name, &handler)))
         {
-        const char * str;
         if (succeeded(reg_get_string(child, name, event_fn, 0)))
           stream_printf(context->cfg.console_out, "  %s void %s(canmsg_t *);\r\n", name, event_fn);
 
@@ -178,8 +177,6 @@ result_t script_ls_name_action(cli_t *context, const char * path)
 
     if (matched)
       {
-      memid_t key;
-
       // we have to stat the file
       stream_p hndl;
       if (failed(stream_open(get_context(context), name, &hndl)))

@@ -46,8 +46,6 @@ result_t open_key(memid_t current, const char *path, bool create, memid_t *memid
   if (path == 0 || memid == 0)
     return e_bad_parameter;
 
-  memid_t parent = 0;
-
   vector_p parts = string_split(path, '/');
 
   uint16_t num_parts;

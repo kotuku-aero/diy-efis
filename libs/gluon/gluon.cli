@@ -1,0 +1,31 @@
+gluon
+#submode gluon
+    ls { <STRING:name> }
+    rm <STRING:name>
+    capture <STRING:name>
+    #submode capture
+        rate <UINT16:rate>
+        length <UINT32:length>
+        trigger
+        #submode trigger
+            eq <ENUM:can_ids:id> <INT16:value>
+            lt <ENUM:can_ids:id> <INT16:value>
+            gt <ENUM:can_ids:id> <INT16:value>
+            eqf <ENUM:can_ids:id> <FLOAT:value>
+            ltf <ENUM:can_ids:id> <FLOAT:value>
+            gtf <ENUM:can_ids:id> <FLOAT:value>
+            rm eq <ENUM:can_ids:id>
+            rm lt <ENUM:can_ids:id>
+            rm gt <ENUM:can_ids:id>
+            rm eqf <ENUM:can_ids:id>
+            rm ltf <ENUM:can_ids:id>
+            rm gtf <ENUM:can_ids:id>
+            exit
+        #endsubmode
+        ls
+        id <ENUM:can_ids:id> { <STRING:name> }
+        rm <ENUM:can_ids:id>
+        exit
+    #endsubmode
+    exit
+#endsubmode

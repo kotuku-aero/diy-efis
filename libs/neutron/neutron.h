@@ -2546,12 +2546,12 @@ extern void neutron_run();
 
   
 typedef struct _filter_params_t {
-  long double coefficient;
-  long double value;
+  float coefficient;
+  float value;
   } filter_params_t;
   
-typedef long double (*mac_fn)(filter_type_e filter_type,
-                              long double val,
+typedef float (*mac_fn)(filter_type_e filter_type,
+                              float val,
                               uint16_t length,
                               filter_params_t *filter);
 /**

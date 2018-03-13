@@ -446,8 +446,8 @@ static void print_help()
   std::cerr << "    -i <path>  Set include path to <path>" << std::endl;
   std::cerr << "    -o <path>  Set the output path to <path>" << std::endl;
   std::cerr << "    -f <filename>  Set the output base filename to <filename> defaults to input filename" << std::endl;
-  std::cerr << "    -l <path>  Set the generated library header path to <path>";
-  std::cerr << "    -s      Generate implementation files as <filename>_impl.c" << std::endl;
+  std::cerr << "    -l <path>  Set the generated library header path to <path>" << std::endl;
+  std::cerr << "    -s Generate implementation files as <filename>_impl.c" << std::endl;
   std::cerr << "example: cli -o . -l ../../../libs/muon ahrs.cli" << std::endl;
   }
 

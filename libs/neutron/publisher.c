@@ -84,7 +84,7 @@ typedef struct _pre_filter_t {
                                   // can only be set if the value_type is
                                   // CANAS_DATATYPE_FLOAT otherwise ignored
   uint32_t num_samples;           // number of samples between captures
-  long double accum;              // accumulated value for the capture filter
+  float accum;              // accumulated value for the capture filter
   } pre_filter_t;
 
 // this group of functions defines an area to publish regular status updates
@@ -123,7 +123,7 @@ typedef struct _boxcar_filter_datapoint_t
   uint16_t filter_length;
   uint16_t head;                // oldest datapoint
   uint16_t tail;                // newest datapoint
-  long double filter[];         // length is filter_length
+  float filter[];         // length is filter_length
   } boxcar_datapoint_t;
 
 typedef struct _filter_datapoint_t
@@ -137,14 +137,14 @@ typedef struct _filter_datapoint_t
   uint16_t filter_length;
   uint16_t frequency;           // number of 1msec intervals
   uint32_t last_tick;           // when the mac last calculated
-  long double gain;
+  float gain;
   filter_params_t filter[];
   } filter_datapoint_t;
     
 static inline uint16_t sizeof_boxcar(uint16_t filter_length)
   {
   return sizeof(boxcar_datapoint_t) + 
-    (sizeof(long double) * filter_length);
+    (sizeof(float) * filter_length);
   }
 
 static inline uint16_t sizeof_fir(uint16_t filter_length)
@@ -1241,4 +1241,9 @@ result_t publish_datapoint(uint16_t can_id, uint16_t rate, filter_type_e filter_
 
   // and start the datapoint running
   return create_datapoint(published_datapoints, can_id, datapoint_key);
+  }
+
+result_t monitor_datapoint(uint16_t can_id)
+  {
+  return e_not_implemented;
   }

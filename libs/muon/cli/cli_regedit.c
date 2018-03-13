@@ -383,7 +383,6 @@ result_t ls_path_recursive_action(cli_t *context, const char * path)
   field_datatype dt = 0;
   memid_t child = 0;
   uint16_t i;
-  char name[REG_NAME_MAX + 1];
 
   if (matches == 0)
     {

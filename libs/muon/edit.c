@@ -198,7 +198,6 @@ void reset_undo(editor_t *ed)
 result_t load_file(editor_t *ed, handle_t stream)
   {
   uint32_t length;
-  int f;
   result_t result;
 
   if(failed(result = stream_length(stream, &length)))
@@ -1432,7 +1431,7 @@ void right(editor_t *ed, int select)
 
 int wordchar(int ch)
   {
-  return ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z' || ch >= '0' && ch <= '9';
+  return (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9');
   }
 
 void wordleft(editor_t *ed, int select)
@@ -1629,7 +1628,6 @@ void insert_char(editor_t *ed, char ch)
 void newline(editor_t *ed)
   {
   int p;
-  char ch;
 
   erase_selection(ed);
   insert(ed, ed->linepos + ed->col, "\r\n", 2);
@@ -2079,7 +2077,6 @@ void help(editor_t *ed)
 void muon_edit(handle_t console_in, handle_t console_out, const char *title, handle_t stream)
   {
   int rc;
-  int i;
 
   editor_t *ed = (editor_t *) neutron_malloc(sizeof(editor_t));
   memset(ed, 0, sizeof(editor_t));
