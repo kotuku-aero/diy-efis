@@ -2,10 +2,11 @@ gluon
 #submode gluon
     ls { <STRING:name> }
     rm <STRING:name>
+	show <STRING:name> { <STRING:from> { <STRING:to> }  }
+	query <STRING:name>
     capture <STRING:name>
     #submode capture
         rate <UINT16:rate>
-        length <UINT32:length>
         trigger
         #submode trigger
             eq <ENUM:can_ids:id> <INT16:value>

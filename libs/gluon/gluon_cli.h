@@ -13,9 +13,11 @@ extern result_t gluon_ls_name_action(cli_t *context, const char * gluon_ls_name_
 
 extern result_t gluon_rm_name_action(cli_t *context, const char * gluon_rm_name_);
 
-extern result_t gluon_capture_name_rate_rate_action(cli_t *context, uint16_t gluon_capture_name_rate_rate_);
+extern result_t gluon_show_name_from_to_action(cli_t *context, const char * gluon_show_name_, const char * gluon_show_name_from_, const char * gluon_show_name_from_to_);
 
-extern result_t gluon_capture_name_length_length_action(cli_t *context, uint32_t gluon_capture_name_length_length_);
+extern result_t gluon_query_name_action(cli_t *context, const char * gluon_query_name_);
+
+extern result_t gluon_capture_name_rate_rate_action(cli_t *context, uint16_t gluon_capture_name_rate_rate_);
 
 extern result_t gluon_capture_name_trigger_eq_id_value_action(cli_t *context, uint16_t gluon_capture_name_trigger_eq_id_, int16_t gluon_capture_name_trigger_eq_id_value_);
 

@@ -32,6 +32,46 @@ static result_t cli_gluon_rm_name (cli_t *parser)
   }
 
 
+static result_t cli_gluon_show_name_from_to (cli_t *parser)
+  {
+  result_t result;
+  const char * gluon_show_name_ = 0;
+  const char * gluon_show_name_from_ = 0;
+  const char * gluon_show_name_from_to_ = 0;
+
+  if(failed(result = cli_get_string(&parser->tokens[1], &gluon_show_name_)))
+    return result;
+
+  if(parser->tokens[2].token_length > 0 &&
+    failed(result = cli_get_string(&parser->tokens[2], &gluon_show_name_from_)))
+    return result;
+
+  if(parser->tokens[3].token_length > 0 &&
+    failed(result = cli_get_string(&parser->tokens[3], &gluon_show_name_from_to_)))
+    return result;
+
+  result = gluon_show_name_from_to_action(parser, gluon_show_name_, ((parser->tokens[2].token_length > 0) ? gluon_show_name_from_ : 0), ((parser->tokens[3].token_length > 0) ? gluon_show_name_from_to_ : 0));
+
+
+  return result;
+  }
+
+
+static result_t cli_gluon_query_name (cli_t *parser)
+  {
+  result_t result;
+  const char * gluon_query_name_ = 0;
+
+  if(failed(result = cli_get_string(&parser->tokens[1], &gluon_query_name_)))
+    return result;
+
+  result = gluon_query_name_action(parser, gluon_query_name_);
+
+
+  return result;
+  }
+
+
 static result_t cli_gluon_capture_name_rate_rate (cli_t *parser)
   {
   result_t result;
@@ -41,21 +81,6 @@ static result_t cli_gluon_capture_name_rate_rate (cli_t *parser)
     return result;
 
   result = gluon_capture_name_rate_rate_action(parser, gluon_capture_name_rate_rate_);
-
-
-  return result;
-  }
-
-
-static result_t cli_gluon_capture_name_length_length (cli_t *parser)
-  {
-  result_t result;
-  uint32_t gluon_capture_name_length_length_;
-
-  if(failed(result = cli_get_uint32(&parser->tokens[1], &gluon_capture_name_length_length_)))
-    return result;
-
-  result = gluon_capture_name_length_length_action(parser, gluon_capture_name_length_length_);
 
 
   return result;
@@ -388,17 +413,27 @@ static cli_node_t node_gluon_rm_name;
 
 static cli_node_t node_gluon_rm;
 
+static cli_node_t node_gluon_show_name_from_to_end;
+
+static cli_node_t node_gluon_show_name_from_to;
+
+static cli_node_t node_gluon_show_name_from;
+
+static cli_node_t node_gluon_show_name;
+
+static cli_node_t node_gluon_show;
+
+static cli_node_t node_gluon_query_name_end;
+
+static cli_node_t node_gluon_query_name;
+
+static cli_node_t node_gluon_query;
+
 static cli_node_t node_gluon_capture_name_rate_rate_end;
 
 static cli_node_t node_gluon_capture_name_rate_rate;
 
 static cli_node_t node_gluon_capture_name_rate;
-
-static cli_node_t node_gluon_capture_name_length_length_end;
-
-static cli_node_t node_gluon_capture_name_length_length;
-
-static cli_node_t node_gluon_capture_name_length;
 
 static cli_node_t node_gluon_capture_name_trigger_eq_id_value_end;
 
@@ -585,8 +620,88 @@ static cli_node_t node_gluon_rm = {
   0,
   "rm",
   0,
-  &node_gluon_capture,
+  &node_gluon_show,
   &node_gluon_rm_name
+  };
+
+
+static cli_node_t node_gluon_show_name_from_to_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_gluon_show_name_from_to,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_gluon_show_name_from_to = {
+  CLI_NODE_STRING,
+  CLI_NODE_FLAGS_OPT_START | CLI_NODE_FLAGS_OPT_END | CLI_NODE_FLAGS_OPT_PARTIAL,
+  "STRING:to",
+  0,
+  0,
+  &node_gluon_show_name_from_to_end
+  };
+
+
+static cli_node_t node_gluon_show_name_from = {
+  CLI_NODE_STRING,
+  CLI_NODE_FLAGS_OPT_START | CLI_NODE_FLAGS_OPT_PARTIAL,
+  "STRING:from",
+  0,
+  0,
+  &node_gluon_show_name_from_to
+  };
+
+
+static cli_node_t node_gluon_show_name = {
+  CLI_NODE_STRING,
+  0,
+  "STRING:name",
+  0,
+  0,
+  &node_gluon_show_name_from
+  };
+
+
+static cli_node_t node_gluon_show = {
+  CLI_NODE_KEYWORD,
+  0,
+  "show",
+  0,
+  &node_gluon_query,
+  &node_gluon_show_name
+  };
+
+
+static cli_node_t node_gluon_query_name_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_gluon_query_name,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_gluon_query_name = {
+  CLI_NODE_STRING,
+  0,
+  "STRING:name",
+  0,
+  0,
+  &node_gluon_query_name_end
+  };
+
+
+static cli_node_t node_gluon_query = {
+  CLI_NODE_KEYWORD,
+  0,
+  "query",
+  0,
+  &node_gluon_capture,
+  &node_gluon_query_name
   };
 
 
@@ -615,38 +730,8 @@ static cli_node_t node_gluon_capture_name_rate = {
   0,
   "rate",
   0,
-  &node_gluon_capture_name_length,
-  &node_gluon_capture_name_rate_rate
-  };
-
-
-static cli_node_t node_gluon_capture_name_length_length_end = {
-  CLI_NODE_END,
-  CLI_NODE_FLAGS_OPT_END,
-  cli_gluon_capture_name_length_length,
-  0,
-  0,
-  0
-  };
-
-
-static cli_node_t node_gluon_capture_name_length_length = {
-  CLI_NODE_UINT32,
-  0,
-  "UINT32:length",
-  0,
-  0,
-  &node_gluon_capture_name_length_length_end
-  };
-
-
-static cli_node_t node_gluon_capture_name_length = {
-  CLI_NODE_KEYWORD,
-  0,
-  "length",
-  0,
   &node_gluon_capture_name_trigger,
-  &node_gluon_capture_name_length_length
+  &node_gluon_capture_name_rate_rate
   };
 
 
