@@ -1107,6 +1107,15 @@ static bool alarm_hook(const canmsg_t *msg, void *parg)
         publish_int16(alarm->alarm_id, &value, 1);
         }
       }
+
+    // see if we are monitoring
+    if (dp->can_id == msg->id &&
+      !dp->flags.loopback &&
+      !dp->flags.publish)
+      {
+      // this is a monitored datapoint.  Just capture the value
+      memcpy(&dp->value, msg, sizeof(canas_msg_t));
+      }
     }
 
   return true;
@@ -1245,5 +1254,19 @@ result_t publish_datapoint(uint16_t can_id, uint16_t rate, filter_type_e filter_
 
 result_t monitor_datapoint(uint16_t can_id)
   {
-  return e_not_implemented;
+  result_t result;
+  published_datapoint_t *dp;
+  if (failed(find_datapoint(can_id, &dp, 0)))
+    {
+    // there is no datapoint being published
+    dp = alloc_datapoint(ft_none, 0, 0);
+    if (dp == 0)
+      return e_not_enough_memory;
+
+    dp->can_id = can_id;
+    // add the monitored datapoint
+    return vector_push_back(published_datapoints, &dp);
+    }
+
+  return s_ok;
   }
