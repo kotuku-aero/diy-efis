@@ -2527,17 +2527,26 @@ extern result_t decompress(stream_p stream, handle_t parg, get_byte_fn getter, s
 //
 // Kernel start routines
 /**
- * @function scheduler_init()
- * Initialize the real-time scheduler
- * @return s_ok if created ok
+ * @function neutron_run(const char *name, uint16_t stack_size, task_callback callback, void *parg, uint8_t priority, task_p *task)
+ * Initialize memory, create a root task and dispatch it.
+ * Never returns
+ * @param heap          optional memory heap if a built-in scheduler
+ * @param length        length of the heap
+ * @param name          name of the task
+ * @param stack_size    size of stack to allocate (words)
+ * @param callback      task main routine
+ * @param parg          argument to pass to task
+ * @param priority      initial priority
+ * @param task          created task handle
  */
-extern result_t scheduler_init();
-/**
- * @function neutron_run()
- * run the scheduler, never returns
- */
-extern void neutron_run();
-
+extern void neutron_run(void *heap,
+                         size_t length,
+                        const char *name,
+                        uint16_t stack_size,
+                        task_callback callback,
+                        void *parg,
+                        uint8_t priority,
+                        task_p *task);
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Functions that allow hooking the publisher to filter or process

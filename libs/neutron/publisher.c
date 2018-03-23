@@ -1092,6 +1092,11 @@ static bool alarm_hook(const canmsg_t *msg, void *parg)
     if(failed(vector_at(published_datapoints, dpi, &dp)))
       return true;
     
+    // we don't process received data that is published by the
+    // publisher
+    if(dp->flags.loopback)
+      continue;
+    
     uint16_t ai;
     for(ai = 0; ai < dp->num_alarms; ai++)
       {

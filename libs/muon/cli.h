@@ -136,9 +136,9 @@ typedef struct cli_node_ {
     void                  *param;    /**< Token-dependent parameter */
     char                  *desc;     /**< A per-node description string */
     /** Pointer to the next sibling in the same level of the tree */
-    struct cli_node_        *sibling;
+    const struct cli_node_ *sibling;
     /** Pointer to all its children in the next level of the tree */
-    struct cli_node_        *children;
+    const struct cli_node_ *children;
 } cli_node_t;
 
 /**
@@ -158,12 +158,12 @@ typedef struct cli_token_ {
      * Pointer to the parent node whose one of its children matches
      * this token.
      */
-    cli_node_t *parent;
+    const cli_node_t *parent;
     /**
      * Pointer to the parse node that matches this token. Note that this
      * field is only filled out when the token is pushed into the stack.
      */
-    cli_node_t *node;
+    const cli_node_t *node;
 } cli_token_t;
 
 #define CLI_NODE_FLAGS_OPT_START          (1 << 1)
