@@ -2777,15 +2777,17 @@ result_t pie(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
 /////////////////////////////////////////////////////////////////////////
 //
 // This is the double buffered framebuffer draw code.
+//
+// The state machine is triggered when the bsp_queue_empty is called
+//
 
 typedef enum
   {
-  fbds_idle,
-  fbds_in_paint,
-  fbds_painting,
-  fbds_painted,
-  fbds_in_sync,
-  fbds_in_sync_need_paint
+  fbds_idle,              // a paint message can be generated
+  fbds_in_paint,          // a window is busy painting
+  fbds_painted,           // all windows painted, ready for sync
+  fbds_in_sync,           // waiting for framebuffer sync to be completed
+  fbds_in_sync_need_paint // an invalidate message received
   } framebuffer_draw_state;
 
 static framebuffer_draw_state state = fbds_idle;
@@ -2793,60 +2795,57 @@ static framebuffer_draw_state state = fbds_idle;
 static int paint_depth = 0;
 
 // these are the fbds state machine transitions
+
+/////////////////////////////////////////////////////////////////////////
+// BSP_SYNC transitions
 // a bsp_sync is detected
 result_t bsp_sync()
   {
-  if(state == fbds_painted && paint_depth == 0)
+  if(state == fbds_painted)
     {
     state = fbds_in_sync;     // we are syncing the framebuffer now
+    // to the actual copy.  Can be DMA, or memory copy
     bsp_sync_framebuffer();
     }
 
   return s_ok;
   }
 
+result_t bsp_sync_done()
+  {
+  if (state == fbds_in_sync)
+    state = fbds_idle;      // move to idle
+  else if (state == fbds_in_sync_need_paint)
+    {
+    // send a paint message to the root window to start a paint cycle
+    post_message(0, &paint_msg, INDEFINITE_WAIT);
+    state = fbds_idle;
+    }
+
+  return s_ok;
+  }
+
+// this means there are no more messages so a paint can be
+// generated
 result_t bsp_queue_empty(handle_t hwnd)       // the queue is empty
   {
-  result_t result = s_false;
-  enter_critical();
+  result_t result = s_false;           // don't send a paint message
   switch(state)
     {
     case fbds_idle :
-      state = fbds_in_paint;        // the GDI is painting so don't update video buffer
-      result = s_ok;                  // send a paint message
+      result = s_ok;                  // send a paint message, however there may be no update
       break;
-    case fbds_in_paint :
-      state = fbds_painting;
-      result = s_ok;
-      break;
-    case fbds_painting :
-      break;
-    case fbds_painted :
-      state = fbds_in_paint;
-      result = s_ok;
-      break;
-    case fbds_in_sync :
-      state = fbds_in_sync_need_paint;
-      break;
-    case fbds_in_sync_need_paint :
-      state = fbds_in_paint;
-      exit_critical();
-      // we post a paint message to the root window
-      return post_message(0, &paint_msg, INDEFINITE_WAIT);
     }
-
-  exit_critical();
 
   return result;
   }
 
+// a paint message has been sent and a window is invalid
 result_t bsp_begin_paint(handle_t hwnd)       // the application is starting to paint
   {
   paint_depth++;
-  if(state == fbds_in_sync_need_paint)
-    post_message(0, &paint_msg, INDEFINITE_WAIT);
 
-  state = fbds_painting;
+  state = fbds_in_paint;
 
   return s_ok;
   }
@@ -2859,26 +2858,10 @@ result_t bsp_end_paint(handle_t hwnd)         // the application has finished pa
   return s_ok;
   }
 
-result_t bsp_sync_done()
+result_t bsp_window_invalidated(handle_t hwnd)
   {
-  switch(state)
-    {
-    case fbds_idle :
-      break;
-    case fbds_in_paint :
-      break;
-    case fbds_painting :
-      break;
-    case fbds_painted :
-      break;
-    case fbds_in_sync :
-      state = fbds_idle;
-      break;
-    case fbds_in_sync_need_paint :
-      post_message(0, &paint_msg, INDEFINITE_WAIT);
-      state = fbds_in_paint;
-      break;
-    }
+  if (state == fbds_in_sync)
+    state = fbds_in_sync_need_paint;
 
   return s_ok;
   }

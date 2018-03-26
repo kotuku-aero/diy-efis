@@ -1083,6 +1083,17 @@ result_t invalidate_rect(handle_t hwnd, const rect_t *rect)
 
   wnd->invalid = true;
 
+  // special case if this is the root window.
+  if (wnd->parent == 0)
+    {
+    // to support a framebuffer, the top level window is
+    // assumed to be double-buffered and the child windows will either
+    // share the canvas or bitblt to the canvas.
+    // this call advises the double-buffering state machine to 
+    // copy the screen canvas to the hardware.
+    bsp_window_invalidated(hwnd);
+    }
+
   // now we need to invalidate our children
   handle_t child = 0;
   if(succeeded(get_first_child(hwnd, &child)))

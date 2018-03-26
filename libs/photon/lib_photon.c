@@ -1106,7 +1106,6 @@ static duk_ret_t lib_begin_paint(duk_context *ctx)
 
   begin_paint(handle);
   return 0;
-  return 0;
   }
 
 static duk_ret_t lib_end_paint(duk_context *ctx)
@@ -1120,6 +1119,7 @@ static duk_ret_t lib_end_paint(duk_context *ctx)
   duk_pop(ctx);
 
   end_paint(handle);
+  return 0;
   }
 
 static duk_ret_t lib_invalidate(duk_context *ctx)
