@@ -359,7 +359,7 @@ static void fb_sync(void *parg)
   while(true)
     {
     // this simulates the hardware.  We only sync every 500msec
-    // as this is a test harness
+    // as this is a test harness, the real hardware would give a vsync every 50/60 msec
     semaphore_wait(sync, 500);
     bsp_sync();
     }

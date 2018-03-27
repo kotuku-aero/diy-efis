@@ -97,7 +97,7 @@ extern result_t electron_init(const char *reg_path, bool factory_reset)
     return result;
 
   // start the can systems
-  if (failed(result = can_aerospace_init(&init_params, factory_reset)) &&
+  if (failed(result = can_aerospace_init(&init_params, factory_reset, true)) &&
     result != e_path_not_found)
     return result;
 

@@ -152,7 +152,6 @@
     <ClCompile Include="..\..\libs\neutron\manifest.c" />
     <ClCompile Include="..\..\libs\neutron\map.c" />
     <ClCompile Include="..\..\libs\neutron\neutron.c" />
-    <ClCompile Include="..\..\libs\neutron\publisher.c" />
     <ClCompile Include="..\..\libs\neutron\registry.c" />
     <ClCompile Include="..\..\libs\neutron\regstream.c" />
     <ClCompile Include="..\..\libs\neutron\slcan.c" />

@@ -24,7 +24,6 @@
       <itemPath>strstream.c</itemPath>
       <itemPath>regstream.c</itemPath>
       <itemPath>stream_printf.c</itemPath>
-      <itemPath>publisher.c</itemPath>
       <itemPath>neutron.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"

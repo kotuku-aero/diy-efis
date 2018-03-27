@@ -180,44 +180,26 @@ typedef result_t (*wndproc)(handle_t hwnd, const canmsg_t *msg);
 #define HWND_BROADCAST  (handle_t)(0xffffffff)
   
 // specific window messages
-// 1799
 #define id_paint (id_user_defined_start -1)
-// 1798
-#define id_create (id_user_defined_start -2)
-// 1797
-#define id_close (id_user_defined_start -3)
-// 1796
-#define id_timer (id_user_defined_start -4)
-// 1795
-#define id_key0 (id_user_defined_start -5)
-// 1794
-#define id_key1 (id_user_defined_start -6)
-// 1793
-#define id_key2 (id_user_defined_start -7)
-// 1792
-#define id_key3 (id_user_defined_start -8)
-// 1791
-#define id_key4 (id_user_defined_start -9)
-// 1790
-#define id_decka (id_user_defined_start -10)
-// 1789
-#define id_deckb (id_user_defined_start -11)
-// 1788
-#define id_menu_up (id_user_defined_start -12)
-// 1787
-#define id_menu_dn (id_user_defined_start -13)
-// 1786
-#define id_menu_left (id_user_defined_start -14)
-// 1785
-#define id_menu_right (id_user_defined_start -15)
-// 1784
-#define id_menu_ok (id_user_defined_start -16)
-// 1783
-#define id_menu_cancel (id_user_defined_start -17)
-// 1782
-#define id_menu_select (id_user_defined_start -18)
-// 1781
-#define id_buttonpress (id_user_defined_start -19)
+#define id_invalidate (id_user_defined_start -2)
+#define id_create (id_user_defined_start -3)
+#define id_close (id_user_defined_start -4)
+#define id_timer (id_user_defined_start -5)
+#define id_key0 (id_user_defined_start -6)
+#define id_key1 (id_user_defined_start -7)
+#define id_key2 (id_user_defined_start -8)
+#define id_key3 (id_user_defined_start -9)
+#define id_key4 (id_user_defined_start -10)
+#define id_decka (id_user_defined_start -11)
+#define id_deckb (id_user_defined_start -12)
+#define id_menu_up (id_user_defined_start -13)
+#define id_menu_dn (id_user_defined_start -14)
+#define id_menu_left (id_user_defined_start -15)
+#define id_menu_right (id_user_defined_start -16)
+#define id_menu_ok (id_user_defined_start -17)
+#define id_menu_cancel (id_user_defined_start -18)
+#define id_menu_select (id_user_defined_start -19)
+#define id_buttonpress (id_user_defined_start -20)
 #define id_first_internal_msg id_buttonpress
 #define id_last_internal_msg id_paint
 

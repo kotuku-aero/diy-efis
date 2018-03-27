@@ -223,8 +223,8 @@ static duk_ret_t lib_publish_float(duk_context *ctx)
   {
   uint16_t id = duk_get_uint(ctx, 0);
   float v = (float)duk_get_number(ctx, 1);
-
-  publish_float(id, v);
+  canmsg_t msg;
+  can_send(create_can_msg_float(&msg, id, 0, v));
   return 0;
   }
 
@@ -233,7 +233,9 @@ static duk_ret_t lib_publish_int8(duk_context *ctx)
   uint16_t id = duk_get_uint(ctx, 0);
   int8_t v = (int8_t)duk_get_int(ctx, 1);
 
-  publish_int8(id, &v, 1);
+  canmsg_t msg;
+  can_send(create_can_msg_int8(&msg, id, 0, v));
+
   return 0;
   }
 
@@ -242,7 +244,9 @@ static duk_ret_t lib_publish_uint8(duk_context *ctx)
   uint16_t id = duk_get_uint(ctx, 0);
   uint8_t v = (uint8_t)duk_get_uint(ctx, 1);
 
-  publish_uint8(id, &v, 1);
+  canmsg_t msg;
+  can_send(create_can_msg_uint8(&msg, id, 0, v));
+
   return 0;
   }
 
@@ -251,7 +255,9 @@ static duk_ret_t lib_publish_int16(duk_context *ctx)
   uint16_t id = duk_get_uint(ctx, 0);
   int16_t v = (int16_t)duk_get_int(ctx, 1);
 
-  publish_int16(id, &v, 1);
+  canmsg_t msg;
+  can_send(create_can_msg_int16(&msg, id, 0, v));
+
   return 0;
   }
 
@@ -260,7 +266,8 @@ static duk_ret_t lib_publish_uint16(duk_context *ctx)
   uint16_t id = duk_get_uint(ctx, 0);
   uint16_t v = (uint16_t)duk_get_uint(ctx, 1);
 
-  publish_uint16(id, &v, 1);
+  canmsg_t msg;
+  can_send(create_can_msg_uint16(&msg, id, 0, v));
   return 0;
   }
 
@@ -269,7 +276,8 @@ static duk_ret_t lib_publish_int32(duk_context *ctx)
   uint16_t id = duk_get_uint(ctx, 0);
   int32_t v = (int32_t)duk_get_int(ctx, 1);
 
-  publish_int32(id, v);
+  canmsg_t msg;
+  can_send(create_can_msg_int32(&msg, id, 0, v));
   return 0;
   }
 
@@ -278,7 +286,8 @@ static duk_ret_t lib_publish_uint32(duk_context *ctx)
   uint16_t id = duk_get_uint(ctx, 0);
   int32_t v = (int32_t)duk_get_int(ctx, 1);
 
-  publish_int32(id, v);
+  canmsg_t msg;
+  can_send(create_can_msg_uint32(&msg, id, 0, v));
   return 0;
   }
 
@@ -289,10 +298,32 @@ static duk_ret_t lib_publish_string(duk_context *ctx)
   if (v == 0)
     return;
 
-  // we only ever publish 4 characters
-  uint16_t len = min(4, strlen(v));
+  canmsg_t msg;
 
-  publish_int8(id, v, len);
+  // we only ever publish 4 characters
+  uint16_t len =strlen(v);
+  uint16_t pos;
+  for (pos = 0; pos < len; pos += 4)
+    {
+    uint16_t n = min(4, len - pos);
+    switch (n)
+      {
+      case 0 :
+        break;
+      case 1 :
+        can_send(create_can_msg_int8(&msg, id, 0, v[pos]));
+        break;
+      case 2 :
+        can_send(create_can_msg_int8_2(&msg, id, 0, v[pos], v[pos]+1));
+        break;
+      case 3 : 
+        can_send(create_can_msg_int8_3(&msg, id, 0, v[pos], v[pos] + 1, v[pos] + 2));
+        break;
+      case 4 :
+        can_send(create_can_msg_int8_4(&msg, id, 0, v[pos], v[pos] + 1, v[pos] + 2, v[pos] + 3));
+        break;
+      }
+    }
   return 0;
   }
 
@@ -308,11 +339,11 @@ static duk_ret_t lib_publish_array(duk_context *ctx)
     }
 
   n = duk_get_length(ctx, 1);
-  if (n > 4)
-    return -1;
 
-  uint8_t msg[4];
-  for (i = 0; i < n; i++)
+  canmsg_t msg;
+  uint8_t array[4];
+  uint16_t index = 0;
+  for (i = 0; i < n; i ++)
     {
     uint8_t val;
     if (duk_get_prop_index(ctx, 1, i))
@@ -324,141 +355,35 @@ static duk_ret_t lib_publish_array(duk_context *ctx)
       val = 0;
       }
 
-    msg[i] = val;
+    array[index++] = val;
+    if (index == 4)
+      {
+      can_send(create_can_msg_uint8_4(&msg, id, 0, array[0], array[1], array[2], array[3]));
+      index = 0;
+      }
 
-    /* ... */
     duk_pop(ctx);
     }
 
-  // publish an array
-  publish_uint8(id, msg, n);
-  }
-
-static duk_ret_t lib_get_published_int8(duk_context *ctx)
-  {
-  uint16_t id = duk_get_uint(ctx, 0);
-  int8_t v;
-
-  uint16_t len = 1;
-  if (failed(get_datapoint_int8(id, &v, &len)))
-    return 0;
-  
-  duk_push_int(ctx, v);
-
-  return 1;
-  }
-
-static duk_ret_t lib_get_published_uint8(duk_context *ctx)
-  {
-  uint16_t id = duk_get_uint(ctx, 0);
-  uint8_t v;
-
-  uint16_t len = 1;
-  if (failed(get_datapoint_uint8(id, &v, &len)))
-    return 0;
-  
-  duk_push_uint(ctx, v);
-
-  return 1;
-  }
-
-static duk_ret_t lib_get_published_int16(duk_context *ctx)
-  {
-  uint16_t id = duk_get_uint(ctx, 0);
-  int16_t v;
-  uint16_t len = 1;
-  if (failed(get_datapoint_int16(id, &v, &len)))
-    return 0;
-
-  duk_push_int(ctx, v);
-
-  return 1;
-  }
-
-static duk_ret_t lib_get_published_uint16(duk_context *ctx)
-  {
-  uint16_t id = duk_get_uint(ctx, 0);
-  uint16_t v;
-  uint16_t len = 1;
-  if (failed(get_datapoint_uint16(id, &v, &len)))
-    return 0;
-
-  duk_push_uint(ctx, v);
-
-  return 1;
-  }
-
-static duk_ret_t lib_get_published_int32(duk_context *ctx)
-  {
-  uint16_t id = duk_get_uint(ctx, 0);
-  int32_t v;
-
-  if (failed(get_datapoint_int32(id, &v)))
-    return 0;
-
-  duk_push_int(ctx, v);
-
-  return 1;
-  }
-
-static duk_ret_t lib_get_published_uint32(duk_context *ctx)
-  {
-  uint16_t id = duk_get_uint(ctx, 0);
-  uint32_t v;
-
-  if (failed(get_datapoint_uint32(id, &v)))
-    return 0;
-
-  duk_push_int(ctx, v);
-
-  return 1;
-  }
-
-static duk_ret_t lib_get_published_string(duk_context *ctx)
-  {
-  uint16_t id = duk_get_uint(ctx, 0);
-  char v[5] = { 0, 0, 0, 0, 0 };
-  uint16_t len = 4;
-  if (failed(get_datapoint_int8(id, v, &len)))
-    return 0;
-
-  duk_push_string(ctx, v);
-
-  return 1;
-  }
-
-static duk_ret_t lib_get_published_array(duk_context *ctx)
-  {
-  uint16_t id = duk_get_uint(ctx, 0);
-  uint8_t v[4];
-  uint16_t len = 0;
-
-  if (failed(get_datapoint_uint8(id, v, &len)))
-    return 0;
-
-  duk_idx_t arr_idx;
-
-  arr_idx = duk_push_array(ctx);
-  for (arr_idx = 0; arr_idx < len; arr_idx++)
+  switch (index)
     {
-    duk_push_uint(ctx, v[arr_idx]);
-    duk_put_prop_index(ctx, arr_idx, 0);
+    case 0 :
+      break;
+    case 1 :
+      can_send(create_can_msg_uint8(&msg, id, 0, array[0]));
+      break;
+    case 2 :
+      can_send(create_can_msg_uint8_2(&msg, id, 0, array[0], array[1]));
+      break;
+    case 3 :
+      can_send(create_can_msg_uint8_3(&msg, id, 0, array[0], array[1], array[2]));
+      break;
+    case 4 :
+      can_send(create_can_msg_uint8_4(&msg, id, 0, array[0], array[1], array[2], array[3]));
+      break;
     }
 
-  return 1;
-  }
-
-static duk_ret_t lib_get_published_float(duk_context *ctx)
-  {
-  uint16_t id = duk_get_uint(ctx, 0);
-  float v;
-
-  if (failed(get_datapoint_float(id, &v)))
-    return 0;
-
-  duk_push_number(ctx, v);
-
-  return 1;
+  return 0;
   }
 
 static duk_ret_t lib_reg_create_key(duk_context *ctx)
@@ -1316,15 +1241,6 @@ result_t register_ion_functions(duk_context *ctx, handle_t co)
   add_function(ctx, lib_publish_uint32, "publish_uint32", 2);
   add_function(ctx, lib_publish_string, "publish_string", 2);
   add_function(ctx, lib_publish_array, "publish_array", 2);
-  add_function(ctx, lib_get_published_int8, "get_published_int8", 1);
-  add_function(ctx, lib_get_published_uint8, "get_published_uint8", 1);
-  add_function(ctx, lib_get_published_int16, "get_published_int16", 1);
-  add_function(ctx, lib_get_published_uint16, "get_published_uint16", 1);
-  add_function(ctx, lib_get_published_int32, "get_published_int32", 1);
-  add_function(ctx, lib_get_published_uint32, "get_published_uint32", 1);
-  add_function(ctx, lib_get_published_float, "get_published_float", 1);
-  add_function(ctx, lib_get_published_string, "get_published_string", 1);
-  add_function(ctx, lib_get_published_array, "get_published_array", 1);
   add_function(ctx, lib_get_int8, "get_int8", 2);
   add_function(ctx, lib_get_uint8, "get_uint8", 2);
   add_function(ctx, lib_get_int16, "get_int16", 2);

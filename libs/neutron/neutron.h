@@ -877,6 +877,13 @@ extern result_t can_send_raw(canmsg_t *);
 extern result_t can_send_reply(canmsg_t *);
 
 /**
+ * Simulate a can message being received
+ * @param msg
+ */
+extern void publish_local(const canmsg_t *msg);
+
+
+/**
  * @function bool (*msg_hook_fn)(const canmsg_t *msg, void *parg)
  * @param msg   Can message to process
  * @param parg  Argument used when hook function registered
@@ -922,155 +929,6 @@ extern result_t subscribe(msg_hook_t *handler);
  * @return s_ok if the handler can be removed
  */
 extern result_t unsubscribe(msg_hook_t *handler);
-/**
- * @function publish_float(uint16_t id, float value)
- * Update the datapoint with a float value
- * @param id        Can ID to publish
- * @param value     value to publish
- * @return  s_ok if the datapoint is registered with the publisher
- */
-extern result_t publish_float(uint16_t id, float value);
-/**
- * @function publish_int8(uint16_t id, const int8_t *value, uint16_t len)
- * Update the datapoint with a series of 8 bit integers
- * @param id        Can ID to publish
- * @param value     values to publish
- * @param len       number to publish (1..4)
- * @return  s_ok if the datapoint is registered with the publisher
- */
-extern result_t publish_int8(uint16_t id, const int8_t *value, uint16_t len);
-/**
- * @function publish_uint8(uint16_t id, const uint8_t *value, uint16_t len)
- * Update the datapoint with a series of 8 bit unsigned integers
- * @param id        Can ID to publish
- * @param value     values to publish
- * @param len       number to publish (1..4)
- * @return  s_ok if the datapoint is registered with the publisher
- */
-extern result_t publish_uint8(uint16_t id, const uint8_t *value, uint16_t len);
-/**
- * @function publish_int16(uint16_t id, const int16_t *value, uint16_t len)
- * Update the datapoint with a series of 16 bit integers
- * @param id        Can ID to publish
- * @param value     values to publish
- * @param len       number to publish (1..2)
- * @return  s_ok if the datapoint is registered with the publisher
- */
-extern result_t publish_int16(uint16_t id, const int16_t *value, uint16_t len);
-/**
- * @function publish_uint16(uint16_t id, const uint16_t *value, uint16_t len)
- * Update the datapoint with a series of 16 bit unsigned integers
- * @param id        Can ID to publish
- * @param value     values to publish
- * @param len       number to publish (1..2)
- * @return  s_ok if the datapoint is registered with the publisher
- */
-extern result_t publish_uint16(uint16_t id, const uint16_t *value, uint16_t len);
-/**
- * @function publish_int32(uint16_t id, int32_t value)
- * Update the datapoint with a 32bit value
- * @param id        Can ID to publish
- * @param value     values to publish
- * @return  s_ok if the datapoint is registered with the publisher
- */
-extern result_t publish_int32(uint16_t id, int32_t value);
-/**
- * @function publish_uint32(uint16_t id, uint32_t value)
- * Update the datapoint with a 32bit value
- * @param id        Can ID to publish
- * @param value     values to publish
- * @return  s_ok if the datapoint is registered with the publisher
- */
-extern result_t publish_uint32(uint16_t id, uint32_t value);
-/**
- * @function get_datapoint_int8(uint16_t id, int8_t *value, uint16_t *len)
- * Return the value of a datapoint as a int8_t
- * @param id      The id to publish
- * @param value   The value to get
- * @param len     Size of value array when called, returned with actual number read
- * @return s_ok if the datapoint is found, e_not_found if not.
- */
-extern result_t lookup_int8(uint16_t id, int8_t *value, uint16_t *len);
- /**
-  * @function get_datapoint_uint8(uint16_t id, uint8_t *value, uint16_t *len)
- * Return the value of a datapoint as a uint8_t
- * @param id      The id to publish
- * @param value   The value to get
- * @param len     Size of value array when called, returned with actual number read
- * @return s_ok if the datapoint is found, e_not_found if not.
- */
-extern result_t lookup_uint8(uint16_t id, uint8_t *value, uint16_t *len);
-/**
- * @function get_datapoint_int16(uint16_t id, int16_t *value, uint16_t *len)
- * Return the value of a datapoint as a int16_t
- * @param id      The id to publish
- * @param value   The value to get
- * @param len     Size of value array when called, returned with actual number read
- * @return s_ok if the datapoint is found, e_not_found if not.
- */
-extern result_t lookup_int16(uint16_t id, int16_t *value, uint16_t *len);
- /**
-  * @function get_datapoint_uint16(uint16_t id, uint16_t *value, uint16_t *len)
- * Return the value of a datapoint as a uint16_t
- * @param id      The id to publish
- * @param value   The value to get
- * @param len     Size of value array when called, returned with actual number read
- * @return s_ok if the datapoint is found, e_not_found if not.
- */
-extern result_t lookup_uint16(uint16_t id, uint16_t *value, uint16_t *len);
-/**
- * @function get_datapoint_int32(uint16_t id, int32_t *value)
- * Return the value of a datapoint as a int32_t
- * @param id      The id to publish
- * @param value   The value to get
- * @return s_ok if the datapoint is found, e_not_found if not.
- */
-extern result_t lookup_int32(uint16_t id, int32_t *value);
-/**
- * @function get_datapoint_uint32(uint16_t id, uint32_t *value)
- * Return the value of a datapoint as a uint32_t
- * @param id      The id to publish
- * @param value   The value to get
- * @return s_ok if the datapoint is found, e_not_found if not.
- */
-extern result_t lookup_uint32(uint16_t id, uint32_t *value);
-/**
- * @function get_datapoint_float(uint16_t id, float *value)
- * Return the value of a datapoint as a float
- * @param id      The id to publish
- * @param value   The value to get
- * @return s_ok if the datapoint is found, e_not_found if not.
- */
-extern result_t lookup_float(uint16_t id, float *value);
- 
-typedef enum _filter_type_e
-  {
-  ft_none,
-  ft_boxcar,
-  ft_iir,
-  ft_fir
-  } filter_type_e;
-
-/**
- * @function define_datapoint(uint16_t can_id, uint16_t rate, uint16_t type, uint16_t boxcar_length, bool loopback, bool publish)
- * Utility function to create a published datapoint.  Primarily used by embedded devices to quickly set
- * up the registry to publish simple data.
- * @param can_id      Id to publish.
- * @param rate        Milli-seconds between published data
- * @param type        One of the CANAS_DATATYPE_ constants, generally only the simple numeric ones are supported (FLOAT, SHORT...)
- * @param boxcar_length Optional (if > 0) simple boxcar filter length.  Allows for simple filtering.
- * @param loopback    True if the datapoint is also published internally
- * @param publish     True if the datapoint is published to the can-bus
- * @return s_ok if the datapoint is published.
- * @remark If the datapoint can be created, the publisher is notified immediately of the new datapoint
- */
-extern result_t publish_datapoint(uint16_t can_id, uint16_t rate, filter_type_e type, uint16_t boxcar_length, bool loopback, bool publish);
-/**
- * @function Monitor the CAN bus for a published datapoint
- * @param can_id  Id to monitor
- * @return s_ok if enough resources to monitor the datapoint
- */
-extern result_t monitor_datapoint(uint16_t can_id);
 
 #define numelements(a) (sizeof(a) / sizeof(a[0]))
 
@@ -2547,28 +2405,6 @@ extern void neutron_run(void *heap,
                         void *parg,
                         uint8_t priority,
                         task_p *task);
-////////////////////////////////////////////////////////////////////////////////
-//
-// Functions that allow hooking the publisher to filter or process
-// can datapoints
-//
-
-  
-typedef struct _filter_params_t {
-  float coefficient;
-  float value;
-  } filter_params_t;
-  
-typedef float (*mac_fn)(filter_type_e filter_type,
-                              float val,
-                              uint16_t length,
-                              filter_params_t *filter);
-/**
- * Get a function that implements a mac.  If none provided a 'c' function is used
- * @param memid The key for the filter that is to be filtered
- * @return a function, if 0 then a default function is used.
- */
-extern mac_fn bsp_get_mac(memid_t memid);
 
 //////////////////////////////////////////////////////////////////////
 //
