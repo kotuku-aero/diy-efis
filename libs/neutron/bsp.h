@@ -289,6 +289,10 @@ extern result_t bsp_sync_framebuffer();
  */
 extern result_t bsp_sync_done();
 /**
+ * Called when at least one window gets an invalid message
+*/
+extern result_t bsp_window_invalidated(handle_t hwnd);
+/**
  * Query if a paint message should be sent
  * @return s_ok if send paint, s_false if not
  */
