@@ -1,7 +1,7 @@
 #ifndef __neutron_cli_h__
 #define __neutron_cli_h__
 /* This is an auto-generated file by cli */
-#include "../../muon/muon.h"
+#include "muon.h"
 
 #ifdef __cplusplus
 extern "C" {

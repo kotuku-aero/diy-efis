@@ -27,9 +27,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{3f83d2b2-31b6-4926-a4bc-7ec2c09b2e8b}</ProjectGuid>
+    <ProjectGuid>{8f7249be-50cd-4d92-a75f-b50239157413}</ProjectGuid>
     <Keyword>Linux</Keyword>
-    <RootNamespace>diy_efis</RootNamespace>
+    <RootNamespace>photon</RootNamespace>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
     <ApplicationType>Linux</ApplicationType>
     <ApplicationTypeRevision>1.0</ApplicationTypeRevision>
@@ -39,11 +39,12 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
-    <RemoteRootDir>~/projects/raspberry-pi</RemoteRootDir>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <RemoteRootDir>~/projects/libs</RemoteRootDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
-    <RemoteRootDir>~/projects/raspberry-pi</RemoteRootDir>
+    <RemoteRootDir>~/projects/libs</RemoteRootDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
@@ -63,35 +64,17 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
-    <ClCompile Include="..\..\diy-efis\diyefis_cli.c" />
-    <ClCompile Include="..\..\diy-efis\main.c" />
-    <ClCompile Include="..\..\diy-efis\shell.c" />
+    <ClCompile Include="..\..\..\libs\photon\font.c" />
+    <ClCompile Include="..\..\..\libs\photon\lib_photon.c" />
+    <ClCompile Include="..\..\..\libs\photon\photon.c" />
+    <ClCompile Include="..\..\..\libs\photon\png_canvas.c" />
+    <ClCompile Include="..\..\..\libs\photon\widget.c" />
+    <ClCompile Include="..\..\..\libs\photon\window.c" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\diy-efis\diyefis.cli" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\diy-efis\diyefis_cli.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\electron\electron.vcxproj">
-      <Project>{b873988d-f431-4394-a778-95324250d756}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\ion\ion.vcxproj">
-      <Project>{530ecec9-6a62-4cb1-9cff-35bfa814d1ec}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\muon\muon.vcxproj">
-      <Project>{9ab31627-72c1-45a0-b206-6352a15eb777}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\neutron\neutron.vcxproj">
-      <Project>{c09fd512-bd02-42e0-854d-87606b7b723c}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\photon\photon.vcxproj">
-      <Project>{8f7249be-50cd-4d92-a75f-b50239157413}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\proton\proton.vcxproj">
-      <Project>{9b21cb41-0bd3-4d4b-ab74-d226119e0859}</Project>
-    </ProjectReference>
+    <ClInclude Include="..\..\..\libs\photon\photon.h" />
+    <ClInclude Include="..\..\..\libs\photon\widget.h" />
+    <ClInclude Include="..\..\..\libs\photon\window.h" />
   </ItemGroup>
   <ItemDefinitionGroup />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
