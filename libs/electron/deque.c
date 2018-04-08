@@ -33,12 +33,28 @@ then the origional copyright notice is to be respected.
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
-#include "deque.h"
-
 #include <string.h>
 #include <stdlib.h>
 
-result_t deque_create(uint16_t element_size, uint16_t length, handle_t *handle)
+// internal file used to expose deque structures for the atom microkernel
+#include "../neutron/neutron.h"
+
+struct _deque_t
+  {
+  semaphore_p readers;
+  semaphore_p writers;
+  void *buffer;
+  void *back;
+  void *front;
+  void *end;
+  uint16_t length;      // number of elements that can be queued
+  uint16_t size;        // size of elements in the queue
+  uint16_t count;
+  };
+
+typedef struct _deque_t deque_t;
+
+result_t deque_create(uint16_t element_size, uint16_t length, deque_p *handle)
   {
   result_t result;
   if(element_size == 0 ||
@@ -85,12 +101,8 @@ result_t deque_create(uint16_t element_size, uint16_t length, handle_t *handle)
   return s_ok;
   }
 
-result_t deque_close(handle_t hndl)
+result_t deque_close(deque_p deque)
   {
-  if(hndl == 0)
-    return e_bad_parameter;
-
-  deque_t *deque = (deque_t *)hndl;
   semaphore_close(deque->readers);
   semaphore_close(deque->writers);
   free(deque->buffer);
@@ -99,35 +111,20 @@ result_t deque_close(handle_t hndl)
   return s_ok;
   }
 
-result_t can_pop(handle_t hndl)
+result_t can_pop(deque_p deque)
   {
-  if(hndl == 0)
-    return e_bad_parameter;
-
-  deque_t *deque = (deque_t *)hndl;
-
   return deque->count > 0 ? s_ok : s_false;
   }
 
-result_t count(handle_t hndl, uint16_t *value)
+result_t count(deque_p deque, uint16_t *value)
   {
-  if(hndl == 0)
-    return e_bad_parameter;
-
-  deque_t *deque = (deque_t *)hndl;
-
   *value = deque->count;
 
   return s_ok;
   }
 
-result_t push_back(handle_t hndl, const void *item, uint32_t max_wait)
+result_t push_back(deque_p deque, const void *item, uint32_t max_wait)
   {
-  if(hndl == 0)
-    return e_bad_parameter;
-
-  deque_t *deque = (deque_t *)hndl;
-
   enter_critical();
   while(deque->count >= deque->length)
     {
@@ -158,13 +155,8 @@ result_t push_back(handle_t hndl, const void *item, uint32_t max_wait)
   return s_ok;
   }
 
-result_t pop_front(handle_t hndl, void *item, uint32_t max_wait)
+result_t pop_front(deque_p deque, void *item, uint32_t max_wait)
   {
-  if(hndl == 0)
-    return e_bad_parameter;
-
-  deque_t *deque = (deque_t *)hndl;
-
   enter_critical();
   while(deque->count == 0)
     {
@@ -196,13 +188,8 @@ result_t pop_front(handle_t hndl, void *item, uint32_t max_wait)
   return s_ok;
   }
 
-result_t at(handle_t hndl, uint16_t offset, void *buffer)
+result_t at(deque_p deque, uint16_t offset, void *buffer)
   {
-  if(hndl == 0)
-    return e_bad_parameter;
-
-  deque_t *deque = (deque_t *)hndl;
-
   if(buffer == 0)
     return e_bad_parameter;
 
@@ -234,13 +221,8 @@ result_t at(handle_t hndl, uint16_t offset, void *buffer)
   return s_ok;
   }
 
-result_t capacity(handle_t hndl, uint16_t *value)
+result_t capacity(deque_p deque, uint16_t *value)
   {
-  if(hndl == 0)
-    return e_bad_parameter;
-
-  deque_t *deque = (deque_t *)hndl;
-
   *value = deque->length - deque->count;
 
   return s_ok;

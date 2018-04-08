@@ -203,6 +203,9 @@ typedef result_t (*wndproc)(handle_t hwnd, const canmsg_t *msg);
 #define id_first_internal_msg id_buttonpress
 #define id_last_internal_msg id_paint
 
+struct _canvas_t;
+typedef struct _canvas_t canvas_t;
+
 /**
  * @function open_screen(uint16_t orientation, wndproc cb, uint16_t id, handle_t *hwnd)
  * Open the display screen and return the handle to the window
@@ -264,6 +267,14 @@ extern result_t create_window(handle_t parent, const rect_t *bounds, wndproc cb,
  * @return s_ok if window created ok
  */
 extern result_t create_child_window(handle_t parent, const rect_t *bounds, wndproc cb, uint16_t id, memid_t key, const char *prototype, handle_t *hwnd);
+/**
+ * @function result_t get_canvas(handle_t window, canvas_t **canvas)
+ * Get the drawing surface from a window
+ * @param window    Window to get canvas from
+ * @param canvas    Drawing surface
+ * @return s_ok if the window is valid and the canvas exists
+*/
+extern result_t get_canvas(handle_t window, canvas_t **canvas);
 /**
  * @function close_window(handle_t hwnd);
  * Close a window and release all resources
@@ -475,7 +486,7 @@ extern result_t compile_function(handle_t hwnd, const char *func, stream_p strea
  * @param   canvas to release
  * @return s_ok if all resources freed.
  */
-extern result_t canvas_close(handle_t hwnd);
+extern result_t canvas_close(canvas_t *canvas);
 /**
  * @function create_rect_canvas(const extent_t *length, handle_t *hndl)
  * Create an off screen canvas
@@ -483,7 +494,7 @@ extern result_t canvas_close(handle_t hwnd);
  * @param hndl    created handle
  * @return s_ok if enough memory for canvas
  */
-extern result_t create_rect_canvas(const extent_t *size, handle_t *hndl);
+extern result_t create_rect_canvas(const extent_t *size, canvas_t **hndl);
 /**
  * @function create_bitmap_canvas(const bitmap_t *bitmap, handle_t *hndl)
  * Create a canvas from the dimensions of the bitmap and select the pixels
@@ -492,7 +503,7 @@ extern result_t create_rect_canvas(const extent_t *size, handle_t *hndl);
  * @param hndl      created canvas
  * @return s_ok if canvas created ok
  */
-extern result_t create_bitmap_canvas(const bitmap_t *bitmap, handle_t *hndl);
+extern result_t create_bitmap_canvas(const bitmap_t *bitmap, canvas_t **canvas);
 /**
 * @function create_png_canvas(handle_t stream, handle_t *hndl)
 * Create a canvas from the PNG image provided in the stream
@@ -500,16 +511,16 @@ extern result_t create_bitmap_canvas(const bitmap_t *bitmap, handle_t *hndl);
 * @param hndl      created canvas
 * @return s_ok if canvas created ok
 */
-extern result_t create_png_canvas(handle_t stream, handle_t *hndl);
+extern result_t create_png_canvas(handle_t stream, canvas_t **canvas);
 /**
- * @function load_png(handle_t canvas, handle_t stream, const point_t *pt)
+ * @function load_png(canvas_t *canvas, handle_t stream, const point_t *pt)
  * Load a png image from the stream onto the canvas.
  * @param canvas    canvas to render png onto
  * @param strean    Stream to read from
  * @param pt        optional point to load image onto 0,0 if not given
  * @return s_ok if the canvas is large enough and the stream is a valid png
 */
-extern result_t load_png(handle_t canvas, handle_t stream, const point_t *pt);
+extern result_t load_png(canvas_t *canvas, handle_t stream, const point_t *pt);
 /**
  * Get the length of a canvas
  * @param canvas  Canvas to query
@@ -517,7 +528,7 @@ extern result_t load_png(handle_t canvas, handle_t stream, const point_t *pt);
  * @param bpp     optional bits per pixel for canvas
  * @return s_ok if a valid canvas
  */
-extern result_t get_canvas_extents(handle_t canvas, extent_t *extent, uint16_t *bpp);
+extern result_t get_canvas_extents(canvas_t *canvas, extent_t *extent, uint16_t *bpp);
 /**
  * @function get_orientation(handle_t hwnd, uint16_t *orientation)
  * Return the orientation of the window
@@ -535,7 +546,7 @@ extern result_t get_orientation(handle_t hwnd, uint16_t *orientation);
  */
 extern result_t set_orientation(handle_t hwnd, uint16_t orientation);
 /**
- * @function polyline(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, const point_t *points, uint16_t count)
+ * @function polyline(canvas_t *canvas, const rect_t *clip_rect, const pen_t *pen, const point_t *points, uint16_t count)
  * Draw a polyline
  * @param canvas      canvas to draw on
  * @param clip_rect   rectangle to clip to
@@ -544,9 +555,9 @@ extern result_t set_orientation(handle_t hwnd, uint16_t orientation);
  * @param points      points to draw
  * @return s_ok if succeeded
  */
-extern result_t polyline(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, uint16_t count, const point_t *points);
+extern result_t polyline(canvas_t *canvas, const rect_t *clip_rect, const pen_t *pen, uint16_t count, const point_t *points);
 /**
- * @function ellipse(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, const rect_t *area)
+ * @function ellipse(canvas_t *canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, const rect_t *area)
  * Draw an ellipse
  * @param canvas      canvas to draw on
  * @param clip_rect   rectangle to clip to
@@ -555,13 +566,13 @@ extern result_t polyline(handle_t canvas, const rect_t *clip_rect, const pen_t *
  * @param area        area of the ellise
  * @return  s_ok if succeeded
  */
-extern result_t ellipse(handle_t canvas,
+extern result_t ellipse(canvas_t *canvas,
                         const rect_t *clip_rect,
                         const pen_t *pen,
                         color_t color,
                         const rect_t *area);
 /**
- * @function polygon(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, const point_t *points, uint16_t count)
+ * @function polygon(canvas_t *canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, const point_t *points, uint16_t count)
  * Draw a polygon and optionally fill it
  * @param canvas      canvas to draw on
  * @param clip_rect   rectangle to clip to
@@ -571,9 +582,9 @@ extern result_t ellipse(handle_t canvas,
  * @param points      points of the polygon
  * @return  s_ok if succeeded
  */
-extern result_t polygon(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, uint16_t count, const point_t *points);
+extern result_t polygon(canvas_t *canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, uint16_t count, const point_t *points);
 /**
-* @function polypolygon(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, handle_t poly)
+* @function polypolygon(canvas_t *canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, handle_t poly)
 * Draw a polypolygon and optionally fill it
 * @param canvas      canvas to draw on
 * @param clip_rect   rectangle to clip to
@@ -583,9 +594,9 @@ extern result_t polygon(handle_t canvas, const rect_t *clip_rect, const pen_t *p
 * @param lengths
 * @return  s_ok if succeeded
 */
-extern result_t polypolygon(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, uint16_t count, const uint16_t *lengths, const point_t *points);
+extern result_t polypolygon(canvas_t *canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, uint16_t count, const uint16_t *lengths, const point_t *points);
 /**
- * @function rectangle(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, const rect_t *area)
+ * @function rectangle(canvas_t *canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, const rect_t *area)
  * Draw a rectangle
  * @param canvas        canvas to draw on
  * @param clip_rect     rectangle to clip to
@@ -594,13 +605,13 @@ extern result_t polypolygon(handle_t canvas, const rect_t *clip_rect, const pen_
  * @param area          area of rectangle
  * @return  s_ok if succeeded
  */
-extern result_t rectangle(handle_t canvas,
+extern result_t rectangle(canvas_t *canvas,
                           const rect_t *clip_rect,
                           const pen_t *pen,
                           color_t color,
                           const rect_t *area);
 /**
- * @function round_rect(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, const rect_t *area, gdi_dim_t radius)
+ * @function round_rect(canvas_t *canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, const rect_t *area, gdi_dim_t radius)
  * Draw a rectangle with rounded corners
  * @param canvas        canvas to draw on
  * @param clip_rect     rectangle to clip to
@@ -610,14 +621,14 @@ extern result_t rectangle(handle_t canvas,
  * @param corners       radius of corners
  * @return  s_ok if succeeded
  */
-extern result_t round_rect(handle_t canvas,
+extern result_t round_rect(canvas_t *canvas,
                            const rect_t *clip_rect,
                            const pen_t *pen,
                            color_t color,
                            const rect_t *area,
                            gdi_dim_t radius);
 /**
- * @function bit_blt(handle_t canvas, const rect_t *clip_rect, const rect_t *dest_rect, handle_t src_canvas, const rect_t *src_clip_rect, const point_t *src_pt)
+ * @function bit_blt(canvas_t *canvas, const rect_t *clip_rect, const rect_t *dest_rect, handle_t src_canvas, const rect_t *src_clip_rect, const point_t *src_pt)
  * Copy pixels from one canvas to another
  * @param canvas        canvas to draw on
  * @param clip_rect     rectangle to clip to
@@ -628,26 +639,26 @@ extern result_t round_rect(handle_t canvas,
  * @param operation     raster operation
  * @return  s_ok if succeeded
  */
-extern result_t bit_blt(handle_t canvas,
+extern result_t bit_blt(canvas_t *canvas,
                         const rect_t *clip_rect,
                         const rect_t *dest_rect,
-                        handle_t src_canvas,
+                        canvas_t *src_canvas,
                         const rect_t *src_clip_rect,
                         const point_t *src_pt);
 /**
- * @function get_pixel(handle_t canvas, const rect_t *clip_rect, const point_t *pt, color_t *pixel)
+ * @function get_pixel(canvas_t *canvas, const rect_t *clip_rect, const point_t *pt, color_t *pixel)
  * Return pixel 
  * @param canvas      canvas to query
  * @param clip_rect   rectangle to clip to
  * @param pt          point to get
  * @return pixel at point
  */
-extern result_t get_pixel(handle_t canvas,
+extern result_t get_pixel(canvas_t *canvas,
                                 const rect_t *clip_rect,
                                 const point_t *pt,
                           color_t *pixel);
 /**
- * @function set_pixel(handle_t canvas, const rect_t *clip_rect, const point_t *pt, color_t c, color_t *pixel)
+ * @function set_pixel(canvas_t *canvas, const rect_t *clip_rect, const point_t *pt, color_t c, color_t *pixel)
  * Set a pixel
  * @param canvas      canvas to write to
  * @param clip_rect   rectangle to clip to
@@ -656,13 +667,13 @@ extern result_t get_pixel(handle_t canvas,
  * @param pixel       optional old pixel
  * @return s_ok if set ok
  */
-extern result_t set_pixel(handle_t canvas,
+extern result_t set_pixel(canvas_t *canvas,
                                 const rect_t *clip_rect,
                                 const point_t *pt,
                           color_t c,
                           color_t *pixel);
 /**
- * @function arc(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, const point_t *pt, gdi_dim_t radius, int start, int end)
+ * @function arc(canvas_t *canvas, const rect_t *clip_rect, const pen_t *pen, const point_t *pt, gdi_dim_t radius, int start, int end)
  * Draw an arc
  * @param canvas      canvas to draw on
  * @param clip_rect   rectangle to clip to
@@ -673,7 +684,7 @@ extern result_t set_pixel(handle_t canvas,
  * @param end         end angle in degress 0-359
  * @return s_ok if completed
  */
-extern result_t arc(handle_t canvas,
+extern result_t arc(canvas_t *canvas,
                            const rect_t *clip_rect,
                            const pen_t *pen,
                            const point_t *pt,
@@ -681,7 +692,7 @@ extern result_t arc(handle_t canvas,
                            int start,
                            int end);
 /**
- * @function pie(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, const point_t *pt, int start, int end, gdi_dim_t radii,vgdi_dim_t inner)
+ * @function pie(canvas_t *canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, const point_t *pt, int start, int end, gdi_dim_t radii,vgdi_dim_t inner)
  * Draw a pie
  * @param canvas      canvas to write to
  * @param clip_rect   rectangle to clip to
@@ -694,7 +705,7 @@ extern result_t arc(handle_t canvas,
  * @param inner       innert radius
  * @return  s_ok if completed
  */
-extern result_t pie(handle_t canvas,
+extern result_t pie(canvas_t *canvas,
                            const rect_t *clip_rect,
                            const pen_t *pen,
                            color_t color,
@@ -730,7 +741,7 @@ extern result_t load_font(handle_t stream);
  */
 extern result_t register_font(const uint8_t *buffer, uint16_t length);
 /**
- * @function draw_text(handle_t canvas, const rect_t *clip_rect, handle_t  font, color_t fg, color_t bg, const char *str, uint16_t count, const point_t *src_pt, const rect_t *txt_clip_rect, text_flags format, uint16_t *char_widths)
+ * @function draw_text(canvas_t *canvas, const rect_t *clip_rect, handle_t  font, color_t fg, color_t bg, const char *str, uint16_t count, const point_t *src_pt, const rect_t *txt_clip_rect, text_flags format, uint16_t *char_widths)
  * Draw text
  * @param canvas      canvas to write to
  * @param clip_rect   rectangle to clip to
@@ -745,7 +756,7 @@ extern result_t register_font(const uint8_t *buffer, uint16_t length);
  * @param char_widths optional array of widths of characters written
  * @return  s_ok if completed
  */
-extern result_t draw_text(handle_t canvas,
+extern result_t draw_text(canvas_t *canvas,
                                  const rect_t *clip_rect,
                                  handle_t  font,
                                  color_t fg,
@@ -757,7 +768,7 @@ extern result_t draw_text(handle_t canvas,
                                  text_flags format,
                                  uint16_t *char_widths);
 /**
- * @function text_extent(handle_t canvas, handle_t  font, const char *str, uint16_t count, extent_t *extent)
+ * @function text_extent(canvas_t *canvas, handle_t  font, const char *str, uint16_t count, extent_t *extent)
  * Return the area text draws within
  * @param canvas      canvas to write to
  * @param font        font to use
@@ -766,7 +777,7 @@ extern result_t draw_text(handle_t canvas,
  * @param extent      resulting extents
  * @return  s_ok if completed
  */
-extern result_t text_extent(handle_t canvas,
+extern result_t text_extent(canvas_t *canvas,
                             handle_t  font,
                             const char *str,
                             uint16_t count,
@@ -790,9 +801,10 @@ extern result_t is_invalid(handle_t hwnd);
  * @function begin_paint(handle_t hwnd)
  * Notify the GDI a write operation is beginning
  * @param hwnd  handle to notify
+ * @param canvas  Drawing canvas to use
  * @return s_ok if the canvas can be painted on
  */
-extern result_t begin_paint(handle_t hwnd);
+extern result_t begin_paint(handle_t hwnd, canvas_t **canvas);
 /**
  * @function end_paint(handle_t hwnd)
  * Notify the canvas that the update operation is complete and

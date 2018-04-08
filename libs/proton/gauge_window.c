@@ -137,18 +137,19 @@ static int calculate_rotation(gauge_window_t *wnd, float value);
 static const pen_t *calculate_pen(gauge_window_t *wnd, uint16_t width, float value, pen_t *pen);
 static color_t calculate_color(gauge_window_t *wnd, float value);
 
-static void update_dial_gauge(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect);
-static void update_bar_gauge(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect);
-static void draw_pointer(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect, const pen_t *pen, int rotation);
-static void draw_sweep(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect, const pen_t *pen, color_t fill, int rotation);
-static void draw_bar(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect, const pen_t *pen, int rotation);
-static void draw_point(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect, const pen_t *pen, int rotation);
-static void draw_graph_value(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect, const pen_t *pen, size_t index, gdi_dim_t offset);
-static void draw_bar_graph(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect, const rect_t *rect);
+static void update_dial_gauge(canvas_t *canvas, gauge_window_t *wnd, const rect_t *wnd_rect);
+static void update_bar_gauge(canvas_t *canvas, gauge_window_t *wnd, const rect_t *wnd_rect);
+static void draw_pointer(canvas_t *canvas, gauge_window_t *wnd, const rect_t *wnd_rect, const pen_t *pen, int rotation);
+static void draw_sweep(canvas_t *canvas, gauge_window_t *wnd, const rect_t *wnd_rect, const pen_t *pen, color_t fill, int rotation);
+static void draw_bar(canvas_t *canvas, gauge_window_t *wnd, const rect_t *wnd_rect, const pen_t *pen, int rotation);
+static void draw_point(canvas_t *canvas, gauge_window_t *wnd, const rect_t *wnd_rect, const pen_t *pen, int rotation);
+static void draw_graph_value(canvas_t *canvas, gauge_window_t *wnd, const rect_t *wnd_rect, const pen_t *pen, size_t index, gdi_dim_t offset);
+static void draw_bar_graph(canvas_t *canvas, gauge_window_t *wnd, const rect_t *wnd_rect, const rect_t *rect);
 
 static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
-  begin_paint(hwnd);
+  canvas_t *canvas;
+  begin_paint(hwnd, &canvas);
 
   gauge_window_t *wnd = (gauge_window_t *)proxy->parg;
   rect_t wnd_rect;
@@ -158,15 +159,15 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
   rect_extents(&wnd_rect, &ex);
   
   // fill without a border
-  rectangle(hwnd, &wnd_rect, 0, wnd->background_color, &wnd_rect);
+  rectangle(canvas, &wnd_rect, 0, wnd->background_color, &wnd_rect);
 
   if (wnd->draw_border)
-    round_rect(hwnd, &wnd_rect, &wnd->border_pen, color_hollow, &wnd_rect, 12);
+    round_rect(canvas, &wnd_rect, &wnd->border_pen, color_hollow, &wnd_rect, 12);
 
   if(is_bar_style(wnd))
-    update_bar_gauge(hwnd, wnd, &wnd_rect);
+    update_bar_gauge(canvas, wnd, &wnd_rect);
   else
-    update_dial_gauge(hwnd, wnd, &wnd_rect);
+    update_dial_gauge(canvas, wnd, &wnd_rect);
 
   end_paint(hwnd);
   return s_ok;
@@ -226,7 +227,7 @@ static result_t on_value_label(handle_t hwnd, event_proxy_t *proxy, const canmsg
   return s_ok;
   }
 
-void update_bar_gauge(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect)
+void update_bar_gauge(canvas_t *canvas, gauge_window_t *wnd, const rect_t *wnd_rect)
   {
   // we support up to 4 ID's.
 
@@ -261,7 +262,7 @@ void update_bar_gauge(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect
   size_t i;
   for(i = 0; i < wnd->num_values; i++)
     {
-    draw_bar_graph(hwnd, wnd, wnd_rect, &graph);
+    draw_bar_graph(canvas, wnd, wnd_rect, &graph);
     graph.left += 14;
     graph.right += 14;
     }
@@ -269,7 +270,7 @@ void update_bar_gauge(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect
   if(wnd->draw_name)
     {
     extent_t sz;
-    text_extent(hwnd, wnd->font, wnd->name, 0, &sz);
+    text_extent(canvas, wnd->font, wnd->name, 0, &sz);
     point_t pt;
     bottom_right(wnd_rect, &pt);
 
@@ -277,7 +278,7 @@ void update_bar_gauge(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect
     pt.x -= sz.dx;
     pt.y -= sz.dy;
 
-    draw_text(hwnd, wnd_rect, wnd->font,
+    draw_text(canvas, wnd_rect, wnd->font,
               wnd->name_color, wnd->background_color,
               wnd->name, 0, &pt, 0, 0, 0);
     }
@@ -308,7 +309,7 @@ void update_bar_gauge(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect
       long value = last_tick.value;
 
       extent_t sz;
-      text_extent(hwnd, wnd->font, last_tick.text, 0, &sz);
+      text_extent(canvas, wnd->font, last_tick.text, 0, &sz);
 
       float relative_value = value - first_tick.value;
       float pixels = relative_value * pixels_per_unit;
@@ -317,7 +318,7 @@ void update_bar_gauge(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect
           (graph.bottom - pixels) - 7 - (sz.dy >> 1)
         };
 
-      draw_text(hwnd, wnd_rect, wnd->font,
+      draw_text(canvas, wnd_rect, wnd->font,
                 wnd->name_color, wnd->background_color,
                 last_tick.text, 0, &pt, 0, 0, 0);
       }
@@ -327,12 +328,12 @@ void update_bar_gauge(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect
 
   for (i = 0; i < wnd->num_values; i++)
     {
-    draw_graph_value(hwnd, wnd, wnd_rect, &lightblue_pen, i, offset);
+    draw_graph_value(canvas, wnd, wnd_rect, &lightblue_pen, i, offset);
     offset += 14;
     }
   }
 
-void update_dial_gauge(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect)
+void update_dial_gauge(canvas_t *canvas, gauge_window_t *wnd, const rect_t *wnd_rect)
   {
   if (wnd->draw_name)
     {
@@ -343,12 +344,12 @@ void update_dial_gauge(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rec
     copy_point(&wnd->name_pt, &name_pt);
 
     extent_t sz;
-    text_extent(hwnd, wnd->name_font, wnd->name, 0, &sz);
+    text_extent(canvas, wnd->name_font, wnd->name, 0, &sz);
 
     name_pt.x -= sz.dx >> 1;
     name_pt.y -= sz.dy >>1;
 
-    draw_text(hwnd, wnd_rect, wnd->name_font,
+    draw_text(canvas, wnd_rect, wnd->name_font,
               wnd->name_color, wnd->background_color,
               wnd->name, 0, &name_pt, 0, 0, 0);
     }
@@ -409,11 +410,11 @@ void update_dial_gauge(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rec
         arc_angles[1] = 360;
         }
 
-      arc(hwnd, wnd_rect, &last_step.pen, &wnd->center,
+      arc(canvas, wnd_rect, &last_step.pen, &wnd->center,
           wnd->gauge_radii, arc_angles[0], arc_angles[1]);
 
       if(arc_angles[2] >= 0)
-        arc(hwnd, wnd_rect, &last_step.pen, &wnd->center,
+        arc(canvas, wnd_rect, &last_step.pen, &wnd->center,
             wnd->gauge_radii, 0, arc_angles[2]);
 
       arc_start = arc_end;
@@ -458,13 +459,13 @@ void update_dial_gauge(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rec
 
       rotate_point(&wnd->center, &pts[1], arc_start);
 
-      polyline(hwnd, wnd_rect, &white_pen, 2, pts);
+      polyline(canvas, wnd_rect, &white_pen, 2, pts);
 
       if (tick.text[0] != 0 && wnd->font != 0)
         {
         // write the text at the point
         extent_t size;
-        text_extent(hwnd, wnd->font, tick.text, 0, &size);
+        text_extent(canvas, wnd->font, tick.text, 0, &size);
 
         // the text is below the tick marks
         point_t top_left = {
@@ -477,7 +478,7 @@ void update_dial_gauge(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rec
         top_left.x -= (size.dx >> 1);
         top_left.y -= (size.dy >> 1);
 
-        draw_text(hwnd, wnd_rect, wnd->font, color_white, wnd->background_color,
+        draw_text(canvas, wnd_rect, wnd->font, color_white, wnd->background_color,
                   tick.text, 0, &top_left, 0, 0, 0);
         }
       }
@@ -491,37 +492,37 @@ void update_dial_gauge(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rec
     switch (wnd->style)
       {
     case gs_pointer_minmax:
-      draw_point(hwnd, wnd, wnd_rect,
+      draw_point(canvas, wnd, wnd_rect,
                  calculate_pen(wnd, 1, wnd->min_values[0], &pointer_pen), 
                  calculate_rotation(wnd, wnd->min_values[0]));
-      draw_point(hwnd, wnd, wnd_rect,
+      draw_point(canvas, wnd, wnd_rect,
                  calculate_pen(wnd, 1, wnd->max_values[0], &pointer_pen),
                  calculate_rotation(wnd, wnd->max_values[0]));
       break;
     case gs_pointer:
-      draw_pointer(hwnd, wnd, wnd_rect,
+      draw_pointer(canvas, wnd, wnd_rect,
                    calculate_pen(wnd, wnd->width, wnd->values[0], &pointer_pen),
                    calculate_rotation(wnd, wnd->values[0]));
       break;
     case gs_sweep:
-      draw_sweep(hwnd, wnd, wnd_rect,
+      draw_sweep(canvas, wnd, wnd_rect,
                  calculate_pen(wnd, wnd->width, wnd->values[0], &pointer_pen),
                  calculate_color(wnd, wnd->values[0]), calculate_rotation(wnd, wnd->values[0]));
       break;
     case gs_bar:
-      draw_bar(hwnd, wnd, wnd_rect,
+      draw_bar(canvas, wnd, wnd_rect,
                calculate_pen(wnd, wnd->width, wnd->values[0], &pointer_pen),
                calculate_rotation(wnd, wnd->values[0]));
       break;
     case gs_point_minmax:
-      draw_point(hwnd, wnd, wnd_rect,
+      draw_point(canvas, wnd, wnd_rect,
                  calculate_pen(wnd, 1, wnd->min_values[0], &pointer_pen),
                  calculate_rotation(wnd, wnd->min_values[0]));
-      draw_point(hwnd, wnd, wnd_rect,
+      draw_point(canvas, wnd, wnd_rect,
                  calculate_pen(wnd, 1, wnd->max_values[0], &pointer_pen),
                  calculate_rotation(wnd, wnd->max_values[0]));
     case gs_point:
-      draw_point(hwnd, wnd, wnd_rect,
+      draw_point(canvas, wnd, wnd_rect,
                  calculate_pen(wnd, 1, wnd->values[0], &pointer_pen),
                  calculate_rotation(wnd, wnd->values[0]));
       break;
@@ -538,19 +539,19 @@ void update_dial_gauge(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rec
 
       size_t len = strlen(str);
       extent_t size;
-      text_extent(hwnd, wnd->value_font, str, len, &size);
+      text_extent(canvas, wnd->value_font, str, len, &size);
 
 //      pen(&gray_pen);
 //      background_color(color_black);
 
       // draw a rectangle around the text
-      rectangle(hwnd, wnd_rect, &gray_pen, color_black, &wnd->value_rect);
+      rectangle(canvas, wnd_rect, &gray_pen, color_black, &wnd->value_rect);
 
       point_t pt = {
         wnd->value_rect.right - (size.dx + 2),
         wnd->value_rect.top + 2 };
 
-      draw_text(hwnd, wnd_rect, wnd->value_font, color_lightblue, color_black,
+      draw_text(canvas, wnd_rect, wnd->value_font, color_lightblue, color_black,
                 str, len, &pt, &wnd->value_rect, eto_clipped, 0);
       }
   }
@@ -560,7 +561,7 @@ bool is_bar_style(gauge_window_t *wnd)
   return wnd->style >= bgs_point;
   }
 
-static void draw_pointer(handle_t hwnd,
+static void draw_pointer(canvas_t *canvas,
                          gauge_window_t *wnd,
                          const rect_t *wnd_rect, 
                          const pen_t *outline_pen,
@@ -576,17 +577,17 @@ static void draw_pointer(handle_t hwnd,
   rotate_point(&wnd->center, &pts[0], rotation+180);
   rotate_point(&wnd->center, &pts[1], rotation+180);
   
-  polyline(hwnd, wnd_rect, outline_pen, 2, pts);
+  polyline(canvas, wnd_rect, outline_pen, 2, pts);
   }
 
-static void draw_sweep(handle_t hwnd,
+static void draw_sweep(canvas_t *canvas,
                        gauge_window_t *wnd,
                        const rect_t *wnd_rect,
                        const pen_t *outline_pen,
                        color_t fill_color,
                        int rotation)
   {
-  pie(hwnd,
+  pie(canvas,
       wnd_rect,
       outline_pen,
       fill_color,
@@ -597,7 +598,7 @@ static void draw_sweep(handle_t hwnd,
       5);
   }
 
-static void draw_bar(handle_t hwnd,
+static void draw_bar(canvas_t *canvas,
                      gauge_window_t *wnd,
                      const rect_t *wnd_rect,
                      const pen_t *outline_pen,
@@ -619,13 +620,13 @@ static void draw_bar(handle_t hwnd,
   gdi_dim_t radii = wnd->gauge_radii - (wnd->width >> 1);
   radii -= outline_pen->width >> 1;
 
-  arc(hwnd, wnd_rect, outline_pen, &wnd->center, radii, arc_angles[0], arc_angles[1]);
+  arc(canvas, wnd_rect, outline_pen, &wnd->center, radii, arc_angles[0], arc_angles[1]);
 
   if(arc_angles[2] > 0)
-    arc(hwnd, wnd_rect, outline_pen, &wnd->center, radii, 0, arc_angles[2]);
+    arc(canvas, wnd_rect, outline_pen, &wnd->center, radii, 0, arc_angles[2]);
   }
 
-static void draw_point(handle_t hwnd,
+static void draw_point(canvas_t *canvas,
                        gauge_window_t *wnd,
                        const rect_t *wnd_rect,
                        const pen_t *outline_pen,
@@ -645,7 +646,7 @@ static void draw_point(handle_t hwnd,
   rotate_point(&wnd->center, &pts[2], rotn);
   copy_point(&pts[0], &pts[3]);
 
-  polygon(hwnd, wnd_rect, outline_pen, outline_pen->color, 4, pts);
+  polygon(canvas, wnd_rect, outline_pen, outline_pen->color, 4, pts);
   }
 
 static int calculate_rotation(gauge_window_t *wnd, float value)
@@ -737,7 +738,7 @@ static color_t calculate_color(gauge_window_t *wnd, float value)
   return fill_color;
   }
 
-static void draw_bar_graph(handle_t hwnd,
+static void draw_bar_graph(canvas_t *canvas,
                      gauge_window_t *wnd, 
                      const rect_t *wnd_rect,
                      const rect_t *rect)
@@ -781,12 +782,12 @@ static void draw_bar_graph(handle_t hwnd,
     float pixels = relative_value * pixels_per_unit;
     drawing_rect.top = drawing_rect.bottom - (gdi_dim_t) (pixels);
     
-    rectangle(hwnd, wnd_rect, 0, last_step.pen.color, &drawing_rect);
+    rectangle(canvas, wnd_rect, 0, last_step.pen.color, &drawing_rect);
     drawing_rect.bottom = drawing_rect.top;
     }
   }
 
-static void draw_graph_value(handle_t hwnd,
+static void draw_graph_value(canvas_t *canvas,
                        gauge_window_t *wnd,
                        const rect_t *wnd_rect,
                        const pen_t *outline_pen,
@@ -830,7 +831,7 @@ static void draw_graph_value(handle_t hwnd,
       { offset, position + 5 }
     };
 
-  polygon(hwnd, wnd_rect, outline_pen, outline_pen->color, 4, pts);
+  polygon(canvas, wnd_rect, outline_pen, outline_pen->color, 4, pts);
 
   if (wnd->style == bgs_pointer_minmax || wnd->style == bgs_pointer_max)
     {
@@ -845,7 +846,7 @@ static void draw_graph_value(handle_t hwnd,
       pts[2].x = offset; pts[2].y = position - 5;
       pts[3].x = offset; pts[3].y = position + 5;
 
-      polygon(hwnd, wnd_rect, outline_pen, color_hollow, 4, pts);
+      polygon(canvas, wnd_rect, outline_pen, color_hollow, 4, pts);
       }
     }
 
@@ -862,7 +863,7 @@ static void draw_graph_value(handle_t hwnd,
       pts[2].x = offset; pts[2].y = position - 5;
       pts[3].x = offset; pts[3].y =  position + 5;
 
-      polygon(hwnd, wnd_rect, outline_pen, color_hollow, 4, pts);
+      polygon(canvas, wnd_rect, outline_pen, color_hollow, 4, pts);
       }
     }
   }

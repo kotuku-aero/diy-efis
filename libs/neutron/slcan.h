@@ -59,7 +59,7 @@ extern "C" {
 
 static comm_device_p driver;
 
-result_t bsp_can_init(handle_t rx_queue, handle_t worker)
+result_t bsp_can_init(deque_p rx_queue, handle_t worker)
   {
   result_t result;
   memid_t key;
@@ -94,7 +94,7 @@ result_t bsp_send_can(const canmsg_t *msg)
  * baud-rate=uint32:38400
  * device=/dev/ttyAMA0
  */
-extern result_t slcan_create(memid_t key, handle_t rx_queue, comm_device_p *device);
+extern result_t slcan_create(memid_t key, deque_p rx_queue, comm_device_p *device);
 /**
  * Call to send an slcan message.
  * @param msg Message to send

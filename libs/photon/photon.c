@@ -138,20 +138,14 @@ result_t get_screen(handle_t *screen)
   return s_ok;
   }
 
-result_t create_rect_canvas(const extent_t *size, handle_t *hndl)
+result_t create_rect_canvas(const extent_t *size, canvas_t **canvas)
   {
-  result_t result;
-  canvas_t *canvas;
-  if (failed(result = bsp_canvas_create_rect(size, &canvas)))
-    return result;
-
-  *hndl = canvas;
-  return s_ok;
+  return bsp_canvas_create_rect(size, canvas);
   }
 
-result_t create_bitmap_canvas(const bitmap_t *bitmap, handle_t *hndl)
+result_t create_bitmap_canvas(const bitmap_t *bitmap, canvas_t **canvas)
   {
-  return bsp_canvas_create_bitmap(bitmap, (canvas_t **) hndl);
+  return bsp_canvas_create_bitmap(bitmap, canvas);
   }
 
 result_t get_wnddata(handle_t hwnd, void **wnd_data)
@@ -338,9 +332,8 @@ result_t post_message(handle_t hwnd, const canmsg_t *msg, uint32_t max_wait)
   return push_back(phys_screen->event_queue, &wndmsg, max_wait);
   }
 
-result_t canvas_close(handle_t hc)
+result_t canvas_close(canvas_t *canvas)
   {
-  canvas_t *canvas = (canvas_t *) hc;
   return bsp_canvas_close(canvas);
   }
 
@@ -354,15 +347,21 @@ result_t is_invalid(handle_t hwnd)
   return wnd->invalid ? s_ok : s_false;
   }
 
-result_t begin_paint(handle_t hwnd)
+result_t begin_paint(handle_t hwnd, canvas_t **canvas)
   {
   result_t result;
   window_t *wnd;
+  if (canvas == 0)
+    return e_bad_parameter;
+
   if (failed(result = as_window(hwnd, &wnd)))
     return result;
 
   wnd->invalid = false;
+  if (failed(result = get_canvas(hwnd, canvas)))
+    return result;
 
+  // notify the bsp we are painting a window
   return (*wnd->canvas->begin_paint)(wnd);
   }
 
@@ -379,13 +378,8 @@ result_t end_paint(handle_t hwnd)
   return (*wnd->canvas->end_paint)(wnd);
   }
 
-result_t get_canvas_extents(handle_t hwnd, extent_t *extent, uint16_t *bpp)
+result_t get_canvas_extents(canvas_t *canvas, extent_t *extent, uint16_t *bpp)
   {
-  result_t result;
-  canvas_t *canvas;
-  if(failed(result = get_canvas(hwnd, &canvas)))
-    return result;
-
   if (extent != 0)
     {
     extent->dx = canvas->width;
@@ -1521,13 +1515,8 @@ result_t polyline_impl(canvas_t *canvas, const rect_t *clip_rect, const pen_t *p
   return s_ok;
   }
 
-result_t polyline(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen, uint16_t count, const point_t *points)
+result_t polyline(canvas_t *canvas, const rect_t *clip_rect, const pen_t *pen, uint16_t count, const point_t *points)
   {
-  result_t result;
-  canvas_t *canvas;
-  if (failed(result = get_canvas(hwnd, &canvas)))
-    return result;
-
   return polyline_impl(canvas, clip_rect, pen, count, points);
   }
 
@@ -1551,14 +1540,9 @@ static result_t fill_rect(canvas_t *canvas, const rect_t *clip_rect, const rect_
   return s_ok;
   }
 
-result_t ellipse(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
+result_t ellipse(canvas_t *canvas, const rect_t *clip_rect, const pen_t *pen,
     color_t fill, const rect_t *area)
   {
-  result_t result;
-  canvas_t *canvas;
-  if(failed(result = get_canvas(hwnd, &canvas)))
-    return result;
-
   gdi_dim_t w = rect_width(area) >> 1;
   gdi_dim_t h = rect_height(area) >> 1;
 
@@ -2034,7 +2018,7 @@ for(i = 0; i < num_edges; i++)
   return s_ok;
   }
 
-result_t polypolygon(handle_t hwnd, const rect_t *clip_rect, const pen_t *outline, color_t fill, uint16_t count, const uint16_t *lengths, const point_t *pts)
+result_t polypolygon(canvas_t *canvas, const rect_t *clip_rect, const pen_t *outline, color_t fill, uint16_t count, const uint16_t *lengths, const point_t *pts)
   {
   result_t result;
   // if the interior color is hollow then just a line draw
@@ -2044,7 +2028,7 @@ result_t polypolygon(handle_t hwnd, const rect_t *clip_rect, const pen_t *outlin
     uint16_t contour_num;
     for(contour_num = 0; contour_num < count; contour_num++)
       {
-      if(failed(result = polyline(hwnd, clip_rect, outline, lengths[contour_num], cp)))
+      if(failed(result = polyline(canvas, clip_rect, outline, lengths[contour_num], cp)))
         return result;
 
      cp += lengths[contour_num];
@@ -2052,10 +2036,6 @@ result_t polypolygon(handle_t hwnd, const rect_t *clip_rect, const pen_t *outlin
 
     return s_ok;
     }
-
-  canvas_t *canvas;
-  if(failed(result = get_canvas(hwnd, &canvas)))
-    return result;
 
   if (failed(result = polypolygon_impl(canvas, clip_rect, fill, count, lengths, pts)))
     return result;
@@ -2077,19 +2057,16 @@ result_t polypolygon(handle_t hwnd, const rect_t *clip_rect, const pen_t *outlin
   return s_ok;
   }
 
-result_t polygon(handle_t canvas, const rect_t *clip_rect, const pen_t *outline,
+result_t polygon(canvas_t *canvas, const rect_t *clip_rect, const pen_t *outline,
   color_t fill, uint16_t count, const point_t *pts)
   {
   return polypolygon(canvas, clip_rect, outline, fill, 1, &count, pts);
   }
 
-result_t rectangle(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
+result_t rectangle(canvas_t *canvas, const rect_t *clip_rect, const pen_t *pen,
     color_t color, const rect_t *rect)
   {
   result_t result;
-  canvas_t *canvas;
-  if(failed(result = get_canvas(hwnd, &canvas)))
-    return result;
 
   gdi_dim_t rect_offet = (pen == 0 ? 0 : 1);
   rect_t rect_to_fill =
@@ -2126,19 +2103,16 @@ result_t rectangle(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
         }
       };
 
-    return polyline(hwnd, clip_rect, pen, 5, pts);
+    return polyline(canvas, clip_rect, pen, 5, pts);
     }
 
   return s_ok;
   }
 
-result_t round_rect(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
+result_t round_rect(canvas_t *canvas, const rect_t *clip_rect, const pen_t *pen,
     color_t fill, const rect_t *rect, gdi_dim_t dim)
   {
   result_t result;
-  canvas_t *canvas;
-  if(failed(result = get_canvas(hwnd, &canvas)))
-    return result;
 
   // a round rect is a series of lines and arcs.
   rect_t tmp;
@@ -2184,7 +2158,7 @@ result_t round_rect(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
   pts[1].x = draw_rect.right - dim;
   pts[1].y = draw_rect.top;
 
-  if ((result = polyline(hwnd, clip_rect, pen, 2, pts)) != s_ok)   // top
+  if ((result = polyline(canvas, clip_rect, pen, 2, pts)) != s_ok)   // top
     return result;
 
   pts[0].x = draw_rect.right;
@@ -2193,7 +2167,7 @@ result_t round_rect(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
   pts[1].x = draw_rect.right;
   pts[1].y = draw_rect.bottom - dim;
 
-  if ((result = polyline(hwnd, clip_rect, pen, 2, pts)) != s_ok)   // right
+  if ((result = polyline(canvas, clip_rect, pen, 2, pts)) != s_ok)   // right
     return result;
 
   pts[0].x = draw_rect.left;
@@ -2202,7 +2176,7 @@ result_t round_rect(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
   pts[1].x = draw_rect.left;
   pts[1].y = draw_rect.bottom - dim;
 
-  if ((result = polyline(hwnd, clip_rect, pen, 2, pts)) != s_ok)   // left
+  if ((result = polyline(canvas, clip_rect, pen, 2, pts)) != s_ok)   // left
     return result;
 
   pts[0].x = draw_rect.left + dim;
@@ -2211,7 +2185,7 @@ result_t round_rect(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
   pts[1].x = draw_rect.right - dim;
   pts[1].y = draw_rect.bottom;
 
-  if ((result = polyline(hwnd, clip_rect, pen, 2, pts)) != s_ok)   // bottom
+  if ((result = polyline(canvas, clip_rect, pen, 2, pts)) != s_ok)   // bottom
     return result;
 
   // Arcs
@@ -2231,7 +2205,7 @@ result_t round_rect(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
   ellrect.right = draw_rect.left + (dim << 1);
   ellrect.bottom = draw_rect.top + (dim << 1);
 
-  if ((result = ellipse(hwnd, &tmp, pen, fill, &ellrect)) != s_ok)
+  if ((result = ellipse(canvas, &tmp, pen, fill, &ellrect)) != s_ok)
     return result;
 
   // bottom left
@@ -2247,7 +2221,7 @@ result_t round_rect(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
   ellrect.right = draw_rect.left + (dim << 1);
   ellrect.bottom = draw_rect.bottom;
 
-  if ((result = ellipse(hwnd, &tmp, pen, fill, &ellrect)) != s_ok)
+  if ((result = ellipse(canvas, &tmp, pen, fill, &ellrect)) != s_ok)
     return result;
 
   // top right
@@ -2263,7 +2237,7 @@ result_t round_rect(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
   ellrect.right = draw_rect.right;
   ellrect.bottom = draw_rect.top + (dim << 1);
 
-  if ((result = ellipse(hwnd, &tmp, pen, fill, &ellrect)) != s_ok)
+  if ((result = ellipse(canvas, &tmp, pen, fill, &ellrect)) != s_ok)
     return result;
 
   // bottom right
@@ -2279,22 +2253,13 @@ result_t round_rect(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
   ellrect.right = draw_rect.right;
   ellrect.bottom = draw_rect.bottom;
 
-  return ellipse(hwnd, &tmp, pen, fill, &ellrect);
+  return ellipse(canvas, &tmp, pen, fill, &ellrect);
   }
 
-result_t bit_blt(handle_t hwnd, const rect_t *clip_rect,
-    const rect_t *dest_rect, handle_t src_hwnd, const rect_t *src_clip_rect,
+result_t bit_blt(canvas_t *canvas, const rect_t *clip_rect,
+    const rect_t *dest_rect, canvas_t *src_canvas, const rect_t *src_clip_rect,
     const point_t *src_pt)
   {
-  result_t result;
-  canvas_t *canvas;
-  if(failed(result = get_canvas(hwnd, &canvas)))
-    return result;
-
-  canvas_t *src_canvas;
-  if(failed(result = get_canvas(src_hwnd, &src_canvas)))
-    return result;
-
   // if the src point is outside the source then done
   if (!point_in_rect(src_pt, src_clip_rect))
     return s_ok;
@@ -2364,7 +2329,7 @@ result_t bit_blt(handle_t hwnd, const rect_t *clip_rect,
   return s_ok;
   }
 
-result_t get_pixel(handle_t hwnd, const rect_t *clip_rect, const point_t *pt,
+result_t get_pixel(canvas_t *canvas, const rect_t *clip_rect, const point_t *pt,
     color_t *pixel)
   {
   if (!point_in_rect(pt, clip_rect))
@@ -2373,16 +2338,11 @@ result_t get_pixel(handle_t hwnd, const rect_t *clip_rect, const point_t *pt,
     return s_false;
     }
   
-  result_t result;
-  canvas_t *canvas;
-  if(failed(result = get_canvas(hwnd, &canvas)))
-    return result;
-
   *pixel = (*canvas->get_pixel)(canvas, pt);
   return s_ok;
   }
 
-result_t set_pixel(handle_t hwnd, const rect_t *clip_rect, const point_t *pt,
+result_t set_pixel(canvas_t *canvas, const rect_t *clip_rect, const point_t *pt,
     color_t c, color_t *pixel)
   {
   if (!point_in_rect(pt, clip_rect))
@@ -2393,11 +2353,6 @@ result_t set_pixel(handle_t hwnd, const rect_t *clip_rect, const point_t *pt,
     return s_false;
     }
   
-  result_t result;
-  canvas_t *canvas;
-  if(failed(result = get_canvas(hwnd, &canvas)))
-    return result;
-
   if (pixel != 0)
     *pixel = (*canvas->get_pixel)(canvas, pt);
   (*canvas->set_pixel)(canvas, pt, c);
@@ -2504,15 +2459,9 @@ static inline int fix_angle(int angle)
   return angle;
   }
 
-result_t arc(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
+result_t arc(canvas_t *canvas, const rect_t *clip_rect, const pen_t *pen,
     const point_t *p, gdi_dim_t radius, int start_angle, int end_angle)
   {
-  result_t result;
-  canvas_t *canvas;
-  if(failed(result = get_canvas(hwnd, &canvas)))
-    return result;
-
-
   // the arc routine expects 0 degrees is point(0,1) while the routine
   start_angle = fix_angle(start_angle);
   end_angle = fix_angle(end_angle);
@@ -2606,7 +2555,7 @@ result_t arc(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
       // result_t ellipse(handle_t hndl, const rect_t *clip_rect, const pen_t *pen, color_t fill, const rect_t *area)
 
       if (angle >= start_angle && angle <= end_angle)
-        ellipse(hwnd, clip_rect, pen, pen->color,
+        ellipse(canvas, clip_rect, pen, pen->color,
             offset_rect(&rect_offset,
                 make_rect(pt.x + p->x, pt.y + p->y, 
                           pt.x + p->x + wide_pen.dx,
@@ -2614,7 +2563,7 @@ result_t arc(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
 
       angle += 90;
       if (angle >= start_angle && angle <= end_angle)
-        ellipse(hwnd, clip_rect, pen, pen->color,
+        ellipse(canvas, clip_rect, pen, pen->color,
             offset_rect(&rect_offset,
                 make_rect(-pt.y + p->x, pt.x + p->y,
                           -pt.y + p->x + wide_pen.dx,
@@ -2622,7 +2571,7 @@ result_t arc(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
 
       angle += 90;
       if (angle >= start_angle && angle <= end_angle)
-        ellipse(hwnd, clip_rect, pen, pen->color,
+        ellipse(canvas, clip_rect, pen, pen->color,
             offset_rect(&rect_offset,
                 make_rect(-pt.x + p->x, -pt.y + p->y, 
                           -pt.x + p->x + wide_pen.dx,
@@ -2630,7 +2579,7 @@ result_t arc(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
 
       angle += 90;
       if (angle >= start_angle && angle <= end_angle)
-        ellipse(hwnd, clip_rect, pen, pen->color,
+        ellipse(canvas, clip_rect, pen, pen->color,
             offset_rect(&rect_offset,
                 make_rect(pt.y + p->x, -pt.x + p->y,
                           pt.y + p->x + wide_pen.dx,
@@ -2641,7 +2590,7 @@ result_t arc(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
       angle += 90;
 
       if (angle >= start_angle && angle <= end_angle)
-        ellipse(hwnd, clip_rect, pen, pen->color,
+        ellipse(canvas, clip_rect, pen, pen->color,
             offset_rect(&rect_offset,
                 make_rect(pt.y + p->x, pt.x + p->y, 
                           pt.y + p->x + wide_pen.dx,
@@ -2649,7 +2598,7 @@ result_t arc(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
 
       angle += 90;
       if (angle >= start_angle && angle <= end_angle)
-        ellipse(hwnd, clip_rect, pen, pen->color,
+        ellipse(canvas, clip_rect, pen, pen->color,
             offset_rect(&rect_offset,
                 make_rect(-pt.x + p->x, pt.y + p->y,
                           -pt.x + p->x + wide_pen.dx,
@@ -2657,7 +2606,7 @@ result_t arc(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
 
       angle += 90;
       if (angle >= start_angle && angle <= end_angle)
-        ellipse(hwnd, clip_rect, pen, pen->color,
+        ellipse(canvas, clip_rect, pen, pen->color,
             offset_rect(&rect_offset,
                 make_rect(-pt.y + p->x, -pt.x + p->y,
                           -pt.y + p->x + wide_pen.dx,
@@ -2665,7 +2614,7 @@ result_t arc(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
 
       angle += 90;
       if (angle >= start_angle && angle <= end_angle)
-        ellipse(hwnd, clip_rect, pen, pen->color,
+        ellipse(canvas, clip_rect, pen, pen->color,
             offset_rect(&rect_offset,
                 make_rect(pt.x + p->x, -pt.y + p->y,
                           pt.x + p->x + wide_pen.dx,
@@ -2685,15 +2634,10 @@ result_t arc(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
   return s_ok;
   }
 
-result_t pie(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
+result_t pie(canvas_t *canvas, const rect_t *clip_rect, const pen_t *pen,
     color_t c, const point_t *p, int start, int end, gdi_dim_t radii,
     gdi_dim_t inner)
   {
-  result_t result;
-  canvas_t *canvas;
-  if(failed(result = get_canvas(hwnd, &canvas)))
-    return result;
-
   if (end < start)
     {
     int t = start;

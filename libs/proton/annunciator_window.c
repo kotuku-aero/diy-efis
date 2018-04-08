@@ -61,20 +61,21 @@ typedef struct _annunciator_window_t {
 
 /**
  * Draw an annunciator
- * @param hwnd      Window to draw on
+ * @param canvas    Canvas to draw on
  * @param wnd_rect  rectange of the window
  * @param pt        point in window to draw at
  * @param label     Text label
  * @param value     value to print
  */
-static void draw_annunciator(handle_t hwnd, const rect_t *wnd_rect, annunciator_window_t *wnd, const point_t *pt, const char *label, const char *value);
+static void draw_annunciator(canvas_t *canvas, const rect_t *wnd_rect, annunciator_window_t *wnd, const point_t *pt, const char *label, const char *value);
 
 static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *can_msg)
   {
   bool changed = false;
   annunciator_window_t *wnd = (annunciator_window_t *)proxy->parg;
 
-  begin_paint(hwnd);
+  canvas_t *canvas;
+  begin_paint(hwnd, &canvas);
 
   rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
@@ -84,25 +85,25 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ca
 
   rect_t rect;
   if (wnd->draw_border)
-    round_rect(hwnd, &wnd_rect, &white_pen, color_hollow, &wnd_rect, 12);
+    round_rect(canvas, &wnd_rect, &white_pen, color_hollow, &wnd_rect, 12);
   char msg[10];
 
   sprintf(msg, "%02.2d:%02.2d", wnd->clock / 60, wnd->clock % 60);
-  draw_annunciator(hwnd, &wnd_rect, wnd, &clock_pt, "UTC", msg);
+  draw_annunciator(canvas, &wnd_rect, wnd, &clock_pt, "UTC", msg);
 
   double hrs = ((double)wnd->hours) / 100;
 
   sprintf(msg, "%06.1f", wnd->hours);
-  draw_annunciator(hwnd, &wnd_rect, wnd, &hrs_pt, "Hrs", msg);
+  draw_annunciator(canvas, &wnd_rect, wnd, &hrs_pt, "Hrs", msg);
 
   sprintf(msg, "%d", wnd->qnh);
-  draw_annunciator(hwnd, &wnd_rect, wnd, &qnh_pt, "QNH", msg);
+  draw_annunciator(canvas, &wnd_rect, wnd, &qnh_pt, "QNH", msg);
 
   sprintf(msg, "%d", wnd->oat);
-  draw_annunciator(hwnd, &wnd_rect, wnd, &oat_pt, "OAT", msg);
+  draw_annunciator(canvas, &wnd_rect, wnd, &oat_pt, "OAT", msg);
 
   sprintf(msg, "%d", wnd->cas);
-  draw_annunciator(hwnd, &wnd_rect, wnd, &cas_pt, "CAS", msg);
+  draw_annunciator(canvas, &wnd_rect, wnd, &cas_pt, "CAS", msg);
 
   end_paint(hwnd);
   return s_ok;
@@ -193,7 +194,7 @@ static result_t on_air_time(handle_t hwnd, event_proxy_t *proxy, const canmsg_t 
   return s_ok;
   }
 
-static void draw_annunciator(handle_t hwnd,
+static void draw_annunciator(canvas_t *canvas,
   const rect_t *wnd_rect,
   annunciator_window_t *wnd,
   const point_t *pt,
@@ -208,19 +209,19 @@ static void draw_annunciator(handle_t hwnd,
   rect_t rect;
 
   extent_t label_size;
-  text_extent(hwnd, wnd->small_font, label, text_len, &label_size);
+  text_extent(canvas, wnd->small_font, label, text_len, &label_size);
 
   gdi_dim_t width = rect_width(wnd_rect);
   gdi_dim_t text_start = pt->x + width - (label_size.dx + 3);
   gdi_dim_t right = pt->x + width;
 
-  rectangle(hwnd, wnd_rect, 0, color_gray, make_rect(pt->x, pt->y + 1, right, pt->y + 4, &rect));
-  rectangle(hwnd, wnd_rect, 0, color_gray, make_rect(pt->x, pt->y + 4, pt->x + 3, pt->y + 28, &rect));
-  rectangle(hwnd, wnd_rect, 0, color_gray, make_rect(right - 3, pt->y + 4, right, pt->y + 45, &rect));
-  rectangle(hwnd, wnd_rect, 0, color_gray, make_rect(pt->x, pt->y + 28, right, pt->y + 31, &rect));
-  rectangle(hwnd, wnd_rect, 0, color_gray, make_rect(text_start - 6, pt->y + 31, right, pt->y + 45, &rect));
+  rectangle(canvas, wnd_rect, 0, color_gray, make_rect(pt->x, pt->y + 1, right, pt->y + 4, &rect));
+  rectangle(canvas, wnd_rect, 0, color_gray, make_rect(pt->x, pt->y + 4, pt->x + 3, pt->y + 28, &rect));
+  rectangle(canvas, wnd_rect, 0, color_gray, make_rect(right - 3, pt->y + 4, right, pt->y + 45, &rect));
+  rectangle(canvas, wnd_rect, 0, color_gray, make_rect(pt->x, pt->y + 28, right, pt->y + 31, &rect));
+  rectangle(canvas, wnd_rect, 0, color_gray, make_rect(text_start - 6, pt->y + 31, right, pt->y + 45, &rect));
 
-  rectangle(hwnd, wnd_rect, 0, color_black, make_rect(pt->x + 3, pt->y + 4, right - 3, pt->y + 28, &rect));
+  rectangle(canvas, wnd_rect, 0, color_black, make_rect(pt->x + 3, pt->y + 4, right - 3, pt->y + 28, &rect));
 
   point_t label_origin = { text_start, pt->y + 30 };
 
@@ -229,11 +230,11 @@ static void draw_annunciator(handle_t hwnd,
     pt->y + 30 + label_size.dy,
     &rect);
 
-  draw_text(hwnd, wnd_rect, wnd->small_font, color_white, color_black,
+  draw_text(canvas, wnd_rect, wnd->small_font, color_white, color_black,
     label, 0, &label_origin, &rect, 0, 0);
 
   extent_t text_size;
-  text_extent(hwnd, wnd->large_font, value, 0, &text_size);
+  text_extent(canvas, wnd->large_font, value, 0, &text_size);
 
   // center of the text is 37, 16
   point_t origin = {
@@ -243,7 +244,7 @@ static void draw_annunciator(handle_t hwnd,
 
   make_rect_pt(&origin, &text_size, &rect);
 
-  draw_text(hwnd, wnd_rect, wnd->large_font, color_white, color_hollow,
+  draw_text(canvas, wnd_rect, wnd->large_font, color_white, color_hollow,
     value, 0, &origin, &rect, 0, 0);
   }
 

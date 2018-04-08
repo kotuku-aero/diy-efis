@@ -479,8 +479,11 @@ result_t ion_run(ion_register_fn lib_funcs)
   
   // enumerate the ion keys
   memid_t ion_home;
-  if(failed(result = reg_open_key(0, ion_s, &ion_home)))
-    return result;
+  if (failed(result = reg_open_key(0, ion_s, &ion_home)))
+    {
+    if (failed(result = reg_create_key(0, ion_s, &ion_home)))
+      return result;
+    }
   
   // firstly we try to load the handler.
   // TODO: js errors to trace log?????

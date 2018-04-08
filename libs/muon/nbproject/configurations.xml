@@ -6,8 +6,8 @@
                    projectFiles="true">
       <itemPath>muon.h</itemPath>
       <itemPath>cli.h</itemPath>
-      <itemPath>cli/neutron_cli.h</itemPath>
-      <itemPath>cli/neutron_cli_impl.h</itemPath>
+      <itemPath>neutron_cli.h</itemPath>
+      <itemPath>neutron_cli_impl.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -24,13 +24,13 @@
       <itemPath>cli_token_tbl.c</itemPath>
       <itemPath>edit.c</itemPath>
       <itemPath>cli_string.c</itemPath>
-      <itemPath>cli/cansend.c</itemPath>
-      <itemPath>cli/cli_enumerations.c</itemPath>
-      <itemPath>cli/cli_publisher.c</itemPath>
-      <itemPath>cli/cli_regedit.c</itemPath>
-      <itemPath>cli/cli_script.c</itemPath>
-      <itemPath>cli/neutron_cli.c</itemPath>
-      <itemPath>cli/neutron_cli_impl.c</itemPath>
+      <itemPath>cansend.c</itemPath>
+      <itemPath>cli_enumerations.c</itemPath>
+      <itemPath>cli_regedit.c</itemPath>
+      <itemPath>cli_script.c</itemPath>
+      <itemPath>neutron_cli.c</itemPath>
+      <itemPath>neutron_cli_impl.c</itemPath>
+      <itemPath>cli_publisher.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

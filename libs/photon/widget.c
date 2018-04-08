@@ -267,7 +267,7 @@ result_t create_child_widget(handle_t parent, memid_t key, wndproc cb, handle_t 
 
   char type[REG_NAME_MAX];
   const char *prototype = 0;
-  if (succeeded(reg_get_string(key, "type", &type, 0)))
+  if (succeeded(reg_get_string(key, "type", type, 0)))
     {
     // testing hack.  Until we remove all of the native code
     //prototype = type;
@@ -555,7 +555,7 @@ result_t lookup_pen(memid_t key, pen_t *pen)
   return s_ok;
   }
 
-result_t display_roller(handle_t hwnd,
+result_t display_roller(canvas_t *canvas,
                         const rect_t *bounds,
                         uint32_t value,
                         int digits,
@@ -568,7 +568,7 @@ result_t display_roller(handle_t hwnd,
 //  const handle_t  *old_font = cv.font(&arial_12_font);
   
   extent_t size_medium;
-  text_extent(hwnd, small_font, "00", 2, &size_medium);
+  text_extent(canvas, small_font, "00", 2, &size_medium);
 
   point_t pt = {
     bounds->right - (digits == 1 ? size_medium.dx >>= 1 : size_medium.dx),
@@ -610,7 +610,7 @@ result_t display_roller(handle_t hwnd,
       else
         sprintf(str, "%02.2d", (int) minor);
 
-      draw_text(hwnd, bounds, small_font, fg_color, bg_color,
+      draw_text(canvas, bounds, small_font, fg_color, bg_color,
                 str, 0, &pt, bounds, eto_clipped, 0);
       }
 
@@ -626,14 +626,14 @@ result_t display_roller(handle_t hwnd,
   // calc the size
   //cv.font(&arial_15_font);
   extent_t large_size;
-  text_extent(hwnd, large_font, str, len, &large_size);
+  text_extent(canvas, large_font, str, len, &large_size);
 
   pt.x -= large_size.dx;
   pt.y = bounds->top;
   pt.y += (bounds->bottom - bounds->top) >> 1;
   pt.y -= large_size.dy >> 1;
 
-  draw_text(hwnd, bounds, large_font, fg_color, bg_color,
+  draw_text(canvas, bounds, large_font, fg_color, bg_color,
             str, len, &pt, bounds, eto_clipped, 0);
 
   return s_ok;

@@ -189,6 +189,9 @@ result_t bsp_canvas_create_bitmap(const bitmap_t *bitmap, canvas_t **hndl)
 
 result_t bsp_canvas_close(canvas_t *hndl)
   {
+  if (hndl == 0)
+    return e_bad_parameter;
+
   if(hndl->version != sizeof(fb_buffer_canvas_t))
     return e_invalid_handle;
 

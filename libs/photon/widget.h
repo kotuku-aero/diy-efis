@@ -51,7 +51,7 @@ extern result_t lookup_pen_style(memid_t key, const char *name, pen_style *style
 extern result_t lookup_pen(memid_t key, pen_t *pen);
 /**
  * Display a roller
- * @param hwnd      Window to paint on
+ * @param canvas    Canvas to paint on
  * @param bounds    Area for roller
  * @param value     Value, lower nn digits are displayed smaller
  * @param digits    Number of digits to draw in small font, 0 for none
@@ -59,6 +59,6 @@ extern result_t lookup_pen(memid_t key, pen_t *pen);
  * @param fg_color
  * @return 
  */
-extern result_t display_roller(handle_t hwnd, const rect_t *bounds, uint32_t value, int digits, color_t bg_color, color_t fg_color, handle_t  large_font, handle_t  small_font);
+extern result_t display_roller(canvas_t *canvas, const rect_t *bounds, uint32_t value, int digits, color_t bg_color, color_t fg_color, handle_t  large_font, handle_t  small_font);
 
 #endif

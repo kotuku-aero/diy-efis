@@ -40,6 +40,7 @@ it must be removed as soon as possible after the code fragment is identified.
 #include <setjmp.h>
 #include <string.h>
 #include <pthread.h>
+#include <time.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/time.h>
@@ -48,14 +49,16 @@ it must be removed as soon as possible after the code fragment is identified.
 #include <sys/timeb.h>
 #include <semaphore.h>
 
-#include "../../libs/neutron/neutron.h"
+#include "../neutron/neutron.h"
 
-typedef struct _semaphore_t {
+struct _semaphore_t {
   sem_t semp;
   uint32_t count;
-} semaphore_t;
+  };
 
-result_t semaphore_create(handle_t *semp)
+typedef struct _semaphore_t semaphore_t;
+
+result_t semaphore_create(semaphore_p *semp)
 	{
   semaphore_t *semaphore = (semaphore_t *)malloc(sizeof(semaphore_t));
   sem_init(&semaphore->semp, 0, 0);
@@ -65,7 +68,7 @@ result_t semaphore_create(handle_t *semp)
 	return s_ok;
 	}
 
-result_t semaphore_close(handle_t h)
+result_t semaphore_close(semaphore_p h)
 	{
   semaphore_t *sem = ((semaphore_t *)h);
   sem_destroy(&sem->semp);
@@ -74,9 +77,9 @@ result_t semaphore_close(handle_t h)
   return s_ok;
 	}
 
-__thread handle_t tls_mutex;
+__thread semaphore_p tls_mutex;
 
-handle_t bsp_thread_mutex()
+semaphore_p bsp_thread_mutex()
   {
   if(tls_mutex == 0)
     // create our thread specific handle
@@ -85,7 +88,7 @@ handle_t bsp_thread_mutex()
   return tls_mutex;
   }
 
-result_t semaphore_wait(handle_t h, uint32_t timeout_ms)
+result_t semaphore_wait(semaphore_p h, uint32_t timeout_ms)
   {
   semaphore_t *sem = ((semaphore_t *)h);
 
@@ -98,7 +101,7 @@ result_t semaphore_wait(handle_t h, uint32_t timeout_ms)
     }
 
   struct timespec ts;
-  if(clock_gettime(CLOCK_REALTIME, &ts) == -1)
+  if(clock_gettime(0, &ts) == -1)
     return false;
 
   timeout_ms += ts.tv_nsec / 1000000;
@@ -115,14 +118,14 @@ result_t semaphore_wait(handle_t h, uint32_t timeout_ms)
 uint32_t ticks()
   {
   struct timespec ts;
-  if(clock_gettime(CLOCK_REALTIME, &ts) == -1)
+  if(clock_gettime(0, &ts) == -1)
     return 0;
 
   uint32_t tick = (uint32_t)(ts.tv_nsec / 1000000);
   return tick;
   }
 
-result_t semaphore_signal(handle_t h)
+result_t semaphore_signal(semaphore_p h)
   {
   semaphore_t *sem = ((semaphore_t *)h);
   sem_post(&sem->semp);
@@ -130,7 +133,7 @@ result_t semaphore_signal(handle_t h)
   return s_ok;
   }
 
-result_t has_wait_tasks(handle_t hndl)
+result_t has_wait_tasks(semaphore_p hndl)
   {
   semaphore_t *sem = ((semaphore_t *)hndl);
 
@@ -244,12 +247,50 @@ result_t scheduler_init()
   return s_ok;
   }
 
-// this is the main thread loop.  We just block.
-void neutron_run()
+void *neutron_malloc(size_t len)
   {
-  handle_t semp;
-  semaphore_create(&semp);
-  semaphore_wait(semp, INDEFINITE_WAIT);                // and block indefinately
+  return malloc(len);
+  }
+
+void neutron_free(void *mem)
+  {
+  return free(mem);
+  }
+
+void *neutron_realloc(void *mem, size_t len)
+  {
+  return realloc(mem, len);
+  }
+
+char *neutron_strdup(const char *str)
+  {
+  return strdup(str);
+  }
+
+void yield()
+  {
+
+  }
+
+// this is the main thread loop.  we pass control to the startup worker process if
+// is passed in
+void neutron_run(void *heap,
+  size_t length,
+  const char *name,
+  uint16_t stack_size,
+  task_callback callback,
+  void *parg,
+  uint8_t priority,
+  task_p *task)
+  {
+  if (callback != 0)
+    (*callback)(parg);
+  else
+    {
+    semaphore_p semp;
+    semaphore_create(&semp);
+    semaphore_wait(semp, INDEFINITE_WAIT);                // and block indefinately
+    }
   }
 
  result_t task_create(const char *name,
@@ -257,7 +298,7 @@ void neutron_run()
                            task_callback pfn,
                            void *param,
                            uint8_t priority,
-                           handle_t *task)
+   task_p *task)
   {
   thread_handle_t *thread = (thread_handle_t *) malloc(sizeof(thread_handle_t));
   if(thread == 0)
@@ -267,64 +308,66 @@ void neutron_run()
 
   task_resume(thread);
 
-  *task = thread;
+  if(task != 0)
+    *task = thread;
+
   return s_ok;
   }
 
-result_t set_task_priority(handle_t h, uint8_t p)
+result_t set_task_priority(task_p h, uint8_t p)
   {
   thread_handle_set_priority(((thread_handle_t *)h), p);
 
   return s_ok;
   }
 
-result_t get_task_priority(handle_t h, uint8_t *p)
+result_t get_task_priority(task_p h, uint8_t *p)
   {
   *p = thread_handle_get_priority(((thread_handle_t *)h));
 
   return s_ok;
   }
 
-result_t close_task(handle_t h)
+result_t close_task(task_p h)
   {
   destroy_thread_handle((thread_handle_t *)h);
 
   return s_ok;
   }
 
-result_t task_suspend(handle_t h)
+result_t task_suspend(task_p h)
   {
   thread_handle_suspend(((thread_handle_t *)h));
 
   return s_ok;
   }
 
-result_t task_resume(handle_t h)
+result_t task_resume(task_p h)
   {
   thread_handle_resume(((thread_handle_t *)h));
 
   return s_ok;
   }
 
-result_t task_sleep(unsigned long n)
+result_t task_sleep(uint32_t n)
   {
   usleep(n * 1000);
 
   return s_ok;
   }
 
-result_t task_close(handle_t h)
+result_t task_close(semaphore_p h)
   {
   destroy_thread_handle((thread_handle_t *)h);
 
   return s_ok;
   }
 
-void thread_terminate(handle_t h, unsigned long term_code)
+void thread_terminate(semaphore_p h, unsigned long term_code)
   {
   }
 
-unsigned int thread_current_id(handle_t h)
+unsigned int thread_current_id(semaphore_p h)
   {
   return thread_handle_thread_id(((thread_handle_t *)h));
   }

@@ -105,7 +105,7 @@ static result_t verify_slcan(handle_t hndl)
   return s_ok;
   }
 
-result_t slcan_create(memid_t key, handle_t msg_rx_queue, comm_device_p *hndl)
+result_t slcan_create(memid_t key, deque_p msg_rx_queue, comm_device_p *hndl)
   {
   result_t result;
   int i;

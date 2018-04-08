@@ -47,13 +47,6 @@ it must be removed as soon as possible after the code fragment is identified.
 #define CTRL_N (14)
 #define CTRL_P (16)
 
-/*
- * This code will create a channel when called initially.
- */
-
-// allow for up to 4 concurrent channels
-#define MAX_CHANNELS  4
-
 // this should be defined externally in the main program
 extern cli_node_t cli_root;
 // name of the node.  Is a friendly name rather than an id
@@ -86,75 +79,11 @@ typedef struct _service_channel_t
   uint8_t message_code;
   } service_channel_t;
 
-static service_channel_t *channels[MAX_CHANNELS];
-
-static service_channel_t *open_channel(uint16_t can_id)
-  {
-  uint16_t i;
-  for (i = 0; i < MAX_CHANNELS; i++)
-    {
-    if (channels[i] != 0 &&
-        channels[i]->can_id == can_id)
-      return channels[i];
-    }
-
-  return 0;
-  }
-
-void close_channel(uint16_t can_id)
-  {
-  uint16_t i;
-  for (i = 0; i < MAX_CHANNELS; i++)
-    {
-    if (channels[i]->channel_number == can_id)
-      break;
-    }
-
-  if (i == MAX_CHANNELS)
-    return;
-  //
-  canmsg_t nak_msg;
-  memset(&nak_msg, 0, sizeof (canmsg_t));
-
-  // set reply channel
-  nak_msg.id = can_id + 1;
-  nak_msg.length = 4; // close message length is 4
-  nak_msg.canas.data_type = CANAS_DATATYPE_NODATA;
-  nak_msg.canas.service_code = id_ccs_service;
-  nak_msg.canas.message_code = CHANNEL_CLOSE; // close message
-  can_send_reply(&nak_msg);
-
-  // TODO: free other memory.
-  // now we free the channel
-  channels[i]->parser.done = 1;
-  
-  deque_close(channels[i]->queue);
-  channels[i]->queue = 0;
-  }
-
-static result_t get_channel(stream_handle_t *stream, uint16_t *channel)
-  {
-  if(stream == 0 || 
-     channel == 0 ||
-     stream->version != sizeof(service_channel_t))
-    return e_bad_parameter;
-  
-  service_channel_t *sc = (service_channel_t *)stream;
-  *channel = sc->can_id;
-  
-  return s_ok;
-  }
+service_channel_t channel;
 
 static result_t css_stream_eof(stream_handle_t *hndl)
   {
-  result_t result;
-  uint16_t can_id;
-  if(failed(result = get_channel(hndl, &can_id)))
-    return result;
-  
-  service_channel_t *channel = (service_channel_t *)hndl;
-  
-  return channel->queue == 0 ? s_ok : s_false;
+  return channel.queue == 0 ? s_ok : s_false;
   }
 
 static result_t css_stream_read(stream_handle_t *hndl, void *buffer, uint16_t size, uint16_t *read)
@@ -163,11 +92,6 @@ static result_t css_stream_read(stream_handle_t *hndl, void *buffer, uint16_t si
     return e_bad_parameter;
   
   result_t result;
-  uint16_t can_id;
-  if(failed(result = get_channel(hndl, &can_id)))
-    return result;
-  
-  service_channel_t *channel = (service_channel_t *)hndl;
   
   if(read != 0)
     *read = 0;
@@ -177,7 +101,7 @@ static result_t css_stream_read(stream_handle_t *hndl, void *buffer, uint16_t si
   while(size--)
     {
     // get the char
-    if(failed(result = pop_front(channel->queue, buffer, INDEFINITE_WAIT)))
+    if(failed(result = pop_front(channel.queue, buffer, INDEFINITE_WAIT)))
       return result;
     
     if(*str == '\r')
@@ -197,14 +121,8 @@ static result_t css_stream_write(stream_handle_t *hndl, const void *buffer, uint
   if(hndl == 0 || buffer == 0 || size == 0)
     return e_bad_parameter;
   
-  result_t result;
-  uint16_t can_id;
-  if(failed(result = get_channel(hndl, &can_id)))
-    return result;
-  
-  service_channel_t *channel = (service_channel_t *)hndl;
   canmsg_t msg;
-  msg.id = channel->can_id + 1;
+  msg.id = channel.can_id + 1;
   msg.canas.node_id = node_id;
   msg.canas.service_code = id_ccs_service;
   
@@ -255,133 +173,65 @@ static result_t css_stream_write(stream_handle_t *hndl, const void *buffer, uint
 
 static result_t css_stream_close(stream_handle_t *hndl)
   {
-  result_t result;
-  uint16_t can_id;
-  if(failed(result = get_channel(hndl, &can_id)))
-    return result;
-  
-  service_channel_t *channel = (service_channel_t *)hndl;
-  close_channel(channel->can_id);
-  
-  // make sure any in-mem ptrs gone.
-  memset(channel, 0, sizeof(service_channel_t));
-  
-  neutron_free(channel);
-  
+  // flag we are closed
+  channel.can_id = 0;
+
   return s_ok;
   }
 
 
 static void parser_worker(void *parg)
   {
-  service_channel_t *channel = (service_channel_t *) parg;
+  while(true)
+    {
+    // run the CLI waiting for messages
+    cli_run(&channel.parser);
 
-  cli_run(&channel->parser);
-  
-  // clean ourselves up
-  handle_t us = channel->worker;
-  
-  if(channel->queue != 0)
-    deque_close(channel->queue);
-    
-  channels[channel->can_id] = 0;
-  neutron_free(channel);
-  
-  close_task(us);
+
+    // flag the worker is closed
+    canmsg_t msg;
+    msg.id = channel.can_id + 1;
+    msg.canas.node_id = node_id;
+    msg.canas.service_code = id_ccs_service;
+    msg.canas.data_type = CANAS_DATATYPE_NODATA;
+    msg.canas.message_code = CHANNEL_CLOSE;
+
+    can_send_reply(&msg);
+    }
   }
 
-#define RX_BUFFER_SIZE 128
+#define RX_BUFFER_SIZE 2048
 
-void create_channel(const canmsg_t *msg, cli_node_t *app_cli_root)
+bool process_ccs(const canmsg_t *msg, void *parg)
   {
-  uint16_t i;
   canmsg_t reply_msg;
   memset(&reply_msg, 0, sizeof (canmsg_t));
   reply_msg.id = msg->id + 1; // send on the reply channel
   reply_msg.canas.data_type = CANAS_DATATYPE_NODATA;
   reply_msg.canas.service_code = id_ccs_service;
   reply_msg.length = 4;
-
-  for (i = 0; i < MAX_CHANNELS; i++)
+  reply_msg.canas.message_code = PARSER_OK;
+  
+  if(channel.can_id == 0)       // open the channel
     {
-    if (channels[i] == 0)
-      break;
+    channel.can_id = msg->id;       // assign the service channel to our console
+
+    // flag the worker is ok
+    can_send_reply(&reply_msg);
+    return true;
     }
 
-  if (i >= MAX_CHANNELS)
+  // if another device has the channel then we reject messages
+  if(channel.can_id != msg->id)
     {
     // reply to the message
     reply_msg.canas.node_id = node_id;
     reply_msg.canas.message_code = NO_CHANNELS; // flag the message code won't work
     can_send_reply(&reply_msg);
-    return;
-    }
-
-  // we have a channels so create one.
-  service_channel_t *channel = (service_channel_t *) neutron_malloc(sizeof (service_channel_t));
-  memset(channel, 0, sizeof (service_channel_t));
-  
-  channel->stream.version = sizeof(service_channel_t);
-  channel->stream.stream_eof = css_stream_eof;
-  channel->stream.stream_read = css_stream_read;
-  channel->stream.stream_write = css_stream_write;
-  channel->stream.stream_close = css_stream_close;
-
-  channel->can_id = msg->id;
-
-  channel->parser.cfg.root = app_cli_root;
-  channel->parser.cfg.ch_complete = '\t';
-  channel->parser.cfg.ch_erase = '\b';
-  channel->parser.cfg.ch_del = 127;
-  channel->parser.cfg.ch_help = '?';
-  channel->parser.cfg.flags = 0;
-  channel->parser.cfg.prompt = node_name;
-
-  channel->parser.cfg.console_in = &channel->stream;
-  channel->parser.cfg.console_out = &channel->stream;
-  channel->parser.cfg.console_err = &channel->stream;
-  
-  deque_create(sizeof(char), RX_BUFFER_SIZE, &channel->queue);
-
-  if (s_ok != cli_init(&channel->parser.cfg, &channel->parser))
-    {
-    // reply to the message
-    reply_msg.canas.message_code = BAD_INIT; // flag the message code won't work
-    can_send_reply(&reply_msg);
-
-    neutron_free(channel);
-    return;
-    }
-
-  // the channel is open.  create a task.
-  if (failed(task_create("CLI", DEFAULT_STACK_SIZE * 4, parser_worker, channel, NORMAL_PRIORITY-1, &channel->worker)))
-    {
-    // reply to the message
-    reply_msg.canas.message_code = NO_WORKER;
-    can_send_reply(&reply_msg);
-
-    neutron_free(channel);
-    return;
-    }
-
-  channels[i] = channel;
-
-  // flag the worker is ok
-  reply_msg.canas.message_code = PARSER_OK;
-  can_send_reply(&reply_msg);
-  }
-
-bool process_ccs(const canmsg_t *msg, void *parg)
-  {
-  // decide how to create 
-  // find the channel
-  service_channel_t *channel = open_channel(msg->id);
-  if(channel == 0)
-    {
-    // open a channel if possible
-    create_channel(msg, (cli_node_t *)parg);
     return true;
     }
+  
+  // TODO: deadman timer....
 
   if(msg->canas.data_type != CANAS_DATATYPE_NODATA)
     {
@@ -389,33 +239,27 @@ bool process_ccs(const canmsg_t *msg, void *parg)
     switch(msg->canas.data_type)
       {
       case CANAS_DATATYPE_CHAR :
-        push_back(channel->queue, &msg->canas.data[0], 0);
+        push_back(channel.queue, &msg->canas.data[0], INDEFINITE_WAIT);
         break;
       case CANAS_DATATYPE_CHAR2 :
-        push_back(channel->queue, &msg->canas.data[0], 0);
-        push_back(channel->queue, &msg->canas.data[1], 0);
+        push_back(channel.queue, &msg->canas.data[0], INDEFINITE_WAIT);
+        push_back(channel.queue, &msg->canas.data[1], INDEFINITE_WAIT);
         break;
       case CANAS_DATATYPE_CHAR3 :
-        push_back(channel->queue, &msg->canas.data[0], 0);
-        push_back(channel->queue, &msg->canas.data[1], 0);
-        push_back(channel->queue, &msg->canas.data[2], 0);
+        push_back(channel.queue, &msg->canas.data[0], INDEFINITE_WAIT);
+        push_back(channel.queue, &msg->canas.data[1], INDEFINITE_WAIT);
+        push_back(channel.queue, &msg->canas.data[2], INDEFINITE_WAIT);
         break;
       case CANAS_DATATYPE_CHAR4 :
-        push_back(channel->queue, &msg->canas.data[0], 0);
-        push_back(channel->queue, &msg->canas.data[1], 0);
-        push_back(channel->queue, &msg->canas.data[2], 0);
-        push_back(channel->queue, &msg->canas.data[3], 0);
+        push_back(channel.queue, &msg->canas.data[0], INDEFINITE_WAIT);
+        push_back(channel.queue, &msg->canas.data[1], INDEFINITE_WAIT);
+        push_back(channel.queue, &msg->canas.data[2], INDEFINITE_WAIT);
+        push_back(channel.queue, &msg->canas.data[3], INDEFINITE_WAIT);
         break;
       }
     }
   
-  // send ak
-  canmsg_t reply_msg;
-  reply_msg.id = msg->id + 1;
-  reply_msg.length = 4;
-  reply_msg.canas.data_type = CANAS_DATATYPE_NODATA;
-  reply_msg.canas.node_id = node_id;
-  reply_msg.canas.service_code = id_ccs_service;
+  // send ack
   reply_msg.canas.message_code = PARSER_OK;
   can_send_reply(&reply_msg);
   
@@ -426,6 +270,36 @@ static msg_hook_t service_hook = { 0, 0, process_ccs, 0 };
 
 result_t muon_initialize_cli(cli_node_t *cli_root)
   {
-  service_hook.parg = cli_root;
+  result_t result;
+  channel.stream.version = sizeof(service_channel_t);
+  channel.stream.stream_eof = css_stream_eof;
+  channel.stream.stream_read = css_stream_read;
+  channel.stream.stream_write = css_stream_write;
+  channel.stream.stream_close = css_stream_close;
+
+  channel.can_id = 0;
+
+  channel.parser.cfg.root = cli_root;
+  channel.parser.cfg.ch_complete = '\t';
+  channel.parser.cfg.ch_erase = '\b';
+  channel.parser.cfg.ch_del = 127;
+  channel.parser.cfg.ch_help = '?';
+  channel.parser.cfg.flags = 0;
+  channel.parser.cfg.prompt = node_name;
+
+  channel.parser.cfg.console_in = &channel.stream;
+  channel.parser.cfg.console_out = &channel.stream;
+  channel.parser.cfg.console_err = &channel.stream;
+  
+  deque_create(sizeof(char), RX_BUFFER_SIZE, &channel.queue);
+
+  if (failed(result = cli_init(&channel.parser.cfg, &channel.parser)))
+    return result;
+
+  // the channel is open.  create a task.
+  if (failed(result = task_create("CLI", DEFAULT_STACK_SIZE * 2, parser_worker, 
+                         0, NORMAL_PRIORITY-1, &channel.worker)))
+    return result;
+
   return register_service(id_ccs_service, &service_hook);
   }

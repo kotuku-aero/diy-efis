@@ -328,7 +328,8 @@ static result_t set_offset(handle_t hwnd, const variant_t *value)
 
 static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
-  begin_paint(hwnd);
+  canvas_t *canvas;
+  begin_paint(hwnd, &canvas);
 
   airspeed_window_t *wnd = (airspeed_window_t *) proxy->parg;
 
@@ -340,7 +341,7 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
   
   rect_t rect;
 
-  rectangle(hwnd, &wnd_rect, 0, wnd->background_color,  make_rect(8, 8, ex.dx-9, ex.dy-8, &rect));
+  rectangle(canvas, &wnd_rect, 0, wnd->background_color,  make_rect(8, 8, ex.dx-9, ex.dy-8, &rect));
 
   gdi_dim_t median = ex.dy >> 1;
 
@@ -363,7 +364,7 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
       { width-13, marker_line }
       };
 
-    polyline(hwnd, &wnd_rect, &wnd->pen, 2, pts);
+    polyline(canvas, &wnd_rect, &wnd->pen, 2, pts);
 
     if(asi_line ==((asi_line / 100) * 100))
       {
@@ -372,10 +373,10 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
 
       uint16_t len = strlen(str);
       extent_t size;
-      text_extent(hwnd, wnd->font, str, len, &size);
+      text_extent(canvas, wnd->font, str, len, &size);
       point_t pt;
 
-      draw_text(hwnd, &wnd_rect, wnd->font, wnd->text_color, wnd->background_color,
+      draw_text(canvas, &wnd_rect, wnd->font, wnd->text_color, wnd->background_color,
                 str, len, make_point(width-20 - size.dx, marker_line -(size.dy >> 1), &pt),
                 0, 0, 0);
       }
@@ -405,29 +406,29 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
 
   // draw vne exceeded
   if(vne_pixels >= 8)
-    rectangle(hwnd, &wnd_rect, 0, color_red, make_rect(bar2, 8, bar2+4, min((gdi_dim_t)ex.dy-8, vne_pixels), &rect));
+    rectangle(canvas, &wnd_rect, 0, color_red, make_rect(bar2, 8, bar2+4, min((gdi_dim_t)ex.dy-8, vne_pixels), &rect));
 
   // draw vne->vno
   if(vno_pixels >= (gdi_dim_t)8 && vne_pixels < (gdi_dim_t)ex.dy-8)
-    rectangle(hwnd, &wnd_rect, 0, color_yellow,
+    rectangle(canvas, &wnd_rect, 0, color_yellow,
               make_rect(bar2, max((gdi_dim_t)8, vne_pixels), bar2+4,
                         min((gdi_dim_t)ex.dy-8, vno_pixels), &rect));
 
   // draw vno->vs1
   if(vs1_pixels >= 8 && vno_pixels < 232)
-    rectangle(hwnd, &wnd_rect, 0, color_green,
+    rectangle(canvas, &wnd_rect, 0, color_green,
               make_rect(bar2, max((gdi_dim_t)8, vno_pixels),
                         bar2+4, min((gdi_dim_t)ex.dy-8, vs1_pixels), &rect));
 
   // draw vfe->vs0
   if(vs0_pixels >= 8 && vfe_pixels < 232)
-    rectangle(hwnd, &wnd_rect, 0, color_white,
+    rectangle(canvas, &wnd_rect, 0, color_white,
               make_rect(bar1, max((gdi_dim_t)8, vfe_pixels),
                         bar1+4, min((gdi_dim_t)ex.dy-8, vs0_pixels), &rect));
 
   // draw vy -> vx
   if(vx_pixels >= 8 && vy_pixels < 232)
-    rectangle(hwnd, &wnd_rect, 0, color_blue,
+    rectangle(canvas, &wnd_rect, 0, color_blue,
               make_rect(bar0, max((gdi_dim_t)8, vy_pixels), bar0 + 4,
                         min((gdi_dim_t)ex.dy-8, vx_pixels), &rect));
 
@@ -444,10 +445,10 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
         { width - 13,  median }
     };
 
-  polygon(hwnd, &wnd_rect, &white_pen, color_black, 8, roller);
+  polygon(canvas, &wnd_rect, &white_pen, color_black, 8, roller);
 
   // now we draw the roller
-  display_roller(hwnd, make_rect(1, median - 19, width - 20, median + 19, &rect),
+  display_roller(canvas, make_rect(1, median - 19, width - 20, median + 19, &rect),
     wnd->airspeed, 1, color_black, color_white,
     wnd->large_roller, wnd->small_roller);
 

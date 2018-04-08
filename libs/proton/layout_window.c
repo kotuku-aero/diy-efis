@@ -1773,18 +1773,27 @@ result_t load_layout(handle_t parent, memid_t hive)
 
     if (succeeded(reg_get_int16(menu, "menu-start-y", &value)))
       wnd->menu_start_y = value;
-      }
+    }
 
   wnd->key = menu;
 
   char menu_name[REG_STRING_MAX];
 
-  if (succeeded(reg_get_string(menu, "root-keys", menu_name, 0)))
+  if (succeeded(reg_get_string(hive, "root-keys", menu_name, 0)))
     {
     find_keys(wnd, menu_name, &wnd->root_keys);
     wnd->active_keys = wnd->root_keys;
     wnd->menu_timer = 0;
     }
+
+  /*
+  if (succeeded(reg_get_string(hive, "root-menu", menu_name, 0)))
+    {
+    find_menu(wnd, menu_name, &wnd->);
+    wnd->active_keys = wnd->root_keys;
+    wnd->menu_timer = 0;
+    }
+    */
 
   if (failed(lookup_color(menu, "bk-color", &wnd->background_color)))
     wnd->background_color = color_black;

@@ -649,30 +649,6 @@ result_t unsubscribe(msg_hook_t *handler)
   return s_ok;
   }
 
-static uint8_t ids_reply[4];
-
-static bool publish_ids(const canmsg_t *service_msg, void *parg)
-  {
-  
-  // we only accept a publish ids if the addressed node id is 0 or the node if
-  if(service_msg->canas.node_id == 0 ||
-     service_msg->canas.node_id == node_id)
-    {
-    canmsg_t msg;
-
-    ids_reply[0] = hardware_revision;
-    ids_reply[1] = software_revision;
-
-    can_send(create_can_msg_uint8_4(&msg, service_msg->id + 1, 0,
-                                    ids_reply[0], ids_reply[1],
-                                    ids_reply[2], ids_reply[3]));
-    
-    return true;
-    }
-  
-  return false;
-  }
-
 static canmsg_t rx_msg;
 
 static msg_hook_t *services[num_services];
@@ -787,9 +763,7 @@ void can_rx_task(void *parg)
     }
   }
 
-extern result_t neutron_init(const neutron_parameters_t *params, bool init_mode, bool create_worker);
-
-result_t can_aerospace_init(const neutron_parameters_t *params, bool init_mode, bool create_publish_task)
+result_t can_aerospace_init(const neutron_parameters_t *params, bool create_publish_task)
   {
   task_p task_handle;
   result_t result;
@@ -818,29 +792,23 @@ result_t can_aerospace_init(const neutron_parameters_t *params, bool init_mode, 
     return result;
     }
 
-  if (failed(result = task_create("CAN_TX",
-    params->tx_stack_length,
-    can_tx_task, 0,
-    NORMAL_PRIORITY, &task_handle)))
+  if (failed(result = task_create("CAN_TX", params->tx_stack_length, can_tx_task, 0, NORMAL_PRIORITY, &task_handle)))
     {
     trace_error("Cannot create the can_tx task");
     return result;
     }
 
-  if (failed(result = task_create("CAN_RX",
-    params->rx_stack_length,
-    can_rx_task, 0,
-    NORMAL_PRIORITY + 1, &task_handle)))
+  if (failed(result = task_create("CAN_RX", params->rx_stack_length, can_rx_task, 0, NORMAL_PRIORITY + 1, &task_handle)))
     {
     trace_error("Cannot create the can_rx task");
     return result;
     }
   
-  if(failed(result = neutron_init(params, init_mode, create_publish_task)))
+  if(failed(result = neutron_init(params, create_publish_task)))
     return result;
 
   // start the can driver running.
-  return bsp_can_init(can_rx_queue);
+  return bsp_can_init(can_rx_queue, params->bitrate);
   }
 
 void send_param_float(float value, uint16_t id)

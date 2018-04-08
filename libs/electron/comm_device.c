@@ -42,7 +42,7 @@ it must be removed as soon as possible after the code fragment is identified.
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../libs/neutron/neutron.h"
+#include "../neutron/neutron.h"
 
 typedef struct _comm_rx_buffer_t {
   uint16_t version;           // reserved
@@ -52,13 +52,13 @@ typedef struct _comm_rx_buffer_t {
 
 typedef struct _comm_device_t {
   size_t version;
-  handle_t tx_ready;
-  handle_t rx_ready;
-  handle_t event_handler;
+  semaphore_p tx_ready;
+  semaphore_p rx_ready;
+  semaphore_p event_handler;
   int hndl;
 } comm_device_t;
 
-static result_t check_handle(handle_t hndl)
+static result_t check_handle(semaphore_p hndl)
   {
   if(hndl == 0 || ((comm_device_t *)hndl)->version != sizeof(comm_device_t))
     return e_bad_handle;
@@ -66,7 +66,10 @@ static result_t check_handle(handle_t hndl)
   return s_ok;
   }
 
-result_t comm_create_device(memid_t key, handle_t *device)
+const char *serial_device_s = "device";
+const char *baud_rate_s = "baud-rate";
+
+result_t comm_create_device(memid_t key, comm_device_p *device)
   {
   if(device == 0 || key == 0)
     return e_bad_parameter;
@@ -80,12 +83,12 @@ result_t comm_create_device(memid_t key, handle_t *device)
   char driver[REG_STRING_MAX+1];
   uint16_t len = REG_STRING_MAX +1;
 
-  if(failed(result = reg_get_string(key, "device", driver, &len)))
+  if(failed(result = reg_get_string(key, serial_device_s, driver, &len)))
     return result;
 
   // MUST be defined.
   uint32_t baud_rate;
-  if(failed(result = reg_get_uint32(key, "baud-rate", &baud_rate)))
+  if(failed(result = reg_get_uint32(key, baud_rate_s, &baud_rate)))
     return result;
 
   memset(dev, 0, sizeof(comm_device_t));
@@ -108,13 +111,10 @@ result_t comm_create_device(memid_t key, handle_t *device)
   return comm_ioctl(dev, set_device_ctl, &ioctl, sizeof(comms_state_ioctl_t), 0, 0, 0);
   }
 
-result_t comm_close_device(handle_t hndl)
+result_t comm_close_device(comm_device_p device)
   {
   result_t result;
-  if(failed(result = check_handle(hndl)))
-    return result;
 
-  comm_device_t *device = (comm_device_t *)hndl;
   close(device->hndl);
   semaphore_close(device->rx_ready);
   semaphore_close(device->tx_ready);
@@ -123,13 +123,9 @@ result_t comm_close_device(handle_t hndl)
 
   }
 
-result_t comm_write(handle_t hndl, const byte_t *data, uint16_t len, uint32_t timeout)
+result_t comm_write(comm_device_p device, const byte_t *data, uint16_t len, uint32_t timeout)
   {
   result_t result;
-  if(failed(result = check_handle(hndl)))
-    return result;
-
-  comm_device_t *device = (comm_device_t *)hndl;
 
   int xfer_length;
 
@@ -143,13 +139,9 @@ result_t comm_write(handle_t hndl, const byte_t *data, uint16_t len, uint32_t ti
   return s_ok;
   }
 
-result_t comm_read(handle_t hndl, byte_t *data, uint16_t len, uint16_t *bytes_read, uint32_t timeout)
+result_t comm_read(comm_device_p device, byte_t *data, uint16_t len, uint16_t *bytes_read, uint32_t timeout)
   {
   result_t result;
-  if(failed(result = check_handle(hndl)))
-    return result;
-
-  comm_device_t *device = (comm_device_t *)hndl;
 
   int xfer_length;
 
@@ -172,15 +164,11 @@ result_t comm_read(handle_t hndl, byte_t *data, uint16_t len, uint16_t *bytes_re
   return s_ok;
   }
 
-result_t comm_ioctl(handle_t hndl, ioctl_type type, const void *in_buffer,
+result_t comm_ioctl(comm_device_p device, ioctl_type type, const void *in_buffer,
     uint16_t in_buffer_size, void *out_buffer, uint16_t out_buffer_size,
                uint16_t *size_returned)
   {
   result_t result;
-  if(failed(result = check_handle(hndl)))
-    return result;
-
-  comm_device_t *device = (comm_device_t *)hndl;
 
   const comms_ioctl_t *comms_ioctl = (const comms_ioctl_t *)in_buffer;
 
@@ -341,7 +329,7 @@ result_t comm_ioctl(handle_t hndl, ioctl_type type, const void *in_buffer,
         tio.c_cflag |= CLOCAL;
         break;
       case rts_control_enabled:
-        tio.c_cflag |= CRTSCTS;
+//        tio.c_cflag |= CRTSCTS;
         break;
       case rts_control_handshake:
 //          tio.fRtsControl = RTS_CONTROL_HANDSHAKE;

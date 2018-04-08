@@ -201,8 +201,6 @@ typedef result_t (*setter_fn)(handle_t hwnd, const variant_t *value);
 */
 extern result_t add_property(handle_t hwnd, const char *property_name, getter_fn getter, setter_fn setter, field_datatype dt);
 
-extern result_t get_canvas(handle_t hwnd, canvas_t **canvas);
-
 extern result_t get_handle(duk_context *ctx, duk_int_t obj_idx, handle_t *phwnd);
 
 #ifdef __cplusplus

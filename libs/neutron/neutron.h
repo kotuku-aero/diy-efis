@@ -929,6 +929,79 @@ extern result_t subscribe(msg_hook_t *handler);
  * @return s_ok if the handler can be removed
  */
 extern result_t unsubscribe(msg_hook_t *handler);
+/**
+* @function publish_float(uint16_t id, float value)
+* Update the datapoint with a float value
+* @param id        Can ID to publish
+* @param value     value to publish
+* @return  s_ok if the datapoint is registered with the publisher
+*/
+extern result_t publish_float(uint16_t id, float value);
+/**
+* @function publish_int8(uint16_t id, const int8_t *value, uint16_t len)
+* Update the datapoint with a series of 8 bit integers
+* @param id        Can ID to publish
+* @param value     values to publish
+* @param len       number to publish (1..4)
+* @return  s_ok if the datapoint is registered with the publisher
+*/
+extern result_t publish_int8(uint16_t id, const int8_t *value, uint16_t len);
+/**
+* @function publish_uint8(uint16_t id, const uint8_t *value, uint16_t len)
+* Update the datapoint with a series of 8 bit unsigned integers
+* @param id        Can ID to publish
+* @param value     values to publish
+* @param len       number to publish (1..4)
+* @return  s_ok if the datapoint is registered with the publisher
+*/
+extern result_t publish_uint8(uint16_t id, const uint8_t *value, uint16_t len);
+/**
+* @function publish_int16(uint16_t id, const int16_t *value, uint16_t len)
+* Update the datapoint with a series of 16 bit integers
+* @param id        Can ID to publish
+* @param value     values to publish
+* @param len       number to publish (1..2)
+* @return  s_ok if the datapoint is registered with the publisher
+*/
+extern result_t publish_int16(uint16_t id, const int16_t *value, uint16_t len);
+/**
+* @function publish_uint16(uint16_t id, const uint16_t *value, uint16_t len)
+* Update the datapoint with a series of 16 bit unsigned integers
+* @param id        Can ID to publish
+* @param value     values to publish
+* @param len       number to publish (1..2)
+* @return  s_ok if the datapoint is registered with the publisher
+*/
+extern result_t publish_uint16(uint16_t id, const uint16_t *value, uint16_t len);
+/**
+* @function publish_int32(uint16_t id, int32_t value)
+* Update the datapoint with a 32bit value
+* @param id        Can ID to publish
+* @param value     values to publish
+* @return  s_ok if the datapoint is registered with the publisher
+*/
+extern result_t publish_int32(uint16_t id, int32_t value);
+/**
+* @function publish_uint32(uint16_t id, uint32_t value)
+* Update the datapoint with a 32bit value
+* @param id        Can ID to publish
+* @param value     values to publish
+* @return  s_ok if the datapoint is registered with the publisher
+*/
+extern result_t publish_uint32(uint16_t id, uint32_t value);
+
+/**
+* @function define_datapoint(uint16_t can_id, uint16_t rate, uint16_t type, uint16_t boxcar_length, bool loopback, bool publish)
+* Utility function to create a published datapoint.  Primarily used by embedded devices to quickly set
+* up the registry to publish simple data.
+* @param can_id      Id to publish.
+* @param rate        Milli-seconds between published data
+* @param loopback    True if the datapoint is also published internally
+* @param publish     True if the datapoint is published to the can-bus
+* @return s_ok if the datapoint is published.
+* @remark If the datapoint can be created, the publisher is notified immediately of the new datapoint
+*/
+extern result_t publish_datapoint(uint16_t can_id, uint16_t rate, bool loopback, bool publish);
 
 #define numelements(a) (sizeof(a) / sizeof(a[0]))
 
@@ -1023,7 +1096,7 @@ extern result_t semaphore_wait(semaphore_p semaphore, uint32_t ticks);
 #define MAX_PRIORITY 15
 
 #define IDLE_STACK_SIZE 128
-#define DEFAULT_STACK_SIZE 256
+#define DEFAULT_STACK_SIZE 384
 
 struct _task_t;
 typedef struct _task_t *task_p;
@@ -1409,6 +1482,13 @@ extern result_t pop_front(deque_p deque, void *item, uint32_t max_wait);
  * @return s_ok if a valid deque
  */
 extern result_t capacity(deque_p deque, uint16_t *value);
+/**
+ * @function result_t reset(deque_p deque)
+ * Reset the contents of the queue
+ * @param deque Queue to empty
+ * #return s_ok if a valid queue
+ */
+extern result_t reset(deque_p deque);
 
 ///////////////////////////////////////////////////////////////////////////////
 //

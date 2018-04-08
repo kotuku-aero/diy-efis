@@ -43,15 +43,25 @@ it must be removed as soon as possible after the code fragment is identified.
 #ifndef ELECTRON_H_
 #define ELECTRON_H_
 
-#include "../../libs/neutron/bsp.h"
+#include "../neutron/bsp.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern result_t electron_init(const char *reg_path, bool factory_reset);
+// initialize the run-time subsystem.  Return e_exists if not a
+// factory reset, e_not_found if no registry found, s_false to exit
+extern result_t electron_init(int argc, char **argv);
 
 extern result_t create_root_screen(gdi_dim_t x, gdi_dim_t y, const char *device, int display_mode);
+
+// these are the minimum settings for electron.
+extern const char *screen_x_s;
+extern const char *screen_y_s;
+extern const char *framebuffer_device_s;
+extern char *txrdy_int_s;
+extern char *rxrdy_int_s;
+extern char *i2c_device_s;
 
 #ifdef __cplusplus
 }

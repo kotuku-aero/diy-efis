@@ -63,37 +63,254 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
+    <ClCompile Include="..\..\..\libs\electron\comm_device.c" />
+    <ClCompile Include="..\..\..\libs\electron\console.c" />
+    <ClCompile Include="..\..\..\libs\electron\deque.c" />
+    <ClCompile Include="..\..\..\libs\electron\fb.c" />
+    <ClCompile Include="..\..\..\libs\electron\i2c.c" />
+    <ClCompile Include="..\..\..\libs\electron\init.c" />
+    <ClCompile Include="..\..\..\libs\electron\tasks.c" />
+    <ClCompile Include="..\..\..\libs\ion\duktape.c" />
+    <ClCompile Include="..\..\..\libs\ion\ion_cli_impl.c" />
+    <ClCompile Include="..\..\..\libs\ion\ion_interactive.c" />
+    <ClCompile Include="..\..\..\libs\ion\ion_lib.c" />
+    <ClCompile Include="..\..\..\libs\ion\ion_runner.c" />
+    <ClCompile Include="..\..\..\libs\muon\cansend.c">
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\muon\cli.c">
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\muon\cli_enumerations.c">
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\muon\cli_fsm.c">
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\muon\cli_io_nuetron.c">
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\muon\cli_line.c">
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\muon\cli_publisher.c">
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\muon\cli_regedit.c">
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\muon\cli_script.c">
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\muon\cli_string.c">
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\muon\cli_token.c">
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\muon\cli_token_tbl.c">
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\muon\edit.c">
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\muon\neutron_cli_impl.c">
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\neutron\can_aerospace.c" />
+    <ClCompile Include="..\..\..\libs\neutron\decompress.c" />
+    <ClCompile Include="..\..\..\libs\neutron\manifest.c" />
+    <ClCompile Include="..\..\..\libs\neutron\map.c" />
+    <ClCompile Include="..\..\..\libs\neutron\neutron.c" />
+    <ClCompile Include="..\..\..\libs\neutron\publisher.c" />
+    <ClCompile Include="..\..\..\libs\neutron\registry.c" />
+    <ClCompile Include="..\..\..\libs\neutron\regstream.c" />
+    <ClCompile Include="..\..\..\libs\neutron\slcan.c" />
+    <ClCompile Include="..\..\..\libs\neutron\stream.c" />
+    <ClCompile Include="..\..\..\libs\neutron\stream_printf.c" />
+    <ClCompile Include="..\..\..\libs\neutron\strstream.c" />
+    <ClCompile Include="..\..\..\libs\neutron\vector.c" />
+    <ClCompile Include="..\..\..\libs\photon\font.c" />
+    <ClCompile Include="..\..\..\libs\photon\lib_photon.c" />
+    <ClCompile Include="..\..\..\libs\photon\photon.c" />
+    <ClCompile Include="..\..\..\libs\photon\png_canvas.c" />
+    <ClCompile Include="..\..\..\libs\photon\widget.c" />
+    <ClCompile Include="..\..\..\libs\photon\window.c" />
+    <ClCompile Include="..\..\..\libs\proton\airspeed_window.c" />
+    <ClCompile Include="..\..\..\libs\proton\altitude_window.c" />
+    <ClCompile Include="..\..\..\libs\proton\annunciator_window.c" />
+    <ClCompile Include="..\..\..\libs\proton\attitude_window.c" />
+    <ClCompile Include="..\..\..\libs\proton\gauge_window.c" />
+    <ClCompile Include="..\..\..\libs\proton\gps_window.c" />
+    <ClCompile Include="..\..\..\libs\proton\hsi_window.c" />
+    <ClCompile Include="..\..\..\libs\proton\layout_window.c" />
+    <ClCompile Include="..\..\..\libs\proton\neo.c" />
+    <ClCompile Include="..\..\..\libs\proton\pens.c" />
+    <ClCompile Include="..\..\..\libs\proton\proton.c" />
+    <ClCompile Include="..\..\..\libs\proton\regex.c" />
     <ClCompile Include="..\..\diy-efis\diyefis_cli.c" />
     <ClCompile Include="..\..\diy-efis\main.c" />
     <ClCompile Include="..\..\diy-efis\shell.c" />
+    <ClCompile Include="..\..\diy-efis\splash.c" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\libs\ion\duk_source_meta.json" />
+    <None Include="..\..\..\libs\ion\ion.cli" />
+    <None Include="..\..\..\libs\muon\neutron.cli">
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+    </None>
+    <None Include="..\..\..\libs\proton\proton.cli" />
     <None Include="..\..\diy-efis\diyefis.cli" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\libs\electron\console.h" />
+    <ClInclude Include="..\..\..\libs\electron\electron.h" />
+    <ClInclude Include="..\..\..\libs\electron\i2c.h" />
+    <ClInclude Include="..\..\..\libs\ion\duktape.h" />
+    <ClInclude Include="..\..\..\libs\ion\duk_config.h" />
+    <ClInclude Include="..\..\..\libs\ion\interpreter.h" />
+    <ClInclude Include="..\..\..\libs\ion\ion.h" />
+    <ClInclude Include="..\..\..\libs\ion\ion_cli.h" />
+    <ClInclude Include="..\..\..\libs\ion\ion_cli_impl.h" />
+    <ClInclude Include="..\..\..\libs\muon\cli.h">
+      <DeploymentContent>false</DeploymentContent>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\muon\muon.h">
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\muon\neutron_cli.h">
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\muon\neutron_cli_impl.h">
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\neutron\bsp.h" />
+    <ClInclude Include="..\..\..\libs\neutron\neutron.h" />
+    <ClInclude Include="..\..\..\libs\neutron\registry.h" />
+    <ClInclude Include="..\..\..\libs\neutron\slcan.h" />
+    <ClInclude Include="..\..\..\libs\neutron\stream.h" />
+    <ClInclude Include="..\..\..\libs\photon\photon.h" />
+    <ClInclude Include="..\..\..\libs\photon\widget.h" />
+    <ClInclude Include="..\..\..\libs\photon\window.h" />
+    <ClInclude Include="..\..\..\libs\proton\pens.h" />
+    <ClInclude Include="..\..\..\libs\proton\proton.h" />
+    <ClInclude Include="..\..\..\libs\proton\regex.h" />
+    <ClInclude Include="..\..\..\libs\proton\spatial.h" />
     <ClInclude Include="..\..\diy-efis\diyefis_cli.h" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\electron\electron.vcxproj">
-      <Project>{b873988d-f431-4394-a778-95324250d756}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\ion\ion.vcxproj">
-      <Project>{530ecec9-6a62-4cb1-9cff-35bfa814d1ec}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\muon\muon.vcxproj">
-      <Project>{9ab31627-72c1-45a0-b206-6352a15eb777}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\neutron\neutron.vcxproj">
-      <Project>{c09fd512-bd02-42e0-854d-87606b7b723c}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\photon\photon.vcxproj">
-      <Project>{8f7249be-50cd-4d92-a75f-b50239157413}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\proton\proton.vcxproj">
-      <Project>{9b21cb41-0bd3-4d4b-ab74-d226119e0859}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemDefinitionGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <Link />
+    <ClCompile />
+    <Link>
+      <AdditionalOptions>-lpthread -lwiringPi %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+    <ClCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <Link>
+      <AdditionalDependencies>pthread;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-lpthread %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+    <ClCompile />
+  </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
 </Project>

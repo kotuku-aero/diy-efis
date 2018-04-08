@@ -114,7 +114,7 @@ typedef result_t (*begin_paint_fn)(handle_t wnd);
 typedef result_t (*end_paint_fn)(handle_t wnd);
 
 // shared structure for all canvas's
-typedef struct _canvas_t
+struct _canvas_t
   {
   // sizeof the canvas.  This should include any variable data.
   // minumum is sizeof(canvas_t)
@@ -142,7 +142,7 @@ typedef struct _canvas_t
   fast_line_fn fast_line;
   fast_copy_fn fast_copy;
   copy_bitmap_fn bitmap_copy;
-  } canvas_t;
+  };
 
 /**
  * Return a new canvas that is the framebuffer
@@ -215,6 +215,8 @@ typedef struct _neutron_parameters_t
   uint8_t node_id;
   // type of the node
   uint8_t node_type;
+  // rate to open the can bus at (bps/1000)
+  uint16_t bitrate;
   // Revision to support in id msg
   uint8_t hardware_revision;
   // Revision to support in id msg
@@ -234,20 +236,17 @@ typedef struct _neutron_parameters_t
 /**
  * Initialize the can-aerospace subsystem, then initialize neutron
  * @param params
- * @param init_mode
- * @param create_publish_task
+ * @param create_publish_task  True if a worker task is needed
  * @return 
  */  
-extern result_t can_aerospace_init(const neutron_parameters_t *params, bool init_mode, bool create_publish_task);
-
+extern result_t can_aerospace_init(const neutron_parameters_t *params, bool create_publish_task);
 /**
  * Initialize Neutron
  * @param params      setup and memory parameters
- * @param init_mode   true if a factory reset
  * @param worker      Mutual exclusion semaphore.
  * @return s_ok if started ok
  */
-extern result_t neutron_init(const neutron_parameters_t *params, bool init_mode, bool create_worker);
+extern result_t neutron_init(const neutron_parameters_t *params, bool create_worker);
 /**
  * Worker process
  * @param pargs Arguments
@@ -261,7 +260,13 @@ extern void publish_task(void *pargs);
  * Initialize the hardware
  * @param rx_queue  Receive message queue.  The hardware needs to make an ISR safe call to push data onto queue
  */
-extern result_t bsp_can_init(handle_t rx_queue);
+extern result_t bsp_can_init(deque_p rx_queue, uint16_t bitrate);
+/**
+ * Set the baud rate of the can bus
+ * @param rate    Bit rate * 1000
+ * @return s_ok if the rate changed
+ */
+extern result_t bsp_set_can_rate(uint16_t rate);
 /**
  * Send a message
  * @param msg

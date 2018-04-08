@@ -88,7 +88,7 @@ static void init_stream(regstream_handle_t *stream)
   stream->stream.stream_close = regstream_close;
   }
 
-static result_t create_handle(memid_t parent, const char *name, bool create, handle_t *stream)
+static result_t create_handle(memid_t parent, const char *name, bool create, stream_p *stream)
   {
   result_t result;
   uint8_t datatype = 0;
@@ -146,7 +146,7 @@ static result_t create_handle(memid_t parent, const char *name, bool create, han
       }
     }
 
-  *stream = new_stream;
+  *stream = (stream_p) new_stream;
   return exit_registry(s_ok);
   }
 
@@ -307,17 +307,6 @@ static result_t ensure_stream(regstream_handle_t *stream, uint32_t size)
       return result;
     }
 
-  return s_ok;
-  }
-
-/**
- * Store a stream back to the registry
- * @param stream    stream to save
- * @return s_ok if stored ok
- */
-static result_t save_stream(regstream_handle_t *stream)
-  {
-  // TODO:
   return s_ok;
   }
 

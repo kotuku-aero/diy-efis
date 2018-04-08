@@ -494,7 +494,8 @@ result_t on_paint(handle_t hwnd, struct _event_proxy_t *proxy, const canmsg_t *m
   max_order = z_order;
   painting_order = z_order;
 
-  begin_paint(hwnd);
+  canvas_t *canvas;
+  begin_paint(hwnd, &canvas);
 
   do
     {
@@ -505,7 +506,7 @@ result_t on_paint(handle_t hwnd, struct _event_proxy_t *proxy, const canmsg_t *m
       if (z_order > painting_order)
         {
         // get the next highest order after our own
-        if (next_z_order > z_order)
+        if (next_z_order == painting_order || z_order < next_z_order)
           next_z_order = z_order;
 
         // figure out what the last one to do is.

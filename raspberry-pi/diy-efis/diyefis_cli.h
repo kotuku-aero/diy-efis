@@ -1,13 +1,13 @@
-#ifndef __neutron_cli_h__
-#define __neutron_cli_h__
+#ifndef __diyefis_cli_h__
+#define __diyefis_cli_h__
 /* This is an auto-generated file by cli */
-#include "muon.h"
+#include "../../libs/muon/muon.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern cli_node_t neutron_cli_root;
+extern cli_node_t diyefis_cli_root;
 
 extern result_t uint16_name_value_action(cli_t *context, const char * uint16_name_, uint16_t uint16_name_value_);
 
@@ -104,6 +104,32 @@ extern result_t neutron_action(cli_t *context);
 extern result_t send_can_id_type_session_val1_val2_val3_val4_action(cli_t *context, uint16_t send_can_id_, uint16_t send_can_id_type_, uint16_t send_can_id_type_session_, const char * send_can_id_type_session_val1_, const char * send_can_id_type_session_val1_val2_, const char * send_can_id_type_session_val1_val2_val3_, const char * send_can_id_type_session_val1_val2_val3_val4_);
 
 extern const enum_t can_types[];
+
+extern result_t ion_add_id_name_msg_handler_action(cli_t *context, uint16_t ion_add_id_, const char * ion_add_id_name_, const char * ion_add_id_name_msg_handler_);
+
+extern result_t ion_del_id_name_action(cli_t *context, uint16_t ion_del_id_, const char * ion_del_id_name_);
+
+extern result_t ion_cat_name_action(cli_t *context, const char * ion_cat_name_);
+
+extern result_t ion_edit_name_action(cli_t *context, const char * ion_edit_name_);
+
+extern result_t ion_create_name_content_action(cli_t *context, const char * ion_create_name_, const char * ion_create_name_content_);
+
+extern result_t ion_rm_name_action(cli_t *context, const char * ion_rm_name_);
+
+extern result_t ion_ls_name_action(cli_t *context, const char * ion_ls_name_);
+
+extern result_t ion_debug_name_action(cli_t *context, const char * ion_debug_name_);
+
+extern result_t ion_exec_name_action(cli_t *context, const char * ion_exec_name_);
+
+extern result_t ion_exit_action(cli_t *context);
+
+extern result_t ion_action(cli_t *context);
+
+extern result_t shell_action(cli_t *context);
+
+extern result_t exit_action(cli_t *context);
 
 #ifdef __cplusplus
 }
