@@ -213,7 +213,8 @@ result_t publish_int8(uint16_t id, const int8_t *value, uint16_t len)
     return result;
   
   datapoint->value.canas.data_type = int8_dt[len-1];
-  datapoint->value.id = datapoint->can_id;
+  set_can_id(&datapoint->value, datapoint->can_id);
+  set_can_len(&datapoint->value, len + 4);
   for(index = 0; index < len; index++)
     datapoint->value.canas.data[index] = (uint8_t) *value++;
 
@@ -241,7 +242,8 @@ result_t publish_uint8(uint16_t id, const uint8_t *value, uint16_t len)
     return result;
   
   datapoint->value.canas.data_type = uint8_dt[len-1];
-  datapoint->value.id = datapoint->can_id;
+  set_can_id(&datapoint->value, datapoint->can_id);
+  set_can_len(&datapoint->value, len + 4);
   for(index = 0; index < len; index++)
     datapoint->value.canas.data[index] = *value++;
 
@@ -256,7 +258,7 @@ static const uint8_t int16_dt[] =
 
 result_t publish_int16(uint16_t id, const int16_t *value, uint16_t len)
   {
-  if (value == 0 || len == 0 || len > 4)
+  if (value == 0 || len == 0 || len > 2)
     return e_bad_parameter;
 
   result_t result;
@@ -267,8 +269,9 @@ result_t publish_int16(uint16_t id, const int16_t *value, uint16_t len)
     return result;
   
   datapoint->value.canas.data_type = int16_dt[len-1];
-  datapoint->value.id = datapoint->can_id;
-  for(index = 0; index < len; index+=2)
+  set_can_id(&datapoint->value, datapoint->can_id);
+   set_can_len(&datapoint->value, 4 + (len << 1));
+ for(index = 0; index < len; index+=2)
     {
     datapoint->value.canas.data[index] = (*value >> 8);
     datapoint->value.canas.data[index+1] = *value >> 8;
@@ -286,7 +289,7 @@ static const uint8_t uint16_dt[] =
 
 result_t publish_uint16(uint16_t id, const uint16_t *value, uint16_t len)
   {
-  if (value == 0 || len == 0 || len > 4)
+  if (value == 0 || len == 0 || len > 2)
     return e_bad_parameter;
 
   result_t result;
@@ -297,7 +300,8 @@ result_t publish_uint16(uint16_t id, const uint16_t *value, uint16_t len)
     return result;
   
   datapoint->value.canas.data_type = uint16_dt[len-1];
-  datapoint->value.id = datapoint->can_id;
+  set_can_id(&datapoint->value, datapoint->can_id);
+  set_can_len(&datapoint->value, 4 + (len << 1));
   for(index = 0; index < len; index+=2)
     {
     datapoint->value.canas.data[index] = (*value >> 8);
@@ -590,7 +594,7 @@ static bool alarm_hook(const canmsg_t *msg, void *parg)
       alarm_t *alarm = get_alarm(dp, ai);
 
       if(alarm->type == level_alarm &&
-         alarm->reset_id == msg->id)
+         alarm->reset_id == get_can_id(msg))
         {
         alarm->event_time = 0;
 
@@ -601,7 +605,7 @@ static bool alarm_hook(const canmsg_t *msg, void *parg)
       }
 
     // see if we are monitoring
-    if (dp->can_id == msg->id &&
+    if (dp->can_id == get_can_id(msg) &&
       !dp->flags.loopback &&
       !dp->flags.publish)
       {

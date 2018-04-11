@@ -1,6 +1,7 @@
 #include "i2c.h"
 #include "../neutron/bsp.h"
 #include <sys/types.h>
+#include <sys/ioctl.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <wiringPi.h>
@@ -70,7 +71,7 @@ static result_t write_registers(i2c_can_t *driver, uint8_t cmd, uint8_t len, con
   {
   char buffer[32];
   buffer[0] = cmd;
-  memcpy(buffer[1], data, len);
+  memcpy(&buffer[1], data, len);
   struct i2c_msg msg[1] =
     {
       { .addr = DIYEFIS_ID, .flags = 0, .len = 1 + len, .buf = buffer },
@@ -193,12 +194,14 @@ result_t i2c_init(memid_t key, deque_p rx_queue, handle_t *handle)
   if (failed(result = task_create("CANRX", DEFAULT_STACK_SIZE, rx_worker, driver, NORMAL_PRIORITY, 0)))
     return result;
 
+  wiringPiSetupGpio();
+
   // hook the interrupts.  We signal the semaphore when they change
   wiringPiISR(rxrdy_irq, INT_EDGE_FALLING, &rxrdy_int);
   wiringPiISR(txrdy_irq, INT_EDGE_RISING, &txrdy_int);
 
   // setup I2C
-  uint8_t sr = 0xC0;      // open bit and 125 kbs
+  uint8_t sr = 0x80;      // open bit and 125 kbs
   return write_registers(driver, 0x10, 1, &sr);
   // opening the port will generate an txe interrupt...
   }

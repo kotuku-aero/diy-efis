@@ -556,14 +556,7 @@ typedef struct _canas_msg_t
  */
 typedef struct
 {
-  union {
-    struct {
-      uint16_t length : 4;
-      uint16_t reply : 1;
-      uint16_t id: 11;
-      };
-    uint16_t flags;
-    };
+  uint16_t flags;
 
   // following is 8 bytes
   union {
@@ -571,6 +564,55 @@ typedef struct
     uint8_t raw[8];
     };
 } canmsg_t;
+
+#define ID_MASK 0x07FF
+#define ID_LEN 11
+
+#define REPLY_MASK 0x0800
+#define REPLY_SHIFT 11
+
+#define LEN_MASK 0xF000
+#define LEN_SHIFT 12
+
+
+static inline uint16_t get_can_id(const canmsg_t *msg)
+  {
+  return msg->flags & ID_MASK;
+  }
+
+static inline canmsg_t *set_can_id(canmsg_t *msg, uint16_t id)
+  {
+  msg->flags &= ~ID_MASK;
+  msg->flags |= (id & 0x07FF);
+  
+  return msg;
+  }
+
+static inline bool get_can_reply(const canmsg_t *msg)
+  {
+  return (msg->flags & REPLY_MASK)  != 0;
+  }
+
+static inline canmsg_t *set_can_reply(canmsg_t *msg, bool is_it)
+  {
+  msg->flags &= ~REPLY_MASK;
+  msg->flags |= is_it ? REPLY_MASK : 0;
+  
+  return msg;
+  }
+
+static inline uint16_t get_can_len(const canmsg_t *msg)
+  {
+  return (msg->flags & 0xF000) >> LEN_SHIFT;
+  }
+
+static inline canmsg_t *set_can_len(canmsg_t *msg, uint16_t len)
+  {
+  msg->flags &= ~LEN_MASK;
+  msg->flags |= (len & 0x000F) << LEN_SHIFT;
+  
+  return msg;
+  }
 
 /**
  * @struct lla_t
@@ -903,7 +945,8 @@ typedef struct _msg_hook_t
   {
   struct _msg_hook_t *next;
   struct _msg_hook_t *prev;
-  msg_hook_fn callback;
+  msg_hook_fn rx_callback;
+  msg_hook_fn tx_callback;
   void *parg;
   } msg_hook_t;
   

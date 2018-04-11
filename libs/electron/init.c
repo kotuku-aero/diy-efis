@@ -115,7 +115,7 @@ result_t electron_init(int argc, char **argv)
   const char *device = "/dev/i2c-1";
 
   int opt;
-  while ((opt = getopt(argc, argv, "hc:f:x:y:s:")) != -1)
+  while ((opt = getopt(argc, argv, "hc:f:x:y:d:")) != -1)
     {
     switch (opt)
       {

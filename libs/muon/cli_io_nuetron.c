@@ -122,7 +122,7 @@ static result_t css_stream_write(stream_handle_t *hndl, const void *buffer, uint
     return e_bad_parameter;
   
   canmsg_t msg;
-  msg.id = channel.can_id + 1;
+  set_can_id(&msg, channel.can_id + 1);
   msg.canas.node_id = node_id;
   msg.canas.service_code = id_ccs_service;
   
@@ -131,7 +131,7 @@ static result_t css_stream_write(stream_handle_t *hndl, const void *buffer, uint
     {
     if(size >= 4)
       {
-      msg.length = 8;
+      set_can_len(&msg, 8);
       msg.canas.data_type = CANAS_DATATYPE_CHAR4;
       msg.canas.data[0] = *str++;
       msg.canas.data[1] = *str++;
@@ -141,7 +141,7 @@ static result_t css_stream_write(stream_handle_t *hndl, const void *buffer, uint
       }
     else if(size == 3)
       {
-      msg.length = 7;
+      set_can_len(&msg, 7);
       msg.canas.data_type = CANAS_DATATYPE_CHAR3;
       msg.canas.data[0] = *str++;
       msg.canas.data[1] = *str++;
@@ -150,7 +150,7 @@ static result_t css_stream_write(stream_handle_t *hndl, const void *buffer, uint
       }
     else if(size == 2)
       {
-      msg.length =6;
+      set_can_len(&msg, 6);
       msg.canas.data_type = CANAS_DATATYPE_CHAR2;
       msg.canas.data[0] = *str++;
       msg.canas.data[1] = *str++;
@@ -158,7 +158,7 @@ static result_t css_stream_write(stream_handle_t *hndl, const void *buffer, uint
       }
     else
       {
-      msg.length = 5;
+      set_can_len(&msg, 5);
       msg.canas.data_type = CANAS_DATATYPE_CHAR;
       msg.canas.data[0] = *str++;
       size--;
@@ -190,7 +190,7 @@ static void parser_worker(void *parg)
 
     // flag the worker is closed
     canmsg_t msg;
-    msg.id = channel.can_id + 1;
+    set_can_id(&msg, channel.can_id + 1);
     msg.canas.node_id = node_id;
     msg.canas.service_code = id_ccs_service;
     msg.canas.data_type = CANAS_DATATYPE_NODATA;
@@ -206,15 +206,15 @@ bool process_ccs(const canmsg_t *msg, void *parg)
   {
   canmsg_t reply_msg;
   memset(&reply_msg, 0, sizeof (canmsg_t));
-  reply_msg.id = msg->id + 1; // send on the reply channel
+  set_can_id(&reply_msg, get_can_id(msg) + 1); // send on the reply channel
   reply_msg.canas.data_type = CANAS_DATATYPE_NODATA;
   reply_msg.canas.service_code = id_ccs_service;
-  reply_msg.length = 4;
+  set_can_len(&reply_msg, 4);
   reply_msg.canas.message_code = PARSER_OK;
   
   if(channel.can_id == 0)       // open the channel
     {
-    channel.can_id = msg->id;       // assign the service channel to our console
+    channel.can_id = get_can_id(msg);       // assign the service channel to our console
 
     // flag the worker is ok
     can_send_reply(&reply_msg);
@@ -222,7 +222,7 @@ bool process_ccs(const canmsg_t *msg, void *parg)
     }
 
   // if another device has the channel then we reject messages
-  if(channel.can_id != msg->id)
+  if(channel.can_id != get_can_id(msg))
     {
     // reply to the message
     reply_msg.canas.node_id = node_id;

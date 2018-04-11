@@ -261,6 +261,7 @@ extern void publish_task(void *pargs);
  * @param rx_queue  Receive message queue.  The hardware needs to make an ISR safe call to push data onto queue
  */
 extern result_t bsp_can_init(deque_p rx_queue, uint16_t bitrate);
+
 /**
  * Set the baud rate of the can bus
  * @param rate    Bit rate * 1000
@@ -268,10 +269,22 @@ extern result_t bsp_can_init(deque_p rx_queue, uint16_t bitrate);
  */
 extern result_t bsp_set_can_rate(uint16_t rate);
 /**
- * Send a message
- * @param msg
+ * Send a message to the physical hardware
+ * @param msg message to send.
  */
 extern result_t bsp_send_can(const canmsg_t *msg);
+/**
+ * Return how many can messages can be sent
+ * @param capacity  Number that can be sent
+ * @return s_ok if the queue is valid
+ */
+extern result_t bsp_can_tx_queue_capacity(uint16_t *cap);
+/**
+ * Return how many messages can be received
+ * @param num_msgs  How many messages can be received
+ * @return 
+ */
+extern result_t bsp_can_rx_available(uint16_t *num_msgs);
 
 /////////////////////////////////////////////////////////////////////////////
 //

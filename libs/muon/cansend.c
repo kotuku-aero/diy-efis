@@ -99,8 +99,8 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
     return e_bad_parameter;
 
   memset(msg, 0, sizeof(canmsg_t));
-  msg->id = can_id;
-  msg->length = 4;
+  set_can_id(msg, can_id);
+  set_can_len(msg, 4);
 
   msg->canas.service_code = (uint8_t)session;
 
@@ -116,7 +116,7 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
 
       msg->canas.data_type = CANAS_DATATYPE_CHAR;
       *(char *)(&msg->canas.data[0]) = (char)get_int32(val1);
-      msg->length = 5;
+      set_can_len(msg, 5);
       break;
     case CANAS_DATATYPE_CHAR2:    // char2
       if (val4 != 0 ||
@@ -128,7 +128,7 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
       msg->canas.data_type = CANAS_DATATYPE_CHAR2;
       *(char *)(&msg->canas.data[0]) = (char)get_int32(val1);
       *(char *)(&msg->canas.data[1]) = (char)get_int32(val2);
-      msg->length = 6;
+      set_can_len(msg, 6);
       break;
     case CANAS_DATATYPE_CHAR3:    // char3
       if (val4 != 0 ||
@@ -141,7 +141,7 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
       *(char *)(&msg->canas.data[0]) = (char)get_int32(val1);
       *(char *)(&msg->canas.data[1]) = (char)get_int32(val2);
       *(char *)(&msg->canas.data[2]) = (char)get_int32(val3);
-      msg->length = 7;
+      set_can_len(msg, 7);
       break;
     case CANAS_DATATYPE_CHAR4:    // char4
       if (val4 == 0 ||
@@ -155,7 +155,7 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
       *(char *)(&msg->canas.data[1]) = (char)get_int32(val2);
       *(char *)(&msg->canas.data[2]) = (char)get_int32(val3);
       *(char *)(&msg->canas.data[3]) = (char)get_int32(val4);
-      msg->length = 8;
+      set_can_len(msg, 8);
       break;
     case CANAS_DATATYPE_UCHAR:    // uchar
       if (val4 != 0 ||
@@ -166,7 +166,7 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
 
       msg->canas.data_type = CANAS_DATATYPE_UCHAR;
       msg->canas.data[0] = (uint8_t)get_uint32(val1);
-      msg->length = 5;
+      set_can_len(msg, 5);
       break;
     case CANAS_DATATYPE_UCHAR2:    // uchar2
       if (val4 != 0 ||
@@ -178,7 +178,7 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
       msg->canas.data_type = CANAS_DATATYPE_UCHAR2;
       msg->canas.data[0] = (uint8_t)get_uint32(val1);
       msg->canas.data[1] = (uint8_t)get_uint32(val2);
-      msg->length = 6;
+      set_can_len(msg, 6);
       break;
     case CANAS_DATATYPE_UCHAR3:    // uchar3
       if (val4 != 0 ||
@@ -191,7 +191,7 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
       msg->canas.data[0] = (uint8_t)get_uint32(val1);
       msg->canas.data[1] = (uint8_t)get_uint32(val2);
       msg->canas.data[2] = (uint8_t)get_uint32(val3);
-      msg->length = 7;
+      set_can_len(msg, 7);
       break;
     case CANAS_DATATYPE_UCHAR4:    // uchar4
       if (val4 == 0 ||
@@ -205,7 +205,7 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
       msg->canas.data[1] = (uint8_t)get_uint32(val2);
       msg->canas.data[2] = (uint8_t)get_uint32(val3);
       msg->canas.data[3] = (uint8_t)get_uint32(val4);
-      msg->length = 8;
+      set_can_len(msg, 8);
       break;
     case CANAS_DATATYPE_SHORT:    // short
       if (val4 != 0 ||
@@ -219,7 +219,7 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
       msg->canas.data_type = CANAS_DATATYPE_SHORT;
       msg->canas.data[0] = (uint8_t)(int_val >> 8);
       msg->canas.data[1] = (uint8_t)int_val;
-      msg->length = 6;
+      set_can_len(msg, 6);
       break;
     case CANAS_DATATYPE_SHORT2:    // short2
       if (val4 != 0 ||
@@ -237,7 +237,7 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
       int_val = get_int32(val2);
       msg->canas.data[2] = (uint8_t)(int_val >> 8);
       msg->canas.data[3] = (uint8_t)int_val;
-      msg->length = 8;
+      set_can_len(msg, 8);
       break;
     case CANAS_DATATYPE_USHORT:    // ushort
       if (val4 != 0 ||
@@ -251,7 +251,7 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
       msg->canas.data_type = CANAS_DATATYPE_USHORT;
       msg->canas.data[0] = (uint8_t)(int_val >> 8);
       msg->canas.data[1] = (uint8_t)int_val;
-      msg->length = 6;
+      set_can_len(msg, 6);
       break;
     case CANAS_DATATYPE_USHORT2:    // ushort2
       if (val4 != 0 ||
@@ -269,7 +269,7 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
       int_val = get_int32(val2);
       msg->canas.data[2] = (uint8_t)(int_val >> 8);
       msg->canas.data[3] = (uint8_t)int_val;
-      msg->length = 8;
+      set_can_len(msg, 8);
       break;
     case CANAS_DATATYPE_INT32:    // long
       if (val4 != 0 ||
@@ -285,7 +285,7 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
       msg->canas.data[1] = (uint8_t)(int_val >> 16);
       msg->canas.data[2] = (uint8_t)(int_val >> 8);
       msg->canas.data[3] = (uint8_t)int_val;
-      msg->length = 8;
+      set_can_len(msg, 8);
       break;
     case CANAS_DATATYPE_UINT32:    // ulong
       if (val4 != 0 ||
@@ -301,7 +301,7 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
       msg->canas.data[1] = (uint8_t)(int_val >> 16);
       msg->canas.data[2] = (uint8_t)(int_val >> 8);
       msg->canas.data[3] = (uint8_t)int_val;
-      msg->length = 8;
+      set_can_len(msg, 8);
       break;
     case CANAS_DATATYPE_FLOAT:    // float
       if (val4 != 0 ||
@@ -317,7 +317,7 @@ result_t create_can_msg(canmsg_t *msg, uint16_t can_id, uint16_t type, uint16_t 
       msg->canas.data[1] = (uint8_t)((*((uint32_t *)&float_val)) >> 16);
       msg->canas.data[2] = (uint8_t)((*((uint32_t *)&float_val)) >> 8);
       msg->canas.data[3] = (uint8_t)(*((uint32_t *)&float_val));
-      msg->length = 8;
+      set_can_len(msg, 8);
       break;
     default:
     case CANAS_DATATYPE_NODATA:    // nodata
