@@ -546,9 +546,9 @@ result_t defwndproc(handle_t hwnd, const canmsg_t *msg)
       for (item = 0; item < count; item++)
         {
         vector_at(window->events, item, &proxy);
-        if(proxy != 0 && proxy->msg_id == msg->id)
+        if(proxy != 0 && proxy->msg_id == get_can_id(msg))
           {
-          if(msg->id == id_paint)
+          if(get_can_id(msg) == id_paint)
             {
             if(window->invalid)
               {
@@ -600,7 +600,7 @@ static result_t make_window(handle_t hwnd_parent, const rect_t *bounds, wndproc 
   }
 
 static canmsg_t close_msg = {
-  .id = id_close
+  .flags = id_close
   };
 
 result_t close_window(handle_t hwnd)

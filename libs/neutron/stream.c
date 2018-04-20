@@ -226,7 +226,7 @@ result_t stream_path(stream_p hndl, bool full_path, uint16_t len, char *path)
   if (stream->stream_path == 0)
     return e_not_implemented;
 
-  return (*stream->stream_path)(hndl, full_path, len, path);
+  return (*stream->stream_path)(stream, full_path, len, path);
   }
 
 result_t stream_getc(stream_p hndl, char *ch)

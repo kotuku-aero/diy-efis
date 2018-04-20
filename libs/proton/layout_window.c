@@ -282,7 +282,7 @@ static result_t load_can_msg(memid_t key, canmsg_t *msg)
       if (strcmp(type, "NODATA") == 0 ||
         failed(reg_get_string(key, "can-value", value, 0)))
         {
-        msg->id = id;
+        set_can_id(msg, id);
         msg->canas.data_type = CANAS_DATATYPE_NODATA;
         }
       else
@@ -370,7 +370,7 @@ static result_t load_can_msg(memid_t key, canmsg_t *msg)
           }
         else
           {
-          msg->id = id;
+          set_can_id(msg, id);
           msg->canas.data_type = CANAS_DATATYPE_NODATA;
           }
         }
@@ -692,7 +692,7 @@ static void default_paint_handler(handle_t hwnd,
 
 static void default_msg_handler(struct _layout_window_t *wnd, struct _menu_item_t *item, const canmsg_t *msg)
   {
-  if (item->controlling_param == msg->id)
+  if (item->controlling_param == get_can_id(msg))
     memcpy(&item->controlling_variable, msg, sizeof(canmsg_t));
   }
 
@@ -886,7 +886,7 @@ static menu_item_action_result item_event_evaluate(layout_window_t *wnd, menu_it
   menu_item_event_t *mi = (menu_item_event_t *)item;
 
   // see if the event is an internal menu one
-  if (msg->id >= id_first_internal_msg && msg->id <= id_last_internal_msg)
+  if (get_can_id(msg) >= id_first_internal_msg && get_can_id(msg) <= id_last_internal_msg)
     send_message(wnd->window, &mi->msg);
   else
     can_send(&mi->msg);
@@ -968,7 +968,7 @@ static void item_edit_event(layout_window_t *wnd,
 
   menu_item_edit_t *edit = (menu_item_edit_t *)item;
   // see if we update our value
-  if (edit->value_id == msg->id)
+  if (edit->value_id == get_can_id(msg))
     memcpy(&edit->value, msg, sizeof(canmsg_t));
   }
 
@@ -1061,7 +1061,7 @@ static void item_checklist_event(layout_window_t *wnd, menu_item_t *item, const 
 
   menu_item_checklist_t *checklist = (menu_item_checklist_t *)item;
   // see if we update our value
-  if (checklist->value_id == msg->id)
+  if (checklist->value_id == get_can_id(msg))
     {
     memcpy(&checklist->value, msg, sizeof(canmsg_t));
 
@@ -1312,7 +1312,7 @@ static result_t on_key0(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg
   rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
 
-  uint16_t id = msg->id;
+  uint16_t id = get_can_id(msg);
   int16_t value;
   get_param_int16(msg, 0, &value);
   if (wnd->active_keys != 0)
@@ -1347,7 +1347,7 @@ static result_t on_key1(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg
   rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
 
-  uint16_t id = msg->id;
+  uint16_t id = get_can_id(msg);
   int16_t value;
   get_param_int16(msg, 0, &value);
 
@@ -1383,7 +1383,7 @@ static result_t on_key2(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg
   rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
 
-  uint16_t id = msg->id;
+  uint16_t id = get_can_id(msg);
   int16_t value;
   get_param_int16(msg, 0, &value);
 
@@ -1420,7 +1420,7 @@ static result_t on_key3(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg
   rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
 
-  uint16_t id = msg->id;
+  uint16_t id = get_can_id(msg);
   int16_t value;
   get_param_int16(msg, 0, &value);
 
@@ -1457,7 +1457,7 @@ static result_t on_key4(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg
   rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
 
-  uint16_t id = msg->id;
+  uint16_t id = get_can_id(msg);
   int16_t value;
   get_param_int16(msg, 0, &value);
   if (wnd->active_keys != 0)
@@ -1493,7 +1493,7 @@ static result_t on_decka(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
   rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
 
-  uint16_t id = msg->id;
+  uint16_t id = get_can_id(msg);
   int16_t value;
   get_param_int16(msg, 0, &value);
 
@@ -1534,7 +1534,7 @@ static result_t on_deckb(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
   rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
 
-  uint16_t id = msg->id;
+  uint16_t id = get_can_id(msg);
   int16_t value;
   get_param_int16(msg, 0, &value);
 
@@ -1575,7 +1575,7 @@ static result_t on_menu_up(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *
   rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
 
-  uint16_t id = msg->id;
+  uint16_t id = get_can_id(msg);
   int16_t value;
   get_param_int16(msg, 0, &value);
 
@@ -1603,7 +1603,7 @@ static result_t on_menu_dn(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *
   rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
 
-  uint16_t id = msg->id;
+  uint16_t id = get_can_id(msg);
   int16_t value;
   get_param_int16(msg, 0, &value);
 
@@ -1627,7 +1627,7 @@ static result_t on_menu_left(handle_t hwnd, event_proxy_t *proxy, const canmsg_t
   rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
 
-  uint16_t id = msg->id;
+  uint16_t id = get_can_id(msg);
   int16_t value;
   get_param_int16(msg, 0, &value);
 
@@ -1654,7 +1654,7 @@ static result_t on_menu_right(handle_t hwnd, event_proxy_t *proxy, const canmsg_
   rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
 
-  uint16_t id = msg->id;
+  uint16_t id = get_can_id(msg);
   int16_t value;
   get_param_int16(msg, 0, &value);
 
@@ -1684,7 +1684,7 @@ static result_t on_ok(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
 
-  uint16_t id = msg->id;
+  uint16_t id = get_can_id(msg);
   int16_t value;
   get_param_int16(msg, 0, &value);
 

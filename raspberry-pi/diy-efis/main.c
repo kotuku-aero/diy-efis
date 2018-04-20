@@ -5,6 +5,7 @@
 #include "../../libs/muon/muon.h"
 
 #include "diyefis_cli.h"
+#include "../../libs/electron/i2c.h"
 
 #define CAN_TX_BUFFER_LEN 1024
 #define CAN_RX_BUFFER_LEN 1024

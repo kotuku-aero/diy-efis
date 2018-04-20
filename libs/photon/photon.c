@@ -52,8 +52,7 @@ static void on_timer(const canmsg_t *msg)
   }
 
 static const canmsg_t paint_msg = {
-  .id = id_paint,
-  .length = 0,
+  .flags = id_paint,
   .canas.data_type = CANAS_DATATYPE_NODATA
   };
 
@@ -114,7 +113,7 @@ result_t open_screen(uint16_t orientation, wndproc cb, uint16_t id,
   phys_screen->wnd.window_proc = cb;
 
   // where to route can messages to
-  phys_screen->msg_hook.callback = msg_hook;
+  phys_screen->msg_hook.rx_callback = msg_hook;
   // hook the messages
   subscribe(&phys_screen->msg_hook);
 
@@ -311,7 +310,7 @@ result_t post_message(handle_t hwnd, const canmsg_t *msg, uint32_t max_wait)
   // if the message is a paint message it is handled very
   // differently as the message is only sent to the window
   // when there are no more messages
-  if (msg->id == id_paint)
+  if (get_can_id(msg) == id_paint)
     {
     if (hwnd != 0)
       {

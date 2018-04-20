@@ -121,6 +121,9 @@ static result_t css_stream_write(stream_handle_t *hndl, const void *buffer, uint
   if(hndl == 0 || buffer == 0 || size == 0)
     return e_bad_parameter;
   
+  if (channel.can_id == 0)
+    return s_ok;
+
   canmsg_t msg;
   set_can_id(&msg, channel.can_id + 1);
   msg.canas.node_id = node_id;

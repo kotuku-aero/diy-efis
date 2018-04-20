@@ -26,6 +26,8 @@
       <itemPath>stream_printf.c</itemPath>
       <itemPath>neutron.c</itemPath>
       <itemPath>publisher.c</itemPath>
+      <itemPath>manifest.c</itemPath>
+      <itemPath>decompress.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

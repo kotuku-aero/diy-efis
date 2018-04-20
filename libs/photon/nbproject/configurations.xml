@@ -19,8 +19,8 @@
       <itemPath>font.c</itemPath>
       <itemPath>png_canvas.c</itemPath>
       <itemPath>window.c</itemPath>
-      <itemPath>lib_photon.c</itemPath>
       <itemPath>widget.c</itemPath>
+      <itemPath>lib_photon.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

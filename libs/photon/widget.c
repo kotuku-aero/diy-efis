@@ -237,7 +237,7 @@ static result_t set_zorder(handle_t hwnd, const variant_t *value)
   }
 
 static canmsg_t create_msg = {
-  .id = id_create
+  .flags = id_create
   };
 
 result_t create_child_widget(handle_t parent, memid_t key, wndproc cb, handle_t *hwnd)
