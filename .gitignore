@@ -158,3 +158,8 @@
 /pic/usb/nbproject/Makefile-genesis.properties
 /pic/usb/nbproject/Makefile-debug_dspic33ep256gp502.mk
 /raspberry-pi/VC/diy-efis/bin/x64/Debug
+/raspberry-pi/VC/diy-efis/*.user
+/x64/Debug/*.lib
+/x64/Debug/*.pdb
+/x64/Debug/*.exe
+/x64/Debug/*.ilk
