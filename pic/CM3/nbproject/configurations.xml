@@ -40,12 +40,12 @@
         <linkerTool>
           <linkerLibItems>
             <linkerLibProjectItem>
-              <makeArtifact PL="../../diy-efis/libs/neutron"
+              <makeArtifact PL="../../libs/neutron"
                             CT="3"
                             CN="debug_pic33EP256GP502"
                             AC="false"
                             BL="true"
-                            WD="../../diy-efis/libs/neutron"
+                            WD="../../libs/neutron"
                             BC="${MAKE}  -f Makefile CONF=debug_pic33EP256GP502"
                             DBC="${MAKE}  -f Makefile CONF=debug_pic33EP256GP502 TYPE_IMAGE=DEBUG_RUN"
                             CC="rm -rf &quot;build/debug_pic33EP256GP502&quot; &quot;dist/debug_pic33EP256GP502&quot;"
@@ -59,18 +59,18 @@
             <linkerLibProjectItem>
               <makeArtifact PL="../../libs/atom"
                             CT="3"
-                            CN="debug_pic33EPXXXGP502"
+                            CN="debug_pic33EP256GP502"
                             AC="false"
                             BL="true"
                             WD="../../libs/atom"
-                            BC="${MAKE}  -f Makefile CONF=debug_pic33EPXXXGP502"
-                            DBC="${MAKE}  -f Makefile CONF=debug_pic33EPXXXGP502 TYPE_IMAGE=DEBUG_RUN"
-                            CC="rm -rf &quot;build/debug_pic33EPXXXGP502&quot; &quot;dist/debug_pic33EPXXXGP502&quot;"
-                            OP="dist/debug_pic33EPXXXGP502/production/atom.a"
-                            DOP="dist/debug_pic33EPXXXGP502/debug/atom.a"
-                            FL="dist/debug_pic33EPXXXGP502/production/atom.a"
-                            PD="dist/debug_pic33EPXXXGP502/production/atom.a"
-                            DD="dist/debug_pic33EPXXXGP502/debug/atom.a">
+                            BC="${MAKE}  -f Makefile CONF=debug_pic33EP256GP502"
+                            DBC="${MAKE}  -f Makefile CONF=debug_pic33EP256GP502 TYPE_IMAGE=DEBUG_RUN"
+                            CC="rm -rf &quot;build/debug_pic33EP256GP502&quot; &quot;dist/debug_pic33EP256GP502&quot;"
+                            OP="dist/debug_pic33EP256GP502/production/atom.a"
+                            DOP="dist/debug_pic33EP256GP502/debug/atom.a"
+                            FL="dist/debug_pic33EP256GP502/production/atom.a"
+                            PD="dist/debug_pic33EP256GP502/production/atom.a"
+                            DD="dist/debug_pic33EP256GP502/debug/atom.a">
               </makeArtifact>
             </linkerLibProjectItem>
             <linkerLibProjectItem>
@@ -293,12 +293,12 @@
         <linkerTool>
           <linkerLibItems>
             <linkerLibProjectItem>
-              <makeArtifact PL="../../diy-efis/libs/neutron"
+              <makeArtifact PL="../../libs/neutron"
                             CT="3"
                             CN="release_pic33EP256GP502"
                             AC="false"
                             BL="true"
-                            WD="../../diy-efis/libs/neutron"
+                            WD="../../libs/neutron"
                             BC="${MAKE}  -f Makefile CONF=release_pic33EP256GP502"
                             DBC="${MAKE}  -f Makefile CONF=release_pic33EP256GP502 TYPE_IMAGE=DEBUG_RUN"
                             CC="rm -rf &quot;build/release_pic33EP256GP502&quot; &quot;dist/release_pic33EP256GP502&quot;"

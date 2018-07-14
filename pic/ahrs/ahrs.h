@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <math.h>
-#include "../../diy-efis/libs/neutron/neutron.h"
+#include "../../libs/neutron/neutron.h"
 #include "../../libs/atom/analog_devices.h"
 #include "../../libs/atom/input_capture_devices.h"
 #include "../../libs/atom/uart_device.h"

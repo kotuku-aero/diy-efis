@@ -5,7 +5,7 @@
 extern "C"
   {
 #endif
-#include "../../diy-efis/libs/neutron/neutron.h"
+#include "../../libs/neutron/neutron.h"
 /**
  * Called when memory is exhausted
  * @param size

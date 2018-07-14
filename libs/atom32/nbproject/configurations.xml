@@ -15,7 +15,6 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>pic32mz.c</itemPath>
-      <itemPath>s1d13l02.c</itemPath>
       <itemPath>analog.c</itemPath>
       <itemPath>can.c</itemPath>
       <itemPath>i2c.c</itemPath>

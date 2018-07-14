@@ -1,7 +1,7 @@
 #ifndef __edu_cli_h__
 #define __edu_cli_h__
 /* This is an auto-generated file by cli */
-#include "../../diy-efis/libs/muon/muon.h"
+#include "../../libs/muon/muon.h"
 
 #ifdef __cplusplus
 extern "C" {

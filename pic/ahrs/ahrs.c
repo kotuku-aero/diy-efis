@@ -1,5 +1,5 @@
 #include "ahrs.h"
-#include "../../diy-efis/libs/muon/muon.h"
+#include "../../libs/muon/muon.h"
 #include "../../libs/atom/memory.h"
 #include "../../libs/atom16/pps_maps.h"
 #include "ahrs_cli.h"

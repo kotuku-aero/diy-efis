@@ -1,7 +1,7 @@
 #ifndef __eeprom_h__
 #define __eeprom_h__
 
-#include "../../diy-efis/libs/neutron/bsp.h"
+#include "../../libs/neutron/bsp.h"
 
 #ifdef __cplusplus
 extern "C" {

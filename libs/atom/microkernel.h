@@ -12,12 +12,12 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "../../diy-efis/libs/neutron/neutron.h"
+#include "../../libs/neutron/neutron.h"
 #if defined(__dsPIC33EP512GP504__) | defined(__dsPIC33EP512GP506__) | defined(__dsPIC33EP256GP502__) 
 #include <p33Exxxx.h>
 #endif
 #if defined(__PIC32MZ__)
-#include "../../diy-efis/libs/ion/ion.h"
+#include "../../libs/ion/ion.h"
 #include <xc.h>
 #endif
 

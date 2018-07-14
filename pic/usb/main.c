@@ -1,4 +1,4 @@
-#include "../../diy-efis/libs/neutron/neutron.h"
+#include "../../libs/neutron/neutron.h"
 #include "../../libs/atom/eeprom.h"
 #include "../../libs/atom/input_capture_devices.h"
 #include "../../libs/atom16/pps_maps.h"
@@ -858,7 +858,7 @@ static void main_task(void *parg)
     }
 
   // start the canbus stuff working
-  can_aerospace_init(&init_params, true);
+  can_aerospace_init(&init_params, true, false);
   
   // set up the queues
   deque_create(sizeof(uint8_t), tx_queue_length, &ft201_tx_queue);

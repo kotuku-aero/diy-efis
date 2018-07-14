@@ -1,5 +1,5 @@
 #include "../atom/microkernel.h"
-#include "../../diy-efis/libs/neutron/bsp.h"
+#include "../../libs/neutron/bsp.h"
 #include "pps_maps.h"
 
 #ifdef TON

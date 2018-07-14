@@ -37,12 +37,12 @@
         <linkerTool>
           <linkerLibItems>
             <linkerLibProjectItem>
-              <makeArtifact PL="../../diy-efis/libs/neutron"
+              <makeArtifact PL="../../libs/neutron"
                             CT="3"
                             CN="debug_pic33EP256GP502"
                             AC="false"
                             BL="true"
-                            WD="../../diy-efis/libs/neutron"
+                            WD="../../libs/neutron"
                             BC="${MAKE}  -f Makefile CONF=debug_pic33EP256GP502"
                             DBC="${MAKE}  -f Makefile CONF=debug_pic33EP256GP502 TYPE_IMAGE=DEBUG_RUN"
                             CC="rm -rf &quot;build/debug_pic33EP256GP502&quot; &quot;dist/debug_pic33EP256GP502&quot;"
@@ -290,12 +290,12 @@
         <linkerTool>
           <linkerLibItems>
             <linkerLibProjectItem>
-              <makeArtifact PL="../../diy-efis/libs/neutron"
+              <makeArtifact PL="../../libs/neutron"
                             CT="3"
                             CN="release_pic33EP256GP502"
                             AC="false"
                             BL="true"
-                            WD="../../diy-efis/libs/neutron"
+                            WD="../../libs/neutron"
                             BC="${MAKE}  -f Makefile CONF=release_pic33EP256GP502"
                             DBC="${MAKE}  -f Makefile CONF=release_pic33EP256GP502 TYPE_IMAGE=DEBUG_RUN"
                             CC="rm -rf &quot;build/release_pic33EP256GP502&quot; &quot;dist/release_pic33EP256GP502&quot;"

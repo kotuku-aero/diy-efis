@@ -12,11 +12,11 @@
             <sourceEncoding>ISO-8859-1</sourceEncoding>
             <asminc-extensions/>
             <make-dep-projects>
+                <make-dep-project>../../libs/muon</make-dep-project>
                 <make-dep-project>../../libs/atom</make-dep-project>
-                <make-dep-project>../../diy-efis/libs/ion</make-dep-project>
-                <make-dep-project>../../diy-efis/libs/neutron</make-dep-project>
+                <make-dep-project>../../libs/neutron</make-dep-project>
+                <make-dep-project>../../libs/ion</make-dep-project>
                 <make-dep-project>../../libs/atom32</make-dep-project>
-                <make-dep-project>../../diy-efis/libs/muon</make-dep-project>
             </make-dep-projects>
         </data>
     </configuration>

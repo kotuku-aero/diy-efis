@@ -1,4 +1,4 @@
-#include "../../diy-efis/libs/neutron/neutron.h"
+#include "../../libs/neutron/neutron.h"
 #include "../../libs/atom/uart_device.h"
 #include "../../libs/atom/microkernel.h"
 #include "../../libs/atom/eeprom.h"

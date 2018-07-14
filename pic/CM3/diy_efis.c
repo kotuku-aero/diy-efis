@@ -1,8 +1,8 @@
-#include "../../diy-efis/libs/neutron/neutron.h"
+#include "../../libs/neutron/neutron.h"
 #include "../../libs/atom/uart_device.h"
 #include "../../libs/atom/microkernel.h"
 #include "../../libs/atom/eeprom.h"
-#include "../../libs/atom/i2c_mmx_driver.h"
+#include "../../libs/atom/i2c.h"
 #include "../../libs/atom16/pps_maps.h"
 #include <ctype.h>
 
@@ -15,7 +15,7 @@
 #pragma config JTAGEN = OFF             // JTAG Enable bit (JTAG is disabled)
 
 // FPOR
-#pragma config ALTI2C1 = OFF            // Alternate I2C1 pins (I2C1 mapped to SDA1/SCL1 pins)
+#pragma config ALTI2C1 = ON             // Alternate I2C1 pins (I2C1 mapped to SDA1/SCL1 pins)
 #pragma config ALTI2C2 = ON             // Alternate I2C2 pins (I2C2 mapped to SDA2/SCL2 pins)
 #pragma config WDTWIN = WIN25           // Watchdog Window Select bits (WDT Window is 25% of WDT period)
 
@@ -45,107 +45,363 @@
 #pragma config GCP = OFF                // General Segment Code-Protect bit (General Segment Code protect is Disabled)
 
 int main(void);
-/**
- * Receive a buffer from the serial interface and convert to a can message
- * @param config
- * @param 
- * @param len
+
+/*
+ * diy-efis can interface
+ *
+ * diy-efis slave header
+ * |7 6 5 4 3 2 1 0|  Byte 0
+ *  +-----+-----+ |
+ *        |       +---- R/W bit (0 = write, 1 = read)
+ *        +------------ Slave address Default ix 0x48
+ *
+ * |7 6 5 4 3 2 1 0|  Byte 1 - Register address
+ *  | +-----+-----+
+ *  |       +-------- Address (see below)
+ *  +---------------- Auto increment.  Will do a multiple read/write till master sets end
+ *
+ * 1..n bytes of register read/write
+ *
+ * Register 0x10    Status/control register
+ * |7 6 5 4 3 2 1 0|
+ *  | 0 0 0 | | | +--- RO RX Ready.   At least 1 canmsg is available fron the FIFO
+ *  |       | | +----- RO TX FULL.    The transmit fifo is full
+ *  |       | +------- RW RXOVF       Receive overflow.  At least 1 message lost. 
+ *  |       +--------- RW MASK        Mask and acceptance registers enable
+ *  +----------------- RW Enable      Enable bit.  Default 0.
+ *
+ * Register 0x11    Version
+ * |7 6 5 4 3 2 1 0|
+ *  +------+------+
+ *         +---------- RO Revision register, 0x00010001
+ * Register 0x12    MASK Low
+ * |7 6 5 4 3 2 1 0|
+ *  +------+------+
+ *         +---------- RW Mask bits 0-7  1=enable compare, 0 = don't enable
+ * Register 0x13    MASK High
+ * |7 6 5 4 3 2 1 0|
+ *  0 0 0 0 0 +-+-+
+ *              +----- RW Mask bits 8-10 1=enable compare, 0 = don't enable
+ * Register 0x14    Acceptance Low
+ * |7 6 5 4 3 2 1 0|
+ *  +------+------+
+ *         +---------- RW Acceptance bits 0-7
+ * Register 0x15    MASK High
+ * |7 6 5 4 3 2 1 0|
+ *  0 0 0 0 0 +-+-+
+ *              +----- RW Acceptance bits 8-10
+ * Register 0x16    Bitrate low
+ * |7 6 5 4 3 2 1 0|
+ *  +------+------+
+ *         +---------- Low 7 bits of CAN bitrate * 1000
+ * Register 0x17    Bitrate high
+ * |7 6 5 4 3 2 1 0|
+ *  +------+------+
+ *         +---------- Upper 8 bits of CAN bitrate * 1000
+ * NOTE the maximum value is limited to 1000, minimum is 1
+ * Default is set to 125
+ *
+ * -------------------------- TX FIFO  ---------------------------------------
+ *
+ * Register 0x20    TX Register 0
+ * |7 6 5 4 3 2 1 0|
+ *  +--+--+ | +-+-+
+ *     |    | +----- W  TX address 8-10
+ *     |    +------- W  RTR       Reply bit
+ *     +------------ W  LEN       Length.  When written, registers 22-29 can be
+ *                                loaded with data, on the <reg>(LEN) write the
+ *                                message is sent
+ * Register 0x21    TX Register 1
+ * |7 6 5 4 3 2 1 0|
+ *  +------+------+
+ *         +----------  W TX address 0-7
+ * Register 0x22-29   TX Buffer
+ * |7 6 5 4 3 2 1 0|
+ *  +------+------+
+ *         +----------  W Data    Data to be sent
+ *
+ * -------------------------- RX FIFO  ---------------------------------------
+ *
+ * Register 0x30    RX Register 1
+ * |7 6 5 4 3 2 1 0|
+ *  +--+--+ | +-+-+
+ *     |    | +----- R  RX address 8-10
+ *     |    +------- R  RTR       Reply bit
+ *     +------------ R  LEN       Length.  Number of bytes available in the RX buffer
+ *                                When the last register is read, another will be loaded
+ *                                from the RX queue.  Note all 8 can be read, the reload
+ *                                trigger is only set when register 31 is read and
+ *                                a burst read is being done.
+ * Register 0x31    RX Register 0
+ * |7 6 5 4 3 2 1 0|
+ *  +------+------+
+ *         +---------- R  RX address 0-7
+ * Register 0x32-39   RX Buffer
+ * |7 6 5 4 3 2 1 0|
+ *  +------+------+
+ *         +---------- R  Data    Data to be received
+ *
+ * -------------------------- FIFO Operation  ---------------------------------------
+ *
+ * The intent of the tx and rx fifo is to do burst reads and writes ( Byte 1 bit 7 = 1)
+ *
+ * The following is a burst write
+ *
+ * 0x48 <-- command
+ * 0xA0 <-- write reg20, burst write
+ * 0x61 <-- write 6 bytes, address is 0x1xx
+ * 0xAA <-- address bits 0-7 address is 0x1AA
+ * 0x00 <-- data byte 1
+ * 0x01 <-- data byte 2
+ * 0x02 <-- data byte 3
+ * 0x03 <-- data byte 4
+ * 0x04 <-- data byte 5
+ * 0x05 <-- data byte 6
+ *
+ * once the last register is written the message will be transferred to the tx queue
+ *
+ * the following is a burst read.  only 6 bytes available
+ *
+ * 0x49 <-- command - read
+ * 0x30 <-- read 30, not a burst
+ *
+ * 0x6N <-- length is 6 bytes, N bytes remaining
+ *
+ * 0x49 <-- command - read
+ * 0xB1 <-- read register 31, burst read
+ *
+ * 0xNN <-- byte 1 (Register 31)
+ * 0xNN <-- byte 2 (Register 32)
+ * 0xNN <-- byte 3 (Register 33)
+ * 0xNN <-- byte 4 (Register 34)
+ * 0xNN <-- byte 5 (Register 35)
+ * 0xNN <-- byte 6 (Register 36)
+ * 0xNN <-- byte 7 (Register 37)  -> last data register, load next canmsg from queue
  */
-static void process_serial(uart_config_t *uart, uint8_t *buffer, uint8_t len);
 
-#define RX_BUFFER_LENGTH 128
-static uint8_t rx_buffer[RX_BUFFER_LENGTH];
+#define DIYEFIS_ID  0x48
 
-#define TX_BUFFER_LENGTH 32
+#define RXRDY 0x01
+#define TXFULL 0x02
+#define RXOVF 0x04
+#define MSKEN 0x08
+#define ENBL  0x80
+
+static uint8_t regs10[8];           // registers 0x10 - 0x17
+static uint8_t regs20[10];          // registers 0x20 - 0x29
+static uint8_t regs30[10];          // registers 0x30 - 0x39
+
+
+static neutron_parameters_t init_params = 
+  {
+  .node_name = "diy-efis",
+  .node_type = 0,
+  .hardware_revision = 0x30,
+  .software_revision = 0x10,
+  .bitrate = 125
+  };
+
+#define EEPROM_SIZE (128L * 1024L)    // eeprom is 128k bytes
+uint32_t fcy = 70000;
+
+static deque_p i2c_rx_queue;      // messages to be sent to the I2C
+static deque_p i2c_tx_queue;      // messages received from the I2C
+
+static void set_rxrdy(bool is_it)
+  {
+  // open collector
+  if(is_it)
+    {
+    regs10[0] |= RXRDY;
+    PORTBbits.RB15 = 0;
+    TRISBbits.TRISB15 = 0;
+    }
+  else
+    {
+    TRISBbits.TRISB15 = 1;
+    regs10[0] &= ~RXRDY;
+    }
+  }
+
+static void set_txfull(bool is_it)
+  {
+  // open collector
+  if(is_it)
+    {
+    PORTBbits.RB10 = 0;
+    TRISBbits.TRISB10 = 0;
+    regs10[0] |= TXFULL;
+    }
+  else
+    {
+    regs10[0] &= ~TXFULL;
+    TRISBbits.TRISB10 = 1;
+    }
+  }
+
+static result_t process_can(const canmsg_t *msg, void *parg)
+  {
+  if((regs10[0] & ENBL)== 0)
+    return s_ok;
+  
+  // queue the packet, aloow 5 msec for the queue
+  if(failed(push_back(i2c_rx_queue, msg, 5)))
+    // set the overflow flag
+    regs10[0] |= RXOVF;
+  else
+    regs10[0] &= ~RXOVF;
+
+  set_rxrdy(true);           // flag at least 1 message
+  return s_ok;
+  }
+
+static result_t valid_reg(int channel, uint8_t reg)
+  {
+  if(reg >= 0x10 && reg <= 0x18)
+    return s_ok;
+  
+  if(reg >= 0x30 && reg <= 0x39)
+    return s_ok;
+  
+  if(reg >= 0x20 && reg <= 0x29)
+    return s_ok;
+  
+  return s_false;
+  }
+
+static result_t read_reg(int channel, uint8_t reg, uint8_t *value)
+  {
+  if(reg >= 0x10 && reg < 0x18)
+    {
+    *value = regs10[reg - 0x10];
+    return s_ok;
+    }
+  
+  if(reg >= 0x20 && reg <= 0x29)
+    {
+    *value = regs20[reg - 0x20];
+    return s_ok;
+    }
+  
+  if(reg >= 0x30 && reg <= 0x39)
+    {
+    // when we read reg 30 we pop the can queue
+    if(reg == 0x30)
+      {
+      canmsg_t msg;
+      if(failed(pop_front_from_isr(i2c_rx_queue, &msg)))
+        {
+        // no more data :-(
+        set_rxrdy(false);       // flag no more data
+        return e_no_more_information;
+        }
+      
+      // copy the message into the buffer
+      regs30[0] = msg.flags >> 8;
+      regs30[1] = msg.flags;
+      memcpy(&regs30[2], msg.raw, 8);
+      }
+    
+    *value = regs30[reg - 0x30];
+    
+    if(((regs30[0]>> 4) + 0x31) == reg)  // last byte read?
+      {
+      uint16_t num_rx;
+      count(i2c_rx_queue, &num_rx);
+      
+      set_rxrdy(num_rx > 0);
+      }
+    
+    return s_ok;
+    }
+  
+  return e_unexpected;
+  }
+
+static result_t write_reg(int channel, uint8_t reg_num, uint8_t value)
+  {
+  if(reg_num >= 0x10 && reg_num < 0x18)
+    {
+    reg_num -= 0x10;
+    
+    uint8_t old_reg = regs10[reg_num];
+    
+    // decide what was changed....
+    if(reg_num == 0)
+      {
+      value &= ENBL;        // only flag we can change
+      regs10[0] &= ~ENBL;
+      regs10[0] |= value;
+      // see if the register changed
+      if((old_reg & ENBL) != value)
+        {
+        if(value != 0)
+          {
+          // opening the channel
+          uint16_t rate = regs10[0x16];
+          rate |= regs10[0x17] << 8;
+          bsp_set_can_rate(rate);
+          
+          // do other opening stuff...
+          // this will be the masks, for now just accept everything
+          set_txfull(false);     // we are ready to send..
+          }
+        else
+          {
+          // closing the channel
+          reset(i2c_rx_queue);
+          reset(i2c_tx_queue);
+          
+          // clear the irq flags
+          set_rxrdy(false);
+          set_txfull(false);
+          
+          // clear the flags
+          regs10[0] &= ~RXOVF;
+          }
+        }
+      }
+    else
+      regs10[reg_num] = value;
+    
+    
+    return s_ok;
+    }
+  
+  if(reg_num >= 0x20 && reg_num < 0x2A)
+    {
+     regs20[reg_num - 0x20] = value;
+    
+    if(((regs20[0]>> 4) + 0x21) == reg_num)  // last byte written?
+      {
+      canmsg_t msg;
+      msg.flags = (regs20[0] << 8) | regs20[1];
+      if((regs20[0]>> 4) > 0)
+        memcpy(msg.raw, &regs20[2], regs20[0]>> 4);
+      
+      if(failed(push_back(i2c_tx_queue, &msg, 0)))
+        {
+        set_txfull(true);       // not ready any more...
+        return e_no_space;
+        }
+       
+      // if the queue is full then reset ready
+      uint16_t num_tx;
+      capacity(i2c_tx_queue, &num_tx);
+      
+      if(num_tx == 0)
+        set_txfull(true);       // not ready any more...
+      }
+    
+    return s_ok;
+    }
+  
+  return e_unexpected;
+  }
 
 static bool factory_reset = false;
 
-static uart_config_t uart_config = {
-                                    .uart_number = 1,
-                                    .rate = 57600,
-                                    .eol_char = '\n',
-                                    .rx_buffer = rx_buffer,
-                                    .rx_length = RX_BUFFER_LENGTH,
-                                    .eol_char = '\r',
-                                    .flags = UART_EOL_CHAR,
-                                    .callback.uart_callback = process_serial,
-  };
-
-#define BELL 7
-#define CR 13
-#define LR 10
-
-static uint8_t timestamping = 0;
-static bool overflow_warning = false;
-
-typedef enum _can_state_t
-  {
-  can_closed,
-  can_open,
-  can_loopback,
-  can_listen,
-  } can_state_t;
-
-static can_state_t can_state;
-
-typedef enum _config_state
-  {
-  config_can,
-  config_serial,
-  config_complete
-  } config_state;
-
-static neutron_parameters_t init_params = {
-                                           .node_name = "diy-efis",
-                                           .node_type = 0,
-                                           .hardware_revision = 0x30,
-                                           .software_revision = 0x10,
-  };
-
-static void send_nibble(uart_config_t *config, uint8_t value)
-  {
-  value = value & 0x0f;
-  if (value > 9)
-    value = value - 10 + 'A';
-  else
-    value = value + '0';
-
-  write_uart(config, value);
-  }
-
-/**
- * Send given byte value as hexadecimal string
- *
- * @param value Byte value to send over UART
- */
-static void send_hex(uart_config_t *config, uint8_t value)
-  {
-  send_nibble(config, value >> 4);
-  send_nibble(config, value);
-  }
-
-#define MSG_BUFFER_LEN  256
-static deque_p can_msg_buffer;
-
-
-#define I_PLLPRE 0
-#define I_PLLPOST 0
-#define I_PLLDIV ((((FCY * 2)/I_OSC)*(I_PLLPRE+2)*(2*(I_PLLPOST+1)))-2)
-
-static bool process_can(const canmsg_t *msg, void *parg)
-  {
-  if(msg == 0)
-    return false;
-  // push it onto the worker queue
-  if(failed(push_back(can_msg_buffer, msg, 0)))
-    {
-    // set the overflow flag
-    overflow_warning = true;
-    }
-  
-  return true;
-  }
-static msg_hook_t hook = { 0, 0, process_can };
+static msg_hook_t hook = { .callback = process_can };
 
 void panic()
   {
@@ -159,374 +415,22 @@ void malloc_failed_hook(uint16_t size)
   panic();
   }
 
-/**
- * Parse hex value of given string
- *
- * @param line Input string
- * @param len Count of characters to interpret
- * @param value Pointer to variable for the resulting decoded value
- * @return 0 on error, 1 on success
- */
-static uint8_t parse_hex(uint8_t * line, uint8_t len, unsigned long * value)
+static void test_key(uint16_t *prev_state, uint16_t port_bits, uint16_t mask, uint16_t id)
   {
-  *value = 0;
-  while (len--)
+  uint16_t old_state = *prev_state & mask;
+  uint16_t masked_bits = port_bits & mask;
+
+  if(old_state != masked_bits)       // test for change
     {
-    if (*line == 0) return 0;
-    *value <<= 4;
-    if ((*line >= '0') && (*line <= '9'))
-      *value += *line - '0';
-    else if ((*line >= 'A') && (*line <= 'F'))
-      *value += *line - 'A' + 10;
-    else if ((*line >= 'a') && (*line <= 'f'))
-      *value += *line - 'a' + 10;
-    else return 0;
-    line++;
-    }
-  return 1;
-  }
-
-/**
- * Interprets given line and transmit can message
- *
- * @param line Line string which contains the transmit command
- * @returns true if the message was posted, false if queue full
- */
-static bool transmit_can(uart_config_t *config, uint8_t *line)
-  {
-  if (can_state == can_closed)
-    return true;
-
-  unsigned long temp;
-  uint8_t idlen;
-  uint8_t *ptr;
-
-  canmsg_t canmsg;
-  ptr = (uint8_t *) & canmsg;
-
-  for (temp = 0; temp < sizeof (canmsg_t); temp++)
-    *ptr++ = 0;
-
-  if (((line[0] == 'r') || (line[0] == 'R')))
-    canmsg.reply = 1;
-
-  // upper case -> extended identifier
-  if (line[0] < 'Z')
-    {
-    idlen = 8;
-    }
-  else
-    idlen = 3;
-
-  if (!parse_hex(&line[1], idlen, &temp))
-    return 0;
-  canmsg.id = temp;
-
-  if (!parse_hex(&line[1 + idlen], 1, &temp))
-    return 0;
-
-  canmsg.length = temp;
-
-  if (canmsg.reply == 0)
-    {
-    uint8_t i;
-    uint8_t length = canmsg.length;
-    if (length > 8)
-      length = 8;
-    for (i = 0; i < length; i++)
-      {
-      if (!parse_hex(&line[idlen + 2 + i * 2], 2, &temp))
-        return 0;
-      canmsg.raw[i] = temp;
-      }
-    }
-
-  can_send_raw(&canmsg);
-
-  return true;
-  }
-
-// Setup with user defined timing settings for CNF1/CNF2/CNF3
-
-static uint8_t set_userdefined_timing(uart_config_t *config, uint8_t cmd, uint8_t *buffer, uint8_t len)
-  {
-
-  return CR;
-  }
-
-// Setup with standard CAN bitrates
-
-static uint8_t setup_standard_timing(uart_config_t *config, uint8_t cmd, uint8_t *buffer, uint8_t len)
-  {
-  // since this is a CanFLY device we always run at 125k
-  return buffer[1] == '4' ? CR : BELL;
-  }
-
-// Get hardware version
-
-static uint8_t get_hardware_version(uart_config_t *config, uint8_t cmd, uint8_t *buffer, uint8_t len)
-  {
-  write_uart(config, 'V');
-  send_hex(config, 1);
-  send_hex(config, 0);
-  return CR;
-  }
-
-// Get firmware version
-
-static uint8_t get_firmware_version(uart_config_t *config, uint8_t cmd, uint8_t *buffer, uint8_t len)
-  {
-  write_uart(config, 'v');
-  send_hex(config, 1);
-  send_hex(config, 0);
-  return CR;
-  }
-
-// Get serial number
-
-static uint8_t get_serial_number(uart_config_t *config, uint8_t cmd, uint8_t *buffer, uint8_t len)
-  {
-  write_uart(config, 'N');
-  send_hex(config, 0xFF);
-  send_hex(config, 0xFF);
-  return CR;
-  }
-
-// Open CAN channel
-
-static uint8_t set_state(uart_config_t *config, uint8_t cmd, uint8_t *buffer, uint8_t len)
-  {
-  // O = open
-  // l = loop-back mode
-  // L = listen only mode
-  // C = close
-  switch (cmd)
-    {
-    case 'O':
-      can_state = can_open;
-      break;
-    case 'l':
-      can_state = can_loopback;
-      break;
-    case 'L':
-      can_state = can_listen;
-      break;
-    case 'C':
-      can_state = can_closed;
-      break;
-    }
-  return CR;
-  }
-
-// Read status flags
-
-static uint8_t read_status_flags(uart_config_t *config, uint8_t cmd, uint8_t *buffer, uint8_t len)
-  {
-  uint8_t status = 0;
-
-  if (overflow_warning)
-    status |= 0x08;
-  /*
-    if (flags & 0x01) status |= 0x04; // error warning
-    if (flags & 0xC0) status |= 0x08; // data overrun
-    if (flags & 0x18) status |= 0x20; // passive error
-    if (flags & 0x20) status |= 0x80; // bus error
-   */
-  write_uart(config, 'F');
-  send_hex(config, status);
-
-  overflow_warning = false;
-
-  return CR;
-  }
-
-static uint8_t process_transmit_command(uart_config_t *config, uint8_t cmd, uint8_t *buffer, uint8_t len)
-  {
-  if (can_state != can_open &&
-      can_state != can_loopback)
-    return BELL;
-
-  // r -> transmit rtr 11 bits
-  // t -> transmit 11 bit id
-  // R -> transmit RTR 29 bits
-  // T -> transmit 29 bit id
-  if (transmit_can(config, buffer))
-    {
-    write_uart(config, 'z');
-    return CR;
-    }
-
-  return BELL;
-  }
-
-static uint8_t set_timestamping(uart_config_t *config, uint8_t cmd, uint8_t *buffer, uint8_t len)
-  {
-  unsigned long stamping;
-  if (parse_hex(&buffer[1], 1, &stamping))
-    {
-    timestamping = (stamping != 0);
-    return CR;
-    }
-
-
-  return BELL;
-  }
-
-static uint8_t process_query_command(uart_config_t *config, uint8_t cmd, uint8_t *buffer, uint8_t len)
-  {
-  // q = 11 bit identifier query
-  // Q = 29 bit identifier query
-  // set the data logging protocol
-  // Format is 
-  //  [q|Q]sssssssseeeeeeeerrr[admM]
-  //
-  // ssssssss Start timestamp in seconds since 1/1/2000
-  // eeeeeeee End timestamp in seconds since 1/1/2000
-  // rrr  Sample window in seconds
-  // admM   a = avg of sample window
-  //        d = stddev of sample window
-  //        m = min of sample window
-  //        M = max of sample window
-
-  return CR;
-  }
-
-// playback rate of report in MS
-
-static uint8_t set_playback_rate(uart_config_t *config, uint8_t cmd, uint8_t *buffer, uint8_t len)
-  {
-
-  return CR;
-  }
-
-static uint8_t define_report(uart_config_t *config, uint8_t cmd, uint8_t *buffer, uint8_t len)
-  {
-  // 11 bit attribute format
-  // 29 bit attribute format
-  // Add attribute to report.
-  //
-  // [aA][CR] will clear the report definition
-  // [a]000fff[CR] add all logged attributes to the report
-  // [A]0000ffff[CR] add all logged attributes to the report (29 bit)
-  // [a]nnn   add the specific ID to the report
-  // [A]nnnn  add the specific 29 bit attribute to the report
-  // [a]nnnlll  add the range of attributes to the report
-  // [A]nnnnllll  add the range of 29 bit attributes to the report
-
-  return CR;
-  }
-
-static uint8_t configure_logging(uart_config_t *config, uint8_t cmd, uint8_t *buffer, uint8_t len)
-  {
-  // add 11 bit attribute to logging
-  // add a 29 bit attribute to logging
-  // Add a tag to be data logged.  maximum number is 128 tags
-  //
-  //  [g]nnn[CR]    add a specific 11 bit id to the logger
-  //  [G]nnnn[CR]   add a specific 29 bit id to the logger
-  // immm[CR]   Set the sample rate in milliseconds
-  // g[CR]      Return all logged tags with last known value (11 bit format)
-  // G[CR]      Return all logged tags with last known value (29 bit format)
-  return CR;
-  }
-
-static uint8_t set_acceptance_mask(uart_config_t *config, uint8_t cmd, uint8_t *buffer, uint8_t len)
-  {
-
-  return CR;
-  }
-
-static void process_serial(uart_config_t *config, uint8_t *buffer, uint8_t len)
-  {
-  if (buffer == 0)
-    return;
-
-  // we have a serial line
-  uint8_t result = BELL;
-
-  switch (buffer[0])
-    {
-    case 'S':
-      result = setup_standard_timing(config, buffer[0], buffer + 1, len - 1);
-      break;
-    case 's':
-      result = set_userdefined_timing(config, buffer[0], buffer + 1, len - 1);
-      break;
-    case 'V':
-      result = get_hardware_version(config, buffer[0], buffer + 1, len - 1);
-      break;
-    case 'v':
-      result = get_firmware_version(config, buffer[0], buffer + 1, len - 1);
-      break;
-    case 'N':
-      result = get_serial_number(config, buffer[0], buffer + 1, len - 1);
-      break;
-    case 'O':
-      result = set_state(config, buffer[0], buffer + 1, len - 1);
-      break;
-    case 'l':
-      result = set_state(config, buffer[0], buffer + 1, len - 1);
-      break;
-    case 'L':
-      result = set_state(config, buffer[0], buffer + 1, len - 1);
-      break;
-    case 'C':
-      result = set_state(config, buffer[0], buffer + 1, len - 1);
-      break;
-    case 'r': // Transmit standard RTR (11 bit) frame
-    case 't': // Transmit standard (11 bit) frame
-    case 'R': // Transmit extended RTR (29 bit) frame
-    case 'T': // Transmit extended (29 bit) frame
-      result = process_transmit_command(config, buffer[0], buffer + 1, len - 1);
-      break;
-    case 'F':
-      result = read_status_flags(config, buffer[0], buffer + 1, len - 1);
-      break;
-    case 'Z': // Set time stamping
-      result = set_timestamping(config, buffer[0], buffer + 1, len - 1);
-      break;
-    case 'q':
-    case 'Q':
-      result = process_query_command(config, buffer[0], buffer + 1, len - 1);
-      break;
-    case 'P':
-      result = set_playback_rate(config, buffer[0], buffer + 1, len - 1);
-      break;
-    case 'a':
-    case 'A':
-      result = define_report(config, buffer[0], buffer + 1, len - 1);
-      break;
-    case 'g':
-    case 'G':
-      result = configure_logging(config, buffer[0], buffer + 1, len - 1);
-      break;
-    case 'm':
-    case 'M':
-      result = set_acceptance_mask(config, buffer[0], buffer + 1, len - 1);
-      break;
-
-    }
-
-  // send the command reponse
-  write_uart(config, result);
-  }
-
-static uint16_t keys = 0;
-
-static void test_key(uint16_t portb, uint16_t mask, uint16_t id)
-  {
-  uint16_t old_keys = keys & mask;
-  uint16_t masked_bits = portb & mask;
-
-  if(old_keys != masked_bits)       // test for change
-    {
-    keys &= ~mask;            // kill bit
-    keys |= masked_bits;      // new key
+    *prev_state &= ~mask;            // kill bit
+    *prev_state |= masked_bits;      // new key
     
     canmsg_t msg;
     
     // if the key is pressed portb will be 0, so send a 1
-    process_can(create_can_msg_int16(&msg, id, 0, masked_bits == 0 ? 1 : 0), 0);
+    push_back(i2c_rx_queue,
+              create_can_msg_int16(&msg, id, 0, masked_bits == 0 ? 1 : 0),
+              INDEFINITE_WAIT);
     }
   }
 
@@ -538,7 +442,7 @@ static const int16_t transitions[16] =
    0,  1, -1,  0
   };
 
-static void test_encoder(uint16_t portb, uint16_t a_mask, uint16_t b_mask, uint16_t id)
+static void test_encoder(uint16_t *prev_state, uint16_t port_bits, uint16_t a_mask, uint16_t b_mask, uint16_t id)
   {
   // encoder is as follows
   //    A       B
@@ -546,16 +450,16 @@ static void test_encoder(uint16_t portb, uint16_t a_mask, uint16_t b_mask, uint1
   //    1       0
   //    1       1
   //    0       1
-  uint16_t old_keys = keys & (a_mask | b_mask);
-  uint16_t masked_bits = portb & (a_mask | b_mask);
+  uint16_t old_state = *prev_state & (a_mask | b_mask);
+  uint16_t masked_bits = port_bits & (a_mask | b_mask);
   
-  if(old_keys != masked_bits)
+  if(old_state != masked_bits)
     {
     uint16_t state = 0;
     
-    if(old_keys & a_mask)
+    if(old_state & a_mask)
       state |= 8;
-    if(old_keys & b_mask)
+    if(old_state & b_mask)
       state |= 4;
     
     if(masked_bits & a_mask)
@@ -563,11 +467,12 @@ static void test_encoder(uint16_t portb, uint16_t a_mask, uint16_t b_mask, uint1
     if(masked_bits & b_mask)
       state |= 1;
     
-    keys &= ~(a_mask | b_mask);
-    keys |= masked_bits;
+    *prev_state &= ~(a_mask | b_mask);
+    *prev_state |= masked_bits;
     
     if(transitions[state] != 0)
       {
+      // queue up the message, simulating a message from the canbus
       canmsg_t msg;
       process_can(create_can_msg_int16(&msg, id, 0, transitions[state]), 0);
       }
@@ -580,105 +485,118 @@ static void keys_worker(void *parg)
   uint16_t decka_id;
   uint16_t deckb_id;
   
+  uint16_t key0_state = 0;
+  uint16_t decka_state = 0;
+  uint16_t deckb_state = 0;
+  
   semaphore_p worker_semp;
   
   semaphore_create(&worker_semp);
   
   if(failed(reg_get_uint16(0, "key0-id", &key0_id)))
-    key0_id = id_user_defined_start + 100;
+    key0_id = id_key0;
   
   if(failed(reg_get_uint16(0, "decka-id", &decka_id)))
-    decka_id = id_user_defined_start + 101;
+    decka_id = id_decka;
   
   if(failed(reg_get_uint16(0, "deckb-id", &deckb_id)))
-    deckb_id = id_user_defined_start + 102;
+    deckb_id = id_deckb;
   
   while(true)
     {
     // the worker tests the keys every 100msec
     semaphore_wait(worker_semp, 100);
     
-    test_key(PORTB, 1 << 14, key0_id);
-    test_encoder(PORTA, 1 << 0, 1 << 1, decka_id);
-    test_encoder(PORTB, 1 << 0, 1 << 1, deckb_id);
+    test_key(&key0_state, PORTB, 1 << 14, key0_id);
+    test_encoder(&decka_state, PORTA, 1 << 0, 1 << 1, decka_id);
+    test_encoder(&deckb_state, PORTB, 1 << 0, 1 << 1, deckb_id);
     }  
   }
-
-
-#define EEPROM_SIZE (128L * 1024L)    // eeprom is 128k bytes
 
 static void main_task(void *parg)
   {
   
   // initialize the eeprom as we need our settings first
   eeprom_init(factory_reset, I2C_CHANNEL_2, EEPROM_SIZE);
+  
+  // init the slave
+  i2cs_init(I2C_CHANNEL_1, DIYEFIS_ID, read_reg, write_reg, valid_reg);
 
   uint16_t node_id;
   if (failed(reg_get_uint16(0, "node-id", &node_id)))
     node_id = 200;
 
   init_params.node_id = node_id;
-
-  // start the canbus stuff working
-  neutron_init(&init_params, factory_reset);
+  
+  uint16_t tx_queue_length = 256;
+  uint16_t rx_queue_length = 256;
+  
+  reg_get_uint16(0, "tx-queue-len", &tx_queue_length);
+  reg_get_uint16(0, "rx-queue-len", &rx_queue_length);
   
   // create a queue
-  deque_create(sizeof(canmsg_t), MSG_BUFFER_LEN, &can_msg_buffer);
+  deque_create(sizeof(canmsg_t), tx_queue_length, &i2c_tx_queue);
+  deque_create(sizeof(canmsg_t), rx_queue_length, &i2c_rx_queue);
+  
+  reg_get_uint16(0, "rate", &init_params.bitrate);
+ 
+  regs10[0x16] = init_params.bitrate;
+  regs10[0x17] = init_params.bitrate >> 8;
+  
+  // start the canbus stuff working
+  can_aerospace_init(&init_params, true, false);
   
   subscribe(&hook);
-
-  int i;
-
-  uint16_t value;
+  
+  // TODO: cli for the module
   
   task_create("KEYS", DEFAULT_STACK_SIZE, keys_worker, 0, NORMAL_PRIORITY, 0);
-  
-  // TODO: read other config values that are set....
-  if (failed(reg_get_uint16(0, "baud-rate", &value)))
-    value = 57600;
-
-  uart_config.rate = value;
-
-  open_uart(&uart_config, DEFAULT_STACK_SIZE, DEFAULT_STACK_SIZE);
-
-  // and publish our values
-  //register_datapoints(published_parameter, numelements(published_parameter));
   
   // now we just spin
   while(true)
     {
     canmsg_t msg;
-    if(succeeded(pop_front(can_msg_buffer, &msg, INDEFINITE_WAIT)))
+    if(succeeded(pop_front(i2c_tx_queue, &msg, INDEFINITE_WAIT)))
       {
-      if(can_state > can_closed)
-        {
-        write_uart(&uart_config, 't');
-        send_nibble(&uart_config, msg.id >> 8); // upper 3 bits
-        send_hex(&uart_config, msg.id); // lower 8 bits
-        send_nibble(&uart_config, msg.length); // length
-
-        for (i = 0; i < msg.length; i++)
-          send_hex(&uart_config, msg.raw[i]);
-
-        write_uart(&uart_config, CR);  
-        }
+      if((regs10[0] & ENBL) != 0)
+        can_send_raw(&msg);         // send to the bus..
       }
+    
+    uint16_t tx_cap;
+    capacity(i2c_tx_queue, &tx_cap);
+    if(tx_cap > 2)
+      set_txfull(false);            // flag we can send
     }
   }
 
+#define I_PLLPRE 0
+#define I_PLLPOST 0
+#define I_FOSC 140000000
+#define I_FIN 10000000
+#define I_PLLDIV 54 // ((I_OSC/I_FIN)*(I_PLLPRE+2)*(2*(I_PLLPOST+1)))-2
+
 int main(void)
   {
+  ANSELAbits.ANSA0 = 0;
+  ANSELAbits.ANSA1 = 0;
+  ANSELBbits.ANSB0 = 0;
+  ANSELBbits.ANSB1 = 0;
   TRISAbits.TRISA0 = 1;
   TRISAbits.TRISA1 = 1;
   TRISBbits.TRISB0 = 1;
   TRISBbits.TRISB1 = 1;
+  TRISBbits.TRISB10 = 1;
   TRISBbits.TRISB12 = 1;
+  TRISBbits.TRISB15 = 1;
   CNPUAbits.CNPUA0 = 1;
   CNPUAbits.CNPUA1 = 1;
-  CNPUBbits.CNPUB0 = 1;
-  CNPUBbits.CNPUB1 = 1;
+  CNPUBbits.CNPUB8 = 1;
+  CNPUBbits.CNPUB9 = 1;
+  CNPUBbits.CNPUB10 = 1;
   CNPUBbits.CNPUB12 = 1;
-  
+  CNPUBbits.CNPUB14 = 1;
+  CNPUBbits.CNPUB15 = 1;
+ 
   // set up the PLL for 20Mips
   // FOSC = 10mHz
   // FPLLI = 5Mhz
@@ -705,18 +623,19 @@ int main(void)
   // map pins
   map_rpo(RP36R, rpo_c1tx);
   map_rpi(rpi_rpi45, rpi_c1rx);
-  map_rpo(RP40R, rpo_u1tx);
-  map_rpi(rpi_rpi47, rpi_u1rx);
-  
 
   factory_reset = PORTBbits.RB12 == 0;
   
-  scheduler_init();
   
-  task_create("MAIN", DEFAULT_STACK_SIZE, main_task, 0, NORMAL_PRIORITY, 0);
-   
-  // and start dispatching
-  neutron_run();
+  // pick up a small malloc amount to get the heap pointer
+  uint32_t mem = (uint32_t) malloc(4);
+  mem = ((mem -1) | 0x0f)+1;
+  // this is for dsPIC33EP256GP which is the largest we support
+  // we loose 20k as the code space is mapped
+  size_t length = 0x8000 - mem;
+  
+  neutron_run((void *)mem, length, "MAIN", DEFAULT_STACK_SIZE << 1, 
+              main_task, 0, NORMAL_PRIORITY, 0);
 
   
   return 0;
