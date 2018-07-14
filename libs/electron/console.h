@@ -40,7 +40,7 @@ it must be removed as soon as possible after the code fragment is identified.
 
 /**
  * Init the console subsytem
- * @return >= 0 if ok
+ * @return
  */
 extern int init_console();
 /**

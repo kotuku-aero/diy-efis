@@ -394,6 +394,7 @@ typedef struct _fontinfo_t {
 // return the pen array and its values
 static result_t get_fontinfo(duk_context *ctx, duk_int_t param, fontinfo_t *fi)
   {
+  result_t result;
   // obj is color : value, width: value
   if (ctx == 0 || fi == 0 || !duk_is_object(ctx, param))
     return e_bad_parameter;
@@ -673,10 +674,8 @@ static duk_ret_t lib_bit_blt(duk_context *ctx)
   point_t src_pt = { 0, 0 };
   
   get_point(ctx, 5, &src_pt);
-
-  canvas_t *canvas;
-  if(failed(get_canvas(handle, &canvas)) ||
-    failed(bit_blt(handle, &clip_rect, &rect, src_canvas, &src_rect, &src_pt)))
+  
+  if (failed(bit_blt(handle, &clip_rect, &rect, src_canvas, &src_rect, &src_pt)))
     return DUK_RET_TYPE_ERROR;
 
   return 0;
@@ -1054,7 +1053,7 @@ static duk_ret_t lib_create_rect_canvas(duk_context *ctx)
   ex.dx = duk_get_uint(ctx, 0);
   ex.dy = duk_get_uint(ctx, 1);
 
-  canvas_t *handle;
+  handle_t handle;
   result_t result;
   if (failed(result = create_rect_canvas(&ex, &handle)))
     {
@@ -1105,9 +1104,9 @@ static duk_ret_t lib_begin_paint(duk_context *ctx)
   result = get_handle(ctx, -1, &handle);
   duk_pop(ctx);
 
-  canvas_t *canvas;
-  begin_paint(handle, &canvas);
-  return create_canvas(ctx, canvas);
+  begin_paint(handle);
+  return 0;
+  return 0;
   }
 
 static duk_ret_t lib_end_paint(duk_context *ctx)
@@ -1121,7 +1120,6 @@ static duk_ret_t lib_end_paint(duk_context *ctx)
   duk_pop(ctx);
 
   end_paint(handle);
-  return 0;
   }
 
 static duk_ret_t lib_invalidate(duk_context *ctx)

@@ -116,7 +116,7 @@ typedef struct _png_stream_t
   uint32_t chunk_length;  // length of the current chunk
   uint32_t source_offset; // current source position in the decoder.
   // canvas details
-  canvas_t *canvas;
+  handle_t canvas;
   point_t origin;
   rect_t clip_rect;
   uint32_t cycle;
@@ -959,7 +959,7 @@ static result_t render_png(png_stream_t *png_stream)
   return cache_color(png_stream, 0, 0, true);
   }
 
-result_t load_png(canvas_t *canvas, handle_t stream, const point_t *pt)
+result_t load_png(handle_t canvas, handle_t stream, const point_t *pt)
   {
   result_t result;
   if (stream == 0 || canvas == 0)
@@ -1062,10 +1062,10 @@ result_t load_png(canvas_t *canvas, handle_t stream, const point_t *pt)
   return result;
   }
 
-result_t create_png_canvas(handle_t stream, canvas_t **canvas)
+result_t create_png_canvas(handle_t stream, handle_t *hndl)
   {
   result_t result;
-  if (stream == 0 || canvas == 0)
+  if (stream == 0 || hndl == 0)
     return e_bad_parameter;
 
   png_stream_t *png_stream;
@@ -1077,19 +1077,19 @@ result_t create_png_canvas(handle_t stream, canvas_t **canvas)
   dim.dx = png_stream->width;
   dim.dy = png_stream->height;
 
-  if (failed(result = create_rect_canvas(&dim, canvas)))
+  handle_t canvas;
+  if (failed(result = create_rect_canvas(&dim, &canvas)))
     {
     stream_close((stream_p)png_stream);
     return result;
     }
 
-  png_stream->canvas = *canvas;
+  png_stream->canvas = canvas;
 
-  if (failed(result = render_png(png_stream)))
-    {
-    canvas_close(*canvas);
-    *canvas = 0;
-    }
+  if (succeeded(result = render_png(png_stream)))
+    *hndl = canvas;
+  else
+    canvas_close(canvas);
 
   stream_close((stream_p)png_stream);
   return result;

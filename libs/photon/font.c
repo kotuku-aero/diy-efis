@@ -98,6 +98,7 @@ static inline uint16_t to_small_endian(uint16_t value)
 
 static const glyph_t *get_glyph(const sized_font_t *font, char ch)
   {
+  uint16_t i;
   uint16_t map_num;
   const font_map_t *map = &font->font_maps[0];
 
@@ -356,12 +357,12 @@ static inline result_t is_valid_font(handle_t hndl, sized_font_t **font)
   return s_ok;
   }
 
-result_t draw_text(canvas_t *canvas, const rect_t *clip_rect, handle_t  fp,
+result_t draw_text(handle_t hndl, const rect_t *clip_rect, handle_t  fp,
   color_t fg, color_t bg, const char *str, uint16_t count, const point_t *pt,
   const rect_t *txt_clip_rect, text_flags format, uint16_t *char_widths)
   {
   result_t result;
-  if (canvas == 0 ||
+  if (hndl == 0 ||
     fp == 0 ||
     str == 0 ||
     pt == 0)
@@ -369,6 +370,10 @@ result_t draw_text(canvas_t *canvas, const rect_t *clip_rect, handle_t  fp,
 
   sized_font_t *font;
   if (failed(result = is_valid_font(fp, &font)))
+    return result;
+
+  canvas_t *canvas;
+  if (failed(result = get_canvas(hndl, &canvas)))
     return result;
 
   // create a clipping rectangle as needed
@@ -466,10 +471,10 @@ result_t draw_text(canvas_t *canvas, const rect_t *clip_rect, handle_t  fp,
   return s_ok;
   }
 
-result_t text_extent(canvas_t *canvas, handle_t fh, const char *str, uint16_t count, extent_t *ex)
+result_t text_extent(handle_t hndl, handle_t fh, const char *str, uint16_t count, extent_t *ex)
   {
   result_t result;
-  if (canvas == 0 ||
+  if (hndl == 0 ||
     fh == 0 ||
     str == 0 ||
     ex == 0)
@@ -482,7 +487,7 @@ result_t text_extent(canvas_t *canvas, handle_t fh, const char *str, uint16_t co
 
   ex->dx = 0;
   if (count == 0)
-    count = (uint16_t) strlen(str);
+    count = strlen(str);
 
   ex->dy = font->vertical_height;
 

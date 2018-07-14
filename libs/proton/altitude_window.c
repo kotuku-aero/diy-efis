@@ -61,8 +61,7 @@ typedef struct _altitude_window_t {
  
 static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
-  canvas_t *canvas;
-  begin_paint(hwnd, &canvas);
+  begin_paint(hwnd);
 
   altitude_window_t *wnd = (altitude_window_t *)proxy->parg;
   rect_t wnd_rect;
@@ -74,7 +73,7 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
   rect_t rect;
   gdi_dim_t median_y = ex.dy >> 1;
 
-  rectangle(canvas, &wnd_rect, 0, wnd->background_color, make_rect(8, 8, ex.dx-8, ex.dy-8, &rect));
+  rectangle(hwnd, &wnd_rect, 0, wnd->background_color, make_rect(8, 8, ex.dx-8, ex.dy-8, &rect));
 	
   int i;
 
@@ -91,8 +90,8 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
 		{
 		extent_t size;
     point_t pt;
-    text_extent(canvas, wnd->font, marks[i].text, marks[i].length, &size);
-		draw_text(canvas, &wnd_rect, wnd->font, color_yellow, wnd->background_color,
+    text_extent(hwnd, wnd->font, marks[i].text, marks[i].length, &size);
+		draw_text(hwnd, &wnd_rect, wnd->font, color_yellow, wnd->background_color,
              marks[i].text, marks[i].length,
              make_point(ex.dx - 9 - size.dx, marks[i].pos -(size.dy >> 1), &pt),
              0, 0, 0);
@@ -131,7 +130,7 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
 			{ 20, marker_line }
 			};
 
-		polyline(canvas, &paint_area, &wnd->pen, 2, pts);
+		polyline(hwnd, &paint_area, &wnd->pen, 2, pts);
 
 		if(line_altitude ==((line_altitude / 500) * 500))
 			{
@@ -139,10 +138,10 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
 
 			uint16_t len = strlen(str);
 			extent_t size;
-      text_extent(canvas, wnd->font, str, len, &size);
+      text_extent(hwnd, wnd->font, str, len, &size);
       point_t pt;
       
-			draw_text(canvas, &paint_area, wnd->font, wnd->text_color, wnd->background_color,
+			draw_text(hwnd, &paint_area, wnd->font, wnd->text_color, wnd->background_color,
                str, len, make_point(23, marker_line -(size.dy >> 1), &pt),
                0, 0, 0);
 			}
@@ -167,11 +166,11 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
 		{ 23,  median_y }
 		};
 
-	polygon(canvas, &wnd_rect, &white_pen, color_black, 8, roller);
+	polygon(hwnd, &wnd_rect, &white_pen, color_black, 8, roller);
 
 	rect_t text_rect;
   (36, median_y-19, 88, median_y+19);
-	display_roller(canvas, make_rect(36, median_y-19, ex.dx-8, median_y+19, &text_rect),
+	display_roller(hwnd, make_rect(36, median_y-19, ex.dx-8, median_y+19, &text_rect),
                  wnd->altitude, 2, color_black, wnd->text_color, wnd->large_roller, wnd->small_roller);
 
 	/////////////////////////////////////////////////////////////////////////////
@@ -215,14 +214,14 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
     }
 
 	rect_t vs_rect;
-  rectangle(canvas, &wnd_rect, 0, color_white,
+  rectangle(hwnd, &wnd_rect, 0, color_white,
             make_rect(ex.dx-8, vs, ex.dx-1, vs_base, &vs_rect));
 
   // draw the text at the top of the VSI
   rect_t vsi_rect;
   make_rect(23, 0, ex.dx-8, 18, &vsi_rect);
 
-  rectangle(canvas, &wnd_rect, &white_pen, color_black, &vsi_rect);
+  rectangle(hwnd, &wnd_rect, &white_pen, color_black, &vsi_rect);
 
   vsi_rect.left++;
   vsi_rect.top++;
@@ -240,10 +239,10 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
 
   uint16_t len = strlen(str);
 	extent_t size;
-  text_extent(canvas, wnd->font, str, len, &size);
+  text_extent(hwnd, wnd->font, str, len, &size);
   point_t pt;
 
-	draw_text(canvas, &vsi_rect, wnd->font, color_green, color_black,
+	draw_text(hwnd, &vsi_rect, wnd->font, color_green, color_black,
            str, len,
            make_point(vsi_rect.left + (rect_width(&vsi_rect)>> 1) - (size.dx >> 1),
                vsi_rect.top+1, &pt),
@@ -252,7 +251,7 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
 	// draw the current QNH
   make_rect(23, ex.dy - 19, ex.dx-8, ex.dy-1, &vsi_rect);
 
-  rectangle(canvas, &wnd_rect, &white_pen, color_black, &vsi_rect);
+  rectangle(hwnd, &wnd_rect, &white_pen, color_black, &vsi_rect);
 
   vsi_rect.left++;
   vsi_rect.top++;
@@ -263,9 +262,9 @@ static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *ms
   sprintf(str, "%d", wnd->qnh);
 
   len = strlen(str);
-  text_extent(canvas, wnd->font, str, len, &size);
+  text_extent(hwnd, wnd->font, str, len, &size);
 
-  draw_text(canvas, &vsi_rect, wnd->font, color_green, color_black,
+  draw_text(hwnd, &vsi_rect, wnd->font, color_green, color_black,
            str, len,
            make_point(vsi_rect.left + (rect_width(&vsi_rect)>> 1) - (size.dx >> 1),
                vsi_rect.top+1, &pt),

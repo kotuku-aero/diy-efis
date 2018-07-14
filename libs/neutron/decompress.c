@@ -502,6 +502,7 @@ static result_t read_uint16(handle_t stream, uint16_t *value)
 result_t decompress(stream_p stream, handle_t parg, get_byte_fn getter, set_byte_fn setter, uint32_t *length)
   {
   result_t result;
+  uint32_t bp = 0;	/*bit pointer in the "in" data, current byte is bp >> 3, current bit is bp & 0x7 (from lsb to msb of the byte) */
   uint32_t pos = 0;	/*byte position in the out buffer */
   uint32_t bytes_read = 0;
 
@@ -548,8 +549,8 @@ result_t decompress(stream_p stream, handle_t parg, get_byte_fn getter, set_byte
         }
       else if (decoder.compression == 1)
         {
-        decoder.codetree_buffer = (huffman_node_t *) fixed_deflate_codetree;
-        decoder.codetree_distance_buffer = (huffman_node_t *) fixed_distance_tree;
+        decoder.codetree_buffer = fixed_deflate_codetree;
+        decoder.codetree_distance_buffer = fixed_distance_tree;
         decoder.codetree = (huffman_tree_t *)neutron_malloc(sizeof(huffman_tree_t));
         decoder.codetree_distances = (huffman_tree_t *)neutron_malloc(sizeof(huffman_tree_t));
         /* fixed trees */

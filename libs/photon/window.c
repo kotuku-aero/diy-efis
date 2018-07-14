@@ -494,8 +494,7 @@ result_t on_paint(handle_t hwnd, struct _event_proxy_t *proxy, const canmsg_t *m
   max_order = z_order;
   painting_order = z_order;
 
-  canvas_t *canvas;
-  begin_paint(hwnd, &canvas);
+  begin_paint(hwnd);
 
   do
     {
@@ -506,7 +505,7 @@ result_t on_paint(handle_t hwnd, struct _event_proxy_t *proxy, const canmsg_t *m
       if (z_order > painting_order)
         {
         // get the next highest order after our own
-        if (next_z_order == painting_order || z_order < next_z_order)
+        if (next_z_order > z_order)
           next_z_order = z_order;
 
         // figure out what the last one to do is.
@@ -546,9 +545,9 @@ result_t defwndproc(handle_t hwnd, const canmsg_t *msg)
       for (item = 0; item < count; item++)
         {
         vector_at(window->events, item, &proxy);
-        if(proxy != 0 && proxy->msg_id == get_can_id(msg))
+        if(proxy != 0 && proxy->msg_id == msg->id)
           {
-          if(get_can_id(msg) == id_paint)
+          if(msg->id == id_paint)
             {
             if(window->invalid)
               {
@@ -600,7 +599,7 @@ static result_t make_window(handle_t hwnd_parent, const rect_t *bounds, wndproc 
   }
 
 static canmsg_t close_msg = {
-  .flags = id_close
+  .id = id_close
   };
 
 result_t close_window(handle_t hwnd)
@@ -1083,17 +1082,6 @@ result_t invalidate_rect(handle_t hwnd, const rect_t *rect)
     return result;
 
   wnd->invalid = true;
-
-  // special case if this is the root window.
-  if (wnd->parent == 0)
-    {
-    // to support a framebuffer, the top level window is
-    // assumed to be double-buffered and the child windows will either
-    // share the canvas or bitblt to the canvas.
-    // this call advises the double-buffering state machine to 
-    // copy the screen canvas to the hardware.
-    bsp_window_invalidated(hwnd);
-    }
 
   // now we need to invalidate our children
   handle_t child = 0;

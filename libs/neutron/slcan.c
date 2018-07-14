@@ -105,7 +105,7 @@ static result_t verify_slcan(handle_t hndl)
   return s_ok;
   }
 
-result_t slcan_create(memid_t key, deque_p msg_rx_queue, comm_device_p *hndl)
+result_t slcan_create(memid_t key, handle_t msg_rx_queue, comm_device_p *hndl)
   {
   result_t result;
   int i;
@@ -218,10 +218,10 @@ result_t slcan_send(comm_device_p hndl, const canmsg_t *msg)
 
   slcan_driver_t *driver = (slcan_driver_t *)hndl;
 
-  uint16_t len = get_can_len(msg);
+  uint16_t len = msg->length;
 
   // TODO: make sure this is an extended ID
-  sprintf(driver->send_buffer, canusb_send_cmd, get_can_id(msg), len);
+  sprintf(driver->send_buffer, canusb_send_cmd, msg->id, len);
   char byte_str[16];
 
   uint16_t n;
@@ -472,7 +472,7 @@ static void slcan_worker(void *parg)
             case 'R' :
               continue;
             case 'r' :
-              set_can_reply(&msg, 1);
+              msg.reply = 1;
               break;
             case 't' :
             default :
@@ -489,31 +489,31 @@ static void slcan_worker(void *parg)
             {
             if(index >= msg_len)
               {
-              set_can_id(&msg, 0);
+              msg.id = 0;
               break;
               }
             // todo: range checks?
             val = driver->str[index++];
             num = tohex(val);
-            set_can_id(&msg, (get_can_id(&msg)  << 4) |(num & 0x0f));
+            msg.id = (msg.id  << 4) |(num & 0x0f);
             }
 
           if(index >= msg_len)
             continue;
 
           //trace_error("Can ID is %d\n", msg.id);
-          set_can_len(&msg, tohex(driver->str[index++]));
+          msg.length = tohex(driver->str[index++]);
 
           //trace_error("Can length is %d\n", len);
-          if(get_can_reply(&msg))
+          if(msg.reply)
             continue;
 
           uint16_t dp;
-          for(dp = 0; dp < get_can_len(&msg); dp++)
+          for(dp = 0; dp < msg.length; dp++)
             {
             if(index >= msg_len)
               {
-              set_can_id(&msg, 0);
+              msg.id = 0;
               break;
               }
             else
@@ -524,7 +524,7 @@ static void slcan_worker(void *parg)
             }
 
           // send the message
-          if(get_can_id(&msg) != 0)
+          if(msg.id != 0)
             {
 //#define _DEBUG_SLCAN
 #ifdef _DEBUG_SLCAN

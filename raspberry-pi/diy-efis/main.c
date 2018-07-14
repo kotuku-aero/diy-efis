@@ -1,32 +1,38 @@
 // Basic can aerospace framework support files
-#include "../../libs/electron/electron.h"
-#include "../../libs/neutron/slcan.h"
+#include "electron.h"
+
 #include "../../libs/proton/proton.h"
 #include "../../libs/muon/muon.h"
 
-#include "diyefis_cli.h"
-#include "../../libs/electron/i2c.h"
-
 #define CAN_TX_BUFFER_LEN 1024
 #define CAN_RX_BUFFER_LEN 1024
-
-extern const char *splash_base64;     // 320x240
 
 const char *node_name = "diy-efis";
 
 int main(int argc, char **argv)
   {
-  result_t result;
-  // Call the electron initialize, after this a registry will be
-  // available.
-  if (failed(result = electron_init(argc, argv)))
-    return result;
+	// The command line can pass in the name of the registry used to set us up.  In any
+  // case we need to implement some code
+  const char *ini_path;
+  if(argc > 1)
+    ini_path = argv[1];
+  else
+    ini_path = "diy-efis.reg";
+
+  // TODO: handle this better
+  bool factory_reset = false;
+
+  electron_init(ini_path, factory_reset);
+
+  // register the muon command line handler
+  muon_initialize_cli();
+
 
   uint16_t node_id;
   if(failed(reg_get_uint16(0, "node-id", &node_id)))
     node_id = mfd_node_id;
 
-  neutron_parameters_t init_params;
+  nuetron_parameters_t init_params;
   init_params.node_id = (uint8_t) node_id;
   init_params.node_type = unit_pi;
   init_params.hardware_revision = 0x11;
@@ -38,33 +44,9 @@ int main(int argc, char **argv)
   init_params.publisher_stack_length = 4096;
 
   // start the canbus stuff working
-  if (failed(result = can_aerospace_init(&init_params, true)))
-    {
-    fprintf(stderr, "Cannot initialize : %d", result);
-    return result;
-    }
+  nuetron_init(&init_params, factory_reset);
 
-  // register the muon command line handler
-  muon_initialize_cli(&diyefis_cli_root);
-
-  proton_args_t args;
-
-  // start proton if the key exists
-  memid_t proton_key;
-  if (succeeded(reg_open_key(0, "proton", &proton_key)))
-    {
-    manifest_create(splash_base64, &args.stream);
-
-    args.ci = 0;
-    args.co = 0;
-    args.cerr = 0;
-
-    task_create("PROTON", DEFAULT_STACK_SIZE * 4, run_proton, &args, NORMAL_PRIORITY, 0);
-    }
-
-  ion_init();
-
-  ion_run(0);
+  run_proton(0);
 
   return 0;
   }
@@ -81,22 +63,24 @@ bool bsp_repaint_framebuffer()
   return true;
   }
 
+#include "../../libs/nuetron/slcan.h"
+
 static handle_t driver;
 
-result_t bsp_can_init(deque_p rx_queue, uint16_t bitrate)
+result_t bsp_can_init(handle_t rx_queue)
   {
   result_t result;
   memid_t key;
-  if(failed(result = reg_open_key(0, "electron", &key)))
+  if(failed(result = reg_open_key(0, "slcan", &key)))
     return result;
 
-  return i2c_init(key, rx_queue, &driver);
+  return slcan_create(key, rx_queue, &driver);
   }
 
-result_t bsp_send_can(const canmsg_t *msg)
+result_t bsp_send_can(const can_msg_t *msg)
   {
   if(msg == 0 || driver == 0)
     return e_bad_parameter;
 
-  return i2c_send_can(driver, msg);
+  return slcan_send(driver, msg);
   }

@@ -86,12 +86,10 @@ void run_proton(proton_args_t *args)
         // guaranteed to be 32 bits
         extent_t ex;
         uint16_t bpp;
-        canvas_t *screen_canvas;
-        if(succeeded(get_canvas(main_window, &screen_canvas)) &&
-           succeeded(get_canvas_extents(screen_canvas, &ex, &bpp)) &&
+        if (succeeded(get_canvas_extents(main_window, &ex, &bpp)) &&
           bpp < 32)
           {
-          canvas_t *canvas = 0;
+          handle_t canvas = 0;
           if (succeeded(create_rect_canvas(&ex, &canvas)) &&
             succeeded(load_png(canvas, args->stream, 0)))
             {
@@ -99,13 +97,12 @@ void run_proton(proton_args_t *args)
             point_t pt = { 0, 0 };
 
             // copy the rendered bitmap over
-            bit_blt(screen_canvas, &wnd_rect, &wnd_rect, canvas, &wnd_rect, &pt);
-            bsp_sync_framebuffer();
+            bit_blt(main_window, &wnd_rect, &wnd_rect, canvas, &wnd_rect, &pt);
             }
           canvas_close(canvas);
           }
         else
-          load_png(screen_canvas, args->stream, 0);
+          load_png(main_window, args->stream, 0);
         stream_close(args->stream);
         }
 
@@ -119,7 +116,7 @@ void run_proton(proton_args_t *args)
 
       // attach the ion interpreter to the screen
       if (failed(result = attach_ion(main_window, key, init_script, args->ci, args->co, args->cerr)))
-        return;
+        return result;
 
       // we now need to see if there are any widgets defined.
       // they are located in a key called widgets

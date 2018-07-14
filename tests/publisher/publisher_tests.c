@@ -158,7 +158,7 @@ static const char *bsp_hive = "electron";
 static const char *bsp_hive = "krypton";
 #endif
 
-result_t bsp_can_init(deque_p rx_queue)
+result_t bsp_can_init(handle_t rx_queue)
   {
   result_t result;
   memid_t key;

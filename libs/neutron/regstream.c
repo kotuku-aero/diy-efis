@@ -146,7 +146,7 @@ static result_t create_handle(memid_t parent, const char *name, bool create, str
       }
     }
 
-  *stream = (stream_p) new_stream;
+  *stream = (stream_p)new_stream;
   return exit_registry(s_ok);
   }
 
@@ -307,6 +307,17 @@ static result_t ensure_stream(regstream_handle_t *stream, uint32_t size)
       return result;
     }
 
+  return s_ok;
+  }
+
+/**
+ * Store a stream back to the registry
+ * @param stream    stream to save
+ * @return s_ok if stored ok
+ */
+static result_t save_stream(regstream_handle_t *stream)
+  {
+  // TODO:
   return s_ok;
   }
 

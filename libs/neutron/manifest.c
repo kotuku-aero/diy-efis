@@ -43,12 +43,12 @@ typedef struct _manifest_handle_t
   // only 1 of these can be valid at a time
   handle_t reg_stream;      // source registry stream if not 0
   const char *literal;      // in-memory stream if not 0
-  uint32_t source_length;   // size of the source buffer
-  uint32_t offset;      // current offset in the stream.
-  uint32_t length;      // length of the stream, can be less than the buffer count
+  uint16_t source_length;   // size of the source buffer
+  uint16_t offset;      // current offset in the stream.
+  uint16_t length;      // length of the stream, can be less than the buffer count
 
   int32_t window_pos;   // decoder start offset (initially -100 which is invalid
-  uint8_t buffer[4];      // sliding work buffer for the decoder.
+  char buffer[4];      // sliding work buffer for the decoder.
   } manifest_handle_t;
 
 // inefficent but very fast...
@@ -73,7 +73,7 @@ static const uint8_t esab64[256] =
   64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64
   };
 
-static result_t decode_byte(manifest_handle_t *stream, uint32_t offset, uint8_t *value)
+static result_t decode_byte(manifest_handle_t *stream, uint16_t offset, uint8_t *value)
   {
   result_t result;
   int32_t offs_32 = offset;
@@ -182,7 +182,7 @@ static result_t manifest_stream_read(stream_handle_t *hndl, void *buffer, uint16
   return s_ok;
   }
 
-static result_t manifest_stream_getpos(stream_handle_t *hndl, uint32_t *pos)
+static result_t manifest_stream_getpos(stream_handle_t *hndl, uint16_t *pos)
   {
   result_t result;
   if (hndl == 0 || pos == 0)
@@ -197,7 +197,7 @@ static result_t manifest_stream_getpos(stream_handle_t *hndl, uint32_t *pos)
   return s_ok;
   }
 
-static result_t manifest_stream_setpos(stream_handle_t *hndl, uint32_t pos)
+static result_t manifest_stream_setpos(stream_handle_t *hndl, uint16_t pos)
   {
   result_t result;
   if (hndl == 0)
@@ -216,7 +216,7 @@ static result_t manifest_stream_setpos(stream_handle_t *hndl, uint32_t pos)
   return s_ok;
   }
 
-static result_t manifest_stream_length(stream_handle_t *hndl, uint32_t *length)
+static result_t manifest_stream_length(stream_handle_t *hndl, uint16_t *length)
   {
   result_t result;
   if (hndl == 0 || length == 0)
@@ -289,13 +289,14 @@ result_t manifest_open(memid_t key, const char *path, stream_p *hndl)
   if (failed(result = stream_read(stream->reg_stream, stream->buffer, 4, 0)))
     return result;
 
-  *hndl = (stream_p)stream;
+  *hndl = stream;
   return s_ok;
 
   }
 
 result_t manifest_create(const char *literal, stream_p *hndl)
   {
+  result_t result;
   manifest_handle_t *stream = (manifest_handle_t *)neutron_malloc(sizeof(manifest_handle_t));
 
   init_stream(stream);
@@ -305,6 +306,6 @@ result_t manifest_create(const char *literal, stream_p *hndl)
 
   memcpy(stream->buffer, stream->literal, 4);
 
-  *hndl = (stream_p)stream;
+  *hndl = stream;
   return s_ok;
   }

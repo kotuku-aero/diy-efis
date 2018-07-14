@@ -24,10 +24,8 @@
       <itemPath>strstream.c</itemPath>
       <itemPath>regstream.c</itemPath>
       <itemPath>stream_printf.c</itemPath>
-      <itemPath>neutron.c</itemPath>
       <itemPath>publisher.c</itemPath>
-      <itemPath>manifest.c</itemPath>
-      <itemPath>decompress.c</itemPath>
+      <itemPath>neutron.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -344,11 +342,6 @@
                   value="report"/>
         <property key="warningmessagebreakoptions.W0111_SIM_UNSUPPORTED_SELECTION"
                   value="report"/>
-        <property key="warningmessagebreakoptions.W0112_SIM_INVALID_OPERATION"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W0113_SIM_WRITE_TO_PROTECTED_SFR"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W0114_SIM_INVALID_KEY" value="report"/>
         <property key="warningmessagebreakoptions.W0201_ADC_NO_STIMULUS_FILE"
                   value="report"/>
         <property key="warningmessagebreakoptions.W0202_ADC_GO_DONE_BIT" value="report"/>
@@ -434,11 +427,6 @@
                   value="report"/>
         <property key="warningmessagebreakoptions.W0400_PWM_PWM_FASTER_THAN_FOSC"
                   value="report"/>
-        <property key="warningmessagebreakoptions.W0600_WDT_2ND_WDT_MR_WRITE"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W0601_WDT_EXPIRED" value="report"/>
-        <property key="warningmessagebreakoptions.W0601_WDT_RESET_OUTSIDE_WINDOW"
-                  value="report"/>
         <property key="warningmessagebreakoptions.W0700_CLC_GENERAL_WARNING"
                   value="report"/>
         <property key="warningmessagebreakoptions.W0701_CLC_CLCOUT_AS_INPUT"
@@ -454,8 +442,6 @@
         <property key="warningmessagebreakoptions.W10102_UNSUPPORTED_CLK_SOURCE"
                   value="report"/>
         <property key="warningmessagebreakoptions.W10103_UNSUPPORTED_RECEIVER_FILTER"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W10301_NO_PORT_PINS_FOUND"
                   value="report"/>
         <property key="warningmessagebreakoptions.W1201_DATAFLASH_MEM_OUTSIDE_RANGE"
                   value="report"/>
@@ -498,16 +484,6 @@
                   value="report"/>
         <property key="warningmessagebreakoptions.W2701_MPU_INVALID_REGION"
                   value="report"/>
-        <property key="warningmessagebreakoptions.W3000_LPM_READ_PROTECTION_SECTION"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W3010_SPM_WRITE_PROTECTION_SECTION"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W6001_RTT_FORBIDDEN_RTPRES"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W6002_RTT_BAD_WRITING_ALMV"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W6003_RTT_BAD_WRITING_RTPRES"
-                  value="report"/>
         <property key="warningmessagebreakoptions.W7001_SMT_CLK_SELECTION_NOT_SUPPORT"
                   value="report"/>
         <property key="warningmessagebreakoptions.W7002_SMT_SIG_SELECTION_NOT_SUPPORT"
@@ -531,10 +507,6 @@
         <property key="warningmessagebreakoptions.W9204_UART_RX_EMPTY_QUEUE"
                   value="report"/>
         <property key="warningmessagebreakoptions.W9205_UART_TX_BADFILE" value="report"/>
-        <property key="warningmessagebreakoptions.W9206_UART_RESERVED_MODE"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W9207_UART_UNABLETOCLOSE_FILE"
-                  value="report"/>
         <property key="warningmessagebreakoptions.W9401_CVREF_INVALIDSOURCESELECTION"
                   value="report"/>
         <property key="warningmessagebreakoptions.W9402_CVREF_INPUT_OUTPUTPINCONFLICT"
@@ -878,11 +850,6 @@
                   value="report"/>
         <property key="warningmessagebreakoptions.W0111_SIM_UNSUPPORTED_SELECTION"
                   value="report"/>
-        <property key="warningmessagebreakoptions.W0112_SIM_INVALID_OPERATION"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W0113_SIM_WRITE_TO_PROTECTED_SFR"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W0114_SIM_INVALID_KEY" value="report"/>
         <property key="warningmessagebreakoptions.W0201_ADC_NO_STIMULUS_FILE"
                   value="report"/>
         <property key="warningmessagebreakoptions.W0202_ADC_GO_DONE_BIT" value="report"/>
@@ -968,11 +935,6 @@
                   value="report"/>
         <property key="warningmessagebreakoptions.W0400_PWM_PWM_FASTER_THAN_FOSC"
                   value="report"/>
-        <property key="warningmessagebreakoptions.W0600_WDT_2ND_WDT_MR_WRITE"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W0601_WDT_EXPIRED" value="report"/>
-        <property key="warningmessagebreakoptions.W0601_WDT_RESET_OUTSIDE_WINDOW"
-                  value="report"/>
         <property key="warningmessagebreakoptions.W0700_CLC_GENERAL_WARNING"
                   value="report"/>
         <property key="warningmessagebreakoptions.W0701_CLC_CLCOUT_AS_INPUT"
@@ -988,8 +950,6 @@
         <property key="warningmessagebreakoptions.W10102_UNSUPPORTED_CLK_SOURCE"
                   value="report"/>
         <property key="warningmessagebreakoptions.W10103_UNSUPPORTED_RECEIVER_FILTER"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W10301_NO_PORT_PINS_FOUND"
                   value="report"/>
         <property key="warningmessagebreakoptions.W1201_DATAFLASH_MEM_OUTSIDE_RANGE"
                   value="report"/>
@@ -1032,16 +992,6 @@
                   value="report"/>
         <property key="warningmessagebreakoptions.W2701_MPU_INVALID_REGION"
                   value="report"/>
-        <property key="warningmessagebreakoptions.W3000_LPM_READ_PROTECTION_SECTION"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W3010_SPM_WRITE_PROTECTION_SECTION"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W6001_RTT_FORBIDDEN_RTPRES"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W6002_RTT_BAD_WRITING_ALMV"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W6003_RTT_BAD_WRITING_RTPRES"
-                  value="report"/>
         <property key="warningmessagebreakoptions.W7001_SMT_CLK_SELECTION_NOT_SUPPORT"
                   value="report"/>
         <property key="warningmessagebreakoptions.W7002_SMT_SIG_SELECTION_NOT_SUPPORT"
@@ -1065,10 +1015,6 @@
         <property key="warningmessagebreakoptions.W9204_UART_RX_EMPTY_QUEUE"
                   value="report"/>
         <property key="warningmessagebreakoptions.W9205_UART_TX_BADFILE" value="report"/>
-        <property key="warningmessagebreakoptions.W9206_UART_RESERVED_MODE"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W9207_UART_UNABLETOCLOSE_FILE"
-                  value="report"/>
         <property key="warningmessagebreakoptions.W9401_CVREF_INVALIDSOURCESELECTION"
                   value="report"/>
         <property key="warningmessagebreakoptions.W9402_CVREF_INPUT_OUTPUTPINCONFLICT"
@@ -1412,11 +1358,6 @@
                   value="report"/>
         <property key="warningmessagebreakoptions.W0111_SIM_UNSUPPORTED_SELECTION"
                   value="report"/>
-        <property key="warningmessagebreakoptions.W0112_SIM_INVALID_OPERATION"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W0113_SIM_WRITE_TO_PROTECTED_SFR"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W0114_SIM_INVALID_KEY" value="report"/>
         <property key="warningmessagebreakoptions.W0201_ADC_NO_STIMULUS_FILE"
                   value="report"/>
         <property key="warningmessagebreakoptions.W0202_ADC_GO_DONE_BIT" value="report"/>
@@ -1502,11 +1443,6 @@
                   value="report"/>
         <property key="warningmessagebreakoptions.W0400_PWM_PWM_FASTER_THAN_FOSC"
                   value="report"/>
-        <property key="warningmessagebreakoptions.W0600_WDT_2ND_WDT_MR_WRITE"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W0601_WDT_EXPIRED" value="report"/>
-        <property key="warningmessagebreakoptions.W0601_WDT_RESET_OUTSIDE_WINDOW"
-                  value="report"/>
         <property key="warningmessagebreakoptions.W0700_CLC_GENERAL_WARNING"
                   value="report"/>
         <property key="warningmessagebreakoptions.W0701_CLC_CLCOUT_AS_INPUT"
@@ -1522,8 +1458,6 @@
         <property key="warningmessagebreakoptions.W10102_UNSUPPORTED_CLK_SOURCE"
                   value="report"/>
         <property key="warningmessagebreakoptions.W10103_UNSUPPORTED_RECEIVER_FILTER"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W10301_NO_PORT_PINS_FOUND"
                   value="report"/>
         <property key="warningmessagebreakoptions.W1201_DATAFLASH_MEM_OUTSIDE_RANGE"
                   value="report"/>
@@ -1566,16 +1500,6 @@
                   value="report"/>
         <property key="warningmessagebreakoptions.W2701_MPU_INVALID_REGION"
                   value="report"/>
-        <property key="warningmessagebreakoptions.W3000_LPM_READ_PROTECTION_SECTION"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W3010_SPM_WRITE_PROTECTION_SECTION"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W6001_RTT_FORBIDDEN_RTPRES"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W6002_RTT_BAD_WRITING_ALMV"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W6003_RTT_BAD_WRITING_RTPRES"
-                  value="report"/>
         <property key="warningmessagebreakoptions.W7001_SMT_CLK_SELECTION_NOT_SUPPORT"
                   value="report"/>
         <property key="warningmessagebreakoptions.W7002_SMT_SIG_SELECTION_NOT_SUPPORT"
@@ -1599,10 +1523,6 @@
         <property key="warningmessagebreakoptions.W9204_UART_RX_EMPTY_QUEUE"
                   value="report"/>
         <property key="warningmessagebreakoptions.W9205_UART_TX_BADFILE" value="report"/>
-        <property key="warningmessagebreakoptions.W9206_UART_RESERVED_MODE"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W9207_UART_UNABLETOCLOSE_FILE"
-                  value="report"/>
         <property key="warningmessagebreakoptions.W9401_CVREF_INVALIDSOURCESELECTION"
                   value="report"/>
         <property key="warningmessagebreakoptions.W9402_CVREF_INPUT_OUTPUTPINCONFLICT"
@@ -1946,11 +1866,6 @@
                   value="report"/>
         <property key="warningmessagebreakoptions.W0111_SIM_UNSUPPORTED_SELECTION"
                   value="report"/>
-        <property key="warningmessagebreakoptions.W0112_SIM_INVALID_OPERATION"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W0113_SIM_WRITE_TO_PROTECTED_SFR"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W0114_SIM_INVALID_KEY" value="report"/>
         <property key="warningmessagebreakoptions.W0201_ADC_NO_STIMULUS_FILE"
                   value="report"/>
         <property key="warningmessagebreakoptions.W0202_ADC_GO_DONE_BIT" value="report"/>
@@ -2036,11 +1951,6 @@
                   value="report"/>
         <property key="warningmessagebreakoptions.W0400_PWM_PWM_FASTER_THAN_FOSC"
                   value="report"/>
-        <property key="warningmessagebreakoptions.W0600_WDT_2ND_WDT_MR_WRITE"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W0601_WDT_EXPIRED" value="report"/>
-        <property key="warningmessagebreakoptions.W0601_WDT_RESET_OUTSIDE_WINDOW"
-                  value="report"/>
         <property key="warningmessagebreakoptions.W0700_CLC_GENERAL_WARNING"
                   value="report"/>
         <property key="warningmessagebreakoptions.W0701_CLC_CLCOUT_AS_INPUT"
@@ -2056,8 +1966,6 @@
         <property key="warningmessagebreakoptions.W10102_UNSUPPORTED_CLK_SOURCE"
                   value="report"/>
         <property key="warningmessagebreakoptions.W10103_UNSUPPORTED_RECEIVER_FILTER"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W10301_NO_PORT_PINS_FOUND"
                   value="report"/>
         <property key="warningmessagebreakoptions.W1201_DATAFLASH_MEM_OUTSIDE_RANGE"
                   value="report"/>
@@ -2100,16 +2008,6 @@
                   value="report"/>
         <property key="warningmessagebreakoptions.W2701_MPU_INVALID_REGION"
                   value="report"/>
-        <property key="warningmessagebreakoptions.W3000_LPM_READ_PROTECTION_SECTION"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W3010_SPM_WRITE_PROTECTION_SECTION"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W6001_RTT_FORBIDDEN_RTPRES"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W6002_RTT_BAD_WRITING_ALMV"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W6003_RTT_BAD_WRITING_RTPRES"
-                  value="report"/>
         <property key="warningmessagebreakoptions.W7001_SMT_CLK_SELECTION_NOT_SUPPORT"
                   value="report"/>
         <property key="warningmessagebreakoptions.W7002_SMT_SIG_SELECTION_NOT_SUPPORT"
@@ -2133,10 +2031,6 @@
         <property key="warningmessagebreakoptions.W9204_UART_RX_EMPTY_QUEUE"
                   value="report"/>
         <property key="warningmessagebreakoptions.W9205_UART_TX_BADFILE" value="report"/>
-        <property key="warningmessagebreakoptions.W9206_UART_RESERVED_MODE"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W9207_UART_UNABLETOCLOSE_FILE"
-                  value="report"/>
         <property key="warningmessagebreakoptions.W9401_CVREF_INVALIDSOURCESELECTION"
                   value="report"/>
         <property key="warningmessagebreakoptions.W9402_CVREF_INPUT_OUTPUTPINCONFLICT"
@@ -3031,11 +2925,6 @@
                   value="report"/>
         <property key="warningmessagebreakoptions.W0111_SIM_UNSUPPORTED_SELECTION"
                   value="report"/>
-        <property key="warningmessagebreakoptions.W0112_SIM_INVALID_OPERATION"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W0113_SIM_WRITE_TO_PROTECTED_SFR"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W0114_SIM_INVALID_KEY" value="report"/>
         <property key="warningmessagebreakoptions.W0201_ADC_NO_STIMULUS_FILE"
                   value="report"/>
         <property key="warningmessagebreakoptions.W0202_ADC_GO_DONE_BIT" value="report"/>
@@ -3121,11 +3010,6 @@
                   value="report"/>
         <property key="warningmessagebreakoptions.W0400_PWM_PWM_FASTER_THAN_FOSC"
                   value="report"/>
-        <property key="warningmessagebreakoptions.W0600_WDT_2ND_WDT_MR_WRITE"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W0601_WDT_EXPIRED" value="report"/>
-        <property key="warningmessagebreakoptions.W0601_WDT_RESET_OUTSIDE_WINDOW"
-                  value="report"/>
         <property key="warningmessagebreakoptions.W0700_CLC_GENERAL_WARNING"
                   value="report"/>
         <property key="warningmessagebreakoptions.W0701_CLC_CLCOUT_AS_INPUT"
@@ -3141,8 +3025,6 @@
         <property key="warningmessagebreakoptions.W10102_UNSUPPORTED_CLK_SOURCE"
                   value="report"/>
         <property key="warningmessagebreakoptions.W10103_UNSUPPORTED_RECEIVER_FILTER"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W10301_NO_PORT_PINS_FOUND"
                   value="report"/>
         <property key="warningmessagebreakoptions.W1201_DATAFLASH_MEM_OUTSIDE_RANGE"
                   value="report"/>
@@ -3185,16 +3067,6 @@
                   value="report"/>
         <property key="warningmessagebreakoptions.W2701_MPU_INVALID_REGION"
                   value="report"/>
-        <property key="warningmessagebreakoptions.W3000_LPM_READ_PROTECTION_SECTION"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W3010_SPM_WRITE_PROTECTION_SECTION"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W6001_RTT_FORBIDDEN_RTPRES"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W6002_RTT_BAD_WRITING_ALMV"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W6003_RTT_BAD_WRITING_RTPRES"
-                  value="report"/>
         <property key="warningmessagebreakoptions.W7001_SMT_CLK_SELECTION_NOT_SUPPORT"
                   value="report"/>
         <property key="warningmessagebreakoptions.W7002_SMT_SIG_SELECTION_NOT_SUPPORT"
@@ -3218,10 +3090,6 @@
         <property key="warningmessagebreakoptions.W9204_UART_RX_EMPTY_QUEUE"
                   value="report"/>
         <property key="warningmessagebreakoptions.W9205_UART_TX_BADFILE" value="report"/>
-        <property key="warningmessagebreakoptions.W9206_UART_RESERVED_MODE"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W9207_UART_UNABLETOCLOSE_FILE"
-                  value="report"/>
         <property key="warningmessagebreakoptions.W9401_CVREF_INVALIDSOURCESELECTION"
                   value="report"/>
         <property key="warningmessagebreakoptions.W9402_CVREF_INPUT_OUTPUTPINCONFLICT"
@@ -3590,11 +3458,6 @@
                   value="report"/>
         <property key="warningmessagebreakoptions.W0111_SIM_UNSUPPORTED_SELECTION"
                   value="report"/>
-        <property key="warningmessagebreakoptions.W0112_SIM_INVALID_OPERATION"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W0113_SIM_WRITE_TO_PROTECTED_SFR"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W0114_SIM_INVALID_KEY" value="report"/>
         <property key="warningmessagebreakoptions.W0201_ADC_NO_STIMULUS_FILE"
                   value="report"/>
         <property key="warningmessagebreakoptions.W0202_ADC_GO_DONE_BIT" value="report"/>
@@ -3680,11 +3543,6 @@
                   value="report"/>
         <property key="warningmessagebreakoptions.W0400_PWM_PWM_FASTER_THAN_FOSC"
                   value="report"/>
-        <property key="warningmessagebreakoptions.W0600_WDT_2ND_WDT_MR_WRITE"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W0601_WDT_EXPIRED" value="report"/>
-        <property key="warningmessagebreakoptions.W0601_WDT_RESET_OUTSIDE_WINDOW"
-                  value="report"/>
         <property key="warningmessagebreakoptions.W0700_CLC_GENERAL_WARNING"
                   value="report"/>
         <property key="warningmessagebreakoptions.W0701_CLC_CLCOUT_AS_INPUT"
@@ -3700,8 +3558,6 @@
         <property key="warningmessagebreakoptions.W10102_UNSUPPORTED_CLK_SOURCE"
                   value="report"/>
         <property key="warningmessagebreakoptions.W10103_UNSUPPORTED_RECEIVER_FILTER"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W10301_NO_PORT_PINS_FOUND"
                   value="report"/>
         <property key="warningmessagebreakoptions.W1201_DATAFLASH_MEM_OUTSIDE_RANGE"
                   value="report"/>
@@ -3744,16 +3600,6 @@
                   value="report"/>
         <property key="warningmessagebreakoptions.W2701_MPU_INVALID_REGION"
                   value="report"/>
-        <property key="warningmessagebreakoptions.W3000_LPM_READ_PROTECTION_SECTION"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W3010_SPM_WRITE_PROTECTION_SECTION"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W6001_RTT_FORBIDDEN_RTPRES"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W6002_RTT_BAD_WRITING_ALMV"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W6003_RTT_BAD_WRITING_RTPRES"
-                  value="report"/>
         <property key="warningmessagebreakoptions.W7001_SMT_CLK_SELECTION_NOT_SUPPORT"
                   value="report"/>
         <property key="warningmessagebreakoptions.W7002_SMT_SIG_SELECTION_NOT_SUPPORT"
@@ -3777,10 +3623,6 @@
         <property key="warningmessagebreakoptions.W9204_UART_RX_EMPTY_QUEUE"
                   value="report"/>
         <property key="warningmessagebreakoptions.W9205_UART_TX_BADFILE" value="report"/>
-        <property key="warningmessagebreakoptions.W9206_UART_RESERVED_MODE"
-                  value="report"/>
-        <property key="warningmessagebreakoptions.W9207_UART_UNABLETOCLOSE_FILE"
-                  value="report"/>
         <property key="warningmessagebreakoptions.W9401_CVREF_INVALIDSOURCESELECTION"
                   value="report"/>
         <property key="warningmessagebreakoptions.W9402_CVREF_INPUT_OUTPUTPINCONFLICT"

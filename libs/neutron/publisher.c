@@ -68,6 +68,25 @@ typedef struct _alarm_t {
   uint32_t event_time;
   } alarm_t;
 
+typedef enum _capture_type_e
+  {
+  ct_fifo,      // use first sample after a publish
+  ct_lifo,      // use last sample before a publish
+  ct_min,       // use min of samples
+  ct_max,       // use max of samples
+  ct_avg        // use average of samples
+  } capture_type_e;
+ 
+typedef struct _pre_filter_t {
+  ////////////////////////////////////////////////////////////////
+  // Pre-filter (capture accumulator)
+  capture_type_e capture_type;    // what type of capture to do
+                                  // can only be set if the value_type is
+                                  // CANAS_DATATYPE_FLOAT otherwise ignored
+  uint32_t num_samples;           // number of samples between captures
+  float accum;              // accumulated value for the capture filter
+  } pre_filter_t;
+
 // this group of functions defines an area to publish regular status updates
 // the structure will be filled in with the current values
 typedef struct _published_datapoint_t
@@ -88,12 +107,78 @@ typedef struct _published_datapoint_t
   //
   // Optional alarms follow the optional filter
   uint16_t num_alarms;
+ 
+  ////////////////////////////////////////////////////////////////
+  // the filter type other than none is only really relevant to
+  // floating point types
+  filter_type_e filter_type;
   } published_datapoint_t;
-
-
-static inline uint16_t sizeof_datapoint(uint16_t num_alarms)
+    
+typedef struct _boxcar_filter_datapoint_t
   {
-  uint16_t datapoint_size = sizeof(published_datapoint_t);
+  published_datapoint_t datapoint;
+  pre_filter_t pre_filter;
+  uint16_t frequency;           // how many 1msec steps per filter
+  uint32_t last_tick;           // when last run
+  uint16_t filter_length;
+  uint16_t head;                // oldest datapoint
+  uint16_t tail;                // newest datapoint
+  float filter[];         // length is filter_length
+  } boxcar_datapoint_t;
+
+typedef struct _filter_datapoint_t
+  {
+  published_datapoint_t datapoint;
+  pre_filter_t pre_filter;
+  // we support MAC using hardware (bsp_mac) which is
+  // assigned by the system.  On linux/windows is done in sofware
+  // hardware can do it magically
+  mac_fn function;
+  uint16_t filter_length;
+  uint16_t frequency;           // number of 1msec intervals
+  uint32_t last_tick;           // when the mac last calculated
+  float gain;
+  filter_params_t filter[];
+  } filter_datapoint_t;
+    
+static inline uint16_t sizeof_boxcar(uint16_t filter_length)
+  {
+  return sizeof(boxcar_datapoint_t) + 
+    (sizeof(float) * filter_length);
+  }
+
+static inline uint16_t sizeof_fir(uint16_t filter_length)
+  {
+  return sizeof(boxcar_datapoint_t) + 
+    (sizeof(filter_params_t) * filter_length);
+  }
+
+static inline boxcar_datapoint_t *as_boxcar(published_datapoint_t *dp)
+  {
+  return (boxcar_datapoint_t *)dp;
+  }
+
+static inline filter_datapoint_t *as_filter(published_datapoint_t *dp)
+  {
+  return (filter_datapoint_t *)dp;
+  }
+
+static inline uint16_t sizeof_datapoint(filter_type_e filter_type, uint16_t filter_length, uint16_t num_alarms)
+  {
+  uint16_t datapoint_size = 0;
+  switch(filter_type)
+    {
+    case ft_none :
+      datapoint_size = sizeof(published_datapoint_t);
+      break;
+    case ft_boxcar :
+      datapoint_size = sizeof_boxcar(filter_length);
+      break;
+    case ft_iir :
+    case ft_fir :
+      datapoint_size = sizeof_fir(filter_length);
+      break;
+    }
   
   datapoint_size += sizeof(alarm_t) * num_alarms;
   
@@ -102,7 +187,20 @@ static inline uint16_t sizeof_datapoint(uint16_t num_alarms)
   
 static inline alarm_t *get_alarm(published_datapoint_t *dp, uint16_t index)
   {
-  uint16_t alarm_base = sizeof(published_datapoint_t);
+  uint16_t alarm_base = 0;
+  switch(dp->filter_type)
+    {
+    case ft_none :
+      alarm_base = sizeof(published_datapoint_t);
+      break;
+    case ft_boxcar :
+      alarm_base = sizeof_boxcar(((boxcar_datapoint_t *)dp)->filter_length);
+      break;
+    case ft_iir :
+    case ft_fir :
+      alarm_base = sizeof_fir(((filter_datapoint_t *)dp)->filter_length);
+      break;
+    }
   
   uint8_t *base = (uint8_t *)dp;
   base += alarm_base;
@@ -111,9 +209,11 @@ static inline alarm_t *get_alarm(published_datapoint_t *dp, uint16_t index)
   return (alarm_t *)base;
   }
 
-static inline published_datapoint_t *alloc_datapoint(uint16_t num_alarms)
+static inline published_datapoint_t *alloc_datapoint(filter_type_e filter_type,
+                                                     uint16_t filter_length,
+                                                     uint16_t num_alarms)
   {
-  uint16_t alloc_size = sizeof_datapoint(num_alarms);
+  uint16_t alloc_size = sizeof_datapoint(filter_type, filter_length, num_alarms);
   published_datapoint_t *dp = 
     (published_datapoint_t *)neutron_malloc(alloc_size);
   
@@ -122,7 +222,21 @@ static inline published_datapoint_t *alloc_datapoint(uint16_t num_alarms)
   
   memset(dp, 0, alloc_size);
   dp->version = alloc_size;
+  dp->filter_type = filter_type;
   dp->num_alarms = num_alarms;
+  
+  switch(filter_type)
+    {
+    case ft_boxcar :
+      as_boxcar(dp)->filter_length = filter_length;
+      break;
+    case ft_iir :
+    case ft_fir :
+      as_filter(dp)->filter_length = filter_length;
+      break;
+    default :
+      break;
+    }
   
   return dp;
   }
@@ -135,8 +249,13 @@ typedef struct _enum_descr {
 static vector_p published_datapoints;
 static semaphore_p can_publisher_semp;
 
-static const char *s_neutron_key = "neutron";
+static const char *s_publisher_key = "neutron";
 static const char *s_rate_value = "rate";
+static const char *s_sample_type_value = "sample";
+static const char *s_filter_type_value = "filter";
+static const char *s_filter_length_value = "length";
+static const char *s_coefficient_value = "coeff%d";   // will have 1..16 appended
+static const char *s_filter_gain_value = "gain";
 static const char *s_loopback_value = "loopback";
 static const char *s_publish_value = "publish";
 static const char *s_alarm_min_value = "min";
@@ -178,6 +297,12 @@ static result_t find_datapoint(uint16_t id, published_datapoint_t **dp, uint16_t
 
 extern void publish_local(const canmsg_t *msg);
 
+static inline pre_filter_t *as_pre_filter(published_datapoint_t *datapoint)
+  {
+  // TODO: alignment???
+  return (pre_filter_t *)(((uint8_t *)datapoint)+sizeof(published_datapoint_t));
+  }
+
 result_t publish_float(uint16_t id, float value)
   {
   result_t result;
@@ -187,9 +312,54 @@ result_t publish_float(uint16_t id, float value)
   if(failed(result = find_datapoint(id, &datapoint, &index)))
     return result;
   
-  create_can_msg_float(&datapoint->value, datapoint->can_id, 0, value);
+  if(datapoint->filter_type == ft_none)
+    {
+    create_can_msg_float(&datapoint->value, datapoint->can_id, 0, value);
+    }
+  else
+    {
+    pre_filter_t *pre_filter = as_pre_filter(datapoint);
 
+    // decide what pre-filter algorithm is applied to the sample.
+    switch(pre_filter->capture_type)
+      {
+    case ct_fifo :
+      if(pre_filter->num_samples != 0)
+        break;
+    case ct_lifo :
+      pre_filter->accum = value;
+      break;
+    case ct_min :
+      if(value < pre_filter->accum)
+        pre_filter->accum = value;
+      break;
+    case ct_max :
+      if(value > pre_filter->accum)
+        pre_filter->accum = value;
+      break;
+    case ct_avg :
+      pre_filter->accum += value;
+      break;
+      }
+
+    // this is used when an average value is needed
+    pre_filter->num_samples ++;
+    }
   return s_ok;
+  }
+
+result_t lookup_float(uint16_t id, float *value)
+  {
+  if (value == 0)
+    return e_bad_parameter;
+
+  result_t result;
+   published_datapoint_t *datapoint;
+  
+  if(failed(result = find_datapoint(id, &datapoint, 0)))
+    return result;
+
+  return get_param_float(&datapoint->value, value);
   }
 
 static const uint8_t int8_dt[] =
@@ -213,11 +383,54 @@ result_t publish_int8(uint16_t id, const int8_t *value, uint16_t len)
     return result;
   
   datapoint->value.canas.data_type = int8_dt[len-1];
-  set_can_id(&datapoint->value, datapoint->can_id);
-  set_can_len(&datapoint->value, len + 4);
+  datapoint->value.id = datapoint->can_id;
   for(index = 0; index < len; index++)
     datapoint->value.canas.data[index] = (uint8_t) *value++;
 
+  return s_ok;
+  }
+
+result_t lookup_int8(uint16_t id, int8_t *value, uint16_t *len)
+  {
+  if (value == 0 || len == 0 ||
+    *len == 0 || *len > 4)
+    return e_bad_parameter;
+
+  result_t result;
+  published_datapoint_t *datapoint;
+  
+  if(failed(result = find_datapoint(id, &datapoint, 0)))
+    return result;
+
+  switch (datapoint->value.canas.data_type)
+    {
+    case CANAS_DATATYPE_CHAR :
+      *value = datapoint->value.canas.data[0];
+      break;
+    case CANAS_DATATYPE_CHAR2 :
+      if (*len < 2)
+        return e_bad_parameter;
+      value[0] = datapoint->value.canas.data[0];
+      value[1] = datapoint->value.canas.data[1];
+      break;
+    case CANAS_DATATYPE_CHAR3 :
+      if (*len < 3)
+        return e_bad_parameter;
+      value[0] = datapoint->value.canas.data[0];
+      value[1] = datapoint->value.canas.data[1];
+      value[2] = datapoint->value.canas.data[2];
+      break;
+    case CANAS_DATATYPE_CHAR4 :
+      if (*len < 4)
+        return e_bad_parameter;
+      value[0] = datapoint->value.canas.data[0];
+      value[1] = datapoint->value.canas.data[1];
+      value[2] = datapoint->value.canas.data[2];
+      value[3] = datapoint->value.canas.data[3];
+      break;
+    default :
+      return e_bad_parameter;
+    }
   return s_ok;
   }
 
@@ -242,11 +455,52 @@ result_t publish_uint8(uint16_t id, const uint8_t *value, uint16_t len)
     return result;
   
   datapoint->value.canas.data_type = uint8_dt[len-1];
-  set_can_id(&datapoint->value, datapoint->can_id);
-  set_can_len(&datapoint->value, len + 4);
+  datapoint->value.id = datapoint->can_id;
   for(index = 0; index < len; index++)
     datapoint->value.canas.data[index] = *value++;
 
+  return s_ok;
+  }
+
+result_t lookup_uint8(uint16_t id, uint8_t *value, uint16_t *len)
+  {
+  if (value == 0 || len == 0 ||
+    *len == 0 || *len > 4)
+    return e_bad_parameter;
+
+  result_t result;
+  published_datapoint_t *datapoint;
+  
+  if(failed(result = find_datapoint(id, &datapoint, 0)))
+    return result;
+
+  switch (datapoint->value.canas.data_type)
+    {
+    case CANAS_DATATYPE_UCHAR:
+      *value = datapoint->value.canas.data[0];
+      break;
+    case CANAS_DATATYPE_UCHAR2:
+      if (*len < 2)
+        return e_bad_parameter;
+      value[0] = datapoint->value.canas.data[0];
+      value[1] = datapoint->value.canas.data[1];
+      break;
+    case CANAS_DATATYPE_UCHAR3:
+      if (*len < 3)
+        return e_bad_parameter;
+      value[0] = datapoint->value.canas.data[0];
+      value[1] = datapoint->value.canas.data[1];
+      value[2] = datapoint->value.canas.data[2];
+      break;
+    case CANAS_DATATYPE_UCHAR4:
+      value[0] = datapoint->value.canas.data[0];
+      value[1] = datapoint->value.canas.data[1];
+      value[2] = datapoint->value.canas.data[2];
+      value[3] = datapoint->value.canas.data[3];
+      break;
+    default:
+      return e_bad_parameter;
+    }
   return s_ok;
   }
 
@@ -258,7 +512,7 @@ static const uint8_t int16_dt[] =
 
 result_t publish_int16(uint16_t id, const int16_t *value, uint16_t len)
   {
-  if (value == 0 || len == 0 || len > 2)
+  if (value == 0 || len == 0 || len > 4)
     return e_bad_parameter;
 
   result_t result;
@@ -269,15 +523,49 @@ result_t publish_int16(uint16_t id, const int16_t *value, uint16_t len)
     return result;
   
   datapoint->value.canas.data_type = int16_dt[len-1];
-  set_can_id(&datapoint->value, datapoint->can_id);
-   set_can_len(&datapoint->value, 4 + (len << 1));
- for(index = 0; index < len; index+=2)
+  datapoint->value.id = datapoint->can_id;
+  for(index = 0; index < len; index+=2)
     {
     datapoint->value.canas.data[index] = (*value >> 8);
     datapoint->value.canas.data[index+1] = *value >> 8;
     value++;
     }
 
+  return s_ok;
+  }
+
+result_t lookup_int16(uint16_t id, int16_t *value, uint16_t *len)
+  {
+  if (value == 0 || len == 0 ||
+    *len == 0 || *len > 2)
+    return e_bad_parameter;
+
+  result_t result;
+  published_datapoint_t *datapoint;
+  
+  if(failed(result = find_datapoint(id, &datapoint, 0)))
+    return result;
+
+  switch (datapoint->value.canas.data_type)
+    {
+    case CANAS_DATATYPE_SHORT:
+      *value = 
+        (datapoint->value.canas.data[0] << 8) |
+        datapoint->value.canas.data[1];
+      break;
+    case CANAS_DATATYPE_SHORT2:
+      if (*len < 2)
+        return e_bad_parameter;
+      value[0] = 
+        (datapoint->value.canas.data[0] << 8) |
+        datapoint->value.canas.data[1];
+      value[1] = 
+        (datapoint->value.canas.data[2] << 8) |
+        datapoint->value.canas.data[3];
+      break;
+    default:
+      return e_bad_parameter;
+    }
   return s_ok;
   }
 
@@ -289,7 +577,7 @@ static const uint8_t uint16_dt[] =
 
 result_t publish_uint16(uint16_t id, const uint16_t *value, uint16_t len)
   {
-  if (value == 0 || len == 0 || len > 2)
+  if (value == 0 || len == 0 || len > 4)
     return e_bad_parameter;
 
   result_t result;
@@ -300,8 +588,7 @@ result_t publish_uint16(uint16_t id, const uint16_t *value, uint16_t len)
     return result;
   
   datapoint->value.canas.data_type = uint16_dt[len-1];
-  set_can_id(&datapoint->value, datapoint->can_id);
-  set_can_len(&datapoint->value, 4 + (len << 1));
+  datapoint->value.id = datapoint->can_id;
   for(index = 0; index < len; index+=2)
     {
     datapoint->value.canas.data[index] = (*value >> 8);
@@ -309,6 +596,41 @@ result_t publish_uint16(uint16_t id, const uint16_t *value, uint16_t len)
     value++;
     }
 
+  return s_ok;
+  }
+
+result_t lookup_uint16(uint16_t id, uint16_t *value, uint16_t *len)
+  {
+  if (value == 0 || len == 0 ||
+    *len == 0 || *len > 2)
+    return e_bad_parameter;
+
+  result_t result;
+  published_datapoint_t *datapoint;
+  
+  if(failed(result = find_datapoint(id, &datapoint, 0)))
+    return result;
+
+  switch (datapoint->value.canas.data_type)
+    {
+    case CANAS_DATATYPE_USHORT:
+      *value = 
+        (datapoint->value.canas.data[0] << 8) |
+        datapoint->value.canas.data[1];
+      break;
+    case CANAS_DATATYPE_USHORT2:
+      if (*len < 2)
+        return e_bad_parameter;
+      value[0] = 
+        (datapoint->value.canas.data[0] << 8) |
+        datapoint->value.canas.data[1];
+      value[1] = 
+        (datapoint->value.canas.data[2] << 8) |
+        datapoint->value.canas.data[3];
+      break;
+    default:
+      return e_bad_parameter;
+    }
   return s_ok;
   }
 
@@ -322,6 +644,25 @@ result_t publish_int32(uint16_t id, int32_t value)
     return result;
   
   create_can_msg_int32(&datapoint->value, datapoint->can_id, 0, value);
+  
+  return s_ok;
+  }
+
+result_t lookup_int32(uint16_t id, int32_t *value)
+  {
+  if (value == 0)
+    return e_bad_parameter;
+
+  result_t result;
+  published_datapoint_t *datapoint;
+  
+  if(failed(result = find_datapoint(id, &datapoint, 0)))
+    return result;
+
+  *value = (datapoint->value.canas.data[0] << 24) |
+    (datapoint->value.canas.data[1] << 16) |
+    (datapoint->value.canas.data[2] << 8) |
+    datapoint->value.canas.data[3];
   
   return s_ok;
   }
@@ -340,6 +681,74 @@ result_t publish_uint32(uint16_t id, uint32_t value)
   return s_ok;
   }
 
+result_t lookup_uint32(uint16_t id, uint32_t *value)
+  {
+  if (value == 0)
+    return e_bad_parameter;
+
+  result_t result;
+  published_datapoint_t *datapoint;
+  
+  if(failed(result = find_datapoint(id, &datapoint, 0)))
+    return result;
+
+  *value = (datapoint->value.canas.data[0] << 24) |
+    (datapoint->value.canas.data[1] << 16) |
+    (datapoint->value.canas.data[2] << 8) |
+    datapoint->value.canas.data[3];
+  
+  return s_ok;
+  }
+
+static result_t parse_boxcar(boxcar_datapoint_t *dp, memid_t key)
+  {
+  // a boxcar has a length and not much else.  Is
+  // an average of a sliding window.  Basically a low pass
+  // filter without gain compensation
+ // type of sample accumulation
+  uint16_t v_uint16;
+  if(succeeded(reg_get_uint16(key, s_sample_type_value, &v_uint16)))
+    dp->pre_filter.capture_type = (capture_type_e)v_uint16;
+  
+  return s_ok;
+  }
+
+static result_t parse_filter(filter_datapoint_t *dp, memid_t key)
+  {
+  uint16_t v_uint16;
+  if(succeeded(reg_get_uint16(key, s_sample_type_value, &v_uint16)))
+    dp->pre_filter.capture_type = (capture_type_e)v_uint16;
+  
+  char name[REG_NAME_MAX + 1];
+  // work over each coefficient.
+  uint16_t index;
+  for(index = 1; index <= dp->filter_length; index++)
+    {
+    snprintf(name, REG_NAME_MAX, s_coefficient_value, index);
+    float coeff;
+    if(failed(reg_get_float(key, name, &coeff)))
+      coeff = 0;
+
+    // assign the filter to the fir/iir
+    dp->filter[index].coefficient = coeff;
+    }
+
+  float gain;
+  // pick up the gain of the filter
+  if(failed(reg_get_float(key, s_filter_gain_value, &gain)))
+    gain = 1.0;
+  
+  dp->gain = gain;
+  
+  dp->last_tick = ticks();
+  
+  // assign the mac processor.
+  // this is to allow some sort of fir/iir optimization
+  dp->function = bsp_get_mac(key);
+  
+  return s_ok;
+  }
+
 /**
  * Load a datapoint from the registry
  * @param datapoints  Array to add datapoint to
@@ -352,7 +761,32 @@ static result_t create_datapoint(vector_p datapoints, uint16_t can_id, memid_t k
   uint16_t v_uint16;
   published_datapoint_t *dp;
   char name[REG_NAME_MAX + 1];
-   
+  alarm_t alarm;
+  
+  // get the filter type and number of alarms first
+  filter_type_e filter_type = ft_none;          // no filter
+  uint16_t value_type;
+  uint16_t filter_length = 0;
+
+  // type of filter.  The filter runs at the publish frequency
+  if(succeeded(reg_get_uint16(key, s_filter_type_value, &v_uint16)))
+    filter_type = (filter_type_e) v_uint16;
+
+  if(filter_type != ft_none)
+    {
+    // must have a length!
+    if(succeeded(reg_get_uint16(key, s_filter_length_value, &v_uint16)))
+      {
+      // always clip this, as long filters are NEVER supported
+      if(v_uint16 > 16)
+        v_uint16 = 16;
+
+      filter_length = v_uint16;
+      }
+    else
+      filter_type = ft_none;
+    }
+  
   // count how many alarms there are.
   uint16_t num_alarms = 0;
   memid_t alarm_key = 0;
@@ -364,7 +798,7 @@ static result_t create_datapoint(vector_p datapoints, uint16_t can_id, memid_t k
   while(succeeded(reg_enum_key(key, &key_type, 0, 0, REG_NAME_MAX + 1, name, &alarm_key)))
     num_alarms++;
   
-  dp = alloc_datapoint(num_alarms);
+  dp = alloc_datapoint(filter_type, filter_length, num_alarms);
 
   if(dp == 0)
     return e_not_enough_memory;
@@ -380,6 +814,19 @@ static result_t create_datapoint(vector_p datapoints, uint16_t can_id, memid_t k
     }
   else
     dp->flags.publish = 0;
+
+  switch(dp->filter_type)
+    {
+    case ft_none :
+      break;
+    case ft_boxcar :
+      parse_boxcar(as_boxcar(dp), key);
+      break;
+    case ft_fir :
+    case ft_iir :
+      parse_filter(as_filter(dp), key);
+      break;
+    }
 
   bool v_bool;
   if(succeeded(reg_get_bool(key, s_loopback_value, &v_bool)))
@@ -489,6 +936,8 @@ void publish_task(void *parg)
     published_datapoint_t *dp;
     uint16_t  i;
 
+    float index_value;
+
     // do each datapoint we have registered
     for(i = 0; i < num_datapoints; i++)
       {
@@ -500,6 +949,66 @@ void publish_task(void *parg)
       if(publish)
         {
         dp->next_publish_tick = dp->publish_rate;
+        
+        if(dp->filter_type != ft_none)
+          {
+          pre_filter_t *pre_filter = as_pre_filter(dp);
+        
+          // see if the accumulator is an average,
+          if(pre_filter->capture_type == ct_avg)
+            pre_filter->accum /= pre_filter->num_samples;
+
+          pre_filter->num_samples = 0;
+        
+          // determine the filter type
+          if(dp->filter_type = ft_boxcar)
+            {
+            boxcar_datapoint_t *filt = as_boxcar(dp);
+
+            // pick up the pre-filter value
+            filt->filter[filt->tail++] = pre_filter->accum;
+
+            if(filt->tail >= filt->filter_length)
+              filt->tail = 0;
+
+            if(filt->tail == filt->head)
+              {
+              filt->head++;
+              if(filt->head >= filt->filter_length)
+                filt->head = 0;
+              }
+
+            uint16_t num_values = 1;
+            uint16_t ring_ptr = filt->head;
+            pre_filter->accum = filt->filter[filt->head];
+            do
+              {
+              ring_ptr++;
+              if(ring_ptr >= filt->filter_length)
+                ring_ptr = 0;
+
+              if(ring_ptr == filt->tail)
+                break;
+
+              pre_filter->accum += filt->filter[ring_ptr];
+              num_values++;
+              } while(ring_ptr != filt->tail);
+            
+            // calculate the average value
+            pre_filter->accum /= num_values;
+            }
+          else
+            {
+            filter_datapoint_t *filt = as_filter(dp);
+            // calculate the accumulated filter using the next datapoint
+            pre_filter->accum = (filt->function)(dp->filter_type, pre_filter->accum, filt->filter_length, filt->filter);
+            }
+ 
+          // set the floating point type
+          create_can_msg_float(&dp->value, dp->can_id, 0, (float) pre_filter->accum);
+          
+          pre_filter->accum = 0;
+          }
         
         // send the message to the can queue.  This will decorate it as
         // well
@@ -594,7 +1103,7 @@ static bool alarm_hook(const canmsg_t *msg, void *parg)
       alarm_t *alarm = get_alarm(dp, ai);
 
       if(alarm->type == level_alarm &&
-         alarm->reset_id == get_can_id(msg))
+         alarm->reset_id == msg->id)
         {
         alarm->event_time = 0;
 
@@ -605,7 +1114,7 @@ static bool alarm_hook(const canmsg_t *msg, void *parg)
       }
 
     // see if we are monitoring
-    if (dp->can_id == get_can_id(msg) &&
+    if (dp->can_id == msg->id &&
       !dp->flags.loopback &&
       !dp->flags.publish)
       {
@@ -621,7 +1130,7 @@ static msg_hook_t alarm_cb = { 0, 0, alarm_hook };
 
 extern result_t trace_init();
 
-result_t neutron_init(const neutron_parameters_t *params, bool create_worker)
+result_t neutron_init(const neutron_parameters_t *params, bool init_mode, bool create_worker)
   {
   task_p task_handle;
   result_t result;
@@ -635,12 +1144,13 @@ result_t neutron_init(const neutron_parameters_t *params, bool create_worker)
     return result;
 
   memid_t publisher_key;
-
-  if (failed(reg_open_key(0, s_neutron_key, &publisher_key)))
-    {
-    if (failed(result = reg_create_key(0, s_neutron_key, &publisher_key)))
-      return result;
-    }
+  if(init_mode)
+    result = reg_create_key(0, s_publisher_key, &publisher_key);
+  else
+    result = reg_open_key(0, s_publisher_key, &publisher_key);
+  
+  if(failed(result))
+    return result;
 
   // create the trace handler
   trace_init();
@@ -699,14 +1209,14 @@ result_t neutron_init(const neutron_parameters_t *params, bool create_worker)
   return s_ok;
   }
 
-result_t publish_datapoint(uint16_t can_id, uint16_t rate, bool loopback, bool publish)
+result_t publish_datapoint(uint16_t can_id, uint16_t rate, filter_type_e filter_type, uint16_t filter_length, bool loopback, bool publish)
   {
   result_t result;
   memid_t publisher_key;
-  result = reg_open_key(0, s_neutron_key, &publisher_key);
+  result = reg_open_key(0, s_publisher_key, &publisher_key);
 
   if(result == e_path_not_found)
-    result = reg_create_key(0, s_neutron_key, &publisher_key);
+    result = reg_create_key(0, s_publisher_key, &publisher_key);
 
   if (failed(result))
     return result;
@@ -726,6 +1236,17 @@ result_t publish_datapoint(uint16_t can_id, uint16_t rate, bool loopback, bool p
   if (failed(result = reg_set_uint16(datapoint_key, s_rate_value, rate)))
     return result;
 
+  if (failed(result = reg_set_uint16(datapoint_key, s_sample_type_value, ct_lifo)))
+    return result;
+
+  // just average the values published
+  if (failed(result = reg_set_uint16(datapoint_key, s_filter_type_value, filter_type)))
+    return result;
+
+  if (filter_length > 0 &&
+    failed(result = reg_set_uint16(datapoint_key, s_filter_length_value, filter_length)))
+    return result;
+
   if (failed(result = reg_set_bool(datapoint_key, s_loopback_value, loopback)))
     return result;
 
@@ -735,3 +1256,46 @@ result_t publish_datapoint(uint16_t can_id, uint16_t rate, bool loopback, bool p
   // and start the datapoint running
   return create_datapoint(published_datapoints, can_id, datapoint_key);
   }
+
+result_t monitor_datapoint(uint16_t can_id)
+  {
+  result_t result;
+  published_datapoint_t *dp;
+  if (failed(find_datapoint(can_id, &dp, 0)))
+    {
+    // there is no datapoint being published
+    dp = alloc_datapoint(ft_none, 0, 0);
+    if (dp == 0)
+      return e_not_enough_memory;
+
+    dp->can_id = can_id;
+    // add the monitored datapoint
+    return vector_push_back(published_datapoints, &dp);
+    }
+
+  return s_ok;
+  }
+
+static float dsp_mac(filter_type_e filter_type,
+                           float val,
+                           uint16_t length,
+                           filter_params_t *filter)
+  {
+  float acc = 0;
+  uint16_t index;
+  for(index = 0; index < length -1; index++)
+    {
+    filter[index].value = filter[index+1].value;
+    acc += filter[index].coefficient * filter[index].value;
+    }
+  
+  filter[index].value = val;
+  acc += filter[index].coefficient * filter[index].value;
+  return acc;
+  }
+
+mac_fn bsp_get_mac(memid_t memid)
+  {
+  return dsp_mac;
+  }
+

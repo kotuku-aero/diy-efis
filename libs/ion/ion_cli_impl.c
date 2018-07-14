@@ -36,7 +36,7 @@ it must be removed as soon as possible after the code fragment is identified.
 #include "ion_cli_impl.h"
 #include "../muon/muon.h"
 #include "interpreter.h"
-#include "../muon/neutron_cli_impl.h"
+#include "../muon/cli/neutron_cli_impl.h"
 
 const char *ion_s = "ion";
 const char *event_s = "events";

@@ -69,8 +69,8 @@ typedef struct _gps_window_t {
 
   } gps_window_t;
   
-static void draw_background(canvas_t *canvas, gps_window_t *wnd, const rect_t *wnd_rect, const rect_t *pt, const char *label);
-static void draw_detail(canvas_t *canvas, gps_window_t *wnd, 
+static void draw_background(handle_t hwnd, gps_window_t *wnd, const rect_t *wnd_rect, const rect_t *pt, const char *label);
+static void draw_detail(handle_t hwnd, gps_window_t *wnd, 
                         const rect_t *clip_area, const rect_t *text_area, 
                         const char *value, color_t fg);
 
@@ -99,10 +99,7 @@ result_t create_gps_window(handle_t parent, memid_t key, handle_t *hwnd)
       return result;
     }
   
-  canvas_t *canvas;
-  get_canvas(*hwnd, &canvas);
-
-  text_extent(canvas, wnd->font, "M", 1, &wnd->font_cell_size);
+  text_extent(hwnd, wnd->font, "M", 1, &wnd->font_cell_size);
   wnd->font_cell_size.dx += 2;
 
   if(failed(lookup_color(key, "background-color", &wnd->background_color)))
@@ -120,7 +117,7 @@ result_t create_gps_window(handle_t parent, memid_t key, handle_t *hwnd)
 	return s_ok;
   }
 
-static void update_window(handle_t hwnd, canvas_t *canvas, gps_window_t *wnd)
+static void update_window(handle_t hwnd, gps_window_t *wnd)
   {
   rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
@@ -129,29 +126,29 @@ static void update_window(handle_t hwnd, canvas_t *canvas, gps_window_t *wnd)
   rect_extents(&wnd_rect, &ex);
   
   // fill without a border
-  rectangle(canvas, &wnd_rect, 0, wnd->background_color, &wnd_rect);
+  rectangle(hwnd, &wnd_rect, 0, wnd->background_color, &wnd_rect);
 
   if (wnd->draw_border)
-    round_rect(canvas, &wnd_rect, &gray_pen, color_hollow, &wnd_rect, 12);
+    round_rect(hwnd, &wnd_rect, &gray_pen, color_hollow, &wnd_rect, 12);
   
-  draw_background(canvas, wnd, &wnd_rect, &waypoint, "Waypoint");
-  draw_background(canvas, wnd, &wnd_rect, &dist_to_waypoint, "Distance");
-  draw_background(canvas, wnd, &wnd_rect, &time_to_waypoint, "Time");
-  draw_background(canvas, wnd, &wnd_rect, &next_waypoint, "Next");
+  draw_background(hwnd, wnd, &wnd_rect, &waypoint, "Waypoint");
+  draw_background(hwnd, wnd, &wnd_rect, &dist_to_waypoint, "Distance");
+  draw_background(hwnd, wnd, &wnd_rect, &time_to_waypoint, "Time");
+  draw_background(hwnd, wnd, &wnd_rect, &next_waypoint, "Next");
 
   // display the waypoint
-  draw_detail(canvas, wnd, &wnd_rect, &waypoint_text, wnd->waypoints[0], color_magenta);
+  draw_detail(hwnd, wnd, &wnd_rect, &waypoint_text, wnd->waypoints[0], color_magenta);
 
   // display next waypoint(s)
-  draw_detail(canvas, wnd, &wnd_rect, &next_waypoint_text_0, wnd->waypoints[1], color_green);
-  draw_detail(canvas, wnd, &wnd_rect, &next_waypoint_text_1, wnd->waypoints[2], color_green);
-  draw_detail(canvas, wnd, &wnd_rect, &next_waypoint_text_2, wnd->waypoints[3], color_green);
+  draw_detail(hwnd, wnd, &wnd_rect, &next_waypoint_text_0, wnd->waypoints[1], color_green);
+  draw_detail(hwnd, wnd, &wnd_rect, &next_waypoint_text_1, wnd->waypoints[2], color_green);
+  draw_detail(hwnd, wnd, &wnd_rect, &next_waypoint_text_2, wnd->waypoints[3], color_green);
 
   // draw the distance
   char buf[64];
   sprintf(buf, "%d",(int)wnd->dist_to_waypoint);
 
-  draw_detail(canvas, wnd, &wnd_rect, &dist_to_waypoint_text, buf, color_magenta);
+  draw_detail(hwnd, wnd, &wnd_rect, &dist_to_waypoint_text, buf, color_magenta);
 
   static const char *unknown_time = "--:--";
   static const char *time_fmt = "%02.2d:%02.2d";
@@ -162,7 +159,7 @@ static void update_window(handle_t hwnd, canvas_t *canvas, gps_window_t *wnd)
   else
     sprintf(buf, time_fmt, wnd->time_to_next/60, wnd->time_to_next % 60);
 
-  draw_detail(canvas, wnd, &wnd_rect, &time_to_waypoint_text, buf, color_magenta);
+  draw_detail(hwnd, wnd, &wnd_rect, &time_to_waypoint_text, buf, color_magenta);
   }
 
 result_t widget_wndproc(handle_t hwnd, const canmsg_t *msg)
@@ -170,13 +167,12 @@ result_t widget_wndproc(handle_t hwnd, const canmsg_t *msg)
   bool changed = false;
   gps_window_t *wnd;
   get_wnddata(hwnd, (void **)&wnd);
-  canvas_t *canvas;
   
-  switch(get_can_id(msg))
+  switch(msg->id)
     {
     case id_paint :
-      begin_paint(hwnd, &canvas);
-      update_window(hwnd, canvas, wnd);
+      begin_paint(hwnd);
+      update_window(hwnd, wnd);
       end_paint(hwnd);
       break;
 //    case 	id_new_route :
@@ -218,7 +214,7 @@ result_t widget_wndproc(handle_t hwnd, const canmsg_t *msg)
   return s_ok;
   }
 
-void draw_background(canvas_t *canvas,
+void draw_background(handle_t hwnd,
                      gps_window_t *wnd,
                      const rect_t *wnd_rect, 
                      const rect_t *text_area,
@@ -227,7 +223,7 @@ void draw_background(canvas_t *canvas,
    
   size_t text_len = strlen(label);
   extent_t label_size;
-  text_extent(canvas, wnd->font, label, text_len, &label_size);
+  text_extent(hwnd, wnd->font, label, text_len, &label_size);
 
   int width = rect_width(text_area);
   int text_start = text_area->left + 3;
@@ -236,28 +232,28 @@ void draw_background(canvas_t *canvas,
   
   rect_t rect;
 
-  rectangle(canvas, wnd_rect, 0, color_gray, make_rect(text_area->left, text_area->top+1, right, text_area->top + 4, &rect));
-  rectangle(canvas, wnd_rect, 0, color_gray, make_rect(text_area->left, text_area->top+4, text_area->left + 3, text_area->bottom - 17, &rect));
-  rectangle(canvas, wnd_rect, 0, color_gray, make_rect(right -3, text_area->top+4, right, text_area->bottom -14, &rect));
-  rectangle(canvas, wnd_rect, 0, color_gray, make_rect(text_area->left, text_area->bottom - 17, right, text_area->bottom - 14, &rect));
-  rectangle(canvas, wnd_rect, 0, color_gray, make_rect(text_area->left, text_area->bottom - 14, text_end + 3, text_area->bottom, &rect));
+  rectangle(hwnd, wnd_rect, 0, color_gray, make_rect(text_area->left, text_area->top+1, right, text_area->top + 4, &rect));
+  rectangle(hwnd, wnd_rect, 0, color_gray, make_rect(text_area->left, text_area->top+4, text_area->left + 3, text_area->bottom - 17, &rect));
+  rectangle(hwnd, wnd_rect, 0, color_gray, make_rect(right -3, text_area->top+4, right, text_area->bottom -14, &rect));
+  rectangle(hwnd, wnd_rect, 0, color_gray, make_rect(text_area->left, text_area->bottom - 17, right, text_area->bottom - 14, &rect));
+  rectangle(hwnd, wnd_rect, 0, color_gray, make_rect(text_area->left, text_area->bottom - 14, text_end + 3, text_area->bottom, &rect));
 
   point_t text_origin = { text_start, text_area->bottom - 15 };
 
-  draw_text(canvas, wnd_rect, wnd->font, color_white, color_hollow, label, text_len,
+  draw_text(hwnd, wnd_rect, wnd->font, color_white, color_hollow, label, text_len,
             &text_origin, make_rect(text_origin.x, text_origin.y,
                                    text_origin.x + label_size.dx,
                                    text_origin.y + label_size.dy, &rect ), 0, 0);
 }
 
-void draw_detail(canvas_t *canvas,
+void draw_detail(handle_t hwnd,
                  gps_window_t *wnd,
                  const rect_t *wnd_rect,
                  const rect_t *rect,
                  const char *txt,
                  color_t fg)
   {
-  rectangle(canvas, wnd_rect, 0, wnd->background_color, rect);
+  rectangle(hwnd, wnd_rect, 0, wnd->background_color, rect);
 
   if(txt == 0)
     return;
@@ -280,7 +276,7 @@ void draw_detail(canvas_t *canvas,
   for(c = 0; c < len; c++)
     {
     extent_t cell_size;
-    text_extent(canvas, wnd->font, txt + c, 1, &cell_size);
+    text_extent(wnd, wnd->font, txt + c, 1, &cell_size);
 
     point_t cp;
     copy_point(&pt, &cp);
@@ -288,7 +284,7 @@ void draw_detail(canvas_t *canvas,
     cp.x += cell_width >> 1;
     cp.x -= cell_size.dx >> 1;
 
-    draw_text(canvas, wnd_rect, wnd->font, fg, wnd->background_color, txt + c,
+    draw_text(hwnd, wnd_rect, wnd->font, fg, wnd->background_color, txt + c,
               1, &cp, rect, eto_clipped, 0);
 
     pt.x += cell_width;

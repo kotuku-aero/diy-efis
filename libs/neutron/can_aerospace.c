@@ -50,13 +50,11 @@ uint8_t node_id;
 static uint8_t hardware_revision;
 static uint8_t software_revision;
 
-static msg_hook_t *listener = 0;
-
 canmsg_t *create_can_msg_float(canmsg_t *msg, uint16_t message_id, uint8_t service_code, float value)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  set_can_len(msg, 8);
-  set_can_id(msg, message_id);
+  msg->length = 8;
+  msg->id = message_id;
   msg->canas.data_type = CANAS_DATATYPE_FLOAT;
   msg->canas.service_code = service_code;
 
@@ -72,8 +70,8 @@ canmsg_t *create_can_msg_float(canmsg_t *msg, uint16_t message_id, uint8_t servi
 canmsg_t *create_can_msg_int16(canmsg_t *msg, uint16_t message_id, uint8_t service_code, int16_t data)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  set_can_len(msg, 6);
-  set_can_id(msg, message_id);
+  msg->length = 6;
+  msg->id = message_id;
   msg->canas.data_type = CANAS_DATATYPE_SHORT;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = (uint8_t)(data >> 8);
@@ -85,8 +83,8 @@ canmsg_t *create_can_msg_int16(canmsg_t *msg, uint16_t message_id, uint8_t servi
 canmsg_t *create_can_msg_int16_2(canmsg_t *msg, uint16_t message_id, uint8_t service_code, int16_t data1, int16_t data2)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  set_can_len(msg, 6);
-  set_can_id(msg, message_id);
+  msg->length = 6;
+  msg->id = message_id;
   msg->canas.data_type = CANAS_DATATYPE_SHORT2;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = (uint8_t)(data1 >> 8);
@@ -100,8 +98,8 @@ canmsg_t *create_can_msg_int16_2(canmsg_t *msg, uint16_t message_id, uint8_t ser
 canmsg_t *create_can_msg_int32(canmsg_t *msg, uint16_t message_id, uint8_t service_code, int32_t data)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  set_can_len(msg, 8);
-  set_can_id(msg, message_id);
+  msg->length = 8;
+  msg->id = message_id;
   msg->canas.data_type = CANAS_DATATYPE_INT32;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = (uint8_t)(data >> 24);
@@ -115,8 +113,8 @@ canmsg_t *create_can_msg_int32(canmsg_t *msg, uint16_t message_id, uint8_t servi
 canmsg_t *create_can_msg_uint16(canmsg_t *msg, uint16_t message_id, uint8_t service_code, uint16_t data)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  set_can_len(msg, 6);
-  set_can_id(msg, message_id);
+  msg->length = 6;
+  msg->id = message_id;
   msg->canas.data_type = CANAS_DATATYPE_USHORT;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = (uint8_t)(data >> 8);
@@ -128,8 +126,8 @@ canmsg_t *create_can_msg_uint16(canmsg_t *msg, uint16_t message_id, uint8_t serv
 canmsg_t *create_can_msg_uint16_2(canmsg_t *msg, uint16_t message_id, uint8_t service_code, uint16_t data1, uint16_t data2)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  set_can_len(msg, 6);
-  set_can_id(msg, message_id);
+  msg->length = 6;
+  msg->id = message_id;
   msg->canas.data_type = CANAS_DATATYPE_USHORT2;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = (uint8_t)(data1 >> 8);
@@ -143,8 +141,8 @@ canmsg_t *create_can_msg_uint16_2(canmsg_t *msg, uint16_t message_id, uint8_t se
 canmsg_t *create_can_msg_uint32(canmsg_t *msg, uint16_t message_id, uint8_t service_code, uint32_t data)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  set_can_len(msg, 8);
-  set_can_id(msg, message_id);
+  msg->length = 8;
+  msg->id = message_id;
   msg->canas.data_type = CANAS_DATATYPE_UINT32;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = (uint8_t)(data >> 24);
@@ -158,8 +156,8 @@ canmsg_t *create_can_msg_uint32(canmsg_t *msg, uint16_t message_id, uint8_t serv
 canmsg_t *create_can_msg_int8(canmsg_t *msg, uint16_t message_id, uint8_t service_code, int8_t value)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  set_can_len(msg, 5);
-  set_can_id(msg, message_id);
+  msg->length = 5;
+  msg->id = message_id;
   msg->canas.data_type = CANAS_DATATYPE_UCHAR;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = (uint8_t) value;
@@ -170,8 +168,8 @@ canmsg_t *create_can_msg_int8(canmsg_t *msg, uint16_t message_id, uint8_t servic
 canmsg_t *create_can_msg_int8_2(canmsg_t *msg, uint16_t message_id, uint8_t service_code, int8_t d0, int8_t d1)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  set_can_len(msg, 6);
-  set_can_id(msg, message_id);
+  msg->length = 6;
+  msg->id = message_id;
   msg->canas.data_type = CANAS_DATATYPE_UCHAR2;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = d0;
@@ -183,8 +181,8 @@ canmsg_t *create_can_msg_int8_2(canmsg_t *msg, uint16_t message_id, uint8_t serv
 canmsg_t *create_can_msg_int8_3(canmsg_t *msg, uint16_t message_id, uint8_t service_code, int8_t d0, int8_t d1, int8_t d2)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  set_can_len(msg, 7);
-  set_can_id(msg, message_id);
+  msg->length = 7;
+  msg->id = message_id;
   msg->canas.data_type = CANAS_DATATYPE_UCHAR3;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = d0;
@@ -197,8 +195,8 @@ canmsg_t *create_can_msg_int8_3(canmsg_t *msg, uint16_t message_id, uint8_t serv
 canmsg_t *create_can_msg_int8_4(canmsg_t *msg, uint16_t message_id, uint8_t service_code, int8_t d0, int8_t d1, int8_t d2, int8_t d3)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  set_can_len(msg, 8);
-  set_can_id(msg, message_id);
+  msg->length = 8;
+  msg->id = message_id;
   msg->canas.data_type = CANAS_DATATYPE_UCHAR4;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = d0;
@@ -212,8 +210,8 @@ canmsg_t *create_can_msg_int8_4(canmsg_t *msg, uint16_t message_id, uint8_t serv
 canmsg_t *create_can_msg_uint8(canmsg_t *msg, uint16_t message_id, uint8_t service_code, uint8_t value)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  set_can_len(msg, 5);
-  set_can_id(msg, message_id);
+  msg->length = 5;
+  msg->id = message_id;
   msg->canas.data_type = CANAS_DATATYPE_UCHAR;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = value;
@@ -224,8 +222,8 @@ canmsg_t *create_can_msg_uint8(canmsg_t *msg, uint16_t message_id, uint8_t servi
 canmsg_t *create_can_msg_uint8_2(canmsg_t *msg, uint16_t message_id, uint8_t service_code, uint8_t d0, uint8_t d1)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  set_can_len(msg, 6);
-  set_can_id(msg, message_id);
+  msg->length = 6;
+  msg->id = message_id;
   msg->canas.data_type = CANAS_DATATYPE_UCHAR2;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = d0;
@@ -237,8 +235,8 @@ canmsg_t *create_can_msg_uint8_2(canmsg_t *msg, uint16_t message_id, uint8_t ser
 canmsg_t *create_can_msg_uint8_3(canmsg_t *msg, uint16_t message_id, uint8_t service_code, uint8_t d0, uint8_t d1, uint8_t d2)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  set_can_len(msg, 7);
-  set_can_id(msg, message_id);
+  msg->length = 7;
+  msg->id = message_id;
   msg->canas.data_type = CANAS_DATATYPE_UCHAR3;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = d0;
@@ -251,8 +249,8 @@ canmsg_t *create_can_msg_uint8_3(canmsg_t *msg, uint16_t message_id, uint8_t ser
 canmsg_t *create_can_msg_uint8_4(canmsg_t *msg, uint16_t message_id, uint8_t service_code, uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  set_can_len(msg, 8);
-  set_can_id(msg, message_id);
+  msg->length = 8;
+  msg->id = message_id;
   msg->canas.data_type = CANAS_DATATYPE_UCHAR4;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = d0;
@@ -562,26 +560,11 @@ static deque_p can_tx_queue;
 static deque_p can_rx_queue;
 static uint8_t message_code;
 
-result_t bsp_can_tx_queue_capacity(uint16_t *cap)
-  {
-  if(cap == 0 || can_tx_queue == 0)
-    return e_bad_parameter;
-  
-  return capacity(can_tx_queue, cap);
-  }
-
-result_t bsp_can_rx_available(uint16_t *num_msgs)
-  {
-  if(num_msgs == 0 || can_rx_queue == 0)
-    return e_bad_parameter;
-  
-  return count(can_rx_queue, num_msgs);
-  }
-
 /**
  * Worker task to queue messages
  * @param parg
  */
+    
 void can_tx_task(void *parg)
   {
   canmsg_t tx_msg;
@@ -590,21 +573,13 @@ void can_tx_task(void *parg)
     // block till a message is ready
     pop_front(can_tx_queue, &tx_msg, INDEFINITE_WAIT);
     bsp_send_can(&tx_msg);
-    
-    // call all of the message handlers....
-    msg_hook_t *handler;
-    for(handler = listener; handler != 0; handler = handler->next)
-      {
-      if(handler->tx_callback != 0)
-        (handler->tx_callback)(&tx_msg, handler->parg);
-      }
     }
   }
 
 result_t can_send_raw(canmsg_t *msg)
   {
   if(msg == 0 ||
-     get_can_len(msg) == 0)
+     msg->length == 0)
     return e_bad_parameter;
 
 #if 0  
@@ -630,6 +605,8 @@ result_t can_send(canmsg_t *msg)
   msg->canas.message_code = ++message_code;
   return can_send_reply(msg);
   }
+
+static msg_hook_t *listener = 0;
 
 result_t subscribe(msg_hook_t *handler)
   {
@@ -672,6 +649,30 @@ result_t unsubscribe(msg_hook_t *handler)
   return s_ok;
   }
 
+static uint8_t ids_reply[4];
+
+static bool publish_ids(const canmsg_t *service_msg, void *parg)
+  {
+  
+  // we only accept a publish ids if the addressed node id is 0 or the node if
+  if(service_msg->canas.node_id == 0 ||
+     service_msg->canas.node_id == node_id)
+    {
+    canmsg_t msg;
+
+    ids_reply[0] = hardware_revision;
+    ids_reply[1] = software_revision;
+
+    can_send(create_can_msg_uint8_4(&msg, service_msg->id + 1, 0,
+                                    ids_reply[0], ids_reply[1],
+                                    ids_reply[2], ids_reply[3]));
+    
+    return true;
+    }
+  
+  return false;
+  }
+
 static canmsg_t rx_msg;
 
 static msg_hook_t *services[num_services];
@@ -711,13 +712,10 @@ void can_rx_task(void *parg)
     // call all of the message handlers....
     msg_hook_t *handler;
     for(handler = listener; handler != 0; handler = handler->next)
-      {
-      if(handler->rx_callback != 0)
-        (handler->rx_callback)(&rx_msg, handler->parg);
-      }
+      (handler->callback)(&rx_msg, handler->parg);
 
     // handle the builtin services next.  The service channel +1 is the reply channel
-    switch(get_can_id(&rx_msg) & 0x07fe)
+    switch(rx_msg.id & 0xfffe)
       {
       case node_service_channel_0:
       case node_service_channel_1:
@@ -778,7 +776,7 @@ void can_rx_task(void *parg)
           
           while(service != 0)
             {
-            if((*service->rx_callback)(&rx_msg, service->parg))
+            if((*service->callback)(&rx_msg, service->parg))
               break;      // message was handled
             
             service = service->prev;
@@ -789,7 +787,9 @@ void can_rx_task(void *parg)
     }
   }
 
-result_t can_aerospace_init(const neutron_parameters_t *params, bool create_publish_task)
+extern result_t neutron_init(const neutron_parameters_t *params, bool init_mode, bool create_worker);
+
+result_t can_aerospace_init(const neutron_parameters_t *params, bool init_mode, bool create_publish_task)
   {
   task_p task_handle;
   result_t result;
@@ -818,23 +818,29 @@ result_t can_aerospace_init(const neutron_parameters_t *params, bool create_publ
     return result;
     }
 
-  if (failed(result = task_create("CAN_TX", params->tx_stack_length, can_tx_task, 0, NORMAL_PRIORITY, &task_handle)))
+  if (failed(result = task_create("CAN_TX",
+    params->tx_stack_length,
+    can_tx_task, 0,
+    NORMAL_PRIORITY, &task_handle)))
     {
     trace_error("Cannot create the can_tx task");
     return result;
     }
 
-  if (failed(result = task_create("CAN_RX", params->rx_stack_length, can_rx_task, 0, NORMAL_PRIORITY + 1, &task_handle)))
+  if (failed(result = task_create("CAN_RX",
+    params->rx_stack_length,
+    can_rx_task, 0,
+    NORMAL_PRIORITY + 1, &task_handle)))
     {
     trace_error("Cannot create the can_rx task");
     return result;
     }
   
-  if(failed(result = neutron_init(params, create_publish_task)))
+  if(failed(result = neutron_init(params, init_mode, create_publish_task)))
     return result;
 
   // start the can driver running.
-  return bsp_can_init(can_rx_queue, params->bitrate);
+  return bsp_can_init(can_rx_queue, 125);
   }
 
 void send_param_float(float value, uint16_t id)
@@ -848,4 +854,3 @@ void send_param_int16(int16_t value, uint16_t id)
   canmsg_t msg;
   can_send(create_can_msg_int16(&msg, id, 0, value));
   }
-

@@ -79,29 +79,25 @@ static neutron_parameters_t init_params = {
   .node_id = mfd_node_id_last
   };
 
-extern result_t electron_init(int argc, char **argv)
+
+extern result_t electron_init(const char *reg_path, bool factory_reset)
   {
   result_t result;
   semaphore_create(&mutex);
   semaphore_signal(mutex);
 
-  char *ini_name = "diy-efis.reg";
-
-  if (argc > 1)
-    ini_name = argv[1];
-
   uint32_t reg_size = 4096 * 32;
   // open the registry
-  create_or_open_mmap(ini_name, reg_size, &reg_fd, &reg_mm, &reg_buffer);
+  create_or_open_mmap(reg_path, reg_size, &reg_fd, &reg_mm, &reg_buffer);
 
   reg_size >>= 5;         // make number of blocks
 
-  if (failed(result = bsp_reg_init(false, (uint16_t)reg_size, 128)) &&
+  if (failed(result = bsp_reg_init(factory_reset, (uint16_t)reg_size, 128)) &&
     result != e_not_initialized)
     return result;
 
   // start the can systems
-  if (failed(result = can_aerospace_init(&init_params, false, true)) &&
+  if (failed(result = can_aerospace_init(&init_params, factory_reset, false)) &&
     result != e_path_not_found)
     return result;
 

@@ -102,7 +102,7 @@ result_t create_hsi_window(handle_t parent, memid_t key, handle_t *hwnd)
   return s_ok;
   }
 
-static void update_window(handle_t hwnd, canvas_t *canvas, hsi_window_t *wnd)
+static void update_window(handle_t hwnd, hsi_window_t *wnd)
   {
   rect_t wnd_rect;
   get_window_rect(hwnd, &wnd_rect);
@@ -113,10 +113,10 @@ static void update_window(handle_t hwnd, canvas_t *canvas, hsi_window_t *wnd)
   point_t pt;
   rect_t rect;
   // fill without a border
-  rectangle(canvas, &wnd_rect, 0, wnd->background_color, &wnd_rect);
+  rectangle(hwnd, &wnd_rect, 0, wnd->background_color, &wnd_rect);
 
   if (wnd->draw_border)
-    round_rect(canvas, &wnd_rect, &gray_pen, color_hollow, &wnd_rect, 12);
+    round_rect(hwnd, &wnd_rect, &gray_pen, color_hollow, &wnd_rect, 12);
 
   /////////////////////////////////////////////////////////////////////////////
   //
@@ -155,7 +155,7 @@ static void update_window(handle_t hwnd, canvas_t *canvas, hsi_window_t *wnd)
     rotate_point(&median, &pts[0], index);
     rotate_point(&median, &pts[1], index);
 
-    polyline(canvas, &wnd_rect, &white_pen, 2, pts);
+    polyline(hwnd, &wnd_rect, &white_pen, 2, pts);
 
     bool do_minor_mark = false;
     int16_t minor_index;
@@ -167,7 +167,7 @@ static void update_window(handle_t hwnd, canvas_t *canvas, hsi_window_t *wnd)
       rotate_point(&median, &pts[0], index + minor_index);
       rotate_point(&median, &pts[1], index + minor_index);
 
-      polyline(canvas, &wnd_rect, &white_pen, 2, pts);
+      polyline(hwnd, &wnd_rect, &white_pen, 2, pts);
 
       do_minor_mark = !do_minor_mark;
       }
@@ -178,7 +178,7 @@ static void update_window(handle_t hwnd, canvas_t *canvas, hsi_window_t *wnd)
     int16_t rotn = (index < 0) ? index + 360 : index;
     rotate_point(&median, &pts[0], rotn);
 
-    draw_text(canvas, &wnd_rect, wnd->font, color_white, color_black,
+    draw_text(hwnd, &wnd_rect, wnd->font, color_white, color_black,
       (char *)&i, 1,
       make_point(pts[0].x - font_center, pts[0].y - font_center, &pt),
       0, 0, 0);
@@ -200,7 +200,7 @@ static void update_window(handle_t hwnd, canvas_t *canvas, hsi_window_t *wnd)
   for (i = 0; i < 4; i++)
     rotate_point(&median, &track_marker[i], rotation);
 
-  polygon(canvas, &wnd_rect, &gray_pen, color_hollow, 4, track_marker);
+  polygon(hwnd, &wnd_rect, &gray_pen, color_hollow, 4, track_marker);
 
   point_t track_line[2] = {
     { center_x, center_y - 88 },
@@ -209,7 +209,7 @@ static void update_window(handle_t hwnd, canvas_t *canvas, hsi_window_t *wnd)
 
   rotate_point(&median, &track_line[0], rotation);
 
-  polyline(canvas, &wnd_rect, &track_pen, 2, track_line);
+  polyline(hwnd, &wnd_rect, &track_pen, 2, track_line);
 
   ///////////////////////////////////////////////////////////////////////////
   // Draw the CDI
@@ -230,7 +230,7 @@ static void update_window(handle_t hwnd, canvas_t *canvas, hsi_window_t *wnd)
     rotate_point(&median, &pts[0], rotation);
     rotate_point(&median, &pts[1], rotation);
 
-    polyline(canvas, &wnd_rect, &green_pen_3, 2, pts);
+    polyline(hwnd, &wnd_rect, &green_pen_3, 2, pts);
     }
 
   // draw the CDI Marker head next
@@ -244,7 +244,7 @@ static void update_window(handle_t hwnd, canvas_t *canvas, hsi_window_t *wnd)
   for (i = 0; i < 4; i++)
     rotate_point(&median, &cdi_pts[i], rotation);
 
-  polygon(canvas, &wnd_rect, 0, color_green, 4, cdi_pts);
+  polygon(hwnd, &wnd_rect, 0, color_green, 4, cdi_pts);
 
   // we now convert the deviation to pixels.
   // 1 degree = 24 pixels
@@ -259,7 +259,7 @@ static void update_window(handle_t hwnd, canvas_t *canvas, hsi_window_t *wnd)
   rotate_point(&median, &pts[0], rotation);
   rotate_point(&median, &pts[1], rotation);
 
-  polyline(canvas, &wnd_rect, &green_pen_3, 2, pts);
+  polyline(hwnd, &wnd_rect, &green_pen_3, 2, pts);
 
   pts[0].x = center_x; pts[0].y = center_y + 50;
   pts[1].x = center_x; pts[1].y = center_y + 98;
@@ -267,7 +267,7 @@ static void update_window(handle_t hwnd, canvas_t *canvas, hsi_window_t *wnd)
   rotate_point(&median, &pts[0], rotation);
   rotate_point(&median, &pts[1], rotation);
 
-  polyline(canvas, &wnd_rect, &green_pen_3, 2, pts);
+  polyline(hwnd, &wnd_rect, &green_pen_3, 2, pts);
 
   pts[0].x = center_x + cdi; pts[0].y = center_y - 48;
   pts[1].x = pts[0].x; pts[1].y = center_y + 48;
@@ -275,7 +275,7 @@ static void update_window(handle_t hwnd, canvas_t *canvas, hsi_window_t *wnd)
   rotate_point(&median, &pts[0], rotation);
   rotate_point(&median, &pts[1], rotation);
 
-  polyline(canvas, &wnd_rect, &green_pen_3, 2, pts);
+  polyline(hwnd, &wnd_rect, &green_pen_3, 2, pts);
 
   /////////////////////////////////////////////////////////////////////////////
   //	Draw the heading bug.
@@ -296,14 +296,14 @@ static void update_window(handle_t hwnd, canvas_t *canvas, hsi_window_t *wnd)
   for (i = 0; i < 8; i++)
     rotate_point(&median, &heading_points[i], hdg);
 
-  polyline(canvas, &wnd_rect, &magenta_pen, 8, heading_points);
+  polyline(hwnd, &wnd_rect, &magenta_pen, 8, heading_points);
 
   heading_points[0].x = center_x - 5; heading_points[0].y = 0;
   heading_points[1].x = center_x + 5; heading_points[1].y = 0;
   heading_points[2].x = center_x; heading_points[2].y = 10;
   heading_points[3].x = center_x - 5; heading_points[3].y = 0;
 
-  polygon(canvas, &wnd_rect, &white_pen, color_white, 4, heading_points);
+  polygon(hwnd, &wnd_rect, &white_pen, color_white, 4, heading_points);
 
   /////////////////////////////////////////////////////////////////////////////
   // Draw the wind direction indicator.
@@ -333,7 +333,7 @@ static void update_window(handle_t hwnd, canvas_t *canvas, hsi_window_t *wnd)
   for (i = 0; i < 4; i++)
     rotate_point(&median, &wind_bug[i], relative_wind);
 
-  polyline(canvas, &wnd_rect, &yellow_pen, 4, wind_bug);
+  polyline(hwnd, &wnd_rect, &yellow_pen, 4, wind_bug);
 
   // now the text in upper left
 
@@ -342,14 +342,14 @@ static void update_window(handle_t hwnd, canvas_t *canvas, hsi_window_t *wnd)
   size_t length = strlen(msg);
 
   extent_t pixels;
-  text_extent(canvas, wnd->font, msg, length, &pixels);
-  draw_text(canvas, &wnd_rect, wnd->font, color_yellow, color_hollow,
+  text_extent(wnd, wnd->font, msg, length, &pixels);
+  draw_text(hwnd, &wnd_rect, wnd->font, color_yellow, color_hollow,
     msg, length, make_point(25 - (pixels.dx >> 1), 2, &pt), 0, 0, 0);
 
   sprintf(msg, "%d", wnd->wind_speed);
   length = strlen(msg);
-  text_extent(canvas, wnd->font, msg, length, &pixels);
-  draw_text(canvas, &wnd_rect, wnd->font, color_yellow, color_hollow,
+  text_extent(wnd, wnd->font, msg, length, &pixels);
+  draw_text(hwnd, &wnd_rect, wnd->font, color_yellow, color_hollow,
     msg, length, make_point(25 - (pixels.dx >> 1), 13, &pt), 0, 0, 0);
 
   /////////////////////////////////////////////////////////////////////////////
@@ -357,20 +357,20 @@ static void update_window(handle_t hwnd, canvas_t *canvas, hsi_window_t *wnd)
   // drawn in top right as distance/time
   sprintf(msg, "%d", wnd->distance_to_waypoint);
   length = strlen(msg);
-  text_extent(canvas, wnd->font, msg, length, &pixels);
-  draw_text(canvas, &wnd_rect, wnd->font, color_yellow, color_hollow,
+  text_extent(wnd, wnd->font, msg, length, &pixels);
+  draw_text(hwnd, &wnd_rect, wnd->font, color_yellow, color_hollow,
     msg, length, make_point(window_x - 25 - (pixels.dx >> 1), 2, &pt), 0, 0, 0);
 
   sprintf(msg, "%02.2d:%02.2d", wnd->time_to_waypoint / 60, wnd->time_to_waypoint % 60);
   length = strlen(msg);
-  text_extent(canvas, wnd->font, msg, length, &pixels);
-  draw_text(canvas, &wnd_rect, wnd->font, color_yellow, color_hollow,
+  text_extent(wnd, wnd->font, msg, length, &pixels);
+  draw_text(hwnd, &wnd_rect, wnd->font, color_yellow, color_hollow,
     msg, length, make_point(window_x - 25 - (pixels.dx >> 1), 13, &pt), 0, 0, 0);
 
   sprintf(msg, "%s", wnd->waypoint_name);
   length = strlen(msg);
-  text_extent(canvas, wnd->font, msg, length, &pixels);
-  draw_text(canvas, &wnd_rect, wnd->font, color_yellow, color_hollow,
+  text_extent(wnd, wnd->font, msg, length, &pixels);
+  draw_text(hwnd, &wnd_rect, wnd->font, color_yellow, color_hollow,
     msg, length, make_point(window_x - 25 - (pixels.dx >> 1), 24, &pt), 0, 0, 0);
   }
 
@@ -381,7 +381,7 @@ result_t widget_wndproc(handle_t hwnd, const canmsg_t *msg)
   hsi_window_t *wnd;
   get_wnddata(hwnd, (void **)&wnd);
 
-  switch (get_can_id(msg))
+  switch (msg->id)
     {
     case id_magnetic_heading:
     {
@@ -483,13 +483,10 @@ result_t widget_wndproc(handle_t hwnd, const canmsg_t *msg)
     }
     break;
     case id_paint:
-      {
-    canvas_t *canvas;
-      begin_paint(hwnd, &canvas);
-      update_window(hwnd, canvas, wnd);
+      begin_paint(hwnd);
+      update_window(hwnd, wnd);
       end_paint(hwnd);
-      }
-        break;
+      break;
     default:
       return defwndproc(hwnd, msg);
     }

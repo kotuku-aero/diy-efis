@@ -359,7 +359,7 @@ static void fb_sync(void *parg)
   while(true)
     {
     // this simulates the hardware.  We only sync every 500msec
-    // as this is a test harness, the real hardware would give a vsync every 50/60 msec
+    // as this is a test harness
     semaphore_wait(sync, 500);
     bsp_sync();
     }
@@ -373,7 +373,19 @@ static void *shell_run_ion(void *parg)
 
 int main(int argc, char **argv)
   {
-  if(failed(electron_init(argc, argv)))
+	// The command line can pass in the name of the registry used to set us up.  In any
+  // case we need to implement some code
+  const char *ini_path;
+  if(argc > 1)
+    ini_path = argv[1];
+  else
+    ini_path = "diy-efis.reg";
+
+
+  // TODO: handle this better
+  bool factory_reset = false;
+
+  if(failed(electron_init(ini_path, factory_reset)))
     {
     printf("Unable to initialize the krypton library.");
     return -1;
@@ -519,7 +531,7 @@ static const char *bsp_hive = "electron";
 static const char *bsp_hive = "krypton";
 #endif
 
-result_t bsp_can_init(deque_p rx_queue)
+result_t bsp_can_init(handle_t rx_queue)
   {
   result_t result;
   memid_t key;

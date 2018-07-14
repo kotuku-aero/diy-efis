@@ -33,7 +33,7 @@ then the origional copyright notice is to be respected.
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
-#include "../neutron/bsp.h"
+#include "../../libs/neutron/bsp.h"
 
 #include <stdint.h>
 
@@ -41,12 +41,12 @@ it must be removed as soon as possible after the code fragment is identified.
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
-#include "../photon/photon.h"
+#include "../../libs/neutron/photon.h"
 
 // data that is based on the actual framebuffer
 static int fbfd;          // actual framebuffer
 
-static semaphore_p worker;
+static handle_t worker;
 
 extern void bsp_invalidate_framebuffer();
 extern bool bsp_repaint_framebuffer();
@@ -55,9 +55,9 @@ extern bool bsp_repaint_framebuffer();
 // if single bufferred will be /dev/fb0, double bufferred will be /dev/fb1
 static int fbfd = -1;
 
-const char *screen_x_s = "screen-x";
-const char *screen_y_s = "screen-y";
-const char *framebuffer_device_s = "screen";
+static const char *screen_x_s = "screen-x";
+static const char *screen_y_s = "screen-y";
+static const char *framebuffer_device_s = "screen";
 
 struct _framebuffer_canvas_t;
 
@@ -116,7 +116,7 @@ static result_t init_canvas(framebuffer_canvas_t *canvas,
   memset(canvas, 0, sizeof(framebuffer_canvas_t));
 
   canvas->canvas.version = sizeof(framebuffer_canvas_t);
-  canvas->canvas.bits_per_pixel = 32;
+  canvas->canvas.bits_per_pixel = sizeof(color_t);
   canvas->canvas.width = dx;
   canvas->canvas.height = dy;
   canvas->canvas.get_pixel = bsp_get_pixel;
@@ -743,7 +743,7 @@ static bool is_emulator = false;
 
 static void fb_run(void *parg)
   {
-  semaphore_p semp;
+  handle_t semp;
   if(is_emulator)
     semaphore_create(&semp);
   while(true)
@@ -788,7 +788,7 @@ result_t bsp_canvas_open_framebuffer(canvas_t **canvas)
     y = 240;
 
   if(failed(result = reg_get_string(key, framebuffer_device_s, device, &length)))
-    strcpy(device, "/dev/fb1");
+    strcpy(device, "/tmp/fb0");
 
   // try to open the actual framebuffer.
   // If this is a single-bufferred screen then it will usually be /dev/fb0

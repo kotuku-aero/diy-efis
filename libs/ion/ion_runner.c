@@ -479,11 +479,8 @@ result_t ion_run(ion_register_fn lib_funcs)
   
   // enumerate the ion keys
   memid_t ion_home;
-  if (failed(result = reg_open_key(0, ion_s, &ion_home)))
-    {
-    if (failed(result = reg_create_key(0, ion_s, &ion_home)))
-      return result;
-    }
+  if(failed(result = reg_open_key(0, ion_s, &ion_home)))
+    return result;
   
   // firstly we try to load the handler.
   // TODO: js errors to trace log?????
@@ -606,7 +603,7 @@ result_t ion_run(ion_register_fn lib_funcs)
 
     // see if there is a handler.
     handle_t event_handlers;
-    if (failed(map_find(handlers, (void *)get_can_id(&the_message), &event_handlers)))
+    if (failed(map_find(handlers, (void *)the_message.id, &event_handlers)))
       continue;
 
     // send each handler a message...
