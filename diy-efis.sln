@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "msh", "msh.vcxproj", "{4B662258-EE25-4B87-AC06-3F4324BD4EAF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "msh", "tools\msh\msh.vcxproj", "{4B662258-EE25-4B87-AC06-3F4324BD4EAF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "krypton", "libs\krypton\krypton.vcxproj", "{8AD714BB-EF78-441B-BC81-0B5ABDB41FA5}"
 EndProject
@@ -27,9 +27,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{CADEAC62-E
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{6438D13E-3FAE-4D8F-9E4F-4E6EE70E4346}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cunit", "tools\..\tests\cunit\cunit.vcxproj.vcxproj", "{E88E5D8B-FAA8-41FA-B0A5-77C924300C0E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cunit", "tests\cunit\cunit.vcxproj.vcxproj", "{E88E5D8B-FAA8-41FA-B0A5-77C924300C0E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unit_tests", "tools\..\tests\publisher\publisher.vcxproj", "{D06597D3-5DEA-4B57-B05A-F827DD25D2DC}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unit_tests", "tests\publisher\publisher.vcxproj", "{D06597D3-5DEA-4B57-B05A-F827DD25D2DC}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gluon", "tools\gluon\gluon.vcxproj", "{9EAD2275-597A-4672-A837-987B63E9DED0}"
 EndProject
