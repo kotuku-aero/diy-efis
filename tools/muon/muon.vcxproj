@@ -23,7 +23,7 @@
     <ProjectGuid>{4692AF85-E696-481E-8FFB-5135BDCE2326}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>muon</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -130,12 +130,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\libs\muon\cli.c" />
-    <ClCompile Include="..\..\libs\muon\cli\cansend.c" />
-    <ClCompile Include="..\..\libs\muon\cli\cli_enumerations.c" />
-    <ClCompile Include="..\..\libs\muon\cli\neutron_cli_impl.c" />
-    <ClCompile Include="..\..\libs\muon\cli\cli_publisher.c" />
-    <ClCompile Include="..\..\libs\muon\cli\cli_regedit.c" />
-    <ClCompile Include="..\..\libs\muon\cli\cli_script.c" />
+    <ClCompile Include="..\..\libs\muon\cansend.c" />
+    <ClCompile Include="..\..\libs\muon\cli_enumerations.c" />
+    <ClCompile Include="..\..\libs\muon\neutron_cli_impl.c" />
+    <ClCompile Include="..\..\libs\muon\cli_publisher.c" />
+    <ClCompile Include="..\..\libs\muon\cli_regedit.c" />
+    <ClCompile Include="..\..\libs\muon\cli_script.c" />
     <ClCompile Include="..\..\libs\muon\cli_fsm.c" />
     <ClCompile Include="..\..\libs\muon\cli_io_nuetron.c" />
     <ClCompile Include="..\..\libs\muon\cli_line.c" />
@@ -151,7 +151,7 @@
     <ClInclude Include="..\..\libs\muon\muon.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\libs\muon\cli\neutron.cli" />
+    <None Include="..\..\libs\muon\neutron.cli" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
