@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>com.microchip.mplab.nbide.embedded.makeproject</type>
+    <configuration>
+        <data xmlns="http://www.netbeans.org/ns/make-project/1">
+            <name>diy-efis</name>
+            <creation-uuid>deedcf7d-e95b-4d6d-b5fd-d511e5b0fa4d</creation-uuid>
+            <make-project-type>0</make-project-type>
+            <c-extensions>c</c-extensions>
+            <cpp-extensions/>
+            <header-extensions/>
+            <asminc-extensions/>
+            <sourceEncoding>ISO-8859-1</sourceEncoding>
+            <make-dep-projects>
+                <make-dep-project>../../libs/atom</make-dep-project>
+                <make-dep-project>../../libs/atom16</make-dep-project>
+                <make-dep-project>../../diy-efis/libs/neutron</make-dep-project>
+            </make-dep-projects>
+        </data>
+    </configuration>
+</project>
