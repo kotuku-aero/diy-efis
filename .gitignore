@@ -163,3 +163,5 @@
 /x64/Debug/*.pdb
 /x64/Debug/*.exe
 /x64/Debug/*.ilk
+/raspberry-pi/VC/diy-efis/bin/ARM/Debug
+/raspberry-pi/VC/diy-efis/obj
