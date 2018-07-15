@@ -371,6 +371,8 @@ static void *shell_run_ion(void *parg)
   ion_run(0);
 	}
 
+extern result_t krypton_init(const char *reg_path, bool factory_reset);
+
 int main(int argc, char **argv)
   {
 	// The command line can pass in the name of the registry used to set us up.  In any
@@ -385,7 +387,7 @@ int main(int argc, char **argv)
   // TODO: handle this better
   bool factory_reset = false;
 
-  if(failed(electron_init(ini_path, factory_reset)))
+  if(failed(krypton_init(ini_path, factory_reset)))
     {
     printf("Unable to initialize the krypton library.");
     return -1;

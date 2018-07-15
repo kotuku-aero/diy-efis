@@ -80,7 +80,7 @@ static neutron_parameters_t init_params = {
   };
 
 
-extern result_t electron_init(const char *reg_path, bool factory_reset)
+result_t krypton_init(const char *reg_path, bool factory_reset)
   {
   result_t result;
   semaphore_create(&mutex);

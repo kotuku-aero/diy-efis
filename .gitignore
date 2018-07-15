@@ -165,3 +165,10 @@
 /x64/Debug/*.ilk
 /raspberry-pi/VC/diy-efis/bin/ARM/Debug
 /raspberry-pi/VC/diy-efis/obj
+/libs/krypton/Release/krypton.tlog
+/tools/ion/Release/ion.tlog
+/tools/msh/Release/msh.tlog
+/tools/muon/Release/muon.tlog
+/tools/neutron/Release/neutron.tlog
+/tools/photon/Release/photon.tlog
+/tools/proton/Release/proton.tlog
