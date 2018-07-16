@@ -95,6 +95,9 @@ static result_t css_read_clipboard(stream_handle_t *hndl, void *buffer, uint16_t
   char *str = (char *)buffer;
   LPSTR hglb = GlobalLock(clipdata);
 
+  if (hglb == 0)
+    return e_not_found;
+
   int len = strlen(hglb);
 
   while (size > 0)
@@ -365,7 +368,7 @@ static void fb_sync(void *parg)
     }
   }
 
-static void *shell_run_ion(void *parg)
+static void shell_run_ion(void *parg)
 	{
   // and run the interpreter shell
   ion_run(0);

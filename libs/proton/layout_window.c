@@ -1777,11 +1777,13 @@ result_t load_layout(handle_t parent, memid_t hive)
 
   wnd->key = menu;
 
-  char menu_name[REG_STRING_MAX];
+  memid_t root_keys_key;
 
-  if (succeeded(reg_get_string(menu, "root-keys", menu_name, 0)))
+  static const char *root_keys_s = "root-keys";
+
+  if (succeeded(reg_open_key(menu, root_keys_s, &root_keys_key)))
     {
-    find_keys(wnd, menu_name, &wnd->root_keys);
+    find_keys(wnd, root_keys_s, &wnd->root_keys);
     wnd->active_keys = wnd->root_keys;
     wnd->menu_timer = 0;
     }
