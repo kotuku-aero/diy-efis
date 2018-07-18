@@ -801,14 +801,15 @@ typedef struct _menu_item_cancel_t {
   uint16_t value;     // cancel value
   } menu_item_cancel_t;
 
+static const canmsg_t cancel_msg =
+{
+  .id = id_menu_cancel
+};
+
 static menu_item_action_result item_cancel_evaluate(layout_window_t *wnd, menu_item_t *item, const canmsg_t *msg)
   {
-  /*
-  msg_t cancel_msg(id_menu_cancel);
-  cancel_msg.flags |= LOOPBACK_MESSAGE;
-
-  reinterpret_cast<application_t *>(application_t::instance)->publish(cancel_msg);
-  * */
+  // send the menu cancel message to the window
+  send_message(wnd->window, &cancel_msg);
 
   return mia_cancel;
   }
@@ -1241,8 +1242,9 @@ static result_t find_menu(layout_window_t *wnd, const char *name, menu_t **menu)
       {
       // the protocol assumes all child keys are menu items
       menu_item_t *item = parse_item(wnd, item_key);
-      // add the menu item to the mix
-      vector_push_back(popup->menu_items, &item);
+      if(item != 0)
+        // add the menu item to the mix
+        vector_push_back(popup->menu_items, &item);
       }
 
     // we now load the keys
@@ -1321,8 +1323,7 @@ static result_t on_key0(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg
       value > 0 &&
       (*wnd->active_keys->key0->is_enabled)(wnd, wnd->active_keys->key0, msg))
       {
-      if (wnd->menu_timer != 0)
-        (*wnd->active_keys->key0->evaluate)(wnd, wnd->active_keys->key0, msg);
+      (*wnd->active_keys->key0->evaluate)(wnd, wnd->active_keys->key0, msg);
       wnd->menu_timer = menu_timeout;
       changed = true;
       }

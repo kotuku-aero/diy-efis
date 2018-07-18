@@ -326,6 +326,56 @@ static result_t set_offset(handle_t hwnd, const variant_t *value)
   return s_ok;
   }
 
+static result_t get_back_color(handle_t hwnd, variant_t *value)
+{
+  airspeed_window_t *wnd = get_wnd(hwnd);
+  value->dt = field_uint32;
+  value->v_float = wnd->background_color;
+
+  return s_ok;
+}
+
+static result_t set_back_color(handle_t hwnd, const variant_t *value)
+{
+  airspeed_window_t *wnd = get_wnd(hwnd);
+  if (value->dt != field_uint32)
+    return e_bad_type;
+
+  bool changed = wnd->background_color != value->v_uint32;
+  if (changed)
+  {
+    wnd->background_color = value->v_uint32;
+    invalidate_rect(hwnd, 0);
+  }
+
+  return s_ok;
+}
+
+static result_t get_text_color(handle_t hwnd, variant_t *value)
+{
+  airspeed_window_t *wnd = get_wnd(hwnd);
+  value->dt = field_uint32;
+  value->v_float = wnd->text_color;
+
+  return s_ok;
+}
+
+static result_t set_text_color(handle_t hwnd, const variant_t *value)
+{
+  airspeed_window_t *wnd = get_wnd(hwnd);
+  if (value->dt != field_uint32)
+    return e_bad_type;
+
+  bool changed = wnd->text_color != value->v_uint32;
+  if (changed)
+  {
+    wnd->text_color = value->v_uint32;
+    invalidate_rect(hwnd, 0);
+  }
+
+  return s_ok;
+}
+
 static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
   {
   begin_paint(hwnd);
@@ -570,6 +620,8 @@ result_t create_airspeed_window(handle_t parent, memid_t key, handle_t *hwnd)
   add_property(*hwnd, "vy", get_vy, set_vy, field_uint16);
   add_property(*hwnd, "scale", get_scale, set_scale, field_float);
   add_property(*hwnd, "offset", get_offset, set_offset, field_float);
+  add_property(*hwnd, "back_color", get_back_color, set_back_color, field_uint32);
+  add_property(*hwnd, "text_color", get_text_color, set_text_color, field_uint32);
 
   add_event(*hwnd, id_paint, wnd, 0, on_paint);
   add_event(*hwnd, id_indicated_airspeed, wnd, 0, on_indicated_airspeed);

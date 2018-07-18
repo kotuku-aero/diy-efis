@@ -80,8 +80,8 @@ static const unsigned char charmap[] = {
 int strcasecmp(const char *s1, const char *s2)
   {
   register const unsigned char *cm = charmap,
-  *us1 = (const unsigned char *)s1,
-  *us2 = (const unsigned char  *)s2;
+    *us1 = (const unsigned char *)s1,
+    *us2 = (const unsigned char  *)s2;
 
   while (cm[*us1] == cm[*us2++])
     if (*us1++ == '\0')
@@ -249,19 +249,19 @@ result_t create_child_widget(handle_t parent, memid_t key, wndproc cb, handle_t 
   int16_t value;
   if (failed(result = reg_get_int16(key, "x", &value)))
     return result;
-  rect.left = (gdi_dim_t) value;
+  rect.left = (gdi_dim_t)value;
 
   if (failed(result = reg_get_int16(key, "y", &value)))
     return result;
-  rect.top = (gdi_dim_t) value;
+  rect.top = (gdi_dim_t)value;
 
   if (failed(result = reg_get_int16(key, "width", &value)))
     return result;
-  rect.right = rect.left + (gdi_dim_t) value;
+  rect.right = rect.left + (gdi_dim_t)value;
 
   if (failed(result = reg_get_int16(key, "height", &value)))
     return result;
-  rect.bottom = rect.top + (gdi_dim_t) value;
+  rect.bottom = rect.top + (gdi_dim_t)value;
 
   reg_get_uint16(key, "id", &id);
 
@@ -273,20 +273,20 @@ result_t create_child_widget(handle_t parent, memid_t key, wndproc cb, handle_t 
     //prototype = type;
     }
 
-  if(failed(result = create_child_window(parent, &rect, cb, id, key, prototype, hwnd)))
+  if (failed(result = create_child_window(parent, &rect, cb, id, key, prototype, hwnd)))
     return result;
-  
+
   // set the z-order
-  if(succeeded(result= reg_get_uint16(key, "zorder", &id)))
+  if (succeeded(result = reg_get_uint16(key, "zorder", &id)))
     {
-    if(id < 256)
+    if (id < 256)
       set_z_order(*hwnd, (uint8_t)id);
     }
 
   add_property(*hwnd, "x", get_x, set_x, field_int16);
   add_property(*hwnd, "y", get_y, set_y, field_int16);
   add_property(*hwnd, "width", get_width, set_width, field_int16);
-  add_property(*hwnd, "height",get_height, set_height, field_int16);
+  add_property(*hwnd, "height", get_height, set_height, field_int16);
   add_property(*hwnd, "zorder", get_zorder, set_zorder, field_uint16);
 
   // The widget properties are loaded ok, now we can register them
@@ -314,48 +314,49 @@ result_t create_child_widget(handle_t parent, memid_t key, wndproc cb, handle_t 
         dt = field_stream;
         }
       }
+    }
 
-    // all of the scripts should be attached to the window.  Now we attach the events
-    memid_t events;
-    if (succeeded(reg_open_key(key, "events", &events)))
+  // all of the scripts should be attached to the window.  Now we attach the events
+  memid_t events;
+  if (succeeded(reg_open_key(key, "events", &events)))
+    {
+    // enumerate the keys
+    field_datatype dt = field_string;
+    char name[REG_NAME_MAX];
+    char event_fn[REG_STRING_MAX];
+
+    memid_t child = 0;
+    while (succeeded(reg_enum_key(events, &dt, 0, 0, REG_NAME_MAX, name, &child)))
       {
-      // enumerate the keys
-      field_datatype dt = field_string;
-      char name[REG_NAME_MAX];
-      char event_fn[REG_STRING_MAX];
+      uint16_t can_id = (uint16_t)strtoul(name, 0, 10);
 
-      memid_t child = 0;
-      while (succeeded(reg_enum_key(events, &dt, 0, 0, REG_NAME_MAX, name, &child)))
+      if (can_id > 0)
         {
-        uint16_t can_id = (uint16_t)strtoul(name, 0, 10);
-
-        if (can_id > 0)
-          {
-          if (succeeded(reg_get_string(events, name, event_fn, 0)))
-            add_handler(*hwnd, can_id, event_fn);
-          }
-        dt = field_string;
+        if (succeeded(reg_get_string(events, name, event_fn, 0)))
+          add_handler(*hwnd, can_id, event_fn);
         }
+      dt = field_string;
       }
     }
-  
+
+
   send_message(*hwnd, &create_msg);
 
   return s_ok;
   }
 
 result_t lookup_enum(memid_t key,
-                             const char *name,
-                             const char **values,
-                             int max_values,
-                             int *value)
+  const char *name,
+  const char **values,
+  int max_values,
+  int *value)
   {
   result_t result;
   char str[REG_STRING_MAX + 1];
 
   if (name == 0 ||
-      values == 0 ||
-      value == 0)
+    values == 0 ||
+    value == 0)
     return e_bad_parameter;
 
   if (failed(result = reg_get_string(key, name, str, 0)))
@@ -375,23 +376,23 @@ result_t lookup_enum(memid_t key,
 result_t lookup_font(memid_t key, const char *name, handle_t *font)
   {
   result_t result;
-  if(name == 0 ||
-     font == 0)
+  if (name == 0 ||
+    font == 0)
     return e_bad_parameter;
-  
+
   *font = 0;
 
   memid_t font_key;
-  if(failed(result = reg_open_key(key, name, &font_key)))
+  if (failed(result = reg_open_key(key, name, &font_key)))
     return e_not_found;
 
   char font_name[REG_STRING_MAX];
-  
-  if(failed(result = reg_get_string(font_key, "name", font_name, 0)))
-      return result;
+
+  if (failed(result = reg_get_string(font_key, "name", font_name, 0)))
+    return result;
 
   uint16_t pts;
-  if(failed(result = reg_get_uint16(font_key, "size", &pts)))
+  if (failed(result = reg_get_uint16(font_key, "size", &pts)))
     return result;
 
   // pts is the vertical size.
@@ -447,22 +448,22 @@ static color_lookup_t color_lookups[] = {
 result_t lookup_color(memid_t key, const char *name, color_t *color)
   {
   result_t result;
-  
-  if(name == 0 ||
-     color == 0)
+
+  if (name == 0 ||
+    color == 0)
     return e_bad_parameter;
 
   // determine the type of the registry key
   field_datatype dt = 0;
   memid_t memid;
-  if(failed(result = reg_query_child(key, name, &memid, &dt, 0)))
+  if (failed(result = reg_query_child(key, name, &memid, &dt, 0)))
     return result;
 
-  if(dt == field_string)
+  if (dt == field_string)
     {
     // handle a string type
     char str[REG_STRING_MAX];
-  
+
     *color = color_hollow;
 
     if (failed(result = reg_get_string(key, name, str, 0)))
@@ -470,7 +471,7 @@ result_t lookup_color(memid_t key, const char *name, color_t *color)
 
     if (str[0] == '0' || str[0] == '-')
       {
-      *color = (color_t) strtoul(str, 0, 0);
+      *color = (color_t)strtoul(str, 0, 0);
       return s_ok;
       }
 
@@ -516,16 +517,16 @@ static const pen_value_lookup_t pen_values[] = {
 result_t lookup_pen_style(memid_t key, const char *name, pen_style *value)
   {
   result_t result;
-  if(name == 0 ||
-     value == 0)
+  if (name == 0 ||
+    value == 0)
     return e_bad_parameter;
-  
+
   const pen_value_lookup_t *lookup = pen_values;
-  
+
   char str[REG_STRING_MAX];
 
   *value = ps_solid;
-  
+
   if (failed(result = reg_get_string(key, name, str, 0)))
     return result;
 
@@ -546,27 +547,27 @@ result_t lookup_pen_style(memid_t key, const char *name, pen_style *value)
 result_t lookup_pen(memid_t key, pen_t *pen)
   {
   result_t result;
-  
-  if(failed(result = lookup_color(key, "color", &pen->color)) ||
-     failed(result = lookup_pen_style(key, "style", &pen->style)) ||
-     failed(result = reg_get_uint16(key, "width", &pen->width)))
+
+  if (failed(result = lookup_color(key, "color", &pen->color)) ||
+    failed(result = lookup_pen_style(key, "style", &pen->style)) ||
+    failed(result = reg_get_uint16(key, "width", &pen->width)))
     return result;
 
   return s_ok;
   }
 
 result_t display_roller(handle_t hwnd,
-                        const rect_t *bounds,
-                        uint32_t value,
-                        int digits,
-                        color_t bg_color,
-                        color_t fg_color,
-                        handle_t  large_font,
-                        handle_t  small_font)
+  const rect_t *bounds,
+  uint32_t value,
+  int digits,
+  color_t bg_color,
+  color_t fg_color,
+  handle_t  large_font,
+  handle_t  small_font)
   {
   // we need to work out the size of the roller digits first
 //  const handle_t  *old_font = cv.font(&arial_12_font);
-  
+
   extent_t size_medium;
   text_extent(hwnd, small_font, "00", 2, &size_medium);
 
@@ -574,7 +575,7 @@ result_t display_roller(handle_t hwnd,
     bounds->right - (digits == 1 ? size_medium.dx >>= 1 : size_medium.dx),
     bounds->top
     };
-  
+
   pt.y += (bounds->bottom - bounds->top) >> 1;
   pt.y -= size_medium.dy >> 1;
 
@@ -606,12 +607,12 @@ result_t display_roller(handle_t hwnd,
     if (minor >= 0)
       {
       if (digits == 1)
-        sprintf(str, "%d", (int) minor / 10);
+        sprintf(str, "%d", (int)minor / 10);
       else
-        sprintf(str, "%02.2d", (int) minor);
+        sprintf(str, "%02.2d", (int)minor);
 
       draw_text(hwnd, bounds, small_font, fg_color, bg_color,
-                str, 0, &pt, bounds, eto_clipped, 0);
+        str, 0, &pt, bounds, eto_clipped, 0);
       }
 
     minor -= 10;
@@ -620,7 +621,7 @@ result_t display_roller(handle_t hwnd,
 
   // now the larger value
 
-  sprintf(str, "%d", (int) large_value);
+  sprintf(str, "%d", (int)large_value);
   size_t len = strlen(str);
 
   // calc the size
@@ -634,7 +635,7 @@ result_t display_roller(handle_t hwnd,
   pt.y -= large_size.dy >> 1;
 
   draw_text(hwnd, bounds, large_font, fg_color, bg_color,
-            str, len, &pt, bounds, eto_clipped, 0);
+    str, len, &pt, bounds, eto_clipped, 0);
 
   return s_ok;
   }

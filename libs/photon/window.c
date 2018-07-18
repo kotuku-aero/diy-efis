@@ -392,6 +392,14 @@ result_t compile_function(handle_t hwnd, const char *func, stream_p stream)
     return result;
     }
 
+  // remove any control characters
+  uint32_t pos;
+  for (pos = 0; pos < len; pos++)
+    {
+    if (code[pos] < ' ')
+      code[pos] = ' ';
+    }
+
   duk_push_string(ctx, func);
   duk_compile_lstring(ctx, DUK_COMPILE_FUNCTION, code, len);
 
@@ -533,6 +541,7 @@ result_t defwndproc(handle_t hwnd, const canmsg_t *msg)
   uint16_t count;
   uint16_t item;
 
+
   // now we work through the event handlers.  These can either be 
   // the built in ones, or overloaded javascript handlers.
   window_t *window;
@@ -561,7 +570,18 @@ result_t defwndproc(handle_t hwnd, const canmsg_t *msg)
         }
       }
     }
-  return s_false;
+
+  // paint is handled with z-order not child order
+  if (msg->id == id_paint)
+    return s_ok;
+
+  handle_t child;
+  for (get_first_child(hwnd, &child); child != 0; get_next_sibling(child, &child))
+    {
+    // send the message to the children of this window
+    send_message(child, msg);
+    }
+  return s_ok;
   }
 
 static result_t make_window(handle_t hwnd_parent, const rect_t *bounds, wndproc cb,
