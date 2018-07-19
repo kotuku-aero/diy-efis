@@ -213,9 +213,9 @@ static inline bool succeeded(result_t r)
 #define id_static_pressure            326   // FLOAT      hPa
 #define id_wind_speed                 333   // FLOAT      m/s
 #define id_wind_direction             334   // float      rad     0-360
-#define id_gps_aircraft_latitude      1036  // FLOAT      deg
-#define id_gps_aircraft_longitude     1037  // FLOAT      deg
-#define id_gps_aircraft_height_above_ellipsoid 1038   // FLOAT      m
+#define id_gps_latitude               1036  // FLOAT      deg
+#define id_gps_longitude              1037  // FLOAT      deg
+#define id_gps_height                 1038   // FLOAT      m
 #define id_gps_groundspeed            1039  // FLOAT      m/s
 #define id_true_track                 1040  // SHORT      deg
 #define id_magnetic_track             1041  // SHORT      deg

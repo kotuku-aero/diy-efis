@@ -240,6 +240,267 @@ static canmsg_t create_msg = {
   .id = id_create
   };
 
+typedef struct _event_name_t {
+  const char *name;
+  uint16_t id;
+  } event_name_t;
+
+// all names are prefixed with on_ so not needed here
+static const event_name_t events[] = {
+    { "paint", id_paint },
+{ "create", id_create },
+{ "close", id_close },
+{ "timer", id_timer },
+{ "key0", id_key0 },
+{ "key1", id_key1 },
+{ "key2", id_key2 },
+{ "key3", id_key3 },
+{ "key4", id_key4 },
+{ "decka", id_decka },
+{ "deckb", id_deckb },
+{ "menu_up", id_menu_up },
+{ "menu_dn", id_menu_dn },
+{ "menu_left", id_menu_left },
+{ "menu_right", id_menu_right },
+{ "menu_ok", id_menu_ok },
+{ "menu_cancel", id_menu_cancel },
+{ "menu_select", id_menu_select },
+{ "buttonpress", id_buttonpress },
+{ "pitch_accel", id_pitch_acceleration },
+  { "roll_accel", id_roll_acceleration },
+  { "yaw_accel", id_yaw_acceleration },
+  { "pich_rate", id_pitch_rate },
+  { "roll_rate", id_roll_rate },
+  { "yaw_rate", id_yaw_rate },
+  { "roll_anglem", id_roll_angle_magnetic },
+  { "pitch_anglem", id_pitch_angle_magnetic },
+  { "yaw_anglem", id_yaw_angle_magnetic },
+  { "pitch_angle", id_pitch_angle },
+  { "roll_angle", id_roll_angle },
+  { "yaw_angle", id_yaw_angle },
+  { "alt_rate", id_altitude_rate },
+  { "ias", id_indicated_airspeed },
+  { "tas", id_true_airspeed },
+  { "cas", id_calibrated_airspeed },
+  { "aoa", id_angle_of_attack },
+  { "qnh", id_qnh },
+  { "alt", id_baro_corrected_altitude },
+  { "hdg", id_heading_angle },
+  { "set_hdr", id_heading },
+  { "pa", id_pressure_altitude },
+  { "oat", id_outside_air_temperature },
+  { "dynp", id_differential_pressure },
+  { "statp", id_static_pressure },
+  { "wind_spd", id_wind_speed },
+  { "wind_dir", id_wind_direction },
+  { "gps_lat", id_gps_latitude },
+  { "gps_lng", id_gps_longitude },
+  { "gps_alt", id_gps_height },
+  { "gps_gs", id_gps_groundspeed },
+  { "true_track", id_true_track },
+  { "mag_track", id_magnetic_track },
+  { "mag_heading", id_magnetic_heading },
+  { "lat", id_position_latitude },
+  { "lng", id_position_longitude },
+  { "pres_alt", id_position_altitude },
+  { "velocity_x", id_velocity_x },
+  { "velocity_y", id_velocity_y },
+  { "velocity_z", id_velocity_z },
+  { "imu_mag_x", id_imu_mag_x },
+  { "imu_mag_y", id_imu_mag_y },
+  { "imu_mag_z", id_imu_mag_z },
+  { "imu_accel_x", id_imu_accel_x },
+  { "imu_accel_y", id_imu_accel_y },
+  { "imu_accel_z", id_imu_accel_z },
+  { "imu_gyro_x", id_imu_gyro_x },
+  { "imu_gyro_y", id_imu_gyro_y },
+  { "imu_gyro_z", id_imu_gyro_z },
+  { "onmag_var", id_magnetic_variation },
+  { "def_utc", id_def_utc },
+  { "def_date", id_def_date },
+  { "qnh_up", id_qnh_up },
+  { "qnh_dn", id_qnh_dn },
+  { "set_mag_var", id_set_magnetic_variation },
+  { "heading_up", id_heading_up },
+  { "heading_dn", id_heading_dn },
+  { "stall_wrn", id_stall_warning },
+  { "total_time", id_total_time },
+  { "air_time", id_air_time },
+  { "tach_time", id_tach_time },
+  { "pitch", id_pitch },
+  { "track", id_track },
+  { "deviation", id_deviation },
+  { "track_error", id_track_angle_error },
+  { "est_to_next", id_estimated_time_to_next },
+  { "est_arrival", id_estimated_time_of_arrival },
+  { "est_time", id_estimated_enroute_time },
+  { "wp_0_3", id_waypoint_identifier_0_3 },
+  { "wp_4_7", id_waypoint_identifier_4_7 },
+  { "wp_8_11", id_waypoint_identifier_8_11 },
+  { "wp_12_15", id_waypoint_identifier_12_15 },
+  { "wp_type", id_waypoint_type_identifier },
+  { "wp_lat", id_waypoint_latitude },
+  { "wp_lng", id_waypoint_longitude },
+  { "wp_min_alt", id_waypoint_minimum_altitude },
+  { "wp_max_alt", id_waypoint_maximum_altitude },
+  { "dist_to_next", id_distance_to_next },
+  { "dist_to_go", id_distance_to_destination },
+  { "sel_course", id_selected_course },
+  { "req_trk_angl", id_desired_track_angle },
+  { "nav_command", id_nav_command },
+  { "nav_valid", id_nav_valid },
+  { "gps_valid", id_gps_valid },
+  { "imu_valid", id_imu_valid },
+  { "edu_valid", id_edu_valid },
+  { "aux_battery", id_aux_battery },
+  { "trim_up", id_trim_up },
+  { "trim_dn", id_trim_dn },
+  { "trim_left", id_trim_left },
+  { "trim_right", id_trim_right },
+  { "ap_engage", id_autopilot_engage },
+  { "ap_mroll", id_autopilot_set_max_roll },
+  { "ap_vs_rate", id_autopilot_set_vs_rate },
+  { "wp_turn_hdg", id_waypoint_turn_heading },
+  { "roll_setp", id_roll_servo_set_position },
+  { "pitch_setp", id_pitch_servo_set_postion },
+  { "ap_power", id_autopilot_power },
+  { "ap_alt_mode", id_autopilot_alt_mode },
+  { "ap_vs_mode", id_autopilot_vs_mode },
+  { "ap_mode", id_autopilot_mode },
+  { "ap_status", id_autopilot_status },
+  { "roll_srvs", id_roll_servo_status },
+  { "pitch_srvs", id_pitch_servo_status },
+  { "ap_altitude", id_autopilot_altitude },
+  { "ap_vs", id_autopilot_vertical_speed },
+  { "rpm", id_engine_rpm },
+  { "rpm_a", id_engine_rpm_a },
+  { "egt1", id_exhaust_gas_temperature1 },
+  { "egt2", id_exhaust_gas_temperature2 },
+  { "egt3", id_exhaust_gas_temperature3 },
+  { "egt4", id_exhaust_gas_temperature4 },
+  { "map", id_manifold_pressure },
+  { "oilp", id_oil_pressure },
+  { "oilt", id_oil_temperature },
+  { "cht1", id_cylinder_head_temperature1 },
+  { "cht2", id_cylinder_head_temperature2 },
+  { "cht3", id_cylinder_head_temperature3 },
+  { "cht4", id_cylinder_head_temperature4 },
+  { "rpm_b", id_engine_rpm_b },
+  { "map_b", id_manifold_pressure_b },
+  { "fuel1", id_fuel_pressure },
+  { "dcvolt", id_dc_voltage },
+  { "dcamp", id_dc_current },
+  { "fuelf", id_fuel_flow_rate },
+  { "fuelc", id_fuel_consumed },
+  { "leftfuel", id_edu_left_fuel_quantity },
+  { "rfuel", id_edu_right_fuel_quantity },
+  { "tim_err", id_timing_divergence },
+  { "lmag_rpm", id_left_mag_rpm },
+  { "rmag_rpm", id_right_mag_rpm },
+  { "lmag_adv", id_left_mag_adv },
+  { "rmag_adv", id_right_mag_adv },
+  { "lmag_map", id_left_mag_map },
+  { "rmag_map", id_right_mag_map },
+  { "lmag_volt", id_left_mag_volt },
+  { "rmag_volt", id_right_mag_volt },
+  { "lmag_temp", id_left_mag_temp },
+  { "rmag_temp", id_right_mag_temp },
+  { "lmag_coil1", id_left_mag_coil1 },
+  { "rmag_coil2", id_right_mag_coil1 },
+  { "lmag_coil1", id_left_mag_coil2 },
+  { "rmag_coil2", id_right_mag_coil2 },
+  { "lff", id_fuel_flow_rate_left },
+  { "rff", id_fuel_flow_rate_right },
+  { "active_tank", id_active_fuel_tank },
+  { "lfuel_q", id_left_fuel_quantity },
+  { "r_fuel_q", id_right_fuel_quantity },
+  { "pitot_temp", id_pitot_temperature },
+  { "piotoht", id_pitot_heat_status },
+  { "pitotpwr", id_pitot_power_status },
+  { "fdu_temp", id_fdu_board_temperature },
+  { "set_lfuel_q", id_set_left_fuel_qty },
+  { "set_rfuel_q", id_set_right_fuel_qty },
+  { "mix_set", id_mixture_lever },
+  { "inj_dwell", id_injector_dwell },
+  { "prop_set", id_propeller_speed_lever },
+  { "prop_amps", id_propeller_motor_current },
+  { "prop_low", id_propeller_low_speed },
+  { "prop_high", id_propeller_high_speed },
+  { "rtx_rpm_a", id_rotax_rpm_a },
+  { "rtx_ff_a", id_rotax_fuel_flow_a },
+  { "rtx_map_a", id_rotax_manifold_pressure_a },
+  { "rtx_oilp_a", id_rotax_oil_pressure_a },
+  { "rtx_oilt_a", id_rotax_oil_temperature_a },
+  { "rtx_wtrt_a", id_rotax_coolant_temp_a },
+  { "rtx_egt1_a", id_rotax_egt1_a },
+  { "rtx_egt2_a", id_rotax_egt2_a },
+  { "rtx_egt3_a", id_rotax_egt3_a },
+  { "rtx_egt4_a", id_rotax_egt4_a },
+  { "rtx_tmp_a", id_rotax_intake_temperature_a },
+  { "rtx_oat_a", id_rotax_outside_air_temp_a },
+  { "rtx_tps_a", id_rotax_throttle_position_a },
+  { "rtx_temp_a", id_rotax_ambient_pressure_a },
+  { "rtx_vlt_a", id_rotax_voltage_a },
+  { "rtx_es_a", id_rotax_engine_status_a },
+  { "rtx_hours_a", id_rotax_engine_hours_a },
+  { "rtx_ehrs_a", id_rotax_ecu_hours_a },
+  { "rtx_ss_1_a", id_rotax_sensor_status_1_a },
+  { "rtx_ss_2_a", id_rotax_sensor_status_2_a },
+  { "rtx_ds_1_a", id_rotax_device_status_1_a },
+  { "rtx_ds_2_a", id_rotax_device_status_2_a },
+  { "rtx_rpm_b", id_rotax_rpm_b },
+  { "rtx_ff_b", id_rotax_fuel_flow_b },
+  { "rtx_map_b", id_rotax_manifold_pressure_b },
+  { "rtx_oilp_b", id_rotax_oil_pressure_b },
+  { "rtx_oilt_b", id_rotax_oil_temperature_b },
+  { "rtx_wtrt_b", id_rotax_coolant_temp_b },
+  { "rtx_egt1_b", id_rotax_egt1_b },
+  { "rtx_egt2_b", id_rotax_egt2_b },
+  { "rtx_egt3_b", id_rotax_egt3_b },
+  { "rtx_egt4_b", id_rotax_egt4_b },
+  { "rtx_tmp_b", id_rotax_intake_temperature_b },
+  { "rtx_oat_b", id_rotax_outside_air_temp_b },
+  { "rtx_tps_b", id_rotax_throttle_position_b },
+  { "rtx_temp_b", id_rotax_ambient_pressure_b },
+  { "rtx_vlt_b", id_rotax_voltage_b },
+  { "rtx_es_b", id_rotax_engine_status_b },
+  { "rtx_hours_b", id_rotax_engine_hours_b },
+  { "rtx_ehrs_b", id_rotax_ecu_hours_b },
+  { "rtx_ss_1_b", id_rotax_sensor_status_1_b },
+  { "rtx_ss_2_b", id_rotax_sensor_status_2_b },
+  { "rtx_ds_1_b", id_rotax_device_status_1_b },
+  { "rtx_ds_2_b", id_rotax_device_status_2_b },
+  0,0
+  };
+
+result_t get_event_id(const char *name, uint16_t *id)
+  {
+  if (strncmp(name, "on_", 3) != 0)
+    return e_unexpected;
+
+  name += 3;
+
+  if (isdigit(*name))
+    {
+    *id = (uint16_t) atoi(name);
+    return s_ok;
+    }
+
+  const event_name_t *evp = events;
+  while (evp->name != 0)
+    {
+    if (strcmp(name, evp->name) == 0)
+      {
+      *id = evp->id;
+      return s_ok;
+      }
+
+    evp++;
+    }
+
+  return e_not_found;
+  }
+
 result_t create_child_widget(handle_t parent, memid_t key, wndproc cb, handle_t *hwnd)
   {
   result_t result;
@@ -291,51 +552,40 @@ result_t create_child_widget(handle_t parent, memid_t key, wndproc cb, handle_t 
 
   // The widget properties are loaded ok, now we can register them
 
-  // see if any scriptlets are loadable.  These are used to decorate
-  // the prototype
-  memid_t handlers;
-  if (succeeded(reg_open_key(key, "scripts", &handlers)))
+  // all of the scripts should be attached to the window.  Now we attach the events
+  memid_t events;
+  if (succeeded(reg_open_key(key, "events", &events)))
     {
     // enumerate the keys
     field_datatype dt = field_stream;
     char name[REG_NAME_MAX];
 
     memid_t child = 0;
-    while (succeeded(reg_enum_key(handlers, &dt, 0, 0, REG_NAME_MAX, name, &child)))
+    while (succeeded(reg_enum_key(events, &dt, 0, 0, REG_NAME_MAX, name, &child)))
       {
+      dt = field_stream;
+      // open the stream
       stream_p stream;
-      if (succeeded(stream_open(handlers, name, &stream)))
+      if (succeeded(stream_open(events, name, &stream)))
         {
         if (failed(result = compile_function(*hwnd, name, stream)))
           {
           trace_debug("Cannot compile scriptlet %s when loading window\r\n", name);
           }
-
-        dt = field_stream;
         }
-      }
-    }
+      else
+        continue;   // not a valid stream
 
-  // all of the scripts should be attached to the window.  Now we attach the events
-  memid_t events;
-  if (succeeded(reg_open_key(key, "events", &events)))
-    {
-    // enumerate the keys
-    field_datatype dt = field_string;
-    char name[REG_NAME_MAX];
-    char event_fn[REG_STRING_MAX];
+      uint16_t can_id = 0;
+      
+      if (failed(get_event_id(name, &can_id)))
+        continue;       // ignore it...
 
-    memid_t child = 0;
-    while (succeeded(reg_enum_key(events, &dt, 0, 0, REG_NAME_MAX, name, &child)))
-      {
-      uint16_t can_id = (uint16_t)strtoul(name, 0, 10);
-
+      // the event handler is an anonymous function that is
+      // added to the widget using the event name as the name
       if (can_id > 0)
-        {
-        if (succeeded(reg_get_string(events, name, event_fn, 0)))
-          add_handler(*hwnd, can_id, event_fn);
-        }
-      dt = field_string;
+        add_handler(*hwnd, can_id, name);
+
       }
     }
 

@@ -173,3 +173,11 @@
 /tools/photon/Release/photon.tlog
 /tools/proton/Release/proton.tlog
 /tools/msh/diy-efis.reg
+/libs/krypton/x64/Release/krypton.tlog
+/raspberry-pi/VC/diy-efis/bin/x64/Release
+/tools/ion/x64/Release/ion.tlog
+/tools/msh/x64/Release/msh.tlog
+/tools/muon/x64/Release/muon.tlog
+/tools/neutron/x64/Release/neutron.tlog
+/tools/photon/x64/Release/photon.tlog
+/tools/proton/x64/Release/proton.tlog
