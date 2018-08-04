@@ -239,6 +239,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\libs\electron\console.h" />
+    <ClInclude Include="..\..\..\libs\electron\deque.h" />
     <ClInclude Include="..\..\..\libs\electron\electron.h" />
     <ClInclude Include="..\..\..\libs\electron\i2c.h" />
     <ClInclude Include="..\..\..\libs\ion\duktape.h" />

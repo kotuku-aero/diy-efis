@@ -41,7 +41,7 @@ it must be removed as soon as possible after the code fragment is identified.
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
-#include "../../libs/neutron/photon.h"
+#include "../../libs/photon/photon.h"
 
 // data that is based on the actual framebuffer
 static int fbfd;          // actual framebuffer

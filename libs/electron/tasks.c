@@ -55,7 +55,7 @@ typedef struct _semaphore_t {
   uint32_t count;
 } semaphore_t;
 
-result_t semaphore_create(handle_t *semp)
+result_t semaphore_create(semaphore_p *semp)
 	{
   semaphore_t *semaphore = (semaphore_t *)malloc(sizeof(semaphore_t));
   sem_init(&semaphore->semp, 0, 0);
@@ -65,7 +65,7 @@ result_t semaphore_create(handle_t *semp)
 	return s_ok;
 	}
 
-result_t semaphore_close(handle_t h)
+result_t semaphore_close(semaphore_p h)
 	{
   semaphore_t *sem = ((semaphore_t *)h);
   sem_destroy(&sem->semp);
@@ -85,7 +85,7 @@ handle_t bsp_thread_mutex()
   return tls_mutex;
   }
 
-result_t semaphore_wait(handle_t h, uint32_t timeout_ms)
+result_t semaphore_wait(semaphore_p h, uint32_t timeout_ms)
   {
   semaphore_t *sem = ((semaphore_t *)h);
 
@@ -122,7 +122,7 @@ uint32_t ticks()
   return tick;
   }
 
-result_t semaphore_signal(handle_t h)
+result_t semaphore_signal(semaphore_p h)
   {
   semaphore_t *sem = ((semaphore_t *)h);
   sem_post(&sem->semp);
@@ -130,7 +130,7 @@ result_t semaphore_signal(handle_t h)
   return s_ok;
   }
 
-result_t has_wait_tasks(handle_t hndl)
+result_t has_wait_tasks(semaphore_p hndl)
   {
   semaphore_t *sem = ((semaphore_t *)hndl);
 
@@ -257,7 +257,7 @@ void neutron_run()
                            task_callback pfn,
                            void *param,
                            uint8_t priority,
-                           handle_t *task)
+   task_p *task)
   {
   thread_handle_t *thread = (thread_handle_t *) malloc(sizeof(thread_handle_t));
   if(thread == 0)
@@ -271,60 +271,60 @@ void neutron_run()
   return s_ok;
   }
 
-result_t set_task_priority(handle_t h, uint8_t p)
+result_t set_task_priority(task_p h, uint8_t p)
   {
   thread_handle_set_priority(((thread_handle_t *)h), p);
 
   return s_ok;
   }
 
-result_t get_task_priority(handle_t h, uint8_t *p)
+result_t get_task_priority(task_p h, uint8_t *p)
   {
   *p = thread_handle_get_priority(((thread_handle_t *)h));
 
   return s_ok;
   }
 
-result_t close_task(handle_t h)
+result_t close_task(task_p h)
   {
   destroy_thread_handle((thread_handle_t *)h);
 
   return s_ok;
   }
 
-result_t task_suspend(handle_t h)
+result_t task_suspend(task_p h)
   {
   thread_handle_suspend(((thread_handle_t *)h));
 
   return s_ok;
   }
 
-result_t task_resume(handle_t h)
+result_t task_resume(task_p h)
   {
   thread_handle_resume(((thread_handle_t *)h));
 
   return s_ok;
   }
 
-result_t task_sleep(unsigned long n)
+result_t task_sleep(uint32_t n)
   {
   usleep(n * 1000);
 
   return s_ok;
   }
 
-result_t task_close(handle_t h)
+result_t task_close(task_p h)
   {
   destroy_thread_handle((thread_handle_t *)h);
 
   return s_ok;
   }
 
-void thread_terminate(handle_t h, unsigned long term_code)
+void thread_terminate(task_p h, unsigned long term_code)
   {
   }
 
-unsigned int thread_current_id(handle_t h)
+unsigned int thread_current_id(task_p h)
   {
   return thread_handle_thread_id(((thread_handle_t *)h));
   }

@@ -254,6 +254,9 @@
     <ClInclude Include="..\..\..\libs\electron\i2c.h">
       <Filter>electron</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\libs\electron\deque.h">
+      <Filter>electron</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\diy-efis\diyefis.cli" />
