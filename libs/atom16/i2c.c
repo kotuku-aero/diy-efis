@@ -576,8 +576,29 @@ typedef struct _i2c_slave_t {
   
 static i2c_slave_t slave_channels[2];
 
-static void I2C_slave_int(int chnum)
+// these channels run at a special IRQ level above all others
+// this is the stack.
+
+void I2C_slave_int(int chnum)
   {
+  switch(chnum)
+    {
+    case 0 :
+      if(IFS1bits.SI2C1IF != 0)
+        IFS1bits.SI2C1IF = 0;
+      else
+        return;
+      break;
+    case 1 :
+      if(IFS3bits.SI2C2IF != 0)
+        IFS3bits.SI2C2IF = 0;
+      else
+        return;
+      break;
+    default:
+      return;
+    }
+
   i2c_slave_t *channel = &slave_channels[chnum];
   
   if(((*channel->stat_reg) & 0x0020)== 0)
@@ -627,6 +648,8 @@ static void I2C_slave_int(int chnum)
   *channel->ctl_reg |= 0x1000;    // release the clock.
   }
 
+extern void SI2C1Setup();
+
 static result_t init_slave1(uint16_t slave_address,
                           i2c_read_reg read_register, 
                           i2c_write_reg write_register,
@@ -645,7 +668,8 @@ static result_t init_slave1(uint16_t slave_address,
   
   I2C1CONbits.GCEN = 0;     // no general call (yet)
   I2C1CONbits.SCLREL = 1;   // release clock
-  I2C1CONbits.STREN = 1;    // enable clock stretch
+  //I2C1CONbits.STREN = 1;    // enable clock stretch
+  I2C1CONbits.STREN = 0;    // disable clock stretch
   I2C1CONbits.IPMIEN = 0;   // enable address matching
   I2C1CONbits.I2CEN = 1;
   
@@ -656,13 +680,17 @@ static result_t init_slave1(uint16_t slave_address,
   //IFS10bits.I2C2BCIF = 0;
   IEC1bits.SI2C1IE = 1;
   //IEC10bits.I2C2BCIE = 1;
-  IPC4bits.SI2C1IP = 4;
-  //IPC43bits.I2C2BCIP = 6;
+  //IPC4bits.SI2C1IP = 4;
+  IPC4bits.SI2C1IP = 6;     // run as IRQ6
   // enable I2C
   I2C1CONbits.I2CEN = 1;
   
+  SI2C1Setup();
+  
   return s_ok;
   }
+
+extern void SI2C2Setup();
 
 static result_t init_slave2(uint16_t slave_address,
                           i2c_read_reg read_register, 
@@ -694,10 +722,12 @@ static result_t init_slave2(uint16_t slave_address,
   //IFS10bits.I2C2BCIF = 0;
   IEC3bits.SI2C2IE = 1;
   //IEC10bits.I2C2BCIE = 1;
-  IPC12bits.SI2C2IP = 4;
-  //IPC43bits.I2C2BCIP = 6;
+  //IPC12bits.SI2C2IP = 4;
+  IPC12bits.SI2C2IP = 6;
   // enable I2C
   I2C2CONbits.I2CEN = 1;
+  
+  SI2C1Setup();
   
   return s_ok;
   }
@@ -738,34 +768,12 @@ result_t i2cs_init(int channel,
 extern void yield(void);
 
 
-void __attribute__((interrupt, auto_psv)) _SI2C1Interrupt(void)
-  {
-  if(IFS1bits.SI2C1IF != 0)
-    {
-    IFS1bits.SI2C1IF = 0;
-    I2C_slave_int(I2C_CHANNEL_1);
-    }
-  
-  yield();
-  }
-
 void __attribute__((interrupt, auto_psv)) _MI2C1Interrupt(void)
   {
   if(IFS1bits.MI2C1IF != 0)
     {
     IFS1bits.MI2C1IF = 0;
     I2C_master_int(I2C_CHANNEL_1);
-    }
-  
-  yield();
-  }
-
-void __attribute__((interrupt, auto_psv)) _SI2C2Interrupt(void)
-  {
-  if(IFS3bits.SI2C2IF != 0)
-    {
-    IFS3bits.SI2C2IF = 0;
-    I2C_slave_int(I2C_CHANNEL_2);
     }
   
   yield();

@@ -21,6 +21,7 @@
       <itemPath>i2c.c</itemPath>
       <itemPath>analog_devices.c</itemPath>
       <itemPath>yield.s</itemPath>
+      <itemPath>i2c_int.s</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

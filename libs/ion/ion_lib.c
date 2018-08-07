@@ -187,7 +187,7 @@ static duk_ret_t lib_get_message_id(duk_context *ctx)
   {
   canmsg_t *msg = (canmsg_t *)duk_get_pointer(ctx, 0);
 
-  duk_push_uint(ctx, msg->id);
+  duk_push_uint(ctx, get_can_id(msg));
 
   return 1;
   }

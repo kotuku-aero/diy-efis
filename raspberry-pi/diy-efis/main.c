@@ -13,18 +13,7 @@ const char *node_name = "diy-efis";
 
 int main(int argc, char **argv)
   {
-	// The command line can pass in the name of the registry used to set us up.  In any
-  // case we need to implement some code
-  const char *ini_path;
-  if(argc > 1)
-    ini_path = argv[1];
-  else
-    ini_path = "diy-efis.reg";
-
-  // TODO: handle this better
-  bool factory_reset = false;
-
-  electron_init(ini_path, factory_reset);
+  result_t result = electron_init(argc, argv);
 
   // register the muon command line handler
   muon_initialize_cli(&diyefis_cli_root);
@@ -46,7 +35,7 @@ int main(int argc, char **argv)
   init_params.publisher_stack_length = 4096;
 
   // start the canbus stuff working
-  nuetron_init(&init_params, factory_reset);
+  can_aerospace_init(&init_params, result == s_false, false);
 
   run_proton(0);
 
@@ -92,9 +81,10 @@ result_t bsp_send_can(const canmsg_t *msg)
 #include "../../libs/electron/i2c.h"
 result_t bsp_can_init(deque_p rx_queue, uint16_t bitrate)
   {
+  // the i2c channel is set in the electron key
   result_t result;
   memid_t key;
-  if (failed(result = reg_open_key(0, "i2c", &key)))
+  if (failed(result = reg_open_key(0, "electron", &key)))
     return result;
 
   return i2c_init(key, rx_queue, &driver);

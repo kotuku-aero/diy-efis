@@ -168,7 +168,7 @@ result_t widget_wndproc(handle_t hwnd, const canmsg_t *msg)
   gps_window_t *wnd;
   get_wnddata(hwnd, (void **)&wnd);
   
-  switch(msg->id)
+  switch(get_can_id(msg))
     {
     case id_paint :
       begin_paint(hwnd);

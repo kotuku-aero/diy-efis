@@ -199,7 +199,7 @@ static result_t on_value_label(handle_t hwnd, event_proxy_t *proxy, const canmsg
   size_t i;
   for (i = 0; i < wnd->num_values; i++)
     {
-    if (msg->id == wnd->labels[i])
+    if (get_can_id(msg) == wnd->labels[i])
       {
       float float_value;
       if (succeeded(get_param_float(msg, &float_value)))

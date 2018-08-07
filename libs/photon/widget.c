@@ -237,7 +237,7 @@ static result_t set_zorder(handle_t hwnd, const variant_t *value)
   }
 
 static canmsg_t create_msg = {
-  .id = id_create
+  .flags = id_create
   };
 
 typedef struct _event_name_t {

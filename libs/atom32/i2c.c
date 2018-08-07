@@ -738,7 +738,7 @@ static result_t init_channel1(uint16_t len, uint16_t i2c_worker_stack_length)
   I2C1BRG = CALC_I2CBRG;
   
   IFS3bits.I2C1MIF = 0;
-  IPC29bits.I2C1MIP = 5;
+  IPC29bits.I2C1MIP = 4;
   IPC29bits.I2C1MIS = 0;
   IEC3bits.I2C1MIE = 1;
   
@@ -782,7 +782,7 @@ static result_t init_channel2(uint16_t len, uint16_t i2c_worker_stack_length)
   I2C2MSK = 0;
   
   IFS4bits.I2C2MIF = 0;
-  IPC37bits.I2C2MIP = 5;
+  IPC37bits.I2C2MIP = 4;
   IPC37bits.I2C2MIS = 0;
   IEC4bits.I2C2MIE = 1;
   
@@ -815,7 +815,7 @@ static result_t init_channel3(uint16_t len, uint16_t i2c_worker_stack_length)
   I2C3MSK = 0;
   
   IFS5bits.I2C5MIF = 0;
-  IPC40bits.I2C3MIP = 5;
+  IPC40bits.I2C3MIP = 4;
   IPC40bits.I2C3MIS = 0;
   IEC5bits.I2C3MIE = 1;
   
@@ -848,7 +848,7 @@ static result_t init_channel4(uint16_t len, uint16_t i2c_worker_stack_length)
   I2C4MSK = 0x00000000;
   
   IFS5bits.I2C4MIF = 0;
-  IPC43bits.I2C4MIP = 5;
+  IPC43bits.I2C4MIP = 4;
   IPC46bits.I2C5MIS = 0;
   IEC5bits.I2C4MIE = 1;
 
@@ -881,7 +881,7 @@ static result_t init_channel5(uint16_t len, int16_t i2c_worker_stack_length)
   I2C5MSK = 0;
   
   IFS5bits.I2C5MIF = 0;
-  IPC46bits.I2C5MIP = 5;
+  IPC46bits.I2C5MIP = 4;
   IPC46bits.I2C5MIS = 0;
   IEC5bits.I2C5MIE = 1;
   

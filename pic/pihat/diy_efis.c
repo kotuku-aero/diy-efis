@@ -187,9 +187,9 @@ int main(void);
 #define MSKEN 0x08
 #define ENBL  0x80
 
-static uint8_t regs10[8];           // registers 0x10 - 0x17
-static uint8_t regs20[10];          // registers 0x20 - 0x29
-static uint8_t regs30[10];          // registers 0x30 - 0x39
+uint8_t regs10[8];           // registers 0x10 - 0x17
+uint8_t regs20[10];          // registers 0x20 - 0x29
+uint8_t regs30[10];          // registers 0x30 - 0x39
 
 
 static neutron_parameters_t init_params = 
@@ -361,7 +361,7 @@ static result_t write_reg(int channel, uint8_t reg_num, uint8_t value)
           }
         }
       }
-    else
+    else if(reg_num > 1)          // reg 11 is the version register (ro)
       regs10[reg_num] = value;
     
     
@@ -539,6 +539,8 @@ static void main_task(void *parg)
   deque_create(sizeof(canmsg_t), rx_queue_length, &i2c_rx_queue);
   
   reg_get_uint16(0, "rate", &init_params.bitrate);
+  
+  regs10[1] = 0x11; // version register
  
   regs10[0x16] = init_params.bitrate;
   regs10[0x17] = init_params.bitrate >> 8;

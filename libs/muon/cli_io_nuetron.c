@@ -117,8 +117,8 @@ void close_channel(uint16_t can_id)
   memset(&nak_msg, 0, sizeof (canmsg_t));
 
   // set reply channel
-  nak_msg.id = can_id + 1;
-  nak_msg.length = 4; // close message length is 4
+  set_can_id(&nak_msg, can_id + 1);
+  set_can_len(&nak_msg, 4); // close message length is 4
   nak_msg.canas.data_type = CANAS_DATATYPE_NODATA;
   nak_msg.canas.service_code = id_ccs_service;
   nak_msg.canas.message_code = CHANNEL_CLOSE; // close message
@@ -204,7 +204,7 @@ static result_t css_stream_write(stream_handle_t *hndl, const void *buffer, uint
   
   service_channel_t *channel = (service_channel_t *)hndl;
   canmsg_t msg;
-  msg.id = channel->can_id + 1;
+  set_can_id(&msg, channel->can_id + 1);
   msg.canas.node_id = node_id;
   msg.canas.service_code = id_ccs_service;
   
@@ -213,7 +213,7 @@ static result_t css_stream_write(stream_handle_t *hndl, const void *buffer, uint
     {
     if(size >= 4)
       {
-      msg.length = 8;
+      set_can_len(&msg, 8);
       msg.canas.data_type = CANAS_DATATYPE_CHAR4;
       msg.canas.data[0] = *str++;
       msg.canas.data[1] = *str++;
@@ -223,7 +223,7 @@ static result_t css_stream_write(stream_handle_t *hndl, const void *buffer, uint
       }
     else if(size == 3)
       {
-      msg.length = 7;
+      set_can_len(&msg, 7);
       msg.canas.data_type = CANAS_DATATYPE_CHAR3;
       msg.canas.data[0] = *str++;
       msg.canas.data[1] = *str++;
@@ -232,7 +232,7 @@ static result_t css_stream_write(stream_handle_t *hndl, const void *buffer, uint
       }
     else if(size == 2)
       {
-      msg.length =6;
+      set_can_len(&msg, 6);
       msg.canas.data_type = CANAS_DATATYPE_CHAR2;
       msg.canas.data[0] = *str++;
       msg.canas.data[1] = *str++;
@@ -240,7 +240,7 @@ static result_t css_stream_write(stream_handle_t *hndl, const void *buffer, uint
       }
     else
       {
-      msg.length = 5;
+      set_can_len(&msg, 5);
       msg.canas.data_type = CANAS_DATATYPE_CHAR;
       msg.canas.data[0] = *str++;
       size--;
@@ -297,10 +297,10 @@ void create_channel(const canmsg_t *msg, cli_node_t *app_cli_root)
   uint16_t i;
   canmsg_t reply_msg;
   memset(&reply_msg, 0, sizeof (canmsg_t));
-  reply_msg.id = msg->id + 1; // send on the reply channel
+  set_can_id(&reply_msg, get_can_id(msg) + 1); // send on the reply channel
   reply_msg.canas.data_type = CANAS_DATATYPE_NODATA;
   reply_msg.canas.service_code = id_ccs_service;
-  reply_msg.length = 4;
+  set_can_len(&reply_msg, 4);
 
   for (i = 0; i < MAX_CHANNELS; i++)
     {
@@ -327,7 +327,7 @@ void create_channel(const canmsg_t *msg, cli_node_t *app_cli_root)
   channel->stream.stream_write = css_stream_write;
   channel->stream.stream_close = css_stream_close;
 
-  channel->can_id = msg->id;
+  channel->can_id = get_can_id(msg);
 
   channel->parser.cfg.root = app_cli_root;
   channel->parser.cfg.ch_complete = '\t';
@@ -375,7 +375,7 @@ bool process_ccs(const canmsg_t *msg, void *parg)
   {
   // decide how to create 
   // find the channel
-  service_channel_t *channel = open_channel(msg->id);
+  service_channel_t *channel = open_channel(get_can_id(msg));
   if(channel == 0)
     {
     // open a channel if possible
@@ -411,8 +411,8 @@ bool process_ccs(const canmsg_t *msg, void *parg)
   
   // send ak
   canmsg_t reply_msg;
-  reply_msg.id = msg->id + 1;
-  reply_msg.length = 4;
+  set_can_id(&reply_msg, get_can_id(msg) + 1);
+  set_can_len(&reply_msg, 4);
   reply_msg.canas.data_type = CANAS_DATATYPE_NODATA;
   reply_msg.canas.node_id = node_id;
   reply_msg.canas.service_code = id_ccs_service;

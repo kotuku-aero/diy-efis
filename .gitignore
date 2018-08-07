@@ -181,3 +181,7 @@
 /tools/neutron/x64/Release/neutron.tlog
 /tools/photon/x64/Release/photon.tlog
 /tools/proton/x64/Release/proton.tlog
+/libs/atom16/build/debug_dsPIC33EP256GP502/debug
+/libs/atom16/dist/debug_dsPIC33EP256GP502/debug
+/pic/pihat/build/debug_dsPIC33EP256GP502/debug
+/pic/pihat/dist/debug_dsPIC33EP256GP502/debug

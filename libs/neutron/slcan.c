@@ -218,10 +218,10 @@ result_t slcan_send(comm_device_p hndl, const canmsg_t *msg)
 
   slcan_driver_t *driver = (slcan_driver_t *)hndl;
 
-  uint16_t len = msg->length;
+  uint16_t len = get_can_len(msg);
 
   // TODO: make sure this is an extended ID
-  sprintf(driver->send_buffer, canusb_send_cmd, msg->id, len);
+  sprintf(driver->send_buffer, canusb_send_cmd, get_can_id(msg), len);
   char byte_str[16];
 
   uint16_t n;
@@ -472,7 +472,7 @@ static void slcan_worker(void *parg)
             case 'R' :
               continue;
             case 'r' :
-              msg.reply = 1;
+              set_can_reply(&msg, true);
               break;
             case 't' :
             default :
@@ -489,31 +489,31 @@ static void slcan_worker(void *parg)
             {
             if(index >= msg_len)
               {
-              msg.id = 0;
+              set_can_id(&msg, 0);
               break;
               }
             // todo: range checks?
             val = driver->str[index++];
             num = tohex(val);
-            msg.id = (msg.id  << 4) |(num & 0x0f);
+            set_can_id(&msg, (get_can_id(&msg)  << 4) |(num & 0x0f));
             }
 
           if(index >= msg_len)
             continue;
 
           //trace_error("Can ID is %d\n", msg.id);
-          msg.length = tohex(driver->str[index++]);
+          set_can_len(&msg, tohex(driver->str[index++]));
 
           //trace_error("Can length is %d\n", len);
-          if(msg.reply)
+          if(get_can_reply(&msg))
             continue;
 
           uint16_t dp;
-          for(dp = 0; dp < msg.length; dp++)
+          for(dp = 0; dp < get_can_len(&msg); dp++)
             {
             if(index >= msg_len)
               {
-              msg.id = 0;
+              set_can_id(&msg, 0);
               break;
               }
             else
@@ -524,7 +524,7 @@ static void slcan_worker(void *parg)
             }
 
           // send the message
-          if(msg.id != 0)
+          if(get_can_id(&msg) != 0)
             {
 //#define _DEBUG_SLCAN
 #ifdef _DEBUG_SLCAN

@@ -130,7 +130,8 @@ void task_abort()
 typedef uint16_t stack_type_t;
 
 typedef struct _tcb16_t {
-  volatile tcb_t tcb;       // 42 bytes
+  volatile tcb_t tcb;       // 40 bytes
+  uint16_t splim;
   uint16_t sp;
   uint16_t sr;
   uint16_t w14;
@@ -159,7 +160,8 @@ typedef struct _tcb16_t {
   uint16_t dsrpag;
   uint16_t dswpag;
   uint16_t corcon;
-  uint16_t splim;
+  uint16_t guard[8];     // used when a non maskable IRQ occurs
+                         // ensures the stack cannot overwrite the user stack
   stack_type_t stack[];
   } tcb16_t;
 

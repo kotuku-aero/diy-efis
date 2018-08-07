@@ -33,6 +33,8 @@ then the origional copyright notice is to be respected.
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
+
+#define _POSIX_C_SOURCE 199309L
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -245,11 +247,23 @@ result_t scheduler_init()
   }
 
 // this is the main thread loop.  We just block.
-void neutron_run()
+void neutron_run(void *heap,
+  size_t length,
+  const char *name,
+  uint16_t stack_size,
+  task_callback callback,
+  void *parg,
+  uint8_t priority,
+  task_p *task)
   {
-  handle_t semp;
-  semaphore_create(&semp);
-  semaphore_wait(semp, INDEFINITE_WAIT);                // and block indefinately
+  if (callback != 0)
+    (*callback)(parg);
+  else
+    {
+    handle_t semp;
+    semaphore_create(&semp);
+    semaphore_wait(semp, INDEFINITE_WAIT);                // and block indefinately
+    }
   }
 
  result_t task_create(const char *name,
@@ -267,7 +281,8 @@ void neutron_run()
 
   task_resume(thread);
 
-  *task = thread;
+  if(task != 0)
+    *task = thread;
   return s_ok;
   }
 
@@ -327,4 +342,40 @@ void thread_terminate(task_p h, unsigned long term_code)
 unsigned int thread_current_id(task_p h)
   {
   return thread_handle_thread_id(((thread_handle_t *)h));
+  }
+
+
+void *neutron_calloc(size_t count, size_t size)
+  {
+  return calloc(count, size);
+  }
+
+void *neutron_malloc(size_t size)
+  {
+  return malloc(size);
+  }
+
+void neutron_free(void *mem)
+  {
+  if (mem != 0)
+    free(mem);
+  }
+
+void *neutron_realloc(void *mem, size_t new_size)
+  {
+  return realloc(mem, new_size);
+  }
+
+char *neutron_strdup(const char *str)
+  {
+  size_t len = strlen(str);
+  char *buf = (char *)neutron_malloc(len + 1);
+
+  memcpy(buf, str, len + 1);
+  return buf;
+  }
+
+void yield()
+  {
+
   }

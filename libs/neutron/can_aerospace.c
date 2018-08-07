@@ -53,8 +53,8 @@ static uint8_t software_revision;
 canmsg_t *create_can_msg_float(canmsg_t *msg, uint16_t message_id, uint8_t service_code, float value)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  msg->length = 8;
-  msg->id = message_id;
+  set_can_len(msg, 8);
+  set_can_id(msg, message_id);
   msg->canas.data_type = CANAS_DATATYPE_FLOAT;
   msg->canas.service_code = service_code;
 
@@ -70,8 +70,8 @@ canmsg_t *create_can_msg_float(canmsg_t *msg, uint16_t message_id, uint8_t servi
 canmsg_t *create_can_msg_int16(canmsg_t *msg, uint16_t message_id, uint8_t service_code, int16_t data)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  msg->length = 6;
-  msg->id = message_id;
+  set_can_len(msg, 6);
+  set_can_id(msg, message_id);
   msg->canas.data_type = CANAS_DATATYPE_SHORT;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = (uint8_t)(data >> 8);
@@ -83,8 +83,8 @@ canmsg_t *create_can_msg_int16(canmsg_t *msg, uint16_t message_id, uint8_t servi
 canmsg_t *create_can_msg_int16_2(canmsg_t *msg, uint16_t message_id, uint8_t service_code, int16_t data1, int16_t data2)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  msg->length = 6;
-  msg->id = message_id;
+  set_can_len(msg, 6);
+  set_can_id(msg, message_id);
   msg->canas.data_type = CANAS_DATATYPE_SHORT2;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = (uint8_t)(data1 >> 8);
@@ -98,8 +98,8 @@ canmsg_t *create_can_msg_int16_2(canmsg_t *msg, uint16_t message_id, uint8_t ser
 canmsg_t *create_can_msg_int32(canmsg_t *msg, uint16_t message_id, uint8_t service_code, int32_t data)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  msg->length = 8;
-  msg->id = message_id;
+  set_can_len(msg, 8);
+  set_can_id(msg, message_id);
   msg->canas.data_type = CANAS_DATATYPE_INT32;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = (uint8_t)(data >> 24);
@@ -113,8 +113,8 @@ canmsg_t *create_can_msg_int32(canmsg_t *msg, uint16_t message_id, uint8_t servi
 canmsg_t *create_can_msg_uint16(canmsg_t *msg, uint16_t message_id, uint8_t service_code, uint16_t data)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  msg->length = 6;
-  msg->id = message_id;
+  set_can_len(msg, 6);
+  set_can_id(msg,  message_id);
   msg->canas.data_type = CANAS_DATATYPE_USHORT;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = (uint8_t)(data >> 8);
@@ -126,8 +126,8 @@ canmsg_t *create_can_msg_uint16(canmsg_t *msg, uint16_t message_id, uint8_t serv
 canmsg_t *create_can_msg_uint16_2(canmsg_t *msg, uint16_t message_id, uint8_t service_code, uint16_t data1, uint16_t data2)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  msg->length = 6;
-  msg->id = message_id;
+  set_can_len(msg, 6);
+  set_can_id(msg, message_id);
   msg->canas.data_type = CANAS_DATATYPE_USHORT2;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = (uint8_t)(data1 >> 8);
@@ -141,8 +141,8 @@ canmsg_t *create_can_msg_uint16_2(canmsg_t *msg, uint16_t message_id, uint8_t se
 canmsg_t *create_can_msg_uint32(canmsg_t *msg, uint16_t message_id, uint8_t service_code, uint32_t data)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  msg->length = 8;
-  msg->id = message_id;
+  set_can_len(msg, 8);
+  set_can_id(msg, message_id);
   msg->canas.data_type = CANAS_DATATYPE_UINT32;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = (uint8_t)(data >> 24);
@@ -156,8 +156,8 @@ canmsg_t *create_can_msg_uint32(canmsg_t *msg, uint16_t message_id, uint8_t serv
 canmsg_t *create_can_msg_int8(canmsg_t *msg, uint16_t message_id, uint8_t service_code, int8_t value)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  msg->length = 5;
-  msg->id = message_id;
+  set_can_len(msg, 5);
+  set_can_id(msg, message_id);
   msg->canas.data_type = CANAS_DATATYPE_UCHAR;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = (uint8_t) value;
@@ -168,8 +168,8 @@ canmsg_t *create_can_msg_int8(canmsg_t *msg, uint16_t message_id, uint8_t servic
 canmsg_t *create_can_msg_int8_2(canmsg_t *msg, uint16_t message_id, uint8_t service_code, int8_t d0, int8_t d1)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  msg->length = 6;
-  msg->id = message_id;
+  set_can_len(msg, 6);
+  set_can_id(msg, message_id);
   msg->canas.data_type = CANAS_DATATYPE_UCHAR2;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = d0;
@@ -181,8 +181,8 @@ canmsg_t *create_can_msg_int8_2(canmsg_t *msg, uint16_t message_id, uint8_t serv
 canmsg_t *create_can_msg_int8_3(canmsg_t *msg, uint16_t message_id, uint8_t service_code, int8_t d0, int8_t d1, int8_t d2)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  msg->length = 7;
-  msg->id = message_id;
+  set_can_len(msg, 7);
+  set_can_id(msg, message_id);
   msg->canas.data_type = CANAS_DATATYPE_UCHAR3;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = d0;
@@ -195,8 +195,8 @@ canmsg_t *create_can_msg_int8_3(canmsg_t *msg, uint16_t message_id, uint8_t serv
 canmsg_t *create_can_msg_int8_4(canmsg_t *msg, uint16_t message_id, uint8_t service_code, int8_t d0, int8_t d1, int8_t d2, int8_t d3)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  msg->length = 8;
-  msg->id = message_id;
+  set_can_len(msg, 8);
+  set_can_id(msg, message_id);
   msg->canas.data_type = CANAS_DATATYPE_UCHAR4;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = d0;
@@ -210,8 +210,8 @@ canmsg_t *create_can_msg_int8_4(canmsg_t *msg, uint16_t message_id, uint8_t serv
 canmsg_t *create_can_msg_uint8(canmsg_t *msg, uint16_t message_id, uint8_t service_code, uint8_t value)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  msg->length = 5;
-  msg->id = message_id;
+  set_can_len(msg, 5);
+  set_can_id(msg, message_id);
   msg->canas.data_type = CANAS_DATATYPE_UCHAR;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = value;
@@ -222,8 +222,8 @@ canmsg_t *create_can_msg_uint8(canmsg_t *msg, uint16_t message_id, uint8_t servi
 canmsg_t *create_can_msg_uint8_2(canmsg_t *msg, uint16_t message_id, uint8_t service_code, uint8_t d0, uint8_t d1)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  msg->length = 6;
-  msg->id = message_id;
+  set_can_len(msg, 6);
+  set_can_id(msg, message_id);
   msg->canas.data_type = CANAS_DATATYPE_UCHAR2;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = d0;
@@ -235,8 +235,8 @@ canmsg_t *create_can_msg_uint8_2(canmsg_t *msg, uint16_t message_id, uint8_t ser
 canmsg_t *create_can_msg_uint8_3(canmsg_t *msg, uint16_t message_id, uint8_t service_code, uint8_t d0, uint8_t d1, uint8_t d2)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  msg->length = 7;
-  msg->id = message_id;
+  set_can_len(msg, 7);
+  set_can_id(msg, message_id);
   msg->canas.data_type = CANAS_DATATYPE_UCHAR3;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = d0;
@@ -249,8 +249,8 @@ canmsg_t *create_can_msg_uint8_3(canmsg_t *msg, uint16_t message_id, uint8_t ser
 canmsg_t *create_can_msg_uint8_4(canmsg_t *msg, uint16_t message_id, uint8_t service_code, uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3)
   {
   memset(msg, 0, sizeof(canmsg_t));
-  msg->length = 8;
-  msg->id = message_id;
+  set_can_len(msg, 8);
+  set_can_id(msg, message_id);
   msg->canas.data_type = CANAS_DATATYPE_UCHAR4;
   msg->canas.service_code = service_code;
   msg->canas.data[0] = d0;
@@ -579,7 +579,7 @@ void can_tx_task(void *parg)
 result_t can_send_raw(canmsg_t *msg)
   {
   if(msg == 0 ||
-     msg->length == 0)
+     get_can_len(msg) == 0)
     return e_bad_parameter;
 
 #if 0  
@@ -663,7 +663,7 @@ static bool publish_ids(const canmsg_t *service_msg, void *parg)
     ids_reply[0] = hardware_revision;
     ids_reply[1] = software_revision;
 
-    can_send(create_can_msg_uint8_4(&msg, service_msg->id + 1, 0,
+    can_send(create_can_msg_uint8_4(&msg, get_can_id(service_msg) + 1, 0,
                                     ids_reply[0], ids_reply[1],
                                     ids_reply[2], ids_reply[3]));
     
@@ -715,7 +715,7 @@ void can_rx_task(void *parg)
       (handler->callback)(&rx_msg, handler->parg);
 
     // handle the builtin services next.  The service channel +1 is the reply channel
-    switch(rx_msg.id & 0xfffe)
+    switch(get_can_id(&rx_msg) & 0xfffe)
       {
       case node_service_channel_0:
       case node_service_channel_1:

@@ -55,9 +55,9 @@ extern bool bsp_repaint_framebuffer();
 // if single bufferred will be /dev/fb0, double bufferred will be /dev/fb1
 static int fbfd = -1;
 
-static const char *screen_x_s = "screen-x";
-static const char *screen_y_s = "screen-y";
-static const char *framebuffer_device_s = "screen";
+const char *screen_x_s = "screen-x";
+const char *screen_y_s = "screen-y";
+const char *framebuffer_device_s = "screen";
 
 struct _framebuffer_canvas_t;
 

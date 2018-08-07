@@ -100,6 +100,11 @@ static result_t print_error(const char *msg, result_t result)
   return result;
   }
 
+extern const char *i2c_device_s;
+extern const char *screen_x_s;
+extern const char *screen_y_s;
+extern const char *framebuffer_device_s;
+
 result_t electron_init(int argc, char **argv)
   {
   result_t result;
@@ -206,7 +211,7 @@ result_t electron_init(int argc, char **argv)
 
     }
 
-  return s_ok;
+  return factory_reset ? s_false : s_ok;
   }
 
 #define BLOCK_SHIFT 5

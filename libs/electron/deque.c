@@ -38,7 +38,7 @@ it must be removed as soon as possible after the code fragment is identified.
 #include <string.h>
 #include <stdlib.h>
 
-result_t deque_create(uint16_t element_size, uint16_t length, handle_t *handle)
+result_t deque_create(uint16_t element_size, uint16_t length, deque_p *handle)
   {
   result_t result;
   if(element_size == 0 ||
@@ -85,7 +85,7 @@ result_t deque_create(uint16_t element_size, uint16_t length, handle_t *handle)
   return s_ok;
   }
 
-result_t deque_close(handle_t hndl)
+result_t deque_close(deque_p hndl)
   {
   if(hndl == 0)
     return e_bad_parameter;
@@ -99,7 +99,7 @@ result_t deque_close(handle_t hndl)
   return s_ok;
   }
 
-result_t can_pop(handle_t hndl)
+result_t can_pop(deque_p hndl)
   {
   if(hndl == 0)
     return e_bad_parameter;
@@ -109,7 +109,7 @@ result_t can_pop(handle_t hndl)
   return deque->count > 0 ? s_ok : s_false;
   }
 
-result_t count(handle_t hndl, uint16_t *value)
+result_t count(deque_p hndl, uint16_t *value)
   {
   if(hndl == 0)
     return e_bad_parameter;
@@ -121,7 +121,7 @@ result_t count(handle_t hndl, uint16_t *value)
   return s_ok;
   }
 
-result_t push_back(handle_t hndl, const void *item, uint32_t max_wait)
+result_t push_back(deque_p hndl, const void *item, uint32_t max_wait)
   {
   if(hndl == 0)
     return e_bad_parameter;
@@ -158,7 +158,7 @@ result_t push_back(handle_t hndl, const void *item, uint32_t max_wait)
   return s_ok;
   }
 
-result_t pop_front(handle_t hndl, void *item, uint32_t max_wait)
+result_t pop_front(deque_p hndl, void *item, uint32_t max_wait)
   {
   if(hndl == 0)
     return e_bad_parameter;
@@ -196,7 +196,7 @@ result_t pop_front(handle_t hndl, void *item, uint32_t max_wait)
   return s_ok;
   }
 
-result_t at(handle_t hndl, uint16_t offset, void *buffer)
+result_t at(deque_p hndl, uint16_t offset, void *buffer)
   {
   if(hndl == 0)
     return e_bad_parameter;
@@ -234,7 +234,7 @@ result_t at(handle_t hndl, uint16_t offset, void *buffer)
   return s_ok;
   }
 
-result_t capacity(handle_t hndl, uint16_t *value)
+result_t capacity(deque_p hndl, uint16_t *value)
   {
   if(hndl == 0)
     return e_bad_parameter;

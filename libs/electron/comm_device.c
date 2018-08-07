@@ -341,7 +341,7 @@ result_t comm_ioctl(comm_device_p hndl, ioctl_type type, const void *in_buffer,
         tio.c_cflag |= CLOCAL;
         break;
       case rts_control_enabled:
-        tio.c_cflag |= CRTSCTS;
+        //tio.c_cflag |= CRTSCTS;
         break;
       case rts_control_handshake:
 //          tio.fRtsControl = RTS_CONTROL_HANDSHAKE;

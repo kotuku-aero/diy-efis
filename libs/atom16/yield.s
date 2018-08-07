@@ -7,7 +7,8 @@
     
 _enter_critical:
   PUSH W0
-  MOV #0x00E0, W0   ; set IRQL=1
+  ;MOV #0x00E0, W0   ; set IRQL=7
+  MOV #0x00A0, W0   ; set IRQL=5 or mask ints
   MOV W0, SR
   POP W0
   RETURN
@@ -22,7 +23,8 @@ _exit_critical:
 _yield:
   PUSH SR;
   PUSH.D W0         ; we need W0, and W1
-  MOV #0x00E0, W0    ; set IRQL=7
+  ;MOV #0x00E0, W0    ; set IRQL=7
+  MOV #0x00A0, W0   ; set IRQL=5
   MOV W0, SR
   ; stack is
   ; W1
@@ -30,7 +32,7 @@ _yield:
   ; SR
   ; Return address (2 words)
   MOV _current_task, W0
-  ADD #40, W0	      ; W0-> points w15
+  ADD #42, W0	     ; W0-> points w15
   MOV W15, W1        ; W1 = old stack pointer
   MOV W0, W15        ; W15 = context
   SUB #6, W1         ; Remove the PUSHD and SR
@@ -67,9 +69,10 @@ _dispatch_task:
   NOP
   
   ; return current_task in WO
-  ADD #96, W0        ; W0-> points SPLIM
+  ADD #40, W0	    ; offset to stack limit
   MOV [W0], W1     ; get the stack limit
   MOV W1, SPLIM
+  ADD #58, W0        ; W0-> points regs top
   MOV W0, W15        ; stack points to the state regs
   POP CORCON
   POP DSWPAG

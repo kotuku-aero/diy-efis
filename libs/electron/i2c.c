@@ -166,9 +166,20 @@ static result_t read_msg(i2c_can_t *driver, canmsg_t *msg)
   uint8_t *buffer = (uint8_t *)msg;
   buffer++;
 
-  // burst read the message
-  if (failed(result = read_registers(driver, 0x31, len + 1, buffer)))
-    return result;
+  // there is a bug in the pi hardware where it cannot reliably burst read more than 4 bytes...
+  len++;
+  uint8_t n;
+  uint8_t pos = buffer;
+  while (len > 0)
+    {
+    n = min(4, len);
+    // burst read the message
+    if (failed(result = read_registers(driver, 0x31, n, pos)))
+      return result;
+
+    buffer += n;
+    len -= n;
+    }
 
   uint16_t flags = r30 << 8;
   flags |= *buffer;           // get the low 8 bits
@@ -291,7 +302,7 @@ result_t init_hardware(memid_t key)
   return s_ok;
   }
 
-#define _DEBUG_SLAVE
+//#define _DEBUG_SLAVE
 #ifdef _DEBUG_SLAVE
 static void i2c_tests();
 #endif
@@ -352,44 +363,86 @@ result_t i2c_send_can(handle_t handle, const canmsg_t *msg)
 
 #ifdef _DEBUG_SLAVE
 // i2c tests
-static const uint8_t tests[7] = {
-    0x55,
-    0xAA,
+static const uint8_t tests[6] = {
+    0xAA,   // reg 0x12
     0xBA,
     0xAD,
     0xF0,
     0x0D,
-    0x80,
+    0x55,
   };
 
 static void i2c_tests()
   {
-  uint8_t wr_regs[7];
-  uint8_t rd_regs[7];
+  uint8_t wr_regs[6];
+  uint8_t rd_regs[6];
 
   uint16_t test_num;
   for (test_num = 0; test_num < 10000; test_num++)
     {
     uint16_t i;
-    memcpy(wr_regs, tests, 7);
+    memcpy(wr_regs, tests, 6);
 
     if (test_num & 1)
-      for (i = 0; i < 7; i++)
+      for (i = 0; i < 6; i++)
         wr_regs[i] = wr_regs[i] ^ 0xff;
 
-    if (failed(write_registers(the_driver, 0x11, 7, wr_regs)))
+    if (failed(write_registers(the_driver, 0x12, 6, wr_regs)))
       {
       trace_error("Unable to write regs on test iteration %d\n", test_num);
       return;
       }
 
-    if (failed(read_registers(the_driver, 0x11, 7, rd_regs)))
+    if (failed(read_registers(the_driver, 0x12, 4, rd_regs)))
+      {
+      trace_error("Unable to read regs on test iteration %d\n", test_num);
+      return;
+      }
+    if (failed(read_registers(the_driver, 0x16, 2, &rd_regs[4])))
       {
       trace_error("Unable to read regs on test iteration %d\n", test_num);
       return;
       }
 
-    if(memcmp(wr_regs, rd_regs, 7)!= 0)
+    /*
+    if (failed(read_registers(the_driver, 0x12, 1, &rd_regs[0])))
+      {
+      trace_error("Unable to read regs on test iteration %d\n", test_num);
+      return;
+      }
+
+    if (failed(read_registers(the_driver, 0x13, 1, &rd_regs[1])))
+      {
+      trace_error("Unable to read regs on test iteration %d\n", test_num);
+      return;
+      }
+
+    if (failed(read_registers(the_driver, 0x14, 1, &rd_regs[2])))
+      {
+      trace_error("Unable to read regs on test iteration %d\n", test_num);
+      return;
+      }
+
+    if (failed(read_registers(the_driver, 0x15, 1, &rd_regs[3])))
+      {
+      trace_error("Unable to read regs on test iteration %d\n", test_num);
+      return;
+      }
+
+    if (failed(read_registers(the_driver, 0x16, 1, &rd_regs[4])))
+      {
+      trace_error("Unable to read regs on test iteration %d\n", test_num);
+      return;
+      }
+
+    if (failed(read_registers(the_driver, 0x17, 1, &rd_regs[5])))
+      {
+      trace_error("Unable to read regs on test iteration %d\n", test_num);
+      return;
+      }
+      */
+
+    if(memcmp(wr_regs, rd_regs, 6)!= 0)
       {
       trace_error("Register comparison failed on test iteration %d\n", test_num);
       return;
