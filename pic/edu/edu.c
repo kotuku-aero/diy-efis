@@ -7,7 +7,6 @@
 #include "../../libs/atom/i2c.h"
 #include "../../libs/muon/muon.h"
 #include "../../libs/atom/memory.h"
-#include "../../libs/atom16/pps_maps.h"
 #include "edu_cli.h"
 
 #include <string.h>
@@ -106,15 +105,15 @@ static uint8_t pmag2_rx_buffer[RX_BUFFER_LENGTH];
  * CHT2 - AN12
  * CHT3 - AN11
  * CHT4 - AN45
- * RIGHT_FUEL - AN4 **** CHECK
- * LEFT_FUEL - AN3
- * ISENSE - AN2
- * VSENSE - AN48
- * OILT - AN49
+ * RIGHT_FUEL - AN7
+ * LEFT_FUEL - AN8
+ * ISENSE - AN6
+ * VSENSE - AN5
+ * OILT - AN2
  * OILP - AN9
  * FUELP - AN10
  * OAT - AN18
- * MAP - AN7
+ * MAP - AN3
  * 
  * U1TX - RPF5 = 1
  * U1RX - RF4 = U1RXR = 2
@@ -194,7 +193,7 @@ static analog_channel_definition_t analog_channel_definitions[] = {
   // TODO: fix this...
   { 
     .name = "left-fuel",
-    .channel = 3, 
+    .channel = 8, 
     .can_id = id_left_fuel_quantity,
     .scale = 80.0,
     .offset = 0,
@@ -203,7 +202,7 @@ static analog_channel_definition_t analog_channel_definitions[] = {
   ///////////////////////////////////////////////
   { 
     .name = "right-fuel",
-    .channel = 4, 
+    .channel = 7, 
     .can_id = id_right_fuel_quantity,
     .scale = 80.0,
     .offset = 0,
@@ -277,7 +276,7 @@ static analog_channel_definition_t analog_channel_definitions[] = {
   },
   { 
     .name = "cht-4",
-    .channel = 45,
+    .channel = 4,
     .can_id = id_cylinder_head_temperature4,
     .scale = CHT_CAL,
     .offset = 273.15,
@@ -295,7 +294,7 @@ static analog_channel_definition_t analog_channel_definitions[] = {
   // offset = 150-(.04 * 1111.11111111111) = 105.5555555555556
   { 
     .name = "map",
-    .channel = 7,
+    .channel = 3,
     .can_id = id_manifold_pressure,
     .scale = 1111.11111111111,
     .offset = 105.5555555555556,
@@ -324,7 +323,7 @@ static analog_channel_definition_t analog_channel_definitions[] = {
   // DC volts
   { 
     .name = "dc-voltage",
-    .channel = 48,
+    .channel = 5,
     .can_id = id_dc_voltage,
     .scale = 19.00,
     .offset = 0,
@@ -341,7 +340,7 @@ static analog_channel_definition_t analog_channel_definitions[] = {
   // 0-5v = 89v
   { 
     .name = "dc-amps",
-    .channel = 2,
+    .channel = 6,
     .can_id = id_dc_current,
     .scale = 89.0,
     .offset = -46.5,
@@ -367,7 +366,7 @@ static analog_channel_definition_t analog_channel_definitions[] = {
   // but is degrees kelvin so add 273 + 100 for offset
   { 
     .name = "oil-t",
-    .channel = 49,
+    .channel = 2,
     .can_id = id_oil_temperature,
     .scale = -129.129886507,
     .offset = 373,
@@ -392,7 +391,6 @@ static analog_channel_definition_t analog_channel_definitions[] = {
     .offset = -82.73708748,
     .publish_rate=500
   },
-  /*  
   ///////////////////////////////////////////////
   // OAT
   // based on 10mv/degree K
@@ -405,37 +403,19 @@ static analog_channel_definition_t analog_channel_definitions[] = {
     .offset = 0.0,
     .publish_rate=500
   },   
-  */
   };
 
-uint16_t select_channel(uint16_t channel)
-  {
-  return channel;
-  }
   
 static analog_channels_t channels =
   {
   .channel_definition = analog_channel_definitions,
   .num_channels = numelements(analog_channel_definitions),  // number of channels
-  .analog_factor = 0.000244140625,       // 12 bit ADC
-  .channel_select = select_channel
+  .analog_factor = 0.000244140625       // 12 bit ADC
 };
 
 static uint32_t last_tick;
 static bool engine_running = false;
 static uint32_t tach_time_value;
-
-#define BITRATE 	125000               // 125kbs
-#define PRSEG_LEN   1
-#define PRSEG_VAL   (PRSEG_LEN -1)
-#define SEG1PH_LEN  5
-#define SEG1PH_VAL  (SEG1PH_LEN -1)
-#define SEG2PH_LEN  3
-#define SEG2PH_VAL  (SEG2PH_LEN -1)
-#define NTQ 		(1 + PRSEG_LEN + SEG1PH_LEN + SEG2PH_LEN) // Number of Tq cycles which will make the
-//CAN Bit Timing .
-//#define BRP_VAL		((FCY/(2* NTQ * BITRATE))-1)  //Formulae used for C1CFG1bits.BRP
-#define BRP_VAL 27
 
 
 static neutron_parameters_t init_params = {
@@ -454,7 +434,7 @@ bool ev_msg(const canmsg_t *msg, void *parg)
   if(msg == 0)
     return false;
 
-  switch(msg->id)
+  switch(get_can_id(msg))
     {
     }
   
@@ -463,8 +443,117 @@ bool ev_msg(const canmsg_t *msg, void *parg)
 
 static msg_hook_t functions_hook = { 0, 0, ev_msg, 0 };
 
+static const publish_setup_t publisher_init[] =
+  {
+    {
+    .can_id = id_fuel_flow_rate,
+    .rate = 1000,
+      .publish = true
+    },
+    { 
+      .can_id = id_engine_rpm_a,
+      .rate = 25,
+      .loopback = true,
+      .publish = true
+    },
+    { 
+      .can_id = id_engine_rpm_b,
+      .rate = 25,
+      .loopback = true,
+      .publish = true
+    },
+    {
+      .can_id = id_left_fuel_quantity,
+      .rate=500,
+      .publish = true
+    },
+    { 
+      .can_id = id_right_fuel_quantity,
+      .rate=500,
+      .publish = true
+    },
+    { 
+      .can_id = id_exhaust_gas_temperature1,
+      .rate=500,
+      .publish = true
+    },      
+    {
+      .can_id = id_exhaust_gas_temperature2,
+      .rate=500,
+      .publish = true
+    },
+    { 
+      .can_id = id_exhaust_gas_temperature3,
+      .rate=500,
+      .publish = true
+    },
+    { 
+      .can_id = id_exhaust_gas_temperature4,
+      .rate=500,
+      .publish = true
+    },
+    {
+      .can_id = id_cylinder_head_temperature1,
+      .rate=500,
+      .publish = true
+    },
+    { 
+      .can_id = id_cylinder_head_temperature2,
+      .rate=500,
+      .publish = true
+    },
+    { 
+      .can_id = id_cylinder_head_temperature3,
+      .rate=500,
+      .publish = true
+    },
+    { 
+      .can_id = id_cylinder_head_temperature4,
+      .rate=500,
+      .publish = true
+    },
+    { 
+      .can_id = id_manifold_pressure,
+      .rate=500,
+      .publish = true
+    },
+    { 
+      .can_id = id_fuel_pressure,
+      .rate=500,
+      .publish = true
+    },
+    { 
+      .can_id = id_dc_voltage,
+      .rate=500,
+      .publish = true
+        
+    },   
+    { 
+      .can_id = id_dc_current,
+      .rate=500,
+      .publish = true
+    },   
+    { 
+      .can_id = id_oil_temperature,
+      .rate=500,
+      .publish = true
+    }, 
+    { 
+      .can_id = id_oil_pressure,
+      .rate=500,
+      .publish = true
+    },
+    { 
+      .can_id = id_outside_air_temperature,
+      .rate=5000,
+      .publish = true
+    },
+    {
+      .can_id = 0
+    }
+  };
 
-static void edu_task(void *parg)
+static void startup_task(void *parg)
   {
   result_t result;
   
@@ -481,6 +570,9 @@ static void edu_task(void *parg)
     init_eeprom = true;
     reg_set_uint16(0, node_id_name, init_params.node_id);
     reg_set_uint32(0, tach_time_name, 0);
+    
+    // publish all of the datapoint defaults
+    setup_publisher(publisher_init);
     }
 
   // fuel consumption
@@ -492,7 +584,7 @@ static void edu_task(void *parg)
   // read the 
   reg_get_uint32(0, tach_time_name, &tach_time_value);
   
-  can_aerospace_init(&init_params, init_eeprom, true);
+  can_aerospace_init(&init_params, init_eeprom, false);
   
   // TODO: read other config values that are set....
   deque_create(sizeof(char), RX_BUFFER_LENGTH, &pmag1_config.rx_queue);
@@ -538,11 +630,12 @@ static init_port_t init_ports[] = {
   &PB3DIV, 0x0000007F, 0x00000013,          // 10mhz = 200/20
   &INTCON, 0x00001000, 0x00001000,          // Multi-vector mode
   &ANSELB, 0x00000040, 0x00000000,          // AN46 is digital input
+  &TRISB,  0x00000040, 0x00000040,
+  &TRISD,  0x00000820, 0x00000A00,          // RD5 output, RD9 in RD11 in
+  &TRISF,  0x00000022, 0x00000000,          // RF5, RF1 output
   &CNPUB,  0x00002840, 0x00002840,          // RB6 pullup, RB13, RB11 pullup as not used
   &CNPUD,  0x00000E00, 0x00000E00,          // RD9, RD10, RD11 pullup as not used
   &CNPUF,  0x00000018, 0x00000018,          // RF3, RF4 pullup as not used
-  &TRISF,  0x00000022, 0x00000000,          // RF5, RF1 output
-  &TRISD,  0x00000020, 0x00000000,          // RD5 output
   &RPF1R,  0x0000001F, 0x0000000F,          // RPF1     C1TX
   &C1RXR,  0x0000001F, 0x00000003,          // RPD11    C1RX
   &C1CON,  0x00008000, 0x00008000,          // Turn ON CAN controller
@@ -578,18 +671,13 @@ int main(void)
     }
   
   SYSKEY = 0x33333333;
- 
-  // lock the peripherals.
-  //__builtin_write_OSCCONL(OSCCON | (1<<6));
   
   // pick up a small malloc amount to get the heap pointer
   uint32_t mem = (uint32_t) malloc(4);
   mem = ((mem -1) | 0x0f)+1;
-
-  // 480k of memory
-  size_t length = 0x78000;
+  size_t length = (0x80000000 + (512 * 1024)) - mem;
   
-  neutron_run((void *)mem, length, "EDU", DEFAULT_STACK_SIZE, edu_task, 0, NORMAL_PRIORITY, 0);
+  neutron_run((void *)mem, length, "EDU", DEFAULT_STACK_SIZE, startup_task, 0, NORMAL_PRIORITY, 0);
 
   return 0;
   }
@@ -706,7 +794,7 @@ void panic()
 #ifdef _DEBUG
   while(true);
 #else
-  //Reset();
+  Reset();
 #endif
   }
 
