@@ -23,7 +23,7 @@ extern result_t matrix_name_value_action(cli_t *context, const char * matrix_nam
 
 extern result_t string_name_value_action(cli_t *context, const char * string_name_, const char * string_name_value_);
 
-extern result_t script_name_value_action(cli_t *context, const char * script_name_, const char * script_name_value_);
+extern result_t stream_name_value_action(cli_t *context, const char * stream_name_, const char * stream_name_value_);
 
 extern result_t bool_name_value_action(cli_t *context, const char * bool_name_, uint16_t bool_name_value_);
 

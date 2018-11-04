@@ -66,7 +66,7 @@ static float get_float(const char * str)
   float result = 0;
 
   if(strlen(str)> 0)
-    result = atof(str);
+    result = strtof(str, 0);
 
   return result;
   }

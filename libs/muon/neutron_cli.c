@@ -134,19 +134,20 @@ static result_t cli_string_name_value (cli_t *parser)
   }
 
 
-static result_t cli_script_name_value (cli_t *parser)
+static result_t cli_stream_name_value (cli_t *parser)
   {
   result_t result;
-  const char * script_name_ = 0;
-  const char * script_name_value_ = 0;
+  const char * stream_name_ = 0;
+  const char * stream_name_value_ = 0;
 
-  if(failed(result = cli_get_string(&parser->tokens[1], &script_name_)))
+  if(failed(result = cli_get_string(&parser->tokens[1], &stream_name_)))
     return result;
 
-  if(failed(result = cli_get_string(&parser->tokens[2], &script_name_value_)))
+  if(parser->tokens[2].token_length > 0 &&
+    failed(result = cli_get_string(&parser->tokens[2], &stream_name_value_)))
     return result;
 
-  result = script_name_value_action(parser, script_name_, script_name_value_);
+  result = stream_name_value_action(parser, stream_name_, ((parser->tokens[2].token_length > 0) ? stream_name_value_ : 0));
 
 
   return result;
@@ -720,13 +721,13 @@ static cli_node_t node_string_name;
 
 static cli_node_t node_string;
 
-static cli_node_t node_script_name_value_end;
+static cli_node_t node_stream_name_value_end;
 
-static cli_node_t node_script_name_value;
+static cli_node_t node_stream_name_value;
 
-static cli_node_t node_script_name;
+static cli_node_t node_stream_name;
 
-static cli_node_t node_script;
+static cli_node_t node_stream;
 
 static cli_node_t node_bool_name_value_end;
 
@@ -1211,48 +1212,48 @@ static cli_node_t node_string = {
   0,
   "string",
   0,
-  &node_script,
+  &node_stream,
   &node_string_name
   };
 
 
-static cli_node_t node_script_name_value_end = {
+static cli_node_t node_stream_name_value_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_script_name_value,
+  cli_stream_name_value,
   0,
   0,
   0
   };
 
 
-static cli_node_t node_script_name_value = {
+static cli_node_t node_stream_name_value = {
   CLI_NODE_STRING,
-  0,
+  CLI_NODE_FLAGS_OPT_START | CLI_NODE_FLAGS_OPT_END | CLI_NODE_FLAGS_OPT_PARTIAL,
   "STRING:value",
   0,
   0,
-  &node_script_name_value_end
+  &node_stream_name_value_end
   };
 
 
-static cli_node_t node_script_name = {
+static cli_node_t node_stream_name = {
   CLI_NODE_STRING,
   0,
   "STRING:name",
   0,
   0,
-  &node_script_name_value
+  &node_stream_name_value
   };
 
 
-static cli_node_t node_script = {
+static cli_node_t node_stream = {
   CLI_NODE_KEYWORD,
   0,
-  "script",
+  "stream",
   0,
   &node_bool,
-  &node_script_name
+  &node_stream_name
   };
 
 

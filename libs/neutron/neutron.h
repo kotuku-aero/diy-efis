@@ -1098,6 +1098,23 @@ typedef enum _filter_type_e
  * @remark If the datapoint can be created, the publisher is notified immediately of the new datapoint
  */
 extern result_t publish_datapoint(uint16_t can_id, uint16_t rate, filter_type_e type, uint16_t boxcar_length, bool loopback, bool publish);
+
+typedef struct _publish_setup_t {
+  uint16_t can_id;
+  uint16_t rate;
+  filter_type_e filter_type;
+  uint16_t filter_length;
+  bool loopback;
+  bool publish;
+  } publish_setup_t;
+
+/**
+ * Setup a set of published datapoints
+ * @param values list of publishing defaults, can_id = 0 ends the list
+ * @return s_ok if setup ok.
+ */  
+extern result_t setup_publisher(const publish_setup_t *values);
+
 /**
  * @function Monitor the CAN bus for a published datapoint
  * @param can_id  Id to monitor

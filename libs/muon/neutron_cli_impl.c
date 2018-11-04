@@ -199,7 +199,7 @@ result_t show_value(handle_t dest, memid_t key, field_datatype type, const char 
       int16_t value;
       reg_get_int16(key, name, &value);
       do_indent(dest, *indent);
-      stream_printf(dest, "int16  %s %d\r\n", name, (int32_t)value);
+      stream_printf(dest, "int16  %s %d\r\n", name, value);
       }
       break;
     case field_uint16:
@@ -213,7 +213,7 @@ result_t show_value(handle_t dest, memid_t key, field_datatype type, const char 
         succeeded(find_enum_name(enumerations, value, &enum_value)))
         stream_printf(dest, "uint16 %s %s\r\n", name, enum_value->name);
       else
-        stream_printf(dest, "uint16 %s %ud\r\n", name, (uint32_t)value);
+        stream_printf(dest, "uint16 %s %ud\r\n", name, value);
       }
       break;
     case field_int32:

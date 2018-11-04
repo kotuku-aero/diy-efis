@@ -1209,6 +1209,28 @@ result_t neutron_init(const neutron_parameters_t *params, bool init_mode, bool c
   return s_ok;
   }
 
+result_t setup_publisher(const publish_setup_t *values)
+  {
+  result_t result;
+  
+  while(values->can_id != 0)
+    {
+    result = publish_datapoint(values->can_id,
+                               values->rate,
+                               values->filter_type,
+                               values->filter_length,
+                               values->loopback,
+                               values->publish);
+    
+    if(failed(result))
+      return result;
+    
+    values++;
+    }
+  
+  return s_ok;
+  }
+
 result_t publish_datapoint(uint16_t can_id, uint16_t rate, filter_type_e filter_type, uint16_t filter_length, bool loopback, bool publish)
   {
   result_t result;
