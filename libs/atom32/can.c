@@ -14,47 +14,38 @@ static semaphore_p can_tx_event;
 
 // these are the CAN fifo buffers. We use 4 tx priorities and 4 rx priorities
 // each is 16 bytes x 32 slots
-__attribute__ ((packed)) struct _can_tx_msg_t {
+__attribute__ ((packed)) struct _pic_can_msg_t {
   uint32_t sid;
-  union {
-    uint32_t dlc: 4;
-    uint32_t rb0: 1;
-    uint32_t : 3;
-    uint32_t rb1: 1;
-    uint32_t rtr: 1;
-    uint32_t eid: 18;
-    uint32_t ide: 1;
-    uint32_t srr: 1;
-    };
-    uint8_t data[8];
-  };
-  
-typedef struct _can_tx_msg_t can_tx_msg_t;
-  
-__attribute__ ((packed)) struct _can_rx_msg_t {
-  union {
-    uint32_t sid: 11;
-    uint32_t filhit: 5;
-    uint32_t cmsgts: 16;
-    };
-  union {
-    uint32_t dlc: 4;
-    uint32_t rb0: 1;
-    uint32_t : 3;
-    uint32_t rb1: 1;
-    uint32_t rtr: 1;
-    uint32_t eid: 18;
-    uint32_t ide: 1;
-    uint32_t srr: 1;
-    };
+  uint32_t eid;
   uint8_t data[8];
   };
   
-typedef struct _can_rx_msg_t can_rx_msg_t;
+typedef struct _pic_can_msg_t pic_can_msg_t;
+  
+ 
+static inline void set_dlc(pic_can_msg_t *msg, int len)
+  {
+  msg->eid = (msg->eid & 0xfff0) | (len & 0x0f);
+  }
+
+static inline int get_dlc(const pic_can_msg_t *msg)
+  {
+  return msg->eid & 0x0f;
+  }
+
+static inline void set_rtr(pic_can_msg_t *msg, bool is_it)
+  {
+  msg->eid = (msg->eid & 0xffDF) | (is_it ? 0x0020 : 0);
+  }
+
+static inline bool get_rtr(const pic_can_msg_t *msg)
+  {
+  return (msg->eid & 0x0020)!= 0 ? true : false;
+  }
     
 // THESE MUST be adjacent in memory and correspond to the pic32 fifo buffers
-static can_tx_msg_t __attribute__((coherent)) tx_fifo[NUM_OF_ECAN_BUFFERS];
-static can_rx_msg_t __attribute__((coherent)) rx_fifo[NUM_OF_ECAN_BUFFERS];
+static pic_can_msg_t __attribute__((coherent)) tx_fifo[NUM_OF_ECAN_BUFFERS];
+static pic_can_msg_t __attribute__((coherent)) rx_fifo[NUM_OF_ECAN_BUFFERS];
 
 #define BITRATE 	125000               // 125kbs
 #define PRSEG_LEN   1
@@ -180,12 +171,12 @@ void can1_interrupt(void)
       }
     else if(icode == 1)
       {
-      can_rx_msg_t *rx = (can_rx_msg_t *) PA_TO_KVA1(C1FIFOUA1);
+      pic_can_msg_t *rx = (pic_can_msg_t *) PA_TO_KVA1(C1FIFOUA1);
       
       canmsg_t frame;
-      frame.id = rx->sid;
-      frame.reply = rx->rtr;
-      frame.length = rx->dlc;
+      set_can_id(&frame, rx->sid);
+      set_can_reply(&frame, get_rtr(rx));
+      set_can_len(&frame, get_dlc(rx));
       frame.raw[0] = rx->data[0];
       frame.raw[1] = rx->data[1];
       frame.raw[2] = rx->data[2];
@@ -207,7 +198,7 @@ void can1_interrupt(void)
  
 result_t bsp_send_can(const canmsg_t *msg)
   {
-  can_tx_msg_t *next_buffer;
+  pic_can_msg_t *next_buffer;
   
   // spin till a buffer is free
   while(C1FIFOINT0bits.TXNFULLIF == 0)
@@ -217,10 +208,11 @@ result_t bsp_send_can(const canmsg_t *msg)
     }
 
   enter_critical();
-  next_buffer = (can_tx_msg_t *) PA_TO_KVA1(C1FIFOUA0);
+  next_buffer = (pic_can_msg_t *) PA_TO_KVA1(C1FIFOUA0);
 
-  next_buffer->sid = msg->id;
-  next_buffer->dlc = msg->length;
+  next_buffer->sid = get_can_id(msg);
+  set_dlc(next_buffer, get_can_len(msg));
+  set_rtr(next_buffer, get_can_reply(msg));
   next_buffer->data[0] = msg->canas.node_id;
   next_buffer->data[1] = msg->canas.data_type;
   next_buffer->data[2] = msg->canas.service_code;

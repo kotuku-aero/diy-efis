@@ -21,45 +21,6 @@ static void idle_task(void *parg)
     }
   }
 
-result_t scheduler_init()
-  {
-  if(!is_init)
-    {
-    // create the idle task.
-    task_p hndl;
-    task_create("IDLE", IDLE_STACK_SIZE, idle_task, 0, IDLE_PRIORITY, &hndl);
-    
-    _mtc0(_CP0_SRSMAP, _CP0_SRSMAP_SELECT, 0x76543210);
-    // set up TMR1 as our kernel timer.
-    PR1 = TIMER;                         // 1 msec timer.
-    TMR1 = 0;
-    T1CONbits.TCKPS = 0;                // clk is 1:1
-    T1CONbits.TCS = 0;                  // select clock source to free-run
-    T1CONbits.TGATE = 0;
-    T1CONbits.TON = 1;
-
-    // set up timer 1
-    IPC1bits.T1IP = 2;
-    IFS0bits.T1IF = 0;
-    IEC0bits.T1IE = 1;
-    
-    // set to low priority for yield
-    IPC0bits.CS0IP = 1;
-    IPC0bits.CS0IS = 0;
-    
-    IEC0bits.CS0IE = 1;
-    
-    // set the MX, and CU1 bit
-    uint32_t sr = _mfc0(_CP0_STATUS, _CP0_STATUS_SELECT);
-    sr |= 0x21000000;
-    _mtc0(_CP0_STATUS, _CP0_STATUS_SELECT, sr);
-
-    is_init = true;
-    }
-
-  return s_ok;
-  }
-
 typedef enum {
   EXCEP_IRQ = 0,          // interrupt
   EXCEP_MOD = 1,          // TLB Modified
@@ -303,26 +264,39 @@ extern void neutron_run(void *the_heap,
     // create the idle task.
   task_create("IDLE", IDLE_STACK_SIZE, idle_task, 0, IDLE_PRIORITY, 0);
 
-  // this will allocate a new task pasth 
-  task_create(name, stack_size, callback, parg, priority, task);
-  
-  // make sure no IRQ till the new stack is swapped in
-  enter_critical();
-  
+  // _mtc0(_CP0_SRSMAP, _CP0_SRSMAP_SELECT, 0x76543210);
   // set up TMR1 as our kernel timer.
-  /*
   PR1 = TIMER;                         // 1 msec timer.
   TMR1 = 0;
-  T1CONbits.TCKPS = 1;                 // clk / 8 or 0.4 usec clock to counter
-  T1CONbits.TCS = 0;                   // select clock source to free-run
+  T1CONbits.TCKPS = 0;                // clk is 1:1
+  T1CONbits.TCS = 0;                  // select clock source to free-run
   T1CONbits.TGATE = 0;
-  T1CONbits.TON = 1;
 
-  // allow timer interrupt after the first task dispatched.
+  // set up timer 1
+  IPC1bits.T1IP = 2;
   IFS0bits.T1IF = 0;
   IEC0bits.T1IE = 1;
-  IPC0bits.T1IP = 4;
+
+  // set to low priority for yield
+  IPC0bits.CS0IP = 1;
+  IPC0bits.CS0IS = 0;
+
+  IEC0bits.CS0IE = 1;
+
+  T1CONbits.TON = 1;
+
+  // set the MX, and CU1 bit
+  /*
+  uint32_t sr = _mfc0(_CP0_STATUS, _CP0_STATUS_SELECT);
+  sr |= 0x21000000;
+  _mtc0(_CP0_STATUS, _CP0_STATUS_SELECT, sr);
    * */
+
+  // this will allocate a new task 
+  task_create(name, stack_size, callback, parg, priority, task);
+
+  // make sure no IRQ till the new stack is swapped in
+  enter_critical();
 
   dispatch_task();
   }

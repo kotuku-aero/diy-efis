@@ -52,7 +52,7 @@ yield:
     
     la      k1, current_task
     lw	  k0, 0(k1)	    // first word is version which is sizeof(tcb_t)
-    lw	  k1, 0(k0)	    // should be 64 bytes as of writing
+    lh	  k1, 0(k0)	    // should be 64 bytes as of writing
     add	  k0, k1	    // offset to the state
     
     mflo   k1, $ac0
@@ -173,7 +173,7 @@ dispatch_task:
   // schedule sets current task to the next task to run.
   la      k1, current_task
   lw	  k0, 0(k1)	    // first word is version which is sizeof(tcb_t)
-  lw	  k1, 0(k0)	    // should be 64 bytes as of writing
+  lh	  k1, 0(k0)	    // should be 64 bytes as of writing
   add	  k0, k1	    // offset to the state
   
   // create a stack frame
@@ -318,7 +318,7 @@ _\handler:
     
   la      k1, current_task
   lw	  k0, 0(k1)	    // first word is version which is sizeof(tcb_t)
-  lw	  k1, 0(k0)	    // should be 64 bytes as of writing
+  lh	  k1, 0(k0)	    // should be 64 bytes as of writing
   add	  k0, k1	    // offset to the state
     
     mflo   k1, $ac0

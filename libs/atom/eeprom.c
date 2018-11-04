@@ -1,4 +1,4 @@
-#include "../../libs/neutron/bsp.h"
+#include "../../diy-efis/libs/neutron/bsp.h"
 
 #include "i2c.h"
 #include <string.h>
