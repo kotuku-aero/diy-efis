@@ -78,6 +78,7 @@ typedef enum _task_state
   ts_aborted
   } task_state;
 
+  // this must be mod8
 typedef struct _task_control_block_t {
   uint16_t version;     // this must be sizeof(tcb_t) 
   uint8_t priority;
@@ -96,6 +97,7 @@ typedef struct _task_control_block_t {
   volatile struct _task_control_block_t *next_task;
   volatile struct _task_control_block_t *prev_task;
   uint32_t reserved2;
+  uint32_t reserved3;
   } tcb_t;
 
 // This is the task that is running. exposed so we can add a watch onto it.

@@ -16,6 +16,20 @@
                 <make-dep-project>../../libs/neutron</make-dep-project>
                 <make-dep-project>../../libs/atom16</make-dep-project>
             </make-dep-projects>
+            <sourceRootList/>
+            <confList>
+                <confElem>
+                    <name>debug_dspic33ep256gp502</name>
+                    <type>2</type>
+                </confElem>
+                <confElem>
+                    <name>release_dspic33EP256gp502</name>
+                    <type>2</type>
+                </confElem>
+            </confList>
+            <formatting>
+                <project-formatting-style>false</project-formatting-style>
+            </formatting>
         </data>
     </configuration>
 </project>

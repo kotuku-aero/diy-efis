@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="62">
+<configurationDescriptor version="65">
   <logicalFolder name="root" displayName="root" projectFiles="true">
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
@@ -54,6 +54,9 @@
         <languageToolchainVersion>1.33</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
+      <packs>
+        <pack name="dsPIC33E-GM-GP-MC-GU-MU_DFP" vendor="Microchip" version="1.0.19"/>
+      </packs>
       <compileType>
         <linkerTool>
           <linkerLibItems>
@@ -256,6 +259,9 @@
         <languageToolchainVersion>1.33</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
+      <packs>
+        <pack name="dsPIC33E-GM-GP-MC-GU-MU_DFP" vendor="Microchip" version="1.0.19"/>
+      </packs>
       <compileType>
         <linkerTool>
           <linkerLibItems>
@@ -458,6 +464,9 @@
         <languageToolchainVersion>1.33</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
+      <packs>
+        <pack name="dsPIC33E-GM-GP-MC-GU-MU_DFP" vendor="Microchip" version="1.0.19"/>
+      </packs>
       <compileType>
         <linkerTool>
           <linkerLibItems>
@@ -660,6 +669,9 @@
         <languageToolchainVersion>1.33</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
+      <packs>
+        <pack name="dsPIC33E-GM-GP-MC-GU-MU_DFP" vendor="Microchip" version="1.0.19"/>
+      </packs>
       <compileType>
         <linkerTool>
           <linkerLibItems>
@@ -862,6 +874,9 @@
         <languageToolchainVersion>1.33</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
+      <packs>
+        <pack name="dsPIC33E-GM-GP-MC-GU-MU_DFP" vendor="Microchip" version="1.0.19"/>
+      </packs>
       <compileType>
         <linkerTool>
           <linkerLibItems>
@@ -1064,6 +1079,9 @@
         <languageToolchainVersion>1.33</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
+      <packs>
+        <pack name="dsPIC33E-GM-GP-MC-GU-MU_DFP" vendor="Microchip" version="1.0.19"/>
+      </packs>
       <compileType>
         <linkerTool>
           <linkerLibItems>
@@ -1266,6 +1284,9 @@
         <languageToolchainVersion>1.44</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
+      <packs>
+        <pack name="PIC32MZ-EF_DFP" vendor="Microchip" version="1.0.17"/>
+      </packs>
       <compileType>
         <linkerTool>
           <linkerLibItems>
@@ -1536,6 +1557,9 @@
         <languageToolchainVersion>1.44</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
+      <packs>
+        <pack name="PIC32MZ-EF_DFP" vendor="Microchip" version="1.0.17"/>
+      </packs>
       <compileType>
         <linkerTool>
           <linkerLibItems>
@@ -1806,6 +1830,9 @@
         <languageToolchainVersion>1.44</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
+      <packs>
+        <pack name="PIC32MZ-EF_DFP" vendor="Microchip" version="1.0.17"/>
+      </packs>
       <compileType>
         <linkerTool>
           <linkerLibItems>
@@ -2069,6 +2096,9 @@
         <languageToolchainVersion>1.44</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
+      <packs>
+        <pack name="PIC32MZ-EF_DFP" vendor="Microchip" version="1.0.17"/>
+      </packs>
       <compileType>
         <linkerTool>
           <linkerLibItems>

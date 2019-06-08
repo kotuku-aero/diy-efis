@@ -25,8 +25,8 @@ typedef struct _capture_channel_definition_t
   float scale;
   float offset;
   bool loopback;
-  unsigned int capture_count;   // number of samples captured
-  unsigned int timer_value;     // last value read from the timer capture register, if 0 then resync
+  uint32_t capture_count;   // number of samples captured
+  uint32_t timer_value;     // last value read from the timer capture register, if 0 then resync
   float result;                 // filter result
   } capture_channel_definition_t;
 

@@ -18,6 +18,23 @@
                 <make-dep-project>../../libs/ion</make-dep-project>
                 <make-dep-project>../../libs/atom32</make-dep-project>
             </make-dep-projects>
+            <sourceRootList>
+                <sourceRootElem>../../libs/atom</sourceRootElem>
+                <sourceRootElem>.</sourceRootElem>
+            </sourceRootList>
+            <confList>
+                <confElem>
+                    <name>release_pic32MZ2048EFH064</name>
+                    <type>2</type>
+                </confElem>
+                <confElem>
+                    <name>debug_pic32MZ2048EFH064</name>
+                    <type>2</type>
+                </confElem>
+            </confList>
+            <formatting>
+                <project-formatting-style>false</project-formatting-style>
+            </formatting>
         </data>
     </configuration>
 </project>

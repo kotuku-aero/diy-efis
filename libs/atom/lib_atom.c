@@ -71,14 +71,14 @@ static void rx_callback(uart_config_t *uart, uint8_t *buffer, uint8_t length)
   
   canmsg_t msg;
   memset(&msg, 0, sizeof(canmsg_t));
-  msg.id = handle->msg_id;
+  set_can_id(&msg, handle->msg_id);
   while(length > 0)
     {
     uint16_t len = length;
     if(len > 4)
       len = 4;
 
-    msg.length = 4 + len;
+    set_can_len(&msg, 4 + len);
     msg.canas.data_type = datatypes[len-1];
     
     length -= len;

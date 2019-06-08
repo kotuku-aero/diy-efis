@@ -35,5 +35,11 @@
     <ClInclude Include="deque.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="krypton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="getopt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

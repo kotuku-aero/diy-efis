@@ -17,6 +17,22 @@
                 <make-dep-project>../../libs/neutron</make-dep-project>
                 <make-dep-project>../../libs/atom32</make-dep-project>
             </make-dep-projects>
+            <sourceRootList>
+                <sourceRootElem>.</sourceRootElem>
+            </sourceRootList>
+            <confList>
+                <confElem>
+                    <name>debug_pic32MZ2048EFH064</name>
+                    <type>2</type>
+                </confElem>
+                <confElem>
+                    <name>release_pic32MZ2048EFH064</name>
+                    <type>2</type>
+                </confElem>
+            </confList>
+            <formatting>
+                <project-formatting-style>false</project-formatting-style>
+            </formatting>
         </data>
     </configuration>
 </project>

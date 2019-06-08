@@ -27,7 +27,7 @@ static i2c_can_t *the_driver;
 
 const char *txrdy_int_s = "txrdy-gpio";
 const char *rxrdy_int_s = "rxrdy-gpio";
-const char *i2c_device_s = "device";
+extern const char *device_s;
 
 struct i2c_msg {
 __u16 addr;
@@ -257,7 +257,7 @@ result_t init_hardware(memid_t key)
 
     char device_name[REG_STRING_MAX];
 
-    if (failed(result = reg_get_string(key, i2c_device_s, device_name, 0)))
+    if (failed(result = reg_get_string(key, device_s, device_name, 0)))
       return result;
 
     reg_get_uint16(key, txrdy_int_s, &txrdy_irq);

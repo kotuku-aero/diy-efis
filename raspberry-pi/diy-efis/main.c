@@ -11,6 +11,16 @@
 
 const char *node_name = "diy-efis";
 
+/*
+ * This build uses the SLCAN as an interface.  THe i2c version of the pi interface
+ * works perfectly, the Raspberry-pi does not.  This was a big waste of time.  The device
+ * does not implement clock stretching so the i2c interface sits abandoned.
+ * fortunately the serial interface (USB) does work so the SLCAN is enabled.
+ * defaults to ttyUSB0 so easy to implement
+*/
+
+#define _SLCAN
+
 int main(int argc, char **argv)
   {
   result_t result = electron_init(argc, argv);
@@ -56,16 +66,24 @@ bool bsp_repaint_framebuffer()
 
 static handle_t driver;
 
-#ifdef _SLCAN
 #include "../../libs/neutron/slcan.h"
+#include "../../libs/electron/i2c.h"
 
+static bool i2c_can = false;
 
 result_t bsp_can_init(deque_p rx_queue, uint16_t bitrate)
   {
   result_t result;
+
+  if (failed(result = reg_get_bool(0, "12c_can", &i2c_can)))
+    i2c_can = false;
+
   memid_t key;
-  if(failed(result = reg_open_key(0, "slcan", &key)))
+  if (failed(result = reg_open_key(0, "electron", &key)))
     return result;
+
+  if (i2c_can)
+    return i2c_init(key, rx_queue, &driver);
 
   return slcan_create(key, rx_queue, &driver);
   }
@@ -75,27 +93,9 @@ result_t bsp_send_can(const canmsg_t *msg)
   if(msg == 0 || driver == 0)
     return e_bad_parameter;
 
+  if(i2c_can)
+    return i2c_send_can(driver, msg);
+
   return slcan_send(driver, msg);
   }
-#else
-#include "../../libs/electron/i2c.h"
-result_t bsp_can_init(deque_p rx_queue, uint16_t bitrate)
-  {
-  // the i2c channel is set in the electron key
-  result_t result;
-  memid_t key;
-  if (failed(result = reg_open_key(0, "electron", &key)))
-    return result;
-
-  return i2c_init(key, rx_queue, &driver);
-  }
-
-result_t bsp_send_can(const canmsg_t *msg)
-  {
-  if (msg == 0 || driver == 0)
-    return e_bad_parameter;
-
-  return i2c_send_can(driver, msg);
-  }
-#endif
 

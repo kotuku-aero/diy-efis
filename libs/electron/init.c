@@ -87,12 +87,14 @@ static const char *help =
 "  -f <path>      Set the framebuffer path to <path>\n"
 "  -x <x-pixels>  Set the screen width to x-pixels\n"
 "  -y <y-pixels>  Set the screen height to y-pixels\n"
-"  -d <device>    Open the i2c-devicet <device>\n"
+"  -d <device>    Open the comm-device <device>\n"
+"                 Device can be i2c:/dev/i2c-1 or slcan:/dev/ttyUSB0\n"
+"                 or which wver driver to use"
 "  -h             Print this help message\n"
-" Values for CM3:\n"
-" diy-efis -c 32768 -f /dev/fb1 -x 320 -y 240 -d /dev/i2c-1 diy-efis.reg\n"
 " Values for PI-TFT:\n"
-" diy-efis -c 32768 -f /dev/fb1 -x 480 -y 320 -d /dev/i2c-1 diy-efis.reg\n";
+" diy-efis -c 32768 -f /dev/fb1 -x 480 -y 320 -d i2c:/dev/i2c-1 diy-efis.reg\n"
+" Values for PI and slcan:\n"
+" diy-efis -c 32768 -f /dev/fb1 -x 800 -y 480 -d slcan:/dev/ttyUSB0 diy-efis.reg\n";
 
 static result_t print_error(const char *msg, result_t result)
   {
@@ -100,7 +102,7 @@ static result_t print_error(const char *msg, result_t result)
   return result;
   }
 
-extern const char *i2c_device_s;
+extern const char *device_s = "device";
 extern const char *screen_x_s;
 extern const char *screen_y_s;
 extern const char *framebuffer_device_s;
@@ -117,7 +119,7 @@ result_t electron_init(int argc, char **argv)
   const char *fb_path = "/dev/fb1";
   const char *width = "320";
   const char *height = "240";
-  const char *device = "/dev/i2c-1";
+  const char *device = "i2c:/dev/i2c-1";
 
   int opt;
   while ((opt = getopt(argc, argv, "hc:f:x:y:d:")) != -1)
@@ -206,9 +208,32 @@ result_t electron_init(int argc, char **argv)
     if(failed(result = reg_set_uint16(key, screen_y_s, value)))
       return print_error("Cannot set screen_y\n", result);
 
-    if (failed(result = reg_set_string(key, i2c_device_s, device)))
-      return print_error("Cannot set i2c device name\n", result);
+    // determine the driver name
+    const char *device_name = device;
 
+    if (strncmp(device_name, "i2c:", 4) == 0)
+      {
+      device_name += 4;
+
+      if (failed(result = reg_set_string(key, device_s, device_name)))
+        return print_error("Cannot set i2c device name\n", result);
+
+      if (failed(result = reg_set_bool(0, "12c_can", true)))
+        return print_error("Cannot select an 12c device", result);
+      }
+    else if (strncmp(device_name, "slcan:", 6) == 0)
+      {
+      device_name += 6;
+
+      if (failed(result = reg_set_string(key, device_s, device_name)))
+        return print_error("Cannot set i2c device name\n", result);
+
+      if (failed(result = reg_set_bool(0, "12c_can", false)))
+        return print_error("Cannot select an 12c device", result);
+
+      }
+    else
+      return print_error("Cannot determine the CAN driver port", e_bad_parameter);
     }
 
   return factory_reset ? s_false : s_ok;

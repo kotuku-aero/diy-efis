@@ -10,7 +10,7 @@ static semaphore_p capture_complete;
 static capture_channel_definition_t *channel_defn[NUM_CAPTURE_CHANNELS];
 static void init_channel(capture_channel_definition_t *channel_definition);
 static void init_hardware();
-static void update_channel(capture_channel_definition_t *channel, int value);
+static void update_channel(capture_channel_definition_t *channel, uint32_t value);
 
 void __attribute__( (interrupt(IPL0AUTO), vector(_INPUT_CAPTURE_1_VECTOR))) _ic1_interrupt( void );
 void ic1_interrupt(void)
@@ -84,68 +84,80 @@ void ic9_interrupt(void)
     update_channel(channel_defn[8], IC9BUF);
   }
 
-// called from the interrupt routine when the publish tick is made
-void __attribute__( (interrupt(IPL0AUTO), vector(_TIMER_2_VECTOR))) _t2_interrupt( void );
-void t2_interrupt(void)
-  {
-  int i;
-  IFS0bits.T2IF = 0;
-
-  for(i = 0; i < NUM_CAPTURE_CHANNELS; i++)
-    if(channel_defn[i] != 0)
-      channel_defn[i]->timer_value = 0;
-
-  // set the flag
-  signal_from_isr(capture_complete);
-  }
-
 static void init_channel(capture_channel_definition_t *channel_definition)
   {
   channel_defn[channel_definition->channel-1] = channel_definition;
   
-  switch(channel_definition->channel)
+  switch(channel_definition->channel & CHANNEL_MASK)
     {
     case 1 :
+      IC1CONbits.C32 = 1;
+      IC1CONbits.ICM = 3;
+      IC1CONbits.ON = 1;
       IFS0bits.IC1IF = 0;
       IEC0bits.IC1IE = 1;
       IPC1bits.IC1IP = 4;
       break;
     case 2 :
+      IC2CONbits.C32 = 1;
+      IC2CONbits.ICM = 3;
+      IC2CONbits.ON = 1;
       IFS0bits.IC2IF = 0;
       IEC0bits.IC2IE = 1;
       IPC2bits.IC2IP = 4;
       break;
     case 3 :
+      IC3CONbits.C32 = 1;
+      IC3CONbits.ICM = 3;
+      IC3CONbits.ON = 1;
       IFS0bits.IC3IF = 0;
       IEC0bits.IC3IE = 1;
       IPC4bits.IC3IP = 4;
       break;
     case 4 :
+      IC4CONbits.C32 = 1;
+      IC4CONbits.ICM = 3;
+      IC4CONbits.ON = 1;
       IFS0bits.IC4IF = 0;
       IEC0bits.IC4IE = 1;
       IPC5bits.IC4IP = 4;
       break;
     case 5 :
+      IC5CONbits.C32 = 1;
+      IC5CONbits.ICM = 3;
+      IC5CONbits.ON = 1;
       IFS0bits.IC5IF = 0;
       IEC0bits.IC5IE = 1;
       IPC6bits.IC5IP = 4;
       break;
     case 6 :
+      IC6CONbits.C32 = 1;
+      IC6CONbits.ICM = 3;
+      IC6CONbits.ON = 1;
       IFS0bits.IC6IF = 0;
       IEC0bits.IC6IE = 1;
       IPC7bits.IC6IP = 4;
       break;
     case 7 :
+      IC7CONbits.C32 = 1;
+      IC7CONbits.ICM = 3;
+      IC7CONbits.ON = 1;
       IFS1bits.IC7IF = 0;
       IEC1bits.IC7IE = 1;
       IPC8bits.IC7IP = 4;
       break;
     case 8 :
+      IC8CONbits.C32 = 1;
+      IC8CONbits.ICM = 3;
+      IC8CONbits.ON = 1;
       IFS1bits.IC8IF = 0;
       IEC1bits.IC8IE = 1;
       IPC9bits.IC8IP = 4;
       break;
     case 9 :
+      IC9CONbits.C32 = 1;
+      IC9CONbits.ICM = 3;
+      IC9CONbits.ON = 1;
       IFS1bits.IC9IF = 0;
       IEC1bits.IC9IE = 1;
       IPC10bits.IC9IP = 4;
@@ -153,69 +165,45 @@ static void init_channel(capture_channel_definition_t *channel_definition)
     }
   }
 
-static void init_hardware()
-  {
-  }
-
-static void update_channel(capture_channel_definition_t *channel, int value)
+static void update_channel(capture_channel_definition_t *channel, uint32_t value)
   {
   if (channel == 0)
     return;
 
-  // if the timer_value == 0 then the timer has overflowed so we can't
-  // use the value.  We need to resync the input capture
-  if (channel->timer_value > 0)
-    {
-    int period = value - channel->timer_value;
-    channel->result += period;
-    channel->capture_count++;
-    }
-
-  channel->timer_value = value;
-  }
-
-static void calculate_and_publish(capture_channel_definition_t *channel_definition)
+  if(channel->timer_value > value)
   {
-  // signal one more clock timeout
-  float result;
+    // wrapped around, ignore this sample
+    channel->timer_value = value;
+    return;
+    }
+  
+  uint32_t period = value - channel->timer_value;
+  channel->timer_value = value;
+
+  // take the average period
+    channel->result += period;
+  channel->result /= 2;
+    channel->capture_count++;
+
+
+  // TODO: handle accumulator
   // calculate the result first
-  if (channel_definition->capture_count == 0)
-    channel_definition->result = 0;
-  else if(channel_definition->capture_count >= channel_definition->publish_rate)
+  if(channel->capture_count >= channel->publish_rate)
     {
-    // take the average value
-    channel_definition->result /= channel_definition->capture_count;
-
-    // the result is a count of 20mhz / 256 intervals
-    channel_definition->result *= 0.0000128;
-
-    // convert to a frequency
-    channel_definition->result = 1 / channel_definition->result;
+    float result = channel->result;
+    result *= channel->scale;
+    result += channel->offset;
+    
+    if(result != 0)
+      // convert to frequency
+      result = 1 / result;
 
     // if we have a result processor then we just pass the filtered value to it to be processed.
     // publish the result to the publisher.
-    publish_float(channel_definition->can_id, channel_definition->result);
+    publish_float(channel->can_id, result);
 
     // reset counter so that we calculate the next period
-    channel_definition->result = -1;
-    channel_definition->capture_count = 0;
-    }
-  else
-    channel_definition->capture_count++;
-  }
-
-// called back from the microkernel when a conversion is complete
-
-static void capture_callback_proc(void *parg)
-  {
-  int i;
-  while (true)
-    {
-    semaphore_wait(capture_complete, INDEFINITE_WAIT);
-
-    for(i = 0; i < NUM_CAPTURE_CHANNELS; i++)
-      if(channel_defn[i] != 0)
-        calculate_and_publish(channel_defn[i]);
+    channel->capture_count = 0;
     }
   }
 
@@ -237,10 +225,14 @@ result_t capture_init(capture_channels_t *init_channels, uint16_t stack_length)
     init_channel(channel_definition);
     }
 
-  init_hardware();
-
-  // schedule 2 tasks.
-  return task_create("CAPTURE", stack_length, capture_callback_proc, 0, NORMAL_PRIORITY, 0);
+  // the timer 2/3 is used for the input capture.  It runs on PBCLK3 which is
+  // a 10mhz clock.
+  // the 10mhz clock is / 16 so the clock is 625khz or 1.6ns/count.
+  //
+  // this yields counts of up to 6871 sec/interval
+  T2CONbits.T32 = 1;    // 32 bit timer.
+  T2CONbits.TCKPS = 4;  // prescaller of 16
+  T2CONbits.TON = 1;    // start the timer.
   }
 
 static const char *scale_name = "scale";

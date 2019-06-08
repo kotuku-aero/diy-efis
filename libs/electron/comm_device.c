@@ -66,6 +66,8 @@ static result_t check_handle(handle_t hndl)
   return s_ok;
   }
 
+extern const char *device_s;
+
 result_t comm_create_device(memid_t key, comm_device_p *device)
   {
   if(device == 0 || key == 0)
@@ -80,13 +82,12 @@ result_t comm_create_device(memid_t key, comm_device_p *device)
   char driver[REG_STRING_MAX+1];
   uint16_t len = REG_STRING_MAX +1;
 
-  if(failed(result = reg_get_string(key, "device", driver, &len)))
+  if(failed(result = reg_get_string(key, device_s, driver, &len)))
     return result;
 
-  // MUST be defined.
-  uint32_t baud_rate;
+  uint32_t baud_rate = 57600;
   if(failed(result = reg_get_uint32(key, "baud-rate", &baud_rate)))
-    return result;
+    baud_rate = 57600;
 
   memset(dev, 0, sizeof(comm_device_t));
   dev->version = sizeof(comm_device_t);

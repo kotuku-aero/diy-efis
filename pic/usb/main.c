@@ -227,7 +227,7 @@ static bool transmit_can(uint8_t cmd, handle_t stream)
   memset(&canmsg, 0, sizeof(canmsg_t));
 
   if(((cmd == 'r') || (cmd == 'R')))
-    canmsg.reply = 1;
+    set_can_reply(&canmsg, 1);
   
   // read till eof
   char line[32];
@@ -240,21 +240,21 @@ static bool transmit_can(uint8_t cmd, handle_t stream)
 
   if (!parse_hex(str, idlen, &temp))
     return 0;
-  canmsg.id = temp;
+  set_can_id(&canmsg, temp);
   
   str += idlen;
 
   if (!parse_hex(str, 1, &temp))
     return 0;
   
-  canmsg.length = temp;
+  set_can_len(&canmsg, temp);
   
   str++;
 
-  if (!canmsg.reply)
+  if (!get_can_reply(&canmsg))
     {
     uint8_t i;
-    uint8_t length = canmsg.length;
+    uint8_t length = get_can_len(&canmsg);
     if (length > 8)
       length = 8;
     
@@ -499,12 +499,12 @@ static void open_terminal(uint8_t cmd, handle_t stream)
   
   canmsg_t msg;
   msg.flags = 0;
-  msg.id = node_service_channel_100;
+  set_can_id(&msg, node_service_channel_100);
   msg.canas.data_type = CANAS_DATATYPE_NODATA;
   msg.canas.node_id = terminal_node_id;         // node we are calling
   msg.canas.service_code = id_ccs_service;
   msg.canas.message_code = ++message_code;
-  msg.length = 4;
+  set_can_len(&msg, 4);
   
   can_send_raw(&msg); 
   }
@@ -513,46 +513,46 @@ static void send_terminal(handle_t stream)
   {
   canmsg_t msg;
   msg.flags = 0;
-  msg.id = node_service_channel_100;
+  set_can_id(&msg, node_service_channel_100);
   msg.canas.data_type = CANAS_DATATYPE_NODATA;
   msg.canas.node_id = terminal_node_id;         // node we are calling
   msg.canas.service_code = id_ccs_service;
   msg.canas.message_code = ++message_code;
-  msg.length = 4;
+  set_can_len(&msg, 4);
   
   char c;
   // read till eof
   while(succeeded(stream_getc(stream, &c)))
     {
-    switch(msg.length)
+    switch(get_can_len(&msg))
       {
       case 4 :
         msg.canas.data_type = CANAS_DATATYPE_CHAR;
         msg.canas.data[0] = (uint8_t) c;
-        msg.length++;
+        set_can_len(&msg, get_can_len(&msg)+1);
         break;
       case 5 :
         msg.canas.data_type = CANAS_DATATYPE_CHAR2;
         msg.canas.data[1] = (uint8_t) c;
-        msg.length++;
+        set_can_len(&msg, get_can_len(&msg)+1);
         break;
       case 6 :
         msg.canas.data_type = CANAS_DATATYPE_CHAR3;
         msg.canas.data[2] = (uint8_t) c;
-        msg.length++;
+        set_can_len(&msg, get_can_len(&msg)+1);
         break;
       case 7 :
         msg.canas.data_type = CANAS_DATATYPE_CHAR4;
         msg.canas.data[3] = (uint8_t) c;
-        msg.length++;
+        set_can_len(&msg, get_can_len(&msg)+1);
         
         can_send(&msg);
-        msg.length = 4;       // reset buffer.
+        set_can_len(&msg, 4);       // reset buffer.
         break;
       }
     }
   
-  if(msg.length > 4)
+  if(get_can_len(&msg) > 4)
     can_send_raw(&msg);
   }
 
@@ -562,7 +562,7 @@ static bool process_terminal(const canmsg_t *msg, void *parg)
   {
   // we only respond to reply messages from the remote end.
   if(msg->canas.service_code != id_ccs_service ||
-     msg->id != node_service_channel_100 +1 ||
+     get_can_id(msg) != node_service_channel_100 +1 ||
      msg->canas.node_id != terminal_node_id)
     return false;
   
@@ -621,15 +621,15 @@ static bool process_can(const canmsg_t *msg, void *parg)
     char *ch = can_buf;
 
     // runt packets are ignored
-    if(msg->length == 0)
+    if(get_can_len(msg) == 0)
       return true;
 
     *ch++ = 't';
-    ch = write_nibble(ch, msg->id >> 8); // upper 3 bits
-    ch = write_hex(ch, msg->id); // lower 8 bits
-    ch = write_nibble(ch, msg->length); // length
+    ch = write_nibble(ch, get_can_id(msg) >> 8); // upper 3 bits
+    ch = write_hex(ch, get_can_id(msg)); // lower 8 bits
+    ch = write_nibble(ch, get_can_len(msg)); // length
 
-    for (i = 0; i < msg->length; i++)
+    for (i = 0; i < get_can_len(msg); i++)
       ch = write_hex(ch, msg->raw[i]);
 
     *ch++ =  CR;
@@ -833,6 +833,108 @@ static void tx_queue_task(void *parg)
     }
   }
 
+
+/* This version of the USB adapter (1.1) supports an encoder so the USB
+ * can be used for a front panel.
+ */
+static void test_key(uint16_t *prev_state, uint16_t port_bits, uint16_t mask, uint16_t id)
+  {
+  uint16_t old_state = *prev_state & mask;
+  uint16_t masked_bits = port_bits & mask;
+
+  if(old_state != masked_bits)       // test for change
+    {
+    *prev_state &= ~mask;            // kill bit
+    *prev_state |= masked_bits;      // new key
+    
+    canmsg_t msg;
+
+    // if the key is pressed portb will be 0, so send a 1
+    push_back(tx_msg_queue,
+              create_can_msg_int16(&msg, id, 0, masked_bits == 0 ? 1 : 0),
+              INDEFINITE_WAIT);
+    }
+  }
+
+static const int16_t transitions[16] = 
+  {
+   0, -1,  1,  0, 
+   1,  0,  0, -1,
+  -1,  0,  0,  1,
+   0,  1, -1,  0
+  };
+
+static void test_encoder(uint16_t *prev_state, uint16_t port_bits, uint16_t a_mask, uint16_t b_mask, uint16_t id)
+  {
+  // encoder is as follows
+  //    A       B
+  //    0       0
+  //    1       0
+  //    1       1
+  //    0       1
+  uint16_t old_state = *prev_state & (a_mask | b_mask);
+  uint16_t masked_bits = port_bits & (a_mask | b_mask);
+  
+  if(old_state != masked_bits)
+    {
+    uint16_t state = 0;
+    
+    if(old_state & a_mask)
+      state |= 8;
+    if(old_state & b_mask)
+      state |= 4;
+    
+    if(masked_bits & a_mask)
+      state |= 2;
+    if(masked_bits & b_mask)
+      state |= 1;
+    
+    *prev_state &= ~(a_mask | b_mask);
+    *prev_state |= masked_bits;
+    
+    if(transitions[state] != 0)
+      {
+      // queue up the message, simulating a message from the canbus
+      canmsg_t msg;
+      process_can(create_can_msg_int16(&msg, id, 0, transitions[state]), 0);
+      }
+    }
+  }
+
+static void keys_worker(void *parg)
+  {
+  uint16_t key0_id;
+  uint16_t decka_id;
+  uint16_t deckb_id;
+  
+  uint16_t key0_state = 0;
+  uint16_t decka_state = 0;
+  uint16_t deckb_state = 0;
+  
+  semaphore_p worker_semp;
+  
+  semaphore_create(&worker_semp);
+  
+  if(failed(reg_get_uint16(0, "key0-id", &key0_id)))
+    key0_id = id_key0;
+  
+  if(failed(reg_get_uint16(0, "decka-id", &decka_id)))
+    decka_id = id_decka;
+  
+  if(failed(reg_get_uint16(0, "deckb-id", &deckb_id)))
+    deckb_id = id_deckb;
+  
+  while(true)
+    {
+    // the worker tests the keys every 100msec
+    semaphore_wait(worker_semp, 100);
+    
+    test_key(&key0_state, PORTB, 1 << 14, key0_id);
+    test_encoder(&decka_state, PORTA, 1 << 0, 1 << 1, decka_id);
+    test_encoder(&deckb_state, PORTB, 1 << 0, 1 << 1, deckb_id);
+    }  
+  }
+
 static const char *rx_queue_length_str = "rxq_len";
 static const char *tx_queue_length_str  = "txq_len";
 
@@ -850,7 +952,8 @@ static void main_task(void *parg)
   
   result = eeprom_init(init_eeprom, I2C_CHANNEL_2, EEPROM_SIZE);
 
-  if(result == e_not_initialized)
+  bool init_mode = result == e_not_initialized;
+  if(init_mode)
     {
     init_eeprom = true;
     reg_set_uint16(0, rx_queue_length_str, rx_queue_length);
@@ -858,7 +961,7 @@ static void main_task(void *parg)
     }
 
   // start the canbus stuff working
-  can_aerospace_init(&init_params, true, false);
+  can_aerospace_init(&init_params, init_mode, true);
   
   // set up the queues
   deque_create(sizeof(uint8_t), tx_queue_length, &ft201_tx_queue);
@@ -882,6 +985,9 @@ static void main_task(void *parg)
   
   task_create("TXTQUE", DEFAULT_STACK_SIZE, tx_queue_task, 0, NORMAL_PRIORITY, 0);
 
+  // create the worker process for the rotary encoder
+  task_create("KEYS", DEFAULT_STACK_SIZE, keys_worker, 0, NORMAL_PRIORITY, 0);
+  
   // general can msg receiver
   subscribe(&hook);
   
@@ -902,11 +1008,11 @@ static void main_task(void *parg)
       {
         canmsg_t msg;
         msg.flags = 0;
-        msg.id = node_service_channel_100;
+        set_can_id(&msg, node_service_channel_100);
         msg.canas.data_type = CANAS_DATATYPE_NODATA;
         msg.canas.node_id = terminal_node_id;         // node we are calling
         msg.canas.service_code = id_ccs_service;
-        msg.length = 4;
+        set_can_len(&msg, 4);
         
       if(ticks() > (terminal_ticks +  terminal_timeout))
         {

@@ -55,12 +55,8 @@ void *neutron_malloc(size_t wanted_size)
 
         /* Ensure that blocks are always aligned to the required number
         of bytes. */
-        if ((wanted_size & 1) != 0x00)
-          {
           /* Byte alignment required. */
-          wanted_size += (2 - (wanted_size & 1));
-          //configASSERT( ( xWantedSize & 1 ) == 0 );
-          }
+        wanted_size = ((wanted_size -1) | 0x07)+1;
         }
 
       if ((wanted_size > 0) && (wanted_size <= free_bytes_remaining))

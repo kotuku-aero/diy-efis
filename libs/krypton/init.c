@@ -1,7 +1,9 @@
-#include "../../libs/electron/electron.h"
+#include "krypton.h"
 
 #include <Windows.h>
 #include <malloc.h>
+#include <stdio.h>
+#include "getopt.h"
 
 static HANDLE reg_fd;
 static HANDLE reg_mm;
@@ -79,16 +81,68 @@ static neutron_parameters_t init_params = {
   .node_id = mfd_node_id_last
   };
 
+static const char *help =
+"diy-efis ALPHA_1\n"
+"diy-efis <Options> registry_path\n"
+"Options only required if creating a new registry:\n"
+"  -c <size>      Create a new registry with <size> blocks, old path will be deleted\n"
+"  -f <path>      Set the framebuffer path to <path>\n"
+"  -x <x-pixels>  Set the screen width to x-pixels\n"
+"  -y <y-pixels>  Set the screen height to y-pixels\n"
+"  -d <device>    Open the i2c-devicet <device>\n"
+"  -h             Print this help message\n"
+" Values for CM3:\n"
+" diy-efis -c 32768 -f /dev/fb1 -x 320 -y 240 -d /dev/i2c-1 diy-efis.reg\n"
+" Values for PI-TFT:\n"
+" diy-efis -c 32768 -f /dev/fb1 -x 480 -y 320 -d /dev/i2c-1 diy-efis.reg\n";
 
-result_t krypton_init(const char *reg_path, bool factory_reset)
+static result_t print_error(const char *msg, result_t result)
+  {
+  fprintf(stderr, "%s %d\n", msg, result);
+  return result;
+  }
+
+extern const char *i2c_device_s;
+extern const char *screen_x_s;
+extern const char *screen_y_s;
+
+result_t krypton_init(int argc, char **argv)
   {
   result_t result;
   semaphore_create(&mutex);
   semaphore_signal(mutex);
 
   uint32_t reg_size = 4096 * 32;
+  bool factory_reset = false;
+  const char *fb_size = "32768";
+  const char *width = "320";
+  const char *height = "240";
+
+  int opt;
+  while ((opt = getopt(argc, argv, "hc:f:x:y:d:")) != -1)
+    {
+    switch (opt)
+      {
+      case 'h':
+        puts(help);
+        return s_false;
+      case 'c':
+        factory_reset = true;
+        fb_size = optarg;
+        break;
+      case 'x':
+        width = optarg;
+        break;
+      case 'y':
+        height = optarg;
+        break;
+      default:
+        return print_error(help, s_false);
+      }
+    }
+
   // open the registry
-  create_or_open_mmap(reg_path, reg_size, &reg_fd, &reg_mm, &reg_buffer);
+  create_or_open_mmap(argv[optind], reg_size, &reg_fd, &reg_mm, &reg_buffer);
 
   reg_size >>= 5;         // make number of blocks
 
@@ -121,7 +175,7 @@ result_t krypton_init(const char *reg_path, bool factory_reset)
     }
 
 
-  return s_ok;
+  return factory_reset ? s_false : s_ok;
   }
 
 #define BLOCK_SHIFT 5
