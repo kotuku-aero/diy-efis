@@ -5,6 +5,8 @@ Experimental Aircraft Avionics based on CAN Aerospace
 
 This repository is the public code and design store for the Kotuku Aerospace http://www.kotuku.aero contributed avionics project.
 
+The Oshkosh 2019 presentation is available [Here](/presentations/OshKosh2019.pdf)
+
 The goal of DIY-EFIS is to provide a reference implementation of an open-source avionics stack based on [Can-Aerospace](http://www.stockflightsystems.com/canaerospace.html)
 
 The key display technology is based on a [Raspberry-PI](https://www.raspberrypi.org/) and a 3D printed case and a power supply with a PIC processor implementing the CanFly protocol
