@@ -28,13 +28,13 @@
         <targetDevice>dsPIC33EP256GP502</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
-        <platformTool>ICD3PlatformTool</platformTool>
+        <platformTool>noID</platformTool>
         <languageToolchain>XC16</languageToolchain>
-        <languageToolchainVersion>1.36</languageToolchainVersion>
-        <platform>3</platform>
+        <languageToolchainVersion>1.60</languageToolchainVersion>
+        <platform>2</platform>
       </toolsSet>
       <packs>
-        <pack name="dsPIC33E-GM-GP-MC-GU-MU_DFP" vendor="Microchip" version="1.0.19"/>
+        <pack name="dsPIC33E-GM-GP-MC-GU-MU_DFP" vendor="Microchip" version="1.2.58"/>
       </packs>
       <compileType>
         <linkerTool>
@@ -42,35 +42,35 @@
             <linkerLibProjectItem>
               <makeArtifact PL="../../libs/neutron"
                             CT="3"
-                            CN="debug_pic33EP256GP502"
-                            AC="false"
+                            CN="debug_dsPIC33EP256GP502"
+                            AC="true"
                             BL="true"
                             WD="../../libs/neutron"
-                            BC="${MAKE}  -f Makefile CONF=debug_pic33EP256GP502"
-                            DBC="${MAKE}  -f Makefile CONF=debug_pic33EP256GP502 TYPE_IMAGE=DEBUG_RUN"
-                            CC="rm -rf &quot;build/debug_pic33EP256GP502&quot; &quot;dist/debug_pic33EP256GP502&quot;"
-                            OP="dist/debug_pic33EP256GP502/production/neutron.a"
-                            DOP="dist/debug_pic33EP256GP502/debug/neutron.a"
-                            FL="dist/debug_pic33EP256GP502/production/neutron.a"
-                            PD="dist/debug_pic33EP256GP502/production/neutron.a"
-                            DD="dist/debug_pic33EP256GP502/debug/neutron.a">
+                            BC="${MAKE}  -f Makefile CONF=debug_dsPIC33EP256GP502"
+                            DBC="${MAKE}  -f Makefile CONF=debug_dsPIC33EP256GP502 TYPE_IMAGE=DEBUG_RUN"
+                            CC="rm -rf &quot;build/debug_dsPIC33EP256GP502&quot; &quot;dist/debug_dsPIC33EP256GP502&quot;"
+                            OP="dist/debug_dsPIC33EP256GP502/production/neutron.a"
+                            DOP="dist/debug_dsPIC33EP256GP502/debug/neutron.a"
+                            FL="dist/debug_dsPIC33EP256GP502/production/neutron.a"
+                            PD="dist/debug_dsPIC33EP256GP502/production/neutron.a"
+                            DD="dist/debug_dsPIC33EP256GP502/debug/neutron.a">
               </makeArtifact>
             </linkerLibProjectItem>
             <linkerLibProjectItem>
               <makeArtifact PL="../../libs/atom"
                             CT="3"
-                            CN="debug_pic33EP256GP502"
-                            AC="false"
+                            CN="debug_dsPIC33EP256GP502"
+                            AC="true"
                             BL="true"
                             WD="../../libs/atom"
-                            BC="${MAKE}  -f Makefile CONF=debug_pic33EP256GP502"
-                            DBC="${MAKE}  -f Makefile CONF=debug_pic33EP256GP502 TYPE_IMAGE=DEBUG_RUN"
-                            CC="rm -rf &quot;build/debug_pic33EP256GP502&quot; &quot;dist/debug_pic33EP256GP502&quot;"
-                            OP="dist/debug_pic33EP256GP502/production/atom.a"
-                            DOP="dist/debug_pic33EP256GP502/debug/atom.a"
-                            FL="dist/debug_pic33EP256GP502/production/atom.a"
-                            PD="dist/debug_pic33EP256GP502/production/atom.a"
-                            DD="dist/debug_pic33EP256GP502/debug/atom.a">
+                            BC="${MAKE}  -f Makefile CONF=debug_dsPIC33EP256GP502"
+                            DBC="${MAKE}  -f Makefile CONF=debug_dsPIC33EP256GP502 TYPE_IMAGE=DEBUG_RUN"
+                            CC="rm -rf &quot;build/debug_dsPIC33EP256GP502&quot; &quot;dist/debug_dsPIC33EP256GP502&quot;"
+                            OP="dist/debug_dsPIC33EP256GP502/production/atom.a"
+                            DOP="dist/debug_dsPIC33EP256GP502/debug/atom.a"
+                            FL="dist/debug_dsPIC33EP256GP502/production/atom.a"
+                            PD="dist/debug_dsPIC33EP256GP502/production/atom.a"
+                            DD="dist/debug_dsPIC33EP256GP502/debug/atom.a">
               </makeArtifact>
             </linkerLibProjectItem>
             <linkerLibProjectItem>
@@ -146,7 +146,8 @@
         <property key="optimization-level" value="0"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
-        <property key="preprocessor-macros" value="_DEBUG;FCY=20000000;I_OSC=10000000"/>
+        <property key="preprocessor-macros"
+                  value="_DEBUG;FCY=20000000;I_OSC=10000000;__dsPIC33"/>
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
         <property key="use-iar" value="false"/>
@@ -154,6 +155,28 @@
       <C30-AR>
         <property key="additional-options-chop-files" value="false"/>
       </C30-AR>
+      <C30-AS>
+        <property key="assembler-symbols" value=""/>
+        <property key="expand-macros" value="false"/>
+        <property key="extra-include-directories-for-assembler" value=""/>
+        <property key="extra-include-directories-for-preprocessor" value=""/>
+        <property key="false-conditionals" value="false"/>
+        <property key="keep-locals" value="false"/>
+        <property key="list-assembly" value="false"/>
+        <property key="list-section-info" value="false"/>
+        <property key="list-source" value="false"/>
+        <property key="list-symbols" value="false"/>
+        <property key="oXC16asm-extra-opts" value=""/>
+        <property key="oXC16asm-list-to-file" value="false"/>
+        <property key="omit-debug-dirs" value="false"/>
+        <property key="omit-forms" value="false"/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="relax" value="false"/>
+        <property key="warning-level" value="emit-warnings"/>
+      </C30-AS>
+      <C30-CO>
+        <property key="coverage-enable" value=""/>
+      </C30-CO>
       <C30-LD>
         <property key="additional-options-use-response-files" value="false"/>
         <property key="boot-eeprom" value="no_eeprom"/>
@@ -208,6 +231,7 @@
         <property key="legacy-libc" value="true"/>
         <property key="mpreserve-all" value="false"/>
         <property key="oXC16glb-macros" value=""/>
+        <property key="omit-pack-options" value="1"/>
         <property key="output-file-format" value="elf"/>
         <property key="preserve-all" value="false"/>
         <property key="preserve-file" value=""/>
@@ -286,11 +310,11 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>ICD3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
-        <languageToolchainVersion>1.36</languageToolchainVersion>
-        <platform>3</platform>
+        <languageToolchainVersion>1.60</languageToolchainVersion>
+        <platform>2</platform>
       </toolsSet>
       <packs>
-        <pack name="dsPIC33E-GM-GP-MC-GU-MU_DFP" vendor="Microchip" version="1.0.19"/>
+        <pack name="dsPIC33E-GM-GP-MC-GU-MU_DFP" vendor="Microchip" version="1.2.58"/>
       </packs>
       <compileType>
         <linkerTool>
@@ -410,6 +434,28 @@
       <C30-AR>
         <property key="additional-options-chop-files" value="false"/>
       </C30-AR>
+      <C30-AS>
+        <property key="assembler-symbols" value=""/>
+        <property key="expand-macros" value="false"/>
+        <property key="extra-include-directories-for-assembler" value=""/>
+        <property key="extra-include-directories-for-preprocessor" value=""/>
+        <property key="false-conditionals" value="false"/>
+        <property key="keep-locals" value="false"/>
+        <property key="list-assembly" value="false"/>
+        <property key="list-section-info" value="false"/>
+        <property key="list-source" value="false"/>
+        <property key="list-symbols" value="false"/>
+        <property key="oXC16asm-extra-opts" value=""/>
+        <property key="oXC16asm-list-to-file" value="false"/>
+        <property key="omit-debug-dirs" value="false"/>
+        <property key="omit-forms" value="false"/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="relax" value="false"/>
+        <property key="warning-level" value="emit-warnings"/>
+      </C30-AS>
+      <C30-CO>
+        <property key="coverage-enable" value=""/>
+      </C30-CO>
       <C30-LD>
         <property key="additional-options-use-response-files" value="false"/>
         <property key="boot-eeprom" value="no_eeprom"/>
@@ -464,6 +510,7 @@
         <property key="legacy-libc" value="true"/>
         <property key="mpreserve-all" value="false"/>
         <property key="oXC16glb-macros" value=""/>
+        <property key="omit-pack-options" value="1"/>
         <property key="output-file-format" value="elf"/>
         <property key="preserve-all" value="false"/>
         <property key="preserve-file" value=""/>

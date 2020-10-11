@@ -36,7 +36,9 @@ it must be removed as soon as possible after the code fragment is identified.
 #ifndef __ion_h__
 #define __ion_h__
 
+#ifndef (__dsPIC33)
 #include "duktape.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {

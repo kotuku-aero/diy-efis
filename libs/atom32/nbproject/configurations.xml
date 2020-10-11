@@ -4,7 +4,6 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>s1d13l02.h</itemPath>
       <itemPath>task_state.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
