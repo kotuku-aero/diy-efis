@@ -14,6 +14,7 @@
             <make-dep-projects/>
             <sourceRootList>
                 <sourceRootElem>.</sourceRootElem>
+                <sourceRootElem>../proton</sourceRootElem>
             </sourceRootList>
             <confList>
                 <confElem>
@@ -22,6 +23,14 @@
                 </confElem>
                 <confElem>
                     <name>release_pic32MZ2048EFH144</name>
+                    <type>3</type>
+                </confElem>
+                <confElem>
+                    <name>debug_pic32MZ2064DAH176</name>
+                    <type>3</type>
+                </confElem>
+                <confElem>
+                    <name>release_pic32MZ2064DAH176</name>
                     <type>3</type>
                 </confElem>
             </confList>

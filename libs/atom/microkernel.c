@@ -284,7 +284,7 @@ void timer_interrupt()
   
   while(hook != 0)
     {
-    (*hook->callback)(timer_tick);
+    (*hook->callback)(hook, timer_tick);
     hook = hook->prev;
     }
   }

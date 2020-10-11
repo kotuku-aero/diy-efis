@@ -17,30 +17,6 @@
             </sourceRootList>
             <confList>
                 <confElem>
-                    <name>debug_dsPIC33EP512GP504</name>
-                    <type>3</type>
-                </confElem>
-                <confElem>
-                    <name>release_dsPIC33EP512GP504</name>
-                    <type>3</type>
-                </confElem>
-                <confElem>
-                    <name>debug_dsPIC33EP512GP506</name>
-                    <type>3</type>
-                </confElem>
-                <confElem>
-                    <name>release_dsPIC33EP512GP506</name>
-                    <type>3</type>
-                </confElem>
-                <confElem>
-                    <name>debug_dsPIC33EP256GP502</name>
-                    <type>3</type>
-                </confElem>
-                <confElem>
-                    <name>release_dsPIC33EP256GP502</name>
-                    <type>3</type>
-                </confElem>
-                <confElem>
                     <name>debug_pic32MZ2048EFH144</name>
                     <type>3</type>
                 </confElem>
@@ -54,6 +30,14 @@
                 </confElem>
                 <confElem>
                     <name>release_pic32MZ2048EFH064</name>
+                    <type>3</type>
+                </confElem>
+                <confElem>
+                    <name>debug_pic32MZ2064DAG176</name>
+                    <type>3</type>
+                </confElem>
+                <confElem>
+                    <name>release_pic32MZ2064DAG176</name>
                     <type>3</type>
                 </confElem>
             </confList>

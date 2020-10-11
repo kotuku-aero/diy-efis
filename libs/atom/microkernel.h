@@ -126,7 +126,9 @@ extern void unblock_tcb(volatile tcb_t *task);
 // the hook function is called WITHIN an interrupt so only
 // IRQ safe operations can occur.  ALso enter_critical and exit_critical cannot
 // be used.
-typedef void (*timer_fn)(uint32_t tcnt);
+struct _timer_hook_t;
+
+typedef void (*timer_fn)(struct _timer_hook_t *, uint32_t tcnt);
 
 typedef struct _timer_hook_t {
   struct _timer_hook_t *next;

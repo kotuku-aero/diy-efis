@@ -33,6 +33,7 @@ then the origional copyright notice is to be respected.
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
+#if !defined(__dsPIC33)
 #include "../../libs/ion/ion.h"
 #include "uart_device.h"
 
@@ -199,3 +200,4 @@ result_t register_atom_functions(duk_context *ctx, handle_t co)
   
   return s_ok;
   }
+#endif

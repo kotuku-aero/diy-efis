@@ -12,7 +12,7 @@
 
 #if defined(__dsPIC33EP512GP504__) | defined(__dsPIC33EP512GP506__) | defined(__dsPIC33EP256GP502__)
 #define NUM_SERIAL_CHANNELS 2
-#elif defined(__32MZ2048EFH144__) | defined(__32MZ2048EFH064__)
+#elif defined(__32MZ2048EFH144__) | defined(__32MZ2048EFH064__) | defined(__32MZ2064DAH176)
 #define NUM_SERIAL_CHANNELS 6
 #endif
 

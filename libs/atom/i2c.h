@@ -91,12 +91,12 @@ extern void init_defaults(i2c_task_t *task);
  */
 extern bool enqueue_i2c_task(int channel, const i2c_task_t *task);
 
-#if defined(__dsPIC33EP512GP504__) | defined(__dsPIC33EP512GP506__) | defined(__dsPIC33EP256GP502__)
+#if defined(__dsPIC33)
 
 #define NUM_I2C_CHANNELS 2
 #define I2C_CHANNEL_1 0
 #define I2C_CHANNEL_2 1
-#elif defined(__32MZ2048EFH144__)
+#elif defined(__32MZ2048EFH144__) | defined(__32MZ2064DAH176)
 #define NUM_I2C_CHANNELS 5
 #define I2C_CHANNEL_1 0
 #define I2C_CHANNEL_2 1

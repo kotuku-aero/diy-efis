@@ -351,8 +351,10 @@ result_t analog_init(analog_channels_t *init_channels, uint16_t stack_length, bo
   //IPC11bits.ADCIS = 0;
   //IEC1bits.ADCIE = 1;
   IFS6bits.ADCEOSIF = 0;
+#ifndef __32MZ2064DAH176
   IPC48bits.ADCEOSIP = 6;
   IPC48bits.ADCEOSIS = 0;
+#endif
   IEC6bits.ADCEOSIE = 1;
 
   

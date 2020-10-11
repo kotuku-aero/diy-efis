@@ -171,7 +171,7 @@ static void update_channel(capture_channel_definition_t *channel, uint32_t value
     return;
 
   if(channel->timer_value > value)
-  {
+    {
     // wrapped around, ignore this sample
     channel->timer_value = value;
     return;
@@ -179,11 +179,11 @@ static void update_channel(capture_channel_definition_t *channel, uint32_t value
   
   uint32_t period = value - channel->timer_value;
   channel->timer_value = value;
-
+  
   // take the average period
-    channel->result += period;
+  channel->result += period;
   channel->result /= 2;
-    channel->capture_count++;
+  channel->capture_count++;
 
 
   // TODO: handle accumulator
@@ -224,7 +224,7 @@ result_t capture_init(capture_channels_t *init_channels, uint16_t stack_length)
     channel_definition = &(channels->channel_definition[channel]);
     init_channel(channel_definition);
     }
-
+  
   // the timer 2/3 is used for the input capture.  It runs on PBCLK3 which is
   // a 10mhz clock.
   // the 10mhz clock is / 16 so the clock is 625khz or 1.6ns/count.

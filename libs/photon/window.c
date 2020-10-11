@@ -491,7 +491,7 @@ result_t on_paint(handle_t hwnd, struct _event_proxy_t *proxy, const canmsg_t *m
   // we assume the widget has painted its canvas, we work over our children
   // in z-order
   uint16_t painting_order = 0;
-  uint16_t next_z_order = 256;
+  uint16_t next_z_order = 0;
   uint16_t max_order = 0;
   handle_t child;
 
@@ -513,7 +513,7 @@ result_t on_paint(handle_t hwnd, struct _event_proxy_t *proxy, const canmsg_t *m
       if (z_order > painting_order)
         {
         // get the next highest order after our own
-        if (next_z_order > z_order)
+        if (z_order < next_z_order || next_z_order == painting_order)
           next_z_order = z_order;
 
         // figure out what the last one to do is.

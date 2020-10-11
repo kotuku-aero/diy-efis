@@ -159,7 +159,7 @@ extern result_t bsp_canvas_open_framebuffer(canvas_t **canvas);
  */
 extern result_t bsp_canvas_create_rect(const extent_t *size, canvas_t **canvas);
 /**
- * Create a canvas given the extents given as achild window canbas
+ * Create a canvas given the extents given as a child window canvas
  * @param parent_canvas The canvas that is the parent of the child
  * @param rect  Size and position of canvas to create
  * @param hndl  handle to new canvas

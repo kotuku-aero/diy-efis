@@ -166,7 +166,9 @@ volatile tcb_t *create_tcb(size_t len, task_callback callback, void *parg)
   task->state.regs[5] = (stack_type_t)stack;      // R05 = sp
   task->state.regs[4] = (stack_type_t) parg;  // R05 = a0
   
-  task->state.fp_status = 0x010C0000;             // initial status
+#ifdef __PIC32_HAS_FPU64
+  task->state.fp_status = 0x010C0000;             // initial status 
+#endif
   
   task->state.epc = (uint32_t) callback;
   task->state.status = 0x25000003;  // EXL and IE are both set, MZ, FR and CU1
