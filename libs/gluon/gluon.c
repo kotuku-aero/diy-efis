@@ -188,7 +188,7 @@ result_t gluon_mktime(uint32_t time, gluon_tm_t *tm)
   return e_not_implemented;
   }
 
-result_t gluon_select(const char *series, uint32_t from, uint32_t to, vector_p columns, vector_p *results)
+result_t gluon_select(const char *series, uint32_t *from, uint32_t *to, vector_p columns, vector_p *results)
   {
   return e_not_implemented;
   }

@@ -211,7 +211,7 @@ result_t task_resume(task_p hndl)
   return s_ok;
   }
 
-static void timer_cb(uint32_t timer_tick)
+static void timer_cb(struct _timer_hook_t *hook, uint32_t timer_tick)
   {
   volatile tcb_t *task = task_list;
   // look for any tasks that are waiting on an event that can time-out

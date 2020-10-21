@@ -47,9 +47,11 @@ it must be removed as soon as possible after the code fragment is identified.
 #include <sys/types.h>
 #include <fcntl.h>
 #ifdef __linux__
+#include "../../libs/electron/electron.h"
 #include <termios.h>
 #include <sys/stat.h>
 #else
+extern result_t krypton_init(const char *reg_path, bool factory_reset);
 #include <Windows.h>
 #endif
 
@@ -86,6 +88,7 @@ typedef struct _service_channel_t
     return feof(ci) ? s_ok : s_false;
     }
 
+#ifndef __linux__
 static HANDLE clipdata = 0;
 static int offset = 0;
 
@@ -138,6 +141,7 @@ static result_t css_read_clipboard(stream_handle_t *hndl, void *buffer, uint16_t
 
   return s_ok;
   }
+#endif
 
 typedef struct _escape_seq_t {
   const char *sequence;
@@ -166,9 +170,9 @@ static void send_escape(uint16_t can_id, uint16_t value)
   {
   canmsg_t msg;
   memset(&msg, 0, sizeof(canmsg_t));
-  msg.id = can_id;
+  set_can_id(&msg, can_id);
   msg.canas.data_type = CANAS_DATATYPE_SHORT;
-  msg.length = 6;
+  set_can_len(&msg, 6);
   msg.canas.service_code = 1;
   msg.canas.data[0] = value >> 8;
   msg.canas.data[1] = value;
@@ -374,11 +378,18 @@ static void shell_run_ion(void *parg)
   ion_run(0);
 	}
 
-extern result_t krypton_init(const char *reg_path, bool factory_reset);
 
 int main(int argc, char **argv)
   {
-	// The command line can pass in the name of the registry used to set us up.  In any
+#ifdef __linux__
+    if(failed(electron_init(argc, argv)))
+    {
+        printf("Unable to initialize the krypton library.");
+        return -1;
+    }
+
+#else
+    // The command line can pass in the name of the registry used to set us up.  In any
   // case we need to implement some code
   const char *ini_path;
   if(argc > 1)
@@ -395,6 +406,7 @@ int main(int argc, char **argv)
     printf("Unable to initialize the krypton library.");
     return -1;
     }
+#endif
 
   uint16_t node_id;
   if(failed(reg_get_uint16(0, "node-id", &node_id)))
@@ -536,7 +548,7 @@ static const char *bsp_hive = "electron";
 static const char *bsp_hive = "krypton";
 #endif
 
-result_t bsp_can_init(handle_t rx_queue)
+result_t bsp_can_init(deque_p rx_queue, uint16_t bit_rate)
   {
   result_t result;
   memid_t key;

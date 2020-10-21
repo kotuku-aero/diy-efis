@@ -28,7 +28,7 @@ providers.
 
 If any file has a copyright notice or portions of code have been used
 and the original copyright notice is not yet transcribed to the repository
-then the origional copyright notice is to be respected.
+then the original copyright notice is to be respected.
 
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
@@ -93,6 +93,7 @@ typedef struct _published_datapoint_t
   {
   uint16_t version;               // should be size of actual type
   uint16_t can_id;                // id to publish
+  uint16_t can_type;              // type of value to publish
   uint16_t publish_rate;          // in number of ticks
   uint32_t next_publish_tick;     // will be set by scheduler, but can also be used
 
@@ -101,7 +102,7 @@ typedef struct _published_datapoint_t
     uint16_t loopback : 1;        // set to loopback to sender
     } flags;
 
-  canmsg_t value;                 // value that is to been published
+  canmsg_t value;                 // value that is to be published
   
   ////////////////////////////////////////////////////////////////
   //
@@ -771,7 +772,7 @@ static result_t create_datapoint(vector_p datapoints, uint16_t can_id, memid_t k
   // type of filter.  The filter runs at the publish frequency
   if(succeeded(reg_get_uint16(key, s_filter_type_value, &v_uint16)))
     filter_type = (filter_type_e) v_uint16;
-
+  
   if(filter_type != ft_none)
     {
     // must have a length!
@@ -1231,7 +1232,12 @@ result_t setup_publisher(const publish_setup_t *values)
   return s_ok;
   }
 
-result_t publish_datapoint(uint16_t can_id, uint16_t rate, filter_type_e filter_type, uint16_t filter_length, bool loopback, bool publish)
+result_t publish_datapoint(uint16_t can_id,
+                           uint16_t rate,
+                           filter_type_e filter_type,
+                           uint16_t filter_length,
+                           bool loopback,
+                           bool publish)
   {
   result_t result;
   memid_t publisher_key;

@@ -111,6 +111,8 @@ static i2c_init_port_t i2c1_fix[] = {
 
 #if !defined(__32MZ2048EFH064__)
 static i2c_init_port_t i2c2_fix[] = {
+  &I2C2CON, 0x00008000, 0x00000000,    // I2C off
+  &I2C2CON, 0x00008000, 0x00008000,    // I2C on
   0,0
   };
 #endif
@@ -234,7 +236,6 @@ void t4_interrupt(void)
       }
 
     // signal 
-    i2c_fixups[i] = 0;
     change_state(i, st_i2c_timeout);    // signal that the device has timed out
     i2c_interrupt(i);         // simulate the stop irq
     }
@@ -814,7 +815,7 @@ static result_t init_channel3(uint16_t len, uint16_t i2c_worker_stack_length)
   I2C3BRG = CALC_I2CBRG;
   I2C3MSK = 0;
   
-  IFS5bits.I2C5MIF = 0;
+  IFS5bits.I2C3MIF = 0;
   IPC40bits.I2C3MIP = 4;
   IPC40bits.I2C3MIS = 0;
   IEC5bits.I2C3MIE = 1;
@@ -891,9 +892,7 @@ static result_t init_channel5(uint16_t len, int16_t i2c_worker_stack_length)
   return s_ok;
   }
 
-static bool is_init = false;
-
-static void setup_timer()
+result_t i2c_init()
   {
   // check the I2c state change = 1.5 a transmit
   PR4 = 41;
@@ -910,15 +909,12 @@ static void setup_timer()
   // start the i2c timeout counter running
   //T4CONbits.TON = 1;
 
-  is_init = true;
+  return s_ok;
   }
 
-result_t i2cm_init(int channel, uint16_t len, uint16_t i2c_worker_stack_length)
+result_t i2c_channel_init(int channel, uint16_t len, uint16_t i2c_worker_stack_length)
   {
   result_t result = e_bad_parameter;
-  
-  if(!is_init)
-    setup_timer();
   
   switch(channel)
     {

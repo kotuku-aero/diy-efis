@@ -132,6 +132,14 @@ result_t semaphore_signal(semaphore_p h)
   return s_ok;
   }
 
+result_t signal_from_isr(semaphore_p h)
+  {
+  semaphore_t *sem = ((semaphore_t *)h);
+  sem_post(&sem->semp);
+
+  return s_ok;
+  }
+
 result_t has_wait_tasks(semaphore_p hndl)
   {
   semaphore_t *sem = ((semaphore_t *)hndl);
@@ -282,7 +290,7 @@ void neutron_run(void *heap,
   task_resume(thread);
 
   if(task != 0)
-    *task = thread;
+    *task = (task_p) thread;
   return s_ok;
   }
 
