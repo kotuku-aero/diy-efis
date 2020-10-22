@@ -380,51 +380,51 @@ static inline bool succeeded(result_t r)
 
 // Definitions for a Rotax ECU, sends data on 2 channels at 125kHz
 
-#define id_rotax_rpm_a                500
-#define id_rotax_fuel_flow_a          524   // liter / hour
-#define id_rotax_manifold_pressure_a  532   // hpa
-#define id_rotax_oil_pressure_a       532   // hpa
-#define id_rotax_oil_temperature_a    536   // kelvin
-#define id_rotax_coolant_temp_a       548
-#define id_rotax_egt1_a               628
-#define id_rotax_egt2_a               630
-#define id_rotax_egt3_a               632
-#define id_rotax_egt4_a               634
-#define id_rotax_intake_temperature_a 640
-#define id_rotax_outside_air_temp_a   642
-#define id_rotax_throttle_position_a  692
-#define id_rotax_ambient_pressure_a   694
-#define id_rotax_voltage_a            950
-#define id_rotax_engine_status_a      556
-#define id_rotax_engine_hours_a       1208
-#define id_rotax_ecu_hours_a          1216
-#define id_rotax_sensor_status_1_a    1500
-#define id_rotax_sensor_status_2_a    1504
-#define id_rotax_device_status_1_a    1508
-#define id_rotax_device_status_2_a    1512
+#define id_rpm_a                500
+#define id_fuel_flow_a          524   // liter / hour
+#define id_manifold_pressure_a  532   // hpa
+#define id_oil_pressure_a       532   // hpa
+#define id_oil_temperature_a    536   // kelvin
+#define id_coolant_temp_a       548
+#define id_egt1_a               628
+#define id_egt2_a               630
+#define id_egt3_a               632
+#define id_egt4_a               634
+#define id_intake_temperature_a 640
+#define id_outside_air_temp_a   642
+#define id_throttle_position_a  692
+#define id_ambient_pressure_a   694
+#define id_voltage_a            950
+#define id_engine_status_a      556
+#define id_engine_hours_a       1208
+#define id_ecu_hours_a          1216
+#define id_sensor_status_1_a    1500
+#define id_sensor_status_2_a    1504
+#define id_device_status_1_a    1508
+#define id_device_status_2_a    1512
 
-#define id_rotax_rpm_b                564
-#define id_rotax_fuel_flow_b          588
-#define id_rotax_manifold_pressure_b  592
-#define id_rotax_oil_pressure_b       596
-#define id_rotax_oil_temperature_b    600
-#define id_rotax_coolant_temp_b       612
-#define id_rotax_egt1_b               644
-#define id_rotax_egt2_b               646
-#define id_rotax_egt3_b               648
-#define id_rotax_egt4_b               650
-#define id_rotax_intake_temperature_b 656
-#define id_rotax_outside_air_temp_b   658
-#define id_rotax_throttle_position_b  696
-#define id_rotax_ambient_pressure_b   698
-#define id_rotax_voltage_b            954
-#define id_rotax_engine_status_b      620
-#define id_rotax_engine_hours_b       1212
-#define id_rotax_ecu_hours_b          1220
-#define id_rotax_sensor_status_1_b    1516
-#define id_rotax_sensor_status_2_b    1520
-#define id_rotax_device_status_1_b    1524
-#define id_rotax_device_status_2_b    1528
+#define id_rpm_b                564
+#define id_fuel_flow_b          588
+#define id_manifold_pressure_b  592
+#define id_oil_pressure_b       596
+#define id_oil_temperature_b    600
+#define id_coolant_temp_b       612
+#define id_egt1_b               644
+#define id_egt2_b               646
+#define id_egt3_b               648
+#define id_egt4_b               650
+#define id_intake_temperature_b 656
+#define id_outside_air_temp_b   658
+#define id_throttle_position_b  696
+#define id_ambient_pressure_b   698
+#define id_voltage_b            954
+#define id_engine_status_b      620
+#define id_engine_hours_b       1212
+#define id_ecu_hours_b          1220
+#define id_sensor_status_1_b    1516
+#define id_sensor_status_2_b    1520
+#define id_device_status_1_b    1524
+#define id_device_status_2_b    1528
 
 // this is the Flight plan service.  It supports up to 255 routes.
 // Route 0 is the current route
