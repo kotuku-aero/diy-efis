@@ -1,5 +1,7 @@
 #include "krypton.h"
 
+#include "../neutron/bsp.h"
+
 #include <Windows.h>
 #include <malloc.h>
 #include <stdio.h>
