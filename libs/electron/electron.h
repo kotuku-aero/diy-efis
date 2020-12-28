@@ -49,7 +49,7 @@ it must be removed as soon as possible after the code fragment is identified.
 extern "C" {
 #endif
 
-extern result_t electron_init(int agc, char **argv);
+extern result_t electron_init(int argc, char **argv);
 
 extern result_t create_root_screen(gdi_dim_t x, gdi_dim_t y, const char *device, int display_mode);
 

@@ -129,8 +129,16 @@ result_t push_back(deque_p deque, const void *item, uint32_t max_wait)
   enter_critical();
   while(deque->count >= deque->length)
     {
+    if(max_wait == 0)
+      {
+      exit_critical();
+
+      return e_no_space;
+      }
+    
     if(failed(semaphore_wait(&deque->writers, max_wait)))        // suspend task
       return e_timeout_error;
+    
     enter_critical();
     }
   

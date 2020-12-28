@@ -147,7 +147,7 @@ result_t eeprom_init(bool factory_reset, int _i2c_channel, uint32_t eeprom_size)
   
   // we read the settings from the external eeprom.
   // this is done using the i2c_mmx driver 
-  i2cm_init(_i2c_channel, NUM_I2C_TASKS, DEFAULT_STACK_SIZE);         // set up driver
+  i2c_channel_init(_i2c_channel, NUM_I2C_TASKS, DEFAULT_STACK_SIZE);         // set up driver
   
 	// and initialize the registry functions
 	return bsp_reg_init(factory_reset, (memid_t)eeprom_size, 128);

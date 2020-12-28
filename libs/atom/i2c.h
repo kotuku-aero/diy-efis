@@ -111,14 +111,20 @@ extern bool enqueue_i2c_task(int channel, const i2c_task_t *task);
 #define I2C_CHANNEL_5 3
 #endif
 /**
- * @function result_t i2cm_init(int channel, uint16_t buffer_length, uint16_t i2c_worker_stack_length)
+ * @function result_t i2c_init()
+ * Initialize the i2c subsystem
+ * @return s_ok if created ok
+ */
+extern result_t i2c_init();
+/**
+ * @function result_t i2c_channel_init(int channel, uint16_t buffer_length, uint16_t i2c_worker_stack_length)
  * Initialize the i2c as a master controller
  * @param channel               Channel to initialize.
  * @param buffer_length           Number of tasks
  * @param i2c_worker_stack_length Stack length
  * @return s_ok if created ok
  */
-extern result_t i2cm_init(int channel, uint16_t buffer_length, uint16_t i2c_worker_stack_length);
+extern result_t i2c_channel_init(int channel, uint16_t buffer_length, uint16_t i2c_worker_stack_length);
 
 /** 
  * return s_ok if register read

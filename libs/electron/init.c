@@ -102,7 +102,7 @@ static result_t print_error(const char *msg, result_t result)
   return result;
   }
 
-extern const char *device_s = "device";
+const char *device_s = "device";
 extern const char *screen_x_s;
 extern const char *screen_y_s;
 extern const char *framebuffer_device_s;

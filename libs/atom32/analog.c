@@ -16,6 +16,22 @@
 static analog_channels_t *channels; // this holds all of the definitions
 static semaphore_t analog_conversion_complete;
 
+static const char *analog_str = "analog";
+static const char *name_str = "name";
+static const char *scale_str = "scale";
+static const char *offset_str = "offset";
+static const char *can_id_str = "can-id";
+static const char *filter_rate_str = "filter-rate";
+static char tmp[32];
+
+static bool has_ch45 = false;
+static bool has_ch46 = false;
+static bool has_ch47 = false;
+static bool has_ch48 = false;
+static bool has_ch49 = false;
+
+static bool alt_sel = false;
+
 static void setup_hardware(analog_channels_t *init_channels);
 
 #include <sys/attribs.h>
@@ -60,8 +76,27 @@ void adc_eos_interrupt(void)
       {
       // we read in unsigned integer format.
       uint32_t chnum = channels->channel_definition[i].channel;
-      uint32_t channel_data = ADCDATA0 + chnum;
-      channels->channel_definition[i].analog_value = (uint16_t) channel_data;
+      
+      bool is_sample = true;
+      
+      if(chnum >= 45)
+        {
+        is_sample = alt_sel;
+        // use adc0..adc4
+        chnum -= 45;
+        }
+      else if(has_ch45 && chnum == 0 ||
+              has_ch46 && chnum == 1 ||
+              has_ch47 && chnum == 2 ||
+              has_ch48 && chnum == 3 ||
+              has_ch49 && chnum == 4)
+        is_sample = !alt_sel;   // only use if the channel is defined
+      
+      if(is_sample)
+        {
+        uint32_t channel_data = ADCDATA0 + chnum;
+        channels->channel_definition[i].analog_value = (uint16_t) channel_data;
+        }
       }
     
     signal_from_isr(&analog_conversion_complete);
@@ -104,18 +139,29 @@ static void conversion_complete_callback(void *parg)
     }
   }
 
-static const char *analog_str = "analog";
-static const char *name_str = "name";
-static const char *scale_str = "scale";
-static const char *offset_str = "offset";
-static const char *can_id_str = "can-id";
-static const char *filter_rate_str = "filter-rate";
-static char tmp[32];
-
 // this is called every 1 msec and all of the analog channels are
 // sampled.  When the scan is completed the published values will be sent
 static void analog_hook_fn(uint32_t ticks)
   {
+  alt_sel = !alt_sel;
+  
+  // switch the channels if this is an alt_sel cycle
+  if(has_ch45)
+    ADCTRGMODEbits.SH0ALT = alt_sel ? 0x01 : 0x00;
+    
+  if(has_ch46)
+    ADCTRGMODEbits.SH1ALT = alt_sel ? 0x01 : 0x00;
+    
+  if(has_ch47)
+    ADCTRGMODEbits.SH2ALT = alt_sel ? 0x01 : 0x00;
+    
+  if(has_ch48)
+    ADCTRGMODEbits.SH3ALT = alt_sel ? 0x01 : 0x00;
+    
+  if(has_ch49)
+    ADCTRGMODEbits.SH4ALT = alt_sel ? 0x01 : 0x00;
+    
+  
   // start the next scan
   ADCCON3bits.GSWTRG = 1;
   }
@@ -208,6 +254,8 @@ result_t analog_init(analog_channels_t *init_channels, uint16_t stack_length, bo
      
     switch(channel)
       {
+      case 45 :
+        has_ch45 = true;
       case 0 :
         ADCTRG1bits.TRGSRC0 = 3;          // scanned trigger
         ADC0TIMEbits.ADCDIV = 1; // ADC0 clock frequency is half of control clock = TAD0
@@ -219,6 +267,8 @@ result_t analog_init(analog_channels_t *init_channels, uint16_t stack_length, bo
         ADCANCONbits.ANEN0 = 1; // Enable the clock to analog bias
         ADCCSS1bits.CSS0 = 1;
         break;
+      case 46:
+        has_ch46 = true;
       case 1 :
         ADCTRG1bits.TRGSRC1 = 3;
         ADC1TIMEbits.ADCDIV = 1; // ADC1 clock frequency is half of control clock = TAD1
@@ -230,6 +280,8 @@ result_t analog_init(analog_channels_t *init_channels, uint16_t stack_length, bo
         ADCANCONbits.ANEN1 = 1; // Enable the clock to analog bias
         ADCCSS1bits.CSS1 = 1;
         break;
+      case 47:
+        has_ch47 = true;
       case 2 :
         ADCTRG1bits.TRGSRC2 = 3;
         ADC2TIMEbits.ADCDIV = 1; // ADC2 clock frequency is half of control clock = TAD2
@@ -241,6 +293,8 @@ result_t analog_init(analog_channels_t *init_channels, uint16_t stack_length, bo
         ADCANCONbits.ANEN2 = 1; // Enable the clock to analog bias
         ADCCSS1bits.CSS2 = 1;
         break;
+      case 48:
+        has_ch48 = true;
       case 3 :
         ADCTRG1bits.TRGSRC3 = 3;
         ADC3TIMEbits.ADCDIV = 1; // ADC2 clock frequency is half of control clock = TAD2
@@ -252,6 +306,8 @@ result_t analog_init(analog_channels_t *init_channels, uint16_t stack_length, bo
         ADCANCONbits.ANEN3 = 1; // Enable the clock to analog bias
         ADCCSS1bits.CSS3 = 1;
         break;
+      case 49:
+        has_ch49 = true;
       case 4 :
         ADCTRG2bits.TRGSRC4 = 3;
         ADC4TIMEbits.ADCDIV = 1; // ADC2 clock frequency is half of control clock = TAD2

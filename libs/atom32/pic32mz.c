@@ -53,7 +53,7 @@ void _general_exception_handler(void)
   _excep_addr = __builtin_mfc0(14, 2);
   _excep_code = (excep_code_t) ((__builtin_mfc0(13, 0) >> 2) & 0x1f);
 
-    panic();
+  panic();
   }
 
 void __attribute__( (interrupt(IPL0AUTO), vector(_TIMER_1_VECTOR))) _t1_interrupt( void );

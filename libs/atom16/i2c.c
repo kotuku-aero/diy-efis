@@ -532,7 +532,7 @@ static result_t init_master2(uint16_t len, uint16_t i2c_worker_stack_length)
   return s_ok;
   }
 
-result_t i2cm_init(int channel, uint16_t len, uint16_t i2c_worker_stack_length)
+result_t i2c_channel_init(int channel, uint16_t len, uint16_t i2c_worker_stack_length)
   {
   result_t result = e_bad_parameter;
   
