@@ -166,9 +166,9 @@ static void send_escape(uint16_t can_id, uint16_t value)
   {
   canmsg_t msg;
   memset(&msg, 0, sizeof(canmsg_t));
-  msg.id = can_id;
+  set_can_id(&msg, can_id);
   msg.canas.data_type = CANAS_DATATYPE_SHORT;
-  msg.length = 6;
+  set_can_len(&msg, 6);
   msg.canas.service_code = 1;
   msg.canas.data[0] = value >> 8;
   msg.canas.data[1] = value;
@@ -374,8 +374,6 @@ static void shell_run_ion(void *parg)
   ion_run(0);
 	}
 
-extern result_t krypton_init(const char *reg_path, bool factory_reset);
-
 int main(int argc, char **argv)
   {
 	// The command line can pass in the name of the registry used to set us up.  In any
@@ -390,7 +388,7 @@ int main(int argc, char **argv)
   // TODO: handle this better
   bool factory_reset = false;
 
-  if(failed(krypton_init(ini_path, factory_reset)))
+  if(failed(krypton_init(argc, argv)))
     {
     printf("Unable to initialize the krypton library.");
     return -1;

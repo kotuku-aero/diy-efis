@@ -185,3 +185,12 @@
 /libs/atom16/dist/debug_dsPIC33EP256GP502/debug
 /pic/pihat/build/debug_dsPIC33EP256GP502/debug
 /pic/pihat/dist/debug_dsPIC33EP256GP502/debug
+*.suo
+*.lib
+*.db
+*.ipch
+*.obj
+*.pdb
+*.user
+*.log
+*.recipe
