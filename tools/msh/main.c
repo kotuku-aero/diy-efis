@@ -378,7 +378,6 @@ static void shell_run_ion(void *parg)
   ion_run(0);
 	}
 
-
 int main(int argc, char **argv)
   {
 #ifdef __linux__
@@ -389,19 +388,7 @@ int main(int argc, char **argv)
     }
 
 #else
-    // The command line can pass in the name of the registry used to set us up.  In any
-  // case we need to implement some code
-  const char *ini_path;
-  if(argc > 1)
-    ini_path = argv[1];
-  else
-    ini_path = "diy-efis.reg";
-
-
-  // TODO: handle this better
-  bool factory_reset = false;
-
-  if(failed(krypton_init(ini_path, factory_reset)))
+  if(failed(krypton_init(argc, argv)))
     {
     printf("Unable to initialize the krypton library.");
     return -1;
