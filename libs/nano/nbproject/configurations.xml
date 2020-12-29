@@ -1,0 +1,813 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="65">
+  <logicalFolder name="root" displayName="root" projectFiles="true">
+    <logicalFolder name="f2" displayName="CLR" projectFiles="true">
+      <logicalFolder name="f1" displayName="Core" projectFiles="true">
+        <logicalFolder name="f1" displayName="Hardware" projectFiles="true">
+          <itemPath>CLR/Core/Hardware/Hardware.cpp</itemPath>
+          <itemPath>CLR/Core/Hardware/Hardware_stub.cpp</itemPath>
+        </logicalFolder>
+        <logicalFolder name="f2" displayName="InterruptHandler" projectFiles="true">
+          <itemPath>CLR/Core/InterruptHandler/InterruptHandler.cpp</itemPath>
+          <itemPath>CLR/Core/InterruptHandler/InterruptHandler_stub.cpp</itemPath>
+        </logicalFolder>
+        <logicalFolder name="f3"
+                       displayName="NativeEventDispatcher"
+                       projectFiles="true">
+          <itemPath>CLR/Core/NativeEventDispatcher/NativeEventDispatcher.cpp</itemPath>
+          <itemPath>CLR/Core/NativeEventDispatcher/NativeEventDispatcher_stub.cpp</itemPath>
+        </logicalFolder>
+        <logicalFolder name="f4" displayName="RPC" projectFiles="true">
+          <itemPath>CLR/Core/RPC/CLR_RT_HeapBlock_EndPoint.cpp</itemPath>
+          <itemPath>CLR/Core/RPC/RPC_stub.cpp</itemPath>
+        </logicalFolder>
+        <logicalFolder name="f5" displayName="Serialization" projectFiles="true">
+          <itemPath>CLR/Core/Serialization/BinaryFormatter.cpp</itemPath>
+          <itemPath>CLR/Core/Serialization/BinaryFormatter_stub.cpp</itemPath>
+        </logicalFolder>
+        <itemPath>CLR/Core/CLR_RT_DblLinkedList.cpp</itemPath>
+        <itemPath>CLR/Core/CLR_RT_HeapBlock.cpp</itemPath>
+        <itemPath>CLR/Core/CLR_RT_HeapBlock_Array.cpp</itemPath>
+        <itemPath>CLR/Core/CLR_RT_HeapBlock_ArrayList.cpp</itemPath>
+        <itemPath>CLR/Core/CLR_RT_HeapBlock_BinaryBlob.cpp</itemPath>
+        <itemPath>CLR/Core/CLR_RT_HeapBlock_Delegate.cpp</itemPath>
+        <itemPath>CLR/Core/CLR_RT_HeapBlock_Delegate_List.cpp</itemPath>
+        <itemPath>CLR/Core/CLR_RT_HeapBlock_Finalizer.cpp</itemPath>
+        <itemPath>CLR/Core/CLR_RT_HeapBlock_Lock.cpp</itemPath>
+        <itemPath>CLR/Core/CLR_RT_HeapBlock_LockRequest.cpp</itemPath>
+        <itemPath>CLR/Core/CLR_RT_HeapBlock_Node.cpp</itemPath>
+        <itemPath>CLR/Core/CLR_RT_HeapBlock_Queue.cpp</itemPath>
+        <itemPath>CLR/Core/CLR_RT_HeapBlock_Stack.cpp</itemPath>
+        <itemPath>CLR/Core/CLR_RT_HeapBlock_String.cpp</itemPath>
+        <itemPath>CLR/Core/CLR_RT_HeapBlock_Timer.cpp</itemPath>
+        <itemPath>CLR/Core/CLR_RT_HeapBlock_WaitForObject.cpp</itemPath>
+        <itemPath>CLR/Core/CLR_RT_HeapCluster.cpp</itemPath>
+        <itemPath>CLR/Core/CLR_RT_Interop.cpp</itemPath>
+        <itemPath>CLR/Core/CLR_RT_Memory.cpp</itemPath>
+        <itemPath>CLR/Core/CLR_RT_ObjectToEvent_Destination.cpp</itemPath>
+        <itemPath>CLR/Core/CLR_RT_ObjectToEvent_Source.cpp</itemPath>
+        <itemPath>CLR/Core/CLR_RT_RuntimeMemory.cpp</itemPath>
+        <itemPath>CLR/Core/CLR_RT_StackFrame.cpp</itemPath>
+        <itemPath>CLR/Core/CLR_RT_SystemAssembliesTable.cpp</itemPath>
+        <itemPath>CLR/Core/CLR_RT_UnicodeHelper.cpp</itemPath>
+        <itemPath>CLR/Core/Cache.cpp</itemPath>
+        <itemPath>CLR/Core/Checks.cpp</itemPath>
+        <itemPath>CLR/Core/Core.cpp</itemPath>
+        <itemPath>CLR/Core/Core.h</itemPath>
+        <itemPath>CLR/Core/Execution.cpp</itemPath>
+        <itemPath>CLR/Core/GarbageCollector.cpp</itemPath>
+        <itemPath>CLR/Core/GarbageCollector_Compaction.cpp</itemPath>
+        <itemPath>CLR/Core/GarbageCollector_ComputeReachabilityGraph.cpp</itemPath>
+        <itemPath>CLR/Core/GarbageCollector_Info.cpp</itemPath>
+        <itemPath>CLR/Core/Interpreter.cpp</itemPath>
+        <itemPath>CLR/Core/Random.cpp</itemPath>
+        <itemPath>CLR/Core/Streams.cpp</itemPath>
+        <itemPath>CLR/Core/StringTable.cpp</itemPath>
+        <itemPath>CLR/Core/StringTableData.cpp</itemPath>
+        <itemPath>CLR/Core/Thread.cpp</itemPath>
+        <itemPath>CLR/Core/TypeSystem.cpp</itemPath>
+        <itemPath>CLR/Core/TypeSystemLookup.cpp</itemPath>
+        <itemPath>CLR/Core/Various.cpp</itemPath>
+        <itemPath>CLR/Core/corhdr_private.h</itemPath>
+        <itemPath>CLR/Core/nanoSupport_CRC32.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f2" displayName="CoreLib" projectFiles="true">
+        <itemPath>CLR/CorLib/CorLib.h</itemPath>
+        <itemPath>CLR/CorLib/corlib_native.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native.h</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_AppDomain.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Array.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Attribute.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_BitConverter.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Collections_ArrayList.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Console.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Convert.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_DateTime.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Delegate.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Diagnostics_Debug.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Diagnostics_Debugger.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Double.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Enum.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Exception.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_GC.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Globalization_CultureInfo.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Globalization_DateTimeFormat.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Guid.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_MarshalByRefObject.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_MathInternal.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_MulticastDelegate.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Number.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Object.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Random.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Reflection_Assembly.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Reflection_Binder.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Reflection_ConstructorInfo.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Reflection_FieldInfo.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Reflection_MemberInfo.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Reflection_MethodBase.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Reflection_PropertyInfo.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Reflection_RuntimeFieldInfo.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Reflection_RuntimeMethodInfo.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Runtime_CompilerServices_RuntimeHelpers.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Runtime_Remoting_RemotingServices.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_RuntimeType.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_String.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Threading_AutoResetEvent.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Threading_Interlocked.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Threading_ManualResetEvent.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Threading_Monitor.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Threading_Thread.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Threading_Timer.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Threading_WaitHandle.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_TimeSpan.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_Type.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_ValueType.cpp</itemPath>
+        <itemPath>CLR/CorLib/corlib_native_System_WeakReference.cpp</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f3" displayName="Debugger" projectFiles="true">
+        <itemPath>CLR/Debugger/Debugger.cpp</itemPath>
+        <itemPath>CLR/Debugger/Debugger.h</itemPath>
+        <itemPath>CLR/Debugger/Debugger_full.cpp</itemPath>
+        <itemPath>CLR/Debugger/Debugger_minimal.cpp</itemPath>
+        <itemPath>CLR/Debugger/Debugger_stub.cpp</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f4" displayName="Diagnostics" projectFiles="true">
+        <itemPath>CLR/Diagnostics/Diagnostics.h</itemPath>
+        <itemPath>CLR/Diagnostics/Diagnostics_stub.cpp</itemPath>
+        <itemPath>CLR/Diagnostics/Info.cpp</itemPath>
+        <itemPath>CLR/Diagnostics/Profile.cpp</itemPath>
+        <itemPath>CLR/Diagnostics/Profiler.cpp</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f5" displayName="Helpers" projectFiles="true">
+        <logicalFolder name="f1" displayName="Base64" projectFiles="true">
+          <itemPath>CLR/Helpers/Base64/base64.c</itemPath>
+          <itemPath>CLR/Helpers/Base64/base64.h</itemPath>
+        </logicalFolder>
+        <logicalFolder name="f2" displayName="TintPrintf" projectFiles="true">
+          <itemPath>CLR/Helpers/TinyPrintf/printf.c</itemPath>
+          <itemPath>CLR/Helpers/TinyPrintf/printf.h</itemPath>
+        </logicalFolder>
+      </logicalFolder>
+      <logicalFolder name="f6" displayName="Include" projectFiles="true">
+        <itemPath>CLR/Include/nanoCLR_Application.h</itemPath>
+        <itemPath>CLR/Include/nanoCLR_Checks.h</itemPath>
+        <itemPath>CLR/Include/nanoCLR_Debugging.h</itemPath>
+        <itemPath>CLR/Include/nanoCLR_ErrorCodes.h</itemPath>
+        <itemPath>CLR/Include/nanoCLR_Hardware.h</itemPath>
+        <itemPath>CLR/Include/nanoCLR_Headers.h</itemPath>
+        <itemPath>CLR/Include/nanoCLR_Interop.h</itemPath>
+        <itemPath>CLR/Include/nanoCLR_Messaging.h</itemPath>
+        <itemPath>CLR/Include/nanoCLR_ParseOptions.h</itemPath>
+        <itemPath>CLR/Include/nanoCLR_PlatformDef.h</itemPath>
+        <itemPath>CLR/Include/nanoCLR_Profiling.h</itemPath>
+        <itemPath>CLR/Include/nanoCLR_Runtime.h</itemPath>
+        <itemPath>CLR/Include/nanoCLR_Runtime__HeapBlock.h</itemPath>
+        <itemPath>CLR/Include/nanoCLR_Runtime__Serialization.h</itemPath>
+        <itemPath>CLR/Include/nanoCLR_Types.h</itemPath>
+        <itemPath>CLR/Include/nanoCLR_Win32.h</itemPath>
+        <itemPath>CLR/Include/nanoPackStruct.h</itemPath>
+        <itemPath>CLR/Include/nanoSupport.h</itemPath>
+        <itemPath>CLR/Include/nanoVersion.h</itemPath>
+        <itemPath>CLR/Include/nanoWeak.h</itemPath>
+        <itemPath>CLR/Include/nf_errors_exceptions.h</itemPath>
+        <itemPath>CLR/Include/opcode.def</itemPath>
+        <itemPath>CLR/Include/WireProtocol.h</itemPath>
+        <itemPath>CLR/Include/WireProtocol_App_Interface.h</itemPath>
+        <itemPath>CLR/Include/WireProtocol_HAL_Interface.h</itemPath>
+        <itemPath>CLR/Include/WireProtocol_Message.h</itemPath>
+        <itemPath>CLR/Include/WireProtocol_MonitorCommands.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f7" displayName="Messaging" projectFiles="true">
+        <itemPath>CLR/Messaging/Messaging.cpp</itemPath>
+        <itemPath>CLR/Messaging/Messaging_stub.cpp</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f8" displayName="Startup" projectFiles="true">
+        <itemPath>CLR/Startup/CLRStartup.cpp</itemPath>
+        <itemPath>CLR/Startup/CLRStartup.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f9" displayName="System.Math" projectFiles="true">
+        <itemPath>CLR/System.Math/nf_native_system_math.cpp</itemPath>
+        <itemPath>CLR/System.Math/nf_native_system_math.h</itemPath>
+        <itemPath>CLR/System.Math/nf_native_system_math_System_Math.cpp</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f10" displayName="WireProtocol" projectFiles="true">
+        <itemPath>CLR/WireProtocol/targetHAL_time.cpp</itemPath>
+        <itemPath>CLR/WireProtocol/WireProtocol_App_Interface.c</itemPath>
+        <itemPath>CLR/WireProtocol/WireProtocol_HAL_Interface.c</itemPath>
+        <itemPath>CLR/WireProtocol/WireProtocol_Message.c</itemPath>
+        <itemPath>CLR/WireProtocol/WireProtocol_MonitorCommands.c</itemPath>
+      </logicalFolder>
+    </logicalFolder>
+    <logicalFolder name="Events" displayName="Events" projectFiles="true">
+      <itemPath>Events/nf_rt_events_native.cpp</itemPath>
+      <itemPath>Events/nf_rt_events_native.h</itemPath>
+      <itemPath>Events/nf_rt_events_native_nanoFramework_Runtime_Events_EventSink.cpp</itemPath>
+      <itemPath>Events/nf_rt_events_native_nanoFramework_Runtime_Events_NativeEventDispatcher.cpp</itemPath>
+      <itemPath>Events/nf_rt_events_native_nanoFramework_Runtime_Events_WeakDelegate.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="FileSystem" displayName="FileSystem" projectFiles="true">
+      <itemPath>FileSystem/nf_sys_io_filesystem.cpp</itemPath>
+      <itemPath>FileSystem/nf_sys_io_filesystem.h</itemPath>
+      <itemPath>FileSystem/nf_sys_io_filesystem_System_IO_File.cpp</itemPath>
+      <itemPath>FileSystem/nf_sys_io_filesystem_System_IO_FileStream.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="f1" displayName="Graphics" projectFiles="true">
+      <logicalFolder name="f1" displayName="Graphics" projectFiles="true">
+        <logicalFolder name="f1" displayName="Core" projectFiles="true">
+          <logicalFolder name="f1" displayName="Support" projectFiles="true">
+            <logicalFolder name="f1" displayName="Bmp" projectFiles="true">
+              <itemPath>Graphics/Graphics/Core/Support/Bmp/Bitmap_Decoder.cpp</itemPath>
+            </logicalFolder>
+            <logicalFolder name="f2" displayName="Fonts" projectFiles="true">
+              <logicalFolder name="f1" displayName="TinyFonts" projectFiles="true">
+                <itemPath>Graphics/Graphics/Core/Support/Fonts/TinyFonts/NinaB.tinyfnt</itemPath>
+                <itemPath>Graphics/Graphics/Core/Support/Fonts/TinyFonts/small.tinyfnt</itemPath>
+              </logicalFolder>
+              <itemPath>Graphics/Graphics/Core/Support/Fonts/Font.cpp</itemPath>
+            </logicalFolder>
+            <logicalFolder name="f3" displayName="Gif" projectFiles="true">
+              <itemPath>Graphics/Graphics/Core/Support/Gif/Gif.cpp</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Gif/GifDecoder.cpp</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Gif/gif.h</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Gif/giffile.h</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Gif/lzw.h</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Gif/lzwread.cpp</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Gif/lzwread.h</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Gif/lzwutil.h</itemPath>
+            </logicalFolder>
+            <logicalFolder name="f4" displayName="Jpeg" projectFiles="true">
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/Jpeg.cpp</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jbytearraydatasrc.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jcapimin.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jcapistd.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jccoefct.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jccolor.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jcdctmgr.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jchuff.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jchuff.h</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jcinit.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jcmainct.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jcmarker.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jcmaster.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jcomapi.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jconfig.h</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jcparam.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jcphuff.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jcprepct.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jcsample.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jctrans.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jdapimin.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jdapistd.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jdcoefct.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jdcolor.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jdct.h</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jddctmgr.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jdhuff.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jdhuff.h</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jdinput.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jdmainct.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jdmarker.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jdmaster.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jdmerge.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jdphuff.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jdpostct.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jdsample.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jdtrans.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jerror.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jerror.h</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jfdctflt.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jfdctfst.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jfdctint.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jidctflt.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jidctfst.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jidctint.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jidctred.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jinclude.h</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jmemmgr.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jmemnanoclr.cpp</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jmemsys.h</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jmorecfg.h</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jpegint.h</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jpeglib.h</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jquant1.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jquant2.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jutils.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/jversion.h</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/mcbcr.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/mcbcr.h</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/mfint.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/miint.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/pfint.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/piint.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/transupp.c</itemPath>
+              <itemPath>Graphics/Graphics/Core/Support/Jpeg/transupp.h</itemPath>
+            </logicalFolder>
+          </logicalFolder>
+          <itemPath>Graphics/Graphics/Core/Graphics.cpp</itemPath>
+          <itemPath>Graphics/Graphics/Core/Graphics.h</itemPath>
+          <itemPath>Graphics/Graphics/Core/GraphicsDriver.cpp</itemPath>
+          <itemPath>Graphics/Graphics/Core/GraphicsMemoryHeap.cpp</itemPath>
+          <itemPath>Graphics/Graphics/Core/GraphicsMemoryHeap.h</itemPath>
+        </logicalFolder>
+        <logicalFolder name="f2" displayName="Displays" projectFiles="true">
+          <itemPath>Graphics/Graphics/Displays/Display.h</itemPath>
+          <itemPath>Graphics/Graphics/Displays/DisplayInterface.h</itemPath>
+          <itemPath>Graphics/Graphics/Displays/ILI9341_240x320_SPI.cpp</itemPath>
+          <itemPath>Graphics/Graphics/Displays/Otm8009a_DSI_Video_Mode.cpp</itemPath>
+          <itemPath>Graphics/Graphics/Displays/SSD1306_128x64.cpp</itemPath>
+          <itemPath>Graphics/Graphics/Displays/SSD1331_94x64_SPI.cpp</itemPath>
+          <itemPath>Graphics/Graphics/Displays/ST7789V_240x320_SPI.cpp</itemPath>
+          <itemPath>Graphics/Graphics/Displays/Spi_To_Display.cpp</itemPath>
+        </logicalFolder>
+        <logicalFolder name="f3" displayName="Native" projectFiles="true">
+          <itemPath>Graphics/Graphics/Native/nanoFramework_Graphics.cpp</itemPath>
+          <itemPath>Graphics/Graphics/Native/nanoFramework_Graphics.h</itemPath>
+          <itemPath>Graphics/Graphics/Native/nanoFramework_Graphics_nanoFramework_UI_Bitmap.cpp</itemPath>
+          <itemPath>Graphics/Graphics/Native/nanoFramework_Graphics_nanoFramework_UI_DisplayControl.cpp</itemPath>
+          <itemPath>Graphics/Graphics/Native/nanoFramework_Graphics_nanoFramework_UI_Font.cpp</itemPath>
+          <itemPath>Graphics/Graphics/Native/nanoFramework_Graphics_nanoFramework_UI_Ink.cpp</itemPath>
+          <itemPath>Graphics/Graphics/Native/nanoFramework_Graphics_nanoFramework_UI_TouchCollectorConfiguration.cpp</itemPath>
+          <itemPath>Graphics/Graphics/Native/nanoFramework_Graphics_nanoFramework_UI_TouchEventProcessor.cpp</itemPath>
+          <itemPath>Graphics/Graphics/Native/nanoFramework_Graphics_nanoFramework_UI_TouchPanel.cpp</itemPath>
+        </logicalFolder>
+      </logicalFolder>
+      <logicalFolder name="f2" displayName="TouchPanel" projectFiles="true">
+        <logicalFolder name="f1" displayName="Core" projectFiles="true">
+          <itemPath>Graphics/TouchPanel/Core/Gestures.cpp</itemPath>
+          <itemPath>Graphics/TouchPanel/Core/Gestures.h</itemPath>
+          <itemPath>Graphics/TouchPanel/Core/Ink.cpp</itemPath>
+          <itemPath>Graphics/TouchPanel/Core/Ink.h</itemPath>
+          <itemPath>Graphics/TouchPanel/Core/TouchPanel.cpp</itemPath>
+          <itemPath>Graphics/TouchPanel/Core/TouchPanel.h</itemPath>
+        </logicalFolder>
+        <logicalFolder name="f2" displayName="Devices" projectFiles="true">
+          <itemPath>Graphics/TouchPanel/Devices/TouchDevice.h</itemPath>
+          <itemPath>Graphics/TouchPanel/Devices/TouchInterface.h</itemPath>
+          <itemPath>Graphics/TouchPanel/Devices/XPT2046.cpp</itemPath>
+          <itemPath>Graphics/TouchPanel/Devices/ft6x06_I2C.cpp</itemPath>
+        </logicalFolder>
+      </logicalFolder>
+    </logicalFolder>
+    <logicalFolder name="f3" displayName="HAL" projectFiles="true">
+      <logicalFolder name="f1" displayName="Include" projectFiles="true">
+        <itemPath>HAL/Include/nanoHAL.h</itemPath>
+        <itemPath>HAL/Include/nanoHAL_Boot.h</itemPath>
+        <itemPath>HAL/Include/nanoHAL_Capabilites.h</itemPath>
+        <itemPath>HAL/Include/nanoHAL_ConfigurationManager.h</itemPath>
+        <itemPath>HAL/Include/nanoHAL_Graphics.h</itemPath>
+        <itemPath>HAL/Include/nanoHAL_Network.h</itemPath>
+        <itemPath>HAL/Include/nanoHAL_Power.h</itemPath>
+        <itemPath>HAL/Include/nanoHAL_ReleaseInfo.h</itemPath>
+        <itemPath>HAL/Include/nanoHAL_Spi.h</itemPath>
+        <itemPath>HAL/Include/nanoHAL_Time.h</itemPath>
+        <itemPath>HAL/Include/nanoHAL_Types.h</itemPath>
+        <itemPath>HAL/Include/nanoHAL_Watchdog.h</itemPath>
+        <itemPath>HAL/Include/nanoHAL_Windows_Storage.h</itemPath>
+        <itemPath>HAL/Include/nanoHAL_v2.h</itemPath>
+      </logicalFolder>
+      <itemPath>HAL/nanoHAL_Boot.c</itemPath>
+      <itemPath>HAL/nanoHAL_Capabilites.c</itemPath>
+      <itemPath>HAL/nanoHAL_ConfigurationManager.c</itemPath>
+      <itemPath>HAL/nanoHAL_ConfigurationManager_stubs.c</itemPath>
+      <itemPath>HAL/nanoHAL_SystemEvents.c</itemPath>
+      <itemPath>HAL/nanoHAL_SystemInformation.cpp</itemPath>
+      <itemPath>HAL/nanoHAL_Time.cpp</itemPath>
+      <itemPath>HAL/nanoHAL_Watchdog.c</itemPath>
+    </logicalFolder>
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="LinkerScript"
+                   displayName="Linker Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="f4" displayName="Native" projectFiles="true">
+      <itemPath>Native/nf_rt_native.cpp</itemPath>
+      <itemPath>Native/nf_rt_native.h</itemPath>
+      <itemPath>Native/nf_rt_native_nanoFramework_Runtime_Hardware_SystemInfo.cpp</itemPath>
+      <itemPath>Native/nf_rt_native_nanoFramework_Runtime_Native_ExecutionConstraint.cpp</itemPath>
+      <itemPath>Native/nf_rt_native_nanoFramework_Runtime_Native_GC.cpp</itemPath>
+      <itemPath>Native/nf_rt_native_nanoFramework_Runtime_Native_Power.cpp</itemPath>
+      <itemPath>Native/nf_rt_native_nanoFramework_Runtime_Native_Rtc_stubs.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="f5" displayName="PAL" projectFiles="true">
+      <logicalFolder name="f1" displayName="AsyncProcCall" projectFiles="true">
+        <itemPath>PAL/AsyncProcCall/AsyncCompletions.cpp</itemPath>
+        <itemPath>PAL/AsyncProcCall/AsyncContinuations.cpp</itemPath>
+        <itemPath>PAL/AsyncProcCall/Async_stubs.cpp</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f2" displayName="BlockStorage" projectFiles="true">
+        <itemPath>PAL/BlockStorage/nanoPAL_BlockStorage.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f3" displayName="COM" projectFiles="true">
+        <logicalFolder name="f1" displayName="sockets" projectFiles="true">
+          <logicalFolder name="f1" displayName="ssl" projectFiles="true">
+            <logicalFolder name="f1" displayName="mbedTLS" projectFiles="true">
+              <itemPath>PAL/COM/sockets/ssl/mbedTLS/mbedtls.h</itemPath>
+              <itemPath>PAL/COM/sockets/ssl/mbedTLS/nf_mbedtls_config.h</itemPath>
+              <itemPath>PAL/COM/sockets/ssl/mbedTLS/ssl_accept_internal.cpp</itemPath>
+              <itemPath>PAL/COM/sockets/ssl/mbedTLS/ssl_add_cert_auth_internal.cpp</itemPath>
+              <itemPath>PAL/COM/sockets/ssl/mbedTLS/ssl_close_socket_internal.cpp</itemPath>
+              <itemPath>PAL/COM/sockets/ssl/mbedTLS/ssl_connect_internal.cpp</itemPath>
+              <itemPath>PAL/COM/sockets/ssl/mbedTLS/ssl_decode_private_key_internal.cpp</itemPath>
+              <itemPath>PAL/COM/sockets/ssl/mbedTLS/ssl_exit_context_internal.cpp</itemPath>
+              <itemPath>PAL/COM/sockets/ssl/mbedTLS/ssl_generic.cpp</itemPath>
+              <itemPath>PAL/COM/sockets/ssl/mbedTLS/ssl_generic_init_internal.cpp</itemPath>
+              <itemPath>PAL/COM/sockets/ssl/mbedTLS/ssl_initialize_internal.cpp</itemPath>
+              <itemPath>PAL/COM/sockets/ssl/mbedTLS/ssl_parse_certificate_internal.cpp</itemPath>
+              <itemPath>PAL/COM/sockets/ssl/mbedTLS/ssl_pending_internal.cpp</itemPath>
+              <itemPath>PAL/COM/sockets/ssl/mbedTLS/ssl_read_internal.cpp</itemPath>
+              <itemPath>PAL/COM/sockets/ssl/mbedTLS/ssl_uninitialize_internal.cpp</itemPath>
+              <itemPath>PAL/COM/sockets/ssl/mbedTLS/ssl_write_internal.cpp</itemPath>
+            </logicalFolder>
+            <itemPath>PAL/COM/sockets/ssl/ssl.cpp</itemPath>
+            <itemPath>PAL/COM/sockets/ssl/ssl.h</itemPath>
+            <itemPath>PAL/COM/sockets/ssl/ssl_functions.h</itemPath>
+            <itemPath>PAL/COM/sockets/ssl/ssl_stubs.cpp</itemPath>
+            <itemPath>PAL/COM/sockets/ssl/ssl_types.h</itemPath>
+          </logicalFolder>
+          <itemPath>PAL/COM/sockets/Sockets_debugger.cpp</itemPath>
+          <itemPath>PAL/COM/sockets/sockets_lwip.cpp</itemPath>
+          <itemPath>PAL/COM/sockets/sockets_lwip.h</itemPath>
+        </logicalFolder>
+        <itemPath>PAL/COM/COM_stubs.c</itemPath>
+        <itemPath>PAL/COM/ComDirector.cpp</itemPath>
+        <itemPath>PAL/COM/GenericPort_stubs.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f4" displayName="Double" projectFiles="true">
+        <itemPath>PAL/Double/nanoPAL_NativeDouble.cpp</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f5" displayName="Events" projectFiles="true">
+        <itemPath>PAL/Events/nanoPAL_Events.cpp</itemPath>
+        <itemPath>PAL/Events/nanoPAL_Events_driver.cpp</itemPath>
+        <itemPath>PAL/Events/nanoPAL_Events_functions.cpp</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f6" displayName="Include" projectFiles="true">
+        <itemPath>PAL/Include/CPU_GPIO_decl.h</itemPath>
+        <itemPath>PAL/Include/CPU_SPI_decl.h</itemPath>
+        <itemPath>PAL/Include/nanoCRT.h</itemPath>
+        <itemPath>PAL/Include/nanoPAL.h</itemPath>
+        <itemPath>PAL/Include/nanoPAL_AsyncProcCalls_decl.h</itemPath>
+        <itemPath>PAL/Include/nanoPAL_BlockStorage.h</itemPath>
+        <itemPath>PAL/Include/nanoPAL_COM.h</itemPath>
+        <itemPath>PAL/Include/nanoPAL_Events.h</itemPath>
+        <itemPath>PAL/Include/nanoPAL_GPIO.h</itemPath>
+        <itemPath>PAL/Include/nanoPAL_NativeDouble.h</itemPath>
+        <itemPath>PAL/Include/nanoPAL_Network.h</itemPath>
+        <itemPath>PAL/Include/nanoPAL_PerformanceCounters.h</itemPath>
+        <itemPath>PAL/Include/nanoPAL_Sockets.h</itemPath>
+        <itemPath>PAL/Include/nanoPAL_Time.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f7" displayName="Lwip" projectFiles="true">
+        <itemPath>PAL/Lwip/lwIP_Sockets.cpp</itemPath>
+        <itemPath>PAL/Lwip/lwIP_Sockets.h</itemPath>
+        <itemPath>PAL/Lwip/lwIP_Sockets_functions.cpp</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f8" displayName="Profiler" projectFiles="true">
+        <itemPath>PAL/Profiler/nanoPAL_PerformanceCounters_stubs.cpp</itemPath>
+      </logicalFolder>
+      <itemPath>PAL/nanoPAL_Network_stubs.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="f6" displayName="ResourceManager" projectFiles="true">
+      <itemPath>ResourceManager/nf_system_resourcemanager.cpp</itemPath>
+      <itemPath>ResourceManager/nf_system_resourcemanager.h</itemPath>
+      <itemPath>ResourceManager/nf_system_resourcemanager_System_Resources_ResourceManager.cpp</itemPath>
+      <itemPath>ResourceManager/nf_system_resourcemanager_nanoFramework_Runtime_Native_ResourceUtility.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="Startup" displayName="Startup" projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="System.Collections"
+                   displayName="System.Collections"
+                   projectFiles="true">
+      <itemPath>System.Collections/nf_system_collections.cpp</itemPath>
+      <itemPath>System.Collections/nf_system_collections.h</itemPath>
+      <itemPath>System.Collections/nf_system_collections_System_Collections_Queue.cpp</itemPath>
+      <itemPath>System.Collections/nf_system_collections_System_Collections_Stack.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="f7" displayName="SystemText" projectFiles="true">
+      <itemPath>System.Text/nf_system_text.cpp</itemPath>
+      <itemPath>System.Text/nf_system_text.h</itemPath>
+      <itemPath>System.Text/nf_system_text_System_Text_UTF8Decoder.cpp</itemPath>
+      <itemPath>System.Text/nf_system_text_System_Text_UTF8Encoding.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceRootList>
+    <Elem>CLR/CorLib</Elem>
+    <Elem>CLR/Debugger</Elem>
+    <Elem>CLR/Diagnostics</Elem>
+    <Elem>CLR/Helpers</Elem>
+    <Elem>CLR/Include</Elem>
+    <Elem>CLR/Messaging</Elem>
+    <Elem>CLR/Startup</Elem>
+    <Elem>CLR/System.Math</Elem>
+    <Elem>CLR/WireProtocol</Elem>
+    <Elem>Collections</Elem>
+    <Elem>System.Collections</Elem>
+    <Elem>Events</Elem>
+    <Elem>FileSystem</Elem>
+    <Elem>Graphics</Elem>
+    <Elem>CLR/Core</Elem>
+    <Elem>HAL</Elem>
+    <Elem>Native</Elem>
+    <Elem>PAL</Elem>
+    <Elem>ResourceManager</Elem>
+    <Elem>System.Text</Elem>
+  </sourceRootList>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="default" type="3">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <targetDevice>PIC32MZ2064DAR176</targetDevice>
+        <targetHeader></targetHeader>
+        <targetPluginBoard></targetPluginBoard>
+        <platformTool>ICD3PlatformTool</platformTool>
+        <languageToolchain>XC32</languageToolchain>
+        <languageToolchainVersion>2.50</languageToolchainVersion>
+        <platform>2</platform>
+      </toolsSet>
+      <packs>
+        <pack name="PIC32MZ-DA_DFP" vendor="Microchip" version="1.2.102"/>
+      </packs>
+      <ScriptingSettings>
+      </ScriptingSettings>
+      <compileType>
+        <linkerTool>
+          <linkerLibItems>
+          </linkerLibItems>
+        </linkerTool>
+        <archiverTool>
+        </archiverTool>
+        <loading>
+          <useAlternateLoadableFile>false</useAlternateLoadableFile>
+          <parseOnProdLoad>false</parseOnProdLoad>
+          <alternateLoadableFile></alternateLoadableFile>
+        </loading>
+        <subordinates>
+        </subordinates>
+      </compileType>
+      <makeCustomizationType>
+        <makeCustomizationPreStepEnabled>false</makeCustomizationPreStepEnabled>
+        <makeUseCleanTarget>false</makeUseCleanTarget>
+        <makeCustomizationPreStep></makeCustomizationPreStep>
+        <makeCustomizationPostStepEnabled>false</makeCustomizationPostStepEnabled>
+        <makeCustomizationPostStep></makeCustomizationPostStep>
+        <makeCustomizationPutChecksumInUserID>false</makeCustomizationPutChecksumInUserID>
+        <makeCustomizationEnableLongLines>false</makeCustomizationEnableLongLines>
+        <makeCustomizationNormalizeHexFile>false</makeCustomizationNormalizeHexFile>
+      </makeCustomizationType>
+      <C32>
+        <property key="additional-warnings" value="false"/>
+        <property key="addresss-attribute-use" value="false"/>
+        <property key="enable-app-io" value="false"/>
+        <property key="enable-omit-frame-pointer" value="false"/>
+        <property key="enable-symbols" value="true"/>
+        <property key="enable-unroll-loops" value="false"/>
+        <property key="exclude-floating-point" value="false"/>
+        <property key="extra-include-directories" value="../ion"/>
+        <property key="generate-16-bit-code" value="false"/>
+        <property key="generate-micro-compressed-code" value="false"/>
+        <property key="isolate-each-function" value="false"/>
+        <property key="make-warnings-into-errors" value="false"/>
+        <property key="optimization-level" value=""/>
+        <property key="place-data-into-section" value="false"/>
+        <property key="post-instruction-scheduling" value="default"/>
+        <property key="pre-instruction-scheduling" value="default"/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="strict-ansi" value="false"/>
+        <property key="support-ansi" value="false"/>
+        <property key="toplevel-reordering" value=""/>
+        <property key="unaligned-access" value=""/>
+        <property key="use-cci" value="false"/>
+        <property key="use-iar" value="false"/>
+        <property key="use-indirect-calls" value="false"/>
+      </C32>
+      <C32-AR>
+        <property key="additional-options-chop-files" value="false"/>
+      </C32-AR>
+      <C32-AS>
+        <property key="assembler-symbols" value=""/>
+        <property key="enable-symbols" value="true"/>
+        <property key="exclude-floating-point-library" value="false"/>
+        <property key="expand-macros" value="false"/>
+        <property key="extra-include-directories-for-assembler" value=""/>
+        <property key="extra-include-directories-for-preprocessor" value=""/>
+        <property key="false-conditionals" value="false"/>
+        <property key="generate-16-bit-code" value="false"/>
+        <property key="generate-micro-compressed-code" value="false"/>
+        <property key="keep-locals" value="false"/>
+        <property key="list-assembly" value="false"/>
+        <property key="list-source" value="false"/>
+        <property key="list-symbols" value="false"/>
+        <property key="oXC32asm-list-to-file" value="false"/>
+        <property key="omit-debug-dirs" value="false"/>
+        <property key="omit-forms" value="false"/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="warning-level" value=""/>
+      </C32-AS>
+      <C32-CO>
+        <property key="coverage-enable" value=""/>
+      </C32-CO>
+      <C32-LD>
+        <property key="additional-options-use-response-files" value="false"/>
+        <property key="additional-options-write-sla" value="false"/>
+        <property key="allocate-dinit" value="false"/>
+        <property key="code-dinit" value="false"/>
+        <property key="ebase-addr" value=""/>
+        <property key="enable-check-sections" value="false"/>
+        <property key="exclude-floating-point-library" value="false"/>
+        <property key="exclude-standard-libraries" value="false"/>
+        <property key="extra-lib-directories" value=""/>
+        <property key="fill-flash-options-addr" value=""/>
+        <property key="fill-flash-options-const" value=""/>
+        <property key="fill-flash-options-how" value="0"/>
+        <property key="fill-flash-options-inc-const" value="1"/>
+        <property key="fill-flash-options-increment" value=""/>
+        <property key="fill-flash-options-seq" value=""/>
+        <property key="fill-flash-options-what" value="0"/>
+        <property key="generate-16-bit-code" value="false"/>
+        <property key="generate-cross-reference-file" value="false"/>
+        <property key="generate-micro-compressed-code" value="false"/>
+        <property key="heap-size" value=""/>
+        <property key="input-libraries" value=""/>
+        <property key="kseg-length" value=""/>
+        <property key="kseg-origin" value=""/>
+        <property key="linker-symbols" value=""/>
+        <property key="map-file" value="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map"/>
+        <property key="no-device-startup-code" value="false"/>
+        <property key="no-startup-files" value="false"/>
+        <property key="oXC32ld-extra-opts" value=""/>
+        <property key="optimization-level" value=""/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="remove-unused-sections" value="false"/>
+        <property key="report-memory-usage" value="false"/>
+        <property key="serial-length" value=""/>
+        <property key="serial-origin" value=""/>
+        <property key="stack-size" value=""/>
+        <property key="symbol-stripping" value=""/>
+        <property key="trace-symbols" value=""/>
+        <property key="warn-section-align" value="false"/>
+      </C32-LD>
+      <C32CPP>
+        <property key="additional-warnings" value="false"/>
+        <property key="addresss-attribute-use" value="false"/>
+        <property key="check-new" value="false"/>
+        <property key="eh-specs" value="true"/>
+        <property key="enable-app-io" value="false"/>
+        <property key="enable-omit-frame-pointer" value="false"/>
+        <property key="enable-symbols" value="true"/>
+        <property key="enable-unroll-loops" value="false"/>
+        <property key="exceptions" value="true"/>
+        <property key="exclude-floating-point" value="false"/>
+        <property key="extra-include-directories" value="../ion"/>
+        <property key="generate-16-bit-code" value="false"/>
+        <property key="generate-micro-compressed-code" value="false"/>
+        <property key="isolate-each-function" value="false"/>
+        <property key="make-warnings-into-errors" value="false"/>
+        <property key="optimization-level" value=""/>
+        <property key="place-data-into-section" value="false"/>
+        <property key="post-instruction-scheduling" value="default"/>
+        <property key="pre-instruction-scheduling" value="default"/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="rtti" value="true"/>
+        <property key="strict-ansi" value="false"/>
+        <property key="toplevel-reordering" value=""/>
+        <property key="unaligned-access" value=""/>
+        <property key="use-cci" value="false"/>
+        <property key="use-iar" value="false"/>
+        <property key="use-indirect-calls" value="false"/>
+      </C32CPP>
+      <C32Global>
+        <property key="common-include-directories" value=""/>
+        <property key="gp-relative-option" value=""/>
+        <property key="legacy-libc" value="true"/>
+        <property key="mdtcm" value=""/>
+        <property key="mitcm" value=""/>
+        <property key="mstacktcm" value="false"/>
+        <property key="omit-pack-options" value="1"/>
+        <property key="relaxed-math" value="false"/>
+        <property key="save-temps" value="false"/>
+        <property key="wpo-lto" value="false"/>
+      </C32Global>
+      <ICD3PlatformTool>
+        <property key="ADC" value="true"/>
+        <property key="AutoSelectMemRanges" value="auto"/>
+        <property key="CAN1" value="true"/>
+        <property key="CAN2" value="true"/>
+        <property key="CHANGE NOTICE A" value="true"/>
+        <property key="CHANGE NOTICE B" value="true"/>
+        <property key="CHANGE NOTICE C" value="true"/>
+        <property key="CHANGE NOTICE D" value="true"/>
+        <property key="CHANGE NOTICE E" value="true"/>
+        <property key="CHANGE NOTICE F" value="true"/>
+        <property key="CHANGE NOTICE G" value="true"/>
+        <property key="CHANGE NOTICE H" value="true"/>
+        <property key="CHANGE NOTICE J" value="true"/>
+        <property key="CHANGE NOTICE K" value="true"/>
+        <property key="COMPARATOR" value="true"/>
+        <property key="CTMU" value="true"/>
+        <property key="DMA" value="true"/>
+        <property key="ETHERNET CONTROLLER" value="true"/>
+        <property key="Freeze All Other Peripherals" value="true"/>
+        <property key="HLVD" value="true"/>
+        <property key="I2C 1" value="true"/>
+        <property key="I2C 2" value="true"/>
+        <property key="I2C 3" value="true"/>
+        <property key="I2C 4" value="true"/>
+        <property key="I2C 5" value="true"/>
+        <property key="INPUT CAPTURE 1" value="true"/>
+        <property key="INPUT CAPTURE 2" value="true"/>
+        <property key="INPUT CAPTURE 3" value="true"/>
+        <property key="INPUT CAPTURE 4" value="true"/>
+        <property key="INPUT CAPTURE 5" value="true"/>
+        <property key="INPUT CAPTURE 6" value="true"/>
+        <property key="INPUT CAPTURE 7" value="true"/>
+        <property key="INPUT CAPTURE 8" value="true"/>
+        <property key="INPUT CAPTURE 9" value="true"/>
+        <property key="INTERRUPT CONTROL" value="true"/>
+        <property key="OUTPUT COMPARE 1" value="true"/>
+        <property key="OUTPUT COMPARE 2" value="true"/>
+        <property key="OUTPUT COMPARE 3" value="true"/>
+        <property key="OUTPUT COMPARE 4" value="true"/>
+        <property key="OUTPUT COMPARE 5" value="true"/>
+        <property key="OUTPUT COMPARE 6" value="true"/>
+        <property key="OUTPUT COMPARE 7" value="true"/>
+        <property key="OUTPUT COMPARE 8" value="true"/>
+        <property key="OUTPUT COMPARE 9" value="true"/>
+        <property key="PARALLEL MASTER/SLAVE PORT" value="true"/>
+        <property key="REAL TIME CLOCK" value="true"/>
+        <property key="REFERENCE CLOCK1" value="true"/>
+        <property key="REFERENCE CLOCK2" value="true"/>
+        <property key="REFERENCE CLOCK3" value="true"/>
+        <property key="REFERENCE CLOCK4" value="true"/>
+        <property key="REFERENCE CLOCK5" value="true"/>
+        <property key="SPI/I2S 1" value="true"/>
+        <property key="SPI/I2S 2" value="true"/>
+        <property key="SPI/I2S 3" value="true"/>
+        <property key="SPI/I2S 4" value="true"/>
+        <property key="SPI/I2S 5" value="true"/>
+        <property key="SPI/I2S 6" value="true"/>
+        <property key="SecureSegment.SegmentProgramming" value="FullChipProgramming"/>
+        <property key="TIMER1" value="true"/>
+        <property key="TIMER2" value="true"/>
+        <property key="TIMER3" value="true"/>
+        <property key="TIMER4" value="true"/>
+        <property key="TIMER5" value="true"/>
+        <property key="TIMER6" value="true"/>
+        <property key="TIMER7" value="true"/>
+        <property key="TIMER8" value="true"/>
+        <property key="TIMER9" value="true"/>
+        <property key="ToolFirmwareFilePath"
+                  value="Press to browse for a specific firmware version"/>
+        <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
+        <property key="UART1" value="true"/>
+        <property key="UART2" value="true"/>
+        <property key="UART3" value="true"/>
+        <property key="UART4" value="true"/>
+        <property key="UART5" value="true"/>
+        <property key="UART6" value="true"/>
+        <property key="debugoptions.useswbreakpoints" value="false"/>
+        <property key="hwtoolclock.frcindebug" value="false"/>
+        <property key="memories.aux" value="false"/>
+        <property key="memories.bootflash" value="false"/>
+        <property key="memories.configurationmemory" value="true"/>
+        <property key="memories.configurationmemory2" value="true"/>
+        <property key="memories.dataflash" value="true"/>
+        <property key="memories.eeprom" value="true"/>
+        <property key="memories.flashdata" value="true"/>
+        <property key="memories.id" value="true"/>
+        <property key="memories.instruction.ram" value="true"/>
+        <property key="memories.instruction.ram.ranges"
+                  value="${memories.instruction.ram.ranges}"/>
+        <property key="memories.programmemory" value="true"/>
+        <property key="memories.programmemory.ranges" value="1d000000-1d1fffff"/>
+        <property key="poweroptions.powerenable" value="false"/>
+        <property key="programoptions.donoteraseauxmem" value="false"/>
+        <property key="programoptions.eraseb4program" value="true"/>
+        <property key="programoptions.preservedataflash" value="false"/>
+        <property key="programoptions.preservedataflash.ranges" value=""/>
+        <property key="programoptions.preserveeeprom" value="false"/>
+        <property key="programoptions.preserveeeprom.ranges" value=""/>
+        <property key="programoptions.preserveprogram.ranges" value=""/>
+        <property key="programoptions.preserveprogramrange" value="false"/>
+        <property key="programoptions.preserveuserid" value="false"/>
+        <property key="programoptions.programcalmem" value="false"/>
+        <property key="programoptions.programuserotp" value="false"/>
+        <property key="programoptions.testmodeentrymethod" value="VDDFirst"/>
+        <property key="programoptions.usehighvoltageonmclr" value="false"/>
+        <property key="programoptions.uselvpprogramming" value="false"/>
+        <property key="voltagevalue" value="3.25"/>
+      </ICD3PlatformTool>
+    </conf>
+  </confs>
+</configurationDescriptor>
