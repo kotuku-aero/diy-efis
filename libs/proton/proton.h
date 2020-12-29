@@ -50,28 +50,33 @@ extern "C"
 
 
 typedef struct _proton_args_t {
+  // this is passed the splash screen
   stream_p stream;
+  // this is the handle to the screen
+  handle_t screen;
+  // orientation of the screen
+  uint16_t orientation;
+  // optional serial input from console
   handle_t ci;
+  // optional serial output to console
   handle_t co;
+  // optional error stream
   handle_t cerr;
   } proton_args_t;
 
+  /**
+   * @function proton_init(proton_args_t *args)
+   * @param args arguments to init proton with
+   * @return handle to the root screen
+   */
+  extern handle_t proton_init(proton_args_t *args);
+  
   /**
    * @function run_proton(void *parg, handle_t ci, handle_t co, handle_t cerr)
    * Run the main window application loop
    * @param parg  Argument to pass
    */
-  extern void run_proton(proton_args_t *args);
-
-/**
- * @function load_layout(handle_t canvas, memid_t hive)
- * Load a registry hive that describes a series of windows
- * @param canvas    Parent window to create child windows within
- * @param hive      list of keys that describe each window
- * @return s_ok if loaded ok
- */
-extern result_t load_layout(handle_t canvas, memid_t hive);
-extern handle_t main_window;
+  extern void run_proton();
 
 #ifdef	__cplusplus
   }

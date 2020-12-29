@@ -840,7 +840,7 @@ result_t can_aerospace_init(const neutron_parameters_t *params, bool init_mode, 
     return result;
 
   // start the can driver running.
-  return bsp_can_init(can_rx_queue, 125);
+  return bsp_can_init(can_rx_queue, params->fsys, params->bitrate);
   }
 
 void send_param_float(float value, uint16_t id)

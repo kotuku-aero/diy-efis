@@ -60,7 +60,7 @@ result_t stream_close(stream_p hndl)
   if(stream->stream_close == 0)
     return e_not_implemented;
 
-  return (*stream->stream_close)(stream);
+  return (*(stream->stream_close))(stream);
   }
 
 result_t stream_delete(stream_p hndl)
@@ -74,7 +74,7 @@ result_t stream_delete(stream_p hndl)
   if(stream->stream_delete == 0)
     return e_not_implemented;
 
-  return (*stream->stream_delete)(stream);
+  return (*(stream->stream_delete))(stream);
   }
 
 result_t stream_eof(stream_p hndl)
@@ -88,7 +88,7 @@ result_t stream_eof(stream_p hndl)
   if(stream->stream_eof == 0)
     return e_not_implemented;
 
-  return (*stream->stream_eof)(stream);
+  return (*(stream->stream_eof))(stream);
   }
 
 result_t stream_read(stream_p hndl, void *buffer, uint16_t size, uint16_t *read)
@@ -105,7 +105,7 @@ result_t stream_read(stream_p hndl, void *buffer, uint16_t size, uint16_t *read)
   if(stream->stream_read == 0)
     return e_not_implemented;
 
-  return (*stream->stream_read)(stream, buffer, size, read);
+  return (*(stream->stream_read))(stream, buffer, size, read);
   }
 
 result_t stream_write(stream_p hndl, const void *buffer, uint16_t size)
@@ -122,7 +122,7 @@ result_t stream_write(stream_p hndl, const void *buffer, uint16_t size)
   if(stream->stream_write == 0)
     return e_not_implemented;
 
-  return (*stream->stream_write)(stream, buffer, size);
+  return (*(stream->stream_write))(stream, buffer, size);
   }
 
 result_t stream_copy(stream_p from, stream_p to)
@@ -170,7 +170,7 @@ result_t stream_getpos(stream_p hndl, uint32_t *pos)
   if(stream->stream_getpos == 0)
     return e_not_implemented;
 
-  return (*stream->stream_getpos)(stream, pos);
+  return (*(stream->stream_getpos))(stream, pos);
   }
 
 result_t stream_setpos(stream_p hndl, uint32_t pos)
@@ -184,7 +184,7 @@ result_t stream_setpos(stream_p hndl, uint32_t pos)
   if(stream->stream_setpos == 0)
     return e_not_implemented;
 
-  return (*stream->stream_setpos)(stream, pos);
+  return (*(stream->stream_setpos))(stream, pos);
   }
 
 result_t stream_length(stream_p hndl, uint32_t *length)
@@ -198,7 +198,7 @@ result_t stream_length(stream_p hndl, uint32_t *length)
   if(stream->stream_length == 0)
     return e_not_implemented;
 
-  return (*stream->stream_length)(stream, length);
+  return (*(stream->stream_length))(stream, length);
   }
 
 result_t stream_truncate(stream_p hndl, uint32_t length)
@@ -212,7 +212,7 @@ result_t stream_truncate(stream_p hndl, uint32_t length)
   if(stream->stream_truncate == 0)
     return e_not_implemented;
 
-  return (*stream->stream_truncate)(stream, length);
+  return (*(stream->stream_truncate))(stream, length);
   }
 
 result_t stream_path(stream_p hndl, bool full_path, uint16_t len, char *path)
@@ -226,7 +226,7 @@ result_t stream_path(stream_p hndl, bool full_path, uint16_t len, char *path)
   if (stream->stream_path == 0)
     return e_not_implemented;
 
-  return (*stream->stream_path)(hndl, full_path, len, path);
+  return (*(stream->stream_path))(hndl, full_path, len, path);
   }
 
 result_t stream_getc(stream_p hndl, char *ch)
@@ -240,7 +240,7 @@ result_t stream_getc(stream_p hndl, char *ch)
   if(stream->stream_read == 0)
     return e_not_implemented;
 
-  return (*stream->stream_read)(stream, ch, 1, 0);
+  return (*(stream->stream_read))(stream, ch, 1, 0);
   }
 
 result_t stream_putc(stream_p hndl, char ch)
@@ -254,7 +254,7 @@ result_t stream_putc(stream_p hndl, char ch)
   if(stream->stream_write == 0)
     return e_not_implemented;
 
-  return (*stream->stream_write)(stream, &ch, 1);
+  return (*(stream->stream_write))(stream, &ch, 1);
   }
 
 result_t stream_puts(stream_p hndl, const char *str)
@@ -269,7 +269,7 @@ result_t stream_puts(stream_p hndl, const char *str)
     return e_not_implemented;
 
   uint16_t len = (uint16_t) strlen(str);
-  return (*stream->stream_write)(stream, str, len);
+  return (*(stream->stream_write))(stream, str, len);
   }
 
 result_t stream_gets(stream_p hndl, char *buffer, uint16_t len)

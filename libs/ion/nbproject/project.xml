@@ -7,7 +7,7 @@
             <creation-uuid>cb13ec25-6782-4369-90b6-a13d4efc7077</creation-uuid>
             <make-project-type>0</make-project-type>
             <c-extensions>c</c-extensions>
-            <cpp-extensions/>
+            <cpp-extensions>cpp</cpp-extensions>
             <header-extensions>h</header-extensions>
             <asminc-extensions/>
             <sourceEncoding>ISO-8859-1</sourceEncoding>
@@ -17,27 +17,11 @@
             </sourceRootList>
             <confList>
                 <confElem>
-                    <name>debug_pic32MZ2048EFH064</name>
+                    <name>pic32MZ2048EFH064</name>
                     <type>3</type>
                 </confElem>
                 <confElem>
-                    <name>release_pic32MZ2048EFH064</name>
-                    <type>3</type>
-                </confElem>
-                <confElem>
-                    <name>debug_pic32MZ2048EFH144</name>
-                    <type>3</type>
-                </confElem>
-                <confElem>
-                    <name>release_pic32MZ2048EFH144</name>
-                    <type>3</type>
-                </confElem>
-                <confElem>
-                    <name>debug_pic32MZ2064DAH176</name>
-                    <type>3</type>
-                </confElem>
-                <confElem>
-                    <name>release_pic32MZ2064DAH176</name>
+                    <name>pic32MZ2064DAH176</name>
                     <type>3</type>
                 </confElem>
             </confList>

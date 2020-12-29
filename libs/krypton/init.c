@@ -1,5 +1,5 @@
 #include "krypton.h"
-
+#include "../neutron/neutron.h"
 #include "../neutron/bsp.h"
 
 #include <Windows.h>
@@ -88,13 +88,11 @@ static const char *help =
 "diy-efis <Options> registry_path\n"
 "Options only required if creating a new registry:\n"
 "  -c <size>      Create a new registry with <size> blocks, old path will be deleted\n"
-"  -f <path>      Set the framebuffer path to <path>\n"
 "  -x <x-pixels>  Set the screen width to x-pixels\n"
 "  -y <y-pixels>  Set the screen height to y-pixels\n"
-"  -d <device>    Open the i2c-devicet <device>\n"
 "  -h             Print this help message\n"
-" Values for CM3:\n"
-" diy-efis -c 32768 -f /dev/fb1 -x 320 -y 240 -d /dev/i2c-1 diy-efis.reg\n"
+" Values for MSH:\n"
+" diy-efis -c 32768 -x 320 -y 240 diy-efis.reg\n"
 " Values for PI-TFT:\n"
 " diy-efis -c 32768 -f /dev/fb1 -x 480 -y 320 -d /dev/i2c-1 diy-efis.reg\n";
 
@@ -139,7 +137,8 @@ result_t krypton_init(int argc, char **argv)
         height = optarg;
         break;
       default:
-        return print_error(help, s_false);
+        print_error(help, s_false);
+        exit(-1);
       }
     }
 

@@ -48,19 +48,19 @@ static pic_can_msg_t __attribute__((coherent)) tx_fifo[NUM_OF_ECAN_BUFFERS];
 static pic_can_msg_t __attribute__((coherent)) rx_fifo[NUM_OF_ECAN_BUFFERS];
 
 #define BITRATE 	125000               // 125kbs
+#define SJW_LEN     1
+#define SJW_VAL     (SJW_LEN -1)
 #define PRSEG_LEN   1
 #define PRSEG_VAL   (PRSEG_LEN -1)
 #define SEG1PH_LEN  5
 #define SEG1PH_VAL  (SEG1PH_LEN -1)
 #define SEG2PH_LEN  3
 #define SEG2PH_VAL  (SEG2PH_LEN -1)
-#define NTQ 		(PRSEG_LEN + SEG1PH_LEN + SEG2PH_LEN) // Number of Tq cycles which will make the
+#define NTQ 		(PRSEG_LEN + SEG1PH_LEN + SEG2PH_LEN + SJW_LEN) // Number of Tq cycles which will make the
 //CAN Bit Timing .
-//#define BRP_VAL		((PCLK5/(2* NTQ * BITRATE))-1)  //Formulae used for C1CFG1bits.BRP
-#define BRP_VAL 19           // for 50mhz FSYS
 
 
-result_t bsp_can_init(handle_t rx_queue)
+result_t bsp_can_init(handle_t rx_queue, uint32_t fcy, uint32_t bitrate)
   {
   C1CONbits.REQOP = 4;
   while(C1CONbits.OPMOD != 4);
@@ -71,14 +71,14 @@ result_t bsp_can_init(handle_t rx_queue)
   
   can_rx_queue = rx_queue;
   
+  uint32_t brp = (fcy / (2* NTQ * ((uint32_t) bitrate)))-1;
     // set up the can bus interface
-  C1CFGbits.SJW = 00; //Synchronized jump width time is 1 x TQ when SJW is equal to 00
-  C1CFGbits.BRP = BRP_VAL; //((FCY/(2*NTQ*BITRATE))-1)
+  C1CFGbits.SJW = SJW_VAL; //Synchronized jump width time is 1 x TQ when SJW is equal to 00
+  C1CFGbits.BRP = brp;
   C1CFGbits.SEG2PHTS = 1;       //
   C1CFGbits.PRSEG = PRSEG_VAL;  // Preamble
   C1CFGbits.SEG1PH = SEG1PH_VAL;
   C1CFGbits.SEG2PH = SEG2PH_VAL;
-  C1CFGbits.SEG2PHTS = 1; // use PS2 for calcs
   
   C1FIFOBA = (uint32_t) KVA_TO_PA(tx_fifo);
   

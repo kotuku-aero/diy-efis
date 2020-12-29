@@ -96,7 +96,7 @@ extern bool enqueue_i2c_task(int channel, const i2c_task_t *task);
 #define NUM_I2C_CHANNELS 2
 #define I2C_CHANNEL_1 0
 #define I2C_CHANNEL_2 1
-#elif defined(__32MZ2048EFH144__) | defined(__32MZ2064DAH176)
+#elif defined(__32MZ2048EFH144__) | defined(__32MZ2064DAH176)| defined(__32MZ2064DAG176)
 #define NUM_I2C_CHANNELS 5
 #define I2C_CHANNEL_1 0
 #define I2C_CHANNEL_2 1

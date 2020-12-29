@@ -115,32 +115,7 @@ void enable_tx(int next_buffer, int priority)
 //CAN Bit Timing .
 //#define BRP_VAL		((FCY/(2* NTQ * BITRATE))-1)  //Formulae used for C1CFG1bits.BRP
 
-extern uint32_t fcy;
-
-result_t bsp_set_can_rate(uint16_t rate)
-  {  
-  
-  // should be 27 for 70000, 7 for 20000
-  uint32_t brp = (fcy / (2* NTQ * rate))-1;
-  if(C1CFG1bits.BRP != (uint16_t) brp)
-    {
-    /* Set the ECAN module for Configuration Mode before writing into the Baud
-    Rate Control Registers */
-    C1CTRL1bits.REQOP = 4;
-
-    while(C1CTRL1bits.OPMODE != 4);
-
-    C1CFG1bits.BRP = (uint16_t) brp;
-
-    C1CTRL1bits.REQOP = 0;
-
-    while(C1CTRL1bits.OPMODE != 0); // wait for ready
-    }
-  return s_ok;
-  }
-
-
-result_t bsp_can_init(deque_p rx_queue, uint16_t bitrate)
+result_t bsp_can_init(deque_p rx_queue, uint32_t fcy, uint32_t bitrate)
   {
   // configure dma channel 0 to the txcan function
   DMA0CONbits.SIZE = 0x0;
@@ -183,6 +158,7 @@ result_t bsp_can_init(deque_p rx_queue, uint16_t bitrate)
   
   // set the initial rate to 125kbs
   // should be 27 for 70000, 7 for 20000
+  
   uint32_t brp = (fcy / (2* NTQ * bitrate))-1;
   
   C1CFG1bits.BRP = (uint16_t) brp;

@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-extern void memory_init(uint8_t **heap, uint32_t *length);
-
 /* The size of the structure placed at the beginning of each allocated memory
 block must by correctly byte aligned. */
 

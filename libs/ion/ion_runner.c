@@ -379,10 +379,10 @@ result_t ion_create_worker(memid_t home,
       return result;
       }
     }
-
+  
   // create the worker thread
   if (create_worker &&
-    failed(result = task_create(name, 1024, ion_worker, *ion, priority, &ion_ctx->worker)))
+    failed(result = task_create(name ==0 ? "ION" : name, 1024, ion_worker, *ion, priority, &ion_ctx->worker)))
     {
     // release the context..
     ion_close(ion_ctx);

@@ -12,6 +12,22 @@ static const char *screen_x_s = "screen-x";
 static const char *screen_y_s = "screen-y";
 static const char *fb_buffer_device_s = "screen";
 
+/*
+{
+LPDIRECTDRAWSURFACE lpddsprimary = NULL;
+DDSURFACEDESC2 ddsd;
+RECT client;
+UCHAR *primary_buffer;
+
+GetWindowRect(hwnd,&client);
+memset(&ddsd,0,sizeof(ddsd));ddstruct.dwSize=sizeof(ddsd);
+lpddsprimary->Lock(NULL,&ddsd,DDLOCK_SURFACEMEMORYPTR|DDLOCK_WAIT,NULL);
+primary_buffer=(UCHAR*)ddsd.lpSurface;
+Draw_a_fullGreenScreen(); // function defined somewhere else
+Draw_a_fullRedScreen(); // function defined somewhere else
+lpddsprimary->Unlock(NULL);
+}*/
+
 struct _fb_buffer_canvas_t;
 
 typedef uint32_t (*pack_pixel_fn)(struct _fb_buffer_canvas_t *canvas, color_t color);

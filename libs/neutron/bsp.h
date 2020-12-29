@@ -230,7 +230,9 @@ typedef struct _neutron_parameters_t
   // can publisher worker, if 0 default size used
   uint16_t publisher_stack_length;
   // rate to operate the can bus as
-  uint16_t bitrate;
+  uint32_t bitrate;
+  // clock supplied to the can controller
+  uint32_t fsys;
   } neutron_parameters_t;
 
 /**
@@ -263,7 +265,7 @@ extern void publish_task(void *pargs);
  * Initialize the hardware
  * @param rx_queue  Receive message queue.  The hardware needs to make an ISR safe call to push data onto queue
  */
-extern result_t bsp_can_init(deque_p rx_queue, uint16_t bitrate);
+extern result_t bsp_can_init(deque_p rx_queue, uint32_t fsys, uint32_t bitrate);
 /**
  * Send a message
  * @param msg

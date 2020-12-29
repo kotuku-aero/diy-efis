@@ -28,7 +28,7 @@ providers.
 
 If any file has a copyright notice or portions of code have been used
 and the original copyright notice is not yet transcribed to the repository
-then the origional copyright notice is to be respected.
+then the original copyright notice is to be respected.
 
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
@@ -36,24 +36,20 @@ it must be removed as soon as possible after the code fragment is identified.
 #ifndef __ion_h__
 #define __ion_h__
 
-#ifndef __dsPIC33
-#include "duktape.h"
-#endif
+// the nanoFramework header
+#include "CLR_Startup_Thread.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "interpreter.h"
 
   typedef struct _ion_context_t {
     handle_t console_in;          // console in for script engine
     handle_t console_out;         // console out for script engine
     handle_t console_err;         // error console for script engine
     memid_t home;                 // home registry key for the script engine
-    duk_context *ctx;             // context, used by script engine
-    memid_t script;               // handle to the script.  Used to compare running instances
-    task_p worker;              // worker script
+    task_p worker;                // worker script.  This runs the nanoFramework
     deque_p message_queue;       // queue of messages being handled
     } ion_context_t;
 
@@ -67,21 +63,46 @@ extern "C" {
   extern const char *event_s;
   extern const char *ion_name;
 
-typedef struct _event_registration_t {
-  uint16_t can_id;
-  const char *function_name;
-} event_registration_t;
-/**
- * @function add_event_handler(const char *script, const uint16_t *ids, uint16_t num_ids)
- * Utility function to register an event handler that will be processed by the ion engine.
- * @param name      Name of the javascript file.
- * @param script    Text of the javascript to be stored.
- * @param ids       Array of can-id's and function names to be registered
- * @param num_ids   Number of events to be hooked
- * @return s_ok if the events can be registered ok
- * @remark This is primarily used by embedded devices to register their default event scripts
- */
-extern result_t add_event_handler(const char *name, const char *script, const event_registration_t *ids, uint16_t num_ids);
+extern result_t ion_init();
+  /**
+   * Setup the ECMA Script 5 interpreter
+   * @param home      home key to refer all load funcs to
+   * @param path      path to the script to run
+   * @param ci        console in
+   * @param co        console out handler
+   * @param cerr      console error
+   * @param ion       resulting interactive interpreter
+   * @return 
+   */
+  extern result_t ion_create(memid_t home, const char *path,
+                             handle_t ci,
+                             handle_t co,
+                             handle_t cerr,
+                             struct _ion_context_t **ion);
+  /**
+   * Queue a message to the worker to process.
+   * @param ion     Context for the interpreter
+   * @param handler Registered name for the message (MUST be static variable)
+   * @param msg     Message to queue
+  */
+  extern result_t ion_queue_message(struct _ion_context_t *ion, const char *handler, const canmsg_t *msg);
+  /**
+   * Execute an interactive command in the shell
+   * @param ion     Context to use
+   */
+  extern result_t ion_exec(struct _ion_context_t *ion);
+
+  extern result_t ion_close(struct _ion_context_t *ion);
+  
+  
+  /**
+   * @function ion_run(ion_register_fn lib_funcs)
+   * Run the ion event handler code.  Usually the last thing to do
+   * Never returns
+   * @param lib_funcs Optional library functions to register
+   * 
+   */
+  extern result_t ion_run();
 
 
 #ifdef __cplusplus

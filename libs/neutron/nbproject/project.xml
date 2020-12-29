@@ -17,35 +17,15 @@
             </sourceRootList>
             <confList>
                 <confElem>
-                    <name>debug_pic32MZ2048EFH064</name>
+                    <name>pic32MZ2048EFH064</name>
                     <type>3</type>
                 </confElem>
                 <confElem>
-                    <name>release_pic32MZ2048EFH064</name>
+                    <name>dsPIC33EP256GP502</name>
                     <type>3</type>
                 </confElem>
                 <confElem>
-                    <name>debug_pic32MZ2048EFH144</name>
-                    <type>3</type>
-                </confElem>
-                <confElem>
-                    <name>release_pic32MZ2048EFH144</name>
-                    <type>3</type>
-                </confElem>
-                <confElem>
-                    <name>debug_dsPIC33EP256GP502</name>
-                    <type>3</type>
-                </confElem>
-                <confElem>
-                    <name>release_dsPIC33EP256GP502</name>
-                    <type>3</type>
-                </confElem>
-                <confElem>
-                    <name>debug_pic32MZ2064DAH176</name>
-                    <type>3</type>
-                </confElem>
-                <confElem>
-                    <name>release_pic32MZ2064DAH176</name>
+                    <name>pic32MZ2064DAH176</name>
                     <type>3</type>
                 </confElem>
             </confList>

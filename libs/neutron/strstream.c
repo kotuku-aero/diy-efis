@@ -312,6 +312,6 @@ result_t strstream_create(const uint8_t *lit, uint32_t len, bool read_only, stre
     stream->length = len;
     }
     
-  *hndl = (stream_p)stream;
+  *hndl = &stream->stream;
   return s_ok;
   }

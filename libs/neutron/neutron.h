@@ -1215,8 +1215,8 @@ extern result_t semaphore_wait(semaphore_p semaphore, uint32_t ticks);
 #define HIGH_PRIORITY 12
 #define MAX_PRIORITY 15
 
-#define IDLE_STACK_SIZE 128
-#define DEFAULT_STACK_SIZE 256
+#define IDLE_STACK_SIZE 512
+#define DEFAULT_STACK_SIZE 2048
 
 struct _task_t;
 typedef struct _task_t *task_p;

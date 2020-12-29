@@ -56,6 +56,39 @@ void _general_exception_handler(void)
   panic();
   }
 
+
+void _simple_tlb_refill_exception_handler()
+  {
+  _excep_addr = __builtin_mfc0(14, 2);
+  _excep_code = (excep_code_t) ((__builtin_mfc0(13, 0) >> 2) & 0x1f);
+
+  panic();
+  }
+
+void _cache_err_exception_handler()
+  {
+  _excep_addr = __builtin_mfc0(14, 2);
+  _excep_code = (excep_code_t) ((__builtin_mfc0(13, 0) >> 2) & 0x1f);
+
+  panic();
+  }
+
+void _bootstrap_exception_handler()
+  {
+  _excep_addr = __builtin_mfc0(14, 2);
+  _excep_code = (excep_code_t) ((__builtin_mfc0(13, 0) >> 2) & 0x1f);
+
+  panic();
+  }
+
+void _DefaultInterrupt()
+  {
+  _excep_addr = __builtin_mfc0(14, 2);
+  _excep_code = (excep_code_t) ((__builtin_mfc0(13, 0) >> 2) & 0x1f);
+
+  panic();
+  }
+
 void __attribute__( (interrupt(IPL0AUTO), vector(_TIMER_1_VECTOR))) _t1_interrupt( void );
 void t1_interrupt(void)
   {
@@ -65,7 +98,7 @@ void t1_interrupt(void)
 
 void task_abort()
   {
-  // seruous problem here
+  // serious problem here
   enter_critical();
   if(current_task != 0)
     current_task->state = ts_aborted;
