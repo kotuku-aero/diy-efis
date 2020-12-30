@@ -21,6 +21,11 @@
 #include <xc.h>
 #endif
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Signal within an isr
  * @param semaphore
@@ -143,9 +148,8 @@ extern bool scheduler_enabled;
 extern result_t has_wait_tasks(semaphore_p hndl);
 
 
-#if defined(__PIC32MZ__)
-// register the atom specific ION interpreter functions
-extern result_t register_atom_functions(duk_context *ctx, handle_t co);
+#ifdef __cplusplus
+  }
 #endif
 
 #endif

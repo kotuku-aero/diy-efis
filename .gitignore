@@ -33,3 +33,13 @@
 *.user
 *.log
 *.recipe
+*.ods#
+/libs/atom/.generated_files/*.flag
+/libs/atom16/.generated_files/*.flag
+/libs/atom32/.generated_files/*.flag
+/libs/ion/.generated_files/*.flag
+/libs/muon/.generated_files/*.flag
+/libs/neutron/.generated_files/*.flag
+/libs/photon/.generated_files/*.flag
+/libs/proton/.generated_files/*.flag
+/libs/yaffs2/.generated_files/*.flag

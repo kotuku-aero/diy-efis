@@ -39,6 +39,8 @@ it must be removed as soon as possible after the code fragment is identified.
 // the nanoFramework header
 #include "CLR_Startup_Thread.h"
 
+#include "../neutron/neutron.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -18,8 +18,8 @@
       <itemPath>photon.c</itemPath>
       <itemPath>font.c</itemPath>
       <itemPath>png_canvas.c</itemPath>
-      <itemPath>window.c</itemPath>
       <itemPath>widget.c</itemPath>
+      <itemPath>window.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -45,7 +45,7 @@
         <platformTool></platformTool>
         <languageToolchain>XC32</languageToolchain>
         <languageToolchainVersion>2.50</languageToolchainVersion>
-        <platform>2</platform>
+        <platform>3</platform>
       </toolsSet>
       <packs>
         <pack name="PIC32MZ-DA_DFP" vendor="Microchip" version="1.2.102"/>

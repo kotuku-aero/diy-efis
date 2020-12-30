@@ -314,6 +314,142 @@ extern result_t bsp_begin_paint(handle_t wnd);
  */
 extern result_t bsp_end_paint(handle_t wnd);
 
+/**********************************************************
+ * Support for updating a flash file system.  This can be embedded flash
+ * or sd-card flash
+ */
+
+typedef struct _nand_chip_t {
+  
+ 	void (*set_ale)(struct _nand_chip_t *device, uint32_t high);
+	void (*set_cle)(struct _nand_chip_t * device, uint32_t high);
+
+	unsigned (*read_cycle)(struct _nand_chip_t * device);
+	void (*write_cycle)(struct _nand_chip_t * device, uint32_t b);
+
+	uint32_t (*check_busy)(struct _nand_chip_t * device);
+	void (*idle_fn) (struct _nand_chip_t *device);
+	uint32_t (*power_check) (struct _nand_chip_t *device);
+
+	uint32_t blocks;
+	uint32_t pages_per_block;
+	uint32_t data_bytes_per_page;
+	uint32_t spare_bytes_per_page;
+	uint32_t bus_width_shift;
+  } nand_chip_t;
+  
+  // low level functions
+  enum fs_type {
+    fs_yaffs,       // yaffs2 file system
+    fs_fat32        // fat32 file system
+    };
+  
+#ifndef NAME_MAX
+#define NAME_MAX	256
+#endif
+
+  typedef struct _dirent_t {
+    uint32_t d_ino;           // inode number
+    off_t d_off;              // offset to this dirent
+    uint16_t d_reclen;        // length of this dirent
+    uint8_t d_type;           // type of this record
+    uint8_t d_name[NAME_MAX+1];	// file name (null-terminated)
+  } dirent_t;
+
+
+  typedef struct _stat_t {
+    handle_t st_dev;          // device
+    uint32_t st_ino;          // inode
+    uint32_t st_mode;         // protection
+    uint32_t st_nlink;        // number of hard links
+    uint32_t st_uid;          // user ID of owner (always 1000)
+    uint32_t st_gid;          // group ID of owner (always 1000)
+    uint32_t st_rdev;         // device type (if inode device)
+    off_t st_size;            // total size, in bytes
+    uint32_t st_blksize;      // blocksize for filesystem I/O
+    uint32_t st_blocks;       // number of blocks allocated 
+    uint32_t st_atime;        // time of last access
+    uint32_t st_mtime;        // time of last modification
+    uint32_t st_ctime;        // time of last change
+  } stat_t;
+
+
+  typedef struct _utimbuf_t {
+    uint32_t actime;
+    uint32_t modtime;
+  } utimbuf_t;
+  
+  enum seek_pos {
+    seek_current,
+    seek_begin,
+    seek_end
+    };
+
+    /**
+     * @function  mount(const char *mount_point, fs_type file_type, nand_chip_t device, handle_t *fshndl)
+     * Mount a flash file system
+     * @param mount_point mount point to mount at
+     * @param file_type   type of filesystem
+     * @param device      physical device
+     * @param fshndl      resulting handle
+     * @return s_ok if file system mounted
+     * @remark The first call the mount must be for mount_point = '/' so that
+     * the virtual file system is constructed
+     */
+  extern result_t mount(const char *mount_point, fs_type file_type, nand_chip_t device, handle_t *fshndl);
+  /**
+   * @function umount(handle_t fshndl)
+   * Unmount a file system.  This is very sim
+   * @param fshndl
+   * @return 
+   */
+  extern result_t umount(handle_t fshndl);
+  /**
+   * @function open(const char *path, uint32_t oflag, uint32_t mode, handle_t *fd)
+   * Open a file from the file system
+   * @param path absolute path to the file
+   * @param oflag
+   * @param mode
+   * @param fd resulting file handle.
+   * @return s_ok if file is opened.
+   */
+  result_t open(const char *path, uint32_t oflag, uint32_t mode, handle_t *fd);
+  result_t close(handle_t fd);
+  result_t fsync(handle_t fd) ;
+  result_t fdatasync(handle_t fd) ;
+  result_t flush(handle_t fd) ; /* same as fsync() */
+  result_t access(const char *path, uint32_t amode);
+  result_t dup(handle_t fd, handle_t *fd);
+  result_t fgetfl(handle_t fd, uint32_t *flags);
+  result_t read(handle_t fd, void *buf, uint32_t nbyte, uint32_t *read);
+  result_t write(handle_t fd, const void *buf, uint32_t nbyte, uint32_t *written);
+  result_t seek(handle_t fd, off_t offset, seek_pos whence, uint32_t *pos);
+  result_t truncate(const char *path, off_t new_size);
+  result_t ftruncate(handle_t fd, off_t new_size);
+  result_t unlink(const char *path);
+  result_t funlink(handle_t fd);
+  result_t rename(const char *old_path, const char *new_path);
+  result_t stat(const char *path, struct stat *buf);
+  result_t fstat(handle_t fd, struct stat *buf);
+  result_t utime(const char *path, const utimbuf_t *buf);
+  result_t futime(handle_t fd, const utimbuf_t *buf);
+  result_t chmod(const char *path, mode_t mode);
+  result_t fchmod(handle_t fd, mode_t mode);
+  result_t mkdir(const char *path, mode_t mode);
+  result_t rmdir(const char *path) ;
+  result_t opendir(const char *dirname, handle_t *dirp);
+  result_t readdir(handle_t dirp, dirent_t *dirent) ;
+  result_t rewinddir(handle_t dirp) ;
+  result_t closedir(handle_t dirp) ;
+  result_t format(fs_type file_type, nand_chip_t device);
+  result_t sync(handle_t fshndl);
+  result_t symlink(const char *oldpath, const char *newpath);
+  result_t readlink(const char *path, char *buf, uint16_t bufsiz);
+  result_t link(const char *oldpath, const char *newpath);
+  result_t freespace(const char *path, off_t *space);
+  result_t totalspace(const char *path, off_t *space);
+
+
 #ifdef __cplusplus
   }
 #endif

@@ -35,14 +35,17 @@ it must be removed as soon as possible after the code fragment is identified.
 */
 #include "window.h"
 
+/*
 // call this to register the ION script functions.
 // normally passed in on ion_run()
 extern result_t register_photon_functions(duk_context *ctx, handle_t co);
+ * */
 
 static const char *datatype_prop = "datatype";
 static const char *func_prop = "func";
 const char *handle_prop = "handle";
 
+/*
 // TODO: we can now attach global functions to the script using a callback.
 // expose the window specific JS functions
 result_t attach_ion(handle_t hndl, memid_t key, const char *startup_script, handle_t ci, handle_t co, handle_t cerr)
@@ -63,6 +66,7 @@ result_t detach_ion(handle_t hndl)
   {
   return e_not_implemented;
   }
+ * */
 
 result_t add_event(handle_t hwnd, uint16_t id, void *parg, const char *func, event_handler_fn callback)
   {
@@ -202,6 +206,7 @@ result_t find_event(handle_t hwnd, uint16_t id, event_proxy_t **details)
   return *details == 0 ? e_not_found : s_ok;
   }
 
+/*
 static duk_ret_t lib_window_dtor(duk_context *ctx)
   {
 
@@ -483,6 +488,7 @@ result_t remove_handler(handle_t hwnd, uint16_t id)
 
   return remove_event(hwnd, id, true);
   }
+ * */
 
 result_t on_paint(handle_t hwnd, struct _event_proxy_t *proxy, const canmsg_t *msg)
   {
@@ -630,8 +636,10 @@ result_t close_window(handle_t hwnd)
   if (failed(result = as_window(hwnd, &window)))
     return result;
 
+  /*
   if (failed(detach_ion_from_window(hwnd)))
     return result;
+   * */
 
   // send an id_close to the window so it can remove all of the
   // data from the window
@@ -683,7 +691,7 @@ result_t create_window(handle_t hwnd_parent, const rect_t *bounds, wndproc cb, u
   if (failed(result = make_window(hwnd_parent, bounds, cb, id, canvas, hwnd)))
     return result;
 
-  return attach_ion_to_window(0, 0, *hwnd);
+  return s_ok; // attach_ion_to_window(0, 0, *hwnd);
   }
 
 result_t create_child_window(handle_t hwnd_parent,
@@ -713,7 +721,7 @@ result_t create_child_window(handle_t hwnd_parent,
   if (failed(result = make_window(hwnd_parent, bounds, cb, id, canvas, hwnd)))
     return result;
 
-  return attach_ion_to_window(prototype, key, *hwnd);
+  return s_ok; // attach_ion_to_window(prototype, key, *hwnd);
   }
 
 result_t get_parent(handle_t window, handle_t *parent)
@@ -938,6 +946,7 @@ void free_variant(variant_t *value)
 
   }
 
+/*
 static duk_ret_t photon_setter(duk_context *ctx)
   {
   // get the 'this' pointer
@@ -1049,9 +1058,11 @@ static duk_ret_t photon_getter(duk_context *ctx)
 
   return 1;
   }
+ * */
 
 result_t add_property(handle_t hwnd, const char *property_name, getter_fn getter, setter_fn setter, field_datatype dt)
   {
+  /*
   result_t result;
   handle_t hscreen;
   screen_t *screen;
@@ -1084,7 +1095,7 @@ result_t add_property(handle_t hwnd, const char *property_name, getter_fn getter
   duk_def_prop(ctx, -1, DUK_DEFPROP_HAVE_GETTER | DUK_DEFPROP_HAVE_SETTER | DUK_DEFPROP_SET_ENUMERABLE);
 
   duk_pop(ctx);       // remove the object
-
+*/
   return s_ok;
   }
 

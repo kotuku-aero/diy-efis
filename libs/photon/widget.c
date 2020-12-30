@@ -528,7 +528,7 @@ result_t create_child_widget(handle_t parent, memid_t key, wndproc cb, handle_t 
 
   char type[REG_NAME_MAX];
   const char *prototype = 0;
-  if (succeeded(reg_get_string(key, "type", &type, 0)))
+  if (succeeded(reg_get_string(key, "type", type, 0)))
     {
     // testing hack.  Until we remove all of the native code
     //prototype = type;

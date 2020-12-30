@@ -14,7 +14,14 @@
 
 #ifndef __NAND_DRIVER_H__
 #define __NAND_DRIVER_H__
-#include "nand_chip.h"
+
+#include "../neutron/bsp.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 struct nanddrv_transfer {
 	unsigned char *buffer;
@@ -22,11 +29,16 @@ struct nanddrv_transfer {
 	int nbytes;
 };
 
-int nanddrv_read_tr(struct nand_chip *this, int page,
-		struct nanddrv_transfer *tr, int n_tr);
-int nanddrv_write_tr(struct nand_chip *this, int page,
-		struct nanddrv_transfer *tr, int n_tr);
-int nanddrv_erase(struct nand_chip *this, int block);
+int nanddrv_read_tr(nand_chip_t *this, int page, struct nanddrv_transfer *tr, int n_tr);
+int nanddrv_write_tr(nand_chip_t *this, int page, struct nanddrv_transfer *tr, int n_tr);
+int nanddrv_erase(nand_chip_t *this, int block);
+
+
+#ifdef __cplusplus
+  }
+#endif
+
+
 
 #endif
 

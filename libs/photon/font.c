@@ -33,7 +33,6 @@ then the origional copyright notice is to be respected.
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
-#include "window.h"
 #include "../neutron/bsp.h"
 
 extern color_t aplha_blend(color_t pixel, color_t back, uint8_t weighting);

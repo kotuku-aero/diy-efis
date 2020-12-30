@@ -12,14 +12,13 @@
 
 
 #include "nanddrv.h"
-#include "nand_chip.h"
 
 int nanddrv_initialise(void)
 {
 	return 0;
 }
 
-static void nanddrv_send_addr(struct nand_chip *this, int page, int offset)
+static void nanddrv_send_addr(nand_chip_t *this, int page, int offset)
 {
 	this->set_ale(this,1);
 	if(offset >= 0){
@@ -35,7 +34,7 @@ static void nanddrv_send_addr(struct nand_chip *this, int page, int offset)
 	this->set_ale(this,0);
 }
 
-static void nanddrv_send_cmd(struct nand_chip *this, unsigned char cmd)
+static void nanddrv_send_cmd(nand_chip_t *this, unsigned char cmd)
 {
 	this->set_cle(this, 1);
 	this->write_cycle(this, cmd);
@@ -55,8 +54,7 @@ static inline int nanddrv_status_busy(unsigned char status)
 	return (status & (1 << 6)) == 0;
 }
 
-static unsigned char nanddrv_get_status(struct nand_chip *this,
-					int wait_not_busy)
+static unsigned char nanddrv_get_status(nand_chip_t *this,	int wait_not_busy)
 {
 	unsigned char status;
 
@@ -70,8 +68,7 @@ static unsigned char nanddrv_get_status(struct nand_chip *this,
 	return status;
 }
 
-int nanddrv_read_tr(struct nand_chip *this, int page,
-		struct nanddrv_transfer *tr, int n_tr)
+int nanddrv_read_tr(nand_chip_t *this, int page, struct nanddrv_transfer *tr, int n_tr)
 {
 	unsigned char status;
 	int ncycles;
@@ -122,7 +119,7 @@ int nanddrv_read_tr(struct nand_chip *this, int page,
  * Program page
  * Cmd: 0x80, 5-byte address, data bytes,  Cmd: 0x10, wait not busy
  */
-int nanddrv_write_tr(struct nand_chip *this, int page,
+int nanddrv_write_tr(nand_chip_t *this, int page,
 		struct nanddrv_transfer *tr, int n_tr)
 {
 	unsigned char status;
@@ -175,7 +172,7 @@ int nanddrv_write_tr(struct nand_chip *this, int page,
  * Block erase
  * Cmd: 0x60, 3-byte address, cmd: 0xD0. Wait not busy.
  */
-int nanddrv_erase(struct nand_chip *this, int block)
+int nanddrv_erase(nand_chip_t *this, int block)
 {
 	unsigned char status;
 

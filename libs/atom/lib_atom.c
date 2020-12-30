@@ -34,17 +34,17 @@ If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
 #if !defined(__dsPIC33)
-#include "../../libs/ion/ion.h"
+#include "../ion/ion.h"
 #include "uart_device.h"
 
 // we register the serial handler functions.
 // if used we allow the device specific uart code to be handled
-// by javascript.  The code only supports basic serial comms
-// and all messages are passed as strings to javascript
+// by nano.  The code only supports basic serial comms
+// and all messages are passed as strings to nano
 
 typedef struct _serial_handle_t {
   uart_config_t config;           // will be passed back in the callback
-  duk_context *ctx;               // context owning serial port
+  ion_context_t *ctx;                        // context owning serial port
   uint16_t msg_id;
   char callback[];                // dynamically allocated
   } serial_handle_t;
@@ -59,14 +59,12 @@ static uint8_t datatypes[4] = {
   CANAS_DATATYPE_CHAR4
   };
 
+/*
 // handler for the serial callback
 static void rx_callback(uart_config_t *uart, uint8_t *buffer, uint8_t length)
   {
   serial_handle_t *handle = (serial_handle_t *)uart;
   
-  // we send messages to the context.
-  duk_memory_functions mem_funcs;
-  duk_get_memory_functions(handle->ctx, &mem_funcs);
 
   ion_context_t *ion = (ion_context_t *)mem_funcs.udata;
   
@@ -200,4 +198,6 @@ result_t register_atom_functions(duk_context *ctx, handle_t co)
   
   return s_ok;
   }
+ * */
+
 #endif

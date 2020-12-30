@@ -44,7 +44,6 @@ extern "C" {
 #include <string.h>
 
 #include "../neutron/bsp.h"
-#include "../ion/ion.h"
 
 #define WINDOW_QUEUE_SIZE 128
 
@@ -102,8 +101,6 @@ typedef struct _screen_t
   msg_hook_t msg_hook;
   // this holds the fonts
   vector_p fonts;
-  // ECMA script interpreter for the screen
-  ion_context_t *context;
   } screen_t;
 
 static inline result_t as_screen(handle_t handle, screen_t **screen)
@@ -202,8 +199,6 @@ typedef result_t (*setter_fn)(handle_t hwnd, const variant_t *value);
 extern result_t add_property(handle_t hwnd, const char *property_name, getter_fn getter, setter_fn setter, field_datatype dt);
 
 extern result_t get_canvas(handle_t hwnd, canvas_t **canvas);
-
-extern result_t get_handle(duk_context *ctx, duk_int_t obj_idx, handle_t *phwnd);
 
 #ifdef __cplusplus
 }
