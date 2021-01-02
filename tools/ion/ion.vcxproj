@@ -30,12 +30,8 @@
     <ClCompile Include="..\..\libs\ion\nanoCRT.cpp" />
     <ClCompile Include="..\..\libs\ion\platform_heap.c" />
     <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_CanFlyMsg.cpp" />
-    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_LLA_mshl.cpp" />
-    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_Matrix_mshl.cpp" />
-    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_Neutron_mshl.cpp" />
-    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_Photon_mshl.cpp" />
-    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_QTN_mshl.cpp" />
-    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_XYZ_mshl.cpp" />
+    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_Neutron.cpp" />
+    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_Photon.cpp" />
     <ClCompile Include="..\..\libs\ion\targetHAL.c" />
     <ClCompile Include="..\..\libs\ion\targetHAL_Time.cpp" />
     <ClCompile Include="..\..\libs\ion\targetPAL_Events.cpp" />

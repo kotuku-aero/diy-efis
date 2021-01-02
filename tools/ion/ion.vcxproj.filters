@@ -66,25 +66,13 @@
     <ClCompile Include="..\..\libs\ion\canflylib\CanFly_CoreLibrary.cpp">
       <Filter>canflylib</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_LLA_mshl.cpp">
-      <Filter>runtime</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_Matrix_mshl.cpp">
-      <Filter>runtime</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_Neutron_mshl.cpp">
-      <Filter>runtime</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_Photon_mshl.cpp">
-      <Filter>runtime</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_QTN_mshl.cpp">
-      <Filter>runtime</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_XYZ_mshl.cpp">
-      <Filter>runtime</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_CanFlyMsg.cpp">
+      <Filter>runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_Neutron.cpp">
+      <Filter>runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_Photon.cpp">
       <Filter>runtime</Filter>
     </ClCompile>
   </ItemGroup>
