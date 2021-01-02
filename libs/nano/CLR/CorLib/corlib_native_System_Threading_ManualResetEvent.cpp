@@ -6,37 +6,37 @@
 #include "CorLib.h"
 
 
-HRESULT Library_corlib_native_System_Threading_ManualResetEvent::_ctor___VOID__BOOLEAN( CLR_RT_StackFrame& stack )
-{
-    NATIVE_PROFILE_CLR_CORE();
-    NANOCLR_HEADER();
+HRESULT Library_corlib_native_System_Threading_ManualResetEvent::_ctor___VOID__BOOLEAN(CLR_RT_StackFrame& stack)
+  {
+  NATIVE_PROFILE_CLR_CORE();
+  NANOCLR_HEADER();
 
-    CLR_RT_HeapBlock* pThis = stack.This();
+  CLR_RT_HeapBlock* pThis = stack.This();
 
-    if(stack.Arg1().NumericByRef().s4)
+  if (stack.Arg1().NumericByRef().s4)
     {
-        pThis->SetFlags( CLR_RT_HeapBlock::HB_Signaled );
+    pThis->SetFlags(CLR_RT_HeapBlock::HB_Signaled);
     }
 
-    NANOCLR_NOCLEANUP_NOLABEL();
-}
+  NANOCLR_NOCLEANUP_NOLABEL();
+  }
 
-HRESULT Library_corlib_native_System_Threading_ManualResetEvent::Reset___BOOLEAN( CLR_RT_StackFrame& stack )
-{
-    NATIVE_PROFILE_CLR_CORE();
-    NANOCLR_HEADER();
+HRESULT Library_corlib_native_System_Threading_ManualResetEvent::Reset___BOOLEAN(CLR_RT_StackFrame& stack)
+  {
+  NATIVE_PROFILE_CLR_CORE();
+  NANOCLR_HEADER();
 
-    Library_corlib_native_System_Threading_WaitHandle::Reset( stack );
+  Library_corlib_native_System_Threading_WaitHandle::Reset(stack);
 
-    NANOCLR_NOCLEANUP_NOLABEL();
-}
+  NANOCLR_NOCLEANUP_NOLABEL();
+  }
 
-HRESULT Library_corlib_native_System_Threading_ManualResetEvent::Set___BOOLEAN( CLR_RT_StackFrame& stack )
-{
-    NATIVE_PROFILE_CLR_CORE();
-    NANOCLR_HEADER();
+HRESULT Library_corlib_native_System_Threading_ManualResetEvent::Set___BOOLEAN(CLR_RT_StackFrame& stack)
+  {
+  NATIVE_PROFILE_CLR_CORE();
+  NANOCLR_HEADER();
 
-    Library_corlib_native_System_Threading_WaitHandle::Set( stack );
+  Library_corlib_native_System_Threading_WaitHandle::Set(stack);
 
-    NANOCLR_NOCLEANUP_NOLABEL();    
-}
+  NANOCLR_NOCLEANUP_NOLABEL();
+  }

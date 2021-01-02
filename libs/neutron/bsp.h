@@ -28,7 +28,7 @@ providers.
 
 If any file has a copyright notice or portions of code have been used
 and the original copyright notice is not yet transcribed to the repository
-then the origional copyright notice is to be respected.
+then the original copyright notice is to be respected.
 
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
@@ -233,6 +233,30 @@ typedef struct _neutron_parameters_t
   uint32_t bitrate;
   // clock supplied to the can controller
   uint32_t fsys;
+  // used to generate can packets.  Most low level devices use this format
+  uint32_t sjw;
+  uint32_t prseg;
+  uint32_t seg1ph;
+  uint32_t seg2ph;
+  //
+  // Example device provisioning code
+  // NTQ = sjw + prseg + seg1ph + seg2ph
+  //
+  // for 50mhz clock:
+  //
+  //  sjw = 1
+  //  prseg = 1
+  //  seg1ph = 5
+  //  seg2ph = 3
+  //
+  // ntq = 10
+  // bitrate = 250 kbps
+  // fsys = 50 mHz
+  //
+  // divisor = (fsys / (2* ntq * bitrate))-1;
+  // divisor = (50000 /(2 * 10 * 250))-1;
+  // divisor = 9
+  
   } neutron_parameters_t;
 
 /**
@@ -265,7 +289,7 @@ extern void publish_task(void *pargs);
  * Initialize the hardware
  * @param rx_queue  Receive message queue.  The hardware needs to make an ISR safe call to push data onto queue
  */
-extern result_t bsp_can_init(deque_p rx_queue, uint32_t fsys, uint32_t bitrate);
+extern result_t bsp_can_init(deque_p rx_queue, const neutron_parameters_t *params);
 /**
  * Send a message
  * @param msg

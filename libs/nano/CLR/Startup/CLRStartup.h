@@ -8,11 +8,11 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
-#include <nanoCLR_Runtime.h>
-#include <nanoCLR_Checks.h>
+#include "../Include/nanoCLR_Runtime.h"
+#include "../Include/nanoCLR_Checks.h"
 //#include <nanoCLR_Diagnostics.h>
 //#include <nanoCLR_Hardware.h>
-#include <nanoCLR_Application.h>
+#include "../Include/nanoCLR_Application.h"
 //
 //#include <nanoCLR_Version.h>
 //

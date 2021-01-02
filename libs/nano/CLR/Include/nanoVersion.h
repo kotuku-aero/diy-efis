@@ -7,12 +7,12 @@
 
 // structure to hold 'standard' version information
 typedef struct VersionInfo
-{
-    unsigned short usMajor;
-    unsigned short usMinor;
-    unsigned short usBuild;
-    unsigned short usRevision;
+  {
+  unsigned short usMajor;
+  unsigned short usMinor;
+  unsigned short usBuild;
+  unsigned short usRevision;
 
-} VersionInfo;
+  } VersionInfo;
 
 #endif // _NANO_VERSION_H_

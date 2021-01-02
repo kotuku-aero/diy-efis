@@ -6,19 +6,19 @@
 #include "CorLib.h"
 
 
-HRESULT Library_corlib_native_System_Runtime_Remoting_RemotingServices::IsTransparentProxy___STATIC__BOOLEAN__OBJECT( CLR_RT_StackFrame& stack )
-{
-    NATIVE_PROFILE_CLR_CORE();
-    NANOCLR_HEADER();
+HRESULT Library_corlib_native_System_Runtime_Remoting_RemotingServices::IsTransparentProxy___STATIC__BOOLEAN__OBJECT(CLR_RT_StackFrame& stack)
+  {
+  NATIVE_PROFILE_CLR_CORE();
+  NANOCLR_HEADER();
 
-    bool              fProxy = false;    
+  bool              fProxy = false;
 
-  #if defined(NANOCLR_APPDOMAINS)
-    CLR_RT_HeapBlock& obj    = stack.Arg0();
-    fProxy = obj.IsTransparentProxy();
-  #endif
+#if defined(NANOCLR_APPDOMAINS)
+  CLR_RT_HeapBlock& obj = stack.Arg0();
+  fProxy = obj.IsTransparentProxy();
+#endif
 
-    stack.SetResult_Boolean( fProxy );
+  stack.SetResult_Boolean(fProxy);
 
-    NANOCLR_NOCLEANUP_NOLABEL();
-}
+  NANOCLR_NOCLEANUP_NOLABEL();
+  }

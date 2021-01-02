@@ -28,7 +28,7 @@ providers.
 
 If any file has a copyright notice or portions of code have been used
 and the original copyright notice is not yet transcribed to the repository
-then the origional copyright notice is to be respected.
+then the original copyright notice is to be respected.
 
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
@@ -415,6 +415,10 @@ static inline bool succeeded(result_t r)
 #define id_left_mag_coil2  2213 // SHORT  
 #define id_right_mag_coil2  2214 // SHORT  
 
+extern const char *get_name_from_id(uint16_t id);
+extern uint16_t get_id_from_name(const char* name);
+extern const char* get_datatype_name(uint8_t data_type);
+
   // status bits for autopilot
   #define APSTATUSMODEMASK    0x0007          // mask bits
   #define APMODENONE          0x0000          // no mode engaged, ap standby
@@ -460,6 +464,7 @@ static inline bool succeeded(result_t r)
 #define unit_mfd                      4
 #define unit_usb                      5
 #define unit_scan                     6
+#define unit_efi                      7
 
 #define ahrs_node_id                  128         // this allows for up to 8 AHRS units/bus
 #define ahrs_node_id_last             135
@@ -636,6 +641,15 @@ typedef struct _matrix_t {
   } matrix_t;
 
 extern const matrix_t identity_matrix;
+
+extern const xyz_t *matrix_dot(const matrix_t *m, const xyz_t *v, xyz_t *r);
+extern const matrix_t *matrix_add(const matrix_t *m, const matrix_t *v, matrix_t *r);
+extern const matrix_t *matrix_subtract(const matrix_t *m, const matrix_t *v, matrix_t *r);
+extern const matrix_t *matrix_multiply(const matrix_t *m, const matrix_t *v, matrix_t *r);
+extern const matrix_t *matrix_divide(const matrix_t *m, const matrix_t *v, matrix_t *r);
+extern const matrix_t *matrix_transpose(const matrix_t *m, matrix_t *r);
+extern const matrix_t *matrix_exponetiation(const matrix_t *m, matrix_t *r);
+extern const matrix_t *matrix_copy(const matrix_t* m, matrix_t* r);
 
 /**
  * @function create_can_msg_int16(canmsg_t *msg, uint16_t message_id, uint8_t service_code, int16_t data)
@@ -1196,7 +1210,6 @@ extern result_t semaphore_wait(semaphore_p semaphore, uint32_t ticks);
 #define BELOW_NORMAL 4
 #define NORMAL_PRIORITY 8
 #define HIGH_PRIORITY 12
-#define MAX_PRIORITY 15
 
 #define IDLE_STACK_SIZE 512
 #define DEFAULT_STACK_SIZE 2048

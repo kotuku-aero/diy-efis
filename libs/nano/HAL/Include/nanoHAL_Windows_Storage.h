@@ -5,7 +5,7 @@
 #ifndef _NANOHAL_WINDOWS_STORAGE_H_
 #define _NANOHAL_WINDOWS_STORAGE_H_ 1
 
-#include <Target_Windows_Storage.h>
+#include "../../../ion/Target_Windows_Storage.h"
 
 // FatFs define for size of file name members
 // ANSI/OEM at DBCS
@@ -30,17 +30,17 @@
 // Storage events sub-categories
 //////////////////////////////////////////////////////////////////////////
 typedef enum StorageEventType
-{
-    // INVALID
-    StorageEventType_Invalid                    = 0x00,
+  {
+  // INVALID
+  StorageEventType_Invalid = 0x00,
 
-    // removable device inserted
-    StorageEventType_RemovableDeviceInsertion   = 0x01,
+  // removable device inserted
+  StorageEventType_RemovableDeviceInsertion = 0x01,
 
-    // removable device removed
-    StorageEventType_RemovableDeviceRemoval     = 0x02,
+  // removable device removed
+  StorageEventType_RemovableDeviceRemoval = 0x02,
 
-}StorageEventType;
+  }StorageEventType;
 
 // constants to be used throughout the code
 #define SUPPORTED_DRIVES_COUNT  (2)
@@ -52,21 +52,21 @@ typedef enum StorageEventType
 /////////////////////////////////////////////////////////////////////////////////////////
 
 enum CreationCollisionOption
-{
-    CreationCollisionOption_GenerateUniqueName = 0,
-    CreationCollisionOption_ReplaceExisting,
-    CreationCollisionOption_FailIfExists,
-    CreationCollisionOption_OpenIfExists
-};
+  {
+  CreationCollisionOption_GenerateUniqueName = 0,
+  CreationCollisionOption_ReplaceExisting,
+  CreationCollisionOption_FailIfExists,
+  CreationCollisionOption_OpenIfExists
+  };
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void Target_FileSystemInit(void);
+  void Target_FileSystemInit(void);
 
 #ifdef __cplusplus
-}
+  }
 #endif
 
 #endif // _NANOHAL_WINDOWS_STORAGE_H_

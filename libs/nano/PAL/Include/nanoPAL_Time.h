@@ -6,8 +6,8 @@
 #ifndef _NANOPAL_TIME_H_
 #define _NANOPAL_TIME_H_ 1
 
-#include <nanoWeak.h>
-#include <targetPAL_Time.h>
+#include "../../CLR/Include/nanoWeak.h"
+#include "../../../ion/targetPAL_Time.h"
 
 #ifdef __cplusplus
 extern "C" {

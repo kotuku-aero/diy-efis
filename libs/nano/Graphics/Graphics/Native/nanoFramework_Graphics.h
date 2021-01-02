@@ -18,11 +18,10 @@
 #ifndef _NANOFRAMEWORK_GRAPHICS_H_
 #define _NANOFRAMEWORK_GRAPHICS_H_
 
-#include <nanoCLR_Interop.h>
-#include <nanoCLR_Runtime.h>
-#include <corlib_native.h>
-
-#include "Graphics.h"
+#include "../../../CLR/Include/nanoCLR_Interop.h"
+#include "../../../CLR/Include/nanoCLR_Runtime.h"
+#include "../../../CLR/CorLib/corlib_native.h"
+#include "../../Graphics/Core/Graphics.h"
 
 struct Library_nanoFramework_Graphics_nanoFramework_UI_RoutedEvent
 {

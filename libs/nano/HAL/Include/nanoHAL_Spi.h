@@ -7,9 +7,9 @@
 #ifndef _NANOHAL_SPI_H_
 #define _NANOHAL_SPI_H_ 1
 
-#include "TargetHAL_Spi.h"
+#include "../../../ion/TargetHAL_Spi.h"
 
-#include "CPU_SPI_decl.h"
+#include "../../PAL/Include/CPU_SPI_decl.h"
 
 // Global SPI handle type
 #define CPU_DEVICE_TYPE_SPI 1

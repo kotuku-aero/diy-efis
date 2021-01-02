@@ -6,8 +6,8 @@
 #ifndef _NANOCLR_HARDWARE_H_
 #define _NANOCLR_HARDWARE_H_
 
-#include <nanoCLR_Types.h>
-#include <nanoCLR_Runtime.h>
+#include "nanoCLR_Types.h"
+#include "nanoCLR_Runtime.h"
 
 //--//
 

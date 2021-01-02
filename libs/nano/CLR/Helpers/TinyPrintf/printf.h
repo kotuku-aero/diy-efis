@@ -8,19 +8,19 @@
 #ifndef __TFP_PRINTF__
 #define __TFP_PRINTF__
 
-#include <nanoCLR_Headers.h>
+#include "../../../CLR/Include/nanoCLR_Headers.h"
 
 #ifdef __cplusplus
 extern "C"
-{
+  {
 #endif
 
-    int tiny_sprintf(char *out, const char *format, ...);
-    int tiny_snprintf(char *out, unsigned int max_len, const char *format, ...);
-    int tiny_vsnprintf(char *out, unsigned int max_len, const char *format, va_list va);
+  int tiny_sprintf(char* out, const char* format, ...);
+  int tiny_snprintf(char* out, unsigned int max_len, const char* format, ...);
+  int tiny_vsnprintf(char* out, unsigned int max_len, const char* format, va_list va);
 
 #ifdef __cplusplus
-}
+  }
 #endif
 
 // the defines below allow using the regular calls to sprintf

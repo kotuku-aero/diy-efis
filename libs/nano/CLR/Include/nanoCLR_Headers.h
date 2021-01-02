@@ -13,8 +13,8 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdlib.h>
-#include <nanoWeak.h>
-#include <nanoPackStruct.h>
+#include "nanoWeak.h"
+#include "nanoPackStruct.h"
 
 // Constants for configuration options
 

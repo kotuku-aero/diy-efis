@@ -10,15 +10,15 @@
 #include <nf_rt_native.h>
 #endif
 
-HRESULT Library_corlib_native_System_Console::OutNative___STATIC__VOID__STRING__BOOLEAN( CLR_RT_StackFrame& stack )
-{
-    NANOCLR_HEADER();
+HRESULT Library_corlib_native_System_Console::OutNative___STATIC__VOID__STRING__BOOLEAN(CLR_RT_StackFrame& stack)
+  {
+  NANOCLR_HEADER();
 
 #if defined(_WIN32)
-    return stack.NotImplementedStub();
+  return stack.NotImplementedStub();
 #else
-    NANOCLR_CHECK_HRESULT(Library_corlib_native_System_Diagnostics_Debug::WriteLineNative___STATIC__VOID__STRING__BOOLEAN( stack ));
+  NANOCLR_CHECK_HRESULT(Library_corlib_native_System_Diagnostics_Debug::WriteLineNative___STATIC__VOID__STRING__BOOLEAN(stack));
 #endif
 
-    NANOCLR_NOCLEANUP();    
-}
+  NANOCLR_NOCLEANUP();
+  }

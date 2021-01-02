@@ -6,9 +6,8 @@
 #ifndef _NF_NATIVE_SYSTEM_MATH_H_
 #define _NF_NATIVE_SYSTEM_MATH_H_
 
-#include <nanoCLR_Interop.h>
-#include <nanoCLR_Runtime.h>
-// #include <corlib_native.h>
+#include "../Include/nanoCLR_Interop.h"
+#include "../Include/nanoCLR_Runtime.h"
 
 struct Library_nf_native_system_math_System_Math
 {

@@ -7,8 +7,8 @@
 #ifndef _NANOPAL_BLOCKSTORAGE_H_
 #define _NANOPAL_BLOCKSTORAGE_H_ 1
 
-#include <nanoHAL_v2.h>
-#include <target_BlockStorage.h>
+#include "../../HAL/Include/nanoHAL_v2.h"
+#include "../../../ion/TargetPAL_BlockStorage.h"
 
 /////////////////////////////////////////////////////////
 // Description:

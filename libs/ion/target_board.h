@@ -1,12 +1,4 @@
-#ifndef __target_board_h__
-#define __target_board_h__
+#ifndef _TARGET_BOARD_H_
+#define _TARGET_BOARD_H_
 
-#ifdef __cplusplus
-extern "C"
-  {
-#endif
-#ifdef __cplusplus
-  }
-#endif
-
-#endif
+#endif // _TARGET_BOARD_H_

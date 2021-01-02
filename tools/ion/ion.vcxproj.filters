@@ -13,11 +13,14 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="canflylib">
+      <UniqueIdentifier>{daa61ea8-894f-4be7-b06c-24839f7dcbf5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="runtime">
+      <UniqueIdentifier>{59bc259c-f689-433a-b8e5-ce83ac717344}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\libs\ion\duktape.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libs\ion\ion_cli_impl.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -30,17 +33,62 @@
     <ClCompile Include="..\..\libs\ion\ion_runner.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\libs\ion\CLR_Startup_Thread.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\hardfault.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\ion_cli.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\nanoCRT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\platform_heap.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\targetHAL.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\targetHAL_Time.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\targetPAL_Events.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\targetPAL_Time.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\WireProtocol_ReceiverThread.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\canflylib\CanFly_CoreLibrary.cpp">
+      <Filter>canflylib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_LLA_mshl.cpp">
+      <Filter>runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_Matrix_mshl.cpp">
+      <Filter>runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_Neutron_mshl.cpp">
+      <Filter>runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_Photon_mshl.cpp">
+      <Filter>runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_QTN_mshl.cpp">
+      <Filter>runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_XYZ_mshl.cpp">
+      <Filter>runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_CanFlyMsg.cpp">
+      <Filter>runtime</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\libs\ion\interpreter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libs\ion\duk_config.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libs\ion\duktape.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\libs\ion\ion_cli_impl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -50,8 +98,50 @@
     <ClInclude Include="..\..\libs\ion\ion_cli.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\libs\ion\CLR_Startup_Thread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\ion\lwipopts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\ion\target_board.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\ion\targetHAL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\ion\targetHAL_Time.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\ion\TargetPAL_BlockStorage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\ion\targetPAL_Time.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\ion\WireProtocol_ReceiverThread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\ion\target_os.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\ion\canflylib\CanFly_CoreLibrary.h">
+      <Filter>canflylib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\ion\Target_Windows_Storage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\ion\TargetHAL_Spi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\ion\target_BlockStorage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\libs\ion\ion.cli" />
+    <None Include="..\..\libs\ion\canflylib\FindINTEROP-CanFly.CoreLibrary.cmake">
+      <Filter>canflylib</Filter>
+    </None>
   </ItemGroup>
 </Project>

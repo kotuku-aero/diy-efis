@@ -1,0 +1,1217 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="CLR">
+      <UniqueIdentifier>{0c62607f-2db6-4065-b3fb-7cf5a3fa62cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CLR\Core">
+      <UniqueIdentifier>{40b05800-ccb2-4418-bd44-20ed027b16e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CLR\Core\Hardware">
+      <UniqueIdentifier>{a2db4faf-f480-41de-9749-8e48173a8540}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CLR\Core\InterruptHandler">
+      <UniqueIdentifier>{ab958736-a1f1-47e4-b3db-936d0908ec3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CLR\Core\NativeEventDispatcher">
+      <UniqueIdentifier>{fbde876e-621b-4153-8140-95f0e5df5d33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CLR\Core\RPC">
+      <UniqueIdentifier>{38a94ae9-0b48-4e4d-b394-2a15bfb6647b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CLR\Core\Serialization">
+      <UniqueIdentifier>{f1878644-ed6e-49f0-bac1-a20d68bc8d20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CLR\CoreLib">
+      <UniqueIdentifier>{d8075c41-3bec-4c8f-9a91-8cd8dcda6e9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CLR\Debugger">
+      <UniqueIdentifier>{0bac2651-3da2-42f4-b290-c2768651d449}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CLR\Diagnostics">
+      <UniqueIdentifier>{cb92250f-355a-49c3-93a5-2a299070d571}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CLR\Helpers">
+      <UniqueIdentifier>{3acf514f-1bee-40f7-a790-efbeb91facd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CLR\Helpers\Base64">
+      <UniqueIdentifier>{5a5f40c3-5178-44d1-a57c-f219c4d5b3f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CLR\Helpers\TinyPrintf">
+      <UniqueIdentifier>{0940b80f-8e9b-4fd7-a6e5-d420418da4fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CLR\Include">
+      <UniqueIdentifier>{94f93731-4480-4bb4-a338-229cf5cda100}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CLR\Messaging">
+      <UniqueIdentifier>{9a8ef8a0-88d4-4ed8-9d86-540a781a88fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CLR\Startup">
+      <UniqueIdentifier>{77bd65f3-394c-415b-946b-a48467174053}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CLR\System.Math">
+      <UniqueIdentifier>{4ee5348f-786c-467f-b13a-9b667086cb30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CLR\WireProtocol">
+      <UniqueIdentifier>{8f379517-8272-49d3-90b3-1b53dd134bfa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Events">
+      <UniqueIdentifier>{1453072c-1fde-4a50-9b00-793718fe69f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FileSystem">
+      <UniqueIdentifier>{2fb1c6ce-e35f-47d5-ae1e-5dca96a39f45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{93fae4d9-99e0-4524-8edd-ed7633a4e296}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Graphics">
+      <UniqueIdentifier>{0cd6dc71-8705-4301-aeaf-1e0389a8c009}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Graphics\Core">
+      <UniqueIdentifier>{272509fd-3b9d-4448-b279-74779264c9e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Graphics\Core\Support">
+      <UniqueIdentifier>{8933c0ef-8d4e-4f9f-ad0a-74cfbae0ac60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Graphics\Core\Support\Bmp">
+      <UniqueIdentifier>{4630a51c-bb9b-4747-9944-c719c6d34adb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Graphics\Core\Support\Fonts">
+      <UniqueIdentifier>{7483e986-18e8-498d-9b7f-14205f6d83b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Graphics\Core\Support\Fonts\TinyFonts">
+      <UniqueIdentifier>{e6f98354-a7ca-4b07-9fa9-83e7ddf78eb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Graphics\Core\Support\Gif">
+      <UniqueIdentifier>{247e2f62-c272-49bd-883d-4a476917c811}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Graphics\Core\Support\Jpeg">
+      <UniqueIdentifier>{e172687d-b81d-49a9-97ee-336f2efd6039}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Graphics\Native">
+      <UniqueIdentifier>{f71b8ac8-b89f-4806-a502-2ca1cfbf807d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HAL">
+      <UniqueIdentifier>{aab1e98b-a427-46b1-92ea-c29ff4fb64bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HAL\Include">
+      <UniqueIdentifier>{1aa56ee8-5018-4768-96ed-7a83b3b9835c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Native">
+      <UniqueIdentifier>{f5559b57-d6e7-4bde-a35f-91d17fdf2153}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PAL">
+      <UniqueIdentifier>{6dce5bad-4a8a-4d6b-a6f1-8f905976a61f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PAL\AsyncProcCall">
+      <UniqueIdentifier>{c01dda1e-980c-40c3-972a-8cdb17596172}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PAL\BlockStorage">
+      <UniqueIdentifier>{4caf89f9-6843-4cce-8648-5749c6170a64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PAL\COM">
+      <UniqueIdentifier>{e351d4ba-d73f-4bff-b8d7-b19ae26b11a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PAL\COM\sockets">
+      <UniqueIdentifier>{1398a746-d101-403a-8546-3ec52d6d19be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PAL\COM\sockets\ssl">
+      <UniqueIdentifier>{746f5dc0-2baf-4d27-b40e-b485e56f32cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PAL\COM\sockets\ssl\mbedTLS">
+      <UniqueIdentifier>{38c84ebc-db42-4024-8d88-585cb6f2604c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PAL\Double">
+      <UniqueIdentifier>{8755c7b2-9d55-4d48-82b3-f98d5be17755}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PAL\Events">
+      <UniqueIdentifier>{37cccc3f-e57f-4ffa-b908-92e543411e1e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PAL\Include">
+      <UniqueIdentifier>{696347dc-0136-45ca-a2d8-9379297860f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PAL\Lwip">
+      <UniqueIdentifier>{e6b1c631-491c-4f4a-81ea-50853b7ab7e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PAL\Profiler">
+      <UniqueIdentifier>{9a696c1a-bab2-4cd2-92cd-67c4c35f78ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ResourceManager">
+      <UniqueIdentifier>{16ef863f-3939-4d12-848c-76357fe5bcd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System.Collections">
+      <UniqueIdentifier>{f0de1504-4bfb-4dbd-a8dc-b0d6c9113e6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System.Text">
+      <UniqueIdentifier>{db8e22fa-901c-4128-9623-8fcd7d2ba1ca}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\Hardware\Hardware.cpp">
+      <Filter>CLR\Core\Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\Hardware\Hardware_stub.cpp">
+      <Filter>CLR\Core\Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\InterruptHandler\InterruptHandler.cpp">
+      <Filter>CLR\Core\InterruptHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\InterruptHandler\InterruptHandler_stub.cpp">
+      <Filter>CLR\Core\InterruptHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\NativeEventDispatcher\NativeEventDispatcher.cpp">
+      <Filter>CLR\Core\NativeEventDispatcher</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\NativeEventDispatcher\NativeEventDispatcher_stub.cpp">
+      <Filter>CLR\Core\NativeEventDispatcher</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\Serialization\BinaryFormatter.cpp">
+      <Filter>CLR\Core\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\Serialization\BinaryFormatter_stub.cpp">
+      <Filter>CLR\Core\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\RPC\CLR_RT_HeapBlock_EndPoint.cpp">
+      <Filter>CLR\Core\RPC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\RPC\RPC_stub.cpp">
+      <Filter>CLR\Core\RPC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\Cache.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\Checks.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\CLR_RT_DblLinkedList.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\CLR_RT_HeapBlock.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\CLR_RT_HeapBlock_Array.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\CLR_RT_HeapBlock_ArrayList.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\CLR_RT_HeapBlock_BinaryBlob.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\CLR_RT_HeapBlock_Delegate.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\CLR_RT_HeapBlock_Delegate_List.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\CLR_RT_HeapBlock_Finalizer.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\CLR_RT_HeapBlock_Lock.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\CLR_RT_HeapBlock_LockRequest.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\CLR_RT_HeapBlock_Node.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\CLR_RT_HeapBlock_Queue.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\CLR_RT_HeapBlock_Stack.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\CLR_RT_HeapBlock_String.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\CLR_RT_HeapBlock_Timer.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\CLR_RT_HeapBlock_WaitForObject.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\CLR_RT_HeapCluster.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\CLR_RT_Interop.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\CLR_RT_Memory.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\CLR_RT_ObjectToEvent_Destination.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\CLR_RT_ObjectToEvent_Source.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\CLR_RT_RuntimeMemory.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\CLR_RT_StackFrame.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\CLR_RT_SystemAssembliesTable.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\CLR_RT_UnicodeHelper.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\Core.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\Execution.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\GarbageCollector.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\GarbageCollector_Compaction.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\GarbageCollector_ComputeReachabilityGraph.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\GarbageCollector_Info.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\Interpreter.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\nanoSupport_CRC32.c">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\Random.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\Streams.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\StringTable.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\StringTableData.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\Thread.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\TypeSystem.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\TypeSystemLookup.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Core\Various.cpp">
+      <Filter>CLR\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_AppDomain.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Array.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Attribute.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_BitConverter.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Collections_ArrayList.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Console.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Convert.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_DateTime.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Delegate.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Diagnostics_Debug.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Diagnostics_Debugger.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Double.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Enum.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Exception.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_GC.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Globalization_CultureInfo.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Globalization_DateTimeFormat.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Guid.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_MarshalByRefObject.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_MathInternal.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_MulticastDelegate.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Number.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Object.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Random.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Reflection_Assembly.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Reflection_Binder.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Reflection_ConstructorInfo.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Reflection_FieldInfo.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Reflection_MemberInfo.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Reflection_MethodBase.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Reflection_PropertyInfo.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Reflection_RuntimeFieldInfo.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Reflection_RuntimeMethodInfo.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Runtime_CompilerServices_RuntimeHelpers.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Runtime_Remoting_RemotingServices.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_RuntimeType.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_String.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Threading_AutoResetEvent.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Threading_Interlocked.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Threading_ManualResetEvent.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Threading_Monitor.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Threading_Thread.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Threading_Timer.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Threading_WaitHandle.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_TimeSpan.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Type.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_ValueType.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_WeakReference.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Debugger\Debugger.cpp">
+      <Filter>CLR\Debugger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Debugger\Debugger_full.cpp">
+      <Filter>CLR\Debugger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Debugger\Debugger_minimal.cpp">
+      <Filter>CLR\Debugger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Debugger\Debugger_stub.cpp">
+      <Filter>CLR\Debugger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Diagnostics\Diagnostics_stub.cpp">
+      <Filter>CLR\Diagnostics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Diagnostics\Info.cpp">
+      <Filter>CLR\Diagnostics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Diagnostics\Profile.cpp">
+      <Filter>CLR\Diagnostics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Diagnostics\Profiler.cpp">
+      <Filter>CLR\Diagnostics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Helpers\Base64\base64.c">
+      <Filter>CLR\Helpers\Base64</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Helpers\TinyPrintf\printf.c">
+      <Filter>CLR\Helpers\TinyPrintf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Messaging\Messaging.cpp">
+      <Filter>CLR\Messaging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Messaging\Messaging_stub.cpp">
+      <Filter>CLR\Messaging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\Startup\CLRStartup.cpp">
+      <Filter>CLR\Startup</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\System.Math\nf_native_system_math.cpp">
+      <Filter>CLR\System.Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\System.Math\nf_native_system_math_System_Math.cpp">
+      <Filter>CLR\System.Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\WireProtocol\targetHAL_time.cpp">
+      <Filter>CLR\WireProtocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\WireProtocol\WireProtocol_App_Interface.c">
+      <Filter>CLR\WireProtocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\WireProtocol\WireProtocol_HAL_Interface.c">
+      <Filter>CLR\WireProtocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\WireProtocol\WireProtocol_Message.c">
+      <Filter>CLR\WireProtocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\WireProtocol\WireProtocol_MonitorCommands.c">
+      <Filter>CLR\WireProtocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Events\nf_rt_events_native.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Events\nf_rt_events_native_nanoFramework_Runtime_Events_EventSink.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Events\nf_rt_events_native_nanoFramework_Runtime_Events_NativeEventDispatcher.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Events\nf_rt_events_native_nanoFramework_Runtime_Events_WeakDelegate.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\FileSystem\nf_sys_io_filesystem.cpp">
+      <Filter>FileSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\FileSystem\nf_sys_io_filesystem_System_IO_File.cpp">
+      <Filter>FileSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\FileSystem\nf_sys_io_filesystem_System_IO_FileStream.cpp">
+      <Filter>FileSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Bmp\Bitmap_Decoder.cpp">
+      <Filter>Graphics\Graphics\Core\Support\Bmp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Fonts\Font.cpp">
+      <Filter>Graphics\Graphics\Core\Support\Fonts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Gif\GifDecoder.cpp">
+      <Filter>Graphics\Graphics\Core\Support\Gif</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Gif\lzwread.cpp">
+      <Filter>Graphics\Graphics\Core\Support\Gif</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Gif\Gif.cpp">
+      <Filter>Graphics\Graphics\Core\Support\Gif</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jbytearraydatasrc.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jcapimin.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jcapistd.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jccoefct.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jccolor.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jcdctmgr.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jchuff.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jcinit.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jcmainct.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jcmarker.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jcmaster.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jcomapi.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jcparam.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jcphuff.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jcprepct.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jcsample.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jctrans.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jdapimin.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jdapistd.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jdcoefct.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jdcolor.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jddctmgr.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jdhuff.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jdinput.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jdmainct.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jdmarker.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jdmaster.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jdmerge.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jdphuff.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jdpostct.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jdsample.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jdtrans.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jerror.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jfdctflt.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jfdctfst.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jfdctint.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jidctflt.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jidctfst.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jidctint.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jidctred.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jmemmgr.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jmemnanoclr.cpp">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\Jpeg.cpp">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jquant1.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jquant2.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jutils.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\mcbcr.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\mfint.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\miint.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\pfint.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\piint.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\transupp.c">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Native\nanoFramework_Graphics_nanoFramework_UI_Bitmap.cpp">
+      <Filter>Graphics\Graphics\Native</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Native\nanoFramework_Graphics_nanoFramework_UI_DisplayControl.cpp">
+      <Filter>Graphics\Graphics\Native</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Native\nanoFramework_Graphics_nanoFramework_UI_Font.cpp">
+      <Filter>Graphics\Graphics\Native</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Native\nanoFramework_Graphics_nanoFramework_UI_Ink.cpp">
+      <Filter>Graphics\Graphics\Native</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Native\nanoFramework_Graphics_nanoFramework_UI_TouchCollectorConfiguration.cpp">
+      <Filter>Graphics\Graphics\Native</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Native\nanoFramework_Graphics_nanoFramework_UI_TouchEventProcessor.cpp">
+      <Filter>Graphics\Graphics\Native</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Native\nanoFramework_Graphics_nanoFramework_UI_TouchPanel.cpp">
+      <Filter>Graphics\Graphics\Native</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Native\nanoFramework_Graphics.cpp">
+      <Filter>Graphics\Graphics\Native</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\HAL\nanoHAL_Boot.c">
+      <Filter>HAL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\HAL\nanoHAL_Capabilites.c">
+      <Filter>HAL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\HAL\nanoHAL_ConfigurationManager.c">
+      <Filter>HAL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\HAL\nanoHAL_ConfigurationManager_stubs.c">
+      <Filter>HAL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\HAL\nanoHAL_SystemEvents.c">
+      <Filter>HAL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\HAL\nanoHAL_SystemInformation.cpp">
+      <Filter>HAL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\HAL\nanoHAL_Time.cpp">
+      <Filter>HAL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\HAL\nanoHAL_Watchdog.c">
+      <Filter>HAL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Native\nf_rt_native.cpp">
+      <Filter>Native</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Native\nf_rt_native_nanoFramework_Runtime_Hardware_SystemInfo.cpp">
+      <Filter>Native</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Native\nf_rt_native_nanoFramework_Runtime_Native_ExecutionConstraint.cpp">
+      <Filter>Native</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Native\nf_rt_native_nanoFramework_Runtime_Native_GC.cpp">
+      <Filter>Native</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Native\nf_rt_native_nanoFramework_Runtime_Native_Power.cpp">
+      <Filter>Native</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Native\nf_rt_native_nanoFramework_Runtime_Native_Rtc_stubs.cpp">
+      <Filter>Native</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\nanoPAL_Network_stubs.cpp">
+      <Filter>PAL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\AsyncProcCall\Async_stubs.cpp">
+      <Filter>PAL\AsyncProcCall</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\AsyncProcCall\AsyncCompletions.cpp">
+      <Filter>PAL\AsyncProcCall</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\AsyncProcCall\AsyncContinuations.cpp">
+      <Filter>PAL\AsyncProcCall</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\BlockStorage\nanoPAL_BlockStorage.c">
+      <Filter>PAL\BlockStorage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\COM\ComDirector.cpp">
+      <Filter>PAL\COM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\COM\GenericPort_stubs.c">
+      <Filter>PAL\COM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\COM\COM_stubs.c">
+      <Filter>PAL\COM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\COM\sockets\sockets_lwip.cpp">
+      <Filter>PAL\COM\sockets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\COM\sockets\Sockets_debugger.cpp">
+      <Filter>PAL\COM\sockets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\COM\sockets\ssl\ssl.cpp">
+      <Filter>PAL\COM\sockets\ssl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\COM\sockets\ssl\ssl_stubs.cpp">
+      <Filter>PAL\COM\sockets\ssl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\COM\sockets\ssl\mbedTLS\ssl_accept_internal.cpp">
+      <Filter>PAL\COM\sockets\ssl\mbedTLS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\COM\sockets\ssl\mbedTLS\ssl_add_cert_auth_internal.cpp">
+      <Filter>PAL\COM\sockets\ssl\mbedTLS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\COM\sockets\ssl\mbedTLS\ssl_close_socket_internal.cpp">
+      <Filter>PAL\COM\sockets\ssl\mbedTLS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\COM\sockets\ssl\mbedTLS\ssl_connect_internal.cpp">
+      <Filter>PAL\COM\sockets\ssl\mbedTLS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\COM\sockets\ssl\mbedTLS\ssl_decode_private_key_internal.cpp">
+      <Filter>PAL\COM\sockets\ssl\mbedTLS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\COM\sockets\ssl\mbedTLS\ssl_exit_context_internal.cpp">
+      <Filter>PAL\COM\sockets\ssl\mbedTLS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\COM\sockets\ssl\mbedTLS\ssl_generic.cpp">
+      <Filter>PAL\COM\sockets\ssl\mbedTLS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\COM\sockets\ssl\mbedTLS\ssl_generic_init_internal.cpp">
+      <Filter>PAL\COM\sockets\ssl\mbedTLS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\COM\sockets\ssl\mbedTLS\ssl_initialize_internal.cpp">
+      <Filter>PAL\COM\sockets\ssl\mbedTLS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\COM\sockets\ssl\mbedTLS\ssl_parse_certificate_internal.cpp">
+      <Filter>PAL\COM\sockets\ssl\mbedTLS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\COM\sockets\ssl\mbedTLS\ssl_pending_internal.cpp">
+      <Filter>PAL\COM\sockets\ssl\mbedTLS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\COM\sockets\ssl\mbedTLS\ssl_read_internal.cpp">
+      <Filter>PAL\COM\sockets\ssl\mbedTLS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\COM\sockets\ssl\mbedTLS\ssl_uninitialize_internal.cpp">
+      <Filter>PAL\COM\sockets\ssl\mbedTLS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\COM\sockets\ssl\mbedTLS\ssl_write_internal.cpp">
+      <Filter>PAL\COM\sockets\ssl\mbedTLS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\Double\nanoPAL_NativeDouble.cpp">
+      <Filter>PAL\Double</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\Events\nanoPAL_Events_driver.cpp">
+      <Filter>PAL\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\Events\nanoPAL_Events_functions.cpp">
+      <Filter>PAL\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\Events\nanoPAL_Events.cpp">
+      <Filter>PAL\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\Lwip\lwIP_Sockets_functions.cpp">
+      <Filter>PAL\Lwip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\Lwip\lwIP_Sockets.cpp">
+      <Filter>PAL\Lwip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\PAL\Profiler\nanoPAL_PerformanceCounters_stubs.cpp">
+      <Filter>PAL\Profiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\ResourceManager\nf_system_resourcemanager.cpp">
+      <Filter>ResourceManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\ResourceManager\nf_system_resourcemanager_nanoFramework_Runtime_Native_ResourceUtility.cpp">
+      <Filter>ResourceManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\ResourceManager\nf_system_resourcemanager_System_Resources_ResourceManager.cpp">
+      <Filter>ResourceManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\System.Collections\nf_system_collections_System_Collections_Queue.cpp">
+      <Filter>System.Collections</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\System.Collections\nf_system_collections_System_Collections_Stack.cpp">
+      <Filter>System.Collections</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\System.Collections\nf_system_collections.cpp">
+      <Filter>System.Collections</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\System.Text\nf_system_text_System_Text_UTF8Decoder.cpp">
+      <Filter>System.Text</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\System.Text\nf_system_text_System_Text_UTF8Encoding.cpp">
+      <Filter>System.Text</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\System.Text\nf_system_text.cpp">
+      <Filter>System.Text</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\Graphics.cpp">
+      <Filter>Graphics\Graphics\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\GraphicsDriver.cpp">
+      <Filter>Graphics\Graphics\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\Graphics\Graphics\Core\GraphicsMemoryHeap.cpp">
+      <Filter>Graphics\Graphics\Core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\libs\nano\CLR\Core\Core.h">
+      <Filter>CLR\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Core\corhdr_private.h">
+      <Filter>CLR\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\CorLib\CorLib.h">
+      <Filter>CLR\CoreLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\CorLib\corlib_native.h">
+      <Filter>CLR\CoreLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Debugger\Debugger.h">
+      <Filter>CLR\Debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Diagnostics\Diagnostics.h">
+      <Filter>CLR\Diagnostics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Helpers\Base64\base64.h">
+      <Filter>CLR\Helpers\Base64</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Helpers\TinyPrintf\printf.h">
+      <Filter>CLR\Helpers\TinyPrintf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Include\nanoCLR_Application.h">
+      <Filter>CLR\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Include\nanoCLR_Checks.h">
+      <Filter>CLR\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Include\nanoCLR_Debugging.h">
+      <Filter>CLR\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Include\nanoCLR_ErrorCodes.h">
+      <Filter>CLR\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Include\nanoCLR_Hardware.h">
+      <Filter>CLR\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Include\nanoCLR_Headers.h">
+      <Filter>CLR\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Include\nanoCLR_Interop.h">
+      <Filter>CLR\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Include\nanoCLR_Messaging.h">
+      <Filter>CLR\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Include\nanoCLR_ParseOptions.h">
+      <Filter>CLR\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Include\nanoCLR_PlatformDef.h">
+      <Filter>CLR\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Include\nanoCLR_Profiling.h">
+      <Filter>CLR\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Include\nanoCLR_Runtime.h">
+      <Filter>CLR\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Include\nanoCLR_Runtime__HeapBlock.h">
+      <Filter>CLR\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Include\nanoCLR_Runtime__Serialization.h">
+      <Filter>CLR\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Include\nanoCLR_Types.h">
+      <Filter>CLR\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Include\nanoCLR_Win32.h">
+      <Filter>CLR\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Include\nanoPackStruct.h">
+      <Filter>CLR\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Include\nanoSupport.h">
+      <Filter>CLR\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Include\nanoVersion.h">
+      <Filter>CLR\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Include\nanoWeak.h">
+      <Filter>CLR\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Include\nf_errors_exceptions.h">
+      <Filter>CLR\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Include\WireProtocol.h">
+      <Filter>CLR\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Include\WireProtocol_App_Interface.h">
+      <Filter>CLR\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Include\WireProtocol_HAL_Interface.h">
+      <Filter>CLR\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Include\WireProtocol_Message.h">
+      <Filter>CLR\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Include\WireProtocol_MonitorCommands.h">
+      <Filter>CLR\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\Startup\CLRStartup.h">
+      <Filter>CLR\Startup</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\System.Math\nf_native_system_math.h">
+      <Filter>CLR\System.Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\Events\nf_rt_events_native.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\FileSystem\nf_sys_io_filesystem.h">
+      <Filter>FileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Gif\giffile.h">
+      <Filter>Graphics\Graphics\Core\Support\Gif</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Gif\lzw.h">
+      <Filter>Graphics\Graphics\Core\Support\Gif</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Gif\lzwread.h">
+      <Filter>Graphics\Graphics\Core\Support\Gif</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Gif\lzwutil.h">
+      <Filter>Graphics\Graphics\Core\Support\Gif</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Gif\gif.h">
+      <Filter>Graphics\Graphics\Core\Support\Gif</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jchuff.h">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jconfig.h">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jdct.h">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jdhuff.h">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jerror.h">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jinclude.h">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jmemsys.h">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jmorecfg.h">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jpegint.h">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jpeglib.h">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\jversion.h">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\mcbcr.h">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Jpeg\transupp.h">
+      <Filter>Graphics\Graphics\Core\Support\Jpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\Graphics\Graphics\Native\nanoFramework_Graphics.h">
+      <Filter>Graphics\Graphics\Native</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\HAL\Include\nanoHAL_Boot.h">
+      <Filter>HAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\HAL\Include\nanoHAL_Capabilites.h">
+      <Filter>HAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\HAL\Include\nanoHAL_ConfigurationManager.h">
+      <Filter>HAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\HAL\Include\nanoHAL_Graphics.h">
+      <Filter>HAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\HAL\Include\nanoHAL_Network.h">
+      <Filter>HAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\HAL\Include\nanoHAL_Power.h">
+      <Filter>HAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\HAL\Include\nanoHAL_ReleaseInfo.h">
+      <Filter>HAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\HAL\Include\nanoHAL_Spi.h">
+      <Filter>HAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\HAL\Include\nanoHAL_Time.h">
+      <Filter>HAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\HAL\Include\nanoHAL_Types.h">
+      <Filter>HAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\HAL\Include\nanoHAL_v2.h">
+      <Filter>HAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\HAL\Include\nanoHAL_Watchdog.h">
+      <Filter>HAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\HAL\Include\nanoHAL_Windows_Storage.h">
+      <Filter>HAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\HAL\Include\nanoHAL.h">
+      <Filter>HAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\Native\nf_rt_native.h">
+      <Filter>Native</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\PAL\COM\sockets\sockets_lwip.h">
+      <Filter>PAL\COM\sockets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\PAL\COM\sockets\ssl\ssl.h">
+      <Filter>PAL\COM\sockets\ssl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\PAL\COM\sockets\ssl\ssl_functions.h">
+      <Filter>PAL\COM\sockets\ssl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\PAL\COM\sockets\ssl\ssl_types.h">
+      <Filter>PAL\COM\sockets\ssl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\PAL\COM\sockets\ssl\mbedTLS\mbedtls.h">
+      <Filter>PAL\COM\sockets\ssl\mbedTLS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\PAL\COM\sockets\ssl\mbedTLS\nf_mbedtls_config.h">
+      <Filter>PAL\COM\sockets\ssl\mbedTLS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\PAL\Include\nanoCRT.h">
+      <Filter>PAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\PAL\Include\nanoPAL.h">
+      <Filter>PAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\PAL\Include\nanoPAL_AsyncProcCalls_decl.h">
+      <Filter>PAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\PAL\Include\nanoPAL_BlockStorage.h">
+      <Filter>PAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\PAL\Include\nanoPAL_COM.h">
+      <Filter>PAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\PAL\Include\nanoPAL_Events.h">
+      <Filter>PAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\PAL\Include\nanoPAL_GPIO.h">
+      <Filter>PAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\PAL\Include\nanoPAL_NativeDouble.h">
+      <Filter>PAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\PAL\Include\nanoPAL_Network.h">
+      <Filter>PAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\PAL\Include\nanoPAL_PerformanceCounters.h">
+      <Filter>PAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\PAL\Include\nanoPAL_Sockets.h">
+      <Filter>PAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\PAL\Include\nanoPAL_Time.h">
+      <Filter>PAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\PAL\Include\CPU_GPIO_decl.h">
+      <Filter>PAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\PAL\Include\CPU_SPI_decl.h">
+      <Filter>PAL\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\PAL\Lwip\lwIP_Sockets.h">
+      <Filter>PAL\Lwip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\ResourceManager\nf_system_resourcemanager.h">
+      <Filter>ResourceManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\System.Collections\nf_system_collections.h">
+      <Filter>System.Collections</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\System.Text\nf_system_text.h">
+      <Filter>System.Text</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\Graphics\Graphics\Core\Graphics.h">
+      <Filter>Graphics\Graphics\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\Graphics\Graphics\Core\GraphicsMemoryHeap.h">
+      <Filter>Graphics\Graphics\Core</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\libs\nano\CLR\Include\opcode.def">
+      <Filter>CLR\Include</Filter>
+    </None>
+    <None Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Fonts\TinyFonts\NinaB.tinyfnt">
+      <Filter>Graphics\Graphics\Core\Support\Fonts\TinyFonts</Filter>
+    </None>
+    <None Include="..\..\libs\nano\Graphics\Graphics\Core\Support\Fonts\TinyFonts\small.tinyfnt">
+      <Filter>Graphics\Graphics\Core\Support\Fonts\TinyFonts</Filter>
+    </None>
+  </ItemGroup>
+</Project>

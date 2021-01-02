@@ -47,20 +47,8 @@ static inline bool get_rtr(const pic_can_msg_t *msg)
 static pic_can_msg_t __attribute__((coherent)) tx_fifo[NUM_OF_ECAN_BUFFERS];
 static pic_can_msg_t __attribute__((coherent)) rx_fifo[NUM_OF_ECAN_BUFFERS];
 
-#define BITRATE 	125000               // 125kbs
-#define SJW_LEN     1
-#define SJW_VAL     (SJW_LEN -1)
-#define PRSEG_LEN   1
-#define PRSEG_VAL   (PRSEG_LEN -1)
-#define SEG1PH_LEN  5
-#define SEG1PH_VAL  (SEG1PH_LEN -1)
-#define SEG2PH_LEN  3
-#define SEG2PH_VAL  (SEG2PH_LEN -1)
-#define NTQ 		(PRSEG_LEN + SEG1PH_LEN + SEG2PH_LEN + SJW_LEN) // Number of Tq cycles which will make the
-//CAN Bit Timing .
 
-
-result_t bsp_can_init(handle_t rx_queue, uint32_t fcy, uint32_t bitrate)
+result_t bsp_can_init(handle_t rx_queue, const neutron_parameters_t *params)
   {
   C1CONbits.REQOP = 4;
   while(C1CONbits.OPMOD != 4);
@@ -71,14 +59,16 @@ result_t bsp_can_init(handle_t rx_queue, uint32_t fcy, uint32_t bitrate)
   
   can_rx_queue = rx_queue;
   
-  uint32_t brp = (fcy / (2* NTQ * ((uint32_t) bitrate)))-1;
+  uint32_t ntq = params->sjw + params->prseg + params->seg1ph + params->seg2ph;
+  
+  uint32_t brp = (params->fsys / (2* ntq * ((uint32_t) params->bitrate)))-1;
     // set up the can bus interface
-  C1CFGbits.SJW = SJW_VAL; //Synchronized jump width time is 1 x TQ when SJW is equal to 00
+  C1CFGbits.SJW = params->sjw -1; //Synchronized jump width time is 1 x TQ when SJW is equal to 00
   C1CFGbits.BRP = brp;
   C1CFGbits.SEG2PHTS = 1;       //
-  C1CFGbits.PRSEG = PRSEG_VAL;  // Preamble
-  C1CFGbits.SEG1PH = SEG1PH_VAL;
-  C1CFGbits.SEG2PH = SEG2PH_VAL;
+  C1CFGbits.PRSEG = params->prseg -1;
+  C1CFGbits.SEG1PH = params->seg1ph -1;
+  C1CFGbits.SEG2PH = params->seg2ph -1;
   
   C1FIFOBA = (uint32_t) KVA_TO_PA(tx_fifo);
   

@@ -57,17 +57,17 @@
 
  /* Pointer to routine to downsample a single component */
 typedef JMETHOD(void, downsample1_ptr,
-(j_compress_ptr cinfo, jpeg_component_info* compptr,
+  (j_compress_ptr cinfo, jpeg_component_info* compptr,
     JSAMPARRAY input_data, JSAMPARRAY output_data));
 
 /* Private subobject */
 
 typedef struct {
-    struct jpeg_downsampler pub;  /* public fields */
+  struct jpeg_downsampler pub;  /* public fields */
 
-    /* Downsampling method pointers, one per component */
-    downsample1_ptr methods[MAX_COMPONENTS];
-} my_downsampler;
+  /* Downsampling method pointers, one per component */
+  downsample1_ptr methods[MAX_COMPONENTS];
+  } my_downsampler;
 
 typedef my_downsampler* my_downsample_ptr;
 
@@ -80,9 +80,9 @@ typedef my_downsampler* my_downsample_ptr;
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 METHODDEF(void)
 start_pass_downsample(j_compress_ptr cinfo)
-{
-    /* no work for now */
-}
+  {
+  /* no work for now */
+  }
 #pragma GCC diagnostic pop
 
 
@@ -93,23 +93,23 @@ start_pass_downsample(j_compress_ptr cinfo)
 
 LOCAL(void)
 expand_right_edge(JSAMPARRAY image_data, int num_rows,
-    JDIMENSION input_cols, JDIMENSION output_cols)
-{
-    register JSAMPROW ptr;
-    register JSAMPLE pixval;
-    register int count;
-    int row;
-    int numcols = (int)(output_cols - input_cols);
+  JDIMENSION input_cols, JDIMENSION output_cols)
+  {
+  register JSAMPROW ptr;
+  register JSAMPLE pixval;
+  register int count;
+  int row;
+  int numcols = (int)(output_cols - input_cols);
 
-    if (numcols > 0) {
-        for (row = 0; row < num_rows; row++) {
-            ptr = image_data[row] + input_cols;
-            pixval = ptr[-1];    /* don't need GETJSAMPLE() here */
-            for (count = numcols; count > 0; count--)
-                *ptr++ = pixval;
-        }
+  if (numcols > 0) {
+    for (row = 0; row < num_rows; row++) {
+      ptr = image_data[row] + input_cols;
+      pixval = ptr[-1];    /* don't need GETJSAMPLE() here */
+      for (count = numcols; count > 0; count--)
+        *ptr++ = pixval;
+      }
     }
-}
+  }
 
 
 /*
@@ -120,21 +120,21 @@ expand_right_edge(JSAMPARRAY image_data, int num_rows,
 
 METHODDEF(void)
 sep_downsample(j_compress_ptr cinfo,
-    JSAMPIMAGE input_buf, JDIMENSION in_row_index,
-    JSAMPIMAGE output_buf, JDIMENSION out_row_group_index)
-{
-    my_downsample_ptr downsample = (my_downsample_ptr)cinfo->downsample;
-    int ci;
-    jpeg_component_info* compptr;
-    JSAMPARRAY in_ptr, out_ptr;
+  JSAMPIMAGE input_buf, JDIMENSION in_row_index,
+  JSAMPIMAGE output_buf, JDIMENSION out_row_group_index)
+  {
+  my_downsample_ptr downsample = (my_downsample_ptr)cinfo->downsample;
+  int ci;
+  jpeg_component_info* compptr;
+  JSAMPARRAY in_ptr, out_ptr;
 
-    for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components;
-        ci++, compptr++) {
-        in_ptr = input_buf[ci] + in_row_index;
-        out_ptr = output_buf[ci] + (out_row_group_index * compptr->v_samp_factor);
-        (*downsample->methods[ci]) (cinfo, compptr, in_ptr, out_ptr);
+  for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components;
+    ci++, compptr++) {
+    in_ptr = input_buf[ci] + in_row_index;
+    out_ptr = output_buf[ci] + (out_row_group_index * compptr->v_samp_factor);
+    (*downsample->methods[ci]) (cinfo, compptr, in_ptr, out_ptr);
     }
-}
+  }
 
 
 /*
@@ -146,43 +146,43 @@ sep_downsample(j_compress_ptr cinfo,
 
 METHODDEF(void)
 int_downsample(j_compress_ptr cinfo, jpeg_component_info* compptr,
-    JSAMPARRAY input_data, JSAMPARRAY output_data)
-{
-    int inrow, outrow, h_expand, v_expand, numpix, numpix2, h, v;
-    JDIMENSION outcol, outcol_h;  /* outcol_h == outcol*h_expand */
-    JDIMENSION output_cols = compptr->width_in_blocks * DCTSIZE;
-    JSAMPROW inptr, outptr;
-    CLR_INT32 outvalue;
+  JSAMPARRAY input_data, JSAMPARRAY output_data)
+  {
+  int inrow, outrow, h_expand, v_expand, numpix, numpix2, h, v;
+  JDIMENSION outcol, outcol_h;  /* outcol_h == outcol*h_expand */
+  JDIMENSION output_cols = compptr->width_in_blocks * DCTSIZE;
+  JSAMPROW inptr, outptr;
+  CLR_INT32 outvalue;
 
-    h_expand = cinfo->max_h_samp_factor / compptr->h_samp_factor;
-    v_expand = cinfo->max_v_samp_factor / compptr->v_samp_factor;
-    numpix = h_expand * v_expand;
-    numpix2 = numpix / 2;
+  h_expand = cinfo->max_h_samp_factor / compptr->h_samp_factor;
+  v_expand = cinfo->max_v_samp_factor / compptr->v_samp_factor;
+  numpix = h_expand * v_expand;
+  numpix2 = numpix / 2;
 
-    /* Expand input data enough to let all the output samples be generated
-     * by the standard loop.  Special-casing padded output would be more
-     * efficient.
-     */
-    expand_right_edge(input_data, cinfo->max_v_samp_factor,
-        cinfo->image_width, output_cols * h_expand);
+  /* Expand input data enough to let all the output samples be generated
+   * by the standard loop.  Special-casing padded output would be more
+   * efficient.
+   */
+  expand_right_edge(input_data, cinfo->max_v_samp_factor,
+    cinfo->image_width, output_cols * h_expand);
 
-    inrow = 0;
-    for (outrow = 0; outrow < compptr->v_samp_factor; outrow++) {
-        outptr = output_data[outrow];
-        for (outcol = 0, outcol_h = 0; outcol < output_cols;
-            outcol++, outcol_h += h_expand) {
-            outvalue = 0;
-            for (v = 0; v < v_expand; v++) {
-                inptr = input_data[inrow + v] + outcol_h;
-                for (h = 0; h < h_expand; h++) {
-                    outvalue += (CLR_INT32)GETJSAMPLE(*inptr++);
-                }
-            }
-            *outptr++ = (JSAMPLE)((outvalue + numpix2) / numpix);
+  inrow = 0;
+  for (outrow = 0; outrow < compptr->v_samp_factor; outrow++) {
+    outptr = output_data[outrow];
+    for (outcol = 0, outcol_h = 0; outcol < output_cols;
+      outcol++, outcol_h += h_expand) {
+      outvalue = 0;
+      for (v = 0; v < v_expand; v++) {
+        inptr = input_data[inrow + v] + outcol_h;
+        for (h = 0; h < h_expand; h++) {
+          outvalue += (CLR_INT32)GETJSAMPLE(*inptr++);
+          }
         }
-        inrow += v_expand;
+      *outptr++ = (JSAMPLE)((outvalue + numpix2) / numpix);
+      }
+    inrow += v_expand;
     }
-}
+  }
 
 
 /*
@@ -193,15 +193,15 @@ int_downsample(j_compress_ptr cinfo, jpeg_component_info* compptr,
 
 METHODDEF(void)
 fullsize_downsample(j_compress_ptr cinfo, jpeg_component_info* compptr,
-    JSAMPARRAY input_data, JSAMPARRAY output_data)
-{
-    /* Copy the data */
-    jcopy_sample_rows(input_data, 0, output_data, 0,
-        cinfo->max_v_samp_factor, cinfo->image_width);
-    /* Edge-expand */
-    expand_right_edge(output_data, cinfo->max_v_samp_factor,
-        cinfo->image_width, compptr->width_in_blocks * DCTSIZE);
-}
+  JSAMPARRAY input_data, JSAMPARRAY output_data)
+  {
+  /* Copy the data */
+  jcopy_sample_rows(input_data, 0, output_data, 0,
+    cinfo->max_v_samp_factor, cinfo->image_width);
+  /* Edge-expand */
+  expand_right_edge(output_data, cinfo->max_v_samp_factor,
+    cinfo->image_width, compptr->width_in_blocks * DCTSIZE);
+  }
 
 
 /*
@@ -220,77 +220,77 @@ fullsize_downsample(j_compress_ptr cinfo, jpeg_component_info* compptr,
 
 __inline METHODDEF(void)
 h2v1_downsample_mmx(j_compress_ptr cinfo, jpeg_component_info* compptr,
-    JSAMPARRAY input_data, JSAMPARRAY output_data);
+  JSAMPARRAY input_data, JSAMPARRAY output_data);
 #endif
 METHODDEF(void)
 h2v1_downsample_orig(j_compress_ptr cinfo, jpeg_component_info* compptr,
-    JSAMPARRAY input_data, JSAMPARRAY output_data);
+  JSAMPARRAY input_data, JSAMPARRAY output_data);
 
 
 METHODDEF(void)
 h2v1_downsample(j_compress_ptr cinfo, jpeg_component_info* compptr,
-    JSAMPARRAY input_data, JSAMPARRAY output_data)
-{
+  JSAMPARRAY input_data, JSAMPARRAY output_data)
+  {
 #ifdef JPEG_MMX_SUPPORTED
-    if ((((int)input_data[0]) & 7) != 0) {
-        WARNMS(cinfo, JERR_BAD_ALIGN_TYPE);
+  if ((((int)input_data[0]) & 7) != 0) {
+    WARNMS(cinfo, JERR_BAD_ALIGN_TYPE);
     }
-    else if (cinfo->dct_method == JDCT_ISLOW_MMX ||
-        cinfo->dct_method == JDCT_IFAST_MMX) {
-        h2v1_downsample_mmx(cinfo, compptr, input_data, output_data);
-        return;
+  else if (cinfo->dct_method == JDCT_ISLOW_MMX ||
+    cinfo->dct_method == JDCT_IFAST_MMX) {
+    h2v1_downsample_mmx(cinfo, compptr, input_data, output_data);
+    return;
     }
 #endif
-    h2v1_downsample_orig(cinfo, compptr, input_data, output_data);
-}
+  h2v1_downsample_orig(cinfo, compptr, input_data, output_data);
+  }
 
 
 METHODDEF(void)
 h2v1_downsample_orig(j_compress_ptr cinfo, jpeg_component_info* compptr,
-    JSAMPARRAY input_data, JSAMPARRAY output_data)
-{
-    int outrow;
-    JDIMENSION outcol;
-    JDIMENSION output_cols = compptr->width_in_blocks * DCTSIZE;
-    register JSAMPROW inptr, outptr;
-    register int bias;
+  JSAMPARRAY input_data, JSAMPARRAY output_data)
+  {
+  int outrow;
+  JDIMENSION outcol;
+  JDIMENSION output_cols = compptr->width_in_blocks * DCTSIZE;
+  register JSAMPROW inptr, outptr;
+  register int bias;
 
-    /* Expand input data enough to let all the output samples be generated
-     * by the standard loop.  Special-casing padded output would be more
-     * efficient.
-     */
-    expand_right_edge(input_data, cinfo->max_v_samp_factor,
-        cinfo->image_width, output_cols * 2);
+  /* Expand input data enough to let all the output samples be generated
+   * by the standard loop.  Special-casing padded output would be more
+   * efficient.
+   */
+  expand_right_edge(input_data, cinfo->max_v_samp_factor,
+    cinfo->image_width, output_cols * 2);
 
-    for (outrow = 0; outrow < compptr->v_samp_factor; outrow++) {
-        outptr = output_data[outrow];
-        inptr = input_data[outrow];
-        bias = 0;      /* bias = 0,1,0,1,... for successive samples */
-        for (outcol = 0; outcol < output_cols; outcol++) {
-            *outptr++ = (JSAMPLE)((GETJSAMPLE(*inptr) + GETJSAMPLE(inptr[1])
-                + bias) >> 1);
-            bias ^= 1;    /* 0=>1, 1=>0 */
-            inptr += 2;
-        }
+  for (outrow = 0; outrow < compptr->v_samp_factor; outrow++) {
+    outptr = output_data[outrow];
+    inptr = input_data[outrow];
+    bias = 0;      /* bias = 0,1,0,1,... for successive samples */
+    for (outcol = 0; outcol < output_cols; outcol++) {
+      *outptr++ = (JSAMPLE)((GETJSAMPLE(*inptr) + GETJSAMPLE(inptr[1])
+        + bias) >> 1);
+      bias ^= 1;    /* 0=>1, 1=>0 */
+      inptr += 2;
+      }
     }
-}
+  }
 
 
 #ifdef JPEG_MMX_SUPPORTED
 __inline METHODDEF(void)
 h2v1_downsample_mmx(j_compress_ptr cinfo, jpeg_component_info* compptr,
-    JSAMPARRAY input_data, JSAMPARRAY output_data)
-{
-    JDIMENSION output_cols = compptr->width_in_blocks * DCTSIZE;
+  JSAMPARRAY input_data, JSAMPARRAY output_data)
+  {
+  JDIMENSION output_cols = compptr->width_in_blocks * DCTSIZE;
 
-    // declare 64-bit constants in unions with double variables to 
-    // ensure 8-byte alignment
-    const static union u1 {
-        _int64 const1;
-        double align;
+  // declare 64-bit constants in unions with double variables to 
+  // ensure 8-byte alignment
+  const static union u1 {
+    _int64 const1;
+    double align;
     } mmxbias = { 0x0001000000010000 },
-        flipbias = { 0x0001000100010001 },
-        mask = { 0x00FF00FF00FF00FF };
+      flipbias = { 0x0001000100010001 },
+      mask = { 0x00FF00FF00FF00FF };
 
     int vsamp = compptr->v_samp_factor;
 
@@ -299,7 +299,7 @@ h2v1_downsample_mmx(j_compress_ptr cinfo, jpeg_component_info* compptr,
      * efficient.
      */
     expand_right_edge(input_data, cinfo->max_v_samp_factor,
-        cinfo->image_width, output_cols * 2);
+      cinfo->image_width, output_cols * 2);
 
     /* MMX(TM) Technology h2v1 Downsampling Implementation
      * This code assumes that output_cols will be a multiple of 8.
@@ -308,66 +308,66 @@ h2v1_downsample_mmx(j_compress_ptr cinfo, jpeg_component_info* compptr,
     */
     _asm {
 
-        xor eax, eax                  // eax:  row counter
-        movq mm7, mask                // mm7: 0x00FF00FF00FF00FF
-        movq mm6, flipbias            // mm6: 0x0001000100010001
+      xor eax, eax                  // eax:  row counter
+      movq mm7, mask                // mm7: 0x00FF00FF00FF00FF
+      movq mm6, flipbias            // mm6: 0x0001000100010001
 
-        row_loop :
-        movq mm0, mmxbias             // mm0: 0x0000000100000001
-            mov edx, output_cols          // edx: column counter
-            mov ebx, [output_data]
-            mov esi, [ebx + 4 * eax]        // output pointer
-            mov ebx, [input_data]
-            mov edi, [ebx + 4 * eax]        // input pointer
+      row_loop :
+      movq mm0, mmxbias             // mm0: 0x0000000100000001
+        mov edx, output_cols          // edx: column counter
+        mov ebx, [output_data]
+        mov esi, [ebx + 4 * eax]        // output pointer
+        mov ebx, [input_data]
+        mov edi, [ebx + 4 * eax]        // input pointer
 
 
-  // average 16 bytes of input array into 8 bytes of output array using
-  // MMX(TM) instructions
-        mmx_loop:
+// average 16 bytes of input array into 8 bytes of output array using
+// MMX(TM) instructions
+mmx_loop:
 
-            movq mm1, [edi]       // read 8 bytes from input array
-                                  // mm1: i8  i7 i6  i5  i4  i3  i2  i1
-                movq mm3, [edi + 8]     // read next 8 bytes from input array
-                                      // mm3: i16 15 i14 i13 i12 i11 i10 i9
-                movq mm2, mm1
+        movq mm1, [edi]       // read 8 bytes from input array
+                              // mm1: i8  i7 i6  i5  i4  i3  i2  i1
+          movq mm3, [edi + 8]     // read next 8 bytes from input array
+                                // mm3: i16 15 i14 i13 i12 i11 i10 i9
+          movq mm2, mm1
 
-                psrlw mm1, 8          // mm1: 0   i8  0   i6  0   i4  0  i2
-                movq mm4, mm3
+          psrlw mm1, 8          // mm1: 0   i8  0   i6  0   i4  0  i2
+          movq mm4, mm3
 
-                psrlw mm3, 8          // mm3: 0   i16 0   i14 0   i12 0  i10
-                pand mm2, mm7         // mm2: 0   i7  0   i5  0   i3  0  i1
+          psrlw mm3, 8          // mm3: 0   i16 0   i14 0   i12 0  i10
+          pand mm2, mm7         // mm2: 0   i7  0   i5  0   i3  0  i1
 
-                pand mm4, mm7         // mm4: 0   i15 0   i13 0   i11 0  i9
-                paddw mm1, mm2
+          pand mm4, mm7         // mm4: 0   i15 0   i13 0   i11 0  i9
+          paddw mm1, mm2
 
-                paddw mm3, mm4
-                paddw mm1, mm0        // add bias
+          paddw mm3, mm4
+          paddw mm1, mm0        // add bias
 
-                paddw mm3, mm0        // add bias
-                psrlw mm1, 1          // mm1 contains four averages
-                                      // mm1: 0   a4  0   a3  0   a2  0  a1
+          paddw mm3, mm0        // add bias
+          psrlw mm1, 1          // mm1 contains four averages
+                                // mm1: 0   a4  0   a3  0   a2  0  a1
 
-                psrlw mm3, 1          // mm3 contains next four averages
-                                      // mm3: 0   a8  0   a7  0   a6  0  a5
-                sub edx, 8            // mm1: a8  a7  a6  a5  a4  a3  a2 a1
+          psrlw mm3, 1          // mm3 contains next four averages
+                                // mm3: 0   a8  0   a7  0   a6  0  a5
+          sub edx, 8            // mm1: a8  a7  a6  a5  a4  a3  a2 a1
 
-                packuswb mm1, mm3     // pack into one register
-                add edi, 16
+          packuswb mm1, mm3     // pack into one register
+          add edi, 16
 
-                movq[esi], mm1       // write 8 averages to output array
+          movq[esi], mm1       // write 8 averages to output array
 
-                add esi, 8
-                cmp edx, 8
+          add esi, 8
+          cmp edx, 8
 
-                jge mmx_loop
+          jge mmx_loop
 
-                inc eax
-                cmp eax, vsamp
-                jl row_loop
+          inc eax
+          cmp eax, vsamp
+          jl row_loop
 
-                emms
-    }
-}
+          emms
+      }
+  }
 #endif
 
 
@@ -380,82 +380,82 @@ h2v1_downsample_mmx(j_compress_ptr cinfo, jpeg_component_info* compptr,
 #ifdef JPEG_MMX_SUPPORTED
 __inline METHODDEF(void)
 h2v2_downsample_mmx(j_compress_ptr cinfo, jpeg_component_info* compptr,
-    JSAMPARRAY input_data, JSAMPARRAY output_data);
+  JSAMPARRAY input_data, JSAMPARRAY output_data);
 #endif
 METHODDEF(void)
 h2v2_downsample_orig(j_compress_ptr cinfo, jpeg_component_info* compptr,
-    JSAMPARRAY input_data, JSAMPARRAY output_data);
+  JSAMPARRAY input_data, JSAMPARRAY output_data);
 
 METHODDEF(void)
 h2v2_downsample(j_compress_ptr cinfo, jpeg_component_info* compptr,
-    JSAMPARRAY input_data, JSAMPARRAY output_data)
-{
+  JSAMPARRAY input_data, JSAMPARRAY output_data)
+  {
 #ifdef JPEG_MMX_SUPPORTED
-    if ((((int)input_data[0]) & 7) != 0) {
-        WARNMS(cinfo, JERR_BAD_ALIGN_TYPE);
+  if ((((int)input_data[0]) & 7) != 0) {
+    WARNMS(cinfo, JERR_BAD_ALIGN_TYPE);
     }
-    else if (cinfo->dct_method == JDCT_ISLOW_MMX ||
-        cinfo->dct_method == JDCT_IFAST_MMX) {
-        h2v2_downsample_mmx(cinfo, compptr, input_data, output_data);
-        return;
+  else if (cinfo->dct_method == JDCT_ISLOW_MMX ||
+    cinfo->dct_method == JDCT_IFAST_MMX) {
+    h2v2_downsample_mmx(cinfo, compptr, input_data, output_data);
+    return;
     }
 #endif
-    h2v2_downsample_orig(cinfo, compptr, input_data, output_data);
-}
+  h2v2_downsample_orig(cinfo, compptr, input_data, output_data);
+  }
 
 
 METHODDEF(void)
 h2v2_downsample_orig(j_compress_ptr cinfo, jpeg_component_info* compptr,
-    JSAMPARRAY input_data, JSAMPARRAY output_data)
-{
-    int inrow, outrow;
-    JDIMENSION outcol;
-    JDIMENSION output_cols = compptr->width_in_blocks * DCTSIZE;
-    register JSAMPROW inptr0, inptr1, outptr;
-    register int bias;
+  JSAMPARRAY input_data, JSAMPARRAY output_data)
+  {
+  int inrow, outrow;
+  JDIMENSION outcol;
+  JDIMENSION output_cols = compptr->width_in_blocks * DCTSIZE;
+  register JSAMPROW inptr0, inptr1, outptr;
+  register int bias;
 
-    /* Expand input data enough to let all the output samples be generated
-     * by the standard loop.  Special-casing padded output would be more
-     * efficient.
-     */
-    expand_right_edge(input_data, cinfo->max_v_samp_factor,
-        cinfo->image_width, output_cols * 2);
+  /* Expand input data enough to let all the output samples be generated
+   * by the standard loop.  Special-casing padded output would be more
+   * efficient.
+   */
+  expand_right_edge(input_data, cinfo->max_v_samp_factor,
+    cinfo->image_width, output_cols * 2);
 
-    inrow = 0;
-    for (outrow = 0; outrow < compptr->v_samp_factor; outrow++) {
-        outptr = output_data[outrow];
-        inptr0 = input_data[inrow];
-        inptr1 = input_data[inrow + 1];
-        bias = 1;      /* bias = 1,2,1,2,... for successive samples */
-        for (outcol = 0; outcol < output_cols; outcol++) {
-            *outptr++ = (JSAMPLE)((GETJSAMPLE(*inptr0) + GETJSAMPLE(inptr0[1]) +
-                GETJSAMPLE(*inptr1) + GETJSAMPLE(inptr1[1])
-                + bias) >> 2);
-            bias ^= 3;    /* 1=>2, 2=>1 */
-            inptr0 += 2; inptr1 += 2;
-        }
-        inrow += 2;
+  inrow = 0;
+  for (outrow = 0; outrow < compptr->v_samp_factor; outrow++) {
+    outptr = output_data[outrow];
+    inptr0 = input_data[inrow];
+    inptr1 = input_data[inrow + 1];
+    bias = 1;      /* bias = 1,2,1,2,... for successive samples */
+    for (outcol = 0; outcol < output_cols; outcol++) {
+      *outptr++ = (JSAMPLE)((GETJSAMPLE(*inptr0) + GETJSAMPLE(inptr0[1]) +
+        GETJSAMPLE(*inptr1) + GETJSAMPLE(inptr1[1])
+        + bias) >> 2);
+      bias ^= 3;    /* 1=>2, 2=>1 */
+      inptr0 += 2; inptr1 += 2;
+      }
+    inrow += 2;
     }
-}
+  }
 
 
 #ifdef JPEG_MMX_SUPPORTED
 
 __inline METHODDEF(void)
 h2v2_downsample_mmx(j_compress_ptr cinfo, jpeg_component_info* compptr,
-    JSAMPARRAY input_data, JSAMPARRAY output_data)
-{
-    JDIMENSION output_cols = compptr->width_in_blocks * DCTSIZE;
+  JSAMPARRAY input_data, JSAMPARRAY output_data)
+  {
+  JDIMENSION output_cols = compptr->width_in_blocks * DCTSIZE;
 
-    // declare 64-bit constants in unions with double variables to 
-    // ensure 8-byte alignment
+  // declare 64-bit constants in unions with double variables to 
+  // ensure 8-byte alignment
 
-    const static union u1 {
-        _int64 const1;
-        double align;
+  const static union u1 {
+    _int64 const1;
+    double align;
     } mmxbias = { 0x0002000100020001 },
-        mask = { 0x00FF00FF00FF00FF },
-        flipbias = { 0x0003000300030003 };
+      mask = { 0x00FF00FF00FF00FF },
+      flipbias = { 0x0003000300030003 };
 
     int vsamp = compptr->v_samp_factor;
 
@@ -464,7 +464,7 @@ h2v2_downsample_mmx(j_compress_ptr cinfo, jpeg_component_info* compptr,
      * efficient.
      */
     expand_right_edge(input_data, cinfo->max_v_samp_factor,
-        cinfo->image_width, output_cols * 2);
+      cinfo->image_width, output_cols * 2);
 
     // MMX(TM) Technology h2v2 Downsampling Implementation
     // This code assumes that output_cols will be a multiple of 8.
@@ -472,87 +472,87 @@ h2v2_downsample_mmx(j_compress_ptr cinfo, jpeg_component_info* compptr,
     // (average) samples, respectively.
     _asm {
 
-        xor eax, eax                      // eax: row counter
-        movq mm7, mask                    // mm7: 0x00FF00FF00FF00FF
+      xor eax, eax                      // eax: row counter
+      movq mm7, mask                    // mm7: 0x00FF00FF00FF00FF
 
-        row_loop :
-        mov edx, output_cols          // edx:  column counter 
-            movq mm0, mmxbias
-            mov ebx, [output_data]
-            mov esi, [ebx + 4 * eax]        // output pointer
-            mov ebx, [input_data]
-            mov edi, [ebx + 4 * eax]        // input pointer 0
-            push eax
-            inc eax
-            mov ebx, [ebx + 4 * eax]        // input pointer 1
+      row_loop :
+      mov edx, output_cols          // edx:  column counter 
+        movq mm0, mmxbias
+        mov ebx, [output_data]
+        mov esi, [ebx + 4 * eax]        // output pointer
+        mov ebx, [input_data]
+        mov edi, [ebx + 4 * eax]        // input pointer 0
+        push eax
+        inc eax
+        mov ebx, [ebx + 4 * eax]        // input pointer 1
 
-  // average 16 bytes of each input array into 8 bytes of output array using
-  // MMX(TM) instructions   
-        mmx_loop:
-            movq mm1, [edi]       // read 8 bytes from first input row
-                                  // mm1: i18 i17 i16 i15 i14 i13 i12 i11
+// average 16 bytes of each input array into 8 bytes of output array using
+// MMX(TM) instructions   
+mmx_loop:
+        movq mm1, [edi]       // read 8 bytes from first input row
+                              // mm1: i18 i17 i16 i15 i14 i13 i12 i11
 
-                movq mm3, [ebx]       // read 8 bytes from second input row
-                                      // mm3: i28 i27 i26 i25 i24 i23 i22 i21
-                movq mm2, mm1
+          movq mm3, [ebx]       // read 8 bytes from second input row
+                                // mm3: i28 i27 i26 i25 i24 i23 i22 i21
+          movq mm2, mm1
 
-                movq mm4, mm3
-                psrlw mm1, 8          // mm1: 0   i18 0   i16 0   i14 0   i12
+          movq mm4, mm3
+          psrlw mm1, 8          // mm1: 0   i18 0   i16 0   i14 0   i12
 
-                psrlw mm3, 8          // mm3: 0   i28 0   i26 0   i24 0   i22 
-                pand mm2, mm7         // mm2: 0   i17 0   i15 0   i13 0   i11
+          psrlw mm3, 8          // mm3: 0   i28 0   i26 0   i24 0   i22 
+          pand mm2, mm7         // mm2: 0   i17 0   i15 0   i13 0   i11
 
-                pand mm4, mm7         // mm4: 0   i27 0   i25 0   i23 0   i21
-                paddw mm1, mm2
+          pand mm4, mm7         // mm4: 0   i27 0   i25 0   i23 0   i21
+          paddw mm1, mm2
 
-                movq mm5, [edi + 8]     // read next 8 bytes from first input row               
-                paddw mm4, mm3
+          movq mm5, [edi + 8]     // read next 8 bytes from first input row               
+          paddw mm4, mm3
 
-                movq mm3, [ebx + 8]     // read next 8 bytes from second input row        
-                paddw mm1, mm4        // add two input rows
+          movq mm3, [ebx + 8]     // read next 8 bytes from second input row        
+          paddw mm1, mm4        // add two input rows
 
-                movq mm6, mm5
-                psrlw mm5, 8
+          movq mm6, mm5
+          psrlw mm5, 8
 
-                movq mm4, mm3
-                psrlw mm3, 8
+          movq mm4, mm3
+          psrlw mm3, 8
 
 
-                pand mm6, mm7
-                pand mm4, mm7
+          pand mm6, mm7
+          pand mm4, mm7
 
-                paddw mm5, mm6
-                paddw mm3, mm4
+          paddw mm5, mm6
+          paddw mm3, mm4
 
-                paddw mm5, mm3
-                paddw mm1, mm0        // add bias
+          paddw mm5, mm3
+          paddw mm1, mm0        // add bias
 
-                psrlw mm1, 2          // mm1: 0   a4  0   a3  0   a2  0   a1
-                paddw mm5, mm0        // add bias
+          psrlw mm1, 2          // mm1: 0   a4  0   a3  0   a2  0   a1
+          paddw mm5, mm0        // add bias
 
-                psrlw mm5, 2          // mm5: 0   a8  0   a7  0   a6  0   a5
-                add edi, 16
+          psrlw mm5, 2          // mm5: 0   a8  0   a7  0   a6  0   a5
+          add edi, 16
 
-                packuswb mm1, mm5     // mm1: a8  a7  a6  a5  a4  a3  a2  a1
-                add ebx, 16
+          packuswb mm1, mm5     // mm1: a8  a7  a6  a5  a4  a3  a2  a1
+          add ebx, 16
 
-                sub edx, 8
+          sub edx, 8
 
-                movq[esi], mm1       // write 8 averages to output array
+          movq[esi], mm1       // write 8 averages to output array
 
-                add esi, 8
-                cmp edx, 8
-                jge mmx_loop
+          add esi, 8
+          cmp edx, 8
+          jge mmx_loop
 
-                pop eax
-                inc eax
-                cmp eax, vsamp
-                jl row_loop
+          pop eax
+          inc eax
+          cmp eax, vsamp
+          jl row_loop
 
-                emms
+          emms
 
-    }
-}
+      }
+  }
 #endif /* JPEG_MMX_SUPPORTED */
 
 #ifdef INPUT_SMOOTHING_SUPPORTED
@@ -565,96 +565,96 @@ h2v2_downsample_mmx(j_compress_ptr cinfo, jpeg_component_info* compptr,
 
 METHODDEF(void)
 h2v2_smooth_downsample(j_compress_ptr cinfo, jpeg_component_info* compptr,
-    JSAMPARRAY input_data, JSAMPARRAY output_data)
-{
-    int inrow, outrow;
-    JDIMENSION colctr;
-    JDIMENSION output_cols = compptr->width_in_blocks * DCTSIZE;
-    register JSAMPROW inptr0, inptr1, above_ptr, below_ptr, outptr;
-    CLR_INT32 membersum, neighsum, memberscale, neighscale;
+  JSAMPARRAY input_data, JSAMPARRAY output_data)
+  {
+  int inrow, outrow;
+  JDIMENSION colctr;
+  JDIMENSION output_cols = compptr->width_in_blocks * DCTSIZE;
+  register JSAMPROW inptr0, inptr1, above_ptr, below_ptr, outptr;
+  CLR_INT32 membersum, neighsum, memberscale, neighscale;
 
-    /* Expand input data enough to let all the output samples be generated
-     * by the standard loop.  Special-casing padded output would be more
-     * efficient.
-     */
-    expand_right_edge(input_data - 1, cinfo->max_v_samp_factor + 2,
-        cinfo->image_width, output_cols * 2);
+  /* Expand input data enough to let all the output samples be generated
+   * by the standard loop.  Special-casing padded output would be more
+   * efficient.
+   */
+  expand_right_edge(input_data - 1, cinfo->max_v_samp_factor + 2,
+    cinfo->image_width, output_cols * 2);
 
-    /* We don't bother to form the individual "smoothed" input pixel values;
-     * we can directly compute the output which is the average of the four
-     * smoothed values.  Each of the four member pixels contributes a fraction
-     * (1-8*SF) to its own smoothed image and a fraction SF to each of the three
-     * other smoothed pixels, therefore a total fraction (1-5*SF)/4 to the final
-     * output.  The four corner-adjacent neighbor pixels contribute a fraction
-     * SF to just one smoothed pixel, or SF/4 to the final output; while the
-     * eight edge-adjacent neighbors contribute SF to each of two smoothed
-     * pixels, or SF/2 overall.  In order to use integer arithmetic, these
-     * factors are scaled by 2^16 = 65536.
-     * Also recall that SF = smoothing_factor / 1024.
-     */
+  /* We don't bother to form the individual "smoothed" input pixel values;
+   * we can directly compute the output which is the average of the four
+   * smoothed values.  Each of the four member pixels contributes a fraction
+   * (1-8*SF) to its own smoothed image and a fraction SF to each of the three
+   * other smoothed pixels, therefore a total fraction (1-5*SF)/4 to the final
+   * output.  The four corner-adjacent neighbor pixels contribute a fraction
+   * SF to just one smoothed pixel, or SF/4 to the final output; while the
+   * eight edge-adjacent neighbors contribute SF to each of two smoothed
+   * pixels, or SF/2 overall.  In order to use integer arithmetic, these
+   * factors are scaled by 2^16 = 65536.
+   * Also recall that SF = smoothing_factor / 1024.
+   */
 
-    memberscale = 16384 - cinfo->smoothing_factor * 80; /* scaled (1-5*SF)/4 */
-    neighscale = cinfo->smoothing_factor * 16; /* scaled SF/4 */
+  memberscale = 16384 - cinfo->smoothing_factor * 80; /* scaled (1-5*SF)/4 */
+  neighscale = cinfo->smoothing_factor * 16; /* scaled SF/4 */
 
-    inrow = 0;
-    for (outrow = 0; outrow < compptr->v_samp_factor; outrow++) {
-        outptr = output_data[outrow];
-        inptr0 = input_data[inrow];
-        inptr1 = input_data[inrow + 1];
-        above_ptr = input_data[inrow - 1];
-        below_ptr = input_data[inrow + 2];
+  inrow = 0;
+  for (outrow = 0; outrow < compptr->v_samp_factor; outrow++) {
+    outptr = output_data[outrow];
+    inptr0 = input_data[inrow];
+    inptr1 = input_data[inrow + 1];
+    above_ptr = input_data[inrow - 1];
+    below_ptr = input_data[inrow + 2];
 
-        /* Special case for first column: pretend column -1 is same as column 0 */
-        membersum = GETJSAMPLE(*inptr0) + GETJSAMPLE(inptr0[1]) +
-            GETJSAMPLE(*inptr1) + GETJSAMPLE(inptr1[1]);
-        neighsum = GETJSAMPLE(*above_ptr) + GETJSAMPLE(above_ptr[1]) +
-            GETJSAMPLE(*below_ptr) + GETJSAMPLE(below_ptr[1]) +
-            GETJSAMPLE(*inptr0) + GETJSAMPLE(inptr0[2]) +
-            GETJSAMPLE(*inptr1) + GETJSAMPLE(inptr1[2]);
-        neighsum += neighsum;
-        neighsum += GETJSAMPLE(*above_ptr) + GETJSAMPLE(above_ptr[2]) +
-            GETJSAMPLE(*below_ptr) + GETJSAMPLE(below_ptr[2]);
-        membersum = membersum * memberscale + neighsum * neighscale;
-        *outptr++ = (JSAMPLE)((membersum + 32768) >> 16);
-        inptr0 += 2; inptr1 += 2; above_ptr += 2; below_ptr += 2;
+    /* Special case for first column: pretend column -1 is same as column 0 */
+    membersum = GETJSAMPLE(*inptr0) + GETJSAMPLE(inptr0[1]) +
+      GETJSAMPLE(*inptr1) + GETJSAMPLE(inptr1[1]);
+    neighsum = GETJSAMPLE(*above_ptr) + GETJSAMPLE(above_ptr[1]) +
+      GETJSAMPLE(*below_ptr) + GETJSAMPLE(below_ptr[1]) +
+      GETJSAMPLE(*inptr0) + GETJSAMPLE(inptr0[2]) +
+      GETJSAMPLE(*inptr1) + GETJSAMPLE(inptr1[2]);
+    neighsum += neighsum;
+    neighsum += GETJSAMPLE(*above_ptr) + GETJSAMPLE(above_ptr[2]) +
+      GETJSAMPLE(*below_ptr) + GETJSAMPLE(below_ptr[2]);
+    membersum = membersum * memberscale + neighsum * neighscale;
+    *outptr++ = (JSAMPLE)((membersum + 32768) >> 16);
+    inptr0 += 2; inptr1 += 2; above_ptr += 2; below_ptr += 2;
 
-        for (colctr = output_cols - 2; colctr > 0; colctr--) {
-            /* sum of pixels directly mapped to this output element */
-            membersum = GETJSAMPLE(*inptr0) + GETJSAMPLE(inptr0[1]) +
-                GETJSAMPLE(*inptr1) + GETJSAMPLE(inptr1[1]);
-            /* sum of edge-neighbor pixels */
-            neighsum = GETJSAMPLE(*above_ptr) + GETJSAMPLE(above_ptr[1]) +
-                GETJSAMPLE(*below_ptr) + GETJSAMPLE(below_ptr[1]) +
-                GETJSAMPLE(inptr0[-1]) + GETJSAMPLE(inptr0[2]) +
-                GETJSAMPLE(inptr1[-1]) + GETJSAMPLE(inptr1[2]);
-            /* The edge-neighbors count twice as much as corner-neighbors */
-            neighsum += neighsum;
-            /* Add in the corner-neighbors */
-            neighsum += GETJSAMPLE(above_ptr[-1]) + GETJSAMPLE(above_ptr[2]) +
-                GETJSAMPLE(below_ptr[-1]) + GETJSAMPLE(below_ptr[2]);
-            /* form final output scaled up by 2^16 */
-            membersum = membersum * memberscale + neighsum * neighscale;
-            /* round, descale and output it */
-            *outptr++ = (JSAMPLE)((membersum + 32768) >> 16);
-            inptr0 += 2; inptr1 += 2; above_ptr += 2; below_ptr += 2;
-        }
+    for (colctr = output_cols - 2; colctr > 0; colctr--) {
+      /* sum of pixels directly mapped to this output element */
+      membersum = GETJSAMPLE(*inptr0) + GETJSAMPLE(inptr0[1]) +
+        GETJSAMPLE(*inptr1) + GETJSAMPLE(inptr1[1]);
+      /* sum of edge-neighbor pixels */
+      neighsum = GETJSAMPLE(*above_ptr) + GETJSAMPLE(above_ptr[1]) +
+        GETJSAMPLE(*below_ptr) + GETJSAMPLE(below_ptr[1]) +
+        GETJSAMPLE(inptr0[-1]) + GETJSAMPLE(inptr0[2]) +
+        GETJSAMPLE(inptr1[-1]) + GETJSAMPLE(inptr1[2]);
+      /* The edge-neighbors count twice as much as corner-neighbors */
+      neighsum += neighsum;
+      /* Add in the corner-neighbors */
+      neighsum += GETJSAMPLE(above_ptr[-1]) + GETJSAMPLE(above_ptr[2]) +
+        GETJSAMPLE(below_ptr[-1]) + GETJSAMPLE(below_ptr[2]);
+      /* form final output scaled up by 2^16 */
+      membersum = membersum * memberscale + neighsum * neighscale;
+      /* round, descale and output it */
+      *outptr++ = (JSAMPLE)((membersum + 32768) >> 16);
+      inptr0 += 2; inptr1 += 2; above_ptr += 2; below_ptr += 2;
+      }
 
-        /* Special case for last column */
-        membersum = GETJSAMPLE(*inptr0) + GETJSAMPLE(inptr0[1]) +
-            GETJSAMPLE(*inptr1) + GETJSAMPLE(inptr1[1]);
-        neighsum = GETJSAMPLE(*above_ptr) + GETJSAMPLE(above_ptr[1]) +
-            GETJSAMPLE(*below_ptr) + GETJSAMPLE(below_ptr[1]) +
-            GETJSAMPLE(inptr0[-1]) + GETJSAMPLE(inptr0[1]) +
-            GETJSAMPLE(inptr1[-1]) + GETJSAMPLE(inptr1[1]);
-        neighsum += neighsum;
-        neighsum += GETJSAMPLE(above_ptr[-1]) + GETJSAMPLE(above_ptr[1]) +
-            GETJSAMPLE(below_ptr[-1]) + GETJSAMPLE(below_ptr[1]);
-        membersum = membersum * memberscale + neighsum * neighscale;
-        *outptr = (JSAMPLE)((membersum + 32768) >> 16);
+    /* Special case for last column */
+    membersum = GETJSAMPLE(*inptr0) + GETJSAMPLE(inptr0[1]) +
+      GETJSAMPLE(*inptr1) + GETJSAMPLE(inptr1[1]);
+    neighsum = GETJSAMPLE(*above_ptr) + GETJSAMPLE(above_ptr[1]) +
+      GETJSAMPLE(*below_ptr) + GETJSAMPLE(below_ptr[1]) +
+      GETJSAMPLE(inptr0[-1]) + GETJSAMPLE(inptr0[1]) +
+      GETJSAMPLE(inptr1[-1]) + GETJSAMPLE(inptr1[1]);
+    neighsum += neighsum;
+    neighsum += GETJSAMPLE(above_ptr[-1]) + GETJSAMPLE(above_ptr[1]) +
+      GETJSAMPLE(below_ptr[-1]) + GETJSAMPLE(below_ptr[1]);
+    membersum = membersum * memberscale + neighsum * neighscale;
+    *outptr = (JSAMPLE)((membersum + 32768) >> 16);
 
-        inrow += 2;
+    inrow += 2;
     }
-}
+  }
 
 
 /*
@@ -665,67 +665,67 @@ h2v2_smooth_downsample(j_compress_ptr cinfo, jpeg_component_info* compptr,
 
 METHODDEF(void)
 fullsize_smooth_downsample(j_compress_ptr cinfo, jpeg_component_info* compptr,
-    JSAMPARRAY input_data, JSAMPARRAY output_data)
-{
-    int outrow;
-    JDIMENSION colctr;
-    JDIMENSION output_cols = compptr->width_in_blocks * DCTSIZE;
-    register JSAMPROW inptr, above_ptr, below_ptr, outptr;
-    CLR_INT32 membersum, neighsum, memberscale, neighscale;
-    int colsum, lastcolsum, nextcolsum;
+  JSAMPARRAY input_data, JSAMPARRAY output_data)
+  {
+  int outrow;
+  JDIMENSION colctr;
+  JDIMENSION output_cols = compptr->width_in_blocks * DCTSIZE;
+  register JSAMPROW inptr, above_ptr, below_ptr, outptr;
+  CLR_INT32 membersum, neighsum, memberscale, neighscale;
+  int colsum, lastcolsum, nextcolsum;
 
-    /* Expand input data enough to let all the output samples be generated
-     * by the standard loop.  Special-casing padded output would be more
-     * efficient.
-     */
-    expand_right_edge(input_data - 1, cinfo->max_v_samp_factor + 2,
-        cinfo->image_width, output_cols);
+  /* Expand input data enough to let all the output samples be generated
+   * by the standard loop.  Special-casing padded output would be more
+   * efficient.
+   */
+  expand_right_edge(input_data - 1, cinfo->max_v_samp_factor + 2,
+    cinfo->image_width, output_cols);
 
-    /* Each of the eight neighbor pixels contributes a fraction SF to the
-     * smoothed pixel, while the main pixel contributes (1-8*SF).  In order
-     * to use integer arithmetic, these factors are multiplied by 2^16 = 65536.
-     * Also recall that SF = smoothing_factor / 1024.
-     */
+  /* Each of the eight neighbor pixels contributes a fraction SF to the
+   * smoothed pixel, while the main pixel contributes (1-8*SF).  In order
+   * to use integer arithmetic, these factors are multiplied by 2^16 = 65536.
+   * Also recall that SF = smoothing_factor / 1024.
+   */
 
-    memberscale = 65536L - cinfo->smoothing_factor * 512L; /* scaled 1-8*SF */
-    neighscale = cinfo->smoothing_factor * 64; /* scaled SF */
+  memberscale = 65536L - cinfo->smoothing_factor * 512L; /* scaled 1-8*SF */
+  neighscale = cinfo->smoothing_factor * 64; /* scaled SF */
 
-    for (outrow = 0; outrow < compptr->v_samp_factor; outrow++) {
-        outptr = output_data[outrow];
-        inptr = input_data[outrow];
-        above_ptr = input_data[outrow - 1];
-        below_ptr = input_data[outrow + 1];
+  for (outrow = 0; outrow < compptr->v_samp_factor; outrow++) {
+    outptr = output_data[outrow];
+    inptr = input_data[outrow];
+    above_ptr = input_data[outrow - 1];
+    below_ptr = input_data[outrow + 1];
 
-        /* Special case for first column */
-        colsum = GETJSAMPLE(*above_ptr++) + GETJSAMPLE(*below_ptr++) +
-            GETJSAMPLE(*inptr);
-        membersum = GETJSAMPLE(*inptr++);
-        nextcolsum = GETJSAMPLE(*above_ptr) + GETJSAMPLE(*below_ptr) +
-            GETJSAMPLE(*inptr);
-        neighsum = colsum + (colsum - membersum) + nextcolsum;
-        membersum = membersum * memberscale + neighsum * neighscale;
-        *outptr++ = (JSAMPLE)((membersum + 32768) >> 16);
-        lastcolsum = colsum; colsum = nextcolsum;
+    /* Special case for first column */
+    colsum = GETJSAMPLE(*above_ptr++) + GETJSAMPLE(*below_ptr++) +
+      GETJSAMPLE(*inptr);
+    membersum = GETJSAMPLE(*inptr++);
+    nextcolsum = GETJSAMPLE(*above_ptr) + GETJSAMPLE(*below_ptr) +
+      GETJSAMPLE(*inptr);
+    neighsum = colsum + (colsum - membersum) + nextcolsum;
+    membersum = membersum * memberscale + neighsum * neighscale;
+    *outptr++ = (JSAMPLE)((membersum + 32768) >> 16);
+    lastcolsum = colsum; colsum = nextcolsum;
 
-        for (colctr = output_cols - 2; colctr > 0; colctr--) {
-            membersum = GETJSAMPLE(*inptr++);
-            above_ptr++; below_ptr++;
-            nextcolsum = GETJSAMPLE(*above_ptr) + GETJSAMPLE(*below_ptr) +
-                GETJSAMPLE(*inptr);
-            neighsum = lastcolsum + (colsum - membersum) + nextcolsum;
-            membersum = membersum * memberscale + neighsum * neighscale;
-            *outptr++ = (JSAMPLE)((membersum + 32768) >> 16);
-            lastcolsum = colsum; colsum = nextcolsum;
-        }
+    for (colctr = output_cols - 2; colctr > 0; colctr--) {
+      membersum = GETJSAMPLE(*inptr++);
+      above_ptr++; below_ptr++;
+      nextcolsum = GETJSAMPLE(*above_ptr) + GETJSAMPLE(*below_ptr) +
+        GETJSAMPLE(*inptr);
+      neighsum = lastcolsum + (colsum - membersum) + nextcolsum;
+      membersum = membersum * memberscale + neighsum * neighscale;
+      *outptr++ = (JSAMPLE)((membersum + 32768) >> 16);
+      lastcolsum = colsum; colsum = nextcolsum;
+      }
 
-        /* Special case for last column */
-        membersum = GETJSAMPLE(*inptr);
-        neighsum = lastcolsum + (colsum - membersum) + colsum;
-        membersum = membersum * memberscale + neighsum * neighscale;
-        *outptr = (JSAMPLE)((membersum + 32768) >> 16);
+    /* Special case for last column */
+    membersum = GETJSAMPLE(*inptr);
+    neighsum = lastcolsum + (colsum - membersum) + colsum;
+    membersum = membersum * memberscale + neighsum * neighscale;
+    *outptr = (JSAMPLE)((membersum + 32768) >> 16);
 
     }
-}
+  }
 
 #endif /* INPUT_SMOOTHING_SUPPORTED */
 
@@ -737,65 +737,65 @@ fullsize_smooth_downsample(j_compress_ptr cinfo, jpeg_component_info* compptr,
 
 GLOBAL(void)
 jinit_downsampler(j_compress_ptr cinfo)
-{
-    my_downsample_ptr downsample;
-    int ci;
-    jpeg_component_info* compptr;
-    boolean smoothok = TRUE;
+  {
+  my_downsample_ptr downsample;
+  int ci;
+  jpeg_component_info* compptr;
+  boolean smoothok = TRUE;
 
-    downsample = (my_downsample_ptr)
-        (*cinfo->mem->alloc_small) ((j_common_ptr)cinfo, JPOOL_IMAGE,
-            SIZEOF(my_downsampler));
-    cinfo->downsample = (struct jpeg_downsampler*) downsample;
-    downsample->pub.start_pass = start_pass_downsample;
-    downsample->pub.downsample = sep_downsample;
-    downsample->pub.need_context_rows = FALSE;
+  downsample = (my_downsample_ptr)
+    (*cinfo->mem->alloc_small) ((j_common_ptr)cinfo, JPOOL_IMAGE,
+      SIZEOF(my_downsampler));
+  cinfo->downsample = (struct jpeg_downsampler*)downsample;
+  downsample->pub.start_pass = start_pass_downsample;
+  downsample->pub.downsample = sep_downsample;
+  downsample->pub.need_context_rows = FALSE;
 
-    if (cinfo->CCIR601_sampling)
-        ERREXIT(cinfo, JERR_CCIR601_NOTIMPL);
+  if (cinfo->CCIR601_sampling)
+    ERREXIT(cinfo, JERR_CCIR601_NOTIMPL);
 
-    /* Verify we can handle the sampling factors, and set up method pointers */
-    for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components;
-        ci++, compptr++) {
-        if (compptr->h_samp_factor == cinfo->max_h_samp_factor &&
-            compptr->v_samp_factor == cinfo->max_v_samp_factor) {
+  /* Verify we can handle the sampling factors, and set up method pointers */
+  for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components;
+    ci++, compptr++) {
+    if (compptr->h_samp_factor == cinfo->max_h_samp_factor &&
+      compptr->v_samp_factor == cinfo->max_v_samp_factor) {
 #ifdef INPUT_SMOOTHING_SUPPORTED
-            if (cinfo->smoothing_factor) {
-                downsample->methods[ci] = fullsize_smooth_downsample;
-                downsample->pub.need_context_rows = TRUE;
-            }
-            else
+      if (cinfo->smoothing_factor) {
+        downsample->methods[ci] = fullsize_smooth_downsample;
+        downsample->pub.need_context_rows = TRUE;
+        }
+      else
 #endif
-                downsample->methods[ci] = fullsize_downsample;
-        }
-        else if (compptr->h_samp_factor * 2 == cinfo->max_h_samp_factor &&
-            compptr->v_samp_factor == cinfo->max_v_samp_factor) {
-            smoothok = FALSE;
-            downsample->methods[ci] = h2v1_downsample;
-        }
-        else if (compptr->h_samp_factor * 2 == cinfo->max_h_samp_factor &&
-            compptr->v_samp_factor * 2 == cinfo->max_v_samp_factor) {
+        downsample->methods[ci] = fullsize_downsample;
+      }
+    else if (compptr->h_samp_factor * 2 == cinfo->max_h_samp_factor &&
+      compptr->v_samp_factor == cinfo->max_v_samp_factor) {
+      smoothok = FALSE;
+      downsample->methods[ci] = h2v1_downsample;
+      }
+    else if (compptr->h_samp_factor * 2 == cinfo->max_h_samp_factor &&
+      compptr->v_samp_factor * 2 == cinfo->max_v_samp_factor) {
 #ifdef INPUT_SMOOTHING_SUPPORTED
-            if (cinfo->smoothing_factor) {
-                downsample->methods[ci] = h2v2_smooth_downsample;
-                downsample->pub.need_context_rows = TRUE;
-            }
-            else
+      if (cinfo->smoothing_factor) {
+        downsample->methods[ci] = h2v2_smooth_downsample;
+        downsample->pub.need_context_rows = TRUE;
+        }
+      else
 #endif
-                downsample->methods[ci] = h2v2_downsample;
-        }
-        else if ((cinfo->max_h_samp_factor % compptr->h_samp_factor) == 0 &&
-            (cinfo->max_v_samp_factor % compptr->v_samp_factor) == 0) {
-            smoothok = FALSE;
-            downsample->methods[ci] = int_downsample;
-        }
-        else
-            ERREXIT(cinfo, JERR_FRACT_SAMPLE_NOTIMPL);
+        downsample->methods[ci] = h2v2_downsample;
+      }
+    else if ((cinfo->max_h_samp_factor % compptr->h_samp_factor) == 0 &&
+      (cinfo->max_v_samp_factor % compptr->v_samp_factor) == 0) {
+      smoothok = FALSE;
+      downsample->methods[ci] = int_downsample;
+      }
+    else
+      ERREXIT(cinfo, JERR_FRACT_SAMPLE_NOTIMPL);
     }
 
 #ifdef INPUT_SMOOTHING_SUPPORTED
-    if (cinfo->smoothing_factor && !smoothok)
-        TRACEMS(cinfo, 0, JTRC_SMOOTH_NOTIMPL);
+  if (cinfo->smoothing_factor && !smoothok)
+    TRACEMS(cinfo, 0, JTRC_SMOOTH_NOTIMPL);
 #endif
-}
+  }
 

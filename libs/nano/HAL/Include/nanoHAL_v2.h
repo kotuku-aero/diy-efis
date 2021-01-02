@@ -376,8 +376,7 @@ extern "C"
 #endif
 
 // Watchdog driver
-#include <nanoHAL_Watchdog.h>
-
-#include <nanoHAL_Windows_Storage.h>
+#include "nanoHAL_Watchdog.h"
+#include "nanoHAL_Windows_Storage.h"
 
 #endif // _NANOHAL_V2_H_

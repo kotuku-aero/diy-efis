@@ -3,8 +3,8 @@
 // See LICENSE file in the project root for full license information.
 //
 
-#include <nanoWeak.h>
-#include "WireProtocol_HAL_Interface.h"
+#include "../Include/nanoWeak.h"
+#include "../Include/WireProtocol_HAL_Interface.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -17,24 +17,24 @@
 
 // provided as weak to be replaced by actual implementation by HAL interface
 __nfweak int WP_ReceiveBytes(uint8_t* ptr, unsigned short* size)
-{
-    (void)(ptr);
-    (void)(size);
+  {
+  (void)(ptr);
+  (void)(size);
 
-    // default to false
-    return false;
-}
+  // default to false
+  return false;
+  }
 
 // provided as weak to be replaced by actual implementation by HAL interface
 __nfweak int WP_TransmitMessage(WP_Message* message)
-{
-    (void)(message);
+  {
+  (void)(message);
 
-    // default to false
-    return false;
-}
+  // default to false
+  return false;
+  }
 
 // provided as weak to be replaced by actual implementation by HAL interface
 __nfweak void WP_CheckAvailableIncomingData()
-{
-}
+  {
+  }

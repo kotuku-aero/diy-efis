@@ -7,23 +7,23 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HRESULT CLR_RT_HeapBlock_LockRequest::CreateInstance( CLR_RT_HeapBlock_Lock* lock, CLR_RT_SubThread* sth, const CLR_INT64& timeExpire, bool fForce )
-{
-    NATIVE_PROFILE_CLR_CORE();
-    NANOCLR_HEADER();
+HRESULT CLR_RT_HeapBlock_LockRequest::CreateInstance(CLR_RT_HeapBlock_Lock* lock, CLR_RT_SubThread* sth, const CLR_INT64& timeExpire, bool fForce)
+  {
+  NATIVE_PROFILE_CLR_CORE();
+  NANOCLR_HEADER();
 
-    CLR_RT_HeapBlock_LockRequest* req = EVENTCACHE_EXTRACT_NODE(g_CLR_RT_EventCache,CLR_RT_HeapBlock_LockRequest,DATATYPE_LOCK_REQUEST_HEAD); CHECK_ALLOCATION(req);
+  CLR_RT_HeapBlock_LockRequest* req = EVENTCACHE_EXTRACT_NODE(g_CLR_RT_EventCache, CLR_RT_HeapBlock_LockRequest, DATATYPE_LOCK_REQUEST_HEAD); CHECK_ALLOCATION(req);
 
-    req->m_subthreadWaiting = sth;
-    req->m_timeExpire       = timeExpire; CLR_RT_ExecutionEngine::InvalidateTimerCache();
-    req->m_fForce           = fForce;
+  req->m_subthreadWaiting = sth;
+  req->m_timeExpire = timeExpire; CLR_RT_ExecutionEngine::InvalidateTimerCache();
+  req->m_fForce = fForce;
 
-    lock->m_requests.LinkAtBack( req );
+  lock->m_requests.LinkAtBack(req);
 
-    sth->ChangeLockRequestCount( +1 );
+  sth->ChangeLockRequestCount(+1);
 
-    NANOCLR_SET_AND_LEAVE(CLR_E_THREAD_WAITING);
+  NANOCLR_SET_AND_LEAVE(CLR_E_THREAD_WAITING);
 
-    NANOCLR_NOCLEANUP();
-}
+  NANOCLR_NOCLEANUP();
+  }
 

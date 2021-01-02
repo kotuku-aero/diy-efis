@@ -104,18 +104,8 @@ void enable_tx(int next_buffer, int priority)
   }
 
 
-#define BITRATE 	125               // 125kbs
-#define PRSEG_LEN   1
-#define PRSEG_VAL   (PRSEG_LEN -1)
-#define SEG1PH_LEN  5
-#define SEG1PH_VAL  (SEG1PH_LEN -1)
-#define SEG2PH_LEN  3
-#define SEG2PH_VAL  (SEG2PH_LEN -1)
-#define NTQ 		(1 + PRSEG_LEN + SEG1PH_LEN + SEG2PH_LEN) // Number of Tq cycles which will make the
-//CAN Bit Timing .
-//#define BRP_VAL		((FCY/(2* NTQ * BITRATE))-1)  //Formulae used for C1CFG1bits.BRP
 
-result_t bsp_can_init(deque_p rx_queue, uint32_t fcy, uint32_t bitrate)
+result_t bsp_can_init(deque_p rx_queue, const neutron_parameters_t *params)
   {
   // configure dma channel 0 to the txcan function
   DMA0CONbits.SIZE = 0x0;
@@ -154,19 +144,22 @@ result_t bsp_can_init(deque_p rx_queue, uint32_t fcy, uint32_t bitrate)
 
   // set up the can bus interface
   C1CTRL1bits.CANCKS = 0; // Select can clock == Fp (70mhz)
-  C1CFG1bits.SJW = 00; //Synchronized jump width time is 1 x TQ when SJW is equal to 00
-  
+   
   // set the initial rate to 125kbs
   // should be 27 for 70000, 7 for 20000
   
-  uint32_t brp = (fcy / (2* NTQ * bitrate))-1;
+  uint32_t ntq = params->sjw + params->prseg + params->seg1ph + params->seg2ph;
+  
+  uint32_t brp = (params->fsys / (2* ntq * ((uint32_t) params->bitrate)))-1;
+    // set up the can bus interface
   
   C1CFG1bits.BRP = (uint16_t) brp;
+  C1CFG1bits.SJW = (uint16_t)(params->sjw -1);
 
-  C1CFG2bits.PRSEG = PRSEG_VAL; // Preamble
-  C1CFG2bits.SEG1PH = SEG1PH_VAL;
-  C1CFG2bits.SEG2PH = SEG2PH_VAL;
-  C1CFG2bits.SEG2PHTS = 1; // use PS2 for calcs
+  C1CFG2bits.PRSEG = (uint16_t)(params->prseg -1); // Preamble
+  C1CFG2bits.SEG1PH = (uint16_t)(params->seg1ph -1);
+  C1CFG2bits.SEG2PH = (uint16_t)(params->seg2ph -1);
+  C1CFG2bits.SEG2PHTS = 1;  // use PS2 for calcs
 
   C1TR01CONbits.TXEN0 = 1;
   C1TR01CONbits.TXEN1 = 1;

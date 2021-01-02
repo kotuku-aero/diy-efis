@@ -8,7 +8,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void HAL_Windows_FastSleep( signed __int64 ticks );
+void HAL_Windows_FastSleep(signed __int64 ticks);
 
 bool HAL_Windows_IsShutdownPending();
 
@@ -18,23 +18,23 @@ bool HAL_Windows_HasGlobalLock();
 
 unsigned __int64 HAL_Windows_GetPerformanceTicks();
 
-void HAL_Windows_Debug_Print( char* szText );
-                        
+void HAL_Windows_Debug_Print(char* szText);
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class HAL_Mutex
-{
-    CRITICAL_SECTION m_data;
+  {
+  CRITICAL_SECTION m_data;
 
-public:
+  public:
     HAL_Mutex();
     ~HAL_Mutex();
 
     //--//
 
-    void Lock  ();
+    void Lock();
     void Unlock();
-};
+  };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

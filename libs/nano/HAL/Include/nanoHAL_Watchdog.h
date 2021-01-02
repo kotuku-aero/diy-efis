@@ -6,16 +6,16 @@
 #ifndef _NANOHAL_WATCHDOG_H_
 #define _NANOHAL_WATCHDOG_H_ 1
 
-#include <nanoWeak.h>   
+#include "../../CLR/Include/nanoWeak.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-    //Watchdog functions
-    void Watchdog_Init();
-    void Watchdog_Reset();
+  //Watchdog functions
+  void Watchdog_Init();
+  void Watchdog_Reset();
 #ifdef __cplusplus
-}
+  }
 #endif
 
 #endif

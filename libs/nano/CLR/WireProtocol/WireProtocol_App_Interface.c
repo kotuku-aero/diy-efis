@@ -3,24 +3,24 @@
 // See LICENSE file in the project root for full license information.
 //
 
-#include <nanoWeak.h>
-#include "WireProtocol_App_Interface.h"
+#include "../Include/nanoWeak.h"
+#include "../Include/WireProtocol_App_Interface.h"
 
-extern int Messaging_ProcessPayload(WP_Message *message);
+extern int Messaging_ProcessPayload(WP_Message* message);
 
-int WP_App_ProcessHeader(WP_Message *message)
-{
-    // check for reception buffer overflow
-    if (message->m_header.m_size > sizeof(receptionBuffer))
+int WP_App_ProcessHeader(WP_Message* message)
+  {
+  // check for reception buffer overflow
+  if (message->m_header.m_size > sizeof(receptionBuffer))
     {
-        return false;
+    return false;
     }
 
-    message->m_payload = receptionBuffer;
-    return true;
-}
+  message->m_payload = receptionBuffer;
+  return true;
+  }
 
-int WP_App_ProcessPayload(WP_Message *message)
-{
-    return Messaging_ProcessPayload(message);
-}
+int WP_App_ProcessPayload(WP_Message* message)
+  {
+  return Messaging_ProcessPayload(message);
+  }

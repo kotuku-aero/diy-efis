@@ -6,13 +6,13 @@
 #ifndef _NANOCLR_CORLIB_NATIVE_H_
 #define _NANOCLR_CORLIB_NATIVE_H_
 
-#include <nanoCLR_Runtime.h>
-#include <nanoCLR_Checks.h>
+#include "../Include/nanoCLR_Runtime.h"
+#include "../Include/nanoCLR_Checks.h"
 //#include <nanoCLR_Diagnostics.h>
 //#include <nanoCLR_Hardware.h>
 
 #include "corlib_native.h"
-#include "nanoCRT.h"
+#include "../../PAL/Include/nanoCRT.h"
 
 #if !defined(_WIN32)
 #include <printf.h>

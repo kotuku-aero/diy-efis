@@ -6,8 +6,8 @@
 #ifndef _NANOCLR_MESSAGING_H_
 #define _NANOCLR_MESSAGING_H_
 
-#include <nanoCLR_Types.h>
-#include <WireProtocol.h>
+#include "nanoCLR_Types.h"
+#include "WireProtocol.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

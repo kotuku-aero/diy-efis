@@ -8,9 +8,7 @@
 #define _NANOHAL_TIME_H_ 1
 
 #include "nanoHAL_Types.h"
-
-#include <targetHAL_Time.h>
-
+#include "../../../ion/targetHAL_Time.h"
 #include "../../CLR/Include/nanoWeak.h"
 
 /// Our time origin is 1/1/1601 00:00:00.000.000.  In Gregorian Calendar Jan 1, 1601 was also a Monday.

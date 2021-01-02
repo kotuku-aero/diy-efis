@@ -7,7 +7,7 @@
 #ifndef _LZWUTIL_H_
 #define _LZWUTIL_H_
 
-#include "Graphics.h"
+#include "../../Graphics.h"
 
 /*****************************************************************************
     External APIs.  Clients of this library must implement the following
@@ -30,31 +30,31 @@
     format, likewise for four bytes (GAMMANOW extension.)
 ******************************************************************* JohnBo **/
 inline void GIF16Bit(unsigned char* pb, int i)
-{
-    LZW_ASSERT(i >= 0 && i < 65536);
-    pb[0] = static_cast<unsigned char>(i);
-    pb[1] = static_cast<unsigned char>(i >> 8);
-}
+  {
+  LZW_ASSERT(i >= 0 && i < 65536);
+  pb[0] = static_cast<unsigned char>(i);
+  pb[1] = static_cast<unsigned char>(i >> 8);
+  }
 
 /* Inverse operation. */
 inline unsigned short GIFU16(const unsigned char* pb)
-{
-    return static_cast<unsigned short>(pb[0] + (pb[1] << 8));
-}
+  {
+  return static_cast<unsigned short>(pb[0] + (pb[1] << 8));
+  }
 
 
 inline void GIF32Bit(unsigned char* pb, unsigned int i)
-{
-    pb[0] = static_cast<unsigned char>(i);
-    pb[1] = static_cast<unsigned char>(i >> 8);
-    pb[2] = static_cast<unsigned char>(i >> 16);
-    pb[3] = static_cast<unsigned char>(i >> 24);
-}
+  {
+  pb[0] = static_cast<unsigned char>(i);
+  pb[1] = static_cast<unsigned char>(i >> 8);
+  pb[2] = static_cast<unsigned char>(i >> 16);
+  pb[3] = static_cast<unsigned char>(i >> 24);
+  }
 
 /* Inverse operation. */
 inline unsigned int GIFU32(const unsigned char* pb)
-{
-    return pb[0] + (pb[1] << 8) + (pb[2] << 16) + (pb[3] << 24);
-}
+  {
+  return pb[0] + (pb[1] << 8) + (pb[2] << 16) + (pb[3] << 24);
+  }
 
 #endif

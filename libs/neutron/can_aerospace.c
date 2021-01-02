@@ -28,7 +28,7 @@ providers.
 
 If any file has a copyright notice or portions of code have been used
 and the original copyright notice is not yet transcribed to the repository
-then the origional copyright notice is to be respected.
+then the original copyright notice is to be respected.
 
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
@@ -840,7 +840,7 @@ result_t can_aerospace_init(const neutron_parameters_t *params, bool init_mode, 
     return result;
 
   // start the can driver running.
-  return bsp_can_init(can_rx_queue, params->fsys, params->bitrate);
+  return bsp_can_init(can_rx_queue, params);
   }
 
 void send_param_float(float value, uint16_t id)

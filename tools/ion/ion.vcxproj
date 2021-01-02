@@ -19,21 +19,49 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\libs\ion\duktape.c" />
+    <ClCompile Include="..\..\libs\ion\canflylib\CanFly_CoreLibrary.cpp" />
+    <ClCompile Include="..\..\libs\ion\CLR_Startup_Thread.c" />
+    <ClCompile Include="..\..\libs\ion\hardfault.c" />
+    <ClCompile Include="..\..\libs\ion\ion_cli.c" />
     <ClCompile Include="..\..\libs\ion\ion_cli_impl.c" />
     <ClCompile Include="..\..\libs\ion\ion_interactive.c" />
     <ClCompile Include="..\..\libs\ion\ion_lib.c" />
     <ClCompile Include="..\..\libs\ion\ion_runner.c" />
+    <ClCompile Include="..\..\libs\ion\nanoCRT.cpp" />
+    <ClCompile Include="..\..\libs\ion\platform_heap.c" />
+    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_CanFlyMsg.cpp" />
+    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_LLA_mshl.cpp" />
+    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_Matrix_mshl.cpp" />
+    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_Neutron_mshl.cpp" />
+    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_Photon_mshl.cpp" />
+    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_QTN_mshl.cpp" />
+    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_XYZ_mshl.cpp" />
+    <ClCompile Include="..\..\libs\ion\targetHAL.c" />
+    <ClCompile Include="..\..\libs\ion\targetHAL_Time.cpp" />
+    <ClCompile Include="..\..\libs\ion\targetPAL_Events.cpp" />
+    <ClCompile Include="..\..\libs\ion\targetPAL_Time.cpp" />
+    <ClCompile Include="..\..\libs\ion\WireProtocol_ReceiverThread.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\libs\ion\duktape.h" />
-    <ClInclude Include="..\..\libs\ion\duk_config.h" />
-    <ClInclude Include="..\..\libs\ion\interpreter.h" />
+    <ClInclude Include="..\..\libs\ion\canflylib\CanFly_CoreLibrary.h" />
+    <ClInclude Include="..\..\libs\ion\CLR_Startup_Thread.h" />
     <ClInclude Include="..\..\libs\ion\ion.h" />
     <ClInclude Include="..\..\libs\ion\ion_cli.h" />
     <ClInclude Include="..\..\libs\ion\ion_cli_impl.h" />
+    <ClInclude Include="..\..\libs\ion\lwipopts.h" />
+    <ClInclude Include="..\..\libs\ion\targetHAL.h" />
+    <ClInclude Include="..\..\libs\ion\TargetHAL_Spi.h" />
+    <ClInclude Include="..\..\libs\ion\targetHAL_Time.h" />
+    <ClInclude Include="..\..\libs\ion\TargetPAL_BlockStorage.h" />
+    <ClInclude Include="..\..\libs\ion\targetPAL_Time.h" />
+    <ClInclude Include="..\..\libs\ion\target_BlockStorage.h" />
+    <ClInclude Include="..\..\libs\ion\target_board.h" />
+    <ClInclude Include="..\..\libs\ion\target_os.h" />
+    <ClInclude Include="..\..\libs\ion\Target_Windows_Storage.h" />
+    <ClInclude Include="..\..\libs\ion\WireProtocol_ReceiverThread.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\libs\ion\canflylib\FindINTEROP-CanFly.CoreLibrary.cmake" />
     <None Include="..\..\libs\ion\ion.cli" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -110,6 +138,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\libs\nano\HAL\Include;$(ProjectDir)..\..\libs\nano\PAL\Include;$(ProjectDir)..\..\libs\nano\CLR\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -124,6 +153,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\libs\nano\HAL\Include;$(ProjectDir)..\..\libs\nano\PAL\Include;$(ProjectDir)..\..\libs\nano\CLR\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

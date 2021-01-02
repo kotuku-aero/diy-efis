@@ -6,7 +6,7 @@
 #ifndef _NANOHAL_RELEASEINFO_H_
 #define _NANOHAL_RELEASEINFO_H_ 1
 
-#include <nanoPackStruct.h>
+#include "../../CLR/Include/nanoPackStruct.h"
 
 struct __nfpack NFVersion
 {

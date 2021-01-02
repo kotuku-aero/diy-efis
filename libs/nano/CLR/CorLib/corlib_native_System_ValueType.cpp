@@ -6,12 +6,12 @@
 #include "CorLib.h"
 
 
-HRESULT Library_corlib_native_System_ValueType::Equals___BOOLEAN__OBJECT( CLR_RT_StackFrame& stack )
-{
-    NATIVE_PROFILE_CLR_CORE();
-    NANOCLR_HEADER();
+HRESULT Library_corlib_native_System_ValueType::Equals___BOOLEAN__OBJECT(CLR_RT_StackFrame& stack)
+  {
+  NATIVE_PROFILE_CLR_CORE();
+  NANOCLR_HEADER();
 
-    stack.SetResult_Boolean( CLR_RT_HeapBlock::ObjectsEqual( stack.Arg0(), stack.Arg1(), false ) );
+  stack.SetResult_Boolean(CLR_RT_HeapBlock::ObjectsEqual(stack.Arg0(), stack.Arg1(), false));
 
-    NANOCLR_NOCLEANUP_NOLABEL();
-}
+  NANOCLR_NOCLEANUP_NOLABEL();
+  }

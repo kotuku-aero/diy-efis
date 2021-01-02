@@ -3,8 +3,8 @@
 // Portions Copyright (c) Microsoft Corporation.  All rights reserved.
 // See LICENSE file in the project root for full license information.
 //
-#include <nanoCLR_Runtime.h>
-#include <nanoCLR_Debugging.h>
+#include "../Include/nanoCLR_Runtime.h"
+#include "../Include/nanoCLR_Debugging.h"
 
 #define DEFINE_CMD(cmd)                                                                                                \
     {                                                                                                                  \
@@ -84,21 +84,21 @@ const CLR_Messaging_CommandHandlerLookup c_Debugger_Lookup_Request[] = {
     DEFINE_CMD(Resolve_Method),
     DEFINE_CMD(Resolve_VirtualMethod),
 #endif
-//
-#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
-    DEFINE_CMD(Deployment_Status),
-    DEFINE_CMD(Info_SetJMC),
-#endif
-//
-#if defined(NANOCLR_PROFILE_NEW)
-    DEFINE_CMD3(Command),
-#endif
     //
-};
+    #if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
+        DEFINE_CMD(Deployment_Status),
+        DEFINE_CMD(Info_SetJMC),
+    #endif
+        //
+        #if defined(NANOCLR_PROFILE_NEW)
+            DEFINE_CMD3(Command),
+        #endif
+            //
+  };
 
 const CLR_Messaging_CommandHandlerLookup c_Debugger_Lookup_Reply[] = {
     DEFINE_CMD2(Ping),
-};
+  };
 
 #undef DEFINE_CMD
 #undef DEFINE_CMD2

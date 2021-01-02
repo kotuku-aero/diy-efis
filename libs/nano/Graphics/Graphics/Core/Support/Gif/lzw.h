@@ -21,25 +21,25 @@
     compression and decompression.
 ******************************************************************* JohnBo **/
 struct LZW
-{
+  {
   protected:
     inline void LZWInit(unsigned int bcodeSize)
-    {
-        m_bcodeSize = LZW_B8(bcodeSize);
+      {
+      m_bcodeSize = LZW_B8(bcodeSize);
 
-        LZW_ASSERT(bcodeSize >= 2 && bcodeSize <= 8);
-    }
+      LZW_ASSERT(bcodeSize >= 2 && bcodeSize <= 8);
+      }
 
     /* METHODS */
     /* Standard GIF definitions. */
     inline unsigned __int16 WClear(void) const
-    {
-        return LZW_B16(1U << m_bcodeSize);
-    }
+      {
+      return LZW_B16(1U << m_bcodeSize);
+      }
     inline unsigned __int16 WEOD(void) const
-    {
-        return LZW_B16(1U + (1U << m_bcodeSize));
-    }
+      {
+      return LZW_B16(1U + (1U << m_bcodeSize));
+      }
 
     /* DATA TYPES */
     /* Basic types. */
@@ -48,31 +48,31 @@ struct LZW
 
     /* Constants. */
     enum
-    {
-        ctokenBits = 12,
-        ctokens = (1U << ctokenBits),
-    };
+      {
+      ctokenBits = 12,
+      ctokens = (1U << ctokenBits),
+      };
 
     /* DATA */
     unsigned char m_bcodeSize; // The LZW initial code size
-};
+  };
 
 /*****************************************************************************
     A class which also holds the current token size.
 ******************************************************************* JohnBo **/
 struct LZWState : protected LZW
-{
+  {
   protected:
     inline void LZWStateInit(unsigned int bcodeSize)
-    {
-        m_ibitsToken = LZW_B8(bcodeSize + 1);
-        m_itokenLast = WEOD();
+      {
+      m_ibitsToken = LZW_B8(bcodeSize + 1);
+      m_itokenLast = WEOD();
 
-        LZWInit(bcodeSize);
-    }
+      LZWInit(bcodeSize);
+      }
 
     unsigned char m_ibitsToken; // The (current) number of bits in a token
     TokenIndex m_itokenLast;    // The last token to be allocated
-};
+  };
 
 #endif

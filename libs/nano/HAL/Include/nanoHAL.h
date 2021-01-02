@@ -28,7 +28,7 @@
 #include "nanoHAL_Power.h"
 #include "nanoHAL_Time.h"
 
-#include <targetHAL.h>
+#include "../../../ion/targetHAL.h"
 
 #include "nanoHAL_Types.h"
 #include "nanoHAL_ReleaseInfo.h"
@@ -816,9 +816,10 @@ extern bool g_fDoNotUninitializeDebuggerPort;
 
 //--//
 
-#include <nanoPAL_Network.h>
-#include <nanoPAL.h>
 //#include <drivers.h>
+
+#include "../../PAL/Include/nanoPAL_Network.h"
+#include "../../PAL/Include/nanoPAL.h"
 
 /////////////////////////////////////////////////////////////////////
 //
@@ -838,11 +839,11 @@ extern bool g_fDoNotUninitializeDebuggerPort;
 //#include <CPU_INTC_decl.h>
 //
 // Gp I/O driver
-#include <CPU_GPIO_decl.h>
+#include "../../PAL/Include/CPU_GPIO_decl.h"
 
 //
 // SPI driver
-#include <nanoHAL_Spi.h>
+#include "nanoHAL_Spi.h"
 
 //
 //// External bus interface driver
