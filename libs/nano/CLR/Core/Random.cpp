@@ -5,33 +5,33 @@
 //
 #include "Core.h"
 
-__nfweak void CLR_RT_Random::Initialize()
+void CLR_RT_Random::Initialize()
   {
   CLR_INT64  st = HAL_Time_CurrentTime();
 
   srand((unsigned int)st);
   }
 
-__nfweak void CLR_RT_Random::Initialize(int seed)
+void CLR_RT_Random::Initialize(int seed)
   {
   srand(seed);
   }
 
-__nfweak uint32_t CLR_RT_Random::Next()
+uint32_t CLR_RT_Random::Next()
   {
   return rand();
   }
 
 #if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
 
-__nfweak double CLR_RT_Random::NextDouble()
+double CLR_RT_Random::NextDouble()
   {
   // Next() will return value between 0 - 0x7FFFFFFF (inclusive)
   return ((double)rand()) / ((double)0x7FFFFFFF);
   }
 #else
 
-__nfweak CLR_INT64 CLR_RT_Random::NextDouble()
+CLR_INT64 CLR_RT_Random::NextDouble()
   {
   // Next() will return value between 0 - 0x7FFFFFFF (inclusive)
 
@@ -40,7 +40,7 @@ __nfweak CLR_INT64 CLR_RT_Random::NextDouble()
 
 #endif
 
-__nfweak void CLR_RT_Random::NextBytes(unsigned char* buffer, unsigned int count)
+void CLR_RT_Random::NextBytes(unsigned char *buffer, unsigned int count)
   {
   unsigned int i;
 

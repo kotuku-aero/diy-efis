@@ -7,12 +7,12 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HRESULT CLR_RT_ObjectToEvent_Source::CreateInstance(CLR_RT_ObjectToEvent_Destination* event, CLR_RT_HeapBlock& object, CLR_RT_HeapBlock& reference)
+HRESULT CLR_RT_ObjectToEvent_Source::CreateInstance(CLR_RT_ObjectToEvent_Destination *event, CLR_RT_HeapBlock &object, CLR_RT_HeapBlock &reference)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_ObjectToEvent_Source* oe = EVENTCACHE_EXTRACT_NODE(g_CLR_RT_EventCache, CLR_RT_ObjectToEvent_Source, DATATYPE_OBJECT_TO_EVENT); CHECK_ALLOCATION(oe);
+  CLR_RT_ObjectToEvent_Source *oe = EVENTCACHE_EXTRACT_NODE(g_CLR_RT_EventCache, CLR_RT_ObjectToEvent_Source, DATATYPE_OBJECT_TO_EVENT); CHECK_ALLOCATION(oe);
 
   oe->m_eventPtr = event;      // Pointer to the event referenced.
 
@@ -26,12 +26,12 @@ HRESULT CLR_RT_ObjectToEvent_Source::CreateInstance(CLR_RT_ObjectToEvent_Destina
   NANOCLR_NOCLEANUP();
   }
 
-CLR_RT_ObjectToEvent_Source* CLR_RT_ObjectToEvent_Source::ExtractInstance(CLR_RT_HeapBlock& reference)
+CLR_RT_ObjectToEvent_Source *CLR_RT_ObjectToEvent_Source::ExtractInstance(CLR_RT_HeapBlock &reference)
   {
   NATIVE_PROFILE_CLR_CORE();
   if (reference.IsAReferenceOfThisType(DATATYPE_OBJECT_TO_EVENT) == false) return NULL;
 
-  return (CLR_RT_ObjectToEvent_Source*)reference.Dereference();
+  return (CLR_RT_ObjectToEvent_Source *)reference.Dereference();
   }
 
 
@@ -57,7 +57,7 @@ void CLR_RT_ObjectToEvent_Source::Detach()
 void CLR_RT_ObjectToEvent_Source::Relocate()
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_GarbageCollector::Heap_Relocate((void**)&m_objectPtr);
-  CLR_RT_GarbageCollector::Heap_Relocate((void**)&m_referencePtr);
+  CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_objectPtr);
+  CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_referencePtr);
   }
 

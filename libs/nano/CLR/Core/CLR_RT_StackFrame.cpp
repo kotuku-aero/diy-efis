@@ -7,16 +7,16 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HRESULT CLR_RT_StackFrame::Push(CLR_RT_Thread* th, const CLR_RT_MethodDef_Instance& callInst, CLR_INT32 extraBlocks)
+HRESULT CLR_RT_StackFrame::Push(CLR_RT_Thread *th, const CLR_RT_MethodDef_Instance &callInst, CLR_INT32 extraBlocks)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_StackFrame* stack;
-  CLR_RT_StackFrame* caller;
-  CLR_RT_Assembly* assm;
-  const CLR_RECORD_METHODDEF* md;
-  const CLR_RT_MethodDef_Instance* callInstPtr = &callInst;
+  CLR_RT_StackFrame *stack;
+  CLR_RT_StackFrame *caller;
+  CLR_RT_Assembly *assm;
+  const CLR_RECORD_METHODDEF *md;
+  const CLR_RT_MethodDef_Instance *callInstPtr = &callInst;
   CLR_UINT32 sizeLocals;
   CLR_UINT32 sizeEvalStack;
 
@@ -270,13 +270,13 @@ HRESULT CLR_RT_StackFrame::Push(CLR_RT_Thread* th, const CLR_RT_MethodDef_Instan
 
 #ifndef CLR_NO_IL_INLINE
 bool CLR_RT_StackFrame::PushInline(
-  CLR_PMETADATA& ip,
-  CLR_RT_Assembly*& assm,
-  CLR_RT_HeapBlock*& evalPos,
-  CLR_RT_MethodDef_Instance& calleeInst,
-  CLR_RT_HeapBlock* pThis)
+  CLR_PMETADATA &ip,
+  CLR_RT_Assembly *&assm,
+  CLR_RT_HeapBlock *&evalPos,
+  CLR_RT_MethodDef_Instance &calleeInst,
+  CLR_RT_HeapBlock *pThis)
   {
-  const CLR_RECORD_METHODDEF* md = calleeInst.m_target;
+  const CLR_RECORD_METHODDEF *md = calleeInst.m_target;
 
   if ((m_inlineFrame != NULL) || // We can only support one inline at a time per stack call
     (m_evalStackEnd - evalPos) <= (md->numArgs + md->numLocals + md->lengthEvalStack +
@@ -368,7 +368,7 @@ bool CLR_RT_StackFrame::PushInline(
 void CLR_RT_StackFrame::PopInline()
   {
 
-  CLR_RT_HeapBlock& src = m_evalStackPos[0];
+  CLR_RT_HeapBlock &src = m_evalStackPos[0];
 
   RestoreFromInlineStack();
 
@@ -376,7 +376,7 @@ void CLR_RT_StackFrame::PopInline()
     {
     if (m_owningThread->m_currentException.Dereference() == NULL)
       {
-      CLR_RT_HeapBlock& dst = PushValueAndAssign(src);
+      CLR_RT_HeapBlock &dst = PushValueAndAssign(src);
 
       dst.Promote();
       }
@@ -407,7 +407,7 @@ void CLR_RT_StackFrame::RestoreFromInlineStack()
   m_evalStackPos = m_inlineFrame->m_frame.m_evalPos;
   }
 
-void CLR_RT_StackFrame::RestoreStack(CLR_RT_InlineFrame& frame)
+void CLR_RT_StackFrame::RestoreStack(CLR_RT_InlineFrame &frame)
   {
   m_arguments = frame.m_args;
   m_locals = frame.m_locals;
@@ -419,7 +419,7 @@ void CLR_RT_StackFrame::RestoreStack(CLR_RT_InlineFrame& frame)
   m_evalStackEnd -= m_call.m_target->numLocals;
   }
 
-void CLR_RT_StackFrame::SaveStack(CLR_RT_InlineFrame& frame)
+void CLR_RT_StackFrame::SaveStack(CLR_RT_InlineFrame &frame)
   {
   frame.m_args = m_arguments;
   frame.m_locals = m_locals;
@@ -439,7 +439,7 @@ HRESULT CLR_RT_StackFrame::PopAppDomainTransition()
 
   bool fException = false;
   CLR_RT_HeapBlock exception;
-  CLR_RT_StackFrame* caller = this->Caller();
+  CLR_RT_StackFrame *caller = this->Caller();
 
   exception.SetObjectReference(NULL);
 
@@ -487,8 +487,8 @@ HRESULT CLR_RT_StackFrame::PopAppDomainTransition()
     // Now, push the return, if any.
     if (m_call.m_target->retVal != DATATYPE_VOID)
       {
-      CLR_RT_HeapBlock& dst = caller->PushValueAndClear();
-      CLR_RT_HeapBlock& src = this->TopValue();
+      CLR_RT_HeapBlock &dst = caller->PushValueAndClear();
+      CLR_RT_HeapBlock &src = this->TopValue();
 
       NANOCLR_CHECK_HRESULT(caller->m_appDomain->MarshalObject(src, dst));
 
@@ -520,17 +520,17 @@ HRESULT CLR_RT_StackFrame::PopAppDomainTransition()
   }
 
 HRESULT CLR_RT_StackFrame::PushAppDomainTransition(
-  CLR_RT_Thread* th,
-  const CLR_RT_MethodDef_Instance& callInst,
-  CLR_RT_HeapBlock* pThis,
-  CLR_RT_HeapBlock* pArgs)
+  CLR_RT_Thread *th,
+  const CLR_RT_MethodDef_Instance &callInst,
+  CLR_RT_HeapBlock *pThis,
+  CLR_RT_HeapBlock *pArgs)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_StackFrame* frame = NULL;
+  CLR_RT_StackFrame *frame = NULL;
   int cArgs = callInst.m_target->numArgs;
-  CLR_RT_HeapBlock* proxy;
+  CLR_RT_HeapBlock *proxy;
 
   _ASSERTE(pThis->IsTransparentProxy());
 
@@ -560,18 +560,18 @@ HRESULT CLR_RT_StackFrame::PushAppDomainTransition(
 
 HRESULT CLR_RT_StackFrame::MakeCall(
   CLR_RT_MethodDef_Instance md,
-  CLR_RT_HeapBlock* obj,
-  CLR_RT_HeapBlock* args,
+  CLR_RT_HeapBlock *obj,
+  CLR_RT_HeapBlock *args,
   int nArgs)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  const CLR_RECORD_METHODDEF* mdR = md.m_target;
+  const CLR_RECORD_METHODDEF *mdR = md.m_target;
   bool fStatic = (mdR->flags & CLR_RECORD_METHODDEF::MD_Static) != 0;
   int numArgs = mdR->numArgs;
   int argsOffset = 0;
-  CLR_RT_StackFrame* stackSub;
+  CLR_RT_StackFrame *stackSub;
   CLR_RT_HeapBlock tmp;
   tmp.SetObjectReference(NULL);
   CLR_RT_ProtectFromGC gc(tmp);
@@ -668,7 +668,7 @@ HRESULT CLR_RT_StackFrame::FixCall()
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  const CLR_RECORD_METHODDEF* target = m_call.m_target;
+  const CLR_RECORD_METHODDEF *target = m_call.m_target;
   CLR_UINT8 numArgs = target->numArgs;
 
   //
@@ -681,7 +681,7 @@ HRESULT CLR_RT_StackFrame::FixCall()
     CLR_RT_SignatureParser parser;
     parser.Initialize_MethodSignature(m_call.m_assm, target);
     CLR_RT_SignatureParser::Element res;
-    CLR_RT_HeapBlock* args = m_arguments;
+    CLR_RT_HeapBlock *args = m_arguments;
 
     if (parser.m_flags & PIMAGE_CEE_CS_CALLCONV_HASTHIS)
       {
@@ -705,11 +705,11 @@ HRESULT CLR_RT_StackFrame::FixCall()
         CLR_RT_TypeDef_Instance inst;
         inst.InitializeFromIndex(res.m_cls);
         CLR_DataType dtT = (CLR_DataType)inst.m_target->dataType;
-        const CLR_RT_DataTypeLookup& dtl = c_CLR_RT_DataTypeLookup[dtT];
+        const CLR_RT_DataTypeLookup &dtl = c_CLR_RT_DataTypeLookup[dtT];
 
         if (dtl.m_flags & (CLR_RT_DataTypeLookup::c_OptimizedValueType | CLR_RT_DataTypeLookup::c_ValueType))
           {
-          CLR_RT_HeapBlock* value = args->FixBoxingReference();
+          CLR_RT_HeapBlock *value = args->FixBoxingReference();
           FAULT_ON_NULL(value);
 
           if (value->DataType() == dtT)
@@ -747,10 +747,10 @@ HRESULT CLR_RT_StackFrame::HandleSynchronized(bool fAcquire, bool fGlobal)
   NANOCLR_HEADER();
 
   CLR_RT_HeapBlock refType;
-  CLR_RT_HeapBlock* obj;
+  CLR_RT_HeapBlock *obj;
   CLR_RT_HeapBlock ref;
-  CLR_RT_HeapBlock** ppGlobalLock;
-  CLR_RT_HeapBlock* pGlobalLock;
+  CLR_RT_HeapBlock **ppGlobalLock;
+  CLR_RT_HeapBlock *pGlobalLock;
 
   if (fGlobal)
     {
@@ -872,7 +872,7 @@ void CLR_RT_StackFrame::Pop()
 #endif
     }
 
-  CLR_RT_StackFrame* caller = Caller();
+  CLR_RT_StackFrame *caller = Caller();
 
   if (caller->Prev() != NULL)
     {
@@ -890,8 +890,8 @@ void CLR_RT_StackFrame::Pop()
     //
     if (caller->m_flags & CLR_RT_StackFrame::c_ExecutingConstructor)
       {
-      CLR_RT_HeapBlock& src = this->Arg0();
-      CLR_RT_HeapBlock& dst = caller->PushValueAndAssign(src);
+      CLR_RT_HeapBlock &src = this->Arg0();
+      CLR_RT_HeapBlock &dst = caller->PushValueAndAssign(src);
 
       dst.Promote();
 
@@ -934,8 +934,8 @@ void CLR_RT_StackFrame::Pop()
           {
           if (m_owningThread->m_currentException.Dereference() == NULL)
             {
-            CLR_RT_HeapBlock& src = this->TopValue();
-            CLR_RT_HeapBlock& dst = caller->PushValueAndAssign(src);
+            CLR_RT_HeapBlock &src = this->TopValue();
+            CLR_RT_HeapBlock &dst = caller->PushValueAndAssign(src);
 
             dst.Promote();
             }
@@ -950,12 +950,12 @@ void CLR_RT_StackFrame::Pop()
 
     if (idx >= 0)
       {
-      CLR_RT_HeapBlock_Array* array = g_CLR_RT_ExecutionEngine.m_scratchPadArray;
+      CLR_RT_HeapBlock_Array *array = g_CLR_RT_ExecutionEngine.m_scratchPadArray;
 
       if (array && array->m_numOfElements > (CLR_UINT32)idx)
         {
-        CLR_RT_HeapBlock* dst = (CLR_RT_HeapBlock*)array->GetElement((CLR_UINT32)idx);
-        CLR_RT_HeapBlock* exception = m_owningThread->m_currentException.Dereference();
+        CLR_RT_HeapBlock *dst = (CLR_RT_HeapBlock *)array->GetElement((CLR_UINT32)idx);
+        CLR_RT_HeapBlock *exception = m_owningThread->m_currentException.Dereference();
 
         dst->SetObjectReference(NULL);
 
@@ -1003,7 +1003,7 @@ void CLR_RT_StackFrame::Pop()
   // If this StackFrame owns a SubThread, kill it.
   //
   {
-  CLR_RT_SubThread* sth = (CLR_RT_SubThread*)m_owningSubThread->Next();
+  CLR_RT_SubThread *sth = (CLR_RT_SubThread *)m_owningSubThread->Next();
 
   if (sth->Next() && sth->m_owningStackFrame == this)
     {
@@ -1019,7 +1019,7 @@ void CLR_RT_StackFrame::Pop()
 void CLR_RT_StackFrame::SetResult(CLR_INT32 val, CLR_DataType dataType)
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_HeapBlock& top = PushValue();
+  CLR_RT_HeapBlock &top = PushValue();
 
   top.SetInteger(val, dataType);
   }
@@ -1029,7 +1029,7 @@ void CLR_RT_StackFrame::SetResult(CLR_INT32 val, CLR_DataType dataType)
 void CLR_RT_StackFrame::SetResult_R4(float val)
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_HeapBlock& top = PushValue();
+  CLR_RT_HeapBlock &top = PushValue();
 
   top.SetFloat(val);
   }
@@ -1037,7 +1037,7 @@ void CLR_RT_StackFrame::SetResult_R4(float val)
 void CLR_RT_StackFrame::SetResult_R8(double val)
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_HeapBlock& top = PushValue();
+  CLR_RT_HeapBlock &top = PushValue();
 
   top.SetDouble(val);
   }
@@ -1047,7 +1047,7 @@ void CLR_RT_StackFrame::SetResult_R8(double val)
 void CLR_RT_StackFrame::SetResult_R4(CLR_INT32 val)
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_HeapBlock& top = PushValue();
+  CLR_RT_HeapBlock &top = PushValue();
 
   top.SetFloat(val);
   }
@@ -1055,7 +1055,7 @@ void CLR_RT_StackFrame::SetResult_R4(CLR_INT32 val)
 void CLR_RT_StackFrame::SetResult_R8(CLR_INT64 val)
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_HeapBlock& top = PushValue();
+  CLR_RT_HeapBlock &top = PushValue();
 
   top.SetDouble(val);
   }
@@ -1065,7 +1065,7 @@ void CLR_RT_StackFrame::SetResult_R8(CLR_INT64 val)
 void CLR_RT_StackFrame::SetResult_I1(CLR_UINT8 val)
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_HeapBlock& top = PushValue();
+  CLR_RT_HeapBlock &top = PushValue();
 
   top.SetInteger(val);
   }
@@ -1073,7 +1073,7 @@ void CLR_RT_StackFrame::SetResult_I1(CLR_UINT8 val)
 void CLR_RT_StackFrame::SetResult_I2(CLR_INT16 val)
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_HeapBlock& top = PushValue();
+  CLR_RT_HeapBlock &top = PushValue();
 
   top.SetInteger(val);
   }
@@ -1081,15 +1081,15 @@ void CLR_RT_StackFrame::SetResult_I2(CLR_INT16 val)
 void CLR_RT_StackFrame::SetResult_I4(CLR_INT32 val)
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_HeapBlock& top = PushValue();
+  CLR_RT_HeapBlock &top = PushValue();
 
   top.SetInteger(val);
   }
 
-void CLR_RT_StackFrame::SetResult_I8(CLR_INT64& val)
+void CLR_RT_StackFrame::SetResult_I8(CLR_INT64 &val)
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_HeapBlock& top = PushValue();
+  CLR_RT_HeapBlock &top = PushValue();
 
   top.SetInteger(val);
   }
@@ -1097,7 +1097,7 @@ void CLR_RT_StackFrame::SetResult_I8(CLR_INT64& val)
 void CLR_RT_StackFrame::SetResult_U1(CLR_INT8 val)
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_HeapBlock& top = PushValue();
+  CLR_RT_HeapBlock &top = PushValue();
 
   top.SetInteger(val);
   }
@@ -1105,7 +1105,7 @@ void CLR_RT_StackFrame::SetResult_U1(CLR_INT8 val)
 void CLR_RT_StackFrame::SetResult_U2(CLR_UINT16 val)
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_HeapBlock& top = PushValue();
+  CLR_RT_HeapBlock &top = PushValue();
 
   top.SetInteger(val);
   }
@@ -1113,15 +1113,15 @@ void CLR_RT_StackFrame::SetResult_U2(CLR_UINT16 val)
 void CLR_RT_StackFrame::SetResult_U4(CLR_UINT32 val)
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_HeapBlock& top = PushValue();
+  CLR_RT_HeapBlock &top = PushValue();
 
   top.SetInteger(val);
   }
 
-void CLR_RT_StackFrame::SetResult_U8(CLR_UINT64& val)
+void CLR_RT_StackFrame::SetResult_U8(CLR_UINT64 &val)
 
   {
-  CLR_RT_HeapBlock& top = PushValue();
+  CLR_RT_HeapBlock &top = PushValue();
 
   top.SetInteger(val);
   }
@@ -1129,25 +1129,25 @@ void CLR_RT_StackFrame::SetResult_U8(CLR_UINT64& val)
 void CLR_RT_StackFrame::SetResult_Boolean(bool val)
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_HeapBlock& top = PushValue();
+  CLR_RT_HeapBlock &top = PushValue();
 
   top.SetBoolean(val);
   }
 
-void CLR_RT_StackFrame::SetResult_Object(CLR_RT_HeapBlock* val)
+void CLR_RT_StackFrame::SetResult_Object(CLR_RT_HeapBlock *val)
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_HeapBlock& top = PushValue();
+  CLR_RT_HeapBlock &top = PushValue();
 
   top.SetObjectReference(val);
   }
 
-HRESULT CLR_RT_StackFrame::SetResult_String(const char* val)
+HRESULT CLR_RT_StackFrame::SetResult_String(const char *val)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock& top = PushValue();
+  CLR_RT_HeapBlock &top = PushValue();
 
   NANOCLR_SET_AND_LEAVE(CLR_RT_HeapBlock_String::CreateInstance(top, val));
 
@@ -1157,7 +1157,7 @@ HRESULT CLR_RT_StackFrame::SetResult_String(const char* val)
 void CLR_RT_StackFrame::ConvertResultToBoolean()
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_HeapBlock& top = TopValue();
+  CLR_RT_HeapBlock &top = TopValue();
 
   top.SetBoolean(top.NumericByRef().s4 == 0);
   }
@@ -1165,7 +1165,7 @@ void CLR_RT_StackFrame::ConvertResultToBoolean()
 void CLR_RT_StackFrame::NegateResult()
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_HeapBlock& top = TopValue();
+  CLR_RT_HeapBlock &top = TopValue();
 
   top.NumericByRef().s4 = top.NumericByRef().s4 ? 0 : 1;
   }
@@ -1175,14 +1175,14 @@ void CLR_RT_StackFrame::NegateResult()
 // input HeapBlock has timeout value **IN TICKS**
 // sometimes you have to force a cast to (CLR_INT64) otherwise the set operations will fail because of the var size
 // mismatch
-HRESULT CLR_RT_StackFrame::SetupTimeoutFromTicks(CLR_RT_HeapBlock& input, CLR_INT64*& output)
+HRESULT CLR_RT_StackFrame::SetupTimeoutFromTicks(CLR_RT_HeapBlock &input, CLR_INT64 *&output)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
   if (m_customState == 0)
     {
-    CLR_RT_HeapBlock& ref = PushValueAndClear();
+    CLR_RT_HeapBlock &ref = PushValueAndClear();
     CLR_INT64 timeExpire;
 
     //
@@ -1195,23 +1195,23 @@ HRESULT CLR_RT_StackFrame::SetupTimeoutFromTicks(CLR_RT_HeapBlock& input, CLR_IN
     m_customState = 1;
     }
 
-  output = (CLR_INT64*)&m_evalStack[0].NumericByRef().s8;
+  output = (CLR_INT64 *)&m_evalStack[0].NumericByRef().s8;
 
   NANOCLR_NOCLEANUP();
   }
 
 // input HeapBlock is TimeSpan
-HRESULT CLR_RT_StackFrame::SetupTimeoutFromTimeSpan(CLR_RT_HeapBlock& inputTimeSpan, CLR_INT64*& output)
+HRESULT CLR_RT_StackFrame::SetupTimeoutFromTimeSpan(CLR_RT_HeapBlock &inputTimeSpan, CLR_INT64 *&output)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
   if (m_customState == 0)
     {
-    CLR_RT_HeapBlock& ref = PushValueAndClear();
+    CLR_RT_HeapBlock &ref = PushValueAndClear();
     CLR_INT64 timeExpire;
 
-    CLR_INT64* debounceValue = Library_corlib_native_System_TimeSpan::GetValuePtr(inputTimeSpan);
+    CLR_INT64 *debounceValue = Library_corlib_native_System_TimeSpan::GetValuePtr(inputTimeSpan);
     FAULT_ON_NULL(debounceValue);
 
     //
@@ -1224,7 +1224,7 @@ HRESULT CLR_RT_StackFrame::SetupTimeoutFromTimeSpan(CLR_RT_HeapBlock& inputTimeS
     m_customState = 1;
     }
 
-  output = (CLR_INT64*)&m_evalStack[0].NumericByRef().s8;
+  output = (CLR_INT64 *)&m_evalStack[0].NumericByRef().s8;
 
   NANOCLR_NOCLEANUP();
   }
@@ -1238,16 +1238,16 @@ void CLR_RT_StackFrame::Relocate()
 #ifndef CLR_NO_IL_INLINE
   if (m_inlineFrame)
     {
-    CLR_RT_GarbageCollector::Heap_Relocate((void**)&m_inlineFrame->m_frame.m_call.m_assm);
-    CLR_RT_GarbageCollector::Heap_Relocate((void**)&m_inlineFrame->m_frame.m_call.m_target);
-    CLR_RT_GarbageCollector::Heap_Relocate((void**)&m_inlineFrame->m_frame.m_IPStart);
-    CLR_RT_GarbageCollector::Heap_Relocate((void**)&m_inlineFrame->m_frame.m_IP);
+    CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_inlineFrame->m_frame.m_call.m_assm);
+    CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_inlineFrame->m_frame.m_call.m_target);
+    CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_inlineFrame->m_frame.m_IPStart);
+    CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_inlineFrame->m_frame.m_IP);
 
-    CLR_RT_GarbageCollector::Heap_Relocate((void**)&m_call.m_assm);
-    CLR_RT_GarbageCollector::Heap_Relocate((void**)&m_call.m_target);
-    CLR_RT_GarbageCollector::Heap_Relocate((void**)&m_nativeMethod);
-    CLR_RT_GarbageCollector::Heap_Relocate((void**)&m_IPstart);
-    CLR_RT_GarbageCollector::Heap_Relocate((void**)&m_IP);
+    CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_call.m_assm);
+    CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_call.m_target);
+    CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_nativeMethod);
+    CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_IPstart);
+    CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_IP);
 
     CLR_RT_GarbageCollector::Heap_Relocate(
       m_inlineFrame->m_frame.m_args,
@@ -1263,11 +1263,11 @@ void CLR_RT_StackFrame::Relocate()
   else
 #endif
     {
-    CLR_RT_GarbageCollector::Heap_Relocate((void**)&m_call.m_assm);
-    CLR_RT_GarbageCollector::Heap_Relocate((void**)&m_call.m_target);
-    CLR_RT_GarbageCollector::Heap_Relocate((void**)&m_nativeMethod);
-    CLR_RT_GarbageCollector::Heap_Relocate((void**)&m_IPstart);
-    CLR_RT_GarbageCollector::Heap_Relocate((void**)&m_IP);
+    CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_call.m_assm);
+    CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_call.m_target);
+    CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_nativeMethod);
+    CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_IPstart);
+    CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_IP);
 
     CLR_RT_GarbageCollector::Heap_Relocate(m_arguments, m_call.m_target->numArgs);
     CLR_RT_GarbageCollector::Heap_Relocate(m_locals, m_call.m_target->numLocals);

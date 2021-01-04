@@ -8,7 +8,7 @@
 #if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
 #include "../../PAL/Include/nanoPAL_NativeDouble.h"
 
-HRESULT Library_nf_native_system_math_System_Math::Max___STATIC__R4__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Max___STATIC__R4__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -22,7 +22,7 @@ HRESULT Library_nf_native_system_math_System_Math::Max___STATIC__R4__R4__R4(CLR_
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Max___STATIC__R8__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Max___STATIC__R8__R8__R8(CLR_RT_StackFrame &stack)
   {
 #if (DP_FLOATINGPOINT == TRUE)
 
@@ -42,7 +42,7 @@ HRESULT Library_nf_native_system_math_System_Math::Max___STATIC__R8__R8__R8(CLR_
 #endif 
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Min___STATIC__R4__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Min___STATIC__R4__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -56,7 +56,7 @@ HRESULT Library_nf_native_system_math_System_Math::Min___STATIC__R4__R4__R4(CLR_
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Min___STATIC__R8__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Min___STATIC__R8__R8__R8(CLR_RT_StackFrame &stack)
   {
 #if (DP_FLOATINGPOINT == TRUE)
 
@@ -76,7 +76,7 @@ HRESULT Library_nf_native_system_math_System_Math::Min___STATIC__R8__R8__R8(CLR_
 #endif 
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Abs___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Abs___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
 #if (DP_FLOATINGPOINT == TRUE)
 
@@ -95,7 +95,7 @@ HRESULT Library_nf_native_system_math_System_Math::Abs___STATIC__R8__R8(CLR_RT_S
 #endif 
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Abs___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Abs___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -108,7 +108,7 @@ HRESULT Library_nf_native_system_math_System_Math::Abs___STATIC__R4__R4(CLR_RT_S
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Acos___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Acos___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -133,7 +133,7 @@ HRESULT Library_nf_native_system_math_System_Math::Acos___STATIC__R8__R8(CLR_RT_
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Acos___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Acos___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -150,7 +150,7 @@ HRESULT Library_nf_native_system_math_System_Math::Acos___STATIC__R4__R4(CLR_RT_
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Asin___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Asin___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -175,7 +175,7 @@ HRESULT Library_nf_native_system_math_System_Math::Asin___STATIC__R8__R8(CLR_RT_
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Asin___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Asin___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -192,7 +192,7 @@ HRESULT Library_nf_native_system_math_System_Math::Asin___STATIC__R4__R4(CLR_RT_
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Atan___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Atan___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -217,7 +217,7 @@ HRESULT Library_nf_native_system_math_System_Math::Atan___STATIC__R8__R8(CLR_RT_
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Atan___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Atan___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -234,7 +234,7 @@ HRESULT Library_nf_native_system_math_System_Math::Atan___STATIC__R4__R4(CLR_RT_
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Atan2___STATIC__R8__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Atan2___STATIC__R8__R8__R8(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -260,7 +260,7 @@ HRESULT Library_nf_native_system_math_System_Math::Atan2___STATIC__R8__R8__R8(CL
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Atan2___STATIC__R4__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Atan2___STATIC__R4__R4__R4(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -278,7 +278,7 @@ HRESULT Library_nf_native_system_math_System_Math::Atan2___STATIC__R4__R4__R4(CL
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Ceiling___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Ceiling___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -303,7 +303,7 @@ HRESULT Library_nf_native_system_math_System_Math::Ceiling___STATIC__R8__R8(CLR_
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Ceiling___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Ceiling___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -320,7 +320,7 @@ HRESULT Library_nf_native_system_math_System_Math::Ceiling___STATIC__R4__R4(CLR_
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Cos___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Cos___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -345,7 +345,7 @@ HRESULT Library_nf_native_system_math_System_Math::Cos___STATIC__R8__R8(CLR_RT_S
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Cos___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Cos___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -362,7 +362,7 @@ HRESULT Library_nf_native_system_math_System_Math::Cos___STATIC__R4__R4(CLR_RT_S
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Cosh___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Cosh___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -387,7 +387,7 @@ HRESULT Library_nf_native_system_math_System_Math::Cosh___STATIC__R8__R8(CLR_RT_
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Cosh___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Cosh___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -404,7 +404,7 @@ HRESULT Library_nf_native_system_math_System_Math::Cosh___STATIC__R4__R4(CLR_RT_
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::IEEERemainder___STATIC__R8__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::IEEERemainder___STATIC__R8__R8__R8(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -430,7 +430,7 @@ HRESULT Library_nf_native_system_math_System_Math::IEEERemainder___STATIC__R8__R
 #endif      
   }
 
-HRESULT Library_nf_native_system_math_System_Math::IEEERemainder___STATIC__R4__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::IEEERemainder___STATIC__R4__R4__R4(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -448,7 +448,7 @@ HRESULT Library_nf_native_system_math_System_Math::IEEERemainder___STATIC__R4__R
 #endif      
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Exp___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Exp___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -473,7 +473,7 @@ HRESULT Library_nf_native_system_math_System_Math::Exp___STATIC__R8__R8(CLR_RT_S
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Exp___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Exp___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -490,7 +490,7 @@ HRESULT Library_nf_native_system_math_System_Math::Exp___STATIC__R4__R4(CLR_RT_S
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Floor___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Floor___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -515,7 +515,7 @@ HRESULT Library_nf_native_system_math_System_Math::Floor___STATIC__R8__R8(CLR_RT
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Floor___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Floor___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -532,7 +532,7 @@ HRESULT Library_nf_native_system_math_System_Math::Floor___STATIC__R4__R4(CLR_RT
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Log___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Log___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -557,7 +557,7 @@ HRESULT Library_nf_native_system_math_System_Math::Log___STATIC__R8__R8(CLR_RT_S
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Log___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Log___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -574,7 +574,7 @@ HRESULT Library_nf_native_system_math_System_Math::Log___STATIC__R4__R4(CLR_RT_S
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Log10___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Log10___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -599,7 +599,7 @@ HRESULT Library_nf_native_system_math_System_Math::Log10___STATIC__R8__R8(CLR_RT
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Log10___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Log10___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -616,7 +616,7 @@ HRESULT Library_nf_native_system_math_System_Math::Log10___STATIC__R4__R4(CLR_RT
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Pow___STATIC__R8__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Pow___STATIC__R8__R8__R8(CLR_RT_StackFrame &stack)
   {
 #if (DP_FLOATINGPOINT == TRUE)
   NATIVE_PROFILE_CLR_CORE();
@@ -635,7 +635,7 @@ HRESULT Library_nf_native_system_math_System_Math::Pow___STATIC__R8__R8__R8(CLR_
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Pow___STATIC__R4__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Pow___STATIC__R4__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -650,7 +650,7 @@ HRESULT Library_nf_native_system_math_System_Math::Pow___STATIC__R4__R4__R4(CLR_
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Round___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Round___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
 #if (DP_FLOATINGPOINT == TRUE)
 
@@ -680,7 +680,7 @@ HRESULT Library_nf_native_system_math_System_Math::Round___STATIC__R8__R8(CLR_RT
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Round___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Round___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -703,7 +703,7 @@ HRESULT Library_nf_native_system_math_System_Math::Round___STATIC__R4__R4(CLR_RT
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Sign___STATIC__I4__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Sign___STATIC__I4__R8(CLR_RT_StackFrame &stack)
   {
 #if (DP_FLOATINGPOINT == TRUE)
   NATIVE_PROFILE_CLR_CORE();
@@ -723,7 +723,7 @@ HRESULT Library_nf_native_system_math_System_Math::Sign___STATIC__I4__R8(CLR_RT_
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Sign___STATIC__I4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Sign___STATIC__I4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -739,7 +739,7 @@ HRESULT Library_nf_native_system_math_System_Math::Sign___STATIC__I4__R4(CLR_RT_
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Sin___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Sin___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -764,7 +764,7 @@ HRESULT Library_nf_native_system_math_System_Math::Sin___STATIC__R8__R8(CLR_RT_S
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Sin___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Sin___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -781,7 +781,7 @@ HRESULT Library_nf_native_system_math_System_Math::Sin___STATIC__R4__R4(CLR_RT_S
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Sinh___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Sinh___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -806,7 +806,7 @@ HRESULT Library_nf_native_system_math_System_Math::Sinh___STATIC__R8__R8(CLR_RT_
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Sinh___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Sinh___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -823,7 +823,7 @@ HRESULT Library_nf_native_system_math_System_Math::Sinh___STATIC__R4__R4(CLR_RT_
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Sqrt___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Sqrt___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -848,7 +848,7 @@ HRESULT Library_nf_native_system_math_System_Math::Sqrt___STATIC__R8__R8(CLR_RT_
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Sqrt___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Sqrt___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -865,7 +865,7 @@ HRESULT Library_nf_native_system_math_System_Math::Sqrt___STATIC__R4__R4(CLR_RT_
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Tan___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Tan___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -890,7 +890,7 @@ HRESULT Library_nf_native_system_math_System_Math::Tan___STATIC__R8__R8(CLR_RT_S
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Tan___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Tan___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -907,7 +907,7 @@ HRESULT Library_nf_native_system_math_System_Math::Tan___STATIC__R4__R4(CLR_RT_S
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Tanh___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Tanh___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -932,7 +932,7 @@ HRESULT Library_nf_native_system_math_System_Math::Tanh___STATIC__R8__R8(CLR_RT_
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Tanh___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Tanh___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
 #if (NANOCLR_LIGHT_MATH == TRUE)
   return stack.NotImplementedStub();
@@ -949,7 +949,7 @@ HRESULT Library_nf_native_system_math_System_Math::Tanh___STATIC__R4__R4(CLR_RT_
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Truncate___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Truncate___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
 #if (DP_FLOATINGPOINT == TRUE)
   NATIVE_PROFILE_CLR_CORE();
@@ -968,7 +968,7 @@ HRESULT Library_nf_native_system_math_System_Math::Truncate___STATIC__R8__R8(CLR
 #endif
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Truncate___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Truncate___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -985,7 +985,7 @@ HRESULT Library_nf_native_system_math_System_Math::Truncate___STATIC__R4__R4(CLR
 #else
 
     /// No floating point
-HRESULT Library_nf_native_system_math_System_Math::Max___STATIC__R4__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Max___STATIC__R4__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -995,7 +995,7 @@ HRESULT Library_nf_native_system_math_System_Math::Max___STATIC__R4__R4__R4(CLR_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Max___STATIC__R8__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Max___STATIC__R8__R8__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1005,7 +1005,7 @@ HRESULT Library_nf_native_system_math_System_Math::Max___STATIC__R8__R8__R8(CLR_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Min___STATIC__R4__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Min___STATIC__R4__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1015,7 +1015,7 @@ HRESULT Library_nf_native_system_math_System_Math::Min___STATIC__R4__R4__R4(CLR_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Min___STATIC__R8__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Min___STATIC__R8__R8__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1025,7 +1025,7 @@ HRESULT Library_nf_native_system_math_System_Math::Min___STATIC__R8__R8__R8(CLR_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Abs___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Abs___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1035,7 +1035,7 @@ HRESULT Library_nf_native_system_math_System_Math::Abs___STATIC__R8__R8(CLR_RT_S
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Abs___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Abs___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1045,7 +1045,7 @@ HRESULT Library_nf_native_system_math_System_Math::Abs___STATIC__R4__R4(CLR_RT_S
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Acos___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Acos___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1055,7 +1055,7 @@ HRESULT Library_nf_native_system_math_System_Math::Acos___STATIC__R8__R8(CLR_RT_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Acos___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Acos___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1065,7 +1065,7 @@ HRESULT Library_nf_native_system_math_System_Math::Acos___STATIC__R4__R4(CLR_RT_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Asin___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Asin___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1075,7 +1075,7 @@ HRESULT Library_nf_native_system_math_System_Math::Asin___STATIC__R8__R8(CLR_RT_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Asin___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Asin___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1085,7 +1085,7 @@ HRESULT Library_nf_native_system_math_System_Math::Asin___STATIC__R4__R4(CLR_RT_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Atan___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Atan___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1095,7 +1095,7 @@ HRESULT Library_nf_native_system_math_System_Math::Atan___STATIC__R8__R8(CLR_RT_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Atan___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Atan___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1105,7 +1105,7 @@ HRESULT Library_nf_native_system_math_System_Math::Atan___STATIC__R4__R4(CLR_RT_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Atan2___STATIC__R8__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Atan2___STATIC__R8__R8__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1115,7 +1115,7 @@ HRESULT Library_nf_native_system_math_System_Math::Atan2___STATIC__R8__R8__R8(CL
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Atan2___STATIC__R4__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Atan2___STATIC__R4__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1125,7 +1125,7 @@ HRESULT Library_nf_native_system_math_System_Math::Atan2___STATIC__R4__R4__R4(CL
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Ceiling___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Ceiling___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1139,7 +1139,7 @@ HRESULT Library_nf_native_system_math_System_Math::Ceiling___STATIC__R8__R8(CLR_
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Ceiling___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Ceiling___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1149,7 +1149,7 @@ HRESULT Library_nf_native_system_math_System_Math::Ceiling___STATIC__R4__R4(CLR_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Cos___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Cos___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1159,7 +1159,7 @@ HRESULT Library_nf_native_system_math_System_Math::Cos___STATIC__R8__R8(CLR_RT_S
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Cos___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Cos___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1169,7 +1169,7 @@ HRESULT Library_nf_native_system_math_System_Math::Cos___STATIC__R4__R4(CLR_RT_S
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Cosh___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Cosh___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1179,7 +1179,7 @@ HRESULT Library_nf_native_system_math_System_Math::Cosh___STATIC__R8__R8(CLR_RT_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Cosh___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Cosh___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1189,7 +1189,7 @@ HRESULT Library_nf_native_system_math_System_Math::Cosh___STATIC__R4__R4(CLR_RT_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::IEEERemainder___STATIC__R8__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::IEEERemainder___STATIC__R8__R8__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1199,7 +1199,7 @@ HRESULT Library_nf_native_system_math_System_Math::IEEERemainder___STATIC__R8__R
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::IEEERemainder___STATIC__R4__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::IEEERemainder___STATIC__R4__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1209,7 +1209,7 @@ HRESULT Library_nf_native_system_math_System_Math::IEEERemainder___STATIC__R4__R
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Exp___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Exp___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1219,7 +1219,7 @@ HRESULT Library_nf_native_system_math_System_Math::Exp___STATIC__R8__R8(CLR_RT_S
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Exp___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Exp___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1229,7 +1229,7 @@ HRESULT Library_nf_native_system_math_System_Math::Exp___STATIC__R4__R4(CLR_RT_S
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Floor___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Floor___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1241,7 +1241,7 @@ HRESULT Library_nf_native_system_math_System_Math::Floor___STATIC__R8__R8(CLR_RT
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Floor___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Floor___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1251,7 +1251,7 @@ HRESULT Library_nf_native_system_math_System_Math::Floor___STATIC__R4__R4(CLR_RT
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Log___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Log___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1261,7 +1261,7 @@ HRESULT Library_nf_native_system_math_System_Math::Log___STATIC__R8__R8(CLR_RT_S
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Log___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Log___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1271,7 +1271,7 @@ HRESULT Library_nf_native_system_math_System_Math::Log___STATIC__R4__R4(CLR_RT_S
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Log10___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Log10___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1281,7 +1281,7 @@ HRESULT Library_nf_native_system_math_System_Math::Log10___STATIC__R8__R8(CLR_RT
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Log10___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Log10___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1291,7 +1291,7 @@ HRESULT Library_nf_native_system_math_System_Math::Log10___STATIC__R4__R4(CLR_RT
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Pow___STATIC__R8__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Pow___STATIC__R8__R8__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1301,7 +1301,7 @@ HRESULT Library_nf_native_system_math_System_Math::Pow___STATIC__R8__R8__R8(CLR_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Pow___STATIC__R4__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Pow___STATIC__R4__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1311,7 +1311,7 @@ HRESULT Library_nf_native_system_math_System_Math::Pow___STATIC__R4__R4__R4(CLR_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Round___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Round___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1328,7 +1328,7 @@ HRESULT Library_nf_native_system_math_System_Math::Round___STATIC__R8__R8(CLR_RT
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Round___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Round___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1338,7 +1338,7 @@ HRESULT Library_nf_native_system_math_System_Math::Round___STATIC__R4__R4(CLR_RT
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Sign___STATIC__I4__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Sign___STATIC__I4__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1348,7 +1348,7 @@ HRESULT Library_nf_native_system_math_System_Math::Sign___STATIC__I4__R8(CLR_RT_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Sign___STATIC__I4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Sign___STATIC__I4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1358,7 +1358,7 @@ HRESULT Library_nf_native_system_math_System_Math::Sign___STATIC__I4__R4(CLR_RT_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Sin___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Sin___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1368,7 +1368,7 @@ HRESULT Library_nf_native_system_math_System_Math::Sin___STATIC__R8__R8(CLR_RT_S
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Sin___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Sin___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1378,7 +1378,7 @@ HRESULT Library_nf_native_system_math_System_Math::Sin___STATIC__R4__R4(CLR_RT_S
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Sinh___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Sinh___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1388,7 +1388,7 @@ HRESULT Library_nf_native_system_math_System_Math::Sinh___STATIC__R8__R8(CLR_RT_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Sinh___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Sinh___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1398,7 +1398,7 @@ HRESULT Library_nf_native_system_math_System_Math::Sinh___STATIC__R4__R4(CLR_RT_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Sqrt___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Sqrt___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1408,7 +1408,7 @@ HRESULT Library_nf_native_system_math_System_Math::Sqrt___STATIC__R8__R8(CLR_RT_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Sqrt___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Sqrt___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1418,7 +1418,7 @@ HRESULT Library_nf_native_system_math_System_Math::Sqrt___STATIC__R4__R4(CLR_RT_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Tan___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Tan___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1428,7 +1428,7 @@ HRESULT Library_nf_native_system_math_System_Math::Tan___STATIC__R8__R8(CLR_RT_S
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Tan___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Tan___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1438,7 +1438,7 @@ HRESULT Library_nf_native_system_math_System_Math::Tan___STATIC__R4__R4(CLR_RT_S
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Tanh___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Tanh___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1448,7 +1448,7 @@ HRESULT Library_nf_native_system_math_System_Math::Tanh___STATIC__R8__R8(CLR_RT_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Tanh___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Tanh___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1458,7 +1458,7 @@ HRESULT Library_nf_native_system_math_System_Math::Tanh___STATIC__R4__R4(CLR_RT_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Truncate___STATIC__R8__R8(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Truncate___STATIC__R8__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -1468,7 +1468,7 @@ HRESULT Library_nf_native_system_math_System_Math::Truncate___STATIC__R8__R8(CLR
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_nf_native_system_math_System_Math::Truncate___STATIC__R4__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_nf_native_system_math_System_Math::Truncate___STATIC__R4__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();

@@ -7,7 +7,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HRESULT CLR_RT_HeapBlock_Lock::CreateInstance(CLR_RT_HeapBlock_Lock*& lock, CLR_RT_Thread* th, CLR_RT_HeapBlock& resource)
+HRESULT CLR_RT_HeapBlock_Lock::CreateInstance(CLR_RT_HeapBlock_Lock *&lock, CLR_RT_Thread *th, CLR_RT_HeapBlock &resource)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -29,7 +29,7 @@ HRESULT CLR_RT_HeapBlock_Lock::CreateInstance(CLR_RT_HeapBlock_Lock*& lock, CLR_
 
   if (resource.DataType() == DATATYPE_OBJECT)
     {
-    CLR_RT_HeapBlock* ptr = resource.Dereference();
+    CLR_RT_HeapBlock *ptr = resource.Dereference();
 
     if (ptr)
       {
@@ -52,7 +52,7 @@ HRESULT CLR_RT_HeapBlock_Lock::CreateInstance(CLR_RT_HeapBlock_Lock*& lock, CLR_
   NANOCLR_NOCLEANUP();
   }
 
-void CLR_RT_HeapBlock_Lock::DestroyOwner(CLR_RT_SubThread* sth)
+void CLR_RT_HeapBlock_Lock::DestroyOwner(CLR_RT_SubThread *sth)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_FOREACH_NODE(CLR_RT_HeapBlock_Lock::Owner, owner, m_owners)
@@ -77,10 +77,10 @@ void CLR_RT_HeapBlock_Lock::ChangeOwner()
 
   while (true)
     {
-    CLR_RT_HeapBlock_LockRequest* req = (CLR_RT_HeapBlock_LockRequest*)m_requests.ExtractFirstNode(); if (!req) break;
+    CLR_RT_HeapBlock_LockRequest *req = (CLR_RT_HeapBlock_LockRequest *)m_requests.ExtractFirstNode(); if (!req) break;
 
-    CLR_RT_SubThread* sth = req->m_subthreadWaiting;
-    CLR_RT_Thread* th = sth->m_owningThread;
+    CLR_RT_SubThread *sth = req->m_subthreadWaiting;
+    CLR_RT_Thread *th = sth->m_owningThread;
 
     g_CLR_RT_EventCache.Append_Node(req);
 
@@ -96,7 +96,7 @@ void CLR_RT_HeapBlock_Lock::ChangeOwner()
     // If the new owner was waiting on something, update the flags.
     //
     {
-    CLR_RT_StackFrame* stack = th->CurrentFrame();
+    CLR_RT_StackFrame *stack = th->CurrentFrame();
 
     if (stack->m_flags & CLR_RT_StackFrame::c_PendingSynchronizeGlobally)
       {
@@ -119,7 +119,7 @@ void CLR_RT_HeapBlock_Lock::ChangeOwner()
   //
   if (m_resource.DataType() == DATATYPE_OBJECT)
     {
-    CLR_RT_HeapBlock* ptr = m_resource.Dereference();
+    CLR_RT_HeapBlock *ptr = m_resource.Dereference();
 
     if (ptr)
       {
@@ -140,13 +140,13 @@ void CLR_RT_HeapBlock_Lock::ChangeOwner()
   g_CLR_RT_EventCache.Append_Node(this);
   }
 
-HRESULT CLR_RT_HeapBlock_Lock::IncrementOwnership(CLR_RT_HeapBlock_Lock* lock, CLR_RT_SubThread* sth, const CLR_INT64& timeExpire, bool fForce)
+HRESULT CLR_RT_HeapBlock_Lock::IncrementOwnership(CLR_RT_HeapBlock_Lock *lock, CLR_RT_SubThread *sth, const CLR_INT64 &timeExpire, bool fForce)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_Thread* th = sth->m_owningThread;
-  CLR_RT_Thread* thOwner = lock->m_owningThread;
+  CLR_RT_Thread *th = sth->m_owningThread;
+  CLR_RT_Thread *thOwner = lock->m_owningThread;
 
   if (thOwner == th)
     {
@@ -161,7 +161,7 @@ HRESULT CLR_RT_HeapBlock_Lock::IncrementOwnership(CLR_RT_HeapBlock_Lock* lock, C
     NANOCLR_FOREACH_NODE_END();
 
     {
-    CLR_RT_HeapBlock_Lock::Owner* owner = EVENTCACHE_EXTRACT_NODE(g_CLR_RT_EventCache, Owner, DATATYPE_LOCK_OWNER_HEAD); CHECK_ALLOCATION(owner);
+    CLR_RT_HeapBlock_Lock::Owner *owner = EVENTCACHE_EXTRACT_NODE(g_CLR_RT_EventCache, Owner, DATATYPE_LOCK_OWNER_HEAD); CHECK_ALLOCATION(owner);
 
     owner->m_owningSubThread = sth;
     owner->m_recursion = 1;
@@ -179,12 +179,12 @@ HRESULT CLR_RT_HeapBlock_Lock::IncrementOwnership(CLR_RT_HeapBlock_Lock* lock, C
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT CLR_RT_HeapBlock_Lock::DecrementOwnership(CLR_RT_HeapBlock_Lock* lock, CLR_RT_SubThread* sth)
+HRESULT CLR_RT_HeapBlock_Lock::DecrementOwnership(CLR_RT_HeapBlock_Lock *lock, CLR_RT_SubThread *sth)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_Thread* th = sth->m_owningThread;
+  CLR_RT_Thread *th = sth->m_owningThread;
 
   if (lock && lock->m_owningThread == th)
     {

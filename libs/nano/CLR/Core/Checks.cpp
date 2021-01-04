@@ -7,7 +7,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HRESULT CLR_Checks::VerifyObject(CLR_RT_HeapBlock& top)
+HRESULT CLR_Checks::VerifyObject(CLR_RT_HeapBlock &top)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -32,12 +32,12 @@ HRESULT CLR_Checks::VerifyObject(CLR_RT_HeapBlock& top)
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT CLR_Checks::VerifyArrayReference(CLR_RT_HeapBlock& ref)
+HRESULT CLR_Checks::VerifyArrayReference(CLR_RT_HeapBlock &ref)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock_Array* array;
+  CLR_RT_HeapBlock_Array *array;
 
   if (ref.DataType() != DATATYPE_OBJECT)
     {

@@ -7,7 +7,7 @@
 
 //--//
 
-void CLR_RT_GarbageCollector::MarkStack::Initialize(MarkStackElement* ptr, size_t num)
+void CLR_RT_GarbageCollector::MarkStack::Initialize(MarkStackElement *ptr, size_t num)
   {
   NATIVE_PROFILE_CLR_CORE();
   GenericNode_Initialize();
@@ -27,22 +27,22 @@ void CLR_RT_GarbageCollector::MarkStack::Initialize(MarkStackElement* ptr, size_
 
 //--//
 
-bool CLR_RT_GarbageCollector::ComputeReachabilityGraphForSingleBlock(CLR_RT_HeapBlock** ptr)
+bool CLR_RT_GarbageCollector::ComputeReachabilityGraphForSingleBlock(CLR_RT_HeapBlock **ptr)
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_HeapBlock* obj = *ptr; if (obj == NULL || obj->IsAlive()) return true;
+  CLR_RT_HeapBlock *obj = *ptr; if (obj == NULL || obj->IsAlive()) return true;
 
   return ComputeReachabilityGraphForMultipleBlocks(obj, 1);
   }
 
 
-bool CLR_RT_GarbageCollector::ComputeReachabilityGraphForMultipleBlocks(CLR_RT_HeapBlock* lst, CLR_UINT32 num)
+bool CLR_RT_GarbageCollector::ComputeReachabilityGraphForMultipleBlocks(CLR_RT_HeapBlock *lst, CLR_UINT32 num)
   {
   NATIVE_PROFILE_CLR_CORE();
 
-  MarkStack* stackList;
-  MarkStackElement* stack;
-  MarkStackElement* stackLast;
+  MarkStack *stackList;
+  MarkStackElement *stack;
+  MarkStackElement *stackLast;
 
 #define COMPUTEREACHABILITY_LOADSTATE() stackLast = g_CLR_RT_GarbageCollector.m_markStack->m_last; stack = g_CLR_RT_GarbageCollector.m_markStack->m_top; stackList = g_CLR_RT_GarbageCollector.m_markStack;
 #define COMPUTEREACHABILITY_SAVESTATE() g_CLR_RT_GarbageCollector.m_markStack->m_last = stackLast; g_CLR_RT_GarbageCollector.m_markStack->m_top = stack; g_CLR_RT_GarbageCollector.m_markStack = stackList;
@@ -50,17 +50,17 @@ bool CLR_RT_GarbageCollector::ComputeReachabilityGraphForMultipleBlocks(CLR_RT_H
   COMPUTEREACHABILITY_LOADSTATE();
 
   {
-  CLR_RT_HeapBlock* sub = NULL;
+  CLR_RT_HeapBlock *sub = NULL;
 
   while (true)
     {
-    CLR_RT_HeapBlock* ptr = lst;
+    CLR_RT_HeapBlock *ptr = lst;
 
     if (num == 0)
       {
       if (stack->num == 0)
         {
-        MarkStack* stackNext = (MarkStack*)stackList->Prev();
+        MarkStack *stackNext = (MarkStack *)stackList->Prev();
 
         //finished with this MarkStack
         if (stackNext->Prev() == NULL)
@@ -94,7 +94,7 @@ bool CLR_RT_GarbageCollector::ComputeReachabilityGraphForMultipleBlocks(CLR_RT_H
       {
       if (stack == stackLast)
         {
-        MarkStack* stackNext = (MarkStack*)stackList->Next();
+        MarkStack *stackNext = (MarkStack *)stackList->Next();
 
         if (stackNext->Next() != NULL)
           {
@@ -114,13 +114,13 @@ bool CLR_RT_GarbageCollector::ComputeReachabilityGraphForMultipleBlocks(CLR_RT_H
               {
               CLR_UINT32 size = sizeof(MarkStack) + sizeof(MarkStackElement) * cElement;
 
-              stackNext = (MarkStack*)CLR_RT_Memory::Allocate(size, CLR_RT_HeapBlock::HB_SpecialGCAllocation);
+              stackNext = (MarkStack *)CLR_RT_Memory::Allocate(size, CLR_RT_HeapBlock::HB_SpecialGCAllocation);
 
               if (stackNext)
                 {
                 COMPUTEREACHABILITY_SAVESTATE();
 
-                stackNext->Initialize((MarkStackElement*)(&stackNext[1]), (size_t)cElement);
+                stackNext->Initialize((MarkStackElement *)(&stackNext[1]), (size_t)cElement);
 
                 g_CLR_RT_GarbageCollector.m_markStackList->LinkAtBack(stackNext);
 
@@ -180,7 +180,7 @@ bool CLR_RT_GarbageCollector::ComputeReachabilityGraphForMultipleBlocks(CLR_RT_H
 #if defined(NANOCLR_APPDOMAINS)
       case DATATYPE_TRANSPARENT_PROXY:
       {
-      CLR_RT_AppDomain* appDomain = ptr->TransparentProxyAppDomain();
+      CLR_RT_AppDomain *appDomain = ptr->TransparentProxyAppDomain();
 
       if (appDomain)
         {
@@ -204,7 +204,7 @@ bool CLR_RT_GarbageCollector::ComputeReachabilityGraphForMultipleBlocks(CLR_RT_H
       //--//
 
       case DATATYPE_ARRAY_BYREF:
-        sub = (CLR_RT_HeapBlock*)ptr->Array();
+        sub = (CLR_RT_HeapBlock *)ptr->Array();
         break;
 
         //--//
@@ -223,11 +223,11 @@ bool CLR_RT_GarbageCollector::ComputeReachabilityGraphForMultipleBlocks(CLR_RT_H
         // If the array is full of reference types, mark each of them.
         //
       {
-      CLR_RT_HeapBlock_Array* array = (CLR_RT_HeapBlock_Array*)ptr;
+      CLR_RT_HeapBlock_Array *array = (CLR_RT_HeapBlock_Array *)ptr;
 
       if (array->m_fReference)
         {
-        lst = (CLR_RT_HeapBlock*)array->GetFirstElement();
+        lst = (CLR_RT_HeapBlock *)array->GetFirstElement();
         num = array->m_numOfElements;
         }
       }
@@ -238,7 +238,7 @@ bool CLR_RT_GarbageCollector::ComputeReachabilityGraphForMultipleBlocks(CLR_RT_H
 
       case DATATYPE_DELEGATE_HEAD:
       {
-      CLR_RT_HeapBlock_Delegate* dlg = (CLR_RT_HeapBlock_Delegate*)ptr;
+      CLR_RT_HeapBlock_Delegate *dlg = (CLR_RT_HeapBlock_Delegate *)ptr;
 
       lst = &dlg->m_object;
       num = 1;
@@ -247,7 +247,7 @@ bool CLR_RT_GarbageCollector::ComputeReachabilityGraphForMultipleBlocks(CLR_RT_H
 
       case DATATYPE_BINARY_BLOB_HEAD:
       {
-      CLR_RT_HeapBlock_BinaryBlob* blob = (CLR_RT_HeapBlock_BinaryBlob*)ptr;
+      CLR_RT_HeapBlock_BinaryBlob *blob = (CLR_RT_HeapBlock_BinaryBlob *)ptr;
 
       _ASSERTE(blob->BinaryBlobMarkingHandler() == NULL);
       }
@@ -255,7 +255,7 @@ bool CLR_RT_GarbageCollector::ComputeReachabilityGraphForMultipleBlocks(CLR_RT_H
 
       case DATATYPE_DELEGATELIST_HEAD:
       {
-      CLR_RT_HeapBlock_Delegate_List* dlgList = (CLR_RT_HeapBlock_Delegate_List*)ptr;
+      CLR_RT_HeapBlock_Delegate_List *dlgList = (CLR_RT_HeapBlock_Delegate_List *)ptr;
 
       if (dlgList->m_flags & CLR_RT_HeapBlock_Delegate_List::c_Weak)
         {

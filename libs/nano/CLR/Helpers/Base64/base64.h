@@ -7,7 +7,7 @@
 #ifndef __BASE64_H__
 #define __BASE64_H__
 
-#include "../../../HAL/Include/nanoHAL_v2.h"
+#include <ctype.h>
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // we are using the function declarations matching the mbedTLS ones BUT with weak attribute //

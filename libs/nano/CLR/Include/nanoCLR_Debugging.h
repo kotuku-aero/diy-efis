@@ -858,11 +858,6 @@ struct CLR_DBG_Commands
 struct CLR_DBG_Debugger
   {
   CLR_Messaging* m_messaging;
-  static BlockStorageDevice* m_deploymentStorageDevice;
-
-
-  //--//
-
   static void Debugger_Discovery();
   static void Debugger_WaitForCommands();
 
@@ -879,8 +874,6 @@ struct CLR_DBG_Debugger
   void PurgeCache();
 
   private:
-
-    bool CheckPermission(ByteAddress address, int mode);
 
     void AccessMemory(uint32_t location, uint32_t lengthInBytes, uint8_t* buf, uint32_t mode, uint32_t* errorCode);
 
@@ -931,14 +924,6 @@ struct CLR_DBG_Debugger
     static bool Debugging_Execution_Allocate(WP_Message* msg);
 
     static bool Debugging_UpgradeToSsl(WP_Message* msg);
-
-
-
-
-
-
-
-
 #if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
     static bool Debugging_Execution_Breakpoints(WP_Message* msg);
     static bool Debugging_Execution_BreakpointStatus(WP_Message* msg);

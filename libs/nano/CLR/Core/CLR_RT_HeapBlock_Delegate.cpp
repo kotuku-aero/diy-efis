@@ -7,7 +7,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HRESULT CLR_RT_HeapBlock_Delegate::CreateInstance(CLR_RT_HeapBlock& reference, const CLR_RT_MethodDef_Index& ftn, CLR_RT_StackFrame* call)
+HRESULT CLR_RT_HeapBlock_Delegate::CreateInstance(CLR_RT_HeapBlock &reference, const CLR_RT_MethodDef_Index &ftn, CLR_RT_StackFrame *call)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -36,7 +36,7 @@ HRESULT CLR_RT_HeapBlock_Delegate::CreateInstance(CLR_RT_HeapBlock& reference, c
 
   CLR_UINT32 totLength = (CLR_UINT32)(sizeof(CLR_RT_HeapBlock_Delegate) + length * sizeof(CLR_RT_MethodDef_Index));
 
-  CLR_RT_HeapBlock_Delegate* dlg = (CLR_RT_HeapBlock_Delegate*)g_CLR_RT_ExecutionEngine.ExtractHeapBytesForObjects(DATATYPE_DELEGATE_HEAD, 0, totLength); CHECK_ALLOCATION(dlg);
+  CLR_RT_HeapBlock_Delegate *dlg = (CLR_RT_HeapBlock_Delegate *)g_CLR_RT_ExecutionEngine.ExtractHeapBytesForObjects(DATATYPE_DELEGATE_HEAD, 0, totLength); CHECK_ALLOCATION(dlg);
 
   reference.SetObjectReference(dlg);
 
@@ -56,7 +56,7 @@ HRESULT CLR_RT_HeapBlock_Delegate::CreateInstance(CLR_RT_HeapBlock& reference, c
 #if defined(NANOCLR_DELEGATE_PRESERVE_STACK)
   if (call)
     {
-    CLR_RT_MethodDef_Index* callStack = dlg->GetStackFrames();
+    CLR_RT_MethodDef_Index *callStack = dlg->GetStackFrames();
 
     NANOCLR_FOREACH_NODE_BACKWARD__DIRECT(CLR_RT_StackFrame, ptr, call)
       {

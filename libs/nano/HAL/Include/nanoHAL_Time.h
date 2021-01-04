@@ -11,6 +11,10 @@
 #include "../../../ion/targetHAL_Time.h"
 #include "../../CLR/Include/nanoWeak.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 /// Our time origin is 1/1/1601 00:00:00.000.000.  In Gregorian Calendar Jan 1, 1601 was also a Monday.
 #define BASE_YEAR                   1601
 #define BASE_YEAR_LEAPYEAR_ADJUST   388    

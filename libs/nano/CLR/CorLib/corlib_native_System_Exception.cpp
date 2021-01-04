@@ -8,7 +8,7 @@
 struct ExceptionLookup
   {
   HRESULT hr;
-  CLR_RT_TypeDef_Index* ptr;
+  CLR_RT_TypeDef_Index *ptr;
   };
 
 static const ExceptionLookup c_ExceptionLookup[] =
@@ -33,21 +33,21 @@ static const ExceptionLookup c_ExceptionLookup[] =
 
 //--//
 
-HRESULT Library_corlib_native_System_Exception::get_StackTrace___STRING(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_Exception::get_StackTrace___STRING(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock_Array* pArray;
-  StackTrace* pStackTrace;
-  CLR_RT_HeapBlock* pBlkString;
+  CLR_RT_HeapBlock_Array *pArray;
+  StackTrace *pStackTrace;
+  CLR_RT_HeapBlock *pBlkString;
   char                      buf[512];
-  char* strName;
+  char *strName;
   size_t                    iName;
   CLR_RT_HeapBlock          tmpArray; tmpArray.SetObjectReference(NULL);
   CLR_RT_ProtectFromGC      gc(tmpArray);
   int                       depth = 0;
-  CLR_RT_HeapBlock* pThis = stack.This();         FAULT_ON_NULL(pThis);
+  CLR_RT_HeapBlock *pThis = stack.This();         FAULT_ON_NULL(pThis);
 
   pArray = pThis[FIELD___stackTrace].DereferenceArray();
 
@@ -62,8 +62,8 @@ HRESULT Library_corlib_native_System_Exception::get_StackTrace___STRING(CLR_RT_S
 
   NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_Array::CreateInstance(tmpArray, depth, g_CLR_RT_WellKnownTypes.m_String));
 
-  pStackTrace = (StackTrace*)pArray->GetFirstElement();
-  pBlkString = (CLR_RT_HeapBlock*)tmpArray.DereferenceArray()->GetFirstElement();
+  pStackTrace = (StackTrace *)pArray->GetFirstElement();
+  pBlkString = (CLR_RT_HeapBlock *)tmpArray.DereferenceArray()->GetFirstElement();
 
   for (int i = 0; i < depth; i++)
     {
@@ -80,7 +80,7 @@ HRESULT Library_corlib_native_System_Exception::get_StackTrace___STRING(CLR_RT_S
     pBlkString++;
     }
 
-  NANOCLR_SET_AND_LEAVE(Library_corlib_native_System_String::Concat(stack, (CLR_RT_HeapBlock*)tmpArray.DereferenceArray()->GetFirstElement(), depth));
+  NANOCLR_SET_AND_LEAVE(Library_corlib_native_System_String::Concat(stack, (CLR_RT_HeapBlock *)tmpArray.DereferenceArray()->GetFirstElement(), depth));
 
   NANOCLR_NOCLEANUP();
   }
@@ -93,16 +93,16 @@ HRESULT Library_corlib_native_System_Exception::get_StackTrace___STRING(CLR_RT_S
         - S_OK.
         - S_FALSE.  ref points to the pre-allocated OutOfMemory exception
 */
-HRESULT Library_corlib_native_System_Exception::CreateInstance(CLR_RT_HeapBlock& ref, const CLR_RT_TypeDef_Index& cls, HRESULT hrIn, CLR_RT_StackFrame* stack)
+HRESULT Library_corlib_native_System_Exception::CreateInstance(CLR_RT_HeapBlock &ref, const CLR_RT_TypeDef_Index &cls, HRESULT hrIn, CLR_RT_StackFrame *stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
 #if defined(NANOCLR_APPDOMAINS)
-  CLR_RT_AppDomain* appDomainSav = g_CLR_RT_ExecutionEngine.SetCurrentAppDomain(stack->m_appDomain);
+  CLR_RT_AppDomain *appDomainSav = g_CLR_RT_ExecutionEngine.SetCurrentAppDomain(stack->m_appDomain);
 #endif
 
-  CLR_RT_HeapBlock* obj;
+  CLR_RT_HeapBlock *obj;
 
   _ASSERTE(CLR_RT_ExecutionEngine::IsInstanceOf(cls, g_CLR_RT_WellKnownTypes.m_Exception));
 
@@ -134,10 +134,10 @@ HRESULT Library_corlib_native_System_Exception::CreateInstance(CLR_RT_HeapBlock&
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_corlib_native_System_Exception::CreateInstance(CLR_RT_HeapBlock& ref, HRESULT hrIn, CLR_RT_StackFrame* stack)
+HRESULT Library_corlib_native_System_Exception::CreateInstance(CLR_RT_HeapBlock &ref, HRESULT hrIn, CLR_RT_StackFrame *stack)
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_TypeDef_Index* cls = &g_CLR_RT_WellKnownTypes.m_Exception;
+  CLR_RT_TypeDef_Index *cls = &g_CLR_RT_WellKnownTypes.m_Exception;
 
   _ASSERTE(FAILED(hrIn));
 
@@ -153,16 +153,16 @@ HRESULT Library_corlib_native_System_Exception::CreateInstance(CLR_RT_HeapBlock&
   return CreateInstance(ref, *cls, hrIn, stack);
   }
 
-HRESULT Library_corlib_native_System_Exception::SetStackTrace(CLR_RT_HeapBlock& ref, CLR_RT_StackFrame* stack)
+HRESULT Library_corlib_native_System_Exception::SetStackTrace(CLR_RT_HeapBlock &ref, CLR_RT_StackFrame *stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
   if (stack)
     {
-    CLR_RT_HeapBlock* obj;
-    CLR_RT_HeapBlock_Array* array;
-    StackTrace* dst;
+    CLR_RT_HeapBlock *obj;
+    CLR_RT_HeapBlock_Array *array;
+    StackTrace *dst;
     CLR_UINT32              depth;
 
     if (CLR_RT_ExecutionEngine::IsInstanceOf(ref, g_CLR_RT_WellKnownTypes.m_Exception) == false) NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
@@ -185,7 +185,7 @@ HRESULT Library_corlib_native_System_Exception::SetStackTrace(CLR_RT_HeapBlock& 
     //--//
 
     array = obj[FIELD___stackTrace].DereferenceArray();
-    dst = (StackTrace*)array->GetFirstElement();
+    dst = (StackTrace *)array->GetFirstElement();
 
     NANOCLR_FOREACH_NODE_BACKWARD__DIRECT(CLR_RT_StackFrame, stackSub, stack)
       {
@@ -209,24 +209,24 @@ HRESULT Library_corlib_native_System_Exception::SetStackTrace(CLR_RT_HeapBlock& 
   NANOCLR_NOCLEANUP();
   }
 
-CLR_RT_HeapBlock* Library_corlib_native_System_Exception::GetTarget(CLR_RT_HeapBlock& ref)
+CLR_RT_HeapBlock *Library_corlib_native_System_Exception::GetTarget(CLR_RT_HeapBlock &ref)
   {
   NATIVE_PROFILE_CLR_CORE();
   return CLR_RT_ExecutionEngine::IsInstanceOf(ref, g_CLR_RT_WellKnownTypes.m_Exception) ? ref.Dereference() : NULL;
   }
 
-Library_corlib_native_System_Exception::StackTrace* Library_corlib_native_System_Exception::GetStackTrace(CLR_RT_HeapBlock* obj, CLR_UINT32& depth)
+Library_corlib_native_System_Exception::StackTrace *Library_corlib_native_System_Exception::GetStackTrace(CLR_RT_HeapBlock *obj, CLR_UINT32 &depth)
   {
   NATIVE_PROFILE_CLR_CORE();
   if (obj)
     {
-    CLR_RT_HeapBlock_Array* array = obj[FIELD___stackTrace].DereferenceArray();
+    CLR_RT_HeapBlock_Array *array = obj[FIELD___stackTrace].DereferenceArray();
 
     if (array)
       {
       depth = array->m_numOfElements / sizeof(StackTrace);
 
-      return (StackTrace*)array->GetFirstElement();
+      return (StackTrace *)array->GetFirstElement();
       }
     }
 

@@ -7,53 +7,53 @@
 #ifndef _NANOPAL_ASYNCPROCCALLS_DECL_H_
 #define _NANOPAL_ASYNCPROCCALLS_DECL_H_ 1
 
-#include <nanoWeak.h>
+#include "../../CLR/Include/nanoWeak.h"
 
 //--//
 
 typedef void (*HAL_CALLBACK_FPN)(void *arg);
 
 struct HAL_CALLBACK
-{
+  {
   public:
     HAL_CALLBACK_FPN EntryPoint;
     void *Argument;
 
   public:
     void Initialize(HAL_CALLBACK_FPN EntryPoint, void *Argument)
-    {
-        this->EntryPoint = EntryPoint;
-        this->Argument = Argument;
-    }
+      {
+      this->EntryPoint = EntryPoint;
+      this->Argument = Argument;
+      }
 
     void SetArgument(void *Argument)
-    {
-        this->Argument = Argument;
-    }
+      {
+      this->Argument = Argument;
+      }
 
     HAL_CALLBACK_FPN GetEntryPoint() const
-    {
-        return this->EntryPoint;
-    }
+      {
+      return this->EntryPoint;
+      }
     void *GetArgument() const
-    {
-        return this->Argument;
-    }
+      {
+      return this->Argument;
+      }
 
     void Execute() const
-    {
-        HAL_CALLBACK_FPN EntryPoint = this->EntryPoint;
-        void *Argument = this->Argument;
+      {
+      HAL_CALLBACK_FPN EntryPoint = this->EntryPoint;
+      void *Argument = this->Argument;
 
-        if (EntryPoint)
+      if (EntryPoint)
         {
-            EntryPoint(Argument);
+        EntryPoint(Argument);
         }
-    }
-};
+      }
+  };
 
 struct HAL_CONTINUATION : public HAL_DblLinkedNode<HAL_CONTINUATION>
-{
+  {
 
   private:
     HAL_CALLBACK Callback;
@@ -62,23 +62,23 @@ struct HAL_CONTINUATION : public HAL_DblLinkedNode<HAL_CONTINUATION>
     void InitializeCallback(HAL_CALLBACK_FPN EntryPoint, void *Argument = NULL);
 
     void SetArgument(void *Argument)
-    {
-        Callback.SetArgument(Argument);
-    }
+      {
+      Callback.SetArgument(Argument);
+      }
 
     HAL_CALLBACK_FPN GetEntryPoint() const
-    {
-        return Callback.GetEntryPoint();
-    }
+      {
+      return Callback.GetEntryPoint();
+      }
     void *GetArgument() const
-    {
-        return Callback.GetArgument();
-    }
+      {
+      return Callback.GetArgument();
+      }
 
     void Execute() const
-    {
-        Callback.Execute();
-    }
+      {
+      Callback.Execute();
+      }
 
     bool IsLinked();
     void Enqueue();
@@ -91,51 +91,51 @@ struct HAL_CONTINUATION : public HAL_DblLinkedNode<HAL_CONTINUATION>
     static void InitializeList();
 
     static bool Dequeue_And_Execute();
-};
+  };
 
 //--//
 
 struct HAL_COMPLETION : public HAL_CONTINUATION
-{
-    uint64_t EventTimeTicks;
-    bool ExecuteInISR;
+  {
+  uint64_t EventTimeTicks;
+  bool ExecuteInISR;
 
 #if defined(_DEBUG)
-    uint64_t Start_RTC_Ticks;
+  uint64_t Start_RTC_Ticks;
 #endif
 
-    void InitializeForISR(HAL_CALLBACK_FPN EntryPoint, void *Argument = NULL)
+  void InitializeForISR(HAL_CALLBACK_FPN EntryPoint, void *Argument = NULL)
     {
-        ExecuteInISR = true;
+    ExecuteInISR = true;
 
-        InitializeCallback(EntryPoint, Argument);
+    InitializeCallback(EntryPoint, Argument);
     }
 
-    void InitializeForUserMode(HAL_CALLBACK_FPN EntryPoint, void *Argument = NULL)
+  void InitializeForUserMode(HAL_CALLBACK_FPN EntryPoint, void *Argument = NULL)
     {
-        ExecuteInISR = false;
+    ExecuteInISR = false;
 
-        InitializeCallback(EntryPoint, Argument);
+    InitializeCallback(EntryPoint, Argument);
     }
 
-    void EnqueueTicks(uint64_t eventTimeTicks);
-    void EnqueueDelta64(uint64_t miliSecondsFromNow);
-    void EnqueueDelta(uint32_t miliSecondsFromNow);
+  void EnqueueTicks(uint64_t eventTimeTicks);
+  void EnqueueDelta64(uint64_t miliSecondsFromNow);
+  void EnqueueDelta(uint32_t miliSecondsFromNow);
 
-    void Abort();
+  void Abort();
 
-    void Execute();
+  void Execute();
 
-    //--//
+  //--//
 
-    static void Uninitialize();
+  static void Uninitialize();
 
-    static void InitializeList();
+  static void InitializeList();
 
-    static void DequeueAndExec();
+  static void DequeueAndExec();
 
-    static void WaitForInterrupts(uint64_t expireTimeInSysTicks, uint32_t sleepLevel, uint64_t wakeEvents);
-};
+  static void WaitForInterrupts(uint64_t expireTimeInSysTicks, uint32_t sleepLevel, uint64_t wakeEvents);
+  };
 
 //--//
 

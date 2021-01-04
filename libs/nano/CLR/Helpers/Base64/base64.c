@@ -12,7 +12,7 @@
 
 #include "base64.h"
 
-void build_decoding_table(char* decoding_table)
+void build_decoding_table(char *decoding_table)
   {
   if (decoding_table != NULL)
     {
@@ -21,11 +21,11 @@ void build_decoding_table(char* decoding_table)
     }
   }
 
-__nfweak int mbedtls_base64_encode(
-  unsigned char* dst,
+ int mbedtls_base64_encode(
+  unsigned char *dst,
   size_t dlen,
-  size_t* olen,
-  const unsigned char* src, size_t slen)
+  size_t *olen,
+  const unsigned char *src, size_t slen)
   {
   // parameter not used
   (void)dlen;
@@ -53,16 +53,16 @@ __nfweak int mbedtls_base64_encode(
   return 0;
   }
 
-__nfweak int mbedtls_base64_decode(
-  unsigned char* dst,
+ int mbedtls_base64_decode(
+  unsigned char *dst,
   size_t dlen,
-  size_t* olen,
-  const unsigned char* src, size_t slen)
+  size_t *olen,
+  const unsigned char *src, size_t slen)
   {
   // parameter not used
   (void)dlen;
 
-  char* decoding_table = (char*)platform_malloc(256);
+  char *decoding_table = (char *)platform_malloc(256);
 
   if (decoding_table == NULL)
     {

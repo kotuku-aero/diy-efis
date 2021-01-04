@@ -17,7 +17,7 @@ void CLR_RT_Assembly::InitString()
   NATIVE_PROFILE_CLR_CORE();
   }
 
-const char* CLR_RT_Assembly::GetString(CLR_STRING i)
+const char *CLR_RT_Assembly::GetString(CLR_STRING i)
   {
   NATIVE_PROFILE_CLR_CORE();
   static const CLR_STRING iMax = 0xFFFF - c_CLR_StringTable_Size;
@@ -27,15 +27,15 @@ const char* CLR_RT_Assembly::GetString(CLR_STRING i)
     return &c_CLR_StringTable_Data[c_CLR_StringTable_Lookup[(CLR_STRING)0xFFFF - i]];
     }
 
-  return &(((const char*)GetTable(TBL_Strings))[i]);
+  return &(((const char *)GetTable(TBL_Strings))[i]);
   }
 
 #if defined(_WIN32)
 
-void CLR_RT_Assembly::InitString(std::map<std::string, CLR_OFFSET>& map)
+void CLR_RT_Assembly::InitString(std::map<std::string, CLR_OFFSET> &map)
   {
   NATIVE_PROFILE_CLR_CORE();
-  const CLR_STRING* array = c_CLR_StringTable_Lookup;
+  const CLR_STRING *array = c_CLR_StringTable_Lookup;
   size_t            len = c_CLR_StringTable_Size;
   CLR_STRING        idx = 0xFFFF;
 

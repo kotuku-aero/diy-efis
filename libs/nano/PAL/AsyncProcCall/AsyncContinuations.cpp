@@ -4,8 +4,7 @@
 // See LICENSE file in the project root for full license information.
 //
 
-#include "stdafx.h"
-#include <nanoPAL.h>
+#include "../Include/nanoPAL.h"
 
 HAL_DblLinkedList<HAL_CONTINUATION> g_HAL_Continuation_List;
 extern HAL_DblLinkedList<HAL_CONTINUATION> g_HAL_Completion_List;
@@ -13,96 +12,96 @@ extern HAL_DblLinkedList<HAL_CONTINUATION> g_HAL_Completion_List;
 //--//
 
 bool HAL_CONTINUATION::IsLinked()
-{
-    return ((HAL_DblLinkedNode<HAL_CONTINUATION>*)this)->IsLinked();
-}
+  {
+  return ((HAL_DblLinkedNode<HAL_CONTINUATION>*)this)->IsLinked();
+  }
 
 void HAL_CONTINUATION::InitializeList()
-{
-    NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
-    g_HAL_Continuation_List.Initialize();
-}
+  {
+  NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
+  g_HAL_Continuation_List.Initialize();
+  }
 
 void HAL_CONTINUATION::Enqueue()
-{
-    NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
-    if(this->GetEntryPoint() != NULL)
+  {
+  NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
+  if (this->GetEntryPoint() != NULL)
     {
-        GLOBAL_LOCK();
+    GLOBAL_LOCK();
 
-        g_HAL_Continuation_List.LinkAtBack( this );
+    g_HAL_Continuation_List.LinkAtBack(this);
 
-        GLOBAL_UNLOCK();
+    GLOBAL_UNLOCK();
     }
-}
+  }
 
 void HAL_CONTINUATION::Abort()
-{
-    NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
-    GLOBAL_LOCK();
+  {
+  NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
+  GLOBAL_LOCK();
 
-    this->Unlink();
+  this->Unlink();
 
-    GLOBAL_UNLOCK();
-}
+  GLOBAL_UNLOCK();
+  }
 
 bool HAL_CONTINUATION::Dequeue_And_Execute()
-{
-    NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
+  {
+  NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
 
-    // use this as the return value
-    // helpfull to make the call to release the global mutext happens 
-    bool result;
+  // use this as the return value
+  // helpfull to make the call to release the global mutext happens 
+  bool result;
 
-    HAL_CONTINUATION* ptr = NULL;
-    GLOBAL_LOCK();
-    ptr = g_HAL_Continuation_List.ExtractFirstNode();
-    GLOBAL_UNLOCK();
+  HAL_CONTINUATION *ptr = NULL;
+  GLOBAL_LOCK();
+  ptr = g_HAL_Continuation_List.ExtractFirstNode();
+  GLOBAL_UNLOCK();
 
-    if(ptr == NULL )
+  if (ptr == NULL)
     {
-        result = false;
+    result = false;
     }
-    else
+  else
     {
-        //SystemState_SetNoLock( SYSTEM_STATE_NO_CONTINUATIONS );
+    //SystemState_SetNoLock( SYSTEM_STATE_NO_CONTINUATIONS );
 
-        HAL_CALLBACK call = ptr->Callback;
+    HAL_CALLBACK call = ptr->Callback;
 
-        call.Execute();
+    call.Execute();
 
-        //SystemState_ClearNoLock( SYSTEM_STATE_NO_CONTINUATIONS );   // nestable
+    //SystemState_ClearNoLock( SYSTEM_STATE_NO_CONTINUATIONS );   // nestable
 
-        result = true;
+    result = true;
     }
 
-    return result;
-}
+  return result;
+  }
 
-void HAL_CONTINUATION::InitializeCallback( HAL_CALLBACK_FPN entryPoint, void* argument )
-{
-    NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
-    Initialize();
-    
-    Callback.Initialize( entryPoint, argument );
-}
+void HAL_CONTINUATION::InitializeCallback(HAL_CALLBACK_FPN entryPoint, void *argument)
+  {
+  NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
+  Initialize();
+
+  Callback.Initialize(entryPoint, argument);
+  }
 
 void HAL_CONTINUATION::Uninitialize()
-{
-    NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
-    GLOBAL_LOCK();
-    
-    HAL_CONTINUATION* ptr;
+  {
+  NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
+  GLOBAL_LOCK();
 
-    while(TRUE)
+  HAL_CONTINUATION *ptr;
+
+  while (TRUE)
     {
-        ptr = (HAL_CONTINUATION*)g_HAL_Continuation_List.ExtractFirstNode();
-        
-        if(!ptr)
-        {
-            break;
-        }
+    ptr = (HAL_CONTINUATION *)g_HAL_Continuation_List.ExtractFirstNode();
+
+    if (!ptr)
+      {
+      break;
+      }
     }
-    
-    GLOBAL_UNLOCK();
-}
+
+  GLOBAL_UNLOCK();
+  }

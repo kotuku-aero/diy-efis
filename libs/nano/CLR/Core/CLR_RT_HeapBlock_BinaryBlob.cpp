@@ -7,12 +7,12 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HRESULT CLR_RT_HeapBlock_BinaryBlob::CreateInstance(CLR_RT_HeapBlock& reference, CLR_UINT32 length, CLR_RT_MarkingHandler mark, CLR_RT_RelocationHandler relocate, CLR_UINT32 flags)
+HRESULT CLR_RT_HeapBlock_BinaryBlob::CreateInstance(CLR_RT_HeapBlock &reference, CLR_UINT32 length, CLR_RT_MarkingHandler mark, CLR_RT_RelocationHandler relocate, CLR_UINT32 flags)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock_BinaryBlob* obj = Allocate(length, flags); CHECK_ALLOCATION(obj);
+  CLR_RT_HeapBlock_BinaryBlob *obj = Allocate(length, flags); CHECK_ALLOCATION(obj);
 
   reference.SetObjectReference(obj);
 
@@ -22,12 +22,12 @@ HRESULT CLR_RT_HeapBlock_BinaryBlob::CreateInstance(CLR_RT_HeapBlock& reference,
   NANOCLR_NOCLEANUP();
   }
 
-CLR_RT_HeapBlock_BinaryBlob* CLR_RT_HeapBlock_BinaryBlob::Allocate(CLR_UINT32 length, CLR_UINT32 flags)
+CLR_RT_HeapBlock_BinaryBlob *CLR_RT_HeapBlock_BinaryBlob::Allocate(CLR_UINT32 length, CLR_UINT32 flags)
   {
   NATIVE_PROFILE_CLR_CORE();
   CLR_UINT32 totLength = (CLR_UINT32)(sizeof(CLR_RT_HeapBlock_BinaryBlob) + length);
 
-  CLR_RT_HeapBlock_BinaryBlob* obj;
+  CLR_RT_HeapBlock_BinaryBlob *obj;
 
   if (flags & CLR_RT_HeapBlock::HB_Event)
     {
@@ -35,7 +35,7 @@ CLR_RT_HeapBlock_BinaryBlob* CLR_RT_HeapBlock_BinaryBlob::Allocate(CLR_UINT32 le
     }
   else
     {
-    obj = (CLR_RT_HeapBlock_BinaryBlob*)g_CLR_RT_ExecutionEngine.ExtractHeapBytesForObjects(DATATYPE_BINARY_BLOB_HEAD, flags, totLength);
+    obj = (CLR_RT_HeapBlock_BinaryBlob *)g_CLR_RT_ExecutionEngine.ExtractHeapBytesForObjects(DATATYPE_BINARY_BLOB_HEAD, flags, totLength);
     }
 
   if (obj)

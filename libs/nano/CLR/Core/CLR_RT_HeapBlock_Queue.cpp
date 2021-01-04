@@ -6,21 +6,21 @@
 #include "Core.h"
 
 #if (NANOCLR_SYSTEM_COLLECTIONS == TRUE)
-#include <nf_system_collections.h>
+#include "../../System.Collections/nf_system_collections.h"
 
-HRESULT CLR_RT_HeapBlock_Queue::Dequeue(CLR_RT_HeapBlock*& value)
+HRESULT CLR_RT_HeapBlock_Queue::Dequeue(CLR_RT_HeapBlock *&value)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock_Array* array = GetArray();
+  CLR_RT_HeapBlock_Array *array = GetArray();
   CLR_INT32               size = GetSize();
   CLR_INT32               head = Head();
-  CLR_RT_HeapBlock* removed;
+  CLR_RT_HeapBlock *removed;
 
   if (size == 0) NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_OPERATION);
 
-  removed = (CLR_RT_HeapBlock*)array->GetElement(head);
+  removed = (CLR_RT_HeapBlock *)array->GetElement(head);
 
   value = removed->Dereference();
 
@@ -34,12 +34,12 @@ HRESULT CLR_RT_HeapBlock_Queue::Dequeue(CLR_RT_HeapBlock*& value)
   }
 
 // May Trigger GC, but parameter value will be protected
-HRESULT CLR_RT_HeapBlock_Queue::Enqueue(CLR_RT_HeapBlock* value)
+HRESULT CLR_RT_HeapBlock_Queue::Enqueue(CLR_RT_HeapBlock *value)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock_Array* array = GetArray();
+  CLR_RT_HeapBlock_Array *array = GetArray();
   CLR_INT32               size = GetSize();
   CLR_INT32               tail = GetTail();
   CLR_INT32               capacity = array->m_numOfElements;
@@ -68,7 +68,7 @@ HRESULT CLR_RT_HeapBlock_Queue::Enqueue(CLR_RT_HeapBlock* value)
     SetTail(tail);
     }
 
-  ((CLR_RT_HeapBlock*)array->GetElement(tail))->SetObjectReference(value);
+  ((CLR_RT_HeapBlock *)array->GetElement(tail))->SetObjectReference(value);
 
   SetTail((tail + 1) % capacity);
 
@@ -77,14 +77,14 @@ HRESULT CLR_RT_HeapBlock_Queue::Enqueue(CLR_RT_HeapBlock* value)
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT CLR_RT_HeapBlock_Queue::Peek(CLR_RT_HeapBlock*& value)
+HRESULT CLR_RT_HeapBlock_Queue::Peek(CLR_RT_HeapBlock *&value)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
   if (GetSize() == 0) NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_OPERATION);
 
-  value = ((CLR_RT_HeapBlock*)GetArray()->GetElement(Head()))->Dereference();
+  value = ((CLR_RT_HeapBlock *)GetArray()->GetElement(Head()))->Dereference();
 
   NANOCLR_NOCLEANUP();
   }
@@ -94,7 +94,7 @@ HRESULT CLR_RT_HeapBlock_Queue::Clear()
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock_Array* array = GetArray();
+  CLR_RT_HeapBlock_Array *array = GetArray();
   CLR_INT32               size = GetSize();
   CLR_INT32               head = Head();
   CLR_INT32               tail = GetTail();
@@ -120,7 +120,7 @@ HRESULT CLR_RT_HeapBlock_Queue::Clear()
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT CLR_RT_HeapBlock_Queue::ObjArrayMemcpy(CLR_RT_HeapBlock_Array* arraySrc, int indexSrc, CLR_RT_HeapBlock_Array* arrayDst, int indexDst, int length)
+HRESULT CLR_RT_HeapBlock_Queue::ObjArrayMemcpy(CLR_RT_HeapBlock_Array *arraySrc, int indexSrc, CLR_RT_HeapBlock_Array *arrayDst, int indexDst, int length)
   {
   NANOCLR_HEADER();
 
@@ -129,18 +129,18 @@ HRESULT CLR_RT_HeapBlock_Queue::ObjArrayMemcpy(CLR_RT_HeapBlock_Array* arraySrc,
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT CLR_RT_HeapBlock_Queue::CopyTo(CLR_RT_HeapBlock_Array* toArray, CLR_INT32 index)
+HRESULT CLR_RT_HeapBlock_Queue::CopyTo(CLR_RT_HeapBlock_Array *toArray, CLR_INT32 index)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock_Array* array = GetArray();
+  CLR_RT_HeapBlock_Array *array = GetArray();
   CLR_INT32               size = GetSize();
   CLR_INT32               head = Head();
   CLR_INT32               tail = GetTail();
 
   // if the target array is of type Object, we don't need to call the complex Array::Copy() since there will be no casting involved
-  HRESULT(*arrayCopy)(CLR_RT_HeapBlock_Array*, int, CLR_RT_HeapBlock_Array*, int, int) =
+  HRESULT(*arrayCopy)(CLR_RT_HeapBlock_Array *, int, CLR_RT_HeapBlock_Array *, int, int) =
     (toArray->m_typeOfElement == DATATYPE_OBJECT) ? ObjArrayMemcpy : CLR_RT_HeapBlock_Array::Copy;
 
   if (((CLR_INT32)toArray->m_numOfElements) - index < size) NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);

@@ -8,15 +8,15 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 HRESULT CLR_RT_SubThread::CreateInstance(
-  CLR_RT_Thread* th,
-  CLR_RT_StackFrame* stack,
+  CLR_RT_Thread *th,
+  CLR_RT_StackFrame *stack,
   int priority,
-  CLR_RT_SubThread*& sthRef)
+  CLR_RT_SubThread *&sthRef)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_SubThread* sth = EVENTCACHE_EXTRACT_NODE(g_CLR_RT_EventCache, CLR_RT_SubThread, DATATYPE_SUBTHREAD);
+  CLR_RT_SubThread *sth = EVENTCACHE_EXTRACT_NODE(g_CLR_RT_EventCache, CLR_RT_SubThread, DATATYPE_SUBTHREAD);
   CHECK_ALLOCATION(sth);
 
   sth->m_owningThread = th;        // CLR_RT_Thread*     m_owningThread;
@@ -37,7 +37,7 @@ HRESULT CLR_RT_SubThread::CreateInstance(
   NANOCLR_CLEANUP_END();
   }
 
-void CLR_RT_SubThread::DestroyInstance(CLR_RT_Thread* th, CLR_RT_SubThread* sthBase, int flags)
+void CLR_RT_SubThread::DestroyInstance(CLR_RT_Thread *th, CLR_RT_SubThread *sthBase, int flags)
   {
   NATIVE_PROFILE_CLR_CORE();
   //
@@ -45,7 +45,7 @@ void CLR_RT_SubThread::DestroyInstance(CLR_RT_Thread* th, CLR_RT_SubThread* sthB
   //
   while (true)
     {
-    CLR_RT_SubThread* sth = th->CurrentSubThread();
+    CLR_RT_SubThread *sth = th->CurrentSubThread();
     if (sth->Prev() == NULL)
       break;
 
@@ -54,7 +54,7 @@ void CLR_RT_SubThread::DestroyInstance(CLR_RT_Thread* th, CLR_RT_SubThread* sthB
     //
     while (true)
       {
-      CLR_RT_StackFrame* stack = th->CurrentFrame();
+      CLR_RT_StackFrame *stack = th->CurrentFrame();
       if (stack->Prev() == NULL)
         break;
 
@@ -91,7 +91,7 @@ void CLR_RT_SubThread::DestroyInstance(CLR_RT_Thread* th, CLR_RT_SubThread* sthB
 bool CLR_RT_SubThread::ChangeLockRequestCount(int diff)
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_Thread* th = m_owningThread;
+  CLR_RT_Thread *th = m_owningThread;
 
   this->m_lockRequestsCount += diff;
   th->m_lockRequestsCount += diff;
@@ -138,7 +138,7 @@ bool CLR_RT_Thread::CanThreadBeReused()
     (m_status == CLR_RT_Thread::TH_S_Terminated || m_status == CLR_RT_Thread::TH_S_Unstarted);
   }
 
-HRESULT CLR_RT_Thread::PushThreadProcDelegate(CLR_RT_HeapBlock_Delegate* pDelegate)
+HRESULT CLR_RT_Thread::PushThreadProcDelegate(CLR_RT_HeapBlock_Delegate *pDelegate)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -146,7 +146,7 @@ HRESULT CLR_RT_Thread::PushThreadProcDelegate(CLR_RT_HeapBlock_Delegate* pDelega
   CLR_RT_MethodDef_Instance inst;
 
 #if defined(NANOCLR_APPDOMAINS)
-  CLR_RT_AppDomain* appDomainSav = g_CLR_RT_ExecutionEngine.SetCurrentAppDomain(pDelegate->m_appDomain);
+  CLR_RT_AppDomain *appDomainSav = g_CLR_RT_ExecutionEngine.SetCurrentAppDomain(pDelegate->m_appDomain);
 #endif
 
   if (pDelegate == NULL || pDelegate->DataType() != DATATYPE_DELEGATE_HEAD ||
@@ -175,7 +175,7 @@ HRESULT CLR_RT_Thread::PushThreadProcDelegate(CLR_RT_HeapBlock_Delegate* pDelega
 
   if ((inst.m_target->flags & CLR_RECORD_METHODDEF::MD_Static) == 0)
     {
-    CLR_RT_StackFrame* stackTop = this->CurrentFrame();
+    CLR_RT_StackFrame *stackTop = this->CurrentFrame();
 
     stackTop->m_arguments[0].Assign(pDelegate->m_object);
     }
@@ -191,12 +191,12 @@ HRESULT CLR_RT_Thread::PushThreadProcDelegate(CLR_RT_HeapBlock_Delegate* pDelega
   NANOCLR_CLEANUP_END();
   }
 
-HRESULT CLR_RT_Thread::CreateInstance(int pid, int priority, CLR_RT_Thread*& th, CLR_UINT32 flags)
+HRESULT CLR_RT_Thread::CreateInstance(int pid, int priority, CLR_RT_Thread *&th, CLR_UINT32 flags)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_SubThread* sth;
+  CLR_RT_SubThread *sth;
 
   //--//
 
@@ -204,7 +204,7 @@ HRESULT CLR_RT_Thread::CreateInstance(int pid, int priority, CLR_RT_Thread*& th,
   CHECK_ALLOCATION(th);
 
   {
-  CLR_RT_ProtectFromGC gc((void**)&th, CLR_RT_Thread::ProtectFromGCCallback);
+  CLR_RT_ProtectFromGC gc((void **)&th, CLR_RT_Thread::ProtectFromGCCallback);
 
   th->Initialize();
 
@@ -271,9 +271,9 @@ HRESULT CLR_RT_Thread::CreateInstance(int pid, int priority, CLR_RT_Thread*& th,
 
 HRESULT CLR_RT_Thread::CreateInstance(
   int pid,
-  CLR_RT_HeapBlock_Delegate* pDelegate,
+  CLR_RT_HeapBlock_Delegate *pDelegate,
   int priority,
-  CLR_RT_Thread*& th,
+  CLR_RT_Thread *&th,
   CLR_UINT32 flags)
   {
   NATIVE_PROFILE_CLR_CORE();
@@ -331,10 +331,10 @@ bool CLR_RT_Thread::ReleaseWhenDeadEx()
 
 //--//
 
-void CLR_RT_Thread::ProtectFromGCCallback(void* state)
+void CLR_RT_Thread::ProtectFromGCCallback(void *state)
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_Thread* th = (CLR_RT_Thread*)state;
+  CLR_RT_Thread *th = (CLR_RT_Thread *)state;
 
   g_CLR_RT_GarbageCollector.Thread_Mark(th);
   }
@@ -525,22 +525,22 @@ void CLR_RT_Thread::RecoverFromGC()
 void CLR_RT_Thread::Relocate()
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_GarbageCollector::Heap_Relocate((void**)&m_dlg);
+  CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_dlg);
 
   m_currentException.Relocate__HeapBlock();
 
   for (int i = 0; i < m_nestedExceptionsPos; i++)
     {
-    UnwindStack& us = m_nestedExceptions[i];
+    UnwindStack &us = m_nestedExceptions[i];
 
-    CLR_RT_GarbageCollector::Heap_Relocate((void**)&us.m_stack);
-    CLR_RT_GarbageCollector::Heap_Relocate((void**)&us.m_handlerStack);
-    CLR_RT_GarbageCollector::Heap_Relocate((void**)&us.m_exception);
-    CLR_RT_GarbageCollector::Heap_Relocate((void**)&us.m_ip);
-    CLR_RT_GarbageCollector::Heap_Relocate((void**)&us.m_currentBlockStart);
-    CLR_RT_GarbageCollector::Heap_Relocate((void**)&us.m_currentBlockEnd);
-    CLR_RT_GarbageCollector::Heap_Relocate((void**)&us.m_handlerBlockStart);
-    CLR_RT_GarbageCollector::Heap_Relocate((void**)&us.m_handlerBlockEnd);
+    CLR_RT_GarbageCollector::Heap_Relocate((void **)&us.m_stack);
+    CLR_RT_GarbageCollector::Heap_Relocate((void **)&us.m_handlerStack);
+    CLR_RT_GarbageCollector::Heap_Relocate((void **)&us.m_exception);
+    CLR_RT_GarbageCollector::Heap_Relocate((void **)&us.m_ip);
+    CLR_RT_GarbageCollector::Heap_Relocate((void **)&us.m_currentBlockStart);
+    CLR_RT_GarbageCollector::Heap_Relocate((void **)&us.m_currentBlockEnd);
+    CLR_RT_GarbageCollector::Heap_Relocate((void **)&us.m_handlerBlockStart);
+    CLR_RT_GarbageCollector::Heap_Relocate((void **)&us.m_handlerBlockEnd);
     }
   }
 
@@ -551,7 +551,7 @@ void CLR_RT_Thread::Relocate()
 void CLR_RT_Thread::DumpStack()
   {
   NATIVE_PROFILE_CLR_CORE();
-  const char* szStatus;
+  const char *szStatus;
 
   switch (m_status)
     {
@@ -589,7 +589,7 @@ void CLR_RT_Thread::DumpStack()
 
 //--//
 
-void CLR_RT_Thread::ProcessException_FilterPseudoFrameCopyVars(CLR_RT_StackFrame* to, CLR_RT_StackFrame* from)
+void CLR_RT_Thread::ProcessException_FilterPseudoFrameCopyVars(CLR_RT_StackFrame *to, CLR_RT_StackFrame *from)
   {
   NATIVE_PROFILE_CLR_CORE();
   CLR_UINT8 numArgs = from->m_call.m_target->numArgs;
@@ -610,10 +610,10 @@ HRESULT CLR_RT_Thread::ProcessException_EndFilter()
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_StackFrame* stack = CurrentFrame();
+  CLR_RT_StackFrame *stack = CurrentFrame();
   CLR_INT32 choice = stack->PopValue().NumericByRef().s4;
 
-  UnwindStack& us = m_nestedExceptions[m_nestedExceptionsPos - 1];
+  UnwindStack &us = m_nestedExceptions[m_nestedExceptionsPos - 1];
 
   ProcessException_FilterPseudoFrameCopyVars(us.m_handlerStack, stack);
 
@@ -690,8 +690,8 @@ HRESULT CLR_RT_Thread::ProcessException_EndFinally()
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_StackFrame* stack = CurrentFrame();
-  UnwindStack& us = m_nestedExceptions[m_nestedExceptionsPos - 1];
+  CLR_RT_StackFrame *stack = CurrentFrame();
+  UnwindStack &us = m_nestedExceptions[m_nestedExceptionsPos - 1];
 
   if (us.m_ip)
     {
@@ -759,13 +759,13 @@ HRESULT CLR_RT_Thread::ProcessException_Phase1()
   NANOCLR_HEADER();
 
   // Load the UnwindStack entry to process, as created/loaded by ProcessException
-  UnwindStack& us = m_nestedExceptions[m_nestedExceptionsPos - 1];
+  UnwindStack &us = m_nestedExceptions[m_nestedExceptionsPos - 1];
 
   CLR_RT_ExceptionHandler eh;
 
   // If we were executing a filter that returned false, there's not much point checking the stack frames above the
   // point of the filter. Try to resume from the frame of the last filter executed.
-  CLR_RT_StackFrame* stack = us.m_handlerStack;
+  CLR_RT_StackFrame *stack = us.m_handlerStack;
 
 #ifndef CLR_NO_IL_INLINE
   CLR_RT_InlineFrame tmpInline;
@@ -858,7 +858,7 @@ HRESULT CLR_RT_Thread::ProcessException_Phase1()
 
           if (eh.IsFilter())
             {
-            CLR_RT_StackFrame* newStack = NULL;
+            CLR_RT_StackFrame *newStack = NULL;
 
             // Store the IP range that we're currently executing so leave/PopEH doesn't accidentally pop the
             // filter off.
@@ -1006,7 +1006,7 @@ HRESULT CLR_RT_Thread::ProcessException_Phase1()
 
       stack = stack->Caller();
       }
-    }
+      }
 
   us.m_handlerStack = NULL;
   us.SetPhase(UnwindStack::p_2_RunningFinallys_0);
@@ -1046,7 +1046,7 @@ HRESULT CLR_RT_Thread::ProcessException_Phase1()
 #endif
 
   NANOCLR_CLEANUP_END();
-  }
+    }
 
 HRESULT CLR_RT_Thread::ProcessException_Phase2()
   {
@@ -1058,9 +1058,9 @@ HRESULT CLR_RT_Thread::ProcessException_Phase2()
    * we hit our target catch handler, if any.
    */
 
-  UnwindStack& us = m_nestedExceptions[m_nestedExceptionsPos - 1];
+  UnwindStack &us = m_nestedExceptions[m_nestedExceptionsPos - 1];
 
-  CLR_RT_StackFrame* iterStack = CurrentFrame();
+  CLR_RT_StackFrame *iterStack = CurrentFrame();
 
   CLR_RT_ExceptionHandler eh;
 
@@ -1181,7 +1181,7 @@ HRESULT CLR_RT_Thread::ProcessException_Phase2()
       // false and continue looking for a handler for the old exception
       m_nestedExceptionsPos--;
 
-      UnwindStack& us = m_nestedExceptions[m_nestedExceptionsPos - 1];
+      UnwindStack &us = m_nestedExceptions[m_nestedExceptionsPos - 1];
 
       // Since there are no applicable handlers for this IP inside this filter block, and all finally's nested
       // below the filter have executed, we should pop off our pseudoframe and try to find another catch block.
@@ -1315,8 +1315,8 @@ HRESULT CLR_RT_Thread::ProcessException()
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
-  CLR_RT_StackFrame* stack = CurrentFrame();
-  UnwindStack* us = NULL;
+  CLR_RT_StackFrame *stack = CurrentFrame();
+  UnwindStack *us = NULL;
 
   // If the exception was thrown in the middle of an IL instruction,
   // back up the pointer to point to the executing instruction, not the next one.

@@ -3,15 +3,15 @@
 // See LICENSE file in the project root for full license information.
 //
 
+#if !defined(_WIN32)
+
 #include "../Include/nanoWeak.h"
 #include "../Include/WireProtocol_MonitorCommands.h"
 #include "../../PAL/Include/nanoPAL_BlockStorage.h"
 #include "../../../ion/target_board.h"
 
-#if !defined(_WIN32)
-
 // dummy implementation to allow build of nanoCLR
-__nfweak int AccessMemory(uint32_t location, uint32_t lengthInBytes, uint8_t* buffer, int32_t mode, uint32_t* errorCode)
+int AccessMemory(uint32_t location, uint32_t lengthInBytes, uint8_t* buffer, int32_t mode, uint32_t* errorCode)
   {
   (void)location;
   (void)lengthInBytes;
@@ -75,7 +75,7 @@ int Monitor_Ping(WP_Message* message)
   }
 
 // provided as weak to be replaced by actual implementation by application
-__nfweak int Monitor_OemInfo(WP_Message* message)
+int Monitor_OemInfo(WP_Message* message)
   {
   Monitor_OemInfo_Reply cmdReply;
 
@@ -116,7 +116,7 @@ int Monitor_WriteMemory(WP_Message* message)
   }
 
 // provided as weak to be replaced by actual implementation by application
-__nfweak int Monitor_Reboot(WP_Message* message)
+int Monitor_Reboot(WP_Message* message)
   {
   (void)(message);
 

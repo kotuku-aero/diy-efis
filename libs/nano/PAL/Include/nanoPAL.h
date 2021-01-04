@@ -8,107 +8,21 @@
 
 //#include <nanoHAL_Types.h>
 
-#include <nanoHAL.h>
-#include <nanoPAL_Time.h>
-#include <nanoPAL_GPIO.h>
-#include <nanoHAL_v2.h>
-#include <nanoPAL_BlockStorage.h>
-#include <nanoPAL_Events.h>
-#include <nanoPAL_AsyncProcCalls_decl.h>
-#include <nanoPAL_PerformanceCounters.h>
-
-
-
-
-
-#include <nanoPAL_COM.h>
-// 
-#include <nanoPAL_Sockets.h>
-
-
-
-
-
-
-
-
-
+#include "../../HAL/Include/nanoHAL.h"
+#include "../Include/nanoPAL_Time.h"
+#include "../../HAL/Include/nanoHAL_v2.h"
+#include "../Include/nanoPAL_AsyncProcCalls_decl.h"
+#include "../Include/nanoPAL_PerformanceCounters.h"
+#include "../Include/nanoPAL_COM.h"
 
 //
 //#include <Display_decl.h>
-
 //#include <Power_decl.h> (must be before events_decl.h)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //#include <events_decl.h>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //#include <palevent_decl.h>
-
 //#include <heap_decl.h>
-
 // This function returns location of the CLR heap.
 void HeapLocation(unsigned char*& BaseAddress, unsigned int& SizeInBytes);
-
-
-
-
-//
-//#include <graphics_decl.h>
-//
-//#include <I2C_decl.h>
-//#include <io_decl.h>
-//#include <instrumentation_decl.h>
-//
-//#include <FS_decl.h>
-//
-
-
-//
-
-//#include <Power_decl.h>
 
 //
 // !!! KEEP IN SYNC WITH Microsoft.SPOT.Hardware.PowerLevel !!!
@@ -119,95 +33,6 @@ enum POWER_LEVEL
   POWER_LEVEL__MID_POWER = 0x20,
   POWER_LEVEL__LOW_POWER = 0x30,
   };
-
-
-//#include <Security_decl.h>
-//#include <Sockets_decl.h>
-
-//#include <Time_decl.h>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//#include <TimeService_decl.h>
-
-
-//#include <nanocrt_decl.h>
-
 #if defined(PLATFORM_ARM) || defined(PLATFORM_ESP32)
 
 #define strcpy    DoNotUse_*strcpy  []
@@ -235,15 +60,6 @@ int hal_vsnprintf(char* buffer, size_t len, const char* format, va_list arg);
 #else
 !ERROR
 #endif
-
-
-//#include <USART_decl.h>
-//#include <USB_decl.h>
-//#include <PWM_decl.h>
-//#include <Analog_decl.h>
-//#include <AnalogOut_decl.h>
-//
-#include "../../../ion/TargetPAL_BlockStorage.h"
 
 //#include <SD_decl.h>
 

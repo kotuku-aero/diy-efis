@@ -5,11 +5,11 @@
 //
 
 #include "CLRStartup.h"
-#include <nanoHAL.h>
-#include <nanoCLR_Application.h>
-#include <nanoCLR_Hardware.h>
-#include <nanoCLR_Runtime.h>
-#include <nanoCLR_Types.h>
+
+#include "../../HAL/Include/nanoHAL.h"
+#include "../Include/nanoCLR_Application.h"
+#include "../Include/nanoCLR_Runtime.h"
+#include "../Include/nanoCLR_Types.h"
 
 void ClrExit()
 {

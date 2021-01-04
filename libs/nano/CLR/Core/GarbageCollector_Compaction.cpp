@@ -61,32 +61,32 @@ void CLR_RT_GarbageCollector::Heap_Compact()
 
   Heap_Relocate_Prepare(relocHelper, relocMax);
 
-  RelocationRegion* relocBlocks = relocHelper;
-  RelocationRegion* relocCurrent = relocBlocks;
+  RelocationRegion *relocBlocks = relocHelper;
+  RelocationRegion *relocCurrent = relocBlocks;
 
   //--//
 
   TestPointers_PopulateOld();
 
 
-  CLR_RT_HeapCluster* freeRegion_hc = NULL;;
-  CLR_RT_HeapBlock_Node* freeRegion = NULL;
+  CLR_RT_HeapCluster *freeRegion_hc = NULL;;
+  CLR_RT_HeapBlock_Node *freeRegion = NULL;
 
-  CLR_RT_HeapCluster* currentSource_hc = (CLR_RT_HeapCluster*)g_CLR_RT_ExecutionEngine.m_heap.FirstNode();
+  CLR_RT_HeapCluster *currentSource_hc = (CLR_RT_HeapCluster *)g_CLR_RT_ExecutionEngine.m_heap.FirstNode();
   while (currentSource_hc->Next())
     {
-    CLR_RT_HeapBlock_Node* currentSource = currentSource_hc->m_payloadStart;
-    CLR_RT_HeapBlock_Node* currentSource_end = currentSource_hc->m_payloadEnd;
+    CLR_RT_HeapBlock_Node *currentSource = currentSource_hc->m_payloadStart;
+    CLR_RT_HeapBlock_Node *currentSource_end = currentSource_hc->m_payloadEnd;
 
     if (!freeRegion)
       {
       //
       // Move to the next first free region.
       //
-      freeRegion_hc = (CLR_RT_HeapCluster*)g_CLR_RT_ExecutionEngine.m_heap.FirstNode();
+      freeRegion_hc = (CLR_RT_HeapCluster *)g_CLR_RT_ExecutionEngine.m_heap.FirstNode();
       while (true)
         {
-        CLR_RT_HeapCluster* freeRegion_hcNext = (CLR_RT_HeapCluster*)freeRegion_hc->Next(); if (!freeRegion_hcNext) break;
+        CLR_RT_HeapCluster *freeRegion_hcNext = (CLR_RT_HeapCluster *)freeRegion_hc->Next(); if (!freeRegion_hcNext) break;
 
         freeRegion = freeRegion_hc->m_freeList.FirstNode(); if (freeRegion->Next()) break;
 
@@ -156,8 +156,8 @@ void CLR_RT_GarbageCollector::Heap_Compact()
       CLR_UINT32 freeRegion_Size = freeRegion->DataSize();
       bool       fSlide;
 
-      relocCurrent->m_destination = (CLR_UINT8*)freeRegion;
-      relocCurrent->m_start = (CLR_UINT8*)currentSource;
+      relocCurrent->m_destination = (CLR_UINT8 *)freeRegion;
+      relocCurrent->m_start = (CLR_UINT8 *)currentSource;
       relocCurrent->m_offset = (CLR_UINT32)(relocCurrent->m_destination - relocCurrent->m_start);
 
 
@@ -215,7 +215,7 @@ void CLR_RT_GarbageCollector::Heap_Compact()
         // Remove the old free block, copy the data, recreate the new free block.
         // Merge with the following one if they are adjacent now.
         //
-        CLR_RT_HeapBlock_Node* freeRegionNext = freeRegion->Next();
+        CLR_RT_HeapBlock_Node *freeRegionNext = freeRegion->Next();
 
         freeRegion->Unlink();
 
@@ -235,7 +235,7 @@ void CLR_RT_GarbageCollector::Heap_Compact()
 
         if (fSlide == false)
           {
-          CLR_RT_HeapBlock_Node* dst = currentSource_hc->InsertInOrder((CLR_RT_HeapBlock_Node*)relocCurrent->m_start, move);
+          CLR_RT_HeapBlock_Node *dst = currentSource_hc->InsertInOrder((CLR_RT_HeapBlock_Node *)relocCurrent->m_start, move);
 
           if (dst < freeRegion && freeRegion < (dst + dst->DataSize()))
             {
@@ -260,10 +260,10 @@ void CLR_RT_GarbageCollector::Heap_Compact()
         {
 
         freeRegion = NULL;
-        freeRegion_hc = (CLR_RT_HeapCluster*)freeRegion_hc->Next();
+        freeRegion_hc = (CLR_RT_HeapCluster *)freeRegion_hc->Next();
         while (true)
           {
-          CLR_RT_HeapCluster* freeRegion_hcNext = (CLR_RT_HeapCluster*)freeRegion_hc->Next(); if (!freeRegion_hcNext) break;
+          CLR_RT_HeapCluster *freeRegion_hcNext = (CLR_RT_HeapCluster *)freeRegion_hc->Next(); if (!freeRegion_hcNext) break;
 
           freeRegion = freeRegion_hc->m_freeList.FirstNode(); if (freeRegion->Next()) break;
 
@@ -276,7 +276,7 @@ void CLR_RT_GarbageCollector::Heap_Compact()
       }
       }
 
-    currentSource_hc = (CLR_RT_HeapCluster*)currentSource_hc->Next();
+    currentSource_hc = (CLR_RT_HeapCluster *)currentSource_hc->Next();
     }
 
   if (m_relocCount)
@@ -289,7 +289,7 @@ void CLR_RT_GarbageCollector::Heap_Compact()
     }
   }
 
-void CLR_RT_GarbageCollector::Heap_Relocate_Prepare(RelocationRegion* blocks, size_t total)
+void CLR_RT_GarbageCollector::Heap_Relocate_Prepare(RelocationRegion *blocks, size_t total)
   {
   NATIVE_PROFILE_CLR_CORE();
   m_relocBlocks = blocks;
@@ -297,10 +297,10 @@ void CLR_RT_GarbageCollector::Heap_Relocate_Prepare(RelocationRegion* blocks, si
   m_relocCount = 0;
   }
 
-void CLR_RT_GarbageCollector::Heap_Relocate_AddBlock(CLR_UINT8* dst, CLR_UINT8* src, CLR_UINT32 length)
+void CLR_RT_GarbageCollector::Heap_Relocate_AddBlock(CLR_UINT8 *dst, CLR_UINT8 *src, CLR_UINT32 length)
   {
   NATIVE_PROFILE_CLR_CORE();
-  RelocationRegion* reloc = m_relocBlocks;
+  RelocationRegion *reloc = m_relocBlocks;
   size_t            count = m_relocCount;
 
   while (count)
@@ -334,10 +334,10 @@ void CLR_RT_GarbageCollector::Heap_Relocate()
   NATIVE_PROFILE_CLR_CORE();
   if (m_relocCount)
     {
-    RelocationRegion* relocBlocks = m_relocBlocks;
+    RelocationRegion *relocBlocks = m_relocBlocks;
 
-    CLR_UINT8* relocMinimum = relocBlocks->m_start;
-    CLR_UINT8* relocMaximum = relocBlocks->m_end;
+    CLR_UINT8 *relocMinimum = relocBlocks->m_start;
+    CLR_UINT8 *relocMaximum = relocBlocks->m_end;
 
     for (size_t i = 0; i < m_relocCount; i++, relocBlocks++)
       {
@@ -376,8 +376,8 @@ void CLR_RT_GarbageCollector::Heap_Relocate_Pass(RelocateFtn ftn)
 
   NANOCLR_FOREACH_NODE(CLR_RT_HeapCluster, hc, g_CLR_RT_ExecutionEngine.m_heap)
     {
-    CLR_RT_HeapBlock_Node* ptr = hc->m_payloadStart;
-    CLR_RT_HeapBlock_Node* end = hc->m_payloadEnd;
+    CLR_RT_HeapBlock_Node *ptr = hc->m_payloadStart;
+    CLR_RT_HeapBlock_Node *end = hc->m_payloadEnd;
 
 
     while (ptr < end)
@@ -394,7 +394,7 @@ void CLR_RT_GarbageCollector::Heap_Relocate_Pass(RelocateFtn ftn)
 
 //--//
 
-void CLR_RT_GarbageCollector::Heap_Relocate(CLR_RT_HeapBlock* lst, CLR_UINT32 len)
+void CLR_RT_GarbageCollector::Heap_Relocate(CLR_RT_HeapBlock *lst, CLR_UINT32 len)
   {
   NATIVE_PROFILE_CLR_CORE();
   while (len--)
@@ -405,10 +405,10 @@ void CLR_RT_GarbageCollector::Heap_Relocate(CLR_RT_HeapBlock* lst, CLR_UINT32 le
     }
   }
 
-void CLR_RT_GarbageCollector::Heap_Relocate(void** ref)
+void CLR_RT_GarbageCollector::Heap_Relocate(void **ref)
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_UINT8* dst = (CLR_UINT8*)*ref;
+  CLR_UINT8 *dst = (CLR_UINT8 *)*ref;
 
 #if NANOCLR_VALIDATE_HEAP > NANOCLR_VALIDATE_HEAP_0_None
   if (g_CLR_RT_GarbageCollector.m_relocWorker)
@@ -420,14 +420,14 @@ void CLR_RT_GarbageCollector::Heap_Relocate(void** ref)
     {
     if (dst >= g_CLR_RT_GarbageCollector.m_relocMinimum && dst < g_CLR_RT_GarbageCollector.m_relocMaximum)
       {
-      RelocationRegion* relocBlocks = g_CLR_RT_GarbageCollector.m_relocBlocks;
+      RelocationRegion *relocBlocks = g_CLR_RT_GarbageCollector.m_relocBlocks;
       size_t            left = 0;
       size_t            right = g_CLR_RT_GarbageCollector.m_relocCount;
 
       while (left < right)
         {
         size_t            center = (left + right) / 2;
-        RelocationRegion& relocCurrent = relocBlocks[center];
+        RelocationRegion &relocCurrent = relocBlocks[center];
 
         if (dst < relocCurrent.m_start)
           {
@@ -439,7 +439,7 @@ void CLR_RT_GarbageCollector::Heap_Relocate(void** ref)
           }
         else
           {
-          *ref = (void*)(dst + relocCurrent.m_offset);
+          *ref = (void *)(dst + relocCurrent.m_offset);
 
           return;
           }
@@ -450,14 +450,14 @@ void CLR_RT_GarbageCollector::Heap_Relocate(void** ref)
 
 #if NANOCLR_VALIDATE_HEAP >= NANOCLR_VALIDATE_HEAP_3_Compaction
 
-bool CLR_RT_GarbageCollector::Relocation_JustCheck(void** ref)
+bool CLR_RT_GarbageCollector::Relocation_JustCheck(void **ref)
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_UINT8* dst = (CLR_UINT8*)*ref;
+  CLR_UINT8 *dst = (CLR_UINT8 *)*ref;
 
   if (dst)
     {
-    ValidateBlockNotInFreeList(g_CLR_RT_ExecutionEngine.m_heap, (CLR_RT_HeapBlock_Node*)dst);
+    ValidateBlockNotInFreeList(g_CLR_RT_ExecutionEngine.m_heap, (CLR_RT_HeapBlock_Node *)dst);
     }
 
   return true;

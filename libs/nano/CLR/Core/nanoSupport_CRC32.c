@@ -4,7 +4,6 @@
 // See LICENSE file in the project root for full license information.
 //
 
-#include "../../HAL/Include/nanoHAL_Types.h"
 #include "../Include/nanoCLR_Headers.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -47,9 +46,9 @@ static const uint32_t c_CRCTable[256] = {
 // This is declared with GCC weak attribute so it can be replaced with an implementation at target level //
 // Currently this is happening with the STM32 targets as all chips feature a CRC hardware unit           //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-__nfweak uint32_t SUPPORT_ComputeCRC(const void* rgBlock, const uint32_t nLength, const uint32_t crc)
+uint32_t SUPPORT_ComputeCRC(const void *rgBlock, const uint32_t nLength, const uint32_t crc)
   {
-  const unsigned char* ptr = (const unsigned char*)rgBlock;
+  const unsigned char *ptr = (const unsigned char *)rgBlock;
   int32_t lenght = nLength;
   uint32_t newCrc = crc;
 

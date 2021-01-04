@@ -6,18 +6,18 @@
 #include "CorLib.h"
 
 
-HRESULT Library_corlib_native_System_Array::System_Collections_IList_get_Item___OBJECT__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_Array::System_Collections_IList_get_Item___OBJECT__I4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock& thisRef = stack.ThisRef();
+  CLR_RT_HeapBlock &thisRef = stack.ThisRef();
   int               index = stack.Arg1().NumericByRef().s4;
 
   CLR_RT_HeapBlock  ref; NANOCLR_CHECK_HRESULT(ref.InitializeArrayReference(thisRef, index));
 
   {
-  CLR_RT_HeapBlock& top = stack.PushValueAndClear();
+  CLR_RT_HeapBlock &top = stack.PushValueAndClear();
 
   NANOCLR_CHECK_HRESULT(top.LoadFromReference(ref));
   NANOCLR_CHECK_HRESULT(top.PerformBoxingIfNeeded());
@@ -26,12 +26,12 @@ HRESULT Library_corlib_native_System_Array::System_Collections_IList_get_Item___
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Array::System_Collections_IList_set_Item___VOID__I4__OBJECT(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_Array::System_Collections_IList_set_Item___VOID__I4__OBJECT(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock& thisRef = stack.ThisRef();
+  CLR_RT_HeapBlock &thisRef = stack.ThisRef();
   int               index = stack.Arg1().NumericByRef().s4;
 
   CLR_RT_HeapBlock  ref; NANOCLR_CHECK_HRESULT(ref.InitializeArrayReference(thisRef, index));
@@ -41,7 +41,7 @@ HRESULT Library_corlib_native_System_Array::System_Collections_IList_set_Item___
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Array::get_Length___I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_Array::get_Length___I4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -55,13 +55,13 @@ HRESULT Library_corlib_native_System_Array::get_Length___I4(CLR_RT_StackFrame& s
 
 #if (NANOCLR_REFLECTION == TRUE)
 
-HRESULT Library_corlib_native_System_Array::CreateInstance___STATIC__SystemArray__SystemType__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_Array::CreateInstance___STATIC__SystemArray__SystemType__I4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
   CLR_RT_TypeDef_Instance td;
-  CLR_RT_HeapBlock* hbType = stack.Arg0().Dereference();
+  CLR_RT_HeapBlock *hbType = stack.Arg0().Dereference();
 
   NANOCLR_CHECK_HRESULT(Library_corlib_native_System_RuntimeType::GetTypeDescriptor(*hbType, td));
 
@@ -72,7 +72,7 @@ HRESULT Library_corlib_native_System_Array::CreateInstance___STATIC__SystemArray
 
 #endif // NANOCLR_REFLECTION 
 
-HRESULT Library_corlib_native_System_Array::Copy___STATIC__VOID__SystemArray__I4__SystemArray__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_Array::Copy___STATIC__VOID__SystemArray__I4__SystemArray__I4__I4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -82,7 +82,7 @@ HRESULT Library_corlib_native_System_Array::Copy___STATIC__VOID__SystemArray__I4
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Array::Clear___STATIC__VOID__SystemArray__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_Array::Clear___STATIC__VOID__SystemArray__I4__I4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -92,7 +92,7 @@ HRESULT Library_corlib_native_System_Array::Clear___STATIC__VOID__SystemArray__I
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Array::TrySzIndexOf___STATIC__BOOLEAN__SystemArray__I4__I4__OBJECT__BYREF_I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_Array::TrySzIndexOf___STATIC__BOOLEAN__SystemArray__I4__I4__OBJECT__BYREF_I4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -108,14 +108,14 @@ HRESULT Library_corlib_native_System_Array::TrySzIndexOf___STATIC__BOOLEAN__Syst
 
 //--//
 
-HRESULT Library_corlib_native_System_Array::Clear(CLR_RT_StackFrame& stack, CLR_RT_HeapBlock& arg, int index, int length)
+HRESULT Library_corlib_native_System_Array::Clear(CLR_RT_StackFrame &stack, CLR_RT_HeapBlock &arg, int index, int length)
   {
   (void)stack;
 
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock_Array* array;
+  CLR_RT_HeapBlock_Array *array;
   int                     numElem;
 
   NANOCLR_CHECK_HRESULT(CLR_Checks::VerifyArrayReference(arg));
@@ -137,7 +137,7 @@ HRESULT Library_corlib_native_System_Array::Clear(CLR_RT_StackFrame& stack, CLR_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Array::Copy(CLR_RT_StackFrame& stack, CLR_RT_HeapBlock& argSrc, int indexSrc, CLR_RT_HeapBlock& argDst, int indexDst, int length)
+HRESULT Library_corlib_native_System_Array::Copy(CLR_RT_StackFrame &stack, CLR_RT_HeapBlock &argSrc, int indexSrc, CLR_RT_HeapBlock &argDst, int indexDst, int length)
   {
   (void)stack;
 
@@ -155,14 +155,14 @@ HRESULT Library_corlib_native_System_Array::Copy(CLR_RT_StackFrame& stack, CLR_R
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Array::TrySzIndexOf(CLR_RT_StackFrame& stack, CLR_RT_HeapBlock& argSrc, CLR_RT_HeapBlock& match, int start, int stop, bool fForward, CLR_RT_HeapBlock& retValue)
+HRESULT Library_corlib_native_System_Array::TrySzIndexOf(CLR_RT_StackFrame &stack, CLR_RT_HeapBlock &argSrc, CLR_RT_HeapBlock &match, int start, int stop, bool fForward, CLR_RT_HeapBlock &retValue)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
   int index;
   bool fRet;
-  CLR_RT_HeapBlock_Array* array = argSrc.DereferenceArray();
+  CLR_RT_HeapBlock_Array *array = argSrc.DereferenceArray();
 
   NANOCLR_CHECK_HRESULT(CLR_Checks::VerifyArrayReference(argSrc));
 

@@ -4,17 +4,17 @@
 // See LICENSE file in the project root for full license information.
 //
 
-#include <nanoPAL.h>
+#include "../Include/nanoPAL.h"
 
-__nfweak void PAL_PerformanceCounter_Initialize()
+void PAL_PerformanceCounter_Initialize()
 {
 }
 
-__nfweak void PAL_PerformanceCounter_Uninitialize()
+void PAL_PerformanceCounter_Uninitialize()
 {
 }
 
-__nfweak uint32_t PAL_PerformanceCounter()
+uint32_t PAL_PerformanceCounter()
 {
     return 0;
 }

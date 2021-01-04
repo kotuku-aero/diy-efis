@@ -18,7 +18,7 @@
 int CLR_RT_UnicodeHelper::CountNumberOfCharacters(int max)
   {
   NATIVE_PROFILE_CLR_CORE();
-  const CLR_UINT8* pSrc = m_inputUTF8;
+  const CLR_UINT8 *pSrc = m_inputUTF8;
   int              num = 0;
 
   while (true)
@@ -76,7 +76,7 @@ int CLR_RT_UnicodeHelper::CountNumberOfCharacters(int max)
 int CLR_RT_UnicodeHelper::CountNumberOfBytes(int max)
   {
   NATIVE_PROFILE_CLR_CORE();
-  const CLR_UINT16* pSrc = m_inputUTF16;
+  const CLR_UINT16 *pSrc = m_inputUTF16;
   int               num = 0;
 
   while (true)
@@ -135,8 +135,8 @@ int CLR_RT_UnicodeHelper::CountNumberOfBytes(int max)
 bool CLR_RT_UnicodeHelper::ConvertFromUTF8(int iMaxChars, bool fJustMove, int iMaxBytes)
   {
   NATIVE_PROFILE_CLR_CORE();
-  const CLR_UINT8* inputUTF8 = m_inputUTF8;
-  CLR_UINT16* outputUTF16 = m_outputUTF16;
+  const CLR_UINT8 *inputUTF8 = m_inputUTF8;
+  CLR_UINT16 *outputUTF16 = m_outputUTF16;
   int              outputUTF16_size = m_outputUTF16_size;
   CLR_UINT32       ch;
   CLR_UINT32       ch2;
@@ -329,10 +329,10 @@ Exit:
 #endif
 
 // move backward in the UTF8 input
-bool CLR_RT_UnicodeHelper::MoveBackwardInUTF8(const char* utf8StringStart, int iMaxChars)
+bool CLR_RT_UnicodeHelper::MoveBackwardInUTF8(const char *utf8StringStart, int iMaxChars)
   {
   // already at the beginning or iMaxChars < 1?
-  if (m_inputUTF8 <= (const CLR_UINT8*)utf8StringStart || iMaxChars < 1)
+  if (m_inputUTF8 <= (const CLR_UINT8 *)utf8StringStart || iMaxChars < 1)
     {
     return false;
     }
@@ -354,7 +354,7 @@ bool CLR_RT_UnicodeHelper::MoveBackwardInUTF8(const char* utf8StringStart, int i
       }
 
     // reached the beginning?
-    if (m_inputUTF8 == (const CLR_UINT8*)utf8StringStart)
+    if (m_inputUTF8 == (const CLR_UINT8 *)utf8StringStart)
       {
       return false;
       }
@@ -364,8 +364,8 @@ bool CLR_RT_UnicodeHelper::MoveBackwardInUTF8(const char* utf8StringStart, int i
 bool CLR_RT_UnicodeHelper::ConvertToUTF8(int iMaxChars, bool fJustMove)
   {
   NATIVE_PROFILE_CLR_CORE();
-  const CLR_UINT16* inputUTF16 = m_inputUTF16;
-  CLR_UINT8* outputUTF8 = m_outputUTF8;
+  const CLR_UINT16 *inputUTF16 = m_inputUTF16;
+  CLR_UINT8 *outputUTF8 = m_outputUTF8;
   int               outputUTF8_size = m_outputUTF8_size;
   CLR_UINT32        ch;
   bool              res;
@@ -470,12 +470,12 @@ Exit:
 
 #if defined(_WIN32)
 
-void CLR_RT_UnicodeHelper::ConvertToUTF8(const std::wstring& src,
-  std::string& dst)
+void CLR_RT_UnicodeHelper::ConvertToUTF8(const std::wstring &src,
+  std::string &dst)
   {
   if (src.size())
     {
-    char* szBuf;
+    char *szBuf;
     int   iSize;
 
     iSize = ::WideCharToMultiByte(CP_UTF8, 0, src.c_str(), -1, NULL, 0, NULL, NULL);
@@ -499,12 +499,12 @@ void CLR_RT_UnicodeHelper::ConvertToUTF8(const std::wstring& src,
     }
   }
 
-void CLR_RT_UnicodeHelper::ConvertFromUTF8(const std::string& src,
-  std::wstring& dst)
+void CLR_RT_UnicodeHelper::ConvertFromUTF8(const std::string &src,
+  std::wstring &dst)
   {
   if (src.size())
     {
-    wchar_t* szBuf;
+    wchar_t *szBuf;
     int    iSize;
 
     iSize = ::MultiByteToWideChar(CP_UTF8, 0, src.c_str(), -1, NULL, 0);
@@ -542,7 +542,7 @@ UnicodeString::~UnicodeString()
   Release();
   }
 
-HRESULT UnicodeString::Assign(const char* string)
+HRESULT UnicodeString::Assign(const char *string)
   {
   NATIVE_PROFILE_CLR_IO();
   NANOCLR_HEADER();
@@ -561,7 +561,7 @@ HRESULT UnicodeString::Assign(const char* string)
 
   byteLength = (m_length + 1) * sizeof(CLR_UINT16);
 
-  m_wCharArray = (CLR_UINT16*)CLR_RT_Memory::Allocate(byteLength);  CHECK_ALLOCATION(m_wCharArray);
+  m_wCharArray = (CLR_UINT16 *)CLR_RT_Memory::Allocate(byteLength);  CHECK_ALLOCATION(m_wCharArray);
 
   m_unicodeHelper.m_outputUTF16 = m_wCharArray;
   m_unicodeHelper.m_outputUTF16_size = m_length + 1;

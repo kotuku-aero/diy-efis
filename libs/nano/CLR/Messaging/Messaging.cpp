@@ -11,7 +11,7 @@
 
 // the Arm 3.0 compiler drags in a bunch of ABI methods (for initialization) if struct arrays are not initialized
 CLR_UINT32 g_scratchMessaging[sizeof(CLR_Messaging)];
-CLR_Messaging* g_CLR_Messaging;
+CLR_Messaging *g_CLR_Messaging;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -34,14 +34,14 @@ static const CLR_Messaging_CommandHandlerLookup c_Messaging_Lookup_Reply[] = {
 bool CLR_Messaging::AllocateAndQueueMessage(
   CLR_UINT32 cmd,
   unsigned int length,
-  unsigned char* data,
+  unsigned char *data,
   CLR_RT_HeapBlock_EndPoint::Port port,
   CLR_RT_HeapBlock_EndPoint::Address addr,
   CLR_UINT32 found)
   {
   NATIVE_PROFILE_CLR_MESSAGING();
-  CLR_RT_HeapBlock_EndPoint::Message* rpc;
-  CLR_RT_HeapBlock_EndPoint* ep;
+  CLR_RT_HeapBlock_EndPoint::Message *rpc;
+  CLR_RT_HeapBlock_EndPoint *ep;
 
   if ((ep = CLR_RT_HeapBlock_EndPoint::FindEndPoint(port)) == NULL)
     return false;
@@ -49,7 +49,7 @@ bool CLR_Messaging::AllocateAndQueueMessage(
   {
   CLR_RT_ProtectFromGC gc(*ep);
 
-  if ((rpc = (CLR_RT_HeapBlock_EndPoint::Message*)
+  if ((rpc = (CLR_RT_HeapBlock_EndPoint::Message *)
     CLR_RT_Memory::Allocate(sizeof(*rpc) + length, CLR_RT_HeapBlock::HB_CompactOnFailure)) == NULL)
     return false;
 
@@ -72,12 +72,12 @@ bool CLR_Messaging::AllocateAndQueueMessage(
   return true;
   }
 
-bool CLR_Messaging::Messaging_Query(WP_Message* msg)
+bool CLR_Messaging::Messaging_Query(WP_Message *msg)
   {
   NATIVE_PROFILE_CLR_MESSAGING();
-  CLR_Messaging_Commands::Messaging_Query* cmd = (CLR_Messaging_Commands::Messaging_Query*)msg->m_payload;
+  CLR_Messaging_Commands::Messaging_Query *cmd = (CLR_Messaging_Commands::Messaging_Query *)msg->m_payload;
   CLR_Messaging_Commands::Messaging_Query::Reply res;
-  CLR_RT_HeapBlock_EndPoint* ep = CLR_RT_HeapBlock_EndPoint::FindEndPoint(cmd->m_addr.m_to);
+  CLR_RT_HeapBlock_EndPoint *ep = CLR_RT_HeapBlock_EndPoint::FindEndPoint(cmd->m_addr.m_to);
 
   res.m_found = (ep != NULL);
   res.m_addr = cmd->m_addr;
@@ -87,12 +87,12 @@ bool CLR_Messaging::Messaging_Query(WP_Message* msg)
   return true;
   }
 
-bool CLR_Messaging::Messaging_Query__Reply(WP_Message* msg)
+bool CLR_Messaging::Messaging_Query__Reply(WP_Message *msg)
   {
   NATIVE_PROFILE_CLR_MESSAGING();
 
-  CLR_Messaging_Commands::Messaging_Query::Reply* cmd =
-    (CLR_Messaging_Commands::Messaging_Query::Reply*)msg->m_payload;
+  CLR_Messaging_Commands::Messaging_Query::Reply *cmd =
+    (CLR_Messaging_Commands::Messaging_Query::Reply *)msg->m_payload;
 
   g_CLR_Messaging->AllocateAndQueueMessage(
     CLR_Messaging_Commands::c_Messaging_Query,
@@ -107,10 +107,10 @@ bool CLR_Messaging::Messaging_Query__Reply(WP_Message* msg)
 
 //--//
 
-bool CLR_Messaging::Messaging_Send(WP_Message* msg)
+bool CLR_Messaging::Messaging_Send(WP_Message *msg)
   {
   NATIVE_PROFILE_CLR_MESSAGING();
-  CLR_Messaging_Commands::Messaging_Send* cmd = (CLR_Messaging_Commands::Messaging_Send*)msg->m_payload;
+  CLR_Messaging_Commands::Messaging_Send *cmd = (CLR_Messaging_Commands::Messaging_Send *)msg->m_payload;
   CLR_Messaging_Commands::Messaging_Send::Reply res;
   CLR_UINT32 len;
   bool fRes;
@@ -133,7 +133,7 @@ bool CLR_Messaging::Messaging_Send(WP_Message* msg)
   return true;
   }
 
-bool CLR_Messaging::Messaging_Send__Reply(WP_Message* msg)
+bool CLR_Messaging::Messaging_Send__Reply(WP_Message *msg)
   {
   (void)msg;
 
@@ -147,10 +147,10 @@ bool CLR_Messaging::Messaging_Send__Reply(WP_Message* msg)
 
 //--//
 
-bool CLR_Messaging::Messaging_Reply(WP_Message* msg)
+bool CLR_Messaging::Messaging_Reply(WP_Message *msg)
   {
   NATIVE_PROFILE_CLR_MESSAGING();
-  CLR_Messaging_Commands::Messaging_Reply* cmd = (CLR_Messaging_Commands::Messaging_Reply*)msg->m_payload;
+  CLR_Messaging_Commands::Messaging_Reply *cmd = (CLR_Messaging_Commands::Messaging_Reply *)msg->m_payload;
   CLR_Messaging_Commands::Messaging_Reply::Reply res;
   bool fRes;
   CLR_UINT32 len;
@@ -172,7 +172,7 @@ bool CLR_Messaging::Messaging_Reply(WP_Message* msg)
   return true;
   }
 
-bool CLR_Messaging::Messaging_Reply__Reply(WP_Message* msg)
+bool CLR_Messaging::Messaging_Reply__Reply(WP_Message *msg)
   {
   (void)msg;
 
@@ -188,10 +188,10 @@ bool CLR_Messaging::Messaging_Reply__Reply(WP_Message* msg)
 
 //--//
 
-bool CLR_Messaging::App_ProcessHeader(void* state, WP_Message* msg)
+bool CLR_Messaging::App_ProcessHeader(void *state, WP_Message *msg)
   {
   NATIVE_PROFILE_CLR_MESSAGING();
-  CLR_Messaging* pThis = (CLR_Messaging*)state;
+  CLR_Messaging *pThis = (CLR_Messaging *)state;
 
   Watchdog_Reset();
 
@@ -203,7 +203,7 @@ bool CLR_Messaging::App_ProcessHeader(void* state, WP_Message* msg)
 
   if (msg->m_header.m_size)
     {
-    void* ptr = CLR_RT_Memory::Allocate(msg->m_header.m_size, CLR_RT_HeapBlock::HB_CompactOnFailure);
+    void *ptr = CLR_RT_Memory::Allocate(msg->m_header.m_size, CLR_RT_HeapBlock::HB_CompactOnFailure);
 
     if (ptr == NULL)
       {
@@ -211,16 +211,16 @@ bool CLR_Messaging::App_ProcessHeader(void* state, WP_Message* msg)
       return false;
       }
 
-    msg->m_payload = (unsigned char*)ptr;
+    msg->m_payload = (unsigned char *)ptr;
     }
 
   return true;
   }
 
-bool CLR_Messaging::App_ProcessPayload(void* state, WP_Message* msg)
+bool CLR_Messaging::App_ProcessPayload(void *state, WP_Message *msg)
   {
   NATIVE_PROFILE_CLR_MESSAGING();
-  CLR_Messaging* pThis = (CLR_Messaging*)state;
+  CLR_Messaging *pThis = (CLR_Messaging *)state;
 
   Watchdog_Reset();
 
@@ -232,7 +232,7 @@ bool CLR_Messaging::App_ProcessPayload(void* state, WP_Message* msg)
   return true;
   }
 
-bool CLR_Messaging::App_Release(void* state, WP_Message* msg)
+bool CLR_Messaging::App_Release(void *state, WP_Message *msg)
   {
   (void)state;
 
@@ -256,7 +256,7 @@ HRESULT CLR_Messaging::CreateInstance()
   NATIVE_PROFILE_CLR_MESSAGING();
   NANOCLR_HEADER();
 
-  g_CLR_Messaging = (CLR_Messaging*)&g_scratchMessaging[0];
+  g_CLR_Messaging = (CLR_Messaging *)&g_scratchMessaging[0];
 
   CLR_RT_Memory::ZeroFill(g_CLR_Messaging, sizeof(CLR_Messaging));
 
@@ -268,9 +268,9 @@ HRESULT CLR_Messaging::CreateInstance()
 //--//
 
 void CLR_Messaging::Initialize(
-  const CLR_Messaging_CommandHandlerLookup* requestLookup,
+  const CLR_Messaging_CommandHandlerLookup *requestLookup,
   const CLR_UINT32 requestLookupCount,
-  const CLR_Messaging_CommandHandlerLookup* replyLookup,
+  const CLR_Messaging_CommandHandlerLookup *replyLookup,
   const CLR_UINT32 replyLookupCount)
   {
   if (m_fInitialized)
@@ -326,7 +326,7 @@ void CLR_Messaging::Cleanup()
 
 //--//
 
-bool CLR_Messaging::ProcessHeader(WP_Message* msg)
+bool CLR_Messaging::ProcessHeader(WP_Message *msg)
   {
   (void)msg;
 
@@ -335,7 +335,7 @@ bool CLR_Messaging::ProcessHeader(WP_Message* msg)
   return true;
   }
 
-bool CLR_Messaging::ProcessPayload(WP_Message* msg)
+bool CLR_Messaging::ProcessPayload(WP_Message *msg)
   {
   NATIVE_PROFILE_CLR_MESSAGING();
   if (msg->m_header.m_flags & WP_Flags_c_NACK)
@@ -348,7 +348,7 @@ bool CLR_Messaging::ProcessPayload(WP_Message* msg)
 
   //--//
 
-  const CLR_Messaging_CommandHandlerLookups* tables;
+  const CLR_Messaging_CommandHandlerLookups *tables;
   int tableCount = 0;
 
   if (msg->m_header.m_flags & WP_Flags_c_Reply)
@@ -365,7 +365,7 @@ bool CLR_Messaging::ProcessPayload(WP_Message* msg)
   while (tableCount-- > 0)
     {
     size_t num = tables->size;
-    const CLR_Messaging_CommandHandlerLookup* cmd = tables->table;
+    const CLR_Messaging_CommandHandlerLookup *cmd = tables->table;
 
     while (num-- > 0 && cmd != NULL)
       {
@@ -399,7 +399,7 @@ extern "C" int Messaging_ProcessPayload(WP_Message * msg)
 
 //--//
 
-bool CLR_Messaging::SendEvent(unsigned int cmd, unsigned int payloadSize, unsigned char* payload, unsigned int flags)
+bool CLR_Messaging::SendEvent(unsigned int cmd, unsigned int payloadSize, unsigned char *payload, unsigned int flags)
   {
   NATIVE_PROFILE_CLR_MESSAGING();
   WP_PrepareAndSendProtocolMessage(cmd, payloadSize, payload, flags);
@@ -412,7 +412,7 @@ bool CLR_Messaging::SendEvent(unsigned int cmd, unsigned int payloadSize, unsign
 void CLR_Messaging::BroadcastEvent(
   unsigned int cmd,
   unsigned int payloadSize,
-  unsigned char* payload,
+  unsigned char *payload,
   unsigned int flags)
   {
   NATIVE_PROFILE_CLR_MESSAGING();

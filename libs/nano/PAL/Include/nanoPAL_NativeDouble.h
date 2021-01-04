@@ -6,7 +6,7 @@
 #ifndef _NANOPAL_DOUBLE_DECL_H_
 #define _NANOPAL_DOUBLE_DECL_H_
 
-#include <nanoHAL.h>
+#include "../../HAL/Include/nanoHAL.h"
 
 #include <math.h>
 
@@ -17,10 +17,10 @@
 #define __isinfd(x)    (!_finite(x))
 
 inline int __signbitd(double x)
-{
-  unsigned char *ptr = (unsigned char*) &x;
+  {
+  unsigned char *ptr = (unsigned char *)&x;
   return (*(ptr + (sizeof(double) - 1)) & 0x80) != 0;
-}
+  }
 
 #define rint(x)         floor((x) + 0.5) 
 #define remainder(x,y) ((x) - ((y) * rint((x) / (y))))
@@ -53,15 +53,15 @@ inline int __signbitd(double x)
 #endif
 
 namespace System
-{
-    struct Double
+  {
+  struct Double
     {
-        static int32_t      CompareTo( double d, double val );
-        static bool         IsInfinity( double d );
-        static bool         IsNaN( double d );
-        static bool         IsNegativeInfinity( double d );
-        static bool         IsPositiveInfinity( double d );
+    static int32_t      CompareTo(double d, double val);
+    static bool         IsInfinity(double d);
+    static bool         IsNaN(double d);
+    static bool         IsNegativeInfinity(double d);
+    static bool         IsPositiveInfinity(double d);
     };
-}
+  }
 
 #endif  //_NANOPAL_DOUBLE_DECL_H_

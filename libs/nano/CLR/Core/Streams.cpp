@@ -7,7 +7,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HRESULT CLR_RT_HeapBlock_MemoryStream::CreateInstance(CLR_RT_HeapBlock_MemoryStream*& stream, CLR_UINT8* buf, int len)
+HRESULT CLR_RT_HeapBlock_MemoryStream::CreateInstance(CLR_RT_HeapBlock_MemoryStream *&stream, CLR_UINT8 *buf, int len)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -19,7 +19,7 @@ HRESULT CLR_RT_HeapBlock_MemoryStream::CreateInstance(CLR_RT_HeapBlock_MemoryStr
   NANOCLR_NOCLEANUP();
   }
 
-void CLR_RT_HeapBlock_MemoryStream::DeleteInstance(CLR_RT_HeapBlock_MemoryStream*& stream)
+void CLR_RT_HeapBlock_MemoryStream::DeleteInstance(CLR_RT_HeapBlock_MemoryStream *&stream)
   {
   NATIVE_PROFILE_CLR_CORE();
   if (stream)
@@ -32,7 +32,7 @@ void CLR_RT_HeapBlock_MemoryStream::DeleteInstance(CLR_RT_HeapBlock_MemoryStream
     }
   }
 
-HRESULT CLR_RT_HeapBlock_MemoryStream::Initialize(CLR_UINT8* buf, CLR_UINT32 len)
+HRESULT CLR_RT_HeapBlock_MemoryStream::Initialize(CLR_UINT8 *buf, CLR_UINT32 len)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -61,7 +61,7 @@ void CLR_RT_HeapBlock_MemoryStream::Release()
 void CLR_RT_HeapBlock_MemoryStream::Rewind()
   {
   NATIVE_PROFILE_CLR_CORE();
-  m_current = (Buffer*)m_buffers.FirstNode();
+  m_current = (Buffer *)m_buffers.FirstNode();
   m_pos = -1;
   m_avail = 0;
   }
@@ -77,14 +77,14 @@ void CLR_RT_HeapBlock_MemoryStream::Reset()
   Rewind();
   }
 
-HRESULT CLR_RT_HeapBlock_MemoryStream::ToArray(CLR_RT_HeapBlock& ref)
+HRESULT CLR_RT_HeapBlock_MemoryStream::ToArray(CLR_RT_HeapBlock &ref)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
   CLR_UINT32              tot;
-  CLR_RT_HeapBlock_Array* array;
-  CLR_UINT8* buf;
+  CLR_RT_HeapBlock_Array *array;
+  CLR_UINT8 *buf;
 
   tot = 0;
   NANOCLR_FOREACH_NODE(Buffer, node, m_buffers)
@@ -109,10 +109,10 @@ HRESULT CLR_RT_HeapBlock_MemoryStream::ToArray(CLR_RT_HeapBlock& ref)
 
 //--//
 
-CLR_RT_HeapBlock_MemoryStream::Buffer* CLR_RT_HeapBlock_MemoryStream::NewBuffer()
+CLR_RT_HeapBlock_MemoryStream::Buffer *CLR_RT_HeapBlock_MemoryStream::NewBuffer()
   {
   NATIVE_PROFILE_CLR_CORE();
-  Buffer* ptr = EVENTCACHE_EXTRACT_NODE(g_CLR_RT_EventCache, Buffer, DATATYPE_MEMORY_STREAM_DATA);
+  Buffer *ptr = EVENTCACHE_EXTRACT_NODE(g_CLR_RT_EventCache, Buffer, DATATYPE_MEMORY_STREAM_DATA);
 
   if (ptr)
     {
@@ -159,12 +159,12 @@ int CLR_RT_HeapBlock_MemoryStream::BitsWritten()
   return val;
   }
 
-HRESULT CLR_RT_HeapBlock_MemoryStream::ReadBits(CLR_UINT64& res, CLR_UINT32 bits)
+HRESULT CLR_RT_HeapBlock_MemoryStream::ReadBits(CLR_UINT64 &res, CLR_UINT32 bits)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_UINT32* ptr = (CLR_UINT32*)&res;
+  CLR_UINT32 *ptr = (CLR_UINT32 *)&res;
 
   if (bits > 32) { NANOCLR_CHECK_HRESULT(ReadBits(ptr[1], bits - 32)); bits = 32; }
   else { ptr[1] = 0; }
@@ -174,7 +174,7 @@ HRESULT CLR_RT_HeapBlock_MemoryStream::ReadBits(CLR_UINT64& res, CLR_UINT32 bits
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT CLR_RT_HeapBlock_MemoryStream::ReadBits(CLR_UINT32& res, CLR_UINT32 bits)
+HRESULT CLR_RT_HeapBlock_MemoryStream::ReadBits(CLR_UINT32 &res, CLR_UINT32 bits)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -191,7 +191,7 @@ HRESULT CLR_RT_HeapBlock_MemoryStream::ReadBits(CLR_UINT32& res, CLR_UINT32 bits
 
       while (m_pos >= m_current->m_length)
         {
-        m_current = (Buffer*)m_current->Next();
+        m_current = (Buffer *)m_current->Next();
 
         if (m_current->Next() == NULL)
           {
@@ -265,7 +265,7 @@ HRESULT CLR_RT_HeapBlock_MemoryStream::WriteBits(CLR_UINT32 val, CLR_UINT32 bits
 
 //--//
 
-HRESULT CLR_RT_HeapBlock_MemoryStream::ReadArray(CLR_UINT8* buf, CLR_UINT32 bytes)
+HRESULT CLR_RT_HeapBlock_MemoryStream::ReadArray(CLR_UINT8 *buf, CLR_UINT32 bytes)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -282,7 +282,7 @@ HRESULT CLR_RT_HeapBlock_MemoryStream::ReadArray(CLR_UINT8* buf, CLR_UINT32 byte
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT CLR_RT_HeapBlock_MemoryStream::WriteArray(const CLR_UINT8* buf, CLR_UINT32 bytes)
+HRESULT CLR_RT_HeapBlock_MemoryStream::WriteArray(const CLR_UINT8 *buf, CLR_UINT32 bytes)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();

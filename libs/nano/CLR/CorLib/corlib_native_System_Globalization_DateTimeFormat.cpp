@@ -6,12 +6,12 @@
 #include "CorLib.h"
 
 
-HRESULT Library_corlib_native_System_Globalization_DateTimeFormat::FormatDigits___STATIC__STRING__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_Globalization_DateTimeFormat::FormatDigits___STATIC__STRING__I4__I4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock* pArgs = &(stack.Arg0());
+  CLR_RT_HeapBlock *pArgs = &(stack.Arg0());
 
   int value = pArgs[0].NumericByRef().s4;
   int len = pArgs[1].NumericByRef().s4;

@@ -10,7 +10,7 @@
 #include <nf_rt_native.h>
 #endif
 
-HRESULT Library_corlib_native_System_Console::OutNative___STATIC__VOID__STRING__BOOLEAN(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_Console::OutNative___STATIC__VOID__STRING__BOOLEAN(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER();
 

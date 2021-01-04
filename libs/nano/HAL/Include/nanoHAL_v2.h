@@ -9,11 +9,11 @@
 
 #include "../../CLR/Include/nanoCLR_Headers.h"
 
-#include "nanoHAL_Capabilites.h"
-#include "nanoHAL_Network.h"
-#include "nanoHAL_Power.h"
-#include "nanoHAL_ConfigurationManager.h"
-#include "nanoHAL_Boot.h"
+//#include "nanoHAL_Capabilites.h"
+//#include "nanoHAL_Network.h"
+// #include "nanoHAL_Power.h"
+//#include "nanoHAL_ConfigurationManager.h"
+// #include "nanoHAL_Boot.h"
 #include "../../CLR/Include/nanoVersion.h"
 
 typedef uint32_t GPIO_PIN;
@@ -188,7 +188,7 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
-
+/*
 #ifdef __cplusplus
 extern "C"
 {
@@ -201,7 +201,7 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
-
+*/
 //--//
 
 //
@@ -290,7 +290,7 @@ extern "C"
 #else
 #if defined(_DEBUG)
 #if !defined _ASSERTE
-#error
+#define _ASSERTE(expr) 
 #endif
 #define ASSERT(i)        _ASSERTE(i)
 #define _SIDE_ASSERTE(i) _ASSERTE(i)
@@ -376,7 +376,7 @@ extern "C"
 #endif
 
 // Watchdog driver
-#include "nanoHAL_Watchdog.h"
-#include "nanoHAL_Windows_Storage.h"
+//#include "nanoHAL_Watchdog.h"
+//#include "nanoHAL_Windows_Storage.h"
 
 #endif // _NANOHAL_V2_H_

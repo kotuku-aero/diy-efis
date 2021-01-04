@@ -5,37 +5,37 @@
 //
 #include "Core.h"
 
-HRESULT CLR_RT_HeapBlock_ArrayList::GetItem(CLR_INT32 index, CLR_RT_HeapBlock*& value)
+HRESULT CLR_RT_HeapBlock_ArrayList::GetItem(CLR_INT32 index, CLR_RT_HeapBlock *&value)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
   if (index < 0 || index >= GetSize()) NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
 
-  value = ((CLR_RT_HeapBlock*)GetItems()->GetElement(index))->Dereference();
+  value = ((CLR_RT_HeapBlock *)GetItems()->GetElement(index))->Dereference();
 
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT CLR_RT_HeapBlock_ArrayList::SetItem(CLR_INT32 index, CLR_RT_HeapBlock* value)
+HRESULT CLR_RT_HeapBlock_ArrayList::SetItem(CLR_INT32 index, CLR_RT_HeapBlock *value)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
   if (index < 0 || index >= GetSize()) NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
 
-  ((CLR_RT_HeapBlock*)GetItems()->GetElement(index))->SetObjectReference(value);
+  ((CLR_RT_HeapBlock *)GetItems()->GetElement(index))->SetObjectReference(value);
 
   NANOCLR_NOCLEANUP();
   }
 
 // May Trigger GC, but parameter value will be protected
-HRESULT CLR_RT_HeapBlock_ArrayList::Add(CLR_RT_HeapBlock* value, CLR_INT32& index)
+HRESULT CLR_RT_HeapBlock_ArrayList::Add(CLR_RT_HeapBlock *value, CLR_INT32 &index)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock_Array* items = GetItems();
+  CLR_RT_HeapBlock_Array *items = GetItems();
   CLR_INT32               size = GetSize();
   CLR_INT32               capacity = items->m_numOfElements;
 
@@ -53,7 +53,7 @@ HRESULT CLR_RT_HeapBlock_ArrayList::Add(CLR_RT_HeapBlock* value, CLR_INT32& inde
 
   SetSize(size + 1);
 
-  ((CLR_RT_HeapBlock*)items->GetElement(size))->SetObjectReference(value);
+  ((CLR_RT_HeapBlock *)items->GetElement(size))->SetObjectReference(value);
 
   index = size;
 
@@ -73,12 +73,12 @@ HRESULT CLR_RT_HeapBlock_ArrayList::Clear()
   }
 
 // May Trigger GC, but parameter value will be protected
-HRESULT CLR_RT_HeapBlock_ArrayList::Insert(CLR_INT32 index, CLR_RT_HeapBlock* value)
+HRESULT CLR_RT_HeapBlock_ArrayList::Insert(CLR_INT32 index, CLR_RT_HeapBlock *value)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock_Array* items = GetItems();
+  CLR_RT_HeapBlock_Array *items = GetItems();
   CLR_INT32               size = GetSize();
   CLR_INT32               capacity = items->m_numOfElements;
 
@@ -99,8 +99,8 @@ HRESULT CLR_RT_HeapBlock_ArrayList::Insert(CLR_INT32 index, CLR_RT_HeapBlock* va
   if (index < size)
     {
     // Move everything up one slot.
-    CLR_RT_HeapBlock* current = (CLR_RT_HeapBlock*)items->GetElement(size);
-    CLR_RT_HeapBlock* end = (CLR_RT_HeapBlock*)items->GetElement(index);
+    CLR_RT_HeapBlock *current = (CLR_RT_HeapBlock *)items->GetElement(size);
+    CLR_RT_HeapBlock *end = (CLR_RT_HeapBlock *)items->GetElement(index);
 
     do
       {
@@ -108,7 +108,7 @@ HRESULT CLR_RT_HeapBlock_ArrayList::Insert(CLR_INT32 index, CLR_RT_HeapBlock* va
       } while (--current != end);
     }
 
-  ((CLR_RT_HeapBlock*)items->GetElement(index))->SetObjectReference(value);
+  ((CLR_RT_HeapBlock *)items->GetElement(index))->SetObjectReference(value);
 
   SetSize(size + 1);
 
@@ -120,7 +120,7 @@ HRESULT CLR_RT_HeapBlock_ArrayList::RemoveAt(CLR_INT32 index)
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock_Array* items = GetItems();
+  CLR_RT_HeapBlock_Array *items = GetItems();
   CLR_INT32               size = GetSize();
 
   if (index < 0 || index >= size) NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
@@ -129,8 +129,8 @@ HRESULT CLR_RT_HeapBlock_ArrayList::RemoveAt(CLR_INT32 index)
   if (index < size - 1)
     {
     // Move everything down one slot.
-    CLR_RT_HeapBlock* current = (CLR_RT_HeapBlock*)items->GetElement(index);
-    CLR_RT_HeapBlock* end = (CLR_RT_HeapBlock*)items->GetElement(size - 1);
+    CLR_RT_HeapBlock *current = (CLR_RT_HeapBlock *)items->GetElement(index);
+    CLR_RT_HeapBlock *end = (CLR_RT_HeapBlock *)items->GetElement(size - 1);
 
     do
       {
@@ -140,7 +140,7 @@ HRESULT CLR_RT_HeapBlock_ArrayList::RemoveAt(CLR_INT32 index)
 
   size--;
 
-  ((CLR_RT_HeapBlock*)items->GetElement(size))->SetObjectReference(NULL);
+  ((CLR_RT_HeapBlock *)items->GetElement(size))->SetObjectReference(NULL);
 
   SetSize(size);
 
@@ -153,13 +153,13 @@ HRESULT CLR_RT_HeapBlock_ArrayList::SetCapacity(CLR_UINT32 newCapacity)
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock_Array* items = GetItems();
+  CLR_RT_HeapBlock_Array *items = GetItems();
   CLR_UINT32               size = GetSize();
 
   if (newCapacity != items->m_numOfElements) // if capacity is changing
     {
     CLR_RT_HeapBlock        newItemsHB;
-    CLR_RT_HeapBlock_Array* newItems;
+    CLR_RT_HeapBlock_Array *newItems;
 
     if (newCapacity < size) NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
 

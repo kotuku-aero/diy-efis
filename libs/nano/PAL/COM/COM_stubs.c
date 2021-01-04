@@ -6,7 +6,7 @@
 
 #include <nanoPAL_COM.h>
 
-__nfweak bool DebuggerPort_Initialize(COM_HANDLE comPortNum)
+bool DebuggerPort_Initialize(COM_HANDLE comPortNum)
 {
     (void)comPortNum;
 
@@ -14,7 +14,7 @@ __nfweak bool DebuggerPort_Initialize(COM_HANDLE comPortNum)
     return true;
 }
 
-__nfweak bool DebuggerPort_Uninitialize(COM_HANDLE comPortNum)
+bool DebuggerPort_Uninitialize(COM_HANDLE comPortNum)
 {
     (void)comPortNum;
 
@@ -22,7 +22,7 @@ __nfweak bool DebuggerPort_Uninitialize(COM_HANDLE comPortNum)
     return true;
 }
 
-__nfweak int DebuggerPort_Write(COM_HANDLE comPortNum, const char* data, size_t size, int maxRetries)
+int DebuggerPort_Write(COM_HANDLE comPortNum, const char* data, size_t size, int maxRetries)
 {
     (void)maxRetries;
 
@@ -34,7 +34,7 @@ __nfweak int DebuggerPort_Write(COM_HANDLE comPortNum, const char* data, size_t 
     return 0;
 }
 
-__nfweak int DebuggerPort_Read(COM_HANDLE comPortNum, char* data, size_t size)
+int DebuggerPort_Read(COM_HANDLE comPortNum, char* data, size_t size)
 {
     (void)comPortNum;
     (void)data;
@@ -44,7 +44,7 @@ __nfweak int DebuggerPort_Read(COM_HANDLE comPortNum, char* data, size_t size)
     return 0;
 }
 
-__nfweak bool DebuggerPort_Flush(COM_HANDLE comPortNum)
+bool DebuggerPort_Flush(COM_HANDLE comPortNum)
 {
     (void)comPortNum;
 
@@ -52,7 +52,7 @@ __nfweak bool DebuggerPort_Flush(COM_HANDLE comPortNum)
     return true;
 }
 
-__nfweak bool DebuggerPort_IsSslSupported(COM_HANDLE comPortNum)
+bool DebuggerPort_IsSslSupported(COM_HANDLE comPortNum)
 {
     (void)comPortNum;
 
@@ -60,7 +60,7 @@ __nfweak bool DebuggerPort_IsSslSupported(COM_HANDLE comPortNum)
     return false;
 }
 
-__nfweak bool DebuggerPort_UpgradeToSsl(COM_HANDLE comPortNum, unsigned int flags) 
+bool DebuggerPort_UpgradeToSsl(COM_HANDLE comPortNum, unsigned int flags) 
 {
     (void)comPortNum;
     (void)flags;
@@ -69,7 +69,7 @@ __nfweak bool DebuggerPort_UpgradeToSsl(COM_HANDLE comPortNum, unsigned int flag
     return false; 
 }
 
-__nfweak bool DebuggerPort_IsUsingSsl(COM_HANDLE comPortNum)
+bool DebuggerPort_IsUsingSsl(COM_HANDLE comPortNum)
 {
     (void)comPortNum;
 

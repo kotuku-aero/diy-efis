@@ -6,7 +6,7 @@
 #include "CorLib.h"
 
 
-HRESULT Library_corlib_native_System_Delegate::Equals___BOOLEAN__OBJECT(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_Delegate::Equals___BOOLEAN__OBJECT(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -18,19 +18,19 @@ HRESULT Library_corlib_native_System_Delegate::Equals___BOOLEAN__OBJECT(CLR_RT_S
 
 #if (NANOCLR_REFLECTION == TRUE)
 
-HRESULT Library_corlib_native_System_Delegate::GetInvocationList___SZARRAY_SystemDelegate(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_Delegate::GetInvocationList___SZARRAY_SystemDelegate(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock_Delegate* dlg = stack.Arg0().DereferenceDelegate();
-  CLR_RT_HeapBlock_Delegate_List* lst = (CLR_RT_HeapBlock_Delegate_List*)dlg;
+  CLR_RT_HeapBlock_Delegate *dlg = stack.Arg0().DereferenceDelegate();
+  CLR_RT_HeapBlock_Delegate_List *lst = (CLR_RT_HeapBlock_Delegate_List *)dlg;
 
   int delegatesCount = 0;
-  CLR_RT_HeapBlock* returnArray = NULL;
+  CLR_RT_HeapBlock *returnArray = NULL;
 
   // put the return array on the stack
-  CLR_RT_HeapBlock& top = stack.PushValueAndClear();
+  CLR_RT_HeapBlock &top = stack.PushValueAndClear();
 
   if (dlg) {
     if (dlg->DataType() == DATATYPE_DELEGATELIST_HEAD) {
@@ -47,10 +47,10 @@ HRESULT Library_corlib_native_System_Delegate::GetInvocationList___SZARRAY_Syste
   if (delegatesCount > 0) {
 
     // get the pointer to the first element
-    returnArray = (CLR_RT_HeapBlock*)top.DereferenceArray()->GetFirstElement();
+    returnArray = (CLR_RT_HeapBlock *)top.DereferenceArray()->GetFirstElement();
 
     if (delegatesCount > 1) {
-      CLR_RT_HeapBlock* ptr = lst->GetDelegates();
+      CLR_RT_HeapBlock *ptr = lst->GetDelegates();
       // fill the array with the delegates
       for (int i = 0; i < delegatesCount; i++) {
 
@@ -76,18 +76,18 @@ HRESULT Library_corlib_native_System_Delegate::GetInvocationList___SZARRAY_Syste
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Delegate::get_Method___SystemReflectionMethodInfo(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_Delegate::get_Method___SystemReflectionMethodInfo(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock_Delegate* dlg = stack.Arg0().DereferenceDelegate();
+  CLR_RT_HeapBlock_Delegate *dlg = stack.Arg0().DereferenceDelegate();
 
   dlg = GetLastDelegate(dlg); if (!dlg) NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
 
   {
-  CLR_RT_HeapBlock& top = stack.PushValue();
-  CLR_RT_HeapBlock* hbObj;
+  CLR_RT_HeapBlock &top = stack.PushValue();
+  CLR_RT_HeapBlock *hbObj;
 
   NANOCLR_CHECK_HRESULT(g_CLR_RT_ExecutionEngine.NewObjectFromIndex(top, g_CLR_RT_WellKnownTypes.m_MethodInfo));
   hbObj = top.Dereference();
@@ -98,12 +98,12 @@ HRESULT Library_corlib_native_System_Delegate::get_Method___SystemReflectionMeth
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Delegate::get_Target___OBJECT(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_Delegate::get_Target___OBJECT(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock_Delegate* dlg = stack.Arg0().DereferenceDelegate();
+  CLR_RT_HeapBlock_Delegate *dlg = stack.Arg0().DereferenceDelegate();
 
   dlg = GetLastDelegate(dlg); if (!dlg) NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
 
@@ -116,7 +116,7 @@ HRESULT Library_corlib_native_System_Delegate::get_Target___OBJECT(CLR_RT_StackF
 
 #endif // NANOCLR_REFLECTION
 
-HRESULT Library_corlib_native_System_Delegate::Combine___STATIC__SystemDelegate__SystemDelegate__SystemDelegate(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_Delegate::Combine___STATIC__SystemDelegate__SystemDelegate__SystemDelegate(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -126,7 +126,7 @@ HRESULT Library_corlib_native_System_Delegate::Combine___STATIC__SystemDelegate_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Delegate::Remove___STATIC__SystemDelegate__SystemDelegate__SystemDelegate(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_Delegate::Remove___STATIC__SystemDelegate__SystemDelegate__SystemDelegate(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -136,7 +136,7 @@ HRESULT Library_corlib_native_System_Delegate::Remove___STATIC__SystemDelegate__
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Delegate::op_Equality___STATIC__BOOLEAN__SystemDelegate__SystemDelegate(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_Delegate::op_Equality___STATIC__BOOLEAN__SystemDelegate__SystemDelegate(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -146,7 +146,7 @@ HRESULT Library_corlib_native_System_Delegate::op_Equality___STATIC__BOOLEAN__Sy
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Delegate::op_Inequality___STATIC__BOOLEAN__SystemDelegate__SystemDelegate(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_Delegate::op_Inequality___STATIC__BOOLEAN__SystemDelegate__SystemDelegate(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -160,14 +160,14 @@ HRESULT Library_corlib_native_System_Delegate::op_Inequality___STATIC__BOOLEAN__
 
 //--//
 
-CLR_RT_HeapBlock_Delegate* Library_corlib_native_System_Delegate::GetLastDelegate(CLR_RT_HeapBlock_Delegate* dlg)
+CLR_RT_HeapBlock_Delegate *Library_corlib_native_System_Delegate::GetLastDelegate(CLR_RT_HeapBlock_Delegate *dlg)
   {
   NATIVE_PROFILE_CLR_CORE();
   if (dlg)
     {
     if (dlg->DataType() == DATATYPE_DELEGATELIST_HEAD)
       {
-      CLR_RT_HeapBlock_Delegate_List* lst = (CLR_RT_HeapBlock_Delegate_List*)dlg;
+      CLR_RT_HeapBlock_Delegate_List *lst = (CLR_RT_HeapBlock_Delegate_List *)dlg;
 
       if (lst->m_length == 0)
         {
@@ -175,7 +175,7 @@ CLR_RT_HeapBlock_Delegate* Library_corlib_native_System_Delegate::GetLastDelegat
         }
       else
         {
-        CLR_RT_HeapBlock* ptr = lst->GetDelegates();
+        CLR_RT_HeapBlock *ptr = lst->GetDelegates();
 
         dlg = ptr[lst->m_length - 1].DereferenceDelegate();
         }

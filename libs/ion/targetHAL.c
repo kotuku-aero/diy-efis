@@ -29,7 +29,7 @@ void HARD_Breakpoint()
 #endif // !defined(BUILD_RTM)
 
 // NXP targets don't declare any target capability
-__nfweak GET_TARGET_CAPABILITIES(0);
+GET_TARGET_CAPABILITIES(0);
 
 // NXP doesn't have a proprietatry bootloader
 inline TARGET_HAS_PROPRIETARY_BOOTER(false);

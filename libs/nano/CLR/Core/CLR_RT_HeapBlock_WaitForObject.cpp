@@ -13,7 +13,7 @@
 //        - returns CLR_E_THREAD_WAITING - if the target object is not signaled - indicating that the caller thread is waiting
 //                                         for the object to be signaled
 //
-HRESULT CLR_RT_HeapBlock_WaitForObject::CreateInstance(CLR_RT_Thread* caller, const CLR_INT64& timeExpire, CLR_RT_HeapBlock* objects, CLR_UINT32 cObjects, bool fWaitAll)
+HRESULT CLR_RT_HeapBlock_WaitForObject::CreateInstance(CLR_RT_Thread *caller, const CLR_INT64 &timeExpire, CLR_RT_HeapBlock *objects, CLR_UINT32 cObjects, bool fWaitAll)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -26,7 +26,7 @@ HRESULT CLR_RT_HeapBlock_WaitForObject::CreateInstance(CLR_RT_Thread* caller, co
 
   CLR_UINT32 totLength = (CLR_UINT32)(sizeof(CLR_RT_HeapBlock_WaitForObject) + cObjects * sizeof(CLR_RT_HeapBlock));
 
-  CLR_RT_HeapBlock_WaitForObject* wait = EVENTCACHE_EXTRACT_NODE_AS_BYTES(g_CLR_RT_EventCache, CLR_RT_HeapBlock_WaitForObject, DATATYPE_WAIT_FOR_OBJECT_HEAD, 0, totLength); CHECK_ALLOCATION(wait);
+  CLR_RT_HeapBlock_WaitForObject *wait = EVENTCACHE_EXTRACT_NODE_AS_BYTES(g_CLR_RT_EventCache, CLR_RT_HeapBlock_WaitForObject, DATATYPE_WAIT_FOR_OBJECT_HEAD, 0, totLength); CHECK_ALLOCATION(wait);
 
   wait->m_timeExpire = timeExpire; CLR_RT_ExecutionEngine::InvalidateTimerCache();
   wait->m_cObjects = cObjects;
@@ -43,10 +43,10 @@ HRESULT CLR_RT_HeapBlock_WaitForObject::CreateInstance(CLR_RT_Thread* caller, co
   NANOCLR_NOCLEANUP();
   }
 
-void CLR_RT_HeapBlock_WaitForObject::TryWaitForSignal(CLR_RT_Thread* th)
+void CLR_RT_HeapBlock_WaitForObject::TryWaitForSignal(CLR_RT_Thread *th)
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_HeapBlock_WaitForObject* wait = th->m_waitForObject;
+  CLR_RT_HeapBlock_WaitForObject *wait = th->m_waitForObject;
 
   if (wait)
     {
@@ -57,11 +57,11 @@ void CLR_RT_HeapBlock_WaitForObject::TryWaitForSignal(CLR_RT_Thread* th)
     }
   }
 
-bool CLR_RT_HeapBlock_WaitForObject::TryWaitForSignal(CLR_RT_Thread* caller, CLR_RT_HeapBlock* objects, CLR_UINT32 cObjects, bool fWaitAll)
+bool CLR_RT_HeapBlock_WaitForObject::TryWaitForSignal(CLR_RT_Thread *caller, CLR_RT_HeapBlock *objects, CLR_UINT32 cObjects, bool fWaitAll)
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_HeapBlock* blk;
-  CLR_RT_HeapBlock* obj;
+  CLR_RT_HeapBlock *blk;
+  CLR_RT_HeapBlock *obj;
 
   if (fWaitAll)
     {
@@ -123,7 +123,7 @@ bool CLR_RT_HeapBlock_WaitForObject::TryWaitForSignal(CLR_RT_Thread* caller, CLR
   return false;
   }
 
-void CLR_RT_HeapBlock_WaitForObject::SignalObject(CLR_RT_HeapBlock& object)
+void CLR_RT_HeapBlock_WaitForObject::SignalObject(CLR_RT_HeapBlock &object)
   {
   NATIVE_PROFILE_CLR_CORE();
   object.SetFlags(CLR_RT_HeapBlock::HB_Signaled);
@@ -143,14 +143,14 @@ void CLR_RT_HeapBlock_WaitForObject::SignalObject(CLR_RT_HeapBlock& object)
   NANOCLR_FOREACH_NODE_END();
   }
 
-HRESULT CLR_RT_HeapBlock_WaitForObject::WaitForSignal(CLR_RT_StackFrame& stack, const CLR_INT64& timeExpire, CLR_RT_HeapBlock* objects, CLR_UINT32 cObjects, bool fWaitAll)
+HRESULT CLR_RT_HeapBlock_WaitForObject::WaitForSignal(CLR_RT_StackFrame &stack, const CLR_INT64 &timeExpire, CLR_RT_HeapBlock *objects, CLR_UINT32 cObjects, bool fWaitAll)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
   if (stack.m_customState == 0)
     {
-    CLR_RT_HeapBlock* objectsT = objects;
+    CLR_RT_HeapBlock *objectsT = objects;
 
     stack.m_customState = 1;
 
@@ -175,7 +175,7 @@ HRESULT CLR_RT_HeapBlock_WaitForObject::WaitForSignal(CLR_RT_StackFrame& stack, 
   }
 
 
-HRESULT CLR_RT_HeapBlock_WaitForObject::WaitForSignal(CLR_RT_StackFrame& stack, const CLR_INT64& timeExpire, CLR_RT_HeapBlock& object)
+HRESULT CLR_RT_HeapBlock_WaitForObject::WaitForSignal(CLR_RT_StackFrame &stack, const CLR_INT64 &timeExpire, CLR_RT_HeapBlock &object)
   {
   NATIVE_PROFILE_CLR_CORE();
   return WaitForSignal(stack, timeExpire, &object, 1, false);

@@ -4,8 +4,7 @@
 // See LICENSE file in the project root for full license information.
 //
 
-#include "stdafx.h"
-#include "nanoPAL_NativeDouble.h"
+#include "../Include/nanoPAL_NativeDouble.h"
 
 using namespace System;
 // Summary:

@@ -22,7 +22,7 @@ void CLR_RT_DblLinkedList::DblLinkedList_PushToCache()
 
   while (true)
     {
-    CLR_RT_HeapBlock_Node* node = ExtractFirstNode(); if (!node) break;
+    CLR_RT_HeapBlock_Node *node = ExtractFirstNode(); if (!node) break;
 
     g_CLR_RT_EventCache.Append_Node(node);
     }
@@ -35,7 +35,7 @@ void CLR_RT_DblLinkedList::DblLinkedList_Release()
 
   while (true)
     {
-    CLR_RT_HeapBlock_Node* node = ExtractFirstNode(); if (!node) break;
+    CLR_RT_HeapBlock_Node *node = ExtractFirstNode(); if (!node) break;
 
     CLR_RT_Memory::Release(node);
     }
@@ -60,8 +60,8 @@ int CLR_RT_DblLinkedList::NumOfNodes()
 void CLR_RT_DblLinkedList::Relocate()
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_GarbageCollector::Heap_Relocate((void**)&m_first);
-  CLR_RT_GarbageCollector::Heap_Relocate((void**)&m_last);
+  CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_first);
+  CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_last);
   }
 
 #if NANOCLR_VALIDATE_HEAP >= NANOCLR_VALIDATE_HEAP_2_DblLinkedList
@@ -72,8 +72,8 @@ void CLR_RT_DblLinkedList::ValidateList()
 
   if (m_null != NULL) NANOCLR_DEBUG_STOP();
 
-  CLR_RT_HeapBlock_Node* prev = Head();
-  CLR_RT_HeapBlock_Node* node = prev->Next();
+  CLR_RT_HeapBlock_Node *prev = Head();
+  CLR_RT_HeapBlock_Node *node = prev->Next();
 
   while (node)
     {

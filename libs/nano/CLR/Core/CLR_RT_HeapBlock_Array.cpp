@@ -8,14 +8,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 HRESULT CLR_RT_HeapBlock_Array::CreateInstance(
-  CLR_RT_HeapBlock& reference,
+  CLR_RT_HeapBlock &reference,
   CLR_UINT32 length,
-  const CLR_RT_ReflectionDef_Index& reflex)
+  const CLR_RT_ReflectionDef_Index &reflex)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock_Array* pArray;
+  CLR_RT_HeapBlock_Array *pArray;
   CLR_RT_TypeDef_Index cls;
   CLR_RT_TypeDef_Instance inst;
 
@@ -45,14 +45,14 @@ HRESULT CLR_RT_HeapBlock_Array::CreateInstance(
   else
     {
     CLR_DataType dt = (CLR_DataType)inst.m_target->dataType;
-    const CLR_RT_DataTypeLookup& dtl = c_CLR_RT_DataTypeLookup[dt];
+    const CLR_RT_DataTypeLookup &dtl = c_CLR_RT_DataTypeLookup[dt];
 
     if (dtl.m_sizeInBytes == CLR_RT_DataTypeLookup::c_NA)
       {
       NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
       }
 
-    pArray = (CLR_RT_HeapBlock_Array*)g_CLR_RT_ExecutionEngine.ExtractHeapBlocksForArray(inst, length, reflex);
+    pArray = (CLR_RT_HeapBlock_Array *)g_CLR_RT_ExecutionEngine.ExtractHeapBlocksForArray(inst, length, reflex);
     CHECK_ALLOCATION(pArray);
 
     reference.SetObjectReference(pArray);
@@ -64,9 +64,9 @@ HRESULT CLR_RT_HeapBlock_Array::CreateInstance(
   }
 
 HRESULT CLR_RT_HeapBlock_Array::CreateInstance(
-  CLR_RT_HeapBlock& reference,
+  CLR_RT_HeapBlock &reference,
   CLR_UINT32 length,
-  const CLR_RT_TypeDef_Index& cls)
+  const CLR_RT_TypeDef_Index &cls)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -83,9 +83,9 @@ HRESULT CLR_RT_HeapBlock_Array::CreateInstance(
   }
 
 HRESULT CLR_RT_HeapBlock_Array::CreateInstance(
-  CLR_RT_HeapBlock& reference,
+  CLR_RT_HeapBlock &reference,
   CLR_UINT32 length,
-  CLR_RT_Assembly* assm,
+  CLR_RT_Assembly *assm,
   CLR_UINT32 tk)
   {
   NATIVE_PROFILE_CLR_CORE();
@@ -120,8 +120,8 @@ HRESULT CLR_RT_HeapBlock_Array::ClearElements(int index, int length)
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  const CLR_RT_ReflectionDef_Index& reflex = ReflectionDataConst();
-  CLR_UINT8* data = GetElement(index);
+  const CLR_RT_ReflectionDef_Index &reflex = ReflectionDataConst();
+  CLR_UINT8 *data = GetElement(index);
 
   CLR_RT_Memory::ZeroFill(data, length * m_sizeOfElement);
 
@@ -129,7 +129,7 @@ HRESULT CLR_RT_HeapBlock_Array::ClearElements(int index, int length)
     {
     CLR_DataType dt = (CLR_DataType)m_typeOfElement;
     bool fAllocate = (reflex.m_levels == 1 && dt == DATATYPE_VALUETYPE);
-    CLR_RT_HeapBlock* ptr = (CLR_RT_HeapBlock*)data;
+    CLR_RT_HeapBlock *ptr = (CLR_RT_HeapBlock *)data;
 
     switch (dt)
       {
@@ -169,7 +169,7 @@ void CLR_RT_HeapBlock_Array::Relocate()
   //
   if (m_fReference)
     {
-    CLR_RT_GarbageCollector::Heap_Relocate((CLR_RT_HeapBlock*)GetFirstElement(), m_numOfElements);
+    CLR_RT_GarbageCollector::Heap_Relocate((CLR_RT_HeapBlock *)GetFirstElement(), m_numOfElements);
     }
   }
 
@@ -192,12 +192,12 @@ bool CLR_RT_HeapBlock_Array::CheckRange(int index, int length, int numOfElements
    used by TrySzIndexOf
 */
 HRESULT CLR_RT_HeapBlock_Array::IndexOf(
-  CLR_RT_HeapBlock_Array* array,
-  CLR_RT_HeapBlock& match,
+  CLR_RT_HeapBlock_Array *array,
+  CLR_RT_HeapBlock &match,
   int start,
   int stop,
   bool fForward,
-  int& index)
+  int &index)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -215,7 +215,7 @@ HRESULT CLR_RT_HeapBlock_Array::IndexOf(
 
   if (count > 0)
     {
-    CLR_UINT8* data = array->GetFirstElement();
+    CLR_UINT8 *data = array->GetFirstElement();
     CLR_UINT8 sizeElem = array->m_sizeOfElement;
     int pos;
     int incr;
@@ -235,7 +235,7 @@ HRESULT CLR_RT_HeapBlock_Array::IndexOf(
 
     if (!array->m_fReference)
       {
-      CLR_RT_HeapBlock* matchPtr = match.FixBoxingReference();
+      CLR_RT_HeapBlock *matchPtr = match.FixBoxingReference();
       FAULT_ON_NULL(matchPtr);
 
       if (matchPtr->DataType() <= DATATYPE_LAST_PRIMITIVE)
@@ -260,7 +260,7 @@ HRESULT CLR_RT_HeapBlock_Array::IndexOf(
       }
     else
       {
-      CLR_RT_HeapBlock* dataPtr = (CLR_RT_HeapBlock*)data;
+      CLR_RT_HeapBlock *dataPtr = (CLR_RT_HeapBlock *)data;
 
       while (true)
         {
@@ -285,9 +285,9 @@ HRESULT CLR_RT_HeapBlock_Array::IndexOf(
   }
 
 HRESULT CLR_RT_HeapBlock_Array::Copy(
-  CLR_RT_HeapBlock_Array* arraySrc,
+  CLR_RT_HeapBlock_Array *arraySrc,
   int indexSrc,
-  CLR_RT_HeapBlock_Array* arrayDst,
+  CLR_RT_HeapBlock_Array *arrayDst,
   int indexDst,
   int length)
   {
@@ -313,8 +313,8 @@ HRESULT CLR_RT_HeapBlock_Array::Copy(
 
     if (arraySrc->SameHeader(*arrayDst))
       {
-      CLR_UINT8* dataSrc = arraySrc->GetFirstElement();
-      CLR_UINT8* dataDst = arrayDst->GetFirstElement();
+      CLR_UINT8 *dataSrc = arraySrc->GetFirstElement();
+      CLR_UINT8 *dataDst = arrayDst->GetFirstElement();
       CLR_UINT8 sizeElem = arraySrc->m_sizeOfElement;
 
       dataSrc += indexSrc * sizeElem;
@@ -326,8 +326,8 @@ HRESULT CLR_RT_HeapBlock_Array::Copy(
         }
       else
         {
-        CLR_RT_HeapBlock* ptrSrc = (CLR_RT_HeapBlock*)dataSrc;
-        CLR_RT_HeapBlock* ptrDst = (CLR_RT_HeapBlock*)dataDst;
+        CLR_RT_HeapBlock *ptrSrc = (CLR_RT_HeapBlock *)dataSrc;
+        CLR_RT_HeapBlock *ptrDst = (CLR_RT_HeapBlock *)dataDst;
         int incr;
 
         if (arraySrc == arrayDst && ptrSrc < ptrDst)
@@ -351,8 +351,8 @@ HRESULT CLR_RT_HeapBlock_Array::Copy(
       {
       CLR_RT_TypeDescriptor descSrc;
       CLR_RT_TypeDescriptor descDst;
-      CLR_RT_HeapBlock* ptrSrc = (CLR_RT_HeapBlock*)arraySrc->GetElement(indexSrc);
-      CLR_RT_HeapBlock* ptrDst = (CLR_RT_HeapBlock*)arrayDst->GetElement(indexDst);
+      CLR_RT_HeapBlock *ptrSrc = (CLR_RT_HeapBlock *)arraySrc->GetElement(indexSrc);
+      CLR_RT_HeapBlock *ptrDst = (CLR_RT_HeapBlock *)arrayDst->GetElement(indexDst);
 
       NANOCLR_CHECK_HRESULT(descDst.InitializeFromObject(*arrayDst));
       descDst.GetElementType(descDst);

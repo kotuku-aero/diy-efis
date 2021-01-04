@@ -5,16 +5,16 @@
 //
 #include "CorLib.h"
 
-HRESULT Library_corlib_native_System_Enum::HasFlag___BOOLEAN__SystemEnum(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_Enum::HasFlag___BOOLEAN__SystemEnum(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER();
 
   CLR_RT_TypeDescriptor enumTypeDesc;
   CLR_RT_TypeDescriptor flagTypeDesc;
-  CLR_RT_HeapBlock* pEnum;
-  CLR_RT_HeapBlock* enumValue;
-  CLR_RT_HeapBlock* pFlag;
-  CLR_RT_HeapBlock* flagValue;
+  CLR_RT_HeapBlock *pEnum;
+  CLR_RT_HeapBlock *enumValue;
+  CLR_RT_HeapBlock *pFlag;
+  CLR_RT_HeapBlock *flagValue;
 
   // get Enum value from 'This'
   pEnum = &(stack.ThisRef());

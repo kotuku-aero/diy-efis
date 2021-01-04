@@ -7,14 +7,14 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HRESULT CLR_RT_HeapBlock_Delegate_List::CreateInstance(CLR_RT_HeapBlock_Delegate_List*& list, CLR_UINT32 length)
+HRESULT CLR_RT_HeapBlock_Delegate_List::CreateInstance(CLR_RT_HeapBlock_Delegate_List *&list, CLR_UINT32 length)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
   CLR_UINT32 totLength = (CLR_UINT32)(sizeof(CLR_RT_HeapBlock_Delegate_List) + length * sizeof(CLR_RT_HeapBlock));
 
-  list = (CLR_RT_HeapBlock_Delegate_List*)g_CLR_RT_ExecutionEngine.ExtractHeapBytesForObjects(DATATYPE_DELEGATELIST_HEAD, 0, totLength); CHECK_ALLOCATION(list);
+  list = (CLR_RT_HeapBlock_Delegate_List *)g_CLR_RT_ExecutionEngine.ExtractHeapBytesForObjects(DATATYPE_DELEGATELIST_HEAD, 0, totLength); CHECK_ALLOCATION(list);
 
   list->ClearData();
   list->m_cls.Clear();
@@ -24,12 +24,12 @@ HRESULT CLR_RT_HeapBlock_Delegate_List::CreateInstance(CLR_RT_HeapBlock_Delegate
   NANOCLR_NOCLEANUP();
   }
 
-CLR_RT_HeapBlock* CLR_RT_HeapBlock_Delegate_List::CopyAndCompress(CLR_RT_HeapBlock* src, CLR_RT_HeapBlock* dst, CLR_UINT32 num)
+CLR_RT_HeapBlock *CLR_RT_HeapBlock_Delegate_List::CopyAndCompress(CLR_RT_HeapBlock *src, CLR_RT_HeapBlock *dst, CLR_UINT32 num)
   {
   NATIVE_PROFILE_CLR_CORE();
   while (num--)
     {
-    CLR_RT_HeapBlock_Delegate* dlg = src->DereferenceDelegate();
+    CLR_RT_HeapBlock_Delegate *dlg = src->DereferenceDelegate();
     if (dlg)
       {
       dst->SetObjectReference(dlg);
@@ -47,16 +47,16 @@ CLR_RT_HeapBlock* CLR_RT_HeapBlock_Delegate_List::CopyAndCompress(CLR_RT_HeapBlo
   return dst;
   }
 
-HRESULT CLR_RT_HeapBlock_Delegate_List::Change(CLR_RT_HeapBlock& reference, CLR_RT_HeapBlock& delegateSrc, CLR_RT_HeapBlock& delegateTarget, bool fCombine, bool fWeak)
+HRESULT CLR_RT_HeapBlock_Delegate_List::Change(CLR_RT_HeapBlock &reference, CLR_RT_HeapBlock &delegateSrc, CLR_RT_HeapBlock &delegateTarget, bool fCombine, bool fWeak)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock_Delegate_List* dlgListSrc;
-  CLR_RT_HeapBlock_Delegate_List* dlgListDst;
-  CLR_RT_HeapBlock_Delegate* dlg;
-  CLR_RT_HeapBlock* newDlgs;
-  CLR_RT_HeapBlock* oldDlgs;
+  CLR_RT_HeapBlock_Delegate_List *dlgListSrc;
+  CLR_RT_HeapBlock_Delegate_List *dlgListDst;
+  CLR_RT_HeapBlock_Delegate *dlg;
+  CLR_RT_HeapBlock *newDlgs;
+  CLR_RT_HeapBlock *oldDlgs;
   CLR_UINT32                      oldNum;
   CLR_UINT32                      newNum;
 
@@ -83,7 +83,7 @@ HRESULT CLR_RT_HeapBlock_Delegate_List::Change(CLR_RT_HeapBlock& reference, CLR_
     CLR_RT_HeapBlock     intermediate; intermediate.Assign(delegateSrc);
     CLR_RT_ProtectFromGC gc(intermediate);
 
-    dlgListDst = (CLR_RT_HeapBlock_Delegate_List*)dlg;
+    dlgListDst = (CLR_RT_HeapBlock_Delegate_List *)dlg;
     newDlgs = dlgListDst->GetDelegates();
 
     for (num = 0; num < dlgListDst->m_length; num++, newDlgs++)
@@ -142,7 +142,7 @@ HRESULT CLR_RT_HeapBlock_Delegate_List::Change(CLR_RT_HeapBlock& reference, CLR_
       {
       for (num = 0, newDlgs = oldDlgs; num < oldNum; num++, newDlgs++)
         {
-        CLR_RT_HeapBlock_Delegate* ptr = newDlgs->DereferenceDelegate();
+        CLR_RT_HeapBlock_Delegate *ptr = newDlgs->DereferenceDelegate();
         if (ptr)
           {
           if (ptr->DelegateFtn().m_data == dlg->DelegateFtn().m_data &&
@@ -204,7 +204,7 @@ HRESULT CLR_RT_HeapBlock_Delegate_List::Change(CLR_RT_HeapBlock& reference, CLR_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT CLR_RT_HeapBlock_Delegate_List::Combine(CLR_RT_HeapBlock& reference, CLR_RT_HeapBlock& delegateSrc, CLR_RT_HeapBlock& delegateNew, bool fWeak)
+HRESULT CLR_RT_HeapBlock_Delegate_List::Combine(CLR_RT_HeapBlock &reference, CLR_RT_HeapBlock &delegateSrc, CLR_RT_HeapBlock &delegateNew, bool fWeak)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -214,7 +214,7 @@ HRESULT CLR_RT_HeapBlock_Delegate_List::Combine(CLR_RT_HeapBlock& reference, CLR
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT CLR_RT_HeapBlock_Delegate_List::Remove(CLR_RT_HeapBlock& reference, CLR_RT_HeapBlock& delegateSrc, CLR_RT_HeapBlock& delegateOld)
+HRESULT CLR_RT_HeapBlock_Delegate_List::Remove(CLR_RT_HeapBlock &reference, CLR_RT_HeapBlock &delegateSrc, CLR_RT_HeapBlock &delegateOld)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();

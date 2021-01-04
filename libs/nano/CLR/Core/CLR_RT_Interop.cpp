@@ -22,7 +22,7 @@
 #define NANOCLR_INTEROP_NOCLEANUP()                return S_OK;
 
 
-HRESULT Interop_Marshal_bool(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, bool& param)
+HRESULT Interop_Marshal_bool(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, bool &param)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_INTEROP_CHECK_ARG_TYPE(DATATYPE_I4);
@@ -31,7 +31,7 @@ HRESULT Interop_Marshal_bool(const CLR_RT_StackFrame& stackFrame, unsigned int p
   NANOCLR_INTEROP_NOCLEANUP();
   }
 
-HRESULT Interop_Marshal_UINT8(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, unsigned char& param)
+HRESULT Interop_Marshal_UINT8(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, unsigned char &param)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_INTEROP_CHECK_ARG_TYPE(DATATYPE_I4);
@@ -39,7 +39,7 @@ HRESULT Interop_Marshal_UINT8(const CLR_RT_StackFrame& stackFrame, unsigned int 
   NANOCLR_INTEROP_NOCLEANUP();
   }
 
-HRESULT Interop_Marshal_UINT16(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, unsigned short& param)
+HRESULT Interop_Marshal_UINT16(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, unsigned short &param)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_INTEROP_CHECK_ARG_TYPE(DATATYPE_I4)
@@ -47,7 +47,7 @@ HRESULT Interop_Marshal_UINT16(const CLR_RT_StackFrame& stackFrame, unsigned int
   NANOCLR_INTEROP_NOCLEANUP();
   }
 
-HRESULT Interop_Marshal_UINT32(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, unsigned int& param)
+HRESULT Interop_Marshal_UINT32(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, unsigned int &param)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_INTEROP_CHECK_ARG_TYPE(DATATYPE_I4)
@@ -55,7 +55,7 @@ HRESULT Interop_Marshal_UINT32(const CLR_RT_StackFrame& stackFrame, unsigned int
   NANOCLR_INTEROP_NOCLEANUP();
   }
 
-HRESULT Interop_Marshal_UINT64(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, unsigned __int64& param)
+HRESULT Interop_Marshal_UINT64(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, unsigned __int64 &param)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_INTEROP_CHECK_ARG_TYPE(DATATYPE_I8);
@@ -63,7 +63,7 @@ HRESULT Interop_Marshal_UINT64(const CLR_RT_StackFrame& stackFrame, unsigned int
   NANOCLR_INTEROP_NOCLEANUP();
   }
 
-HRESULT Interop_Marshal_CHAR(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, char& param)
+HRESULT Interop_Marshal_CHAR(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, char &param)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_INTEROP_CHECK_ARG_TYPE(DATATYPE_I4)
@@ -71,7 +71,7 @@ HRESULT Interop_Marshal_CHAR(const CLR_RT_StackFrame& stackFrame, unsigned int p
   NANOCLR_INTEROP_NOCLEANUP();
   }
 
-HRESULT Interop_Marshal_INT8(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, signed char& param)
+HRESULT Interop_Marshal_INT8(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, signed char &param)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_INTEROP_CHECK_ARG_TYPE(DATATYPE_I4)
@@ -79,7 +79,7 @@ HRESULT Interop_Marshal_INT8(const CLR_RT_StackFrame& stackFrame, unsigned int p
   NANOCLR_INTEROP_NOCLEANUP();
   }
 
-HRESULT Interop_Marshal_INT16(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, signed short& param)
+HRESULT Interop_Marshal_INT16(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, signed short &param)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_INTEROP_CHECK_ARG_TYPE(DATATYPE_I4);
@@ -87,7 +87,7 @@ HRESULT Interop_Marshal_INT16(const CLR_RT_StackFrame& stackFrame, unsigned int 
   NANOCLR_INTEROP_NOCLEANUP();
   }
 
-HRESULT Interop_Marshal_INT32(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, signed int& param)
+HRESULT Interop_Marshal_INT32(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, signed int &param)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_INTEROP_CHECK_ARG_TYPE(DATATYPE_I4);
@@ -95,7 +95,7 @@ HRESULT Interop_Marshal_INT32(const CLR_RT_StackFrame& stackFrame, unsigned int 
   NANOCLR_INTEROP_NOCLEANUP();
   }
 
-HRESULT Interop_Marshal_INT64(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, signed __int64& param)
+HRESULT Interop_Marshal_INT64(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, signed __int64 &param)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_INTEROP_CHECK_ARG_TYPE(DATATYPE_I8);
@@ -105,7 +105,7 @@ HRESULT Interop_Marshal_INT64(const CLR_RT_StackFrame& stackFrame, unsigned int 
 
 #if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
 
-HRESULT Interop_Marshal_float(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, float& param)
+HRESULT Interop_Marshal_float(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, float &param)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_INTEROP_CHECK_ARG_TYPE(DATATYPE_R4);
@@ -113,7 +113,7 @@ HRESULT Interop_Marshal_float(const CLR_RT_StackFrame& stackFrame, unsigned int 
   NANOCLR_INTEROP_NOCLEANUP();
   }
 
-HRESULT Interop_Marshal_double(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, double& param)
+HRESULT Interop_Marshal_double(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, double &param)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_INTEROP_CHECK_ARG_TYPE(DATATYPE_R8);
@@ -121,7 +121,7 @@ HRESULT Interop_Marshal_double(const CLR_RT_StackFrame& stackFrame, unsigned int
   NANOCLR_INTEROP_NOCLEANUP();
   }
 #else
-HRESULT Interop_Marshal_float(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, signed int& param)
+HRESULT Interop_Marshal_float(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, signed int &param)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_INTEROP_CHECK_ARG_TYPE(DATATYPE_R4);
@@ -129,7 +129,7 @@ HRESULT Interop_Marshal_float(const CLR_RT_StackFrame& stackFrame, unsigned int 
   NANOCLR_INTEROP_NOCLEANUP();
   }
 
-HRESULT Interop_Marshal_double(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, signed __int64& param)
+HRESULT Interop_Marshal_double(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, signed __int64 &param)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_INTEROP_CHECK_ARG_TYPE(DATATYPE_R8);
@@ -139,7 +139,7 @@ HRESULT Interop_Marshal_double(const CLR_RT_StackFrame& stackFrame, unsigned int
 
 #endif
 
-HRESULT Interop_Marshal_LPCSTR(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, const char*& param)
+HRESULT Interop_Marshal_LPCSTR(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, const char *&param)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -161,7 +161,7 @@ HRESULT Interop_Marshal_LPCSTR(const CLR_RT_StackFrame& stackFrame, unsigned int
 #endif
 
 // For unsupported types we set param to zero and always return S_OK.
-HRESULT Interop_Marshal_UNSUPPORTED_TYPE(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, UNSUPPORTED_TYPE& param)
+HRESULT Interop_Marshal_UNSUPPORTED_TYPE(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, UNSUPPORTED_TYPE &param)
   {
   NATIVE_PROFILE_CLR_CORE();
   param = NULL;
@@ -192,12 +192,12 @@ HRESULT Interop_Marshal_UNSUPPORTED_TYPE(const CLR_RT_StackFrame& stackFrame, un
 **********************************************************************/
 template <class T>
 static HRESULT Interop_Marshal_NUMERIC_ARRAY
-(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, T*& pByteParam, unsigned int& arraySize, unsigned int elementSize)
+(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, T *&pByteParam, unsigned int &arraySize, unsigned int elementSize)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock_Array* pHeapBlockArray = NULL;
+  CLR_RT_HeapBlock_Array *pHeapBlockArray = NULL;
 
   if (stackFrame.ArgN(paramIndex).DataType() != DATATYPE_OBJECT)
     {
@@ -212,7 +212,7 @@ static HRESULT Interop_Marshal_NUMERIC_ARRAY
     }
 
   arraySize = pHeapBlockArray->m_numOfElements;
-  pByteParam = (T*)pHeapBlockArray->GetFirstElement();
+  pByteParam = (T *)pHeapBlockArray->GetFirstElement();
 
   NANOCLR_NOCLEANUP();
   }
@@ -222,87 +222,87 @@ static HRESULT Interop_Marshal_NUMERIC_ARRAY
 ** All these functions are wrappers around Interop_Marshal_NUMERIC_ARRAY,
 ** they create type safe interface for users of Interop library.
 **********************************************************************/
-HRESULT Interop_Marshal_bool_ARRAY(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_UINT8& typedArray)
+HRESULT Interop_Marshal_bool_ARRAY(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_UINT8 &typedArray)
   {
   NATIVE_PROFILE_CLR_CORE();
   return Interop_Marshal_NUMERIC_ARRAY<unsigned char>(stackFrame, paramIndex, typedArray.m_pData, typedArray.m_ElemCount, sizeof(unsigned char));
   }
 
-HRESULT Interop_Marshal_UINT8_ARRAY(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_UINT8& typedArray)
+HRESULT Interop_Marshal_UINT8_ARRAY(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_UINT8 &typedArray)
   {
   NATIVE_PROFILE_CLR_CORE();
   return Interop_Marshal_NUMERIC_ARRAY<unsigned char>(stackFrame, paramIndex, typedArray.m_pData, typedArray.m_ElemCount, sizeof(unsigned char));
   }
 
-HRESULT Interop_Marshal_UINT16_ARRAY(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_UINT16& typedArray)
+HRESULT Interop_Marshal_UINT16_ARRAY(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_UINT16 &typedArray)
   {
   NATIVE_PROFILE_CLR_CORE();
   return Interop_Marshal_NUMERIC_ARRAY<unsigned short>(stackFrame, paramIndex, typedArray.m_pData, typedArray.m_ElemCount, sizeof(unsigned short));
   }
 
-HRESULT Interop_Marshal_UINT32_ARRAY(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_UINT32& typedArray)
+HRESULT Interop_Marshal_UINT32_ARRAY(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_UINT32 &typedArray)
   {
   NATIVE_PROFILE_CLR_CORE();
   return Interop_Marshal_NUMERIC_ARRAY<unsigned int>(stackFrame, paramIndex, typedArray.m_pData, typedArray.m_ElemCount, sizeof(unsigned int));
   }
 
-HRESULT Interop_Marshal_UINT64_ARRAY(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_UINT64& typedArray)
+HRESULT Interop_Marshal_UINT64_ARRAY(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_UINT64 &typedArray)
   {
   NATIVE_PROFILE_CLR_CORE();
   return Interop_Marshal_NUMERIC_ARRAY<unsigned __int64>(stackFrame, paramIndex, typedArray.m_pData, typedArray.m_ElemCount, sizeof(unsigned __int64));
   }
 
-HRESULT Interop_Marshal_CHAR_ARRAY(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_CHAR& typedArray)
+HRESULT Interop_Marshal_CHAR_ARRAY(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_CHAR &typedArray)
   {
   NATIVE_PROFILE_CLR_CORE();
   return Interop_Marshal_NUMERIC_ARRAY<char>(stackFrame, paramIndex, typedArray.m_pData, typedArray.m_ElemCount, sizeof(char));
   }
 
-HRESULT Interop_Marshal_INT8_ARRAY(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_INT8& typedArray)
+HRESULT Interop_Marshal_INT8_ARRAY(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_INT8 &typedArray)
   {
   NATIVE_PROFILE_CLR_CORE();
   return Interop_Marshal_NUMERIC_ARRAY<signed char>(stackFrame, paramIndex, typedArray.m_pData, typedArray.m_ElemCount, sizeof(signed char));
   }
 
-HRESULT Interop_Marshal_INT16_ARRAY(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_INT16& typedArray)
+HRESULT Interop_Marshal_INT16_ARRAY(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_INT16 &typedArray)
   {
   NATIVE_PROFILE_CLR_CORE();
   return Interop_Marshal_NUMERIC_ARRAY<signed short>(stackFrame, paramIndex, typedArray.m_pData, typedArray.m_ElemCount, sizeof(signed short));
   }
 
-HRESULT Interop_Marshal_INT32_ARRAY(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_INT32& typedArray)
+HRESULT Interop_Marshal_INT32_ARRAY(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_INT32 &typedArray)
   {
   NATIVE_PROFILE_CLR_CORE();
   return Interop_Marshal_NUMERIC_ARRAY<signed int>(stackFrame, paramIndex, typedArray.m_pData, typedArray.m_ElemCount, sizeof(signed int));
   }
 
-HRESULT Interop_Marshal_INT64_ARRAY(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_INT64& typedArray)
+HRESULT Interop_Marshal_INT64_ARRAY(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_INT64 &typedArray)
   {
   NATIVE_PROFILE_CLR_CORE();
   return Interop_Marshal_NUMERIC_ARRAY<signed __int64>(stackFrame, paramIndex, typedArray.m_pData, typedArray.m_ElemCount, sizeof(signed __int64));
   }
 
 #if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
-HRESULT Interop_Marshal_float_ARRAY(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_float& typedArray)
+HRESULT Interop_Marshal_float_ARRAY(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_float &typedArray)
   {
   NATIVE_PROFILE_CLR_CORE();
   return Interop_Marshal_NUMERIC_ARRAY<float>(stackFrame, paramIndex, typedArray.m_pData, typedArray.m_ElemCount, sizeof(float));
   }
 
-HRESULT Interop_Marshal_double_ARRAY(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_double& typedArray)
+HRESULT Interop_Marshal_double_ARRAY(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_double &typedArray)
   {
   NATIVE_PROFILE_CLR_CORE();
   return Interop_Marshal_NUMERIC_ARRAY<double>(stackFrame, paramIndex, typedArray.m_pData, typedArray.m_ElemCount, sizeof(double));
   }
 #else
 
-HRESULT Interop_Marshal_float_ARRAY(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_float& typedArray)
+HRESULT Interop_Marshal_float_ARRAY(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_float &typedArray)
   {
   NATIVE_PROFILE_CLR_CORE();
   return Interop_Marshal_NUMERIC_ARRAY<signed int>(stackFrame, paramIndex, typedArray.m_pData, typedArray.m_ElemCount, sizeof(signed int));
   }
 
-HRESULT Interop_Marshal_double_ARRAY(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_double& typedArray)
+HRESULT Interop_Marshal_double_ARRAY(const CLR_RT_StackFrame &stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_double &typedArray)
   {
   NATIVE_PROFILE_CLR_CORE();
   return Interop_Marshal_NUMERIC_ARRAY<signed __int64>(stackFrame, paramIndex, typedArray.m_pData, typedArray.m_ElemCount, sizeof(signed __int64));
@@ -325,92 +325,92 @@ HRESULT Interop_Marshal_double_ARRAY(const CLR_RT_StackFrame& stackFrame, unsign
 ** Returns:   S_OK on success or error from StoreToReference. Error return would cause exception thrown in managed code.
 **********************************************************************/
 
-void SetResult_bool(CLR_RT_StackFrame& stackFrame, bool value)
+void SetResult_bool(CLR_RT_StackFrame &stackFrame, bool value)
   {
   NATIVE_PROFILE_CLR_CORE();
   stackFrame.SetResult_Boolean(value);
   }
 
-void SetResult_CHAR(CLR_RT_StackFrame& stackFrame, char value)
+void SetResult_CHAR(CLR_RT_StackFrame &stackFrame, char value)
   {
   NATIVE_PROFILE_CLR_CORE();
   stackFrame.SetResult(value, DATATYPE_I1);
   }
 
-void SetResult_INT8(CLR_RT_StackFrame& stackFrame, signed char value)
+void SetResult_INT8(CLR_RT_StackFrame &stackFrame, signed char value)
   {
   NATIVE_PROFILE_CLR_CORE();
   stackFrame.SetResult(value, DATATYPE_I1);
   }
 
-void SetResult_INT16(CLR_RT_StackFrame& stackFrame, signed short value)
+void SetResult_INT16(CLR_RT_StackFrame &stackFrame, signed short value)
   {
   NATIVE_PROFILE_CLR_CORE();
   stackFrame.SetResult(value, DATATYPE_I2);
   }
 
-void SetResult_INT32(CLR_RT_StackFrame& stackFrame, signed int value)
+void SetResult_INT32(CLR_RT_StackFrame &stackFrame, signed int value)
   {
   NATIVE_PROFILE_CLR_CORE();
   stackFrame.SetResult(value, DATATYPE_I4);
   }
 
-void SetResult_INT64(CLR_RT_StackFrame& stackFrame, signed __int64 value)
+void SetResult_INT64(CLR_RT_StackFrame &stackFrame, signed __int64 value)
   {
   NATIVE_PROFILE_CLR_CORE();
   stackFrame.SetResult_I8(value);
   }
 
-void SetResult_UINT8(CLR_RT_StackFrame& stackFrame, unsigned char value)
+void SetResult_UINT8(CLR_RT_StackFrame &stackFrame, unsigned char value)
   {
   NATIVE_PROFILE_CLR_CORE();
   stackFrame.SetResult(value, DATATYPE_U1);
   }
 
-void SetResult_UINT16(CLR_RT_StackFrame& stackFrame, unsigned short value)
+void SetResult_UINT16(CLR_RT_StackFrame &stackFrame, unsigned short value)
   {
   NATIVE_PROFILE_CLR_CORE();
   stackFrame.SetResult(value, DATATYPE_U2);
   }
 
-void SetResult_UINT32(CLR_RT_StackFrame& stackFrame, unsigned int value)
+void SetResult_UINT32(CLR_RT_StackFrame &stackFrame, unsigned int value)
   {
   NATIVE_PROFILE_CLR_CORE();
   stackFrame.SetResult(value, DATATYPE_U4);
   }
 
-void SetResult_UINT64(CLR_RT_StackFrame& stackFrame, unsigned __int64 value)
+void SetResult_UINT64(CLR_RT_StackFrame &stackFrame, unsigned __int64 value)
   {
   NATIVE_PROFILE_CLR_CORE();
   stackFrame.SetResult_U8(value);
   }
 #if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
-void SetResult_float(CLR_RT_StackFrame& stackFrame, float value)
+void SetResult_float(CLR_RT_StackFrame &stackFrame, float value)
   {
   NATIVE_PROFILE_CLR_CORE();
   stackFrame.SetResult_R4(value);
   }
 
-void SetResult_double(CLR_RT_StackFrame& stackFrame, double value)
+void SetResult_double(CLR_RT_StackFrame &stackFrame, double value)
   {
   NATIVE_PROFILE_CLR_CORE();
   stackFrame.SetResult_R8(value);
   }
 #else
-void SetResult_float(CLR_RT_StackFrame& stackFrame, CLR_INT32 value)
+void SetResult_float(CLR_RT_StackFrame &stackFrame, CLR_INT32 value)
   {
   NATIVE_PROFILE_CLR_CORE();
   stackFrame.SetResult_R4(value);
   }
 
-void SetResult_double(CLR_RT_StackFrame& stackFrame, CLR_INT64& value)
+void SetResult_double(CLR_RT_StackFrame &stackFrame, CLR_INT64 &value)
   {
   NATIVE_PROFILE_CLR_CORE();
   stackFrame.SetResult_R8(value);
   }
 #endif
 
-void SetResult_LPCSTR(CLR_RT_StackFrame& stackFrame, const char* lpszString)
+void SetResult_LPCSTR(CLR_RT_StackFrame &stackFrame, const char *lpszString)
   {
   NATIVE_PROFILE_CLR_CORE();
   stackFrame.SetResult_String(lpszString);
@@ -459,177 +459,177 @@ if ( ((CLR_RT_HeapBlock *)pHeapBlock)->DataType() != ref_type ) \
 #endif
 
 //------------------ Unsigned Integral types ----------------------------------------------------------------------------
-HRESULT Interop_Marshal_bool_ByRef(const CLR_RT_StackFrame& stackFrame, void* pHeapBlock, unsigned int paramIndex, unsigned char*& pParam)
+HRESULT Interop_Marshal_bool_ByRef(const CLR_RT_StackFrame &stackFrame, void *pHeapBlock, unsigned int paramIndex, unsigned char *&pParam)
   {
   NATIVE_PROFILE_CLR_CORE();
   // Declare hRes ( #define NANOCLR_HEADER() HRESULT hr )
   NANOCLR_HEADER();
 
   // Loads heapblock data from heapblock in managed stack frame 
-  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock*)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
+  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock *)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
 
   // Validates that data in heapblock correspond to requested parameter.
   NANOCLR_INTEROP_CHECK_REF_TYPE(DATATYPE_U1)
 
     // Now we have initialized pHeapBlock with reference paramenter. 
     // Need to cast the pointer because &s1 is "CLR_INT8 *", while we need "bool *"
-    pParam = &((CLR_RT_HeapBlock*)pHeapBlock)->NumericByRef().u1;
+    pParam = &((CLR_RT_HeapBlock *)pHeapBlock)->NumericByRef().u1;
 
   // Return S_OK or error if there is "go to" from NANOCLR_CHECK_HRESULT or NANOCLR_SET_AND_LEAVE
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Interop_Marshal_UINT8_ByRef(const CLR_RT_StackFrame& stackFrame, void* pHeapBlock, unsigned int paramIndex, unsigned char*& pParam)
+HRESULT Interop_Marshal_UINT8_ByRef(const CLR_RT_StackFrame &stackFrame, void *pHeapBlock, unsigned int paramIndex, unsigned char *&pParam)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
-  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock*)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
+  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock *)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
   NANOCLR_INTEROP_CHECK_REF_TYPE(DATATYPE_U1)
-    pParam = &((CLR_RT_HeapBlock*)pHeapBlock)->NumericByRef().u1;
+    pParam = &((CLR_RT_HeapBlock *)pHeapBlock)->NumericByRef().u1;
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Interop_Marshal_UINT16_ByRef(const CLR_RT_StackFrame& stackFrame, void* pHeapBlock, unsigned int paramIndex, unsigned short*& pParam)
+HRESULT Interop_Marshal_UINT16_ByRef(const CLR_RT_StackFrame &stackFrame, void *pHeapBlock, unsigned int paramIndex, unsigned short *&pParam)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
-  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock*)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
+  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock *)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
   NANOCLR_INTEROP_CHECK_REF_TYPE(DATATYPE_U2)
-    pParam = &((CLR_RT_HeapBlock*)pHeapBlock)->NumericByRef().u2;
+    pParam = &((CLR_RT_HeapBlock *)pHeapBlock)->NumericByRef().u2;
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Interop_Marshal_UINT32_ByRef(const CLR_RT_StackFrame& stackFrame, void* pHeapBlock, unsigned int paramIndex, unsigned int*& pParam)
+HRESULT Interop_Marshal_UINT32_ByRef(const CLR_RT_StackFrame &stackFrame, void *pHeapBlock, unsigned int paramIndex, unsigned int *&pParam)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
-  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock*)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
+  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock *)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
   NANOCLR_INTEROP_CHECK_REF_TYPE(DATATYPE_U4)
-    pParam = &((CLR_RT_HeapBlock*)pHeapBlock)->NumericByRef().u4;
+    pParam = &((CLR_RT_HeapBlock *)pHeapBlock)->NumericByRef().u4;
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Interop_Marshal_UINT64_ByRef(const CLR_RT_StackFrame& stackFrame, void* pHeapBlock, unsigned int paramIndex, unsigned __int64*& pParam)
+HRESULT Interop_Marshal_UINT64_ByRef(const CLR_RT_StackFrame &stackFrame, void *pHeapBlock, unsigned int paramIndex, unsigned __int64 *&pParam)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
-  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock*)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
+  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock *)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
   NANOCLR_INTEROP_CHECK_REF_TYPE(DATATYPE_U8)
-    pParam = (unsigned __int64*)&((CLR_RT_HeapBlock*)pHeapBlock)->NumericByRef().u8;
+    pParam = (unsigned __int64 *)&((CLR_RT_HeapBlock *)pHeapBlock)->NumericByRef().u8;
   NANOCLR_NOCLEANUP();
   }
 
 //------------------ Signed Integral types ----------------------------------------------------------------------------
-HRESULT Interop_Marshal_CHAR_ByRef(const CLR_RT_StackFrame& stackFrame, void* pHeapBlock, unsigned int paramIndex, char*& pParam)
+HRESULT Interop_Marshal_CHAR_ByRef(const CLR_RT_StackFrame &stackFrame, void *pHeapBlock, unsigned int paramIndex, char *&pParam)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
-  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock*)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
+  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock *)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
   NANOCLR_INTEROP_CHECK_REF_TYPE(DATATYPE_CHAR)
-    pParam = (char*)&((CLR_RT_HeapBlock*)pHeapBlock)->NumericByRef().s1;
+    pParam = (char *)&((CLR_RT_HeapBlock *)pHeapBlock)->NumericByRef().s1;
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Interop_Marshal_INT8_ByRef(const CLR_RT_StackFrame& stackFrame, void* pHeapBlock, unsigned int paramIndex, signed char*& pParam)
+HRESULT Interop_Marshal_INT8_ByRef(const CLR_RT_StackFrame &stackFrame, void *pHeapBlock, unsigned int paramIndex, signed char *&pParam)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
-  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock*)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
+  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock *)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
   // signed char servers for both boolean and sbyte types. So we check for either of them.
 #if defined(_DEBUG)
-  if (!(((CLR_RT_HeapBlock*)pHeapBlock)->DataType() == DATATYPE_I1 ||
-    ((CLR_RT_HeapBlock*)pHeapBlock)->DataType() == DATATYPE_BOOLEAN)
+  if (!(((CLR_RT_HeapBlock *)pHeapBlock)->DataType() == DATATYPE_I1 ||
+    ((CLR_RT_HeapBlock *)pHeapBlock)->DataType() == DATATYPE_BOOLEAN)
     )
     {
     NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
     }
 #endif 
-  pParam = &((CLR_RT_HeapBlock*)pHeapBlock)->NumericByRef().s1;
+  pParam = &((CLR_RT_HeapBlock *)pHeapBlock)->NumericByRef().s1;
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Interop_Marshal_INT16_ByRef(const CLR_RT_StackFrame& stackFrame, void* pHeapBlock, unsigned int paramIndex, signed short*& pParam)
+HRESULT Interop_Marshal_INT16_ByRef(const CLR_RT_StackFrame &stackFrame, void *pHeapBlock, unsigned int paramIndex, signed short *&pParam)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
-  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock*)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
+  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock *)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
   NANOCLR_INTEROP_CHECK_REF_TYPE(DATATYPE_I2)
-    pParam = &((CLR_RT_HeapBlock*)pHeapBlock)->NumericByRef().s2;
+    pParam = &((CLR_RT_HeapBlock *)pHeapBlock)->NumericByRef().s2;
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Interop_Marshal_INT32_ByRef(const CLR_RT_StackFrame& stackFrame, void* pHeapBlock, unsigned int paramIndex, signed int*& pParam)
+HRESULT Interop_Marshal_INT32_ByRef(const CLR_RT_StackFrame &stackFrame, void *pHeapBlock, unsigned int paramIndex, signed int *&pParam)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
-  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock*)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
+  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock *)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
   NANOCLR_INTEROP_CHECK_REF_TYPE(DATATYPE_I4)
-    pParam = &((CLR_RT_HeapBlock*)pHeapBlock)->NumericByRef().s4;
+    pParam = &((CLR_RT_HeapBlock *)pHeapBlock)->NumericByRef().s4;
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Interop_Marshal_INT64_ByRef(const CLR_RT_StackFrame& stackFrame, void* pHeapBlock, unsigned int paramIndex, signed __int64*& pParam)
+HRESULT Interop_Marshal_INT64_ByRef(const CLR_RT_StackFrame &stackFrame, void *pHeapBlock, unsigned int paramIndex, signed __int64 *&pParam)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
-  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock*)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
+  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock *)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
   NANOCLR_INTEROP_CHECK_REF_TYPE(DATATYPE_I8)
-    pParam = (signed __int64*)&((CLR_RT_HeapBlock*)pHeapBlock)->NumericByRef().s8;
+    pParam = (signed __int64 *)&((CLR_RT_HeapBlock *)pHeapBlock)->NumericByRef().s8;
   NANOCLR_NOCLEANUP();
   }
 
 //----------------- Float point types - float and double
 #if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
 
-HRESULT Interop_Marshal_float_ByRef(const CLR_RT_StackFrame& stackFrame, void* pHeapBlock, unsigned int paramIndex, float*& pParam)
+HRESULT Interop_Marshal_float_ByRef(const CLR_RT_StackFrame &stackFrame, void *pHeapBlock, unsigned int paramIndex, float *&pParam)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
-  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock*)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
+  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock *)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
   NANOCLR_INTEROP_CHECK_REF_TYPE(DATATYPE_R4)
-    pParam = &((CLR_RT_HeapBlock*)pHeapBlock)->NumericByRef().r4;
+    pParam = &((CLR_RT_HeapBlock *)pHeapBlock)->NumericByRef().r4;
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Interop_Marshal_double_ByRef(const CLR_RT_StackFrame& stackFrame, void* pHeapBlock, unsigned int paramIndex, double*& pParam)
+HRESULT Interop_Marshal_double_ByRef(const CLR_RT_StackFrame &stackFrame, void *pHeapBlock, unsigned int paramIndex, double *&pParam)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
-  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock*)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
+  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock *)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
   NANOCLR_INTEROP_CHECK_REF_TYPE(DATATYPE_R8)
-    pParam = (double*)&((CLR_RT_HeapBlock*)pHeapBlock)->NumericByRef().r8;
+    pParam = (double *)&((CLR_RT_HeapBlock *)pHeapBlock)->NumericByRef().r8;
   NANOCLR_NOCLEANUP();
   }
 
 
 //----------------- Non Float point types - float and double
 #else
-HRESULT Interop_Marshal_float_ByRef(const CLR_RT_StackFrame& stackFrame, void* pHeapBlock, unsigned int paramIndex, signed int*& pParam)
+HRESULT Interop_Marshal_float_ByRef(const CLR_RT_StackFrame &stackFrame, void *pHeapBlock, unsigned int paramIndex, signed int *&pParam)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
-  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock*)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
+  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock *)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
   NANOCLR_INTEROP_CHECK_REF_TYPE(DATATYPE_R4)
-    pParam = (signed int*)&((CLR_RT_HeapBlock*)pHeapBlock)->NumericByRef().r4;
+    pParam = (signed int *)&((CLR_RT_HeapBlock *)pHeapBlock)->NumericByRef().r4;
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Interop_Marshal_double_ByRef(const CLR_RT_StackFrame& stackFrame, void* pHeapBlock, unsigned int paramIndex, signed __int64*& pParam)
+HRESULT Interop_Marshal_double_ByRef(const CLR_RT_StackFrame &stackFrame, void *pHeapBlock, unsigned int paramIndex, signed __int64 *&pParam)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
-  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock*)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
+  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock *)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
   NANOCLR_INTEROP_CHECK_REF_TYPE(DATATYPE_R8)
-    pParam = (signed __int64*)&((CLR_RT_HeapBlock*)pHeapBlock)->NumericByRef().r8;
+    pParam = (signed __int64 *)&((CLR_RT_HeapBlock *)pHeapBlock)->NumericByRef().r8;
   NANOCLR_NOCLEANUP();
   }
 
 #endif
-HRESULT Interop_Marshal_UNSUPPORTED_TYPE_ByRef(const CLR_RT_StackFrame& stackFrame, void* pHeapBlock, unsigned int paramIndex, UNSUPPORTED_TYPE*& pParam)
+HRESULT Interop_Marshal_UNSUPPORTED_TYPE_ByRef(const CLR_RT_StackFrame &stackFrame, void *pHeapBlock, unsigned int paramIndex, UNSUPPORTED_TYPE *&pParam)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
-  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock*)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
+  NANOCLR_CHECK_HRESULT(((CLR_RT_HeapBlock *)pHeapBlock)->LoadFromReference(stackFrame.ArgN(paramIndex)));
   pParam = NULL;
   NANOCLR_NOCLEANUP();
   }
@@ -652,16 +652,16 @@ HRESULT Interop_Marshal_UNSUPPORTED_TYPE_ByRef(const CLR_RT_StackFrame& stackFra
 ** Returns:   S_OK on success or error from StoreToReference. Error return would cause exception thrown in managed code.
 **********************************************************************/
 
-HRESULT Interop_Marshal_StoreRef(CLR_RT_StackFrame& stackFrame, void* pVoidHeapBlock, unsigned int paramIndex)
+HRESULT Interop_Marshal_StoreRef(CLR_RT_StackFrame &stackFrame, void *pVoidHeapBlock, unsigned int paramIndex)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
-  CLR_RT_HeapBlock* pHeapBlock = (CLR_RT_HeapBlock*)pVoidHeapBlock;
+  CLR_RT_HeapBlock *pHeapBlock = (CLR_RT_HeapBlock *)pVoidHeapBlock;
   NANOCLR_CHECK_HRESULT(pHeapBlock->StoreToReference(stackFrame.ArgN(paramIndex), 0));
   NANOCLR_NOCLEANUP();
   }
 
-CLR_RT_HeapBlock* Interop_Marshal_RetrieveManagedObject(CLR_RT_StackFrame& stackFrame)
+CLR_RT_HeapBlock *Interop_Marshal_RetrieveManagedObject(CLR_RT_StackFrame &stackFrame)
 
   {
   return stackFrame.This();
@@ -684,26 +684,26 @@ CLR_RT_HeapBlock* Interop_Marshal_RetrieveManagedObject(CLR_RT_StackFrame& stack
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif
 
-bool& Interop_Marshal_GetField_bool(CLR_RT_HeapBlock* pThis, unsigned int fieldIndex)
+bool &Interop_Marshal_GetField_bool(CLR_RT_HeapBlock *pThis, unsigned int fieldIndex)
   {
-  return (bool&)pThis[fieldIndex].NumericByRef().u1;
+  return (bool &)pThis[fieldIndex].NumericByRef().u1;
   }
 
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif
 
-unsigned char& Interop_Marshal_GetField_UINT8(CLR_RT_HeapBlock* pThis, unsigned int fieldIndex)
+unsigned char &Interop_Marshal_GetField_UINT8(CLR_RT_HeapBlock *pThis, unsigned int fieldIndex)
   {
   return pThis[fieldIndex].NumericByRef().u1;
   }
 
-unsigned short& Interop_Marshal_GetField_UINT16(CLR_RT_HeapBlock* pThis, unsigned int fieldIndex)
+unsigned short &Interop_Marshal_GetField_UINT16(CLR_RT_HeapBlock *pThis, unsigned int fieldIndex)
   {
   return pThis[fieldIndex].NumericByRef().u2;
   }
 
-unsigned int& Interop_Marshal_GetField_UINT32(CLR_RT_HeapBlock* pThis, unsigned int fieldIndex)
+unsigned int &Interop_Marshal_GetField_UINT32(CLR_RT_HeapBlock *pThis, unsigned int fieldIndex)
   {
   return pThis[fieldIndex].NumericByRef().u4;
   }
@@ -713,31 +713,31 @@ unsigned int& Interop_Marshal_GetField_UINT32(CLR_RT_HeapBlock* pThis, unsigned 
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif
 
-unsigned __int64& Interop_Marshal_GetField_UINT64(CLR_RT_HeapBlock* pThis, unsigned int fieldIndex)
+unsigned __int64 &Interop_Marshal_GetField_UINT64(CLR_RT_HeapBlock *pThis, unsigned int fieldIndex)
   {
-  return (unsigned __int64&)pThis[fieldIndex].NumericByRef().u8;
+  return (unsigned __int64 &)pThis[fieldIndex].NumericByRef().u8;
   }
 
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif
 
-char& Interop_Marshal_GetField_CHAR(CLR_RT_HeapBlock* pThis, unsigned int fieldIndex)
+char &Interop_Marshal_GetField_CHAR(CLR_RT_HeapBlock *pThis, unsigned int fieldIndex)
   {
-  return (char&)pThis[fieldIndex].NumericByRef().s1;
+  return (char &)pThis[fieldIndex].NumericByRef().s1;
   }
 
-signed char& Interop_Marshal_GetField_INT8(CLR_RT_HeapBlock* pThis, unsigned int fieldIndex)
+signed char &Interop_Marshal_GetField_INT8(CLR_RT_HeapBlock *pThis, unsigned int fieldIndex)
   {
   return pThis[fieldIndex].NumericByRef().s1;
   }
 
-signed short& Interop_Marshal_GetField_INT16(CLR_RT_HeapBlock* pThis, unsigned int fieldIndex)
+signed short &Interop_Marshal_GetField_INT16(CLR_RT_HeapBlock *pThis, unsigned int fieldIndex)
   {
   return pThis[fieldIndex].NumericByRef().s2;
   }
 
-signed int& Interop_Marshal_GetField_INT32(CLR_RT_HeapBlock* pThis, unsigned int fieldIndex)
+signed int &Interop_Marshal_GetField_INT32(CLR_RT_HeapBlock *pThis, unsigned int fieldIndex)
   {
   return pThis[fieldIndex].NumericByRef().s4;
   }
@@ -747,9 +747,9 @@ signed int& Interop_Marshal_GetField_INT32(CLR_RT_HeapBlock* pThis, unsigned int
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif
 
-signed __int64& Interop_Marshal_GetField_INT64(CLR_RT_HeapBlock* pThis, unsigned int fieldIndex)
+signed __int64 &Interop_Marshal_GetField_INT64(CLR_RT_HeapBlock *pThis, unsigned int fieldIndex)
   {
-  return (signed __int64&)pThis[fieldIndex].NumericByRef().s8;
+  return (signed __int64 &)pThis[fieldIndex].NumericByRef().s8;
   }
 
 #ifdef __GNUC__
@@ -759,7 +759,7 @@ signed __int64& Interop_Marshal_GetField_INT64(CLR_RT_HeapBlock* pThis, unsigned
 //----------------- Float point types - float and double
 #if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
 
-float& Interop_Marshal_GetField_float(CLR_RT_HeapBlock* pThis, unsigned int fieldIndex)
+float &Interop_Marshal_GetField_float(CLR_RT_HeapBlock *pThis, unsigned int fieldIndex)
   {
   return pThis[fieldIndex].NumericByRef().r4;
   }
@@ -769,9 +769,9 @@ float& Interop_Marshal_GetField_float(CLR_RT_HeapBlock* pThis, unsigned int fiel
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif
 
-double& Interop_Marshal_GetField_double(CLR_RT_HeapBlock* pThis, unsigned int fieldIndex)
+double &Interop_Marshal_GetField_double(CLR_RT_HeapBlock *pThis, unsigned int fieldIndex)
   {
-  return (double&)pThis[fieldIndex].NumericByRef().r8;
+  return (double &)pThis[fieldIndex].NumericByRef().r8;
   }
 
 #ifdef __GNUC__
@@ -780,14 +780,14 @@ double& Interop_Marshal_GetField_double(CLR_RT_HeapBlock* pThis, unsigned int fi
 
 #else
 
-signed int& Interop_Marshal_GetField_float(CLR_RT_HeapBlock* pThis, unsigned int fieldIndex)
+signed int &Interop_Marshal_GetField_float(CLR_RT_HeapBlock *pThis, unsigned int fieldIndex)
   {
-  return (signed int&)pThis[fieldIndex].NumericByRef().r4;
+  return (signed int &)pThis[fieldIndex].NumericByRef().r4;
   }
 
-signed __int64& Interop_Marshal_GetField_double(CLR_RT_HeapBlock* pThis, unsigned int fieldIndex)
+signed __int64 &Interop_Marshal_GetField_double(CLR_RT_HeapBlock *pThis, unsigned int fieldIndex)
   {
-  return (signed __int64&)pThis[fieldIndex].NumericByRef().r8;
+  return (signed __int64 &)pThis[fieldIndex].NumericByRef().r8;
   }
 
 
@@ -801,9 +801,9 @@ signed __int64& Interop_Marshal_GetField_double(CLR_RT_HeapBlock* pThis, unsigne
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif
-UNSUPPORTED_TYPE& Interop_Marshal_GetField_UNSUPPORTED_TYPE(CLR_RT_HeapBlock* pThis, unsigned int fieldIndex)
+UNSUPPORTED_TYPE &Interop_Marshal_GetField_UNSUPPORTED_TYPE(CLR_RT_HeapBlock *pThis, unsigned int fieldIndex)
   {
-  return (UNSUPPORTED_TYPE&)(*((UNSUPPORTED_TYPE*)NULL));
+  return (UNSUPPORTED_TYPE &)(*((UNSUPPORTED_TYPE *)NULL));
   }
 #ifdef __GNUC__
 #pragma GCC diagnostic pop

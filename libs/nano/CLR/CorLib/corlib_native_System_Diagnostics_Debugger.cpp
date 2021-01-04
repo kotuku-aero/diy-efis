@@ -6,7 +6,7 @@
 #include "CorLib.h"
 
 
-HRESULT Library_corlib_native_System_Diagnostics_Debugger::get_IsAttached___STATIC__BOOLEAN(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_Diagnostics_Debugger::get_IsAttached___STATIC__BOOLEAN(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -24,7 +24,7 @@ HRESULT Library_corlib_native_System_Diagnostics_Debugger::get_IsAttached___STAT
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_corlib_native_System_Diagnostics_Debugger::Break___STATIC__VOID(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_Diagnostics_Debugger::Break___STATIC__VOID(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();

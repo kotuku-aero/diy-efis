@@ -7,7 +7,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void CLR_RT_GetVersion(unsigned short int* pMajor, unsigned short int* pMinor, unsigned short int* pBuild, unsigned short int* pRevision)
+void CLR_RT_GetVersion(unsigned short int *pMajor, unsigned short int *pMinor, unsigned short int *pBuild, unsigned short int *pRevision)
   {
   NATIVE_PROFILE_CLR_CORE();
   if (pMajor) *pMajor = VERSION_MAJOR;
@@ -18,12 +18,12 @@ void CLR_RT_GetVersion(unsigned short int* pMajor, unsigned short int* pMinor, u
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HRESULT CLR_RT_ArrayListHelper::PrepareArrayList(CLR_RT_HeapBlock& thisRef, int count, int capacity)
+HRESULT CLR_RT_ArrayListHelper::PrepareArrayList(CLR_RT_HeapBlock &thisRef, int count, int capacity)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock* pThis = thisRef.Dereference(); FAULT_ON_NULL(pThis);
+  CLR_RT_HeapBlock *pThis = thisRef.Dereference(); FAULT_ON_NULL(pThis);
 
   if (count > capacity || capacity < 1)
     {
@@ -37,13 +37,13 @@ HRESULT CLR_RT_ArrayListHelper::PrepareArrayList(CLR_RT_HeapBlock& thisRef, int 
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT CLR_RT_ArrayListHelper::ExtractArrayFromArrayList(CLR_RT_HeapBlock& thisRef, CLR_RT_HeapBlock_Array*& array, int& count, int& capacity)
+HRESULT CLR_RT_ArrayListHelper::ExtractArrayFromArrayList(CLR_RT_HeapBlock &thisRef, CLR_RT_HeapBlock_Array *&array, int &count, int &capacity)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock* pThis;
-  CLR_RT_HeapBlock* items;
+  CLR_RT_HeapBlock *pThis;
+  CLR_RT_HeapBlock *items;
 
   pThis = thisRef.Dereference(); FAULT_ON_NULL(pThis);
   items = &pThis[FIELD___items];
@@ -68,7 +68,7 @@ HRESULT CLR_RT_ArrayListHelper::ExtractArrayFromArrayList(CLR_RT_HeapBlock& this
 
 //--//
 
-HRESULT CLR_RT_ByteArrayReader::Init(const unsigned char* src, unsigned int srcSize)
+HRESULT CLR_RT_ByteArrayReader::Init(const unsigned char *src, unsigned int srcSize)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -81,7 +81,7 @@ HRESULT CLR_RT_ByteArrayReader::Init(const unsigned char* src, unsigned int srcS
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT CLR_RT_ByteArrayReader::Read(void* dst, unsigned int size)
+HRESULT CLR_RT_ByteArrayReader::Read(void *dst, unsigned int size)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -96,14 +96,14 @@ HRESULT CLR_RT_ByteArrayReader::Read(void* dst, unsigned int size)
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT CLR_RT_ByteArrayReader::Read1Byte(void* dst)
+HRESULT CLR_RT_ByteArrayReader::Read1Byte(void *dst)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
   if (1 > sourceSize) NANOCLR_SET_AND_LEAVE(CLR_E_FAIL);
 
-  *(unsigned char*)dst = *source;
+  *(unsigned char *)dst = *source;
 
   source++;
   sourceSize--;

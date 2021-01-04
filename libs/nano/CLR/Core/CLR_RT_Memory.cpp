@@ -31,7 +31,7 @@ void CLR_RT_Memory::Reset()
 #endif
   }
 
-void* CLR_RT_Memory::SubtractFromSystem(size_t len)
+void *CLR_RT_Memory::SubtractFromSystem(size_t len)
   {
   NATIVE_PROFILE_CLR_CORE();
   len = ROUNDTOMULTIPLE(len, CLR_UINT32);
@@ -58,7 +58,7 @@ const CLR_UINT32 c_extra = sizeof(CLR_RT_HeapBlock) * 2;
 #endif
 
 
-void CLR_RT_Memory::Release(void* ptr)
+void CLR_RT_Memory::Release(void *ptr)
   {
   NATIVE_PROFILE_CLR_CORE();
 
@@ -74,7 +74,7 @@ void CLR_RT_Memory::Release(void* ptr)
     DEBUG_POINTER_DECREMENT(ptr, c_extra + sizeof(CLR_UINT32));
 #endif
 
-    CLR_RT_HeapBlock_BinaryBlob* pThis = CLR_RT_HeapBlock_BinaryBlob::GetBlob(ptr);
+    CLR_RT_HeapBlock_BinaryBlob *pThis = CLR_RT_HeapBlock_BinaryBlob::GetBlob(ptr);
 
     if (pThis->DataType() != DATATYPE_BINARY_BLOB_HEAD)
       {
@@ -83,11 +83,11 @@ void CLR_RT_Memory::Release(void* ptr)
     else
       {
 #if defined(NANOCLR_FILL_MEMORY_WITH_DIRTY_PATTERN)
-      CLR_UINT32 len = *(CLR_UINT32*)ptr;
-      CLR_UINT8* blk;
+      CLR_UINT32 len = *(CLR_UINT32 *)ptr;
+      CLR_UINT8 *blk;
       CLR_UINT32 pos;
 
-      for (pos = 0, blk = (CLR_UINT8*)ptr + sizeof(len); pos < c_extra; pos++, blk++)
+      for (pos = 0, blk = (CLR_UINT8 *)ptr + sizeof(len); pos < c_extra; pos++, blk++)
         {
         if (*blk != 0xDD)
           {
@@ -96,7 +96,7 @@ void CLR_RT_Memory::Release(void* ptr)
           }
         }
 
-      for (pos = 0, blk = (CLR_UINT8*)ptr + len - c_extra; pos < c_extra; pos++, blk++)
+      for (pos = 0, blk = (CLR_UINT8 *)ptr + len - c_extra; pos < c_extra; pos++, blk++)
         {
         if (*blk != 0xDD)
           {
@@ -116,13 +116,13 @@ void CLR_RT_Memory::Release(void* ptr)
     }
   }
 
-void* CLR_RT_Memory::Allocate(size_t len, CLR_UINT32 flags)
+void *CLR_RT_Memory::Allocate(size_t len, CLR_UINT32 flags)
   {
   NATIVE_PROFILE_CLR_CORE();
 
   if (s_CLR_RT_Heap.m_size == 0)
     {
-    unsigned char* heapStart = NULL;
+    unsigned char *heapStart = NULL;
     unsigned int heapSize = 0;
 
     ::HeapLocation(heapStart, heapSize);
@@ -148,10 +148,10 @@ void* CLR_RT_Memory::Allocate(size_t len, CLR_UINT32 flags)
   len += c_extra * 2 + sizeof(CLR_UINT32);
 #endif
 
-  CLR_RT_HeapBlock_BinaryBlob* obj = CLR_RT_HeapBlock_BinaryBlob::Allocate((CLR_UINT32)len, flags);
+  CLR_RT_HeapBlock_BinaryBlob *obj = CLR_RT_HeapBlock_BinaryBlob::Allocate((CLR_UINT32)len, flags);
   if (obj)
     {
-    void* res = obj->GetData();
+    void *res = obj->GetData();
 
 #if defined(NANOCLR_TRACE_MALLOC)
     s_TotalAllocated += obj->DataSize();
@@ -161,7 +161,7 @@ void* CLR_RT_Memory::Allocate(size_t len, CLR_UINT32 flags)
 #if defined(NANOCLR_FILL_MEMORY_WITH_DIRTY_PATTERN)
     memset(res, 0xDD, len);
 
-    *(CLR_UINT32*)res = (CLR_UINT32)len;
+    *(CLR_UINT32 *)res = (CLR_UINT32)len;
 
     DEBUG_POINTER_INCREMENT(res, c_extra + sizeof(CLR_UINT32));
 #endif
@@ -172,10 +172,10 @@ void* CLR_RT_Memory::Allocate(size_t len, CLR_UINT32 flags)
   return NULL;
   }
 
-void* CLR_RT_Memory::Allocate_And_Erase(size_t len, CLR_UINT32 flags)
+void *CLR_RT_Memory::Allocate_And_Erase(size_t len, CLR_UINT32 flags)
   {
   NATIVE_PROFILE_CLR_CORE();
-  void* ptr = CLR_RT_Memory::Allocate(len, flags);
+  void *ptr = CLR_RT_Memory::Allocate(len, flags);
 
   if (ptr) ZeroFill(ptr, len);
 
@@ -183,16 +183,16 @@ void* CLR_RT_Memory::Allocate_And_Erase(size_t len, CLR_UINT32 flags)
   }
 
 
-void* CLR_RT_Memory::ReAllocate(void* ptr, size_t len)
+void *CLR_RT_Memory::ReAllocate(void *ptr, size_t len)
   {
   NATIVE_PROFILE_CLR_CORE();
 
   // allocate always as an event but do not run GC on failure
-  void* p = CLR_RT_Memory::Allocate(len, CLR_RT_HeapBlock::HB_Event | CLR_RT_HeapBlock::HB_NoGcOnFailedAllocation); if (!p) return NULL;
+  void *p = CLR_RT_Memory::Allocate(len, CLR_RT_HeapBlock::HB_Event | CLR_RT_HeapBlock::HB_NoGcOnFailedAllocation); if (!p) return NULL;
 
   if (ptr)
     {
-    CLR_RT_HeapBlock_BinaryBlob* pThis = CLR_RT_HeapBlock_BinaryBlob::GetBlob(ptr);
+    CLR_RT_HeapBlock_BinaryBlob *pThis = CLR_RT_HeapBlock_BinaryBlob::GetBlob(ptr);
 
     size_t prevLen = pThis->DataSize() * sizeof(CLR_RT_HeapBlock);
 

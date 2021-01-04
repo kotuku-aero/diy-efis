@@ -4,22 +4,22 @@
 // See LICENSE file in the project root for full license information.
 //
 
-#include <nanoPAL.h>
+#include "../Include/nanoPAL.h"
 
 //--//
 
 // continuation list
-__nfweak void HAL_CONTINUATION::InitializeList()
+void HAL_CONTINUATION::InitializeList()
 {
     NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
 }
 
-__nfweak void HAL_CONTINUATION::Uninitialize()
+void HAL_CONTINUATION::Uninitialize()
 {
     NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
 }
 
-__nfweak void HAL_CONTINUATION::InitializeCallback( HAL_CALLBACK_FPN entryPoint, void* argument )
+void HAL_CONTINUATION::InitializeCallback( HAL_CALLBACK_FPN entryPoint, void* argument )
 {
     (void)entryPoint;
     (void)argument;
@@ -27,23 +27,23 @@ __nfweak void HAL_CONTINUATION::InitializeCallback( HAL_CALLBACK_FPN entryPoint,
     NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
 }
 
-__nfweak void HAL_CONTINUATION::Enqueue()
+void HAL_CONTINUATION::Enqueue()
 {
     NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
 }
 
-__nfweak void HAL_CONTINUATION::Abort  ()
+void HAL_CONTINUATION::Abort  ()
 {
     NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
 }
 
-__nfweak bool HAL_CONTINUATION::Dequeue_And_Execute()
+bool HAL_CONTINUATION::Dequeue_And_Execute()
 {
     NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
     return TRUE;
 }
 
-__nfweak bool HAL_CONTINUATION::IsLinked()
+bool HAL_CONTINUATION::IsLinked()
 {
     NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
     return false;
@@ -52,46 +52,46 @@ __nfweak bool HAL_CONTINUATION::IsLinked()
 //-//
 // completion list
 
-__nfweak void HAL_COMPLETION::InitializeList()
+void HAL_COMPLETION::InitializeList()
 {
     NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
 }
 
-__nfweak void HAL_COMPLETION::Uninitialize()
+void HAL_COMPLETION::Uninitialize()
 {
     NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
 }
 
-__nfweak void HAL_COMPLETION::EnqueueTicks( uint64_t eventTimeTicks)
+void HAL_COMPLETION::EnqueueTicks( uint64_t eventTimeTicks)
 {
     (void)eventTimeTicks;
 
     NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
 }
 
-__nfweak void HAL_COMPLETION::EnqueueDelta( uint32_t uSecFromNow )
+void HAL_COMPLETION::EnqueueDelta( uint32_t uSecFromNow )
 {
     (void)uSecFromNow;
 
     NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
 }
 
-__nfweak void HAL_COMPLETION::Abort()
+void HAL_COMPLETION::Abort()
 {
     NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
 }
 
-__nfweak void HAL_COMPLETION::Execute()
+void HAL_COMPLETION::Execute()
 {
     NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
 }
 
-__nfweak void HAL_COMPLETION::DequeueAndExec()
+void HAL_COMPLETION::DequeueAndExec()
 {
     NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
 }
 
-__nfweak void HAL_COMPLETION::WaitForInterrupts( uint64_t expireTimeInSysTicks, uint32_t sleepLevel, uint64_t wakeEvents )
+void HAL_COMPLETION::WaitForInterrupts( uint64_t expireTimeInSysTicks, uint32_t sleepLevel, uint64_t wakeEvents )
 {
     (void)expireTimeInSysTicks;
     (void)sleepLevel;

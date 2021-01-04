@@ -6,20 +6,20 @@
 
 #include "corlib_native.h"
 #include <ctype.h>
-#include <base64.h>
+#include "../Helpers/Base64/base64.h"
 
-HRESULT Library_corlib_native_System_Convert::NativeToInt64___STATIC__I8__STRING__BOOLEAN__I8__I8__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_Convert::NativeToInt64___STATIC__I8__STRING__BOOLEAN__I8__I8__I4(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER();
   {
   int64_t result = 0;
 
-  char* str = (char*)stack.Arg0().RecoverString();
+  char *str = (char *)stack.Arg0().RecoverString();
   signed int radix = stack.Arg4().NumericByRef().s4;
 
 #if (SUPPORT_ANY_BASE_CONVERSION == TRUE)
   // suport for conversion from any base
-  char* endptr = NULL;
+  char *endptr = NULL;
 
   bool isUInt64 = false;
 
@@ -133,11 +133,11 @@ HRESULT Library_corlib_native_System_Convert::NativeToInt64___STATIC__I8__STRING
 
   }
 
-HRESULT Library_corlib_native_System_Convert::NativeToDouble___STATIC__R8__STRING(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_Convert::NativeToDouble___STATIC__R8__STRING(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER();
   {
-  char* str = (char*)stack.Arg0().RecoverString();
+  char *str = (char *)stack.Arg0().RecoverString();
 
 #if (SUPPORT_ANY_BASE_CONVERSION == TRUE)
   // suport for conversion from any base
@@ -160,7 +160,7 @@ HRESULT Library_corlib_native_System_Convert::NativeToDouble___STATIC__R8__STRIN
   double returnValue = 0.0;
 
   // first pass, get count of decimal places, integer part and check for valid chars
-  char* temp = str;
+  char *temp = str;
   while (*temp != '\0')
     {
     switch (*temp)
@@ -324,34 +324,34 @@ HRESULT Library_corlib_native_System_Convert::NativeToDouble___STATIC__R8__STRIN
 
   }
 
-HRESULT Library_corlib_native_System_Convert::ToBase64String___STATIC__STRING__SZARRAY_U1__I4__I4__BOOLEAN(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_Convert::ToBase64String___STATIC__STRING__SZARRAY_U1__I4__I4__BOOLEAN(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER();
 
   size_t outputLength;
-  char* outArray = NULL;
-  char* outArrayWitLineBreak = NULL;
-  uint8_t* inArrayPointer = NULL;
+  char *outArray = NULL;
+  char *outArrayWitLineBreak = NULL;
+  uint8_t *inArrayPointer = NULL;
   uint8_t lineBreakCount;
   uint16_t offsetIndex = 0;
   uint8_t count = 0;
   uint16_t result;
 
-  CLR_RT_HeapBlock_Array* inArray = stack.Arg0().DereferenceArray();
+  CLR_RT_HeapBlock_Array *inArray = stack.Arg0().DereferenceArray();
   size_t offset = (size_t)stack.Arg1().NumericByRef().s4;
   size_t length = (size_t)stack.Arg2().NumericByRef().s4;
   bool insertLineBreaks = (bool)stack.Arg3().NumericByRefConst().u1;
 
   if (inArray == NULL) NANOCLR_SET_AND_LEAVE(CLR_E_ARGUMENT_NULL);
 
-  inArrayPointer = (uint8_t*)inArray->GetFirstElement();
+  inArrayPointer = (uint8_t *)inArray->GetFirstElement();
   inArrayPointer += (offset * sizeof(uint8_t));
 
   // compute base64 string length
   outputLength = 4 * ((length + 2) / 3);
 
   // need malloc with base64 string length plus string terminator (+1)
-  outArray = (char*)platform_malloc(outputLength + 1);
+  outArray = (char *)platform_malloc(outputLength + 1);
 
   // check if have allocation
   if (outArray == NULL) NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_MEMORY);
@@ -359,7 +359,7 @@ HRESULT Library_corlib_native_System_Convert::ToBase64String___STATIC__STRING__S
   // perform the operation
   // need to tweak the parameter with the output length because it includes room for the terminator
   result = mbedtls_base64_encode(
-    (unsigned char*)outArray,
+    (unsigned char *)outArray,
     (outputLength + 1),
     &outputLength,
     inArrayPointer,
@@ -377,7 +377,7 @@ HRESULT Library_corlib_native_System_Convert::ToBase64String___STATIC__STRING__S
     lineBreakCount = outputLength / 76;
 
     // need malloc with base64 string length plus line breaks (line break is 2 char long: CR + LF) plus final line break
-    outArrayWitLineBreak = (char*)platform_malloc(outputLength + (lineBreakCount * 2) + 2);
+    outArrayWitLineBreak = (char *)platform_malloc(outputLength + (lineBreakCount * 2) + 2);
 
     for (int i = 0; i <= lineBreakCount; i++)
       {
@@ -430,30 +430,30 @@ HRESULT Library_corlib_native_System_Convert::ToBase64String___STATIC__STRING__S
     }
 
   // need to free memory from arrays
-  platform_free((void*)outArray);
+  platform_free((void *)outArray);
 
   if (outArrayWitLineBreak != NULL)
     {
-    platform_free((void*)outArrayWitLineBreak);
+    platform_free((void *)outArrayWitLineBreak);
     }
 
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Convert::FromBase64CharArray___STATIC__SZARRAY_U1__SZARRAY_CHAR__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_Convert::FromBase64CharArray___STATIC__SZARRAY_U1__SZARRAY_CHAR__I4(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER();
 
   size_t outputLength;
-  char* outArray = NULL;
-  uint16_t* inArrayPointerTmp = NULL;
-  uint8_t* inArrayPointer = NULL;
+  char *outArray = NULL;
+  uint16_t *inArrayPointerTmp = NULL;
+  uint8_t *inArrayPointer = NULL;
   uint8_t charValue;
-  CLR_UINT8* returnArray;
+  CLR_UINT8 *returnArray;
   int16_t i = 0;
   uint16_t result;
 
-  CLR_RT_HeapBlock_Array* inArray = stack.Arg0().DereferenceArray();
+  CLR_RT_HeapBlock_Array *inArray = stack.Arg0().DereferenceArray();
   size_t length = (size_t)stack.Arg1().NumericByRef().s4;
 
   if (inArray == NULL) NANOCLR_SET_AND_LEAVE(CLR_E_ARGUMENT_NULL);
@@ -461,8 +461,8 @@ HRESULT Library_corlib_native_System_Convert::FromBase64CharArray___STATIC__SZAR
   outputLength = length / 4 * 3;
 
   // transform the 16 bits inArray to a 8 bits array so mbed knows how to convert it
-  inArrayPointerTmp = (uint16_t*)inArray->GetFirstElementUInt16();
-  inArrayPointer = (uint8_t*)inArray->GetFirstElement();
+  inArrayPointerTmp = (uint16_t *)inArray->GetFirstElementUInt16();
+  inArrayPointer = (uint8_t *)inArray->GetFirstElement();
   for (i = 0; i < (int16_t)length; i++)
     {
     *inArrayPointer = *inArrayPointerTmp;
@@ -492,14 +492,14 @@ HRESULT Library_corlib_native_System_Convert::FromBase64CharArray___STATIC__SZAR
   // reset pointer position (-2 because above we already went back two positions)
   inArrayPointer -= length - 2;
 
-  outArray = (char*)platform_malloc(outputLength + 1);
+  outArray = (char *)platform_malloc(outputLength + 1);
   // check malloc success
   if (outArray == NULL) NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_MEMORY);
 
   // perform the operation
   // need to tweak the parameter with the output length because it includes room for the terminator
   result = mbedtls_base64_decode(
-    (unsigned char*)outArray,
+    (unsigned char *)outArray,
     (outputLength + 1),
     &outputLength,
     inArrayPointer,
@@ -526,7 +526,7 @@ HRESULT Library_corlib_native_System_Convert::FromBase64CharArray___STATIC__SZAR
   NANOCLR_NOCLEANUP();
   }
 
-double Library_corlib_native_System_Convert::GetDoubleFractionalPart(char* str, int length)
+double Library_corlib_native_System_Convert::GetDoubleFractionalPart(char *str, int length)
   {
   double place = 1;
   double returnValue = 0.0;
@@ -542,7 +542,7 @@ double Library_corlib_native_System_Convert::GetDoubleFractionalPart(char* str, 
   return returnValue;
   }
 
-int64_t Library_corlib_native_System_Convert::GetIntegerPart(char* str, int length)
+int64_t Library_corlib_native_System_Convert::GetIntegerPart(char *str, int length)
   {
   int64_t returnValue = 0;
 
@@ -561,7 +561,7 @@ int64_t Library_corlib_native_System_Convert::GetIntegerPart(char* str, int leng
   return returnValue;
   }
 
-int64_t Library_corlib_native_System_Convert::GetIntegerFromHexString(char* str)
+int64_t Library_corlib_native_System_Convert::GetIntegerFromHexString(char *str)
   {
   int64_t returnValue = 0;
 

@@ -7,24 +7,24 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-__nfweak CLR_Messaging* g_CLR_Messaging;
+CLR_Messaging* g_CLR_Messaging;
 
-__nfweak CLR_UINT32     g_scratchMessaging[sizeof(CLR_Messaging)];
+CLR_UINT32     g_scratchMessaging[sizeof(CLR_Messaging)];
 
-__nfweak HRESULT CLR_Messaging::CreateInstance()
+HRESULT CLR_Messaging::CreateInstance()
   {
   NATIVE_PROFILE_CLR_MESSAGING();
   g_CLR_Messaging = (CLR_Messaging*)&g_scratchMessaging[0];
   NANOCLR_SYSTEM_STUB_RETURN();
   }
 
-__nfweak HRESULT CLR_Messaging::DeleteInstance()
+HRESULT CLR_Messaging::DeleteInstance()
   {
   NATIVE_PROFILE_CLR_MESSAGING();
   NANOCLR_SYSTEM_STUB_RETURN();
   }
 
-__nfweak bool CLR_Messaging::SendEvent(unsigned int cmd, unsigned int payloadSize, unsigned char* payload, unsigned int flags)
+bool CLR_Messaging::SendEvent(unsigned int cmd, unsigned int payloadSize, unsigned char* payload, unsigned int flags)
   {
   (void)cmd;
   (void)payloadSize;
@@ -35,7 +35,7 @@ __nfweak bool CLR_Messaging::SendEvent(unsigned int cmd, unsigned int payloadSiz
   return true;
   }
 
-__nfweak void CLR_Messaging::Initialize(const CLR_Messaging_CommandHandlerLookup* requestLookup, const CLR_UINT32 requestLookupCount, const CLR_Messaging_CommandHandlerLookup* replyLookup, const CLR_UINT32 replyLookupCount)
+void CLR_Messaging::Initialize(const CLR_Messaging_CommandHandlerLookup* requestLookup, const CLR_UINT32 requestLookupCount, const CLR_Messaging_CommandHandlerLookup* replyLookup, const CLR_UINT32 replyLookupCount)
   {
   (void)requestLookup;
   (void)requestLookupCount;
@@ -45,7 +45,7 @@ __nfweak void CLR_Messaging::Initialize(const CLR_Messaging_CommandHandlerLookup
   NATIVE_PROFILE_CLR_MESSAGING();
   }
 
-__nfweak void CLR_Messaging::Cleanup()
+void CLR_Messaging::Cleanup()
   {
   NATIVE_PROFILE_CLR_MESSAGING();
   }

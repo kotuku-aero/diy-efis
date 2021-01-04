@@ -7,14 +7,14 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-CLR_RT_ProtectFromGC* CLR_RT_ProtectFromGC::s_first = NULL;
+CLR_RT_ProtectFromGC *CLR_RT_ProtectFromGC::s_first = NULL;
 
-void CLR_RT_ProtectFromGC::Initialize(CLR_RT_HeapBlock& ref)
+void CLR_RT_ProtectFromGC::Initialize(CLR_RT_HeapBlock &ref)
   {
   NATIVE_PROFILE_CLR_CORE();
   m_next = s_first; s_first = this;
 
-  m_data = (void**)&ref;
+  m_data = (void **)&ref;
   m_fpn = NULL;
 
   if (ref.IsForcedAlive())
@@ -29,7 +29,7 @@ void CLR_RT_ProtectFromGC::Initialize(CLR_RT_HeapBlock& ref)
     }
   }
 
-void CLR_RT_ProtectFromGC::Initialize(void** data, Callback fpn)
+void CLR_RT_ProtectFromGC::Initialize(void **data, Callback fpn)
   {
   NATIVE_PROFILE_CLR_CORE();
   m_next = s_first; s_first = this;
@@ -46,7 +46,7 @@ void CLR_RT_ProtectFromGC::Cleanup()
 
   if (m_flags & c_ResetKeepAlive)
     {
-    CLR_RT_HeapBlock* obj = (CLR_RT_HeapBlock*)m_data;
+    CLR_RT_HeapBlock *obj = (CLR_RT_HeapBlock *)m_data;
 
     obj->UnmarkForcedAlive();
     }
@@ -61,14 +61,14 @@ void CLR_RT_ProtectFromGC::Invoke()
     }
   else if (m_data)
     {
-    g_CLR_RT_GarbageCollector.CheckMultipleBlocks((CLR_RT_HeapBlock*)m_data, 1);
+    g_CLR_RT_GarbageCollector.CheckMultipleBlocks((CLR_RT_HeapBlock *)m_data, 1);
     }
   }
 
 void CLR_RT_ProtectFromGC::InvokeAll()
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_ProtectFromGC* ptr;
+  CLR_RT_ProtectFromGC *ptr;
 
   ptr = s_first;
   while (ptr)
@@ -83,9 +83,9 @@ void CLR_RT_ProtectFromGC::InvokeAll()
 
 #if defined(NANOCLR_TRACE_EARLYCOLLECTION)
 
-CLR_RT_AssertEarlyCollection* CLR_RT_AssertEarlyCollection::s_first = NULL;
+CLR_RT_AssertEarlyCollection *CLR_RT_AssertEarlyCollection::s_first = NULL;
 
-CLR_RT_AssertEarlyCollection::CLR_RT_AssertEarlyCollection(CLR_RT_HeapBlock* ptr)
+CLR_RT_AssertEarlyCollection::CLR_RT_AssertEarlyCollection(CLR_RT_HeapBlock *ptr)
   {
   NATIVE_PROFILE_CLR_CORE();
   m_next = s_first; s_first = this;
@@ -105,10 +105,10 @@ void CLR_RT_AssertEarlyCollection::Cancel()
   m_ptr = NULL;
   }
 
-void CLR_RT_AssertEarlyCollection::CheckAll(CLR_RT_HeapBlock* ptr)
+void CLR_RT_AssertEarlyCollection::CheckAll(CLR_RT_HeapBlock *ptr)
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_AssertEarlyCollection* node;
+  CLR_RT_AssertEarlyCollection *node;
 
   node = s_first;
   while (node)
@@ -181,8 +181,8 @@ CLR_UINT32 CLR_RT_GarbageCollector::ExecuteGarbageCollection()
 
     NANOCLR_FOREACH_NODE(CLR_RT_HeapCluster, hc, g_CLR_RT_ExecutionEngine.m_heap)
       {
-      CLR_RT_HeapBlock_Node* ptr = hc->m_payloadStart;
-      CLR_RT_HeapBlock_Node* end = hc->m_payloadEnd;
+      CLR_RT_HeapBlock_Node *ptr = hc->m_payloadStart;
+      CLR_RT_HeapBlock_Node *end = hc->m_payloadEnd;
 
       while (ptr < end)
         {
@@ -193,7 +193,7 @@ CLR_UINT32 CLR_RT_GarbageCollector::ExecuteGarbageCollection()
 
           if (dt == DATATYPE_SZARRAY)
             {
-            CLR_RT_HeapBlock_Array* arr = (CLR_RT_HeapBlock_Array*)ptr;
+            CLR_RT_HeapBlock_Array *arr = (CLR_RT_HeapBlock_Array *)ptr;
 
             if (arr != NULL)
               {
@@ -270,13 +270,13 @@ void CLR_RT_GarbageCollector::MarkSlow()
     //go through managed heap.
     //find all objects that are not alive but are pointed to by a live object
     //put them on the markstack.
-    for (CLR_RT_HeapCluster* hc = (CLR_RT_HeapCluster*)g_CLR_RT_ExecutionEngine.m_heap.FirstNode();
+    for (CLR_RT_HeapCluster *hc = (CLR_RT_HeapCluster *)g_CLR_RT_ExecutionEngine.m_heap.FirstNode();
       hc->Next();
-      hc = (CLR_RT_HeapCluster*)hc->Next()
+      hc = (CLR_RT_HeapCluster *)hc->Next()
       )
       {
-      CLR_RT_HeapBlock* ptr = hc->m_payloadStart;
-      CLR_RT_HeapBlock* end = hc->m_payloadEnd;
+      CLR_RT_HeapBlock *ptr = hc->m_payloadStart;
+      CLR_RT_HeapBlock *end = hc->m_payloadEnd;
 
       while (ptr < end)
         {
@@ -295,7 +295,7 @@ void CLR_RT_GarbageCollector::Mark()
   {
   NATIVE_PROFILE_CLR_CORE();
 #if defined(NANOCLR_VALIDATE_APPDOMAIN_ISOLATION)
-  CLR_RT_AppDomain* appDomainSav = g_CLR_RT_ExecutionEngine.GetCurrentAppDomain();
+  CLR_RT_AppDomain *appDomainSav = g_CLR_RT_ExecutionEngine.GetCurrentAppDomain();
 #endif
 
   //
@@ -334,7 +334,7 @@ void CLR_RT_GarbageCollector::Mark()
 
   CLR_RT_ProtectFromGC::InvokeAll();
 
-  g_CLR_HW_Hardware.PrepareForGC();
+  // g_CLR_HW_Hardware.PrepareForGC();
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -434,9 +434,9 @@ void CLR_RT_GarbageCollector::Mark()
   _ASSERTE(m_markStackList == &markStackList);
   _ASSERTE(m_markStack == &markStack);
 
-  while ((MarkStack*)m_markStackList->LastValidNode() != m_markStack)
+  while ((MarkStack *)m_markStackList->LastValidNode() != m_markStack)
     {
-    MarkStack* markStackT = (MarkStack*)m_markStackList->LastValidNode();
+    MarkStack *markStackT = (MarkStack *)m_markStackList->LastValidNode();
 
     markStackT->RemoveFromList();
 
@@ -507,14 +507,14 @@ void CLR_RT_GarbageCollector::Sweep()
   NANOCLR_FOREACH_NODE(CLR_RT_HeapBlock_Delegate_List, weak, m_weakDelegates_Reachable)
     {
     CLR_UINT32        num = weak->m_length;
-    CLR_RT_HeapBlock* dlgs = weak->GetDelegates();
+    CLR_RT_HeapBlock *dlgs = weak->GetDelegates();
 
     for (; num--; dlgs++)
       {
-      CLR_RT_HeapBlock_Delegate* dlg = dlgs->DereferenceDelegate();
+      CLR_RT_HeapBlock_Delegate *dlg = dlgs->DereferenceDelegate();
       if (dlg)
         {
-        CLR_RT_HeapBlock* obj = dlg->m_object.Dereference();
+        CLR_RT_HeapBlock *obj = dlg->m_object.Dereference();
         if (obj && obj->IsAlive() == false)
           {
           //
@@ -592,7 +592,7 @@ void CLR_RT_GarbageCollector::CheckMemoryPressure()
             CLR_RT_ReflectionDef_Index val;
             CLR_RT_TypeDef_Instance    inst;
             char                       rgBuffer[512];
-            char* szBuffer = rgBuffer;
+            char *szBuffer = rgBuffer;
             size_t                     iBuffer = MAXSTRLEN(rgBuffer);
 
             CLR_Debug::Printf("DROPPING OBJECT ");
@@ -667,7 +667,7 @@ void CLR_RT_GarbageCollector::Assembly_Mark()
 
 //--//
 
-void CLR_RT_GarbageCollector::Thread_Mark(CLR_RT_Thread* th)
+void CLR_RT_GarbageCollector::Thread_Mark(CLR_RT_Thread *th)
   {
   NATIVE_PROFILE_CLR_CORE();
 #if defined(NANOCLR_VALIDATE_APPDOMAIN_ISOLATION)
@@ -682,7 +682,7 @@ void CLR_RT_GarbageCollector::Thread_Mark(CLR_RT_Thread* th)
 
   for (int i = 0; i < th->m_nestedExceptionsPos; i++)
     {
-    CLR_RT_Thread::UnwindStack& us = th->m_nestedExceptions[i];
+    CLR_RT_Thread::UnwindStack &us = th->m_nestedExceptions[i];
 
 #if defined(NANOCLR_VALIDATE_APPDOMAIN_ISOLATION)                    
     (void)g_CLR_RT_ExecutionEngine.SetCurrentAppDomain(us.m_stack->m_appDomain);
@@ -733,7 +733,7 @@ void CLR_RT_GarbageCollector::Thread_Mark(CLR_RT_Thread* th)
 #endif
 
   {
-  CLR_RT_HeapBlock_WaitForObject* wait = th->m_waitForObject;
+  CLR_RT_HeapBlock_WaitForObject *wait = th->m_waitForObject;
 
   if (wait)
     {
@@ -742,7 +742,7 @@ void CLR_RT_GarbageCollector::Thread_Mark(CLR_RT_Thread* th)
   }
   }
 
-void CLR_RT_GarbageCollector::Thread_Mark(CLR_RT_DblLinkedList& threads)
+void CLR_RT_GarbageCollector::Thread_Mark(CLR_RT_DblLinkedList &threads)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_FOREACH_NODE(CLR_RT_Thread, th, threads)
@@ -807,10 +807,10 @@ CLR_UINT32 CLR_RT_GarbageCollector::Heap_ComputeAliveVsDeadRatio()
 
   NANOCLR_FOREACH_NODE(CLR_RT_HeapCluster, hc, g_CLR_RT_ExecutionEngine.m_heap)
     {
-    CLR_RT_HeapBlock_Node* ptr = hc->m_payloadStart;
-    CLR_RT_HeapBlock_Node* end = hc->m_payloadEnd;
+    CLR_RT_HeapBlock_Node *ptr = hc->m_payloadStart;
+    CLR_RT_HeapBlock_Node *end = hc->m_payloadEnd;
 
-    totalBytes += (CLR_UINT32)((CLR_UINT8*)end - (CLR_UINT8*)ptr);
+    totalBytes += (CLR_UINT32)((CLR_UINT8 *)end - (CLR_UINT8 *)ptr);
 
     NANOCLR_FOREACH_NODE_BACKWARD(CLR_RT_HeapBlock_Node, ptrFree, hc->m_freeList)
       {

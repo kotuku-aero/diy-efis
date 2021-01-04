@@ -5,7 +5,7 @@
 //
 
 #include "CorLib.h"
-#include <nanoCLR_Interop.h>
+#include "../Include/nanoCLR_Interop.h"
 
 ///////////////////////////////////////////////////////////////////////
 // !!! KEEP IN SYNC WITH DateTime.DateTimePart (in managed code) !!! //
@@ -30,12 +30,12 @@ enum DateTimePart
 CLR_INT64 s_UTCMask = ULONGLONGCONSTANT(0x8000000000000000);
 CLR_INT64 s_TickMask = ULONGLONGCONSTANT(0x7FFFFFFFFFFFFFFF);
 
-HRESULT Library_corlib_native_System_DateTime::_ctor___VOID__I4__I4__I4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_DateTime::_ctor___VOID__I4__I4__I4__I4__I4__I4__I4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock* pArg = &(stack.Arg1());
+  CLR_RT_HeapBlock *pArg = &(stack.Arg1());
   SYSTEMTIME        st;
 
   NANOCLR_CLEAR(st);
@@ -75,7 +75,7 @@ HRESULT Library_corlib_native_System_DateTime::_ctor___VOID__I4__I4__I4__I4__I4_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_DateTime::GetDateTimePart___I4__SystemDateTimeDateTimePart(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_DateTime::GetDateTimePart___I4__SystemDateTimeDateTimePart(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -141,7 +141,7 @@ HRESULT Library_corlib_native_System_DateTime::GetDateTimePart___I4__SystemDateT
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_DateTime::DaysInMonth___STATIC__I4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_DateTime::DaysInMonth___STATIC__I4__I4__I4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -157,15 +157,15 @@ HRESULT Library_corlib_native_System_DateTime::DaysInMonth___STATIC__I4__I4__I4(
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_DateTime::get_UtcNow___STATIC__SystemDateTime(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_DateTime::get_UtcNow___STATIC__SystemDateTime(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
   CLR_RT_TypeDescriptor dtType;
-  CLR_INT64* val;
+  CLR_INT64 *val;
 
-  CLR_RT_HeapBlock& ref = stack.PushValue();
+  CLR_RT_HeapBlock &ref = stack.PushValue();
 
   // initialize <DateTime> type descriptor
   NANOCLR_CHECK_HRESULT(dtType.InitializeFromType(g_CLR_RT_WellKnownTypes.m_DateTime));
@@ -182,15 +182,15 @@ HRESULT Library_corlib_native_System_DateTime::get_UtcNow___STATIC__SystemDateTi
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_DateTime::get_Today___STATIC__SystemDateTime(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_DateTime::get_Today___STATIC__SystemDateTime(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
   CLR_RT_TypeDescriptor dtType;
-  CLR_INT64* val;
+  CLR_INT64 *val;
 
-  CLR_RT_HeapBlock& ref = stack.PushValue();
+  CLR_RT_HeapBlock &ref = stack.PushValue();
 
   // initialize <DateTime> type descriptor
   NANOCLR_CHECK_HRESULT(dtType.InitializeFromType(g_CLR_RT_WellKnownTypes.m_DateTime));
@@ -209,16 +209,16 @@ HRESULT Library_corlib_native_System_DateTime::get_Today___STATIC__SystemDateTim
 
 //--//
 
-CLR_INT64* Library_corlib_native_System_DateTime::GetValuePtr(CLR_RT_StackFrame& stack)
+CLR_INT64 *Library_corlib_native_System_DateTime::GetValuePtr(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   return GetValuePtr(stack.Arg0());
   }
 
-CLR_INT64* Library_corlib_native_System_DateTime::GetValuePtr(CLR_RT_HeapBlock& ref)
+CLR_INT64 *Library_corlib_native_System_DateTime::GetValuePtr(CLR_RT_HeapBlock &ref)
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_HeapBlock* obj = &ref;
+  CLR_RT_HeapBlock *obj = &ref;
   CLR_DataType      dt = obj->DataType();
 
   if (dt == DATATYPE_OBJECT || dt == DATATYPE_BYREF)
@@ -237,26 +237,26 @@ CLR_INT64* Library_corlib_native_System_DateTime::GetValuePtr(CLR_RT_HeapBlock& 
 
   if (dt == DATATYPE_DATETIME)
     {
-    return (CLR_INT64*)&obj->NumericByRef().s8;
+    return (CLR_INT64 *)&obj->NumericByRef().s8;
     }
 
   if (dt == DATATYPE_I8)
     {
-    return (CLR_INT64*)&obj->NumericByRef().s8;
+    return (CLR_INT64 *)&obj->NumericByRef().s8;
     }
 
   if (dt == DATATYPE_VALUETYPE && obj->ObjectCls().m_data == g_CLR_RT_WellKnownTypes.m_DateTime.m_data)
     {
-    return (CLR_INT64*)&obj[FIELD___ticks].NumericByRef().s8;
+    return (CLR_INT64 *)&obj[FIELD___ticks].NumericByRef().s8;
     }
 
   return NULL;
   }
 
-bool Library_corlib_native_System_DateTime::Expand(CLR_RT_StackFrame& stack, SYSTEMTIME& st)
+bool Library_corlib_native_System_DateTime::Expand(CLR_RT_StackFrame &stack, SYSTEMTIME &st)
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_INT64* val = GetValuePtr(stack);
+  CLR_INT64 *val = GetValuePtr(stack);
 
   if (val)
     {
@@ -270,10 +270,10 @@ bool Library_corlib_native_System_DateTime::Expand(CLR_RT_StackFrame& stack, SYS
   }
 
 // Compress function always creates UTC time.
-void Library_corlib_native_System_DateTime::Compress(CLR_RT_StackFrame& stack, const SYSTEMTIME& st)
+void Library_corlib_native_System_DateTime::Compress(CLR_RT_StackFrame &stack, const SYSTEMTIME &st)
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_INT64* val = GetValuePtr(stack);
+  CLR_INT64 *val = GetValuePtr(stack);
 
   if (val)
     {

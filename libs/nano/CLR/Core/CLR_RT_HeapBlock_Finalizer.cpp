@@ -7,7 +7,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HRESULT CLR_RT_HeapBlock_Finalizer::CreateInstance(CLR_RT_HeapBlock* object, const CLR_RT_TypeDef_Instance& inst)
+HRESULT CLR_RT_HeapBlock_Finalizer::CreateInstance(CLR_RT_HeapBlock *object, const CLR_RT_TypeDef_Instance &inst)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -20,7 +20,7 @@ HRESULT CLR_RT_HeapBlock_Finalizer::CreateInstance(CLR_RT_HeapBlock* object, con
       {
       int                         pos = inst2.m_target->methods_First;
       int                         end = pos + inst2.m_target->vMethods_Num + inst2.m_target->iMethods_Num;
-      const CLR_RECORD_METHODDEF* md = inst2.m_assm->GetMethodDef(pos);
+      const CLR_RECORD_METHODDEF *md = inst2.m_assm->GetMethodDef(pos);
 
       for (; pos < end; pos++, md++)
         {
@@ -29,7 +29,7 @@ HRESULT CLR_RT_HeapBlock_Finalizer::CreateInstance(CLR_RT_HeapBlock* object, con
 
       if (pos < end)
         {
-        CLR_RT_HeapBlock_Finalizer* fin = EVENTCACHE_EXTRACT_NODE_NOALLOC(g_CLR_RT_EventCache, CLR_RT_HeapBlock_Finalizer, DATATYPE_FINALIZER_HEAD); CHECK_ALLOCATION(fin);
+        CLR_RT_HeapBlock_Finalizer *fin = EVENTCACHE_EXTRACT_NODE_NOALLOC(g_CLR_RT_EventCache, CLR_RT_HeapBlock_Finalizer, DATATYPE_FINALIZER_HEAD); CHECK_ALLOCATION(fin);
 
         fin->m_object = object;
 
@@ -52,17 +52,17 @@ HRESULT CLR_RT_HeapBlock_Finalizer::CreateInstance(CLR_RT_HeapBlock* object, con
 void CLR_RT_HeapBlock_Finalizer::Relocate()
   {
   NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_GarbageCollector::Heap_Relocate((void**)&m_object);
+  CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_object);
   }
 
-void CLR_RT_HeapBlock_Finalizer::SuppressFinalize(CLR_RT_HeapBlock* object)
+void CLR_RT_HeapBlock_Finalizer::SuppressFinalize(CLR_RT_HeapBlock *object)
   {
   NATIVE_PROFILE_CLR_CORE();
   RemoveInstance(object, g_CLR_RT_ExecutionEngine.m_finalizersAlive);
   RemoveInstance(object, g_CLR_RT_ExecutionEngine.m_finalizersPending);
   }
 
-void CLR_RT_HeapBlock_Finalizer::RemoveInstance(CLR_RT_HeapBlock* object, CLR_RT_DblLinkedList& lst)
+void CLR_RT_HeapBlock_Finalizer::RemoveInstance(CLR_RT_HeapBlock *object, CLR_RT_DblLinkedList &lst)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_FOREACH_NODE(CLR_RT_HeapBlock_Finalizer, fin, lst)

@@ -20,7 +20,6 @@
       <itemPath>input_capture.c</itemPath>
       <itemPath>uart.c</itemPath>
       <itemPath>yield.S</itemPath>
-      <itemPath>set_defaults.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

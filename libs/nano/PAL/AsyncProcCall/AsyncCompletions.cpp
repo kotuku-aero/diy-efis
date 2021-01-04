@@ -3,10 +3,7 @@
 // Portions Copyright (c) Microsoft Corporation.  All rights reserved.
 // See LICENSE file in the project root for full license information.
 //
-
-#include "stdafx.h"
-
-#include <nanoPAL.h>
+#include "../Include/nanoPAL.h"
 
 HAL_DblLinkedList<HAL_CONTINUATION> g_HAL_Completion_List;
 
@@ -57,7 +54,8 @@ void HAL_COMPLETION::DequeueAndExec()
 		// Current one expired ?
 		if (HAL_Time_CurrentTime() >= ptr->EventTimeTicks)
 		{
-			Events_Set(SYSTEM_EVENT_FLAG_SYSTEM_TIMER);
+			// TODO: make this call....
+			// Events_Set(SYSTEM_EVENT_FLAG_SYSTEM_TIMER);
 
 			ptr->Unlink();
 
@@ -205,7 +203,8 @@ void HAL_COMPLETION::WaitForInterrupts(uint64_t expireTimeInTicks, uint32_t slee
 	}
 
 	// Wait for next interrupt ( timer etc)
-	CPU_Sleep((SLEEP_LEVEL_type)sleepLevel, wakeEvents);
+	//CPU_Sleep((SLEEP_LEVEL_type)sleepLevel, wakeEvents);
+	CPU_Sleep();
 
 	if (state & (resetCompare | nilCompare))
 	{

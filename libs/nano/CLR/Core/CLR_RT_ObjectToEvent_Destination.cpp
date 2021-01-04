@@ -41,7 +41,7 @@ void CLR_RT_ObjectToEvent_Destination::DetachAll()
   NATIVE_PROFILE_CLR_CORE();
   while (true)
     {
-    CLR_RT_ObjectToEvent_Source* ref = (CLR_RT_ObjectToEvent_Source*)m_references.ExtractFirstNode(); if (!ref) break;
+    CLR_RT_ObjectToEvent_Source *ref = (CLR_RT_ObjectToEvent_Source *)m_references.ExtractFirstNode(); if (!ref) break;
 
     ref->Detach();
     }

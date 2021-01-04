@@ -53,12 +53,21 @@ CLR_RT_GarbageCollector    g_CLR_RT_GarbageCollector;
 
 CLR_RT_HeapBlock_CanFlyMsgDispatcher g_CLR_MessageDispatcher;
 
+static uint8_t *heap_base = 0;
+static size_t heap_size = 0;
+
 // this defines the RTL heap.
-void HeapLocation(unsigned char*& base_address, unsigned int& size_in_bytes)
+void HeapLocation(unsigned char *&base_address, unsigned int &size_in_bytes)
   {
-  // allocate 8mb of memory to the heap
-  size_in_bytes = 8192 * 1024 * 1024;
-  base_address = (uint8_t*)ion_malloc(size_in_bytes);
+  if (heap_base == 0)
+    {
+    // allocate 8mb of memory to the heap
+    heap_size = 8192 * 1024 * 1024;
+    heap_base = (uint8_t *)ion_malloc(heap_size);
+    }
+
+  base_address = heap_base;
+  size_in_bytes = heap_size;
   }
 
 

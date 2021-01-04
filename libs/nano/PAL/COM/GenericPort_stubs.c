@@ -5,8 +5,9 @@
 //
 
 #include <nanoPAL_COM.h>
+#include "../Include/nanoPAL_COM.h"
 
-__nfweak bool GenericPort_Initialize(int comPortNum)
+bool GenericPort_Initialize(int comPortNum)
 {
     (void)comPortNum;
 
@@ -14,7 +15,7 @@ __nfweak bool GenericPort_Initialize(int comPortNum)
     return true;
 }
 
-__nfweak bool GenericPort_Uninitialize(int comPortNum)
+bool GenericPort_Uninitialize(int comPortNum)
 {
     (void)comPortNum;
 
@@ -22,7 +23,7 @@ __nfweak bool GenericPort_Uninitialize(int comPortNum)
     return true;
 }
 
-__nfweak uint32_t GenericPort_Write(int comPortNum, const char* data, size_t size)
+uint32_t GenericPort_Write(int comPortNum, const char* data, size_t size)
 {
     (void)comPortNum;
     (void)data;
@@ -32,7 +33,7 @@ __nfweak uint32_t GenericPort_Write(int comPortNum, const char* data, size_t siz
     return 0;
 }
 
-__nfweak int GenericPort_Read(int comPortNum, char* data, size_t size)
+int GenericPort_Read(int comPortNum, char* data, size_t size)
 {
     (void)comPortNum;
     (void)data;
@@ -42,7 +43,7 @@ __nfweak int GenericPort_Read(int comPortNum, char* data, size_t size)
     return 0;
 }
 
-__nfweak bool GenericPort_Flush(int comPortNum)
+bool GenericPort_Flush(int comPortNum)
 {
     (void)comPortNum;
 
@@ -50,7 +51,7 @@ __nfweak bool GenericPort_Flush(int comPortNum)
     return true;
 }
 
-__nfweak bool GenericPort_IsSslSupported(int comPortNum)
+bool GenericPort_IsSslSupported(int comPortNum)
 {
     (void)comPortNum;
 
@@ -58,7 +59,7 @@ __nfweak bool GenericPort_IsSslSupported(int comPortNum)
     return false;
 }
 
-__nfweak bool GenericPort_UpgradeToSsl(int comPortNum, unsigned int flags) 
+bool GenericPort_UpgradeToSsl(int comPortNum, unsigned int flags) 
 {
     (void)comPortNum;
     (void)flags;
@@ -67,7 +68,7 @@ __nfweak bool GenericPort_UpgradeToSsl(int comPortNum, unsigned int flags)
     return false; 
 }
 
-__nfweak bool GenericPort_IsUsingSsl(int comPortNum)
+bool GenericPort_IsUsingSsl(int comPortNum)
 {
     (void)comPortNum;
 

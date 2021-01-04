@@ -12,13 +12,13 @@
 //  http://guid.one/guid/make
 
 
-HRESULT Library_corlib_native_System_Guid::GenerateNewGuid___STATIC__SZARRAY_U1(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_Guid::GenerateNewGuid___STATIC__SZARRAY_U1(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER();
 
   CLR_RT_Random       rand;
-  CLR_UINT8* buf;
-  CLR_RT_HeapBlock& top = stack.PushValueAndClear();
+  CLR_UINT8 *buf;
+  CLR_RT_HeapBlock &top = stack.PushValueAndClear();
 
   // Create a array of 16 bytes on top of stack to return
   NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_Array::CreateInstance(top, 16, g_CLR_RT_WellKnownTypes.m_UInt8));

@@ -5,17 +5,17 @@
 
 #include <nanoPAL_COM.h>
 
-__nfweak bool  Network_Initialize()
+bool  Network_Initialize()
 { 
     return true;
 };
 
-__nfweak bool  Network_Uninitialize()
+bool  Network_Uninitialize()
 {
     return true;
 };
 
-__nfweak void SOCKETS_CloseConnections()
+void SOCKETS_CloseConnections()
 {
     NATIVE_PROFILE_PAL_COM();
 }

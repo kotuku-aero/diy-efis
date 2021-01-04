@@ -21,4 +21,12 @@
 //#include <SPOT_hardware_native.h>
 #include "../Include/nanoCLR_Runtime__HeapBlock.h"
 
+#define VERSION_MAJOR 1
+#define VERSION_MINOR 0
+#define VERSION_BUILD 0
+#define VERSION_REVISION 0
+#define OEMSYSTEMINFOSTRING "CanFly"
+#define TARGETNAMESTRING "CanFly"
+#define PLATFORMNAMESTRING "nanoFramework"
+
 #endif // _NANOCLR_CORE_H_

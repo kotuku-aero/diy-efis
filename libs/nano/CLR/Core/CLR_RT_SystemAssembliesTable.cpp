@@ -8,10 +8,10 @@
 //#include <SPOT_native.h>
 //#include "nanoCLR_Interop.h"
 
-static const CLR_RT_NativeAssemblyData* LookUpAssemblyNativeDataByName
+static const CLR_RT_NativeAssemblyData *LookUpAssemblyNativeDataByName
 (
-  const CLR_RT_NativeAssemblyData** pAssembliesNativeData,
-  const char* lpszAssemblyName
+  const CLR_RT_NativeAssemblyData **pAssembliesNativeData,
+  const char *lpszAssemblyName
 )
   {
   // Just sanity check to avoid crash in strcmp if name is NULL.
@@ -32,9 +32,9 @@ static const CLR_RT_NativeAssemblyData* LookUpAssemblyNativeDataByName
   }
 
 
-const CLR_RT_NativeAssemblyData* GetAssemblyNativeData(const char* lpszAssemblyName)
+const CLR_RT_NativeAssemblyData *GetAssemblyNativeData(const char *lpszAssemblyName)
   {
-  extern const CLR_RT_NativeAssemblyData* g_CLR_InteropAssembliesNativeData[];
+  extern const CLR_RT_NativeAssemblyData *g_CLR_InteropAssembliesNativeData[];
 
   // This will return NULL if there is no registered interop assembly of that name
   return LookUpAssemblyNativeDataByName(

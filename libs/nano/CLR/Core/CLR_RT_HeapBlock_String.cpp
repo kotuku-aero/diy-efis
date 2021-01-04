@@ -7,18 +7,18 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-CLR_RT_HeapBlock_String* CLR_RT_HeapBlock_String::CreateInstance(CLR_RT_HeapBlock& reference, CLR_UINT32 length)
+CLR_RT_HeapBlock_String *CLR_RT_HeapBlock_String::CreateInstance(CLR_RT_HeapBlock &reference, CLR_UINT32 length)
   {
   NATIVE_PROFILE_CLR_CORE();
   CLR_UINT32               totLength = sizeof(CLR_RT_HeapBlock_String) + length + 1;
-  CLR_RT_HeapBlock_String* str;
+  CLR_RT_HeapBlock_String *str;
 
   reference.SetObjectReference(NULL);
 
-  str = (CLR_RT_HeapBlock_String*)g_CLR_RT_ExecutionEngine.ExtractHeapBytesForObjects(DATATYPE_STRING, 0, totLength);
+  str = (CLR_RT_HeapBlock_String *)g_CLR_RT_ExecutionEngine.ExtractHeapBytesForObjects(DATATYPE_STRING, 0, totLength);
   if (str)
     {
-    char* szText = (char*)&str[1]; szText[0] = 0;
+    char *szText = (char *)&str[1]; szText[0] = 0;
 
 #if defined(NANOCLR_NO_ASSEMBLY_STRINGS)
     str->SetStringText(szText);
@@ -32,7 +32,7 @@ CLR_RT_HeapBlock_String* CLR_RT_HeapBlock_String::CreateInstance(CLR_RT_HeapBloc
   return str;
   }
 
-HRESULT CLR_RT_HeapBlock_String::CreateInstance(CLR_RT_HeapBlock& reference, const char* szText)
+HRESULT CLR_RT_HeapBlock_String::CreateInstance(CLR_RT_HeapBlock &reference, const char *szText)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -44,33 +44,33 @@ HRESULT CLR_RT_HeapBlock_String::CreateInstance(CLR_RT_HeapBlock& reference, con
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT CLR_RT_HeapBlock_String::CreateInstance(CLR_RT_HeapBlock& reference, const char* szText, CLR_UINT32 length)
+HRESULT CLR_RT_HeapBlock_String::CreateInstance(CLR_RT_HeapBlock &reference, const char *szText, CLR_UINT32 length)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock_String* str;
-  char* szTextDst;
+  CLR_RT_HeapBlock_String *str;
+  char *szTextDst;
 
   str = CreateInstance(reference, length); CHECK_ALLOCATION(str);
 
-  szTextDst = (char*)str->StringText();
+  szTextDst = (char *)str->StringText();
 
   memcpy(szTextDst, szText, length); szTextDst[length] = 0;
 
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT CLR_RT_HeapBlock_String::CreateInstance(CLR_RT_HeapBlock& reference, const char* szText, CLR_RT_Assembly* assm)
+HRESULT CLR_RT_HeapBlock_String::CreateInstance(CLR_RT_HeapBlock &reference, const char *szText, CLR_RT_Assembly *assm)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock_String* str;
+  CLR_RT_HeapBlock_String *str;
 
   reference.SetObjectReference(NULL);
 
-  str = (CLR_RT_HeapBlock_String*)g_CLR_RT_ExecutionEngine.ExtractHeapBytesForObjects(DATATYPE_STRING, 0, sizeof(CLR_RT_HeapBlock_String)); CHECK_ALLOCATION(str);
+  str = (CLR_RT_HeapBlock_String *)g_CLR_RT_ExecutionEngine.ExtractHeapBytesForObjects(DATATYPE_STRING, 0, sizeof(CLR_RT_HeapBlock_String)); CHECK_ALLOCATION(str);
 
   reference.SetObjectReference(str);
 
@@ -86,22 +86,22 @@ HRESULT CLR_RT_HeapBlock_String::CreateInstance(CLR_RT_HeapBlock& reference, con
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT CLR_RT_HeapBlock_String::CreateInstance(CLR_RT_HeapBlock& reference, CLR_UINT32 token, CLR_RT_Assembly* assm)
+HRESULT CLR_RT_HeapBlock_String::CreateInstance(CLR_RT_HeapBlock &reference, CLR_UINT32 token, CLR_RT_Assembly *assm)
   {
   NATIVE_PROFILE_CLR_CORE();
   return CreateInstance(reference, assm->GetString(CLR_DataFromTk(token)), assm);
   }
 
-HRESULT CLR_RT_HeapBlock_String::CreateInstance(CLR_RT_HeapBlock& reference, CLR_UINT16* szText, CLR_UINT32 length)
+HRESULT CLR_RT_HeapBlock_String::CreateInstance(CLR_RT_HeapBlock &reference, CLR_UINT16 *szText, CLR_UINT32 length)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
   CLR_RT_UnicodeHelper     uh;             uh.SetInputUTF16(szText);
   CLR_UINT32               lengthInBytes = uh.CountNumberOfBytes(length);
-  CLR_RT_HeapBlock_String* str = CreateInstance(reference, lengthInBytes); CHECK_ALLOCATION(str);
+  CLR_RT_HeapBlock_String *str = CreateInstance(reference, lengthInBytes); CHECK_ALLOCATION(str);
 
-  uh.m_outputUTF8 = (CLR_UINT8*)str->StringText();
+  uh.m_outputUTF8 = (CLR_UINT8 *)str->StringText();
   uh.m_outputUTF8_size = lengthInBytes + 1;
 
   uh.ConvertToUTF8(length, false);
@@ -109,7 +109,7 @@ HRESULT CLR_RT_HeapBlock_String::CreateInstance(CLR_RT_HeapBlock& reference, CLR
   NANOCLR_NOCLEANUP();
   }
 
-CLR_RT_HeapBlock_String* CLR_RT_HeapBlock_String::GetStringEmpty()
+CLR_RT_HeapBlock_String *CLR_RT_HeapBlock_String::GetStringEmpty()
   {
   return g_CLR_RT_TypeSystem.m_assemblyMscorlib->GetStaticField(Library_corlib_native_System_String::FIELD_STATIC__Empty)->DereferenceString();
   }

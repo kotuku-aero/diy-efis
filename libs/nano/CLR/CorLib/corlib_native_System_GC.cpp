@@ -6,7 +6,7 @@
 #include "CorLib.h"
 
 
-HRESULT Library_corlib_native_System_GC::AnyPendingFinalizers___STATIC__BOOLEAN(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_GC::AnyPendingFinalizers___STATIC__BOOLEAN(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -17,25 +17,25 @@ HRESULT Library_corlib_native_System_GC::AnyPendingFinalizers___STATIC__BOOLEAN(
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_corlib_native_System_GC::SuppressFinalize___STATIC__VOID__OBJECT(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_GC::SuppressFinalize___STATIC__VOID__OBJECT(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock* pObj = stack.Arg0().Dereference(); FAULT_ON_NULL(pObj);
+  CLR_RT_HeapBlock *pObj = stack.Arg0().Dereference(); FAULT_ON_NULL(pObj);
 
   CLR_RT_HeapBlock_Finalizer::SuppressFinalize(pObj);
 
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_GC::ReRegisterForFinalize___STATIC__VOID__OBJECT(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_System_GC::ReRegisterForFinalize___STATIC__VOID__OBJECT(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
   CLR_RT_TypeDescriptor desc;
-  CLR_RT_HeapBlock* pObj = stack.Arg0().Dereference(); FAULT_ON_NULL(pObj);
+  CLR_RT_HeapBlock *pObj = stack.Arg0().Dereference(); FAULT_ON_NULL(pObj);
 
   CLR_RT_HeapBlock_Finalizer::SuppressFinalize(pObj);
 
