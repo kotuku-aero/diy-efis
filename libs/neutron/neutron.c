@@ -48,9 +48,9 @@ static const char *trace_str = "trace-level";
 // the trace stream is an event stream
 void trace_init()
   {
-  if (failed(stream_open(0, dmesg_str, &trace_stream)))
+  if (failed(reg_stream_open(0, dmesg_str, &trace_stream)))
     {
-    stream_create(0, dmesg_str, &trace_stream);
+    reg_stream_create(0, dmesg_str, &trace_stream);
     }
   else
     stream_truncate(trace_stream, 0);

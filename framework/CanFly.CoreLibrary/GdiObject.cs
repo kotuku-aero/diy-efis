@@ -62,6 +62,18 @@ namespace CanFly
     /// <summary>
     /// Draw a polyline
     /// </summary>
+    /// <param name="clipRect">Rectangle to clip to</param>
+    /// <param name="pen">pen to draw with</param>
+    /// <param name="points">points to draw</param>
+    public void Polyline(Rect clipRect, Pen pen, params Point[] points)
+    {
+      using (PointArray pts = new PointArray(points))
+        Photon.Polyline(Handle, clipRect.Left, clipRect.Right, clipRect.Top, clipRect.Bottom,
+          pen.Handle, pts.Handle);
+    }
+    /// <summary>
+    /// Draw a polyline
+    /// </summary>
     /// <param name="pen">Pen to draw with</param>
     /// <param name="pts">Array of points to use</param>
     public void Polyline(Pen pen, PointArray pts)
@@ -189,6 +201,23 @@ namespace CanFly
     public void DrawText(Font font, uint fg, uint bg, string str, Point src_pt, Rect txt_clip_rect, TextOutStyle format)
     {
       Photon.DrawText(Handle, ClipRect.Left, ClipRect.Right, ClipRect.Top, ClipRect.Bottom,
+        font.Handle, fg, bg, str, src_pt.X, src_pt.Y, 
+        txt_clip_rect.Left, txt_clip_rect.Right, txt_clip_rect.Top, txt_clip_rect.Bottom, format);
+    }
+    /// <summary>
+    /// Draw a string
+    /// </summary>
+    /// <param name="clipRect">Rectangle to clip to</param>
+    /// <param name="font">Font to use</param>
+    /// <param name="fg">Foreground color</param>
+    /// <param name="bg">Background color</param>
+    /// <param name="str">Text to render</param>
+    /// <param name="src_pt">Orgin on canvas</param>
+    /// <param name="txt_clip_rect">Rectangle to clip to</param>
+    /// <param name="format">Format flags</param>
+    public void DrawText(Rect clipRect, Font font, uint fg, uint bg, string str, Point src_pt, Rect txt_clip_rect, TextOutStyle format)
+    {
+      Photon.DrawText(Handle, clipRect.Left, clipRect.Right, clipRect.Top, clipRect.Bottom,
         font.Handle, fg, bg, str, src_pt.X, src_pt.Y, 
         txt_clip_rect.Left, txt_clip_rect.Right, txt_clip_rect.Top, txt_clip_rect.Bottom, format);
     }

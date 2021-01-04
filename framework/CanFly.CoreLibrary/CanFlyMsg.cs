@@ -275,9 +275,10 @@ public sealed class CanFlyMsg
     /// <param name="id">canfly id to assign</param>
     /// <param name="dataType">implementation datatype</param>
     [MethodImpl(MethodImplOptions.InternalCall)]
-    private extern CanFlyMsg(ushort id, ushort dataType, bool dt);
-    public CanFlyMsg(ushort id, CanFlyDataType dataType)
-      : this(id, (ushort)dataType, true)
+    private extern CanFlyMsg(ushort id, ushort dataType, uint rawData);
+    // create an error or NoData message
+    public CanFlyMsg(ushort id, CanFlyDataType dataType, uint rawData)
+      : this(id, (ushort)dataType, rawData)
     {
     }
 
@@ -293,6 +294,16 @@ public sealed class CanFlyMsg
       _data6 = b6;
       _data7 = b7;
     }
+
+    internal ushort NativeFlags {  get { return _flags; } }
+    internal byte Data0 { get { return _data0; } }
+    internal byte Data1 { get { return _data1; } }
+    internal byte Data2 { get { return _data2; } }
+    internal byte Data3 { get { return _data3; } }
+    internal byte Data4 { get { return _data4; } }
+    internal byte Data5 { get { return _data5; } }
+    internal byte Data6 { get { return _data6; } }
+    internal byte Data7 { get { return _data7; } }
 
     /// <summary>
     /// Create a new datatype with a 
@@ -437,11 +448,13 @@ public sealed class CanFlyMsg
     [MethodImpl(MethodImplOptions.InternalCall)]
     public override extern string ToString();
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void Send(CanFlyMsg msg);
+    public extern string ToString(string format);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void SendRaw(CanFlyMsg msg);
+    public static extern void Send();
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void SendRepy(CanFlyMsg msg);
+    public static extern void SendRaw();
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void SendReply();
     [MethodImpl(MethodImplOptions.InternalCall)]
     private extern void SendMessage(uint handle);
     /// <summary>
@@ -454,8 +467,6 @@ public sealed class CanFlyMsg
       SendMessage(widget.Handle);
     }
 
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    private extern void PostMessage(uint handle, uint maxWait);
     /// <summary>
     /// Post a message to the window queue.  Returns as soon as the message is sent
     /// </summary>
@@ -479,10 +490,10 @@ public sealed class CanFlyMsg
     /// <param name="hwnd"></param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern bool GetMessage(out uint hwnd);
+    internal static extern bool GetMessage(uint hwnd, out uint msg_for);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void DispatchMessage(uint hwnd);
+    internal static extern void DispatchMessage(uint hwnd);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void PostMessage(uint hwnd, CanFlyMsg msg, int max_wait);
+    internal static extern void PostMessage(uint hwnd, uint max_wait);
   }
 }

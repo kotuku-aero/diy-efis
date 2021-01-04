@@ -34,29 +34,14 @@ namespace CanFly
     public static readonly ushort id_buttonpress = 1769;
   }
 
-  internal delegate bool wndproc(uint hwnd, ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7);
-
   public sealed class Photon
   {
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern uint OpenScreen(ushort orientation, wndproc cb, ushort id);
-    /**
-    * @function create_window(uint parent, Rect bounds, wndproc cb, ushort id, out uint hwnd)
-    * Create a window.  Will create a new canvas
-    * @param parent  Parent window.  if 0 then the top level window is created
-    * @param bounds  Bounds of window.  if parant != 0 then relative to parent window
-    * @param cb      Callback to receive messages
-    * @param hwnd    resulting handle
-    * @return s_ok if window created ok
-    */
+    internal static extern uint OpenScreen(ushort orientation, ushort id);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern uint CreateWindow(uint parent, int left, int right, int top, int bottom, wndproc cb, ushort id);
+    internal static extern uint CreateWindow(uint parent, int left, int right, int top, int bottom, ushort id);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern uint CreateChildWindow(uint parent, int left, int right, int top, int bottom, wndproc cb, ushort id);
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="hwnd"></param>
+    internal static extern uint CreateChildWindow(uint parent, int left, int right, int top, int bottom, ushort id);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void CloseWindow(uint hwnd);
     

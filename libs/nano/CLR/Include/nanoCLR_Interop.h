@@ -459,6 +459,8 @@ CLR_RT_HeapBlock_NativeEventDispatcher* CreateNativeEventInstance(CLR_RT_StackFr
 // Should be called from ISR.
 void SaveNativeEventToHALQueue(CLR_RT_HeapBlock_NativeEventDispatcher* pContext, uint32_t data1, uint32_t data2);
 
+void SaveCanFlyEventToHALQueue(CLR_RT_HeapBlock_NativeEventDispatcher* pContext, uint16_t flags, uint8_t b0, uint8_t b1, uint8_t b2, uint8_t b3, uint8_t b4, uint8_t b5, uint8_t b6, uint8_t b7);
+
 // Cleans up the data in the queue after interrupts were closed and no managed callbacks are expected.
 void CleanupNativeEventsFromHALQueue(CLR_RT_HeapBlock_NativeEventDispatcher* pContext);
 

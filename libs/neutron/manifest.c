@@ -269,7 +269,7 @@ result_t manifest_open(memid_t key, const char *path, stream_p *hndl)
   result_t result;
   stream_p sh;
   // open a stream
-  if(failed(result = stream_open(key, path, &sh)))
+  if(failed(result = reg_stream_open(key, path, &sh)))
     return result;
 
   manifest_handle_t *stream = (manifest_handle_t *)neutron_malloc(sizeof(manifest_handle_t));

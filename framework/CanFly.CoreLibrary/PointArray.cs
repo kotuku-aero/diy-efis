@@ -118,7 +118,7 @@ namespace CanFly
       return new PointEnumerator(this);
     }
 
-    public uint IndexOf(Point value)
+    public int IndexOf(Point value)
     {
       return PointArrayIndexOf(_handle, value.X, value.Y);
     }
@@ -130,10 +130,10 @@ namespace CanFly
 
     public void Remove(Point value)
     {
-      uint index = PointArrayIndexOf(_handle, value.X, value.Y);
+      int index = PointArrayIndexOf(_handle, value.X, value.Y);
 
       if (index >= 0)
-        PointArrayRemoveAt(_handle, index);
+        PointArrayRemoveAt(_handle, (uint) index);
     }
 
     public void RemoveAt(uint index)
@@ -160,7 +160,7 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     private static extern void PointArrayGetPoint(uint handle, uint index, out int x, out int y);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    private static extern uint PointArrayIndexOf(uint handle, int x, int y);
+    private static extern int PointArrayIndexOf(uint handle, int x, int y);
     [MethodImpl(MethodImplOptions.InternalCall)]
     private static extern void PointArrayRemoveAt(uint handle, uint index);
   }

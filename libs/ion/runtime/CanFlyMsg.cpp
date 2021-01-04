@@ -1,7 +1,7 @@
 #include "../canflylib/CanFly_CoreLibrary.h"
 
 #include "../../../neutron/neutron.h"
-
+#include "../../../photon/photon.h"
 
 static void CopyCanMsg(const canmsg_t* msg, CLR_RT_HeapBlock* pThis)
   {
@@ -660,7 +660,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_CanFlyMsg::GetUInt16Array___SZARRAY_U2
       hr = get_param_uint16(&msg, 1, &val[1]);
       NANOCLR_CHECK_HRESULT(hr);
     case CANAS_DATATYPE_USHORT:
-      if(len == 0)
+      if (len == 0)
         len = 1;
       hr = get_param_uint16(&msg, 0, &val[0]);
       break;
@@ -807,7 +807,117 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_CanFlyMsg::ToString___STRING(CLR_RT_St
     printf_s("%s(%d)", retValue, data_type, id);
   else
     printf_s("%s(%s)", retValue, data_type, id_name);
- 
+
   SetResult_LPCSTR(stack, retValue);
+  NANOCLR_NOCLEANUP();
+  }
+
+HRESULT Library_CanFly_CoreLibrary_CanFly_CanFlyMsg::SendMessage___VOID__U4(CLR_RT_StackFrame& stack)
+  {
+  NANOCLR_HEADER(); hr = S_OK;
+
+  unsigned int param0;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 1, param0));
+
+  // param0 is the handle to a window (hwnd)
+  handle_t hwnd = (handle_t)param0;
+
+  canmsg_t msg;
+  CopyCanMsg(stack.This(), &msg);
+
+  hr = send_message(hwnd, &msg);
+
+  NANOCLR_NOCLEANUP();
+  }
+
+HRESULT Library_CanFly_CoreLibrary_CanFly_CanFlyMsg::PostMessage___STATIC__VOID__U4__U4(CLR_RT_StackFrame& stack)
+  {
+  NANOCLR_HEADER(); hr = S_OK;
+  unsigned int param0;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 1, param0));
+
+  unsigned int param1;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 2, param1));
+
+  // param0 is the handle to a window (hwnd)
+  handle_t hwnd = (handle_t)param0;
+
+  canmsg_t msg;
+  CopyCanMsg(stack.This(), &msg);
+
+  hr = post_message(hwnd, &msg, param1);
+
+  NANOCLR_NOCLEANUP();
+  }
+
+HRESULT Library_CanFly_CoreLibrary_CanFly_CanFlyMsg::Send___STATIC__VOID(CLR_RT_StackFrame& stack)
+  {
+  NANOCLR_HEADER(); hr = S_OK;
+
+  canmsg_t msg;
+  CopyCanMsg(stack.This(), &msg);
+
+  hr = can_send(&msg);
+
+  NANOCLR_NOCLEANUP();
+  }
+
+HRESULT Library_CanFly_CoreLibrary_CanFly_CanFlyMsg::SendRaw___STATIC__VOID(CLR_RT_StackFrame& stack)
+  {
+  NANOCLR_HEADER(); hr = S_OK;
+
+  canmsg_t msg;
+  CopyCanMsg(stack.This(), &msg);
+
+  hr = can_send_raw(&msg);
+
+  NANOCLR_NOCLEANUP();
+  }
+
+HRESULT Library_CanFly_CoreLibrary_CanFly_CanFlyMsg::SendReply___STATIC__VOID(CLR_RT_StackFrame& stack)
+  {
+  NANOCLR_HEADER(); hr = S_OK;
+
+  canmsg_t msg;
+  CopyCanMsg(stack.This(), &msg);
+
+  hr = can_send_reply(&msg);
+
+  NANOCLR_NOCLEANUP();
+  }
+
+HRESULT Library_CanFly_CoreLibrary_CanFly_CanFlyMsg::GetMessage___STATIC__BOOLEAN__U4__BYREF_U4(CLR_RT_StackFrame& stack)
+  {
+  NANOCLR_HEADER(); hr = S_OK;
+
+  unsigned int param0;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+
+  handle_t hwnd;
+  canmsg_t msg;
+
+  bool retValue = get_message((handle_t)param0, &hwnd, &msg);
+
+  stack.Arg1().NumericByRef().u4 = (uint32_t)hwnd;
+
+  // copy it to the object
+  CopyCanMsg(&msg, stack.This());
+
+  SetResult_bool(stack, retValue);
+
+  NANOCLR_NOCLEANUP();
+  }
+
+HRESULT Library_CanFly_CoreLibrary_CanFly_CanFlyMsg::DispatchMessage___STATIC__VOID__U4(CLR_RT_StackFrame& stack)
+  {
+  NANOCLR_HEADER(); hr = S_OK;
+  unsigned int param0;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+
+  canmsg_t msg;
+  CopyCanMsg(stack.This(), &msg);
+
+  dispatch_message((handle_t)param0, &msg);
+
   NANOCLR_NOCLEANUP();
   }

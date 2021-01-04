@@ -30,9 +30,6 @@
     <ClCompile Include="..\..\libs\ion\ion_interactive.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\ion\ion_runner.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libs\ion\CLR_Startup_Thread.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -66,14 +63,35 @@
     <ClCompile Include="..\..\libs\ion\canflylib\CanFly_CoreLibrary.cpp">
       <Filter>canflylib</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_CanFlyMsg.cpp">
+    <ClCompile Include="..\..\libs\ion\runtime\CanFlyEventDispatcher.cpp">
       <Filter>runtime</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_Neutron.cpp">
+    <ClCompile Include="..\..\libs\ion\runtime\CanFlyMsg.cpp">
       <Filter>runtime</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_Photon.cpp">
+    <ClCompile Include="..\..\libs\ion\runtime\CanFlyMsgSink.cpp">
       <Filter>runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\runtime\Font.cpp">
+      <Filter>runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\runtime\Neutron.cpp">
+      <Filter>runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\runtime\Photon.cpp">
+      <Filter>runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\runtime\PointArray.cpp">
+      <Filter>runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="CLR_Message.cpp">
+      <Filter>runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\runtime\CLR_Message.cpp">
+      <Filter>runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\ion_runner.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -124,6 +142,12 @@
     </ClInclude>
     <ClInclude Include="..\..\libs\ion\target_BlockStorage.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\ion\runtime\CLR_Message.h">
+      <Filter>runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\ion\runtime\HeapBlockDispatcher.h">
+      <Filter>runtime</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

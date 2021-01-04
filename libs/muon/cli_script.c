@@ -179,7 +179,7 @@ result_t script_ls_name_action(cli_t *context, const char * path)
       {
       // we have to stat the file
       stream_p hndl;
-      if (failed(stream_open(get_context(context), name, &hndl)))
+      if (failed(reg_stream_open(get_context(context), name, &hndl)))
         continue;
 
       uint32_t length;
@@ -226,7 +226,7 @@ result_t script_rm_name_action(cli_t *context, const char * name)
   stream_p stream;
 
   // see if it exists
-  if (failed(result = stream_open(get_context(context), name, &stream)))
+  if (failed(result = reg_stream_open(get_context(context), name, &stream)))
     {
     if (result != e_path_not_found)
       return result;        // other error.
@@ -244,12 +244,12 @@ result_t script_create_name_action(cli_t *context, const char * name)
   stream_p stream;
 
   // see if it exists
-  if (failed(result = stream_open(get_context(context), name, &stream)))
+  if (failed(result = reg_stream_open(get_context(context), name, &stream)))
     {
     if (result != e_path_not_found)
       return result;        // other error.
 
-    if (failed(result = stream_create(get_context(context), name, &stream)))
+    if (failed(result = reg_stream_create(get_context(context), name, &stream)))
       return result;
     }
 
@@ -274,7 +274,7 @@ result_t script_edit_name_action(cli_t *context, const char * name)
   result_t result;
   stream_p stream;
 
-  if(failed(result = stream_open(get_context(context), name, &stream)))
+  if(failed(result = reg_stream_open(get_context(context), name, &stream)))
     return result;
 
   char * full_path = (char*)neutron_malloc(256);
@@ -297,7 +297,7 @@ result_t script_cat_name_action(cli_t *context, const char * name)
   result_t result;
   stream_p stream;
 
-  if(failed(result = stream_open(get_context(context), name, &stream)))
+  if(failed(result = reg_stream_open(get_context(context), name, &stream)))
     return result;
 
   stream_copy(stream, context->cfg.console_out);

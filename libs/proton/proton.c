@@ -56,6 +56,9 @@ void run_proton(proton_args_t *args)
                                    args->ci, args->co, args->cerr)))
       return;
 
+    // and run the main loop for ion
+    ion_run(key);
+    /*
     // run the message queue
     // despatch messages
     canmsg_t msg;
@@ -64,6 +67,7 @@ void run_proton(proton_args_t *args)
     while (true)
       if (succeeded(get_message(main_window, &hwnd, &msg)))
         dispatch_message(hwnd, &msg);
+        */
     }
   }
 

@@ -566,7 +566,7 @@ result_t create_child_widget(handle_t parent, memid_t key, wndproc cb, handle_t 
       dt = field_stream;
       // open the stream
       stream_p stream;
-      if (succeeded(stream_open(events, name, &stream)))
+      if (succeeded(reg_stream_open(events, name, &stream)))
         {
         if (failed(result = compile_function(*hwnd, name, stream)))
           {

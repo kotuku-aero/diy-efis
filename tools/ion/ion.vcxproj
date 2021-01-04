@@ -26,17 +26,23 @@
     <ClCompile Include="..\..\libs\ion\ion_cli_impl.c" />
     <ClCompile Include="..\..\libs\ion\ion_interactive.c" />
     <ClCompile Include="..\..\libs\ion\ion_lib.c" />
-    <ClCompile Include="..\..\libs\ion\ion_runner.c" />
+    <ClCompile Include="..\..\libs\ion\ion_runner.cpp" />
     <ClCompile Include="..\..\libs\ion\nanoCRT.cpp" />
     <ClCompile Include="..\..\libs\ion\platform_heap.c" />
-    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_CanFlyMsg.cpp" />
-    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_Neutron.cpp" />
-    <ClCompile Include="..\..\libs\ion\runtime\CanFly_CoreLibrary_CanFly_Photon.cpp" />
+    <ClCompile Include="..\..\libs\ion\runtime\CanFlyEventDispatcher.cpp" />
+    <ClCompile Include="..\..\libs\ion\runtime\CanFlyMsg.cpp" />
+    <ClCompile Include="..\..\libs\ion\runtime\CanFlyMsgSink.cpp" />
+    <ClCompile Include="..\..\libs\ion\runtime\CLR_Message.cpp" />
+    <ClCompile Include="..\..\libs\ion\runtime\Font.cpp" />
+    <ClCompile Include="..\..\libs\ion\runtime\Neutron.cpp" />
+    <ClCompile Include="..\..\libs\ion\runtime\Photon.cpp" />
+    <ClCompile Include="..\..\libs\ion\runtime\PointArray.cpp" />
     <ClCompile Include="..\..\libs\ion\targetHAL.c" />
     <ClCompile Include="..\..\libs\ion\targetHAL_Time.cpp" />
     <ClCompile Include="..\..\libs\ion\targetPAL_Events.cpp" />
     <ClCompile Include="..\..\libs\ion\targetPAL_Time.cpp" />
     <ClCompile Include="..\..\libs\ion\WireProtocol_ReceiverThread.c" />
+    <ClCompile Include="CLR_Message.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libs\ion\canflylib\CanFly_CoreLibrary.h" />
@@ -45,6 +51,8 @@
     <ClInclude Include="..\..\libs\ion\ion_cli.h" />
     <ClInclude Include="..\..\libs\ion\ion_cli_impl.h" />
     <ClInclude Include="..\..\libs\ion\lwipopts.h" />
+    <ClInclude Include="..\..\libs\ion\runtime\CLR_Message.h" />
+    <ClInclude Include="..\..\libs\ion\runtime\HeapBlockDispatcher.h" />
     <ClInclude Include="..\..\libs\ion\targetHAL.h" />
     <ClInclude Include="..\..\libs\ion\TargetHAL_Spi.h" />
     <ClInclude Include="..\..\libs\ion\targetHAL_Time.h" />

@@ -372,12 +372,6 @@ static void fb_sync(void *parg)
     }
   }
 
-static void shell_run_ion(void *parg)
-	{
-  // and run the interpreter shell
-  ion_run(0);
-	}
-
 int main(int argc, char **argv)
   {
 #ifdef __linux__
@@ -522,7 +516,6 @@ int main(int argc, char **argv)
     }
 
   task_create("FBSYNC", DEFAULT_STACK_SIZE, fb_sync, 0, BELOW_NORMAL, 0);
-  task_create("ION", DEFAULT_STACK_SIZE, shell_run_ion, 0, NORMAL_PRIORITY, 0);
 
   return cli_run(&channel.parser);
   }

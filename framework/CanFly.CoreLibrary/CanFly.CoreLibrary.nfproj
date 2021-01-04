@@ -24,9 +24,11 @@
   </PropertyGroup>
   <Import Project="$(NanoFrameworkProjectSystemPath)NFProjectSystem.props" Condition="Exists('$(NanoFrameworkProjectSystemPath)NFProjectSystem.props')" />
   <ItemGroup>
-    <Compile Include="Application.cs" />
+    <Compile Include="CanFlyEvent.cs" />
+    <Compile Include="CanFlyEventDispatcher.cs" />
     <Compile Include="Canvas.cs" />
     <Compile Include="Color.cs" />
+    <Compile Include="CanFlyMsgSink.cs" />
     <Compile Include="Extent.cs" />
     <Compile Include="Font.cs" />
     <Compile Include="GdiObject.cs" />
@@ -38,6 +40,7 @@
     <Compile Include="PointArray.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rect.cs" />
+    <Compile Include="Screen.cs" />
     <Compile Include="Stream.cs" />
     <Compile Include="Widget.cs" />
   </ItemGroup>

@@ -3,51 +3,9 @@ using System.Collections;
 
 namespace CanFly
 {
-  public delegate void EventHandler(CanFlyMsg msg);
-  
-  public class Widget : GdiObject
+  public abstract class Widget : GdiObject
   {
-    private Hashtable _eventHandlers;
-
-    private static Widget _screen;
-    private class WidgetLock
-    {
-
-    };
-    private static WidgetLock widgetLock = new WidgetLock();
-    
-    public static Widget Screen
-    {
-      get
-      {
-        if (_screen == null)
-        {
-          lock (widgetLock)
-            if (_screen == null)
-              _screen = new Widget(Photon.OpenScreen(0, WidgetWndProc, 0));
-        }
-
-        return _screen;
-      }
-    }
-
-    /// <summary>
-    /// This is the default wndproc for the system
-    /// </summary>
-    /// <param name="handle">Window that the message is directed to</param>
-    /// <param name="msg"></param>
-    /// <returns></returns>
-    private static bool WidgetWndProc(uint handle, ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7)
-    {
-      CanFlyMsg msg = new CanFlyMsg(flags, b0, b1, b2, b3, b4, b5, b6, b7);
-      object theWidget =  Photon.GetWindowData(handle);
-      if (theWidget == null)
-        return false;
-
-      return ((Widget)theWidget).WndProc(msg);
-    }
-
-    /// <summary>
+     /// <summary>
     /// 
     /// </summary>
     /// <param name="msg"></param>
@@ -61,7 +19,6 @@ namespace CanFly
       : base(hwnd)
     {
       Photon.SetWindowData(Handle, this);
-      _eventHandlers = new Hashtable();
 
       ClipRect = WindowRect;
     }
@@ -73,38 +30,14 @@ namespace CanFly
     /// <param name="bounds">Bounds relative to the parent</param>
     /// <param name="id">Window ID</param>
     protected Widget(Widget parent, Rect bounds, ushort id)
-      : base(Photon.CreateChildWindow(parent.Handle, bounds.Left, bounds.Right, bounds.Top, bounds.Bottom, WidgetWndProc, id))
+      : base(Photon.CreateChildWindow(parent.Handle, bounds.Left, bounds.Right, bounds.Top, bounds.Bottom, id))
     {
       Photon.SetWindowData(Handle, this);
-      _eventHandlers = new Hashtable();
       // default clipping rectangle
       ClipRect = WindowRect;
     }
 
-    private bool WndProc(uint hwnd, CanFlyMsg msg)
-    {
-      return OnMessage(msg);
-    }
-    
-    /// <summary>
-    /// Overide in derived classes to handle registered messages
-    /// </summary>
-    /// <param name="msg"></param>
-    /// <returns></returns>
-    protected virtual bool OnMessage(CanFlyMsg msg)
-    {
-      if (_eventHandlers.Contains(msg.Id))
-      {
-        ArrayList handlers = _eventHandlers[msg.Id] as ArrayList;
-
-        foreach (EventHandler handler in handlers)
-        {
-          handler(msg);
-        }
-      }
-      
-      return false;
-    }
+    protected abstract void OnPaint();
     
     protected override void OnDispose()
     {
@@ -125,7 +58,7 @@ namespace CanFly
 
         Photon.GetWindowRect(Handle, out left, out right, out top, out bottom);
 
-        return new Rect(left, right, top, bottom);
+        return new Rect(left, top, right, bottom);
       }
     }
     /// <summary>
@@ -279,16 +212,6 @@ namespace CanFly
       Photon.EndPaint(Handle);
     }
 
-    protected void AddEventHandler(ushort id, EventHandler handler)
-    {
-      
-    }
-
-    protected void RemoveEventHandle(ushort id, EventHandler handler)
-    {
-      
-    }
-    
     public void DisplayRoller(Rect bounds, int value, int digits,
       uint bg_color, uint fg_color, Font  large_font, Font  small_font)
     {

@@ -23,7 +23,7 @@ namespace CanFly
     /// <param name="right"></param>
     /// <param name="top"></param>
     /// <param name="bottom"></param>
-    public Rect(int left, int right, int top, int bottom)
+    public Rect(int left, int top, int right, int bottom)
     {
       _left = left;
       _top = top;

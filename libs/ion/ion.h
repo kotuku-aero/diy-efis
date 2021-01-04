@@ -45,19 +45,16 @@ it must be removed as soon as possible after the code fragment is identified.
 extern "C" {
 #endif
 
-
   typedef struct _ion_context_t {
     handle_t console_in;          // console in for script engine
     handle_t console_out;         // console out for script engine
     handle_t console_err;         // error console for script engine
     memid_t home;                 // home registry key for the script engine
     task_p worker;                // worker script.  This runs the nanoFramework
-    deque_p message_queue;       // queue of messages being handled
     } ion_context_t;
 
   // this is the type of message passed to the callback functions.
   typedef struct _ion_request {
-    const char *function_name;
     canmsg_t msg;
     } ion_request_t;
 
@@ -87,25 +84,31 @@ extern result_t ion_init();
    * @param handler Registered name for the message (MUST be static variable)
    * @param msg     Message to queue
   */
-  extern result_t ion_queue_message(struct _ion_context_t *ion, const char *handler, const canmsg_t *msg);
-  /**
-   * Execute an interactive command in the shell
-   * @param ion     Context to use
-   */
-  extern result_t ion_exec(struct _ion_context_t *ion);
+  extern result_t ion_queue_message(struct _ion_context_t *ion, const canmsg_t *msg);
 
   extern result_t ion_close(struct _ion_context_t *ion);
-  
-  
   /**
-   * @function ion_run(ion_register_fn lib_funcs)
+   * @function ion_run(memid_t key)
    * Run the ion event handler code.  Usually the last thing to do
    * Never returns
-   * @param lib_funcs Optional library functions to register
+   * @param key Optional key to the registry for ion
    * 
    */
-  extern result_t ion_run();
+  extern result_t ion_run(memid_t key);
 
+  /**
+   * @function ion_malloc(size_t len)
+   * Allocate a block of memory to be used by ion
+   * @param len number of bytes to allocate
+   * @return pointer to the memory block, else 0 for no memory
+  */
+  extern void* ion_malloc(size_t len);
+  /**
+  *  @function ion_free(void *buffer)
+   * Free a block of memory allocated by ion
+   * @param buffer previously allocated buffer
+  */
+  extern void ion_free(void *buffer);
 
 #ifdef __cplusplus
   }

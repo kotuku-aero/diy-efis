@@ -209,7 +209,7 @@ result_t script_name_value_action(cli_t *context, const char * name, const char 
   result_t result;
   vector_p buffer;
   stream_p stream;
-  if (failed(result = stream_create(get_context(context), name, &stream)))
+  if (failed(result = reg_stream_create(get_context(context), name, &stream)))
     return result;
 
   if (failed(result = vector_create(sizeof(char), &buffer)))
@@ -268,9 +268,9 @@ result_t edit_name_action(cli_t *context, const char * name_)
   result_t result;
 
   stream_p stream;
-  if(failed(stream_open(get_context(context), name_, &stream)))
+  if(failed(reg_stream_open(get_context(context), name_, &stream)))
     {
-    if(failed(result = stream_create(get_context(context), name_, &stream)))
+    if(failed(result = reg_stream_create(get_context(context), name_, &stream)))
       return result;
     }
 
@@ -287,7 +287,7 @@ result_t cat_name_action(cli_t *context, const char * name)
 
   stream_p stream;
 
-  if(failed(result = stream_open(get_context(context), name, &stream)))
+  if(failed(result = reg_stream_open(get_context(context), name, &stream)))
     return result;
 
   stream_copy(stream, context->cfg.console_out);

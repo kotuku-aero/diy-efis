@@ -45,19 +45,6 @@ typedef enum __nfpack Flags
     Flags_Broadcast = 4,
 } Flags;
 
-typedef enum __nfpack FieldType
-{
-    FieldType_field_none = 0,
-    FieldType_field_key = 1,
-    FieldType_field_bool = 2,
-    FieldType_field_int16 = 3,
-    FieldType_field_uint16 = 4,
-    FieldType_field_int32 = 5,
-    FieldType_field_uint32 = 6,
-    FieldType_field_float = 7,
-    FieldType_field_stream = 8,
-} FieldType;
-
 typedef enum __nfpack PenStyle
 {
     PenStyle_Solid = 0,
@@ -74,6 +61,212 @@ typedef enum __nfpack TextOutStyle
     TextOutStyle_Opaque = 4,
 } TextOutStyle;
 
+struct Library_CanFly_CoreLibrary_CanFly_CanFlyEventDispatcher
+{
+    static const int FIELD__threadSpawn = 1;
+    static const int FIELD__callbacks = 2;
+    static const int FIELD__disposed = 3;
+    static const int FIELD___CanFlyEventDispatcher = 4;
+
+    NANOCLR_NATIVE_DECLARE(Dispose___VOID__BOOLEAN);
+    NANOCLR_NATIVE_DECLARE(_ctor___VOID);
+
+    //--//
+
+};
+
+struct Library_CanFly_CoreLibrary_CanFly_CanFlyID
+{
+    static const int FIELD_STATIC__id_unused = 0;
+    static const int FIELD_STATIC__id_pitch_acceleration = 1;
+    static const int FIELD_STATIC__id_roll_acceleration = 2;
+    static const int FIELD_STATIC__id_yaw_acceleration = 3;
+    static const int FIELD_STATIC__id_pitch_rate = 4;
+    static const int FIELD_STATIC__id_roll_rate = 5;
+    static const int FIELD_STATIC__id_yaw_rate = 6;
+    static const int FIELD_STATIC__id_roll_angle_magnetic = 7;
+    static const int FIELD_STATIC__id_pitch_angle_magnetic = 8;
+    static const int FIELD_STATIC__id_yaw_angle_magnetic = 9;
+    static const int FIELD_STATIC__id_pitch_angle = 10;
+    static const int FIELD_STATIC__id_roll_angle = 11;
+    static const int FIELD_STATIC__id_yaw_angle = 12;
+    static const int FIELD_STATIC__id_altitude_rate = 13;
+    static const int FIELD_STATIC__id_indicated_airspeed = 14;
+    static const int FIELD_STATIC__id_true_airspeed = 15;
+    static const int FIELD_STATIC__id_calibrated_airspeed = 16;
+    static const int FIELD_STATIC__id_angle_of_attack = 17;
+    static const int FIELD_STATIC__id_qnh = 18;
+    static const int FIELD_STATIC__id_baro_corrected_altitude = 19;
+    static const int FIELD_STATIC__id_heading_angle = 20;
+    static const int FIELD_STATIC__id_heading = 21;
+    static const int FIELD_STATIC__id_pressure_altitude = 22;
+    static const int FIELD_STATIC__id_outside_air_temperature = 23;
+    static const int FIELD_STATIC__id_differential_pressure = 24;
+    static const int FIELD_STATIC__id_static_pressure = 25;
+    static const int FIELD_STATIC__id_wind_speed = 26;
+    static const int FIELD_STATIC__id_wind_direction = 27;
+    static const int FIELD_STATIC__id_gps_latitude = 28;
+    static const int FIELD_STATIC__id_gps_longitude = 29;
+    static const int FIELD_STATIC__id_gps_height = 30;
+    static const int FIELD_STATIC__id_gps_groundspeed = 31;
+    static const int FIELD_STATIC__id_true_track = 32;
+    static const int FIELD_STATIC__id_magnetic_track = 33;
+    static const int FIELD_STATIC__id_magnetic_heading = 34;
+    static const int FIELD_STATIC__id_position_latitude = 35;
+    static const int FIELD_STATIC__id_position_longitude = 36;
+    static const int FIELD_STATIC__id_position_altitude = 37;
+    static const int FIELD_STATIC__id_velocity_x = 38;
+    static const int FIELD_STATIC__id_velocity_y = 39;
+    static const int FIELD_STATIC__id_velocity_z = 40;
+    static const int FIELD_STATIC__id_imu_mag_x = 41;
+    static const int FIELD_STATIC__id_imu_mag_y = 42;
+    static const int FIELD_STATIC__id_imu_mag_z = 43;
+    static const int FIELD_STATIC__id_imu_accel_x = 44;
+    static const int FIELD_STATIC__id_imu_accel_y = 45;
+    static const int FIELD_STATIC__id_imu_accel_z = 46;
+    static const int FIELD_STATIC__id_imu_gyro_x = 47;
+    static const int FIELD_STATIC__id_imu_gyro_y = 48;
+    static const int FIELD_STATIC__id_imu_gyro_z = 49;
+    static const int FIELD_STATIC__id_magnetic_variation = 50;
+    static const int FIELD_STATIC__id_def_utc = 51;
+    static const int FIELD_STATIC__id_def_date = 52;
+    static const int FIELD_STATIC__id_qnh_up = 53;
+    static const int FIELD_STATIC__id_qnh_dn = 54;
+    static const int FIELD_STATIC__id_set_magnetic_variation = 55;
+    static const int FIELD_STATIC__id_heading_up = 56;
+    static const int FIELD_STATIC__id_heading_dn = 57;
+    static const int FIELD_STATIC__id_stall_warning = 58;
+    static const int FIELD_STATIC__id_total_time = 59;
+    static const int FIELD_STATIC__id_air_time = 60;
+    static const int FIELD_STATIC__id_tach_time = 61;
+    static const int FIELD_STATIC__id_pitch = 62;
+    static const int FIELD_STATIC__id_track = 63;
+    static const int FIELD_STATIC__id_deviation = 64;
+    static const int FIELD_STATIC__id_track_angle_error = 65;
+    static const int FIELD_STATIC__id_estimated_time_to_next = 66;
+    static const int FIELD_STATIC__id_estimated_time_of_arrival = 67;
+    static const int FIELD_STATIC__id_estimated_enroute_time = 68;
+    static const int FIELD_STATIC__id_waypoint_identifier_0_3 = 69;
+    static const int FIELD_STATIC__id_waypoint_identifier_4_7 = 70;
+    static const int FIELD_STATIC__id_waypoint_identifier_8_11 = 71;
+    static const int FIELD_STATIC__id_waypoint_identifier_12_15 = 72;
+    static const int FIELD_STATIC__id_waypoint_type_identifier = 73;
+    static const int FIELD_STATIC__id_waypoint_latitude = 74;
+    static const int FIELD_STATIC__id_waypoint_longitude = 75;
+    static const int FIELD_STATIC__id_waypoint_minimum_altitude = 76;
+    static const int FIELD_STATIC__id_waypoint_maximum_altitude = 77;
+    static const int FIELD_STATIC__id_distance_to_next = 78;
+    static const int FIELD_STATIC__id_distance_to_destination = 79;
+    static const int FIELD_STATIC__id_selected_course = 80;
+    static const int FIELD_STATIC__id_desired_track_angle = 81;
+    static const int FIELD_STATIC__id_nav_command = 82;
+    static const int FIELD_STATIC__id_nav_valid = 83;
+    static const int FIELD_STATIC__id_gps_valid = 84;
+    static const int FIELD_STATIC__id_imu_valid = 85;
+    static const int FIELD_STATIC__id_edu_valid = 86;
+    static const int FIELD_STATIC__id_aux_battery = 87;
+    static const int FIELD_STATIC__id_trim_up = 88;
+    static const int FIELD_STATIC__id_trim_dn = 89;
+    static const int FIELD_STATIC__id_trim_left = 90;
+    static const int FIELD_STATIC__id_trim_right = 91;
+    static const int FIELD_STATIC__id_autopilot_engage = 92;
+    static const int FIELD_STATIC__id_autopilot_set_max_roll = 93;
+    static const int FIELD_STATIC__id_autopilot_set_vs_rate = 94;
+    static const int FIELD_STATIC__id_waypoint_turn_heading = 95;
+    static const int FIELD_STATIC__id_roll_servo_set_position = 96;
+    static const int FIELD_STATIC__id_pitch_servo_set_postion = 97;
+    static const int FIELD_STATIC__id_autopilot_power = 98;
+    static const int FIELD_STATIC__id_autopilot_alt_mode = 99;
+    static const int FIELD_STATIC__id_autopilot_vs_mode = 100;
+    static const int FIELD_STATIC__id_autopilot_mode = 101;
+    static const int FIELD_STATIC__id_autopilot_status = 102;
+    static const int FIELD_STATIC__id_roll_servo_status = 103;
+    static const int FIELD_STATIC__id_pitch_servo_status = 104;
+    static const int FIELD_STATIC__id_autopilot_altitude = 105;
+    static const int FIELD_STATIC__id_autopilot_vertical_speed = 106;
+    static const int FIELD_STATIC__id_engine_rpm = 107;
+    static const int FIELD_STATIC__id_engine_rpm_a = 108;
+    static const int FIELD_STATIC__id_exhaust_gas_temperature1 = 109;
+    static const int FIELD_STATIC__id_exhaust_gas_temperature2 = 110;
+    static const int FIELD_STATIC__id_exhaust_gas_temperature3 = 111;
+    static const int FIELD_STATIC__id_exhaust_gas_temperature4 = 112;
+    static const int FIELD_STATIC__id_manifold_pressure = 113;
+    static const int FIELD_STATIC__id_oil_pressure = 114;
+    static const int FIELD_STATIC__id_oil_temperature = 115;
+    static const int FIELD_STATIC__id_cylinder_head_temperature1 = 116;
+    static const int FIELD_STATIC__id_cylinder_head_temperature2 = 117;
+    static const int FIELD_STATIC__id_cylinder_head_temperature3 = 118;
+    static const int FIELD_STATIC__id_cylinder_head_temperature4 = 119;
+    static const int FIELD_STATIC__id_engine_rpm_b = 120;
+    static const int FIELD_STATIC__id_manifold_pressure_b = 121;
+    static const int FIELD_STATIC__id_fuel_pressure = 122;
+    static const int FIELD_STATIC__id_dc_voltage = 123;
+    static const int FIELD_STATIC__id_dc_current = 124;
+    static const int FIELD_STATIC__id_fuel_flow_rate = 125;
+    static const int FIELD_STATIC__id_fuel_consumed = 126;
+    static const int FIELD_STATIC__id_edu_left_fuel_quantity = 127;
+    static const int FIELD_STATIC__id_edu_right_fuel_quantity = 128;
+    static const int FIELD_STATIC__id_timing_divergence = 129;
+    static const int FIELD_STATIC__id_left_mag_rpm = 130;
+    static const int FIELD_STATIC__id_right_mag_rpm = 131;
+    static const int FIELD_STATIC__id_left_mag_adv = 132;
+    static const int FIELD_STATIC__id_right_mag_adv = 133;
+    static const int FIELD_STATIC__id_left_mag_map = 134;
+    static const int FIELD_STATIC__id_right_mag_map = 135;
+    static const int FIELD_STATIC__id_left_mag_volt = 136;
+    static const int FIELD_STATIC__id_right_mag_volt = 137;
+    static const int FIELD_STATIC__id_left_mag_temp = 138;
+    static const int FIELD_STATIC__id_right_mag_temp = 139;
+    static const int FIELD_STATIC__id_left_mag_coil1 = 140;
+    static const int FIELD_STATIC__id_right_mag_coil1 = 141;
+    static const int FIELD_STATIC__id_left_mag_coil2 = 142;
+    static const int FIELD_STATIC__id_right_mag_coil2 = 143;
+    static const int FIELD_STATIC__id_fuel_flow_rate_left = 144;
+    static const int FIELD_STATIC__id_fuel_flow_rate_right = 145;
+    static const int FIELD_STATIC__id_active_fuel_tank = 146;
+    static const int FIELD_STATIC__id_left_fuel_quantity = 147;
+    static const int FIELD_STATIC__id_right_fuel_quantity = 148;
+    static const int FIELD_STATIC__id_pitot_temperature = 149;
+    static const int FIELD_STATIC__id_pitot_heat_status = 150;
+    static const int FIELD_STATIC__id_pitot_power_status = 151;
+    static const int FIELD_STATIC__id_fdu_board_temperature = 152;
+    static const int FIELD_STATIC__id_set_left_fuel_qty = 153;
+    static const int FIELD_STATIC__id_set_right_fuel_qty = 154;
+    static const int FIELD_STATIC__id_mixture_lever = 155;
+    static const int FIELD_STATIC__id_injector_dwell = 156;
+    static const int FIELD_STATIC__id_propeller_speed_lever = 157;
+    static const int FIELD_STATIC__id_propeller_motor_current = 158;
+    static const int FIELD_STATIC__id_propeller_low_speed = 159;
+    static const int FIELD_STATIC__id_propeller_high_speed = 160;
+    static const int FIELD_STATIC__id_set_route = 161;
+    static const int FIELD_STATIC__id_set_route_segments = 162;
+    static const int FIELD_STATIC__id_set_waypoint_identifier_0_3 = 163;
+    static const int FIELD_STATIC__id_set_waypoint_identifier_4_7 = 164;
+    static const int FIELD_STATIC__id_set_waypoint_identifier_8_11 = 165;
+    static const int FIELD_STATIC__id_set_waypoint_identifier_12_15 = 166;
+    static const int FIELD_STATIC__id_set_waypoint_type_identifier = 167;
+    static const int FIELD_STATIC__id_set_waypoint_latitude = 168;
+    static const int FIELD_STATIC__id_set_waypoint_longitude = 169;
+    static const int FIELD_STATIC__id_set_waypoint_minimum_altitude = 170;
+    static const int FIELD_STATIC__id_set_waypoint_maximum_altitude = 171;
+    static const int FIELD_STATIC__id_navigation_mode = 172;
+    static const int FIELD_STATIC__id_alternator_status = 173;
+    static const int FIELD_STATIC__id_voltage_warning = 174;
+    static const int FIELD_STATIC__id_panel_brightness = 175;
+    static const int FIELD_STATIC__id_pitot_temperature_alarm = 176;
+    static const int FIELD_STATIC__id_nav_msg = 177;
+    static const int FIELD_STATIC__id_nav_appr = 178;
+    static const int FIELD_STATIC__id_nav_ils = 179;
+    static const int FIELD_STATIC__id_voltage_sense_1 = 180;
+    static const int FIELD_STATIC__id_voltage_sense_2 = 181;
+    static const int FIELD_STATIC__id_user_defined_start = 182;
+    static const int FIELD_STATIC__id_user_defined_end = 183;
+    static const int FIELD_STATIC__id_node_register = 184;
+
+    //--//
+
+};
+
 struct Library_CanFly_CoreLibrary_CanFly_CanFlyMsg
 {
     static const int FIELD___flags = 1;
@@ -87,7 +280,7 @@ struct Library_CanFly_CoreLibrary_CanFly_CanFlyMsg
     static const int FIELD___data7 = 9;
 
     NANOCLR_NATIVE_DECLARE(ToString___STRING);
-    NANOCLR_NATIVE_DECLARE(_ctor___VOID__U2__U2__BOOLEAN);
+    NANOCLR_NATIVE_DECLARE(_ctor___VOID__U2__U2__U4);
     NANOCLR_NATIVE_DECLARE(_ctor___VOID__U2__U4);
     NANOCLR_NATIVE_DECLARE(_ctor___VOID__U2__I4);
     NANOCLR_NATIVE_DECLARE(_ctor___VOID__U2__U2);
@@ -125,258 +318,34 @@ struct Library_CanFly_CoreLibrary_CanFly_CanFlyMsg
     NANOCLR_NATIVE_DECLARE(GetUInt16Array___SZARRAY_U2);
     NANOCLR_NATIVE_DECLARE(GetInt8Array___SZARRAY_I1);
     NANOCLR_NATIVE_DECLARE(GetUInt8Array___SZARRAY_U1);
+    NANOCLR_NATIVE_DECLARE(ToString___STRING__STRING);
     NANOCLR_NATIVE_DECLARE(SendMessage___VOID__U4);
-    NANOCLR_NATIVE_DECLARE(PostMessage___VOID__U4__U4);
-    NANOCLR_NATIVE_DECLARE(Send___STATIC__VOID__CanFlyCanFlyMsg);
-    NANOCLR_NATIVE_DECLARE(SendRaw___STATIC__VOID__CanFlyCanFlyMsg);
-    NANOCLR_NATIVE_DECLARE(SendRepy___STATIC__VOID__CanFlyCanFlyMsg);
-    NANOCLR_NATIVE_DECLARE(GetMessage___STATIC__BOOLEAN__BYREF_U4);
+    NANOCLR_NATIVE_DECLARE(Send___STATIC__VOID);
+    NANOCLR_NATIVE_DECLARE(SendRaw___STATIC__VOID);
+    NANOCLR_NATIVE_DECLARE(SendReply___STATIC__VOID);
+    NANOCLR_NATIVE_DECLARE(GetMessage___STATIC__BOOLEAN__U4__BYREF_U4);
     NANOCLR_NATIVE_DECLARE(DispatchMessage___STATIC__VOID__U4);
-    NANOCLR_NATIVE_DECLARE(PostMessage___STATIC__VOID__U4__CanFlyCanFlyMsg__I4);
+    NANOCLR_NATIVE_DECLARE(PostMessage___STATIC__VOID__U4__U4);
 
     //--//
 
 };
 
-struct Library_CanFly_CoreLibrary_CanFly_Rect
+struct Library_CanFly_CoreLibrary_CanFly_CanFlyMsgSink__EventInfo
 {
-    static const int FIELD___left = 1;
-    static const int FIELD___top = 2;
-    static const int FIELD___right = 3;
-    static const int FIELD___bottom = 4;
+    static const int FIELD__EventListener = 1;
+    static const int FIELD__EventID = 2;
 
     //--//
 
 };
 
-struct Library_CanFly_CoreLibrary_CanFly_Extent
+struct Library_CanFly_CoreLibrary_CanFly_CanFlyMsgSink
 {
-    static const int FIELD___dx = 1;
-    static const int FIELD___dy = 2;
+    static const int FIELD_STATIC__s_eventSink = 185;
+    static const int FIELD_STATIC__s_eventInfoTable = 186;
 
-    //--//
-
-};
-
-struct Library_CanFly_CoreLibrary_CanFly_Font
-{
-    static const int FIELD___hndl = 1;
-
-    NANOCLR_NATIVE_DECLARE(GetFont___STATIC__U4__STRING__U4);
-    NANOCLR_NATIVE_DECLARE(ReleaseFont___STATIC__VOID__U4);
-    NANOCLR_NATIVE_DECLARE(LoadFont___STATIC__VOID__U4);
-
-    //--//
-
-};
-
-struct Library_CanFly_CoreLibrary_CanFly_Point
-{
-    static const int FIELD___x = 1;
-    static const int FIELD___y = 2;
-
-    //--//
-
-};
-
-struct Library_CanFly_CoreLibrary_CanFly_Widget
-{
-    static const int FIELD_STATIC___screen = 0;
-    static const int FIELD_STATIC__widgetLock = 1;
-
-    static const int FIELD___eventHandlers = 3;
-
-    //--//
-
-};
-
-struct Library_CanFly_CoreLibrary_CanFly_CanFlyID
-{
-    static const int FIELD_STATIC__id_unused = 2;
-    static const int FIELD_STATIC__id_pitch_acceleration = 3;
-    static const int FIELD_STATIC__id_roll_acceleration = 4;
-    static const int FIELD_STATIC__id_yaw_acceleration = 5;
-    static const int FIELD_STATIC__id_pitch_rate = 6;
-    static const int FIELD_STATIC__id_roll_rate = 7;
-    static const int FIELD_STATIC__id_yaw_rate = 8;
-    static const int FIELD_STATIC__id_roll_angle_magnetic = 9;
-    static const int FIELD_STATIC__id_pitch_angle_magnetic = 10;
-    static const int FIELD_STATIC__id_yaw_angle_magnetic = 11;
-    static const int FIELD_STATIC__id_pitch_angle = 12;
-    static const int FIELD_STATIC__id_roll_angle = 13;
-    static const int FIELD_STATIC__id_yaw_angle = 14;
-    static const int FIELD_STATIC__id_altitude_rate = 15;
-    static const int FIELD_STATIC__id_indicated_airspeed = 16;
-    static const int FIELD_STATIC__id_true_airspeed = 17;
-    static const int FIELD_STATIC__id_calibrated_airspeed = 18;
-    static const int FIELD_STATIC__id_angle_of_attack = 19;
-    static const int FIELD_STATIC__id_qnh = 20;
-    static const int FIELD_STATIC__id_baro_corrected_altitude = 21;
-    static const int FIELD_STATIC__id_heading_angle = 22;
-    static const int FIELD_STATIC__id_heading = 23;
-    static const int FIELD_STATIC__id_pressure_altitude = 24;
-    static const int FIELD_STATIC__id_outside_air_temperature = 25;
-    static const int FIELD_STATIC__id_differential_pressure = 26;
-    static const int FIELD_STATIC__id_static_pressure = 27;
-    static const int FIELD_STATIC__id_wind_speed = 28;
-    static const int FIELD_STATIC__id_wind_direction = 29;
-    static const int FIELD_STATIC__id_gps_latitude = 30;
-    static const int FIELD_STATIC__id_gps_longitude = 31;
-    static const int FIELD_STATIC__id_gps_height = 32;
-    static const int FIELD_STATIC__id_gps_groundspeed = 33;
-    static const int FIELD_STATIC__id_true_track = 34;
-    static const int FIELD_STATIC__id_magnetic_track = 35;
-    static const int FIELD_STATIC__id_magnetic_heading = 36;
-    static const int FIELD_STATIC__id_position_latitude = 37;
-    static const int FIELD_STATIC__id_position_longitude = 38;
-    static const int FIELD_STATIC__id_position_altitude = 39;
-    static const int FIELD_STATIC__id_velocity_x = 40;
-    static const int FIELD_STATIC__id_velocity_y = 41;
-    static const int FIELD_STATIC__id_velocity_z = 42;
-    static const int FIELD_STATIC__id_imu_mag_x = 43;
-    static const int FIELD_STATIC__id_imu_mag_y = 44;
-    static const int FIELD_STATIC__id_imu_mag_z = 45;
-    static const int FIELD_STATIC__id_imu_accel_x = 46;
-    static const int FIELD_STATIC__id_imu_accel_y = 47;
-    static const int FIELD_STATIC__id_imu_accel_z = 48;
-    static const int FIELD_STATIC__id_imu_gyro_x = 49;
-    static const int FIELD_STATIC__id_imu_gyro_y = 50;
-    static const int FIELD_STATIC__id_imu_gyro_z = 51;
-    static const int FIELD_STATIC__id_magnetic_variation = 52;
-    static const int FIELD_STATIC__id_def_utc = 53;
-    static const int FIELD_STATIC__id_def_date = 54;
-    static const int FIELD_STATIC__id_qnh_up = 55;
-    static const int FIELD_STATIC__id_qnh_dn = 56;
-    static const int FIELD_STATIC__id_set_magnetic_variation = 57;
-    static const int FIELD_STATIC__id_heading_up = 58;
-    static const int FIELD_STATIC__id_heading_dn = 59;
-    static const int FIELD_STATIC__id_stall_warning = 60;
-    static const int FIELD_STATIC__id_total_time = 61;
-    static const int FIELD_STATIC__id_air_time = 62;
-    static const int FIELD_STATIC__id_tach_time = 63;
-    static const int FIELD_STATIC__id_pitch = 64;
-    static const int FIELD_STATIC__id_track = 65;
-    static const int FIELD_STATIC__id_deviation = 66;
-    static const int FIELD_STATIC__id_track_angle_error = 67;
-    static const int FIELD_STATIC__id_estimated_time_to_next = 68;
-    static const int FIELD_STATIC__id_estimated_time_of_arrival = 69;
-    static const int FIELD_STATIC__id_estimated_enroute_time = 70;
-    static const int FIELD_STATIC__id_waypoint_identifier_0_3 = 71;
-    static const int FIELD_STATIC__id_waypoint_identifier_4_7 = 72;
-    static const int FIELD_STATIC__id_waypoint_identifier_8_11 = 73;
-    static const int FIELD_STATIC__id_waypoint_identifier_12_15 = 74;
-    static const int FIELD_STATIC__id_waypoint_type_identifier = 75;
-    static const int FIELD_STATIC__id_waypoint_latitude = 76;
-    static const int FIELD_STATIC__id_waypoint_longitude = 77;
-    static const int FIELD_STATIC__id_waypoint_minimum_altitude = 78;
-    static const int FIELD_STATIC__id_waypoint_maximum_altitude = 79;
-    static const int FIELD_STATIC__id_distance_to_next = 80;
-    static const int FIELD_STATIC__id_distance_to_destination = 81;
-    static const int FIELD_STATIC__id_selected_course = 82;
-    static const int FIELD_STATIC__id_desired_track_angle = 83;
-    static const int FIELD_STATIC__id_nav_command = 84;
-    static const int FIELD_STATIC__id_nav_valid = 85;
-    static const int FIELD_STATIC__id_gps_valid = 86;
-    static const int FIELD_STATIC__id_imu_valid = 87;
-    static const int FIELD_STATIC__id_edu_valid = 88;
-    static const int FIELD_STATIC__id_aux_battery = 89;
-    static const int FIELD_STATIC__id_trim_up = 90;
-    static const int FIELD_STATIC__id_trim_dn = 91;
-    static const int FIELD_STATIC__id_trim_left = 92;
-    static const int FIELD_STATIC__id_trim_right = 93;
-    static const int FIELD_STATIC__id_autopilot_engage = 94;
-    static const int FIELD_STATIC__id_autopilot_set_max_roll = 95;
-    static const int FIELD_STATIC__id_autopilot_set_vs_rate = 96;
-    static const int FIELD_STATIC__id_waypoint_turn_heading = 97;
-    static const int FIELD_STATIC__id_roll_servo_set_position = 98;
-    static const int FIELD_STATIC__id_pitch_servo_set_postion = 99;
-    static const int FIELD_STATIC__id_autopilot_power = 100;
-    static const int FIELD_STATIC__id_autopilot_alt_mode = 101;
-    static const int FIELD_STATIC__id_autopilot_vs_mode = 102;
-    static const int FIELD_STATIC__id_autopilot_mode = 103;
-    static const int FIELD_STATIC__id_autopilot_status = 104;
-    static const int FIELD_STATIC__id_roll_servo_status = 105;
-    static const int FIELD_STATIC__id_pitch_servo_status = 106;
-    static const int FIELD_STATIC__id_autopilot_altitude = 107;
-    static const int FIELD_STATIC__id_autopilot_vertical_speed = 108;
-    static const int FIELD_STATIC__id_engine_rpm = 109;
-    static const int FIELD_STATIC__id_engine_rpm_a = 110;
-    static const int FIELD_STATIC__id_exhaust_gas_temperature1 = 111;
-    static const int FIELD_STATIC__id_exhaust_gas_temperature2 = 112;
-    static const int FIELD_STATIC__id_exhaust_gas_temperature3 = 113;
-    static const int FIELD_STATIC__id_exhaust_gas_temperature4 = 114;
-    static const int FIELD_STATIC__id_manifold_pressure = 115;
-    static const int FIELD_STATIC__id_oil_pressure = 116;
-    static const int FIELD_STATIC__id_oil_temperature = 117;
-    static const int FIELD_STATIC__id_cylinder_head_temperature1 = 118;
-    static const int FIELD_STATIC__id_cylinder_head_temperature2 = 119;
-    static const int FIELD_STATIC__id_cylinder_head_temperature3 = 120;
-    static const int FIELD_STATIC__id_cylinder_head_temperature4 = 121;
-    static const int FIELD_STATIC__id_engine_rpm_b = 122;
-    static const int FIELD_STATIC__id_manifold_pressure_b = 123;
-    static const int FIELD_STATIC__id_fuel_pressure = 124;
-    static const int FIELD_STATIC__id_dc_voltage = 125;
-    static const int FIELD_STATIC__id_dc_current = 126;
-    static const int FIELD_STATIC__id_fuel_flow_rate = 127;
-    static const int FIELD_STATIC__id_fuel_consumed = 128;
-    static const int FIELD_STATIC__id_edu_left_fuel_quantity = 129;
-    static const int FIELD_STATIC__id_edu_right_fuel_quantity = 130;
-    static const int FIELD_STATIC__id_timing_divergence = 131;
-    static const int FIELD_STATIC__id_left_mag_rpm = 132;
-    static const int FIELD_STATIC__id_right_mag_rpm = 133;
-    static const int FIELD_STATIC__id_left_mag_adv = 134;
-    static const int FIELD_STATIC__id_right_mag_adv = 135;
-    static const int FIELD_STATIC__id_left_mag_map = 136;
-    static const int FIELD_STATIC__id_right_mag_map = 137;
-    static const int FIELD_STATIC__id_left_mag_volt = 138;
-    static const int FIELD_STATIC__id_right_mag_volt = 139;
-    static const int FIELD_STATIC__id_left_mag_temp = 140;
-    static const int FIELD_STATIC__id_right_mag_temp = 141;
-    static const int FIELD_STATIC__id_left_mag_coil1 = 142;
-    static const int FIELD_STATIC__id_right_mag_coil1 = 143;
-    static const int FIELD_STATIC__id_left_mag_coil2 = 144;
-    static const int FIELD_STATIC__id_right_mag_coil2 = 145;
-    static const int FIELD_STATIC__id_fuel_flow_rate_left = 146;
-    static const int FIELD_STATIC__id_fuel_flow_rate_right = 147;
-    static const int FIELD_STATIC__id_active_fuel_tank = 148;
-    static const int FIELD_STATIC__id_left_fuel_quantity = 149;
-    static const int FIELD_STATIC__id_right_fuel_quantity = 150;
-    static const int FIELD_STATIC__id_pitot_temperature = 151;
-    static const int FIELD_STATIC__id_pitot_heat_status = 152;
-    static const int FIELD_STATIC__id_pitot_power_status = 153;
-    static const int FIELD_STATIC__id_fdu_board_temperature = 154;
-    static const int FIELD_STATIC__id_set_left_fuel_qty = 155;
-    static const int FIELD_STATIC__id_set_right_fuel_qty = 156;
-    static const int FIELD_STATIC__id_mixture_lever = 157;
-    static const int FIELD_STATIC__id_injector_dwell = 158;
-    static const int FIELD_STATIC__id_propeller_speed_lever = 159;
-    static const int FIELD_STATIC__id_propeller_motor_current = 160;
-    static const int FIELD_STATIC__id_propeller_low_speed = 161;
-    static const int FIELD_STATIC__id_propeller_high_speed = 162;
-    static const int FIELD_STATIC__id_set_route = 163;
-    static const int FIELD_STATIC__id_set_route_segments = 164;
-    static const int FIELD_STATIC__id_set_waypoint_identifier_0_3 = 165;
-    static const int FIELD_STATIC__id_set_waypoint_identifier_4_7 = 166;
-    static const int FIELD_STATIC__id_set_waypoint_identifier_8_11 = 167;
-    static const int FIELD_STATIC__id_set_waypoint_identifier_12_15 = 168;
-    static const int FIELD_STATIC__id_set_waypoint_type_identifier = 169;
-    static const int FIELD_STATIC__id_set_waypoint_latitude = 170;
-    static const int FIELD_STATIC__id_set_waypoint_longitude = 171;
-    static const int FIELD_STATIC__id_set_waypoint_minimum_altitude = 172;
-    static const int FIELD_STATIC__id_set_waypoint_maximum_altitude = 173;
-    static const int FIELD_STATIC__id_navigation_mode = 174;
-    static const int FIELD_STATIC__id_alternator_status = 175;
-    static const int FIELD_STATIC__id_voltage_warning = 176;
-    static const int FIELD_STATIC__id_panel_brightness = 177;
-    static const int FIELD_STATIC__id_pitot_temperature_alarm = 178;
-    static const int FIELD_STATIC__id_nav_msg = 179;
-    static const int FIELD_STATIC__id_nav_appr = 180;
-    static const int FIELD_STATIC__id_nav_ils = 181;
-    static const int FIELD_STATIC__id_voltage_sense_1 = 182;
-    static const int FIELD_STATIC__id_voltage_sense_2 = 183;
-    static const int FIELD_STATIC__id_user_defined_start = 184;
-    static const int FIELD_STATIC__id_user_defined_end = 185;
-    static const int FIELD_STATIC__id_node_register = 186;
+    NANOCLR_NATIVE_DECLARE(EventConfig___VOID);
 
     //--//
 
@@ -419,6 +388,47 @@ struct Library_CanFly_CoreLibrary_CanFly_Colors
 
 };
 
+struct Library_CanFly_CoreLibrary_CanFly_Extent
+{
+    static const int FIELD___dx = 1;
+    static const int FIELD___dy = 2;
+
+    //--//
+
+};
+
+struct Library_CanFly_CoreLibrary_CanFly_Font
+{
+    static const int FIELD___hndl = 1;
+
+    NANOCLR_NATIVE_DECLARE(GetFont___STATIC__U4__STRING__U4);
+    NANOCLR_NATIVE_DECLARE(ReleaseFont___STATIC__VOID__U4);
+    NANOCLR_NATIVE_DECLARE(LoadFont___STATIC__VOID__U4);
+
+    //--//
+
+};
+
+struct Library_CanFly_CoreLibrary_CanFly_Point
+{
+    static const int FIELD___x = 1;
+    static const int FIELD___y = 2;
+
+    //--//
+
+};
+
+struct Library_CanFly_CoreLibrary_CanFly_Rect
+{
+    static const int FIELD___left = 1;
+    static const int FIELD___top = 2;
+    static const int FIELD___right = 3;
+    static const int FIELD___bottom = 4;
+
+    //--//
+
+};
+
 struct Library_CanFly_CoreLibrary_CanFly_GdiObject
 {
     static const int FIELD___hndl = 1;
@@ -432,12 +442,6 @@ struct Library_CanFly_CoreLibrary_CanFly_Neutron
 {
     NANOCLR_NATIVE_DECLARE(RegCreateKey___STATIC__U4__U4__STRING);
     NANOCLR_NATIVE_DECLARE(RegOpenKey___STATIC__U4__U4__STRING);
-    NANOCLR_NATIVE_DECLARE(RegEnumKey___STATIC__VOID__U4__BYREF_CanFlyFieldType__BYREF_U2__BYREF_SZARRAY_U1__BYREF_STRING__BYREF_U4);
-    NANOCLR_NATIVE_DECLARE(RegDeleteKey___STATIC__VOID__U4);
-    NANOCLR_NATIVE_DECLARE(RegDeleteValue___STATIC__VOID__U4__STRING);
-    NANOCLR_NATIVE_DECLARE(ReqQueryKey___STATIC__VOID__U4__BYREF_CanFlyFieldType__BYREF_STRING__BYREF_U2__BYREF_U4);
-    NANOCLR_NATIVE_DECLARE(RegQueryChild___STATIC__VOID__U4__STRING__BYREF_U4__BYREF_CanFlyFieldType__BYREF_U2);
-    NANOCLR_NATIVE_DECLARE(RegRenameValue___STATIC__VOID__U4__STRING__STRING);
     NANOCLR_NATIVE_DECLARE(RegGetInt8___STATIC__I1__U4__STRING);
     NANOCLR_NATIVE_DECLARE(RegSetInt8___STATIC__VOID__U4__STRING__I1);
     NANOCLR_NATIVE_DECLARE(RegGetUint8___STATIC__U1__U4__STRING);
@@ -456,19 +460,6 @@ struct Library_CanFly_CoreLibrary_CanFly_Neutron
     NANOCLR_NATIVE_DECLARE(RegSetFloat___STATIC__VOID__U4__STRING__R4);
     NANOCLR_NATIVE_DECLARE(RegGetBool___STATIC__BOOLEAN__U4__STRING);
     NANOCLR_NATIVE_DECLARE(RegSetBool___STATIC__VOID__U4__STRING__BOOLEAN);
-    NANOCLR_NATIVE_DECLARE(RegStreamOpen___STATIC__U4__U4__STRING);
-    NANOCLR_NATIVE_DECLARE(RegStreamCreate___STATIC__U4__U4__STRING);
-    NANOCLR_NATIVE_DECLARE(RegStreamClose___STATIC__VOID__U4);
-    NANOCLR_NATIVE_DECLARE(RegStreamDelete___STATIC__VOID__U4);
-    NANOCLR_NATIVE_DECLARE(RegStreamEof___STATIC__BOOLEAN__U4);
-    NANOCLR_NATIVE_DECLARE(RegStreamRead___STATIC__SZARRAY_U1__U4__U2);
-    NANOCLR_NATIVE_DECLARE(RegStreamWrite___STATIC__VOID__U4__SZARRAY_U1);
-    NANOCLR_NATIVE_DECLARE(RegStreamGetPos___STATIC__U4__U4);
-    NANOCLR_NATIVE_DECLARE(RegStreamSetPos___STATIC__VOID__U4__U4);
-    NANOCLR_NATIVE_DECLARE(RegStreamLength___STATIC__U4__U4);
-    NANOCLR_NATIVE_DECLARE(RegStreamTruncate___STATIC__VOID__U4__U4);
-    NANOCLR_NATIVE_DECLARE(RegStreamCopy___STATIC__VOID__U4__U4);
-    NANOCLR_NATIVE_DECLARE(RegStreamPath___STATIC__STRING__U4__BOOLEAN);
 
     //--//
 
@@ -484,9 +475,9 @@ struct Library_CanFly_CoreLibrary_CanFly_Pen
 
 struct Library_CanFly_CoreLibrary_CanFly_Photon
 {
-    NANOCLR_NATIVE_DECLARE(OpenScreen___STATIC__U4__U2__CanFlywndproc__U2);
-    NANOCLR_NATIVE_DECLARE(CreateWindow___STATIC__U4__U4__I4__I4__I4__I4__CanFlywndproc__U2);
-    NANOCLR_NATIVE_DECLARE(CreateChildWindow___STATIC__U4__U4__I4__I4__I4__I4__CanFlywndproc__U2);
+    NANOCLR_NATIVE_DECLARE(OpenScreen___STATIC__U4__U2__U2);
+    NANOCLR_NATIVE_DECLARE(CreateWindow___STATIC__U4__U4__I4__I4__I4__I4__U2);
+    NANOCLR_NATIVE_DECLARE(CreateChildWindow___STATIC__U4__U4__I4__I4__I4__I4__U2);
     NANOCLR_NATIVE_DECLARE(CloseWindow___STATIC__VOID__U4);
     NANOCLR_NATIVE_DECLARE(GetWindowRect___STATIC__VOID__U4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4);
     NANOCLR_NATIVE_DECLARE(GetWindowPos___STATIC__VOID__U4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4);
@@ -573,7 +564,7 @@ struct Library_CanFly_CoreLibrary_CanFly_PointArray
     NANOCLR_NATIVE_DECLARE(PointArrayAppend___STATIC__U4__U4__I4__I4);
     NANOCLR_NATIVE_DECLARE(PointArrayInsertAt___STATIC__VOID__U4__U4__I4__I4);
     NANOCLR_NATIVE_DECLARE(PointArrayGetPoint___STATIC__VOID__U4__U4__BYREF_I4__BYREF_I4);
-    NANOCLR_NATIVE_DECLARE(PointArrayIndexOf___STATIC__U4__U4__I4__I4);
+    NANOCLR_NATIVE_DECLARE(PointArrayIndexOf___STATIC__I4__U4__I4__I4);
     NANOCLR_NATIVE_DECLARE(PointArrayRemoveAt___STATIC__VOID__U4__U4);
 
     //--//
@@ -584,6 +575,35 @@ struct Library_CanFly_CoreLibrary_CanFly_PointArray__PointEnumerator
 {
     static const int FIELD___outer = 1;
     static const int FIELD___index = 2;
+
+    //--//
+
+};
+
+struct Library_CanFly_CoreLibrary_CanFly_RegistryStream
+{
+    NANOCLR_NATIVE_DECLARE(RegStreamOpen___STATIC__U4__U4__STRING);
+    NANOCLR_NATIVE_DECLARE(RegStreamCreate___STATIC__U4__U4__STRING);
+    NANOCLR_NATIVE_DECLARE(RegStreamClose___STATIC__VOID__U4);
+    NANOCLR_NATIVE_DECLARE(RegStreamDelete___STATIC__VOID__U4);
+    NANOCLR_NATIVE_DECLARE(RegStreamEof___STATIC__BOOLEAN__U4);
+    NANOCLR_NATIVE_DECLARE(RegStreamRead___STATIC__SZARRAY_U1__U4__U2);
+    NANOCLR_NATIVE_DECLARE(RegStreamWrite___STATIC__VOID__U4__SZARRAY_U1);
+    NANOCLR_NATIVE_DECLARE(RegStreamGetPos___STATIC__U4__U4);
+    NANOCLR_NATIVE_DECLARE(RegStreamSetPos___STATIC__VOID__U4__U4);
+    NANOCLR_NATIVE_DECLARE(RegStreamLength___STATIC__U4__U4);
+    NANOCLR_NATIVE_DECLARE(RegStreamTruncate___STATIC__VOID__U4__U4);
+    NANOCLR_NATIVE_DECLARE(RegStreamCopy___STATIC__VOID__U4__U4);
+    NANOCLR_NATIVE_DECLARE(RegStreamPath___STATIC__STRING__U4__BOOLEAN);
+
+    //--//
+
+};
+
+struct Library_CanFly_CoreLibrary_CanFly_Screen
+{
+    static const int FIELD_STATIC___screen = 237;
+    static const int FIELD_STATIC__widgetLock = 238;
 
     //--//
 
