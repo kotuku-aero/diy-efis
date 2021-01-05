@@ -1,31 +1,9 @@
-//
-// Copyright (c) .NET Foundation and Contributors
-// Portions Copyright (c) Microsoft Corporation.  All rights reserved.
-// See LICENSE file in the project root for full license information.
-//
-
-#include <nanoHAL.h>
-
-//--//
-/* STDIO stubs                                                              */
-//--//
-
-#if !defined(BUILD_RTM)
-
-void hal_fprintf_SetLoggingCallback(LOGGING_CALLBACK fpn)
-  {
-  (void)fpn;
-  NATIVE_PROFILE_PAL_CRT();
-
-  }
-
-#endif
-
+#include "../nano/HAL/Include/nanoHAL.h"
 
 // because debug_printf needs to be called in both C and C++ we need a proxy to allow it to be called in 'C'
 extern "C" {
 
-#if !defined(BUILD_RTM)
+#ifdef _DEBUG
 
   void debug_printf(const char* format, ...)
     {
@@ -52,10 +30,16 @@ int hal_strcpy_s(char* strDst, size_t sizeInBytes, const char* strSrc)
 #undef strcpy
 
   size_t len;
-  if (strDst == NULL || strSrc == NULL || sizeInBytes == 0) { _ASSERTE(FALSE); return 1; }
+  if (strDst == NULL || strSrc == NULL || sizeInBytes == 0)
+    {
+    _ASSERTE(FALSE); return 1;
+    }
 
   len = hal_strlen_s(strSrc);
-  if (sizeInBytes < len + 1) { _ASSERTE(FALSE); return 1; }
+  if (sizeInBytes < len + 1)
+    {
+    _ASSERTE(FALSE); return 1; 
+    }
 
   strcpy(strDst, strSrc);
   return 0;
@@ -81,15 +65,6 @@ int hal_strncpy_s(char* strDst, size_t sizeInBytes, const char* strSrc, size_t c
   return 0;
 
 #define strncpy DoNotUse_*strncpy []
-  }
-
-size_t hal_strlen_s(const char* str)
-  {
-  NATIVE_PROFILE_PAL_CRT();
-
-  const char* eos = str;
-  while (*eos++);
-  return(eos - str - 1);
   }
 
 int hal_strncmp_s(const char* str1, const char* str2, size_t num)
@@ -122,3 +97,4 @@ int hal_stricmp(const char* dst, const char* src)
 
     return(f - l);
   }
+

@@ -35,6 +35,8 @@ If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
 
+#include "photon.h"
+#include "window.h"
 /**
 * @struct window_msg_t
 */

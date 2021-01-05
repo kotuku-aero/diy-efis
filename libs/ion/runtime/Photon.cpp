@@ -1,33 +1,47 @@
+/*
+#include "../../nano/CLR/Include/nanoCLR_Interop.h"
+#include "../../nano/CLR/Include/nanoCLR_Runtime.h"
+#include "../../nano/CLR/Include/nanoPackStruct.h"
+*/
+
 #include "../canflylib/CanFly_CoreLibrary.h"
 
-#include "../../../neutron/neutron.h"
-#include "../../../photon/photon.h"
+#include "../../neutron/neutron.h"
+#include "../../photon/photon.h"
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::OpenScreen___STATIC__U4__U2__CanFlywndproc__U2(CLR_RT_StackFrame& stack)
+#include "HeapBlockDispatcher.h"
+
+
+extern "C" {
+  static result_t screen_wndproc(handle_t hwnd, const canmsg_t *msg)
+    {
+    // post this to the message queue
+    g_CLR_MessageDispatcher.SaveToProtonQueue(msg);
+    }
+  }
+
+HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::OpenScreen___STATIC__U4__U2__U2(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
-  {
 
   uint16_t param0;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 0, param0));
 
-  UNSUPPORTED param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UNSUPPORTED(stack, 1, param1));
+  uint16_t param1;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 1, param1));
 
-  uint16_t param2;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 2, param2));
+  handle_t hwnd;
+  hr = open_screen(param0, screen_wndproc, param1, &hwnd);
 
-  unsigned int retValue = Photon::OpenScreen(param0, param1, param2, hr);
   NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT32(stack, retValue);
-  }
+
+  SetResult_UINT32(stack, (unsigned int) hwnd);
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::CreateWindow___STATIC__U4__U4__I4__I4__I4__I4__CanFlywndproc__U2(CLR_RT_StackFrame& stack)
+HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::CreateWindow___STATIC__U4__U4__I4__I4__I4__I4__U2(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
-  {
 
   unsigned int param0;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
@@ -44,24 +58,27 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::CreateWindow___STATIC__U4__U4_
   signed int param4;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 4, param4));
 
-  UNSUPPORTED param5;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UNSUPPORTED(stack, 5, param5));
+  uint16_t param5;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 5, param5));
 
-  uint16_t param6;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 6, param6));
+  rect_t bounds;
+  bounds.left = param1;
+  bounds.top = param2;
+  bounds.right = param3;
+  bounds.bottom = param4;
+  handle_t hwnd;
 
-  unsigned int retValue = Photon::CreateWindow(param0, param1, param2, param3, param4, param5, param6, hr);
+  hr = create_window((handle_t)param0, &bounds, defwndproc, param5, &hwnd);
+
   NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT32(stack, retValue);
-  }
+  SetResult_UINT32(stack, (unsigned int)hwnd);
+
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::CreateChildWindow___STATIC__U4__U4__I4__I4__I4__I4__CanFlywndproc__U2(CLR_RT_StackFrame& stack)
+HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::CreateChildWindow___STATIC__U4__U4__I4__I4__I4__I4__U2(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
-  {
-
   unsigned int param0;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
 
@@ -77,100 +94,79 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::CreateChildWindow___STATIC__U4
   signed int param4;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 4, param4));
 
-  UNSUPPORTED param5;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UNSUPPORTED(stack, 5, param5));
+  uint16_t param5;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 5, param5));
 
-  uint16_t param6;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 6, param6));
+  rect_t bounds;
+  bounds.left = param1;
+  bounds.top = param2;
+  bounds.right = param3;
+  bounds.bottom = param4;
 
-  unsigned int retValue = Photon::CreateChildWindow(param0, param1, param2, param3, param4, param5, param6, hr);
+  handle_t hwnd;
+
+  hr = create_child_window((handle_t)param0, &bounds, defwndproc, param5, &hwnd);
+
   NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT32(stack, retValue);
-  }
+  SetResult_UINT32(stack, (unsigned int)hwnd);
+
   NANOCLR_NOCLEANUP();
   }
 
 HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::CloseWindow___STATIC__VOID__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
-  {
 
   unsigned int param0;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
 
-  Photon::CloseWindow(param0, hr);
+  hr = close_window((handle_t)param0);
   NANOCLR_CHECK_HRESULT(hr);
 
-  }
   NANOCLR_NOCLEANUP();
   }
 
 HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::GetWindowRect___STATIC__VOID__U4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
-  {
 
   unsigned int param0;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
 
-  param1;
-  UINT8 heapblock1[CLR_RT_HEAP_BLOCK_SIZE];
-  NANOCLR_CHECK_HRESULT(Interop_Marshal__ByRef(stack, heapblock1, param1));
-
-  param2;
-  UINT8 heapblock2[CLR_RT_HEAP_BLOCK_SIZE];
-  NANOCLR_CHECK_HRESULT(Interop_Marshal__ByRef(stack, heapblock2, param2));
-
-  param3;
-  UINT8 heapblock3[CLR_RT_HEAP_BLOCK_SIZE];
-  NANOCLR_CHECK_HRESULT(Interop_Marshal__ByRef(stack, heapblock3, param3));
-
-  param4;
-  UINT8 heapblock4[CLR_RT_HEAP_BLOCK_SIZE];
-  NANOCLR_CHECK_HRESULT(Interop_Marshal__ByRef(stack, heapblock4, param4));
-
-  Photon::GetWindowRect(param0, param1, param2, param3, param4, hr);
+  rect_t wnd_rect;
+  hr = get_window_rect((handle_t)param0, &wnd_rect);
   NANOCLR_CHECK_HRESULT(hr);
 
-  }
+  stack.Arg2().NumericByRef().s4 = wnd_rect.left;
+  stack.Arg3().NumericByRef().s4 = wnd_rect.top;
+  stack.Arg4().NumericByRef().s4 = wnd_rect.right;
+  stack.Arg5().NumericByRef().s4 = wnd_rect.bottom;
+
   NANOCLR_NOCLEANUP();
   }
 
 HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::GetWindowPos___STATIC__VOID__U4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
-  {
 
   unsigned int param0;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
 
-  param1;
-  UINT8 heapblock1[CLR_RT_HEAP_BLOCK_SIZE];
-  NANOCLR_CHECK_HRESULT(Interop_Marshal__ByRef(stack, heapblock1, param1));
-
-  param2;
-  UINT8 heapblock2[CLR_RT_HEAP_BLOCK_SIZE];
-  NANOCLR_CHECK_HRESULT(Interop_Marshal__ByRef(stack, heapblock2, param2));
-
-  param3;
-  UINT8 heapblock3[CLR_RT_HEAP_BLOCK_SIZE];
-  NANOCLR_CHECK_HRESULT(Interop_Marshal__ByRef(stack, heapblock3, param3));
-
-  param4;
-  UINT8 heapblock4[CLR_RT_HEAP_BLOCK_SIZE];
-  NANOCLR_CHECK_HRESULT(Interop_Marshal__ByRef(stack, heapblock4, param4));
-
-  Photon::GetWindowPos(param0, param1, param2, param3, param4, hr);
+  rect_t pos;
+  hr = get_window_pos((handle_t)param0, &pos);
   NANOCLR_CHECK_HRESULT(hr);
 
-  }
+  stack.Arg2().NumericByRef().s4 = pos.left;
+  stack.Arg3().NumericByRef().s4 = pos.top;
+  stack.Arg4().NumericByRef().s4 = pos.right;
+  stack.Arg5().NumericByRef().s4 = pos.bottom;
+
   NANOCLR_NOCLEANUP();
   }
 
 HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::SetWindowPos___STATIC__VOID__U4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
-  {
 
   unsigned int param0;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
@@ -187,172 +183,176 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::SetWindowPos___STATIC__VOID__U
   signed int param4;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 4, param4));
 
-  Photon::SetWindowPos(param0, param1, param2, param3, param4, hr);
+  rect_t rect;
+  rect.left = param1;
+  rect.top = param2;
+  rect.right = param3;
+  rect.bottom = param4;
+
+  hr = set_window_pos((handle_t)param0, &rect);
+  
   NANOCLR_CHECK_HRESULT(hr);
 
-  }
   NANOCLR_NOCLEANUP();
   }
 
 HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::GetWindowData___STATIC__OBJECT__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
-  {
+  
 
   unsigned int param0;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
 
-  UNSUPPORTED retValue = Photon::GetWindowData(param0, hr);
+  void *wnd_data;
+  hr = get_wnddata((handle_t)param0, &wnd_data);
+
   NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UNSUPPORTED(stack, retValue);
-  }
+ 
+  stack.SetResult_Object((CLR_RT_HeapBlock *)wnd_data);  
+
   NANOCLR_NOCLEANUP();
   }
 
 HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::SetWindowData___STATIC__VOID__U4__OBJECT(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
-  {
 
   unsigned int param0;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
 
-  UNSUPPORTED param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UNSUPPORTED(stack, 1, param1));
-
-  Photon::SetWindowData(param0, param1, hr);
+  hr = set_wnddata((handle_t)param0, stack.Arg1().Dereference());
   NANOCLR_CHECK_HRESULT(hr);
 
-  }
   NANOCLR_NOCLEANUP();
   }
 
 HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::GetParent___STATIC__U4__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
-  {
 
   unsigned int param0;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
 
-  unsigned int retValue = Photon::GetParent(param0, hr);
+  handle_t hwnd;
+  hr = get_parent((handle_t)param0, &hwnd);
   NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT32(stack, retValue);
-  }
+  SetResult_UINT32(stack, (unsigned int)hwnd);
+
   NANOCLR_NOCLEANUP();
   }
 
 HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::GetWindowById___STATIC__U4__U4__U2(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
-  {
-
   unsigned int param0;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
 
   uint16_t param1;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 1, param1));
 
-  unsigned int retValue = Photon::GetWindowById(param0, param1, hr);
+  handle_t hndl;
+  hr = get_window_by_id((handle_t)param0, param1, &hndl);
+
   NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT32(stack, retValue);
-  }
+  SetResult_UINT32(stack, (unsigned int)hndl);
+
   NANOCLR_NOCLEANUP();
   }
 
 HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::GetFirstChild___STATIC__U4__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
-  {
 
   unsigned int param0;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
 
-  unsigned int retValue = Photon::GetFirstChild(param0, hr);
+  handle_t hndl;
+  hr = get_first_child((handle_t)param0, &hndl);
+
   NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT32(stack, retValue);
-  }
+  SetResult_UINT32(stack, (unsigned int)hndl);
+  
   NANOCLR_NOCLEANUP();
   }
 
 HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::GetNextSibling___STATIC__U4__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
-  {
 
   unsigned int param0;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
 
-  unsigned int retValue = Photon::GetNextSibling(param0, hr);
+  handle_t hndl;
+  hr = get_next_sibling((handle_t)param0, &hndl);
+
   NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT32(stack, retValue);
-  }
+  SetResult_UINT32(stack, (unsigned int)hndl);
+
   NANOCLR_NOCLEANUP();
   }
 
 HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::GetPreviousSibling___STATIC__U4__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
-  {
 
   unsigned int param0;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
 
-  unsigned int retValue = Photon::GetPreviousSibling(param0, hr);
+  handle_t hndl;
+  hr = get_previous_sibling((handle_t)param0, &hndl);
+
   NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT32(stack, retValue);
-  }
+  SetResult_UINT32(stack, (unsigned int)hndl);
+
   NANOCLR_NOCLEANUP();
   }
 
 HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::InsertBefore___STATIC__VOID__U4__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
-  {
 
   unsigned int param0;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
 
   unsigned int param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 1, param1));
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
 
-  Photon::InsertBefore(param0, param1, hr);
+  hr = insert_before((handle_t)param0, (handle_t) param1);
+
   NANOCLR_CHECK_HRESULT(hr);
 
-  }
   NANOCLR_NOCLEANUP();
   }
 
 HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::InsertAfter___STATIC__VOID__U4__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
-  {
 
   unsigned int param0;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
 
   unsigned int param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 1, param1));
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
 
-  Photon::InsertAfter(param0, param1, hr);
+  hr = insert_after((handle_t)param0, (handle_t)param1);
+
   NANOCLR_CHECK_HRESULT(hr);
-
-  }
   NANOCLR_NOCLEANUP();
   }
 
 HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::GetZOrder___STATIC__U1__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
-  {
 
   unsigned int param0;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
 
-  uint8_t retValue = Photon::GetZOrder(param0, hr);
+  uint8_t retValue;
+  hr = get_z_order((handle_t)param0, &retValue);
   NANOCLR_CHECK_HRESULT(hr);
   SetResult_UINT8(stack, retValue);
-  }
+
   NANOCLR_NOCLEANUP();
   }
 
@@ -367,7 +367,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::SetZOrder___STATIC__VOID__U4__
   uint8_t param1;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT8(stack, 1, param1));
 
-  Photon::SetZOrder(param0, param1, hr);
+  hr = set_z_order((handle_t)param0, param1);
   NANOCLR_CHECK_HRESULT(hr);
 
   }
@@ -382,7 +382,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::CanvasClose___STATIC__VOID__U4
   unsigned int param0;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
 
-  Photon::CanvasClose(param0, hr);
+  hr = canvas_close((handle_t)param0);
   NANOCLR_CHECK_HRESULT(hr);
 
   }
@@ -400,9 +400,15 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::CreateRectCanvas___STATIC__U4_
   signed int param1;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 1, param1));
 
-  unsigned int retValue = Photon::CreateRectCanvas(param0, param1, hr);
-  NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT32(stack, retValue);
+  extent_t size;
+  size.dx = param0;
+  size.dy = param1;
+
+  handle_t hndl;
+  hr = create_rect_canvas(&size, &hndl);
+
+    NANOCLR_CHECK_HRESULT(hr);
+  SetResult_UINT32(stack, (unsigned int)hndl);
   }
   NANOCLR_NOCLEANUP();
   }
@@ -415,9 +421,11 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::CreatePngCanvas___STATIC__U4__
   unsigned int param0;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
 
-  unsigned int retValue = Photon::CreatePngCanvas(param0, hr);
+  handle_t hndl;
+  hr = create_png_canvas((handle_t)param0, &hndl);
+
   NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT32(stack, retValue);
+  SetResult_UINT32(stack, (unsigned int)hndl);
   }
   NANOCLR_NOCLEANUP();
   }
@@ -439,7 +447,11 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::LoadPng___STATIC__VOID__U4__U4
   signed int param3;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 3, param3));
 
-  Photon::LoadPng(param0, param1, param2, param3, hr);
+  point_t pt;
+  pt.x = param2;
+  pt.y = param3;
+
+  hr = load_png((handle_t)param0, (handle_t)param1, &pt);
   NANOCLR_CHECK_HRESULT(hr);
 
   }
@@ -454,21 +466,14 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::GetCanvasExtents___STATIC__VOI
   unsigned int param0;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
 
-  param1;
-  UINT8 heapblock1[CLR_RT_HEAP_BLOCK_SIZE];
-  NANOCLR_CHECK_HRESULT(Interop_Marshal__ByRef(stack, heapblock1, param1));
-
-  param2;
-  UINT8 heapblock2[CLR_RT_HEAP_BLOCK_SIZE];
-  NANOCLR_CHECK_HRESULT(Interop_Marshal__ByRef(stack, heapblock2, param2));
-
-  param3;
-  UINT8 heapblock3[CLR_RT_HEAP_BLOCK_SIZE];
-  NANOCLR_CHECK_HRESULT(Interop_Marshal__ByRef(stack, heapblock3, param3));
-
-  Photon::GetCanvasExtents(param0, param1, param2, param3, hr);
+  extent_t ex;
+  uint16_t bpp;
+  hr = get_canvas_extents((handle_t)param0, &ex, &bpp);
   NANOCLR_CHECK_HRESULT(hr);
 
+  stack.Arg1().NumericByRef().s2 = bpp;
+  stack.Arg2().NumericByRef().s4 = ex.dx;
+  stack.Arg3().NumericByRef().s4 = ex.dy;
   }
   NANOCLR_NOCLEANUP();
   }
@@ -481,9 +486,10 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::GetOrientation___STATIC__U2__U
   unsigned int param0;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
 
-  uint16_t retValue = Photon::GetOrientation(param0, hr);
+  uint16_t orientation;
+  hr = get_orientation((handle_t)param0, &orientation);
   NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT16(stack, retValue);
+  SetResult_UINT16(stack, orientation);
   }
   NANOCLR_NOCLEANUP();
   }
@@ -499,14 +505,14 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::SetOrientation___STATIC__VOID_
   uint16_t param1;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 1, param1));
 
-  Photon::SetOrientation(param0, param1, hr);
+  hr = set_orientation((handle_t)param0, param1);
   NANOCLR_CHECK_HRESULT(hr);
 
   }
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::CreatePen___STATIC__U4__U4__U2__CanFlyPenStyle(CLR_RT_StackFrame& stack)
+HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::CreatePen___STATIC__U4__U4__U2__U2(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -517,12 +523,14 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::CreatePen___STATIC__U4__U4__U2
   uint16_t param1;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 1, param1));
 
-  UNSUPPORTED param2;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UNSUPPORTED(stack, 2, param2));
+  uint16_t param2;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 2, param2));
 
-  unsigned int retValue = Photon::CreatePen(param0, param1, param2, hr);
+  handle_t pen;
+  hr = create_pen(param0, param1, param2);
+
   NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT32(stack, retValue);
+  SetResult_UINT32(stack, (unsigned int)pen);
   }
   NANOCLR_NOCLEANUP();
   }

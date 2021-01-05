@@ -4,7 +4,7 @@
 #include "../../nano/CLR/Include/nanoCLR_Types.h"
 #include "../../nano/CLR/Include/nanoCLR_Runtime.h"
 
-#include "../../../neutron/neutron.h"
+#include "../../neutron/neutron.h"
 
 
 struct CLR_Message
@@ -38,7 +38,6 @@ struct CLR_Message
 
   CLR_UINT32 m_DebuggerEventsMask;
 
-  PowerLevel_type m_powerLevel;
   CLR_UINT32 m_wakeupEvents;
 
   //--//

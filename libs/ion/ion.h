@@ -73,7 +73,8 @@ extern result_t ion_init();
    * @param ion       resulting interactive interpreter
    * @return 
    */
-  extern result_t ion_create(memid_t home, const char *path,
+  extern result_t ion_create(memid_t home, 
+                             const char *path,
                              handle_t ci,
                              handle_t co,
                              handle_t cerr,

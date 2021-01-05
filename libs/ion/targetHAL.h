@@ -12,67 +12,16 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-// set min possible number of sockets
-#define PLATFORM_DEPENDENT__SOCKETS_MAX_COUNT 1
-
-#if defined(_WIN32)
-#define NANOCLR_STOP() ::DebugBreak()
-#pragma warning(error : 4706) // error C4706: assignment within conditional expression
-#endif
-
-inline void __cdecl HARD_Breakpoint()
-{
-    if (::IsDebuggerPresent())
-    {
-        ::DebugBreak();
-    }
-}
-
-#define HARD_BREAKPOINT() HARD_Breakpoint()
-
-inline bool Target_ConfigUpdateRequiresErase()
-{
-    return true;
-}
-
-inline bool Target_HasNanoBooter()
-{
-    return false;
-};
-
-inline bool Target_IFUCapable()
-{
-    return false;
-};
-
-inline bool Target_HasProprietaryBooter()
-{
-    return false;
-};
-
-inline uint32_t GetPlatformCapabilities()
-{
-    return 0;
-};
-
-inline uint32_t GetTargetCapabilities()
-{
-    return 0;
-};
-
-inline bool RequestToLaunchProprietaryBootloader()
-{
-    return false;
-};
-
-inline bool RequestToLaunchNanoBooter()
-{
-    return false;
-};
-
-//	CPU_Sleep((SLEEP_LEVEL_type)sleepLevel, wakeEvents);
-
+  extern void NanoDebugBreak();
+#define NANOCLR_STOP() ::NanoDebugBreak()
+  extern bool Target_ConfigUpdateRequiresErase();
+  extern bool Target_HasNanoBooter();
+  extern bool Target_IFUCapable();
+  extern bool Target_HasProprietaryBooter();
+  extern uint32_t GetPlatformCapabilities();
+  extern uint32_t GetTargetCapabilities();
+  extern bool RequestToLaunchProprietaryBootloader();
+  extern bool RequestToLaunchNanoBooter();
   extern void CPU_Sleep();
   extern void CPU_Reset();
   extern void Watchdog_Reset();

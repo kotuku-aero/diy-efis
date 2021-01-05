@@ -1,37 +1,58 @@
-//
-// Copyright (c) .NET Foundation and Contributors
-// See LICENSE file in the project root for full license information.
-//
-
-#include <nanoCLR_Headers.h>
-#include <cmsis_gcc.h>
-#include <nanoHAL_v2.h>
-#include <platform_target_capabilities.h>
+#include "../nano/CLR/Include/nanoCLR_Headers.h"
+#include "../nano/HAL/Include/nanoHAL_v2.h"
 
 void HAL_AssertEx()
-{
-    __BKPT(0);
-    while (true)
-    { /*nop*/
+  {
+  NonoDebugBreak();
+
+  while (true)
+    {
     }
-}
+  }
 
-#if !defined(BUILD_RTM)
+#ifdef _WIN32
+void NanoDebugBreak()
+  {
+  return DebugBreak();
+  }
+#endif
 
-void HARD_Breakpoint()
-{
-    __BKPT(0);
-    while (true)
-    { /*nop*/
-    }
-};
+bool Target_ConfigUpdateRequiresErase()
+  {
+  return false;
+  }
 
-#endif // !defined(BUILD_RTM)
+bool Target_HasNanoBooter()
+  {
+  return false;
+  };
 
-// NXP targets don't declare any target capability
-GET_TARGET_CAPABILITIES(0);
+bool Target_IFUCapable()
+  {
+  return false;
+  };
 
-// NXP doesn't have a proprietatry bootloader
-inline TARGET_HAS_PROPRIETARY_BOOTER(false);
+bool Target_HasProprietaryBooter()
+  {
+  return false;
+  };
 
-inline TARGET_IFU_CAPABLE(false);
+uint32_t GetPlatformCapabilities()
+  {
+  return 0;
+  };
+
+uint32_t GetTargetCapabilities()
+  {
+  return 0;
+  };
+
+bool RequestToLaunchProprietaryBootloader()
+  {
+  return false;
+  };
+
+bool RequestToLaunchNanoBooter()
+  {
+  return false;
+  };

@@ -1,6 +1,6 @@
 #include "../canflylib/CanFly_CoreLibrary.h"
 
-#include "../../../neutron/neutron.h"
+#include "../../neutron/neutron.h"
 
 
 HRESULT Library_CanFly_CoreLibrary_CanFly_Neutron::RegCreateKey___STATIC__U4__U4__STRING(CLR_RT_StackFrame& stack)

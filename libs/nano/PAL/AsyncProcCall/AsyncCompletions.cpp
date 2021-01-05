@@ -39,6 +39,11 @@ void HAL_COMPLETION::InitializeList()
 
 //--//
 
+static void HAL_TimeSetCallback(void *arg)
+	{
+	HAL_COMPLETION::DequeueAndExec();
+	}
+
 void HAL_COMPLETION::DequeueAndExec()
 {
 	NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
@@ -69,7 +74,7 @@ void HAL_COMPLETION::DequeueAndExec()
 
 		//
 		// Set the next timer to run otherwise set the next interrupt to be 356 years since last powerup (@25kHz).
-		Time_SetCompare(ptr->Next() ? ptr->EventTimeTicks : HAL_COMPLETION_IDLE_VALUE);
+		HAL_Time_SetCompare(ptr->Next() ? ptr->EventTimeTicks : HAL_COMPLETION_IDLE_VALUE, HAL_TimeSetCallback, 0);
 	}
 
 	GLOBAL_UNLOCK();
@@ -114,7 +119,7 @@ void HAL_COMPLETION::EnqueueTicks(uint64_t eventTimeTicks)
 
 	if (this == g_HAL_Completion_List.FirstNode())
 	{
-		Time_SetCompare(eventTimeTicks);
+		HAL_Time_SetCompare(eventTimeTicks, HAL_TimeSetCallback, 0);
 	}
 
 	GLOBAL_UNLOCK();
@@ -154,7 +159,7 @@ void HAL_COMPLETION::Abort()
 			nextTicks = firstNode->EventTimeTicks;
 		}
 
-		Time_SetCompare(nextTicks);
+		HAL_Time_SetCompare(nextTicks, HAL_TimeSetCallback, 0);
 	}
 
 	GLOBAL_UNLOCK();
@@ -199,7 +204,7 @@ void HAL_COMPLETION::WaitForInterrupts(uint64_t expireTimeInTicks, uint32_t slee
 	if (state & setCompare)
 	{
 		// Set timer for expireTimeInTicks time
-		Time_SetCompare(expireTimeInTicks);
+		HAL_Time_SetCompare(expireTimeInTicks, HAL_TimeSetCallback, 0);
 	}
 
 	// Wait for next interrupt ( timer etc)
@@ -211,7 +216,7 @@ void HAL_COMPLETION::WaitForInterrupts(uint64_t expireTimeInTicks, uint32_t slee
 		// let's get the first node again
 		// it could have changed since CPU_Sleep re-enabled interrupts
 		ptr = (HAL_COMPLETION*)g_HAL_Completion_List.FirstNode();
-		Time_SetCompare((state & resetCompare) ? ptr->EventTimeTicks : HAL_COMPLETION_IDLE_VALUE);
+		HAL_Time_SetCompare((state & resetCompare) ? ptr->EventTimeTicks : HAL_COMPLETION_IDLE_VALUE, HAL_TimeSetCallback, 0);
 	}
 }
 

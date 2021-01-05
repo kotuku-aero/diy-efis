@@ -9,6 +9,7 @@
 #include "../../CLR/Include/nf_errors_exceptions.h"
 
 #include <stddef.h>
+#include <stdint.h>
 
 #if defined (__GNUC__)
 #define __int64 long long

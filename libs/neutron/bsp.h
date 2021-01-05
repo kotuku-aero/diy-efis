@@ -37,6 +37,7 @@ it must be removed as soon as possible after the code fragment is identified.
 #define	__bsp_h__
 
 #include "../photon/photon.h"
+#include "../photon/window.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -207,6 +208,10 @@ extern result_t bsp_reg_read_block(uint32_t memid, uint16_t bytes_to_read, void 
  */
 extern result_t bsp_reg_write_block(uint32_t memid, uint16_t bytes_to_write, const void *buffer);
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/// 
+/// CanFly/Neutron startup
+
 typedef struct _neutron_parameters_t
   {
   // name of the node reported in the nis message
@@ -272,7 +277,6 @@ extern result_t can_aerospace_init(const neutron_parameters_t *params, bool init
  * Initialize Neutron
  * @param params      setup and memory parameters
  * @param init_mode   true if a factory reset
- * @param worker      Mutual exclusion semaphore.
  * @return s_ok if started ok
  */
 extern result_t neutron_init(const neutron_parameters_t *params, bool init_mode, bool create_worker);
@@ -281,6 +285,21 @@ extern result_t neutron_init(const neutron_parameters_t *params, bool init_mode,
  * @param pargs Arguments
  */
 extern void publish_task(void *pargs);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/// 
+/// CanFly/Neutron startup
+///
+/// Only call this is there is a GDI required and a framebuffer is available. 
+/// The device needs to be linked with the photon library.
+/// 
+/// If a c# runtime is required then ion and nano will be required
+
+typedef struct _photon_parameters_t {
+  screen_t *screen;         // actual screen.  Created by a call to create_screen
+  } photon_parameters_t;
+
+extern result_t photon_init(const photon_parameters_t *params, bool init_mode);
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -409,17 +428,17 @@ typedef struct _nand_chip_t {
     seek_end
     };
 
-    /**
-     * @function  mount(const char *mount_point, fs_type file_type, nand_chip_t device, handle_t *fshndl)
-     * Mount a flash file system
-     * @param mount_point mount point to mount at
-     * @param file_type   type of filesystem
-     * @param device      physical device
-     * @param fshndl      resulting handle
-     * @return s_ok if file system mounted
-     * @remark The first call the mount must be for mount_point = '/' so that
-     * the virtual file system is constructed
-     */
+  /**
+    * @function  mount(const char *mount_point, fs_type file_type, nand_chip_t device, handle_t *fshndl)
+    * Mount a flash file system
+    * @param mount_point mount point to mount at
+    * @param file_type   type of filesystem
+    * @param device      physical device
+    * @param fshndl      resulting handle
+    * @return s_ok if file system mounted
+    * @remark The first call the mount must be for mount_point = '/' so that
+    * the virtual file system is constructed
+    */
   extern result_t mount(const char *mount_point, fs_type file_type, nand_chip_t device, handle_t *fshndl);
   /**
    * @function umount(handle_t fshndl)

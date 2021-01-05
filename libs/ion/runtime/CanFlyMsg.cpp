@@ -1,7 +1,7 @@
 #include "../canflylib/CanFly_CoreLibrary.h"
 
-#include "../../../neutron/neutron.h"
-#include "../../../photon/photon.h"
+#include "../../neutron/neutron.h"
+#include "../../photon/photon.h"
 
 static void CopyCanMsg(const canmsg_t* msg, CLR_RT_HeapBlock* pThis)
   {

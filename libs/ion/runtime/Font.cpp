@@ -1,7 +1,7 @@
 #include "../canflylib/CanFly_CoreLibrary.h"
 
-#include "../../../neutron/neutron.h"
-#include "../../../photon/photon.h"
+#include "../../neutron/neutron.h"
+#include "../../photon/photon.h"
 
 HRESULT Library_CanFly_CoreLibrary_CanFly_Font::GetFont___STATIC__U4__STRING__U4(CLR_RT_StackFrame& stack)
   {

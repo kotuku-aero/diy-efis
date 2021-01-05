@@ -446,7 +446,7 @@ bool CLR_DBG_Debugger::Monitor_TargetInfo(WP_Message *msg)
   {
   Monitor_TargetInfo_Reply cmdReply;
 
-  bool fOK = nanoBooter_GetTargetInfo(&cmdReply.m_TargetInfo) == true;
+  bool fOK = nanoBooter_GetTargetInfo(&cmdReply.m_TargetInfo) != 0;
 
   WP_ReplyToCommand(msg, fOK, false, &cmdReply, sizeof(cmdReply));
 

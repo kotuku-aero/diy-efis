@@ -9,7 +9,7 @@
 
 #if defined(NANOCLR_PROFILE_NEW_CALLS)
 
-void* CLR_PROF_CounterCallChain::Prepare(CLR_PROF_Handler* handler)
+void *CLR_PROF_CounterCallChain::Prepare(CLR_PROF_Handler *handler)
   {
   NATIVE_PROFILE_CLR_DIAGNOSTICS();
   if (m_owningHandler)
@@ -32,7 +32,7 @@ void* CLR_PROF_CounterCallChain::Prepare(CLR_PROF_Handler* handler)
     }
   }
 
-void CLR_PROF_CounterCallChain::Complete(CLR_UINT64& t, CLR_PROF_Handler* handler)
+void CLR_PROF_CounterCallChain::Complete(CLR_UINT64 &t, CLR_PROF_Handler *handler)
   {
   NATIVE_PROFILE_CLR_DIAGNOSTICS();
   if (m_owningHandler)
@@ -44,7 +44,7 @@ void CLR_PROF_CounterCallChain::Complete(CLR_UINT64& t, CLR_PROF_Handler* handle
     }
   }
 
-void CLR_PROF_CounterCallChain::Enter(CLR_RT_StackFrame* stack)
+void CLR_PROF_CounterCallChain::Enter(CLR_RT_StackFrame *stack)
   {
   NATIVE_PROFILE_CLR_DIAGNOSTICS();
   CLR_PROF_Handler::SuspendTime();
@@ -70,7 +70,7 @@ void CLR_PROF_CounterCallChain::Leave()
 #if defined(NANOCLR_PROFILE_HANDLER)
 
 bool              CLR_PROF_Handler::s_initialized;
-CLR_PROF_Handler* CLR_PROF_Handler::s_current;
+CLR_PROF_Handler *CLR_PROF_Handler::s_current;
 volatile CLR_UINT64        CLR_PROF_Handler::s_time_overhead;
 volatile CLR_UINT64        CLR_PROF_Handler::s_time_freeze;
 volatile CLR_UINT64        CLR_PROF_Handler::s_time_adjusted;
@@ -115,7 +115,7 @@ void CLR_PROF_Handler::Constructor()
   }
 
 #if defined(NANOCLR_PROFILE_NEW_CALLS)
-void CLR_PROF_Handler::Constructor(CLR_PROF_CounterCallChain& target)
+void CLR_PROF_Handler::Constructor(CLR_PROF_CounterCallChain &target)
   {
   NATIVE_PROFILE_CLR_DIAGNOSTICS();
   SuspendTime();
@@ -147,7 +147,7 @@ void CLR_PROF_Handler::Destructor()
       switch (m_target_Mode)
         {
 #if defined(NANOCLR_PROFILE_NEW_CALLS)
-        case c_Mode_CallChain: ((CLR_PROF_CounterCallChain*)m_target)->Complete(t, this); break;
+        case c_Mode_CallChain: ((CLR_PROF_CounterCallChain *)m_target)->Complete(t, this); break;
 #endif
         }
       }
@@ -159,7 +159,7 @@ void CLR_PROF_Handler::Destructor()
   }
 
 
-void CLR_PROF_Handler::Init(void* target)
+void CLR_PROF_Handler::Init(void *target)
   {
   NATIVE_PROFILE_CLR_DIAGNOSTICS();
   m_target = target;
@@ -182,7 +182,7 @@ void CLR_PROF_Handler::Init(void* target)
   m_time_start = ResumeTime();
   }
 
-static void TestCalibrate(CLR_PROF_CounterCallChain& cnt)
+static void TestCalibrate(CLR_PROF_CounterCallChain &cnt)
   {
   CLR_PROF_Handler c(cnt);
   }

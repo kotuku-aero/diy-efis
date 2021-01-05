@@ -360,23 +360,5 @@ __inline void debug_printf(const char *format, ...)
     }
 #define NANOCLR_LOCKED_ACCESS_GET(name) copy##name
 
-//--//
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-    // Implementation of hardware breakpoint.
-    // Required to make the processor to enter debug state and allowing debug tools to investigate system state.
-    void HARD_Breakpoint();
-
-#ifdef __cplusplus
-}
-#endif
-
-// Watchdog driver
-//#include "nanoHAL_Watchdog.h"
-//#include "nanoHAL_Windows_Storage.h"
 
 #endif // _NANOHAL_V2_H_

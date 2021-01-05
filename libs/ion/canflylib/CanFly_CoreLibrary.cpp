@@ -218,7 +218,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
     Library_CanFly_CoreLibrary_CanFly_Photon::GetCanvasExtents___STATIC__VOID__U4__BYREF_U2__BYREF_I4__BYREF_I4,
     Library_CanFly_CoreLibrary_CanFly_Photon::GetOrientation___STATIC__U2__U4,
     Library_CanFly_CoreLibrary_CanFly_Photon::SetOrientation___STATIC__VOID__U4__U2,
-    Library_CanFly_CoreLibrary_CanFly_Photon::CreatePen___STATIC__U4__U4__U2__CanFlyPenStyle,
+    Library_CanFly_CoreLibrary_CanFly_Photon::CreatePen___STATIC__U4__U4__U2__U2,
     Library_CanFly_CoreLibrary_CanFly_Photon::DisposePen___STATIC__VOID__U4,
     Library_CanFly_CoreLibrary_CanFly_Photon::Polyline___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4,
     Library_CanFly_CoreLibrary_CanFly_Photon::Ellipse___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__I4__I4__I4__I4,
@@ -231,7 +231,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
     Library_CanFly_CoreLibrary_CanFly_Photon::Arc___STATIC__VOID__U4__I4__I4__I4__I4__U4__I4__I4__I4__I4__I4,
     Library_CanFly_CoreLibrary_CanFly_Photon::Pie___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__I4__I4__I4__I4__I4__I4,
     Library_CanFly_CoreLibrary_CanFly_Photon::OpenFont___STATIC__U4__STRING__U2,
-    Library_CanFly_CoreLibrary_CanFly_Photon::DrawText___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__U4__STRING__I4__I4__I4__I4__I4__I4__CanFlyTextOutStyle,
+    Library_CanFly_CoreLibrary_CanFly_Photon::DrawText___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__U4__STRING__I4__I4__I4__I4__I4__I4__U2,
     Library_CanFly_CoreLibrary_CanFly_Photon::TextExtent___STATIC__VOID__U4__U4__STRING__BYREF_I4__BYREF_I4,
     Library_CanFly_CoreLibrary_CanFly_Photon::InvalidateRect___STATIC__VOID__U4__I4__I4__I4__I4,
     Library_CanFly_CoreLibrary_CanFly_Photon::IsValid___STATIC__BOOLEAN__U4,
@@ -329,13 +329,12 @@ static const CLR_RT_MethodHandler method_lookup[] =
     NULL,
     NULL,
     NULL,
-    NULL,
 };
 
 const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_canflylib =
 {
     "CanFly.CoreLibrary",
-    0x061DE970,
+    0xC54DD26D,
     method_lookup,
     { 1, 0, 0, 0 }
 };

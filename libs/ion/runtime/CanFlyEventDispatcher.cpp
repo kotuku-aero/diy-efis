@@ -153,7 +153,7 @@ void CLR_RT_HeapBlock_CanFlyMsgDispatcher::SaveToProtonQueue(const canmsg_t *msg
     memcpy(&rec->msg, msg, sizeof(canmsg_t));
     }
 
-  ::Events_Set(SYSTEM_EVENT_HW_INTERRUPT);
+  //::Events_Set(SYSTEM_EVENT_HW_INTERRUPT);
   }
 
 void SaveNativeEventToHALQueue(CLR_RT_HeapBlock_CanFlyMsgDispatcher* pContext, const canmsg_t *msg)

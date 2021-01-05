@@ -9,9 +9,9 @@
 #ifndef _CANFLY_CORELIBRARY_H_
 #define _CANFLY_CORELIBRARY_H_
 
-#include <nanoCLR_Interop.h>
-#include <nanoCLR_Runtime.h>
-#include <nanoPackStruct.h>
+#include "../../nano/CLR/Include/nanoCLR_Interop.h"
+#include "../../nano/CLR/Include/nanoCLR_Runtime.h"
+#include "../../nano/CLR/Include/nanoPackStruct.h"
 
 typedef enum __nfpack DataType
 {
@@ -500,7 +500,7 @@ struct Library_CanFly_CoreLibrary_CanFly_Photon
     NANOCLR_NATIVE_DECLARE(GetCanvasExtents___STATIC__VOID__U4__BYREF_U2__BYREF_I4__BYREF_I4);
     NANOCLR_NATIVE_DECLARE(GetOrientation___STATIC__U2__U4);
     NANOCLR_NATIVE_DECLARE(SetOrientation___STATIC__VOID__U4__U2);
-    NANOCLR_NATIVE_DECLARE(CreatePen___STATIC__U4__U4__U2__CanFlyPenStyle);
+    NANOCLR_NATIVE_DECLARE(CreatePen___STATIC__U4__U4__U2__U2);
     NANOCLR_NATIVE_DECLARE(DisposePen___STATIC__VOID__U4);
     NANOCLR_NATIVE_DECLARE(Polyline___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4);
     NANOCLR_NATIVE_DECLARE(Ellipse___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__I4__I4__I4__I4);
@@ -513,7 +513,7 @@ struct Library_CanFly_CoreLibrary_CanFly_Photon
     NANOCLR_NATIVE_DECLARE(Arc___STATIC__VOID__U4__I4__I4__I4__I4__U4__I4__I4__I4__I4__I4);
     NANOCLR_NATIVE_DECLARE(Pie___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__I4__I4__I4__I4__I4__I4);
     NANOCLR_NATIVE_DECLARE(OpenFont___STATIC__U4__STRING__U2);
-    NANOCLR_NATIVE_DECLARE(DrawText___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__U4__STRING__I4__I4__I4__I4__I4__I4__CanFlyTextOutStyle);
+    NANOCLR_NATIVE_DECLARE(DrawText___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__U4__STRING__I4__I4__I4__I4__I4__I4__U2);
     NANOCLR_NATIVE_DECLARE(TextExtent___STATIC__VOID__U4__U4__STRING__BYREF_I4__BYREF_I4);
     NANOCLR_NATIVE_DECLARE(InvalidateRect___STATIC__VOID__U4__I4__I4__I4__I4);
     NANOCLR_NATIVE_DECLARE(IsValid___STATIC__BOOLEAN__U4);

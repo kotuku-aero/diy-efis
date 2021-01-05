@@ -1,7 +1,7 @@
 #include "../canflylib/CanFly_CoreLibrary.h"
 
-#include "../../../neutron/neutron.h"
-#include "../../../photon/photon.h"
+#include "../../neutron/neutron.h"
+#include "../../photon/photon.h"
 
 HRESULT Library_CanFly_CoreLibrary_CanFly_PointArray::PointArrayCreate___STATIC__U4__U4(CLR_RT_StackFrame& stack)
   {

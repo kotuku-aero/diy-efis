@@ -8,14 +8,12 @@
 #define _NANOHAL_TIME_H_ 1
 
 #include "nanoHAL_Types.h"
-#include "../../../ion/targetHAL_Time.h"
-#include "../../CLR/Include/nanoWeak.h"
 
 #ifdef _WIN32
 #include <windows.h>
 #endif
 
-/// Our time origin is 1/1/1601 00:00:00.000.000.  In Gregorian Calendar Jan 1, 1601 was also a Monday.
+  /// Our time origin is 1/1/1601 00:00:00.000.000.  In Gregorian Calendar Jan 1, 1601 was also a Monday.
 #define BASE_YEAR                   1601
 #define BASE_YEAR_LEAPYEAR_ADJUST   388    
 #define DAYS_IN_NORMAL_YEAR         365
@@ -38,18 +36,8 @@
 
 #define TIME_UNIX_EPOCH_AS_TICKS           116444736000000000
 
-/// NOTES: Why origin is at 1/1/1601.
-/// Current civil calendar is named as Gregorian calendar after Pope Gregory XIII as he made adjustments
-/// in 1582 (read more at wiki http://en.wikipedia.org/wiki/Gregorian_calendar). Rules governing
-/// leap years were changed from then. Also in that year month October was 21 days instead of usual 31.
-/// This poses a problem on calculating date/time difference, leap years etc before 1582 using simple math.
-/// For example 1500 was a leap year using old method while it is not using new. But in reality, as part of the
-/// history it was leap year. Default CLR origin 1/1/01 gives wrong date time from years before 1582. For example
-/// dates like 10/6/1582 does exist in history (see wiki), while CLR managed date/time will not throw an exception
-/// if you are to create that date. To stay safe side 1/1/1601 is taken as origin, as was done for Windows.
 
-
-uint64_t HAL_Time_SysTicksToTime(unsigned int sysTicks);
+#ifdef __cplusplus
 
 /// <summary>
 /// System time and date for DateTime managed class.
@@ -81,31 +69,59 @@ void      HAL_Time_SetUtcTime(uint64_t utcTime);
 /// Converts 64bit time value to SystemTime structure. 64bit time is assumed as an offset from 1/1/1601:00:00:00.000 in 100ns.
 /// </summary>
 /// <returns>True if conversion is successful.</returns>
-bool HAL_Time_ToSystemTime(uint64_t time, SYSTEMTIME* systemTime);
+bool HAL_Time_ToSystemTime(uint64_t time, SYSTEMTIME *systemTime);
 
 /// <summary>
 /// Retrieves number of days given a month and a year. Calculates for leap years.
 /// </summary>
 /// <returns>S_OK if successful.</returns>
-HRESULT HAL_Time_DaysInMonth(signed int year, signed int month, signed int* days);
+HRESULT HAL_Time_DaysInMonth(signed int year, signed int month, signed int *days);
 
 /// <summary>
 /// Retrieves number of days since the beginning of the year given a month and a year. Calculates for leap years.
 /// </summary>
 /// <returns>S_OK if successful.</returns>
-HRESULT HAL_Time_AccDaysInMonth(signed int year, signed int month, signed int* days);
+HRESULT HAL_Time_AccDaysInMonth(signed int year, signed int month, signed int *days);
 
 /// <summary>
 /// Converts SYSTEMTIME structure to 64bit time, which is assumed as an offset from 1/1/1601:00:00:00.000 in 100ns.
 /// </summary>
 /// <returns>Time value.</returns>
-uint64_t HAL_Time_ConvertFromSystemTime(const SYSTEMTIME* systemTime);
+uint64_t HAL_Time_ConvertFromSystemTime(const SYSTEMTIME *systemTime);
 
 /// APIs to convert between types
-bool          HAL_Time_TimeSpanToStringEx( const int64_t& ticks, char*& buf, size_t& len );
-const char*   HAL_Time_CurrentDateTimeToString();
+const char *HAL_Time_CurrentDateTimeToString();
+bool          HAL_Time_TimeSpanToStringEx(const int64_t &ticks, char *&buf, size_t &len);
 
 
-uint64_t  CPU_MillisecondsToTicks       ( uint64_t ticks  );
+uint64_t  CPU_MillisecondsToTicks(uint64_t ticks);
+
+#endif
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+  /// NOTES: Why origin is at 1/1/1601.
+  /// Current civil calendar is named as Gregorian calendar after Pope Gregory XIII as he made adjustments
+  /// in 1582 (read more at wiki http://en.wikipedia.org/wiki/Gregorian_calendar). Rules governing
+  /// leap years were changed from then. Also in that year month October was 21 days instead of usual 31.
+  /// This poses a problem on calculating date/time difference, leap years etc before 1582 using simple math.
+  /// For example 1500 was a leap year using old method while it is not using new. But in reality, as part of the
+  /// history it was leap year. Default CLR origin 1/1/01 gives wrong date time from years before 1582. For example
+  /// dates like 10/6/1582 does exist in history (see wiki), while CLR managed date/time will not throw an exception
+  /// if you are to create that date. To stay safe side 1/1/1601 is taken as origin, as was done for Windows.
+
+
+  extern uint64_t HAL_Time_SysTicksToTime(unsigned int sysTicks);
+
+  extern uint32_t HAL_Time_CurrentSysTicks();
+
+  typedef void (*expireCallback)(void *arg);
+
+  extern void HAL_Time_SetCompare(uint64_t compareValueTicks, expireCallback cb, void *arg);
+
+#ifdef __cplusplus
+  }
+#endif
 
 #endif //_NANOHAL_TIME_H_

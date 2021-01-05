@@ -6,7 +6,6 @@
 
 #include "../Include/nanoWeak.h"
 #include "../Include/nanoSupport.h"
-#include "../../../ion/targetHAL_Time.h"
 #include "../Include/WireProtocol_Message.h"
 
 uint8_t receptionBuffer[sizeof(WP_Packet) + WP_PACKET_SIZE];
@@ -31,17 +30,23 @@ void WP_ReplyToCommand(WP_Message *message, int fSuccess, int fCritical, void *p
   //
   // Make sure we reply only once!
   //
-  if (message->m_header.m_flags & WP_Flags_c_NonCritical) return;
+  if (message->m_header.m_flags & WP_Flags_c_NonCritical)
+    return;
   message->m_header.m_flags |= WP_Flags_c_NonCritical;
 
   //
   // No caching in the request, no caching in the reply...
   //
-  if (message->m_header.m_flags & WP_Flags_c_NoCaching) flags |= WP_Flags_c_NoCaching;
+  if (message->m_header.m_flags & WP_Flags_c_NoCaching)
+    flags |= WP_Flags_c_NoCaching;
 
-  if (fSuccess) flags |= WP_Flags_c_ACK;
-  else           flags |= WP_Flags_c_NACK;
-  if (!fCritical) flags |= WP_Flags_c_NonCritical;
+  if (fSuccess) 
+    flags |= WP_Flags_c_ACK;
+  else
+    flags |= WP_Flags_c_NACK;
+
+  if (!fCritical) 
+    flags |= WP_Flags_c_NonCritical;
 
   if (fSuccess == false)
     {

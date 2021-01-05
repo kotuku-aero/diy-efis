@@ -1,4 +1,5 @@
 #include "CLR_Message.h"
+#include "HeapBlockDispatcher.h"
 
 HRESULT CLR_Message::Message_Initialize()
   {
@@ -65,7 +66,7 @@ HRESULT CLR_Message::TransferAllInterruptsToApplicationQueue()
 
   while (true)
     {
-    CLRMessage* rec;
+    CLR_Message::CLRMessage* rec;
 
     {
     GLOBAL_LOCK();
@@ -75,15 +76,23 @@ HRESULT CLR_Message::TransferAllInterruptsToApplicationQueue()
     GLOBAL_UNLOCK();
     }
 
-    if (rec == NULL) break;
+    if (rec == NULL) 
+      break;
 
-    CLR_RT_ApplicationInterrupt* queueRec = (CLR_RT_ApplicationInterrupt*)CLR_RT_Memory::Allocate_And_Erase(sizeof(CLR_RT_ApplicationInterrupt), CLR_RT_HeapBlock::HB_CompactOnFailure);  CHECK_ALLOCATION(queueRec);
+    CLR_RT_CanFlyMsgEvent *queueRec = (CLR_RT_CanFlyMsgEvent *)CLR_RT_Memory::Allocate_And_Erase(sizeof(CLR_RT_CanFlyMsgEvent), CLR_RT_HeapBlock::HB_CompactOnFailure);  
+    CHECK_ALLOCATION(queueRec);
 
-    queueRec->m_interruptPortInterrupt.data1 = rec->m_data1;
-    queueRec->m_interruptPortInterrupt.data2 = rec->m_data2;
-    queueRec->m_interruptPortInterrupt.data3 = rec->m_data3;
-    queueRec->m_interruptPortInterrupt.time = rec->m_time;
-    queueRec->m_interruptPortInterrupt.context = (CLR_RT_HeapBlock_NativeEventDispatcher*)rec->m_context;
+    queueRec->m_message.msg.flags = rec->msg.flags;
+    queueRec->m_message.msg.raw[0] = rec->msg.raw[0];
+    queueRec->m_message.msg.raw[1] = rec->msg.raw[1];
+    queueRec->m_message.msg.raw[2] = rec->msg.raw[2];
+    queueRec->m_message.msg.raw[3] = rec->msg.raw[3];
+    queueRec->m_message.msg.raw[4] = rec->msg.raw[4];
+    queueRec->m_message.msg.raw[5] = rec->msg.raw[5];
+    queueRec->m_message.msg.raw[6] = rec->msg.raw[6];
+    queueRec->m_message.msg.raw[7] = rec->msg.raw[7];
+
+    queueRec->m_message.context = (CLR_RT_HeapBlock_CanFlyMsgDispatcher *)rec->m_context;
 
     m_MessageData.m_applicationQueue.LinkAtBack(queueRec); ++m_MessageData.m_queuedMessages;
 

@@ -3,7 +3,7 @@
 
 #include "../canflylib/CanFly_CoreLibrary.h"
 
-#include "../../../neutron/neutron.h"
+#include "../../neutron/neutron.h"
 
 struct CLR_RT_CanFlyMsgEvent;
 
