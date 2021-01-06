@@ -36,9 +36,6 @@ it must be removed as soon as possible after the code fragment is identified.
 #ifndef __ion_h__
 #define __ion_h__
 
-// the nanoFramework header
-#include "CLR_Startup_Thread.h"
-
 #include "../neutron/neutron.h"
 
 #ifdef __cplusplus

@@ -5,7 +5,7 @@ extern "C" {
 
 #ifdef _DEBUG
 
-  void debug_printf(const char* format, ...)
+  void debug_printf(const char *format, ...)
     {
     char buffer[256];
     va_list arg_ptr;
@@ -20,11 +20,11 @@ extern "C" {
     }
 
 #else
-  __inline void debug_printf(const char* format, ...) {}
+  __inline void debug_printf(const char *format, ...) {}
 #endif  // !defined(BUILD_RTM)
   }
 
-int hal_strcpy_s(char* strDst, size_t sizeInBytes, const char* strSrc)
+int hal_strcpy_s(char *strDst, size_t sizeInBytes, const char *strSrc)
   {
   NATIVE_PROFILE_PAL_CRT();
 #undef strcpy
@@ -38,7 +38,7 @@ int hal_strcpy_s(char* strDst, size_t sizeInBytes, const char* strSrc)
   len = hal_strlen_s(strSrc);
   if (sizeInBytes < len + 1)
     {
-    _ASSERTE(FALSE); return 1; 
+    _ASSERTE(FALSE); return 1;
     }
 
   strcpy(strDst, strSrc);
@@ -47,7 +47,7 @@ int hal_strcpy_s(char* strDst, size_t sizeInBytes, const char* strSrc)
 #define strcpy DoNotUse_*strcpy []
   }
 
-int hal_strncpy_s(char* strDst, size_t sizeInBytes, const char* strSrc, size_t count)
+int hal_strncpy_s(char *strDst, size_t sizeInBytes, const char *strSrc, size_t count)
   {
   NATIVE_PROFILE_PAL_CRT();
 #undef strncpy
@@ -67,7 +67,7 @@ int hal_strncpy_s(char* strDst, size_t sizeInBytes, const char* strSrc, size_t c
 #define strncpy DoNotUse_*strncpy []
   }
 
-int hal_strncmp_s(const char* str1, const char* str2, size_t num)
+int hal_strncmp_s(const char *str1, const char *str2, size_t num)
   {
   NATIVE_PROFILE_PAL_CRT();
 #undef strncmp
@@ -79,7 +79,7 @@ int hal_strncmp_s(const char* str1, const char* str2, size_t num)
   }
 
 // Compares 2 ASCII strings case insensitive. Does not take locale into account.
-int hal_stricmp(const char* dst, const char* src)
+int hal_stricmp(const char *dst, const char *src)
   {
   int f = 0, l = 0;
 

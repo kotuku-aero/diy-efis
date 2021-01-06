@@ -2286,7 +2286,14 @@ extern "C" {
 #ifndef NAME_MAX
 #define NAME_MAX	256
 #endif
-
+  /**
+  * @function stream_create(const char *path, stream_p *stream)
+  * Create a stream in the file system
+  * @param path path to the new stream
+  * @param stream stream that is created
+  * @return s_ok if the stream created
+  */
+  result_t stream_create(const char *path, stream_p *stream);
   /**
   * @function stream_open(const char *path, stream_p *stream)
   * Open a stream in the file system

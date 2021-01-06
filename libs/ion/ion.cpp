@@ -115,7 +115,7 @@ result_t ion_init()
   return s_ok;
   }
 
-extern result_t ion_close(struct _ion_context_t *ion)
+extern result_t ion_close(ion_context_t *ion)
   {
   // stop the worker
   close_task(ion->worker);
@@ -464,7 +464,7 @@ result_t ion_create(memid_t home,
     }
 #endif
 
-  trace_info("CLR started ok, ion ready")
+  trace_info("CLR started ok, ion ready");
   return result;
   }
 

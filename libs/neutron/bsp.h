@@ -419,7 +419,8 @@ typedef struct _filesystem_t {
   result_t (*mount)(nand_device_t *device);
   result_t (*unmount)(nand_device_t *device);
   result_t (*fssync)(nand_device_t *device);
-  result_t (*open)(nand_device_t *device, const char *path, uint32_t oflag, uint32_t mode, int *fd);
+  result_t (*open)(nand_device_t *device, const char *path, int *fd);
+  result_t (*create)(nand_device_t *device, const char *path, int *fd);
   result_t (*close)(nand_device_t *device, int fd);
   result_t (*fsync)(nand_device_t *device, int fd);
   result_t (*read)(nand_device_t *device, int fd, uint32_t pos, void *buf, uint32_t nbyte, uint32_t *read);

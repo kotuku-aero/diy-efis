@@ -24,19 +24,10 @@
     <ClCompile Include="..\..\libs\ion\ion_cli_impl.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\ion\CLR_Startup_Thread.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\ion\hardfault.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libs\ion\ion_cli.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libs\ion\nanoCRT.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\ion\platform_heap.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libs\ion\targetHAL.c">
@@ -84,6 +75,18 @@
     <ClCompile Include="..\..\libs\ion\neo.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\libs\ion\runtime\DirectoryEnumerator.cpp">
+      <Filter>runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\runtime\RegistryStream.cpp">
+      <Filter>runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\runtime\Stream.cpp">
+      <Filter>runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\runtime\FileStream.cpp">
+      <Filter>runtime</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libs\ion\ion_cli_impl.h">
@@ -93,9 +96,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libs\ion\ion_cli.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libs\ion\CLR_Startup_Thread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libs\ion\targetHAL.h">

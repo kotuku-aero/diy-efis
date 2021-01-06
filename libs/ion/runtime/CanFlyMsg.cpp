@@ -29,19 +29,22 @@ static void CopyCanMsg(const CLR_RT_HeapBlock* pThis, canmsg_t* msg)
   msg->raw[7] = pThis[Library_CanFly_CoreLibrary_CanFly_CanFlyMsg::FIELD___data7].NumericByRefConst().u1;
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_CanFlyMsg::_ctor___VOID__U2__U2__BOOLEAN(CLR_RT_StackFrame& stack)
+HRESULT Library_CanFly_CoreLibrary_CanFly_CanFlyMsg::_ctor___VOID__U2__U2__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
   uint16_t param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 1, param0));
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 0, param0));
 
   uint16_t param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 2, param1));
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 1, param1));
+
+  uint32_t param2;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 2, param2));
 
   canmsg_t msg;
 
-  create_can_msg_int32(&msg, param0, 0, 0);
+  create_can_msg_int32(&msg, param0, 0, param2);
   msg.canas.data_type = param1;
 
   CopyCanMsg(&msg, stack.This());

@@ -3,18 +3,19 @@ using System.Runtime.CompilerServices;
 
 namespace CanFly
 {
-  public abstract class Stream : IDisposable
+  public class Stream : IDisposable
   {
     private uint _handle;
+    private Stream() { }
 
-    protected Stream(uint handle)
+    protected internal Stream(uint handle)
     {
       _handle = handle;
     }
     
     public void Dispose()
     {
-      OnDispose();
+      StreamClose(Handle);
     }
 
     /// <summary>
@@ -25,67 +26,98 @@ namespace CanFly
       get { return _handle; }
     }
 
-
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void CreateDirectory(string path);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RemoveDirectory(string path);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    private static extern uint GetirectoryEnumertor(string path);
-
-    public DirectoryEnumerator EnumerateDirectory(string path)
-    {
-      return new DirectoryEnumerator(GetirectoryEnumertor(path));
-    }
-
-    protected abstract void OnDispose();
     /// <summary>
     /// Delete the underlying stream
     /// </summary>
-    public abstract void Delete();
+    public void Delete()
+    {
+      StreamDelete(Handle);
+      _handle = 0;
+    }
     /// <summary>
     /// true if the stream is at end of file
     /// </summary>
     /// <returns></returns>
-    public abstract bool Eof();
+    public bool Eof()
+    {
+      return StreamEof(Handle);
+    }
     /// <summary>
     /// Read bytes from the stream
     /// </summary>
     /// <param name="size">Number of bytes to read</param>
     /// <returns>Data read</returns>
-    public abstract byte[] Read(ushort size);
+    public byte[] Read(ushort size)
+    {
+      return StreamRead(Handle, size);
+    }
     /// <summary>
     /// Write bytes to the stream
     /// </summary>
     /// <param name="buffer">Bytes to write</param>
-    public abstract void Write(byte[] buffer);
+    public void Write(byte[] buffer)
+    {
+      StreamWrite(Handle, buffer);
+    }
     /// <summary>
     /// Position of the read/write pointer for the stream
     /// </summary>
-    public abstract uint Pos { get; set; }
+    public uint Pos 
+    {
+      get { return StreamGetPos(Handle); }
+      set { StreamSetPos(Handle, value); }
+    }
     /// <summary>
     /// Length of the stream
     /// </summary>
-    public abstract uint Length { get; }
-    /// <summary>
-    /// Set the length of the streaam
-    /// </summary>
-    /// <param name="length">New Length, if greather than length then length remains unchanged</param>
-    public abstract void Truncate(uint length);
+    public uint Length
+    {
+      get { return StreamLength(Handle); }
+      set { StreamTruncate(Handle, value); }
+    }
     /// <summary>
     /// Copy the contents of a stream
     /// </summary>
     /// <param name="to">Stream to copy to.</param>
-    public abstract void Copy(Stream to);
+    public void Copy(Stream to)
+    {
+      StreamCopy(Handle, to.Handle);
+    }
     /// <summary>
     /// Path of the stream
     /// </summary>
     /// <param name="full_path">If set then the full path is returned, otherwise only the filename</param>
     /// <returns>Filename of full path</returns>
-    public abstract string Path(bool full_path);
+    public string Path(bool full_path)
+    {
+      return StreamPath(Handle, full_path);
+    }
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    private static extern bool StreamEof(uint stream);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    private static extern byte[] StreamRead(uint stream, ushort size);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    private static extern void StreamWrite(uint stream, byte[] buffer);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    private static extern uint StreamGetPos(uint stream);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    private static extern void StreamSetPos(uint stream, uint pos);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    private static extern uint StreamLength(uint stream);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    private static extern void StreamTruncate(uint stream, uint length);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    private static extern void StreamCopy(uint from, uint to);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    private static extern string StreamPath(uint stream, bool full_path);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    private static extern void StreamClose(uint stream);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    private static extern void StreamDelete(uint stream);
   }
 
-  public class FileStream : Stream
+  public sealed class FileStream : Stream
   {
     private FileStream(uint handle) : base(handle) { }
 
@@ -99,80 +131,26 @@ namespace CanFly
       return new FileStream(FileStreamCreate(path));
     }
 
-    protected override void OnDispose()
-    {
-      FileStreamClose(Handle);
-    }
 
-    public override uint Pos { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-    public override uint Length => throw new NotImplementedException();
-
-
-    public override void Delete()
-    {
-      throw new NotImplementedException();
-    }
-
-    public override bool Eof()
-    {
-      throw new NotImplementedException();
-    }
-
-    public override byte[] Read(ushort size)
-    {
-      throw new NotImplementedException();
-    }
-
-    public override void Write(byte[] buffer)
-    {
-      throw new NotImplementedException();
-    }
-
-    public override void Truncate(uint length)
-    {
-      throw new NotImplementedException();
-    }
-
-    public override void Copy(Stream to)
-    {
-      throw new NotImplementedException();
-    }
-
-    public override string Path(bool full_path)
-    {
-      throw new NotImplementedException();
-    }
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void CreateDirectory(string path);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void RemoveDirectory(string path);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    private static extern uint GetDirectoryEnumertor(string path);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     private static extern uint FileStreamOpen(string path);
     [MethodImpl(MethodImplOptions.InternalCall)]
     private static extern uint FileStreamCreate(string path);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    private static extern void FileStreamClose(uint stream);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    private static extern void FileStreamDelete(uint stream);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    private static extern bool FileStreamEof(uint stream);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    private static extern byte[] FileStreamRead(uint stream, ushort size);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    private static extern void FileStreamWrite(uint stream, byte[] buffer);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    private static extern uint FileStreamGetPos(uint stream);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    private static extern void FileStreamSetPos(uint stream, uint pos);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    private static extern uint FileStreamLength(uint stream);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    private static extern void FileStreamTruncate(uint stream, uint length);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    private static extern void FileStreamCopy(uint from, uint to);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    private static extern string FileStreamPath(uint stream, bool full_path);
+
+    public DirectoryEnumerator EnumerateDirectory(string path)
+    {
+      return new DirectoryEnumerator(GetDirectoryEnumertor(path));
+    }
   }
 
-  public class RegistryStream : Stream
+  public sealed class RegistryStream : Stream
   {
 
     private RegistryStream(uint handle) : base(handle) {}
@@ -182,74 +160,15 @@ namespace CanFly
       return new RegistryStream(RegStreamOpen(parent, path));
     }
 
-    protected override void OnDispose()
+    public static RegistryStream Create(uint parent, string path)
     {
-      RegStreamClose(Handle);
-    }
-    public override uint Pos { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-    public override uint Length => throw new NotImplementedException();
-
-    public override void Delete()
-    {
-      throw new NotImplementedException();
+      return new RegistryStream(RegStreamCreate(parent, path));
     }
 
-    public override bool Eof()
-    {
-      throw new NotImplementedException();
-    }
-
-    public override byte[] Read(ushort size)
-    {
-      throw new NotImplementedException();
-    }
-
-    public override void Write(byte[] buffer)
-    {
-      throw new NotImplementedException();
-    }
-
-    public override void Truncate(uint length)
-    {
-      throw new NotImplementedException();
-    }
-
-    public override void Copy(Stream to)
-    {
-      throw new NotImplementedException();
-    }
-
-    public override string Path(bool full_path)
-    {
-      throw new NotImplementedException();
-    }
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     private static extern uint RegStreamOpen(uint parent, string path);
     [MethodImpl(MethodImplOptions.InternalCall)]
     private static extern uint RegStreamCreate(uint parent, string path);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    private static extern void RegStreamClose(uint stream);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    private static extern void RegStreamDelete(uint stream);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    private static extern bool RegStreamEof(uint stream);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    private static extern byte[] RegStreamRead(uint stream, ushort size);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    private static extern void RegStreamWrite(uint stream, byte[] buffer);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    private static extern uint RegStreamGetPos(uint stream);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    private static extern void RegStreamSetPos(uint stream, uint pos);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    private static extern uint RegStreamLength(uint stream);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    private static extern void RegStreamTruncate(uint stream, uint length);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    private static extern void RegStreamCopy(uint from, uint to);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    private static extern string RegStreamPath(uint stream, bool full_path);
   }
 }

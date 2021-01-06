@@ -449,6 +449,46 @@ static result_t file_stream_path(stream_handle_t *stream, bool full_path, uint16
   return fshndl->mount_point->file_type->getpath(fshndl->mount_point->device, fshndl->fd, full_path, path, bytes_remaining);
   }
 
+result_t stream_create(const char *path, stream_p *stream)
+  {
+  if (path == 0 || stream == 0)
+    return e_bad_parameter;
+
+  // get the file system to use.
+  result_t result;
+  mount_point_t *mount;
+  if (failed(result = locate_mount_point(path, &mount)))
+    return result;
+
+  // open the file handle by skipping to the start of the filename
+  // relative to the mount point
+  const char *fs_path = path + strlen(mount->mount_point);
+  int fd;
+  if (failed(result = mount->file_type->create(mount->device, fs_path, 0, 0, &fd)))
+    return result;
+
+  file_stream_t *file_stream = (file_stream_t *)neutron_malloc(sizeof(file_stream_t));
+
+  if (file_stream == 0)
+    return e_not_enough_memory;
+
+  file_stream->fd = fd;
+  file_stream->mount_point = mount;
+  file_stream->stream.version = sizeof(file_stream_t);
+  file_stream->stream.stream_close = file_stream_close;
+  file_stream->stream.stream_delete = file_stream_delete;
+  file_stream->stream.stream_eof = file_stream_eof;
+  file_stream->stream.stream_getpos = file_stream_getpos;
+  file_stream->stream.stream_length = file_stream_length;
+  file_stream->stream.stream_path = file_stream_path;
+  file_stream->stream.stream_read = file_stream_read;
+  file_stream->stream.stream_setpos = file_stream_setpos;
+  file_stream->stream.stream_truncate = file_stream_truncate;
+  file_stream->stream.stream_write = file_stream_write;
+
+  return s_ok;
+  }
+
 result_t stream_open(const char *path, stream_p *stream)
   {
   if (path == 0 || stream == 0)
@@ -486,7 +526,7 @@ result_t stream_open(const char *path, stream_p *stream)
   file_stream->stream.stream_truncate = file_stream_truncate;
   file_stream->stream.stream_write = file_stream_write;
 
-  return e_not_implemented;
+  return s_ok;
   }
 
 result_t stream_rename(stream_p stream, const char *new_filename)
