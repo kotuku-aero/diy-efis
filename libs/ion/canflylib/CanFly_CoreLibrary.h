@@ -388,6 +388,49 @@ struct Library_CanFly_CoreLibrary_CanFly_Colors
 
 };
 
+struct Library_CanFly_CoreLibrary_CanFly_FileStream
+{
+    NANOCLR_NATIVE_DECLARE(FileStreamOpen___STATIC__U4__STRING);
+    NANOCLR_NATIVE_DECLARE(FileStreamCreate___STATIC__U4__STRING);
+    NANOCLR_NATIVE_DECLARE(FileStreamClose___STATIC__VOID__U4);
+    NANOCLR_NATIVE_DECLARE(FileStreamDelete___STATIC__VOID__U4);
+    NANOCLR_NATIVE_DECLARE(FileStreamEof___STATIC__BOOLEAN__U4);
+    NANOCLR_NATIVE_DECLARE(FileStreamRead___STATIC__SZARRAY_U1__U4__U2);
+    NANOCLR_NATIVE_DECLARE(FileStreamWrite___STATIC__VOID__U4__SZARRAY_U1);
+    NANOCLR_NATIVE_DECLARE(FileStreamGetPos___STATIC__U4__U4);
+    NANOCLR_NATIVE_DECLARE(FileStreamSetPos___STATIC__VOID__U4__U4);
+    NANOCLR_NATIVE_DECLARE(FileStreamLength___STATIC__U4__U4);
+    NANOCLR_NATIVE_DECLARE(FileStreamTruncate___STATIC__VOID__U4__U4);
+    NANOCLR_NATIVE_DECLARE(FileStreamCopy___STATIC__VOID__U4__U4);
+    NANOCLR_NATIVE_DECLARE(FileStreamPath___STATIC__STRING__U4__BOOLEAN);
+
+    //--//
+
+};
+
+struct Library_CanFly_CoreLibrary_CanFly_DirectoryEntry
+{
+    static const int FIELD___path = 1;
+    static const int FIELD___name = 2;
+    static const int FIELD___isFile = 3;
+
+    //--//
+
+};
+
+struct Library_CanFly_CoreLibrary_CanFly_DirectoryEnumerator
+{
+    static const int FIELD___handle = 1;
+    static const int FIELD___pos = 2;
+    static const int FIELD___enumPos = 3;
+
+    NANOCLR_NATIVE_DECLARE(GetDirectoryEntry___STATIC__BOOLEAN__U4__BYREF_STRING__BYREF_STRING);
+    NANOCLR_NATIVE_DECLARE(RewindDirectoryEntry___STATIC__VOID__U4);
+
+    //--//
+
+};
+
 struct Library_CanFly_CoreLibrary_CanFly_Extent
 {
     static const int FIELD___dx = 1;
@@ -612,6 +655,10 @@ struct Library_CanFly_CoreLibrary_CanFly_Screen
 struct Library_CanFly_CoreLibrary_CanFly_Stream
 {
     static const int FIELD___handle = 1;
+
+    NANOCLR_NATIVE_DECLARE(CreateDirectory___STATIC__VOID__STRING);
+    NANOCLR_NATIVE_DECLARE(RemoveDirectory___STATIC__VOID__STRING);
+    NANOCLR_NATIVE_DECLARE(GetirectoryEnumertor___STATIC__U4__STRING);
 
     //--//
 

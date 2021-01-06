@@ -23,10 +23,7 @@
     <ClCompile Include="..\..\libs\proton\proton.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\libs\proton\pens.h" />
     <ClInclude Include="..\..\libs\proton\proton.h" />
-    <ClInclude Include="..\..\libs\proton\regex.h" />
-    <ClInclude Include="..\..\libs\proton\spatial.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\libs\proton\proton.cli" />

@@ -2259,22 +2259,6 @@ extern "C" {
    */
   extern result_t reg_stream_create(memid_t parent, const char *path, stream_p *stream);
   /**
-   * @function stream_open(const char *path, stream_p *stream)
-   * Open a stream given a path.
-   * @param path      path to the stream, this is in the flash file system.
-   * @param stream    opened stream
-   * @return s_ok if the stream exists.
-  */
-  extern result_t stream_open(const char *path, stream_p *stream);
-  /**
-   * @function stream_create(memid_t parent, const char *path, stream_p *stream)
-   * Create a new stream.
-   * @param path      path to the stream.
-   * @param stream    newly created stream
-   * @return s_ok if the stream created ok.
-   */
-  extern result_t stream_create(const char *path, stream_p *stream);
-  /**
    * @function manifest_open(const char *path, stream_p *stream)
    * Open a manifest stream.
    * @param key       Key to open resource from
@@ -2299,6 +2283,100 @@ extern "C" {
    * or in code.  The resource is read only
    */
   extern result_t manifest_create(const char *literal, stream_p *stream);
+#ifndef NAME_MAX
+#define NAME_MAX	256
+#endif
+
+  /**
+  * @function stream_open(const char *path, stream_p *stream)
+  * Open a stream in the file system
+  * @param path path to the stream.  Is unix style "/dir/<file>
+  * @param stream resulting stream
+  * @return s_ok if file is found
+  */
+  result_t stream_open(const char *path, stream_p *stream);
+  /**
+  * @function stream_rename(stream_p stream, const char *new_filename)
+  * Rename a stream
+  * @param stream already opened stream
+  * @param new_filename the name of the new file
+  * @return s_ok if renamed ok
+  */
+  result_t stream_rename(stream_p stream, const char *new_filename);
+  /**
+  * @function create_directory(const char *path)
+  * Create a directory
+  * @param path path to the new directory
+  * @return s_ok if path created
+  */
+  result_t create_directory(const char *path);
+  /**
+  * @function remove_directory(const char *path)
+  * Remoce an empty directory
+  * @param path path to the empty directory
+  * @return s_ok if the path can be removed
+  */
+  result_t remove_directory(const char *path);
+  /**
+  * @function open_directory(const char *dirname, handle_t *dirp)
+  * Open a directory to enumerate the contents
+  * @param dirname path to the directory
+  * @param dirp handle to a directory enumeration
+  * @return s_ok if opened
+  */
+  result_t open_directory(const char *dirname, handle_t *dirp);
+
+  typedef enum _dir_entry_type {
+    et_file,
+    et_directory
+    } dir_entry_type;
+  /**
+  * @function read_directory(handle_t dirp, dir_entry_type *et, char *buffer, size_t len)
+  * Read a directory entry and advance the directory pointer
+  * @param dirp opened directory pointer
+  * @param et type of entry
+  * @param buffer buffer to receove the name
+  * @param len length of the buffer passed in
+  * @return s_ok if opened ok
+  */
+  result_t read_directory(handle_t dirp, dir_entry_type *et, char *buffer, size_t len);
+  /**
+  * @function rewind_directory(handle_t dirp)
+  * Skip to the previous directory entry
+  * @param dirp directory entry pointer
+  * @return s_ok if rewound
+  */
+  result_t rewind_directory(handle_t dirp);
+  /**
+  * @function close_directory(handle_t dirp)
+  * Close a directory handle
+  * @param dirp handle to the directory
+  * @return s_ok if closed ok
+  */
+  result_t close_directory(handle_t dirp);
+  /**
+  * @function stream_sync(stream_p stream)
+  * Force a flush of all data for the stream
+  * @param stream  stream to ensure all data is sync
+  * @return s_ok if sync happened
+  */
+  result_t stream_sync(stream_p stream);
+  /**
+  * @function freespace(const char *path, off_t *space)
+  * return how much space is available on the device
+  * @param path path to a device
+  * @param space resulting free space
+  * @return s_ok if the path is valid
+  */
+  result_t freespace(const char *path, uint32_t *space);
+  /**
+  * @function totalspace(const char *path, off_t *space)
+  * return the total space available on a device
+  * @param path path to the mounted file system
+  * @param space resulting space available
+  * @return s_ok if a valid path
+  */
+  result_t totalspace(const char *path, uint32_t *space);
   /**
    * @function stream_close(stream_p stream)
    * Close the stream handle and release all resources

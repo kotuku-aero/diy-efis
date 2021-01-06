@@ -24,12 +24,6 @@
     <ClCompile Include="..\..\libs\ion\ion_cli_impl.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\ion\ion_lib.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\ion\ion_interactive.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libs\ion\CLR_Startup_Thread.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -46,18 +40,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libs\ion\targetHAL.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\ion\targetHAL_Time.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\ion\targetPAL_Events.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\ion\targetPAL_Time.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\ion\WireProtocol_ReceiverThread.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libs\ion\canflylib\CanFly_CoreLibrary.cpp">
@@ -84,13 +66,22 @@
     <ClCompile Include="..\..\libs\ion\runtime\PointArray.cpp">
       <Filter>runtime</Filter>
     </ClCompile>
-    <ClCompile Include="CLR_Message.cpp">
-      <Filter>runtime</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libs\ion\runtime\CLR_Message.cpp">
       <Filter>runtime</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\ion\ion_runner.cpp">
+    <ClCompile Include="..\..\libs\ion\comm_service.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\debug_service.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\targetHAL_Time.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\ion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\neo.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -107,25 +98,7 @@
     <ClInclude Include="..\..\libs\ion\CLR_Startup_Thread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\libs\ion\lwipopts.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libs\ion\target_board.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\libs\ion\targetHAL.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libs\ion\targetHAL_Time.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libs\ion\TargetPAL_BlockStorage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libs\ion\targetPAL_Time.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libs\ion\WireProtocol_ReceiverThread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libs\ion\target_os.h">
@@ -133,15 +106,6 @@
     </ClInclude>
     <ClInclude Include="..\..\libs\ion\canflylib\CanFly_CoreLibrary.h">
       <Filter>canflylib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libs\ion\Target_Windows_Storage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libs\ion\TargetHAL_Spi.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libs\ion\target_BlockStorage.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libs\ion\runtime\CLR_Message.h">
       <Filter>runtime</Filter>
@@ -152,8 +116,5 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\libs\ion\ion.cli" />
-    <None Include="..\..\libs\ion\canflylib\FindINTEROP-CanFly.CoreLibrary.cmake">
-      <Filter>canflylib</Filter>
-    </None>
   </ItemGroup>
 </Project>

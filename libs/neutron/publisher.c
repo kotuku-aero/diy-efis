@@ -1130,6 +1130,7 @@ static bool alarm_hook(const canmsg_t *msg, void *parg)
 static msg_hook_t alarm_cb = { 0, 0, alarm_hook };
 
 extern result_t trace_init();
+extern result_t filesystem_init();
 
 result_t neutron_init(const neutron_parameters_t *params, bool init_mode, bool create_worker)
   {

@@ -33,8 +33,8 @@ then the original copyright notice is to be respected.
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
-#ifndef STREAM_H
-#define	STREAM_H
+#ifndef __stream_h__
+#define	__stream_h__
 
 #ifdef	__cplusplus
 extern "C"

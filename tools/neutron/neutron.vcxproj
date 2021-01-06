@@ -149,6 +149,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\libs\neutron\can_aerospace.c" />
     <ClCompile Include="..\..\libs\neutron\decompress.c" />
+    <ClCompile Include="..\..\libs\neutron\filesystem.c" />
     <ClCompile Include="..\..\libs\neutron\id_names.c" />
     <ClCompile Include="..\..\libs\neutron\manifest.c" />
     <ClCompile Include="..\..\libs\neutron\map.c" />

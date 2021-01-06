@@ -56,7 +56,7 @@ namespace CanFly
     public void Polyline(Pen pen, params Point[] points)
     {
       using (PointArray pts = new PointArray(points))
-        Photon.Polyline(Handle, ClipRect.Left, ClipRect.Right, ClipRect.Top, ClipRect.Bottom,
+        Photon.Polyline(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom,
           pen.Handle, pts.Handle);
     }
     /// <summary>
@@ -68,7 +68,7 @@ namespace CanFly
     public void Polyline(Rect clipRect, Pen pen, params Point[] points)
     {
       using (PointArray pts = new PointArray(points))
-        Photon.Polyline(Handle, clipRect.Left, clipRect.Right, clipRect.Top, clipRect.Bottom,
+        Photon.Polyline(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom,
           pen.Handle, pts.Handle);
     }
     /// <summary>
@@ -78,7 +78,7 @@ namespace CanFly
     /// <param name="pts">Array of points to use</param>
     public void Polyline(Pen pen, PointArray pts)
     {
-      Photon.Polyline(Handle, ClipRect.Left, ClipRect.Right, ClipRect.Top, ClipRect.Bottom,
+      Photon.Polyline(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom,
           pen.Handle, pts.Handle);
     }
     /// <summary>
@@ -89,8 +89,8 @@ namespace CanFly
     /// <param name="area">area of the ellipse</param>
     public void Ellipse(Pen pen, uint color, Rect area)
     {
-      Photon.Ellipse(Handle, ClipRect.Left, ClipRect.Right, ClipRect.Top, ClipRect.Bottom,
-        pen.Handle, color, area.Left, area.Right, area.Top, area.Bottom);
+      Photon.Ellipse(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom,
+        pen.Handle, color, area.Left, area.Top, area.Right, area.Bottom);
     }
     /// <summary>
     /// Draw a polygon
@@ -101,7 +101,7 @@ namespace CanFly
     public void Polygon(Pen pen, uint color, params Point[] points)
     {
       using(PointArray pts = new PointArray(points))
-        Photon.Polygon(Handle, ClipRect.Left, ClipRect.Right, ClipRect.Top, ClipRect.Bottom, pen.Handle, color, pts.Handle);
+        Photon.Polygon(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, pen.Handle, color, pts.Handle);
     }
     /// <summary>
     /// Draw a polygon
@@ -111,7 +111,7 @@ namespace CanFly
     /// <param name="pts">Points to draw</param>
     public void Polygon(Pen pen, uint color, PointArray pts)
     {
-      Photon.Polygon(Handle, ClipRect.Left, ClipRect.Right, ClipRect.Top, ClipRect.Bottom, pen.Handle, color, pts.Handle);
+      Photon.Polygon(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, pen.Handle, color, pts.Handle);
     }
     /// <summary>
     /// Draw a rectangle
@@ -121,8 +121,8 @@ namespace CanFly
     /// <param name="area">Area to draw</param>
     public void Rectangle(Pen pen, uint color, Rect area)
     {
-      Photon.Rectangle(Handle, ClipRect.Left, ClipRect.Right, ClipRect.Top, ClipRect.Bottom, pen.Handle, color, 
-        area.Left, area.Right, area.Top, area.Bottom);
+      Photon.Rectangle(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, pen.Handle, color, 
+        area.Left, area.Top, area.Right, area.Bottom);
     }
     /// <summary>
     /// Draw a rectangle with rounded corners
@@ -133,8 +133,8 @@ namespace CanFly
     /// <param name="radius">Radius of corners</param>
     public void RoundRect(Pen pen, uint color, Rect area, int radius)
     {
-      Photon.RoundRect(Handle, ClipRect.Left, ClipRect.Right, ClipRect.Top, ClipRect.Bottom, pen.Handle, color, 
-        area.Left, area.Right, area.Top, area.Bottom, radius);
+      Photon.RoundRect(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, pen.Handle, color, 
+        area.Left, area.Top, area.Right, area.Bottom, radius);
     }
     /// <summary>
     /// Bit transfer
@@ -144,9 +144,9 @@ namespace CanFly
     /// <param name="src_pt">Point on source to copy from</param>
     public void BitBlt(Rect dest_rect, GdiObject src_canvas, Point src_pt)
     {
-      Photon.BitBlt(Handle, ClipRect.Left, ClipRect.Right, ClipRect.Top, ClipRect.Bottom,
-        dest_rect.Left, dest_rect.Right, dest_rect.Top, dest_rect.Bottom,
-        src_canvas.Handle, src_canvas.ClipRect.Left, src_canvas.ClipRect.Right, src_canvas.ClipRect.Top, src_canvas.ClipRect.Bottom,
+      Photon.BitBlt(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom,
+        dest_rect.Left, dest_rect.Top, dest_rect.Right, dest_rect.Bottom,
+        src_canvas.Handle, src_canvas.ClipRect.Left, src_canvas.ClipRect.Top, src_canvas.ClipRect.Right, src_canvas.ClipRect.Bottom,
         src_pt.X, src_pt.Y);
     }
     /// <summary>
@@ -156,12 +156,12 @@ namespace CanFly
     /// <returns>Color value</returns>
     public uint GetPixel(Point pt)
     {
-      return Photon.GetPixel(Handle, ClipRect.Left, ClipRect.Right, ClipRect.Top, ClipRect.Bottom, pt.X, pt.Y);
+      return Photon.GetPixel(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, pt.X, pt.Y);
     }
 
     public uint SetPixel(Point pt, uint color)
     {
-      return Photon.SetPixel(Handle, ClipRect.Left, ClipRect.Right, ClipRect.Top, ClipRect.Bottom, pt.X, pt.Y, color);
+      return Photon.SetPixel(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, pt.X, pt.Y, color);
     }
     /// <summary>
     /// Draw an Arc
@@ -173,7 +173,7 @@ namespace CanFly
     /// <param name="end">End angle</param>
     public void Arc(Pen pen, Point pt, int radius, int start, int end)
     {
-      Photon.Arc(Handle, ClipRect.Left, ClipRect.Right, ClipRect.Top, ClipRect.Bottom, pen.Handle, pt.X, pt.Y, radius, start, end);
+      Photon.Arc(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, pen.Handle, pt.X, pt.Y, radius, start, end);
     }
     /// <summary>
     /// Draw a filled arc
@@ -186,7 +186,7 @@ namespace CanFly
     /// <param name="inner">Inner arc radii</param>
     public void Pie(Pen pen, uint color, Point pt, int start, int end, int radii, int inner)
     {
-      Photon.Pie(Handle, ClipRect.Left, ClipRect.Right, ClipRect.Top, ClipRect.Bottom, pen.Handle, color, pt.X, pt.Y, start, end, radii, inner);
+      Photon.Pie(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, pen.Handle, color, pt.X, pt.Y, start, end, radii, inner);
     }
     /// <summary>
     /// Draw a string
@@ -200,9 +200,9 @@ namespace CanFly
     /// <param name="format">Format flags</param>
     public void DrawText(Font font, uint fg, uint bg, string str, Point src_pt, Rect txt_clip_rect, TextOutStyle format)
     {
-      Photon.DrawText(Handle, ClipRect.Left, ClipRect.Right, ClipRect.Top, ClipRect.Bottom,
+      Photon.DrawText(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom,
         font.Handle, fg, bg, str, src_pt.X, src_pt.Y, 
-        txt_clip_rect.Left, txt_clip_rect.Right, txt_clip_rect.Top, txt_clip_rect.Bottom, format);
+        txt_clip_rect.Left, txt_clip_rect.Top, txt_clip_rect.Right, txt_clip_rect.Bottom, (ushort) format);
     }
     /// <summary>
     /// Draw a string
@@ -217,9 +217,9 @@ namespace CanFly
     /// <param name="format">Format flags</param>
     public void DrawText(Rect clipRect, Font font, uint fg, uint bg, string str, Point src_pt, Rect txt_clip_rect, TextOutStyle format)
     {
-      Photon.DrawText(Handle, clipRect.Left, clipRect.Right, clipRect.Top, clipRect.Bottom,
+      Photon.DrawText(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom,
         font.Handle, fg, bg, str, src_pt.X, src_pt.Y, 
-        txt_clip_rect.Left, txt_clip_rect.Right, txt_clip_rect.Top, txt_clip_rect.Bottom, format);
+        txt_clip_rect.Left, txt_clip_rect.Right, txt_clip_rect.Top, txt_clip_rect.Bottom, (ushort) format);
     }
     /// <summary>
     /// Get the rendering extent of text

@@ -18,7 +18,7 @@ namespace CanFly
 
     public Pen(uint color, ushort width, PenStyle style)
     {
-      _handle = Photon.CreatePen(color, width, style);
+      _handle = Photon.CreatePen(color, width, (ushort) style);
     }
 
     public void Dispose()

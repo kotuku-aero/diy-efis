@@ -787,8 +787,6 @@ void can_rx_task(void *parg)
     }
   }
 
-extern result_t neutron_init(const neutron_parameters_t *params, bool init_mode, bool create_worker);
-
 result_t can_aerospace_init(const neutron_parameters_t *params, bool init_mode, bool create_publish_task)
   {
   task_p task_handle;

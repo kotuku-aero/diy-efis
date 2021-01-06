@@ -74,5 +74,8 @@
     <ClCompile Include="..\..\libs\neutron\id_names.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\libs\neutron\filesystem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

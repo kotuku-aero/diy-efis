@@ -29,6 +29,7 @@
     <Compile Include="Canvas.cs" />
     <Compile Include="Color.cs" />
     <Compile Include="CanFlyMsgSink.cs" />
+    <Compile Include="DirectoryEnumerator.cs" />
     <Compile Include="Extent.cs" />
     <Compile Include="Font.cs" />
     <Compile Include="GdiObject.cs" />

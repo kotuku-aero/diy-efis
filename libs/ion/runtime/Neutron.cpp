@@ -1,3 +1,8 @@
+/*
+#include "../../nano/CLR/Include/nanoCLR_Interop.h"
+#include "../../nano/CLR/Include/nanoCLR_Runtime.h"
+#include "../../nano/CLR/Include/nanoPackStruct.h"
+*/
 #include "../canflylib/CanFly_CoreLibrary.h"
 
 #include "../../neutron/neutron.h"

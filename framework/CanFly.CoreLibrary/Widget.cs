@@ -5,18 +5,7 @@ namespace CanFly
 {
   public abstract class Widget : GdiObject
   {
-     /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="msg"></param>
-    /// <returns>true if message processed and further processing is not required</returns>
-    protected virtual bool WndProc(CanFlyMsg msg)
-    {
-      return false;
-    }
-
-    internal Widget(uint hwnd)
-      : base(hwnd)
+    internal Widget(uint hwnd) : base(hwnd)
     {
       Photon.SetWindowData(Handle, this);
 
@@ -30,7 +19,7 @@ namespace CanFly
     /// <param name="bounds">Bounds relative to the parent</param>
     /// <param name="id">Window ID</param>
     protected Widget(Widget parent, Rect bounds, ushort id)
-      : base(Photon.CreateChildWindow(parent.Handle, bounds.Left, bounds.Right, bounds.Top, bounds.Bottom, id))
+      : base(Photon.CreateChildWindow(parent.Handle, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom, id))
     {
       Photon.SetWindowData(Handle, this);
       // default clipping rectangle

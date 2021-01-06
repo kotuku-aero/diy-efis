@@ -69,3 +69,10 @@
 /libs/ion/canflylib/CanFly_CoreLibrary_CanFly_RegistryStream.h
 /libs/ion/canflylib/CanFly_CoreLibrary_CanFly_RegistryStream_mshl.cpp
 /libs/ion/canflylib/FindINTEROP-CanFly.CoreLibrary.cmake
+/libs/ion/canflylib/CanFly_CoreLibrary_CanFly_DirectoryEnumerator.cpp
+/libs/ion/canflylib/CanFly_CoreLibrary_CanFly_DirectoryEnumerator.h
+/libs/ion/canflylib/CanFly_CoreLibrary_CanFly_FileStream.cpp
+/libs/ion/canflylib/CanFly_CoreLibrary_CanFly_FileStream.h
+/libs/ion/canflylib/CanFly_CoreLibrary_CanFly_FileStream_mshl.cpp
+/libs/ion/canflylib/CanFly_CoreLibrary_CanFly_Stream.cpp
+/libs/ion/canflylib/CanFly_CoreLibrary_CanFly_Stream.h

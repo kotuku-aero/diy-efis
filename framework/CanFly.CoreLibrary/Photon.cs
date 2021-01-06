@@ -39,20 +39,20 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern uint OpenScreen(ushort orientation, ushort id);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern uint CreateWindow(uint parent, int left, int right, int top, int bottom, ushort id);
+    internal static extern uint CreateWindow(uint parent, int left, int top, int right, int bottom, ushort id);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern uint CreateChildWindow(uint parent, int left, int right, int top, int bottom, ushort id);
+    internal static extern uint CreateChildWindow(uint parent, int left, int top, int right, int bottom, ushort id);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void CloseWindow(uint hwnd);
     
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void GetWindowRect(uint window, out int left, out int right, out int top, out int bottom);
+    internal static extern void GetWindowRect(uint window, out int left, out int top, out int right, out int bottom);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void GetWindowPos(uint window, out int left, out int right, out int top, out int bottom);
+    internal static extern void GetWindowPos(uint window, out int left, out int top, out int right, out int bottom);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetWindowPos(uint window, int left, int right, int top, int bottom);
+    internal static extern void SetWindowPos(uint window, int left, int top, int right, int bottom);
 
     /// <summary>
     /// Return the window data assigned to the window.
@@ -96,36 +96,36 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void SetOrientation(uint hwnd, ushort orientation);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern uint CreatePen(uint color, ushort width, PenStyle style);
+    internal static extern uint CreatePen(uint color, ushort width, ushort style);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void DisposePen(uint handle);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void Polyline(uint canvas,
-      int clipLeft, int clipRight, int clipTop, int clipBottom,
+      int clipLeft, int clipTop, int clipRight, int clipBottom,
       uint penHandle, uint pointsHandle);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void Ellipse(uint canvas, int clipLeft, int clipRight, int clipTop, int clipBottom,
-      uint pen, uint color, int left, int right, int top, int bottom);
+    internal static extern void Ellipse(uint canvas, int clipLeft, int clipTop, int clipRight, int clipBottom,
+      uint pen, uint color, int left, int top, int right, int bottom);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void Polygon(uint canvas, int clipLeft, int clipRight, int clipTop, int clipBottom, uint pen, uint color, uint points);
+    internal static extern void Polygon(uint canvas, int clipLeft, int clipTop, int clipRight, int clipBottom, uint pen, uint color, uint points);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void Rectangle(uint canvas, int clipLeft, int clipRight, int clipTop, int clipBottom, uint pen, uint color, 
-      int left, int right, int top, int bottom);
+    internal static extern void Rectangle(uint canvas, int clipLeft, int clipTop, int clipRight, int clipBottom, uint pen, uint color, 
+      int left, int top, int right, int bottom);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void RoundRect(uint canvas, int clipLeft, int clipRight, int clipTop, int clipBottom, uint pen, uint color, 
-      int left, int right, int top, int bottom, int radius);
+    internal static extern void RoundRect(uint canvas, int clipLeft, int clipTop, int clipRight, int clipBottom, uint pen, uint color, 
+      int left, int top, int right, int bottom, int radius);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void BitBlt(uint canvas, int clipLeft, int clipRight, int clipTop, int clipBottom, 
-      int dest_left, int dest_right, int dest_top, int dest_bottom,
-      uint src_canvas, int src_clip_left, int src_clip_right, int src_clip_top, int src_clip_bottom, 
+    internal static extern void BitBlt(uint canvas, int clipLeft, int clipTop, int clipRight, int clipBottom, 
+      int dest_left, int dest_top, int dest_right, int dest_bottom,
+      uint src_canvas, int src_clip_left, int src_clip_top, int src_clip_right, int src_clip_bottom, 
       int src_pt_x, int src_pt_y);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern uint GetPixel(uint canvas, int clipLeft, int clipRight, int clipTop, int clipBottom, int pt_x, int pt_y);
+    internal static extern uint GetPixel(uint canvas, int clipLeft, int clipTop, int clipRight, int clipBottom, int pt_x, int pt_y);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern uint SetPixel(uint canvas, int clipLeft, int clipRight, int clipTop, int clipBottom, int pt_x, int pt_y, uint c);
+    internal static extern uint SetPixel(uint canvas, int clipLeft, int clipTop, int clipRight, int clipBottom, int pt_x, int pt_y, uint c);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void Arc(uint canvas,
-                              int clipLeft, int clipRight, int clipTop, int clipBottom,
+                              int clipLeft, int clipTop, int clipRight, int clipBottom,
                               uint pen,
                               int pt_x, int pt_y,
                               int radius,
@@ -133,7 +133,7 @@ namespace CanFly
                               int end);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void Pie(uint canvas,
-                              int clipLeft, int clipRight, int clipTop, int clipBottom,
+                              int clipLeft, int clipTop, int clipRight, int clipBottom,
                               uint pen,
                               uint color,
                               int pt_x, int pt_y,
@@ -145,18 +145,18 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern uint OpenFont(string name, ushort pixels);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void DrawText(uint canvas, int clipLeft, int clipRight, int clipTop, int clipBottom,
+    internal static extern void DrawText(uint canvas, int clipLeft, int clipTop, int clipRight, int clipBottom,
                                     uint  font,
                                     uint fg,
                                     uint bg,
                                     string str,
                                     int pt_x, int pt_y,
-                                    int txt_clip_left, int txt_clip_right, int txt_clip_top, int txt_clip_bottom,
-                                    TextOutStyle format);
+                                    int txt_clip_left, int txt_clip_top, int txt_clip_right, int txt_clip_bottom,
+                                    ushort format);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void TextExtent(uint canvas, uint  font, string str, out int dx, out int dy);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void InvalidateRect(uint hwnd, int left, int right, int top, int bottom);
+    internal static extern void InvalidateRect(uint hwnd, int left, int top, int right, int bottom);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern bool IsValid(uint hwnd);
     [MethodImpl(MethodImplOptions.InternalCall)]
