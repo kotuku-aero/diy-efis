@@ -33,4 +33,118 @@ then the original copyright notice is to be respected.
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
-#include "../neutron/bsp.h"
+#include "pen.h"
+
+static handle_t pen_cache;
+
+result_t pen_init()
+  {
+  result_t result;
+  if (failed(result = vector_create(sizeof(pen_t *), &pen_cache)))
+    return result;
+
+  return s_ok;
+  }
+
+result_t pen_create(color_t color, uint16_t width, pen_style style, handle_t *hndl)
+  {
+  if (hndl == 0)
+    return e_bad_pointer;
+
+  result_t result;
+
+  // see if there is a pen that matches
+  pen_t **begin;
+  pen_t **end;
+
+  enter_critical();
+
+  if(failed(result = vector_begin(pen_cache, &begin)) ||
+    failed(result = vector_end(pen_cache, &end)))
+    {
+    exit_critical();
+    return result;
+    }
+
+  for (; begin < end; begin++)
+    {
+    if ((*begin)->color == color &&
+      (*begin)->width == width &&
+      (*begin)->style == style)
+      break;
+    }
+
+  if (begin == end)
+    {
+    *begin = (pen_t *)neutron_malloc(sizeof(pen_t));
+    (*begin)->version = sizeof(pen_t);
+    (*begin)->refcnt = 0;
+    (*begin)->style = style;
+    (*begin)->width = width;
+    (*begin)->color = color;
+
+    // store the new pen
+    vector_push_back(pen_cache, (*begin));
+    }
+
+  (*begin)->refcnt++;
+  exit_critical;
+
+  // return the pointer to the pen
+  *hndl = *begin;
+
+  return s_ok;
+  }
+
+result_t check_pen(handle_t hndl, pen_t **pen)
+  {
+  if (hndl == 0 || pen == 0)
+    return e_bad_pointer;
+
+  *pen = (pen_t *)hndl;
+  if ((*pen)->version != sizeof(pen_t) || (*pen)->refcnt == 0)
+    return e_bad_pointer;
+
+  return s_ok;
+  }
+
+result_t pen_release(handle_t hndl)
+  {
+  result_t result;
+  pen_t *pen;
+
+   if(failed(result = check_pen(hndl, &pen)))
+     return result;
+
+  enter_critical();
+  if (--pen->refcnt == 0)
+    {
+    // find it in the array
+    pen_t **begin;
+    pen_t **end;
+    if (failed(result = vector_begin(pen_cache, &begin)) ||
+      failed(result = vector_end(pen_cache, &end)))
+      {
+      exit_critical();
+      return result;
+      }
+
+    uint16_t index = 0;
+    for (; begin < end; begin++)
+      {
+      if (*begin == pen)
+        {
+        vector_erase(pen_cache, index);
+        break;
+        }
+      index++;
+      }
+
+    // ensure mem invalid in case of reuse
+    memset(pen, 0, sizeof(pen_t));
+    }
+
+  exit_critical();
+
+  return s_ok;
+  }

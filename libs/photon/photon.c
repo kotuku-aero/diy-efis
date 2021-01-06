@@ -37,6 +37,7 @@ it must be removed as soon as possible after the code fragment is identified.
 
 #include "photon.h"
 #include "window.h"
+#include "pen.h"
 /**
 * @struct window_msg_t
 */
@@ -46,6 +47,23 @@ typedef struct _window_msg_t {
   } window_msg_t;
 
 static screen_t *phys_screen;
+
+extern result_t pen_init();
+
+result_t photon_init(const photon_parameters_t *params, bool init_mode)
+  {
+  if (params == 0)
+    return e_bad_parameter;
+
+  result_t result;
+  if (failed(result = pen_init()))
+    return result;
+
+  // get the startup screen.
+  phys_screen = params->screen;
+
+  return s_ok;
+  }
 
 static void on_timer(const canmsg_t *msg)
   {
@@ -1248,8 +1266,14 @@ static result_t polygon_intersect(const rect_t *clip_rect, const point_t *pts, u
   return s_ok;
   }
 
-result_t polyline_impl(canvas_t *canvas, const rect_t *clip_rect, const pen_t *pen, uint16_t count, const point_t *points)
+result_t polyline_impl(canvas_t *canvas, const rect_t *clip_rect, handle_t pen_hndl, uint16_t count, const point_t *points)
   {
+  pen_t *pen;
+  result_t result;
+
+  if (failed(result = check_pen(pen_hndl, &pen)))
+    return result;
+
   gdi_dim_t half_width = pen->width >> 1;
   point_t p1;
   point_t p2;
@@ -1520,9 +1544,13 @@ result_t polyline_impl(canvas_t *canvas, const rect_t *clip_rect, const pen_t *p
   return s_ok;
   }
 
-result_t polyline(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen, uint16_t count, const point_t *points)
+result_t polyline(handle_t hwnd, const rect_t *clip_rect, handle_t pen_hndl, uint16_t count, const point_t *points)
   {
   result_t result;
+  pen_t *pen;
+  if (failed(result = check_pen(pen_hndl, &pen)))
+    return result;
+
   canvas_t *canvas;
   if (failed(result = get_canvas(hwnd, &canvas)))
     return result;
@@ -1550,10 +1578,15 @@ static result_t fill_rect(canvas_t *canvas, const rect_t *clip_rect, const rect_
   return s_ok;
   }
 
-result_t ellipse(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
+result_t ellipse(handle_t hwnd, const rect_t *clip_rect, handle_t pen_hndl,
     color_t fill, const rect_t *area)
   {
+  pen_t *pen;
   result_t result;
+
+  if (failed(result = check_pen(pen_hndl, &pen)))
+    return result;
+
   canvas_t *canvas;
   if(failed(result = get_canvas(hwnd, &canvas)))
     return result;
@@ -2033,9 +2066,13 @@ for(i = 0; i < num_edges; i++)
   return s_ok;
   }
 
-result_t polypolygon(handle_t hwnd, const rect_t *clip_rect, const pen_t *outline, color_t fill, uint16_t count, const uint16_t *lengths, const point_t *pts)
+result_t polypolygon(handle_t hwnd, const rect_t *clip_rect, handle_t outline, color_t fill, uint16_t count, const uint16_t *lengths, const point_t *pts)
   {
   result_t result;
+  pen_t *pen;
+  if (failed(result = check_pen(outline, &pen)))
+    return result;
+
   // if the interior color is hollow then just a line draw
   if (fill == color_hollow)
     {
@@ -2060,7 +2097,7 @@ result_t polypolygon(handle_t hwnd, const rect_t *clip_rect, const pen_t *outlin
     return result;
 
   // now outline the polygon using the pen
-  if (outline != 0 && outline->color != color_hollow)
+  if (outline != 0 && pen->color != color_hollow)
     {
     uint16_t poly;
     for (poly = 0; poly < count; poly++)
@@ -2076,16 +2113,21 @@ result_t polypolygon(handle_t hwnd, const rect_t *clip_rect, const pen_t *outlin
   return s_ok;
   }
 
-result_t polygon(handle_t canvas, const rect_t *clip_rect, const pen_t *outline,
+result_t polygon(handle_t canvas, const rect_t *clip_rect, handle_t outline,
   color_t fill, uint16_t count, const point_t *pts)
   {
   return polypolygon(canvas, clip_rect, outline, fill, 1, &count, pts);
   }
 
-result_t rectangle(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
+result_t rectangle(handle_t hwnd, const rect_t *clip_rect, handle_t pen_hndl,
     color_t color, const rect_t *rect)
   {
+  pen_t *pen;
   result_t result;
+
+  if (failed(result = check_pen(pen_hndl, &pen)))
+    return result;
+
   canvas_t *canvas;
   if(failed(result = get_canvas(hwnd, &canvas)))
     return result;
@@ -2131,10 +2173,15 @@ result_t rectangle(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
   return s_ok;
   }
 
-result_t round_rect(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
+result_t round_rect(handle_t hwnd, const rect_t *clip_rect, handle_t pen_hndl,
     color_t fill, const rect_t *rect, gdi_dim_t dim)
   {
+  pen_t *pen;
   result_t result;
+
+  if (failed(result = check_pen(pen_hndl, &pen)))
+    return result;
+
   canvas_t *canvas;
   if(failed(result = get_canvas(hwnd, &canvas)))
     return result;
@@ -2503,10 +2550,15 @@ static inline int fix_angle(int angle)
   return angle;
   }
 
-result_t arc(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
+result_t arc(handle_t hwnd, const rect_t *clip_rect, handle_t pen_hndl,
     const point_t *p, gdi_dim_t radius, int start_angle, int end_angle)
   {
+  pen_t *pen;
   result_t result;
+
+  if (failed(result = check_pen(pen_hndl, &pen)))
+    return result;
+
   canvas_t *canvas;
   if(failed(result = get_canvas(hwnd, &canvas)))
     return result;
@@ -2602,7 +2654,7 @@ result_t arc(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
       }
     else
       {
-      // result_t ellipse(handle_t hndl, const rect_t *clip_rect, const pen_t *pen, color_t fill, const rect_t *area)
+      // result_t ellipse(handle_t hndl, const rect_t *clip_rect, handle_t pen_hndl, color_t fill, const rect_t *area)
 
       if (angle >= start_angle && angle <= end_angle)
         ellipse(hwnd, clip_rect, pen, pen->color,
@@ -2684,11 +2736,16 @@ result_t arc(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
   return s_ok;
   }
 
-result_t pie(handle_t hwnd, const rect_t *clip_rect, const pen_t *pen,
+result_t pie(handle_t hwnd, const rect_t *clip_rect, handle_t pen_hndl,
     color_t c, const point_t *p, int start, int end, gdi_dim_t radii,
     gdi_dim_t inner)
   {
+  pen_t *pen;
   result_t result;
+
+  if (failed(result = check_pen(pen_hndl, &pen)))
+    return result;
+
   canvas_t *canvas;
   if(failed(result = get_canvas(hwnd, &canvas)))
     return result;

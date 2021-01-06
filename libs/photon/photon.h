@@ -150,16 +150,6 @@ typedef enum _pen_style
   ps_null
   } pen_style;
 
-/**
- * @struct pen_t
- */
-typedef struct _pen_t
-  {
-  color_t color;
-  uint16_t width;
-  pen_style style;
-  } pen_t;
-  
 ////////////////////////////////////////////////////////////////////////////
 typedef uint32_t text_flags;
 enum {
@@ -258,12 +248,10 @@ extern result_t create_window(handle_t parent, const rect_t *bounds, wndproc cb,
  * @param parent  Parent window.  if 0 then the top level window is created
  * @param bounds  Bounds of window.  if parant != 0 then relative to parent window
  * @param cb      Callback to receive messages
- * @param key     Optional registry key with config values
- * @param prototype Optional name of the prototype for the ECMA script object
  * @param hwnd    resulting handle
  * @return s_ok if window created ok
  */
-extern result_t create_child_window(handle_t parent, const rect_t *bounds, wndproc cb, uint16_t id, memid_t key, const char *prototype, handle_t *hwnd);
+extern result_t create_child_window(handle_t parent, const rect_t *bounds, wndproc cb, uint16_t id, handle_t *hwnd);
 /**
  * @function close_window(handle_t hwnd);
  * Close a window and release all resources
@@ -535,7 +523,7 @@ extern result_t get_orientation(handle_t hwnd, uint16_t *orientation);
  */
 extern result_t set_orientation(handle_t hwnd, uint16_t orientation);
 /**
- * @function polyline(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, const point_t *points, uint16_t count)
+ * @function polyline(handle_t canvas, const rect_t *clip_rect, handle_t pen, const point_t *points, uint16_t count)
  * Draw a polyline
  * @param canvas      canvas to draw on
  * @param clip_rect   rectangle to clip to
@@ -544,9 +532,9 @@ extern result_t set_orientation(handle_t hwnd, uint16_t orientation);
  * @param points      points to draw
  * @return s_ok if succeeded
  */
-extern result_t polyline(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, uint16_t count, const point_t *points);
+extern result_t polyline(handle_t canvas, const rect_t *clip_rect, handle_t pen, uint16_t count, const point_t *points);
 /**
- * @function ellipse(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, const rect_t *area)
+ * @function ellipse(handle_t canvas, const rect_t *clip_rect, handle_t pen, color_t color, const rect_t *area)
  * Draw an ellipse
  * @param canvas      canvas to draw on
  * @param clip_rect   rectangle to clip to
@@ -557,11 +545,11 @@ extern result_t polyline(handle_t canvas, const rect_t *clip_rect, const pen_t *
  */
 extern result_t ellipse(handle_t canvas,
                         const rect_t *clip_rect,
-                        const pen_t *pen,
+                        handle_t pen,
                         color_t color,
                         const rect_t *area);
 /**
- * @function polygon(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, const point_t *points, uint16_t count)
+ * @function polygon(handle_t canvas, const rect_t *clip_rect, handle_t pen, color_t color, const point_t *points, uint16_t count)
  * Draw a polygon and optionally fill it
  * @param canvas      canvas to draw on
  * @param clip_rect   rectangle to clip to
@@ -571,9 +559,9 @@ extern result_t ellipse(handle_t canvas,
  * @param points      points of the polygon
  * @return  s_ok if succeeded
  */
-extern result_t polygon(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, uint16_t count, const point_t *points);
+extern result_t polygon(handle_t canvas, const rect_t *clip_rect, handle_t pen, color_t color, uint16_t count, const point_t *points);
 /**
-* @function polypolygon(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, handle_t poly)
+* @function polypolygon(handle_t canvas, const rect_t *clip_rect, handle_t pen, color_t color, handle_t poly)
 * Draw a polypolygon and optionally fill it
 * @param canvas      canvas to draw on
 * @param clip_rect   rectangle to clip to
@@ -583,9 +571,9 @@ extern result_t polygon(handle_t canvas, const rect_t *clip_rect, const pen_t *p
 * @param lengths
 * @return  s_ok if succeeded
 */
-extern result_t polypolygon(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, uint16_t count, const uint16_t *lengths, const point_t *points);
+extern result_t polypolygon(handle_t canvas, const rect_t *clip_rect, handle_t pen, color_t color, uint16_t count, const uint16_t *lengths, const point_t *points);
 /**
- * @function rectangle(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, const rect_t *area)
+ * @function rectangle(handle_t canvas, const rect_t *clip_rect, handle_t pen, color_t color, const rect_t *area)
  * Draw a rectangle
  * @param canvas        canvas to draw on
  * @param clip_rect     rectangle to clip to
@@ -596,11 +584,11 @@ extern result_t polypolygon(handle_t canvas, const rect_t *clip_rect, const pen_
  */
 extern result_t rectangle(handle_t canvas,
                           const rect_t *clip_rect,
-                          const pen_t *pen,
+                          handle_t pen,
                           color_t color,
                           const rect_t *area);
 /**
- * @function round_rect(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, const rect_t *area, gdi_dim_t radius)
+ * @function round_rect(handle_t canvas, const rect_t *clip_rect, handle_t pen, color_t color, const rect_t *area, gdi_dim_t radius)
  * Draw a rectangle with rounded corners
  * @param canvas        canvas to draw on
  * @param clip_rect     rectangle to clip to
@@ -612,7 +600,7 @@ extern result_t rectangle(handle_t canvas,
  */
 extern result_t round_rect(handle_t canvas,
                            const rect_t *clip_rect,
-                           const pen_t *pen,
+                           handle_t pen,
                            color_t color,
                            const rect_t *area,
                            gdi_dim_t radius);
@@ -662,7 +650,7 @@ extern result_t set_pixel(handle_t canvas,
                           color_t c,
                           color_t *pixel);
 /**
- * @function arc(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, const point_t *pt, gdi_dim_t radius, int start, int end)
+ * @function arc(handle_t canvas, const rect_t *clip_rect, handle_t pen, const point_t *pt, gdi_dim_t radius, int start, int end)
  * Draw an arc
  * @param canvas      canvas to draw on
  * @param clip_rect   rectangle to clip to
@@ -675,13 +663,13 @@ extern result_t set_pixel(handle_t canvas,
  */
 extern result_t arc(handle_t canvas,
                            const rect_t *clip_rect,
-                           const pen_t *pen,
+                           handle_t pen,
                            const point_t *pt,
                            gdi_dim_t radius,
                            int start,
                            int end);
 /**
- * @function pie(handle_t canvas, const rect_t *clip_rect, const pen_t *pen, color_t color, const point_t *pt, int start, int end, gdi_dim_t radii,vgdi_dim_t inner)
+ * @function pie(handle_t canvas, const rect_t *clip_rect, handle_t pen, color_t color, const point_t *pt, int start, int end, gdi_dim_t radii,vgdi_dim_t inner)
  * Draw a pie
  * @param canvas      canvas to write to
  * @param clip_rect   rectangle to clip to
@@ -696,7 +684,7 @@ extern result_t arc(handle_t canvas,
  */
 extern result_t pie(handle_t canvas,
                            const rect_t *clip_rect,
-                           const pen_t *pen,
+                           handle_t pen,
                            color_t color,
                            const point_t *pt,
                            int start,
@@ -729,6 +717,22 @@ extern result_t load_font(handle_t stream);
  * @return s_ok if the point sizes in the font are registered ok
  */
 extern result_t register_font(const uint8_t *buffer, uint16_t length);
+/**
+* @function pen_create(color_t color, uint16_t width, pen_style style, handle_t *hndl)
+* Create or return a handle to a pen
+* @param color pen color
+* @param width pen width
+* @param pen_style drawing style
+* @param hndl resulting handle to the pen
+* @return s_ok if it all works
+*/
+extern result_t pen_create(color_t color, uint16_t width, pen_style style, handle_t *hndl);
+/**
+* @function pen_release(handle_t *hndl)
+* @param hndl handle to the pen
+* @return s_ok if release completed
+*/
+extern result_t pen_release(handle_t hndl);
 /**
  * @function draw_text(handle_t canvas, const rect_t *clip_rect, handle_t  font, color_t fg, color_t bg, const char *str, uint16_t count, const point_t *src_pt, const rect_t *txt_clip_rect, text_flags format, uint16_t *char_widths)
  * Draw text

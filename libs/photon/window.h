@@ -43,6 +43,7 @@ extern "C" {
 
 #include <string.h>
 
+#include "photon.h"
 #include "../neutron/bsp.h"
 
 #define WINDOW_QUEUE_SIZE 128

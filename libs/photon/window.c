@@ -390,8 +390,7 @@ result_t create_window(handle_t hwnd_parent, const rect_t *bounds, wndproc cb, u
 result_t create_child_window(handle_t hwnd_parent,
   const rect_t *bounds,
   wndproc cb, uint16_t id,
-  memid_t key,
-  const char *prototype, handle_t *hwnd)
+  handle_t *hwnd)
   {
   result_t result;
   canvas_t *canvas;
