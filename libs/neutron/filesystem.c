@@ -48,7 +48,7 @@ typedef struct _file_stream_t {
   stream_handle_t stream;
   // platform specific information
   mount_point_t *mount_point;
-  int fd;
+  uint32_t fd;
   // position in the stream
   uint32_t position;
   } file_stream_t;
@@ -65,6 +65,7 @@ result_t filesystem_init()
   {
   memset(mounts, 0, sizeof(mount_point_t) * NUM_MOUNTS);
 
+  return s_ok;
   }
 
 // the root is an empty string
@@ -181,7 +182,7 @@ result_t mount(const char *mount_point, filesystem_t *file_type, nand_device_t *
     }
 
   // the fs is mounted so call the mount
-  return file_type->mount(device);
+  return file_type->mount(file_type, device);
   }
 
 static mount_point_t *check_handle(handle_t fshndl)
@@ -218,7 +219,7 @@ extern result_t umount(handle_t fshndl)
   // call to unmount a fs
   result_t result;
 
-  if (failed(result = mount->file_type->unmount(mount->device)))
+  if (failed(result = mount->file_type->unmount(mount->file_type, mount->device)))
     return result;
 
   // remove the mount
@@ -234,7 +235,7 @@ extern result_t fs_sync(handle_t fshndl)
   if (mount == 0)
     return e_bad_parameter;
 
-  return mount->file_type->fssync(mount->device);
+  return mount->file_type->fssync(mount->file_type, mount->device);
   }
 
 static result_t as_file_stream(stream_handle_t *stream, file_stream_t **hndl)
@@ -262,7 +263,7 @@ static result_t file_stream_eof(stream_handle_t *stream)
     return result; 
 
   stat_t fd_stat;
-  if (failed(result = fshndl->mount_point->file_type->stat(fshndl->mount_point->device, fshndl->fd, &fd_stat)))
+  if (failed(result = fshndl->mount_point->file_type->stat(fshndl->mount_point->file_type, fshndl->mount_point->device, fshndl->fd, &fd_stat)))
     return result;
 
   return fshndl->position >= fd_stat.st_size;
@@ -276,7 +277,8 @@ static result_t file_stream_read(stream_handle_t *stream, void *buffer, uint16_t
     return result;
 
   uint32_t bytes_read;
-  if(failed(result = fshndl->mount_point->file_type->read(fshndl->mount_point->device, fshndl->fd, fshndl->position, buffer, size, &bytes_read)))
+  if(failed(result = fshndl->mount_point->file_type->read(fshndl->mount_point->file_type, 
+    fshndl->mount_point->device, fshndl->fd, fshndl->position, buffer, size, &bytes_read)))
     return result;
 
   if (read != 0)
@@ -295,7 +297,8 @@ static result_t file_stream_write(stream_handle_t *stream, const void *buffer, u
     return result;
 
   uint32_t bytes_written;
-  if (failed(result = fshndl->mount_point->file_type->write(fshndl->mount_point->device, fshndl->fd, fshndl->position, buffer, size, &bytes_written)))
+  if (failed(result = fshndl->mount_point->file_type->write(fshndl->mount_point->file_type, 
+    fshndl->mount_point->device, fshndl->fd, fshndl->position, buffer, size, &bytes_written)))
     return result;
 
   fshndl->position += bytes_written;
@@ -326,7 +329,8 @@ static result_t file_stream_setpos(stream_handle_t *stream, uint32_t pos)
 
   stat_t file_stat;
   // get the length
-  if (failed(result = fshndl->mount_point->file_type->stat(fshndl->mount_point->device, fshndl->fd, &file_stat)))
+  if (failed(result = fshndl->mount_point->file_type->stat(fshndl->mount_point->file_type, 
+    fshndl->mount_point->device, fshndl->fd, &file_stat)))
     return result;
 
   if (pos > file_stat.st_size)
@@ -349,7 +353,8 @@ static result_t file_stream_length(stream_handle_t *stream, uint32_t *length)
 
   stat_t file_stat;
   // get the length
-  if (failed(result = fshndl->mount_point->file_type->stat(fshndl->mount_point->device, fshndl->fd, &file_stat)))
+  if (failed(result = fshndl->mount_point->file_type->stat(fshndl->mount_point->file_type, 
+    fshndl->mount_point->device, fshndl->fd, &file_stat)))
     return result;
 
   *length = file_stat.st_size;
@@ -368,13 +373,15 @@ static result_t file_stream_truncate(stream_handle_t *stream, uint32_t length)
 
   stat_t file_stat;
   // get the length
-  if (failed(result = fshndl->mount_point->file_type->stat(fshndl->mount_point->device, fshndl->fd, &file_stat)))
+  if (failed(result = fshndl->mount_point->file_type->stat(fshndl->mount_point->file_type, 
+    fshndl->mount_point->device, fshndl->fd, &file_stat)))
     return result;
 
   if (length > file_stat.st_size)
     return s_ok;
 
-  if (failed(result = fshndl->mount_point->file_type->truncate(fshndl->mount_point->device, fshndl->fd, length)))
+  if (failed(result = fshndl->mount_point->file_type->truncate(fshndl->mount_point->file_type, 
+    fshndl->mount_point->device, fshndl->fd, length)))
     return result;
 
   if (fshndl->position > length)
@@ -393,7 +400,8 @@ static result_t file_stream_close(stream_handle_t *stream)
   if (failed(result = as_file_stream(stream, &fshndl)))
     return result;
 
-  if (failed(result = fshndl->mount_point->file_type->close(fshndl->mount_point->device, fshndl->fd)))
+  if (failed(result = fshndl->mount_point->file_type->close(fshndl->mount_point->file_type, 
+    fshndl->mount_point->device, fshndl->fd)))
     return result;
 
   // remove the handle.
@@ -413,7 +421,8 @@ static result_t file_stream_delete(stream_handle_t *stream)
   if (failed(result = as_file_stream(stream, &fshndl)))
     return result;
 
-  if (failed(result = fshndl->mount_point->file_type->unlink(fshndl->mount_point->device, fshndl->fd)))
+  if (failed(result = fshndl->mount_point->file_type->unlink(fshndl->mount_point->file_type, 
+    fshndl->mount_point->device, fshndl->fd)))
     return result;
 
   fshndl->fd = 0;
@@ -446,7 +455,8 @@ static result_t file_stream_path(stream_handle_t *stream, bool full_path, uint16
     path += copied;
     }
 
-  return fshndl->mount_point->file_type->getpath(fshndl->mount_point->device, fshndl->fd, full_path, path, bytes_remaining);
+  return fshndl->mount_point->file_type->getpath(fshndl->mount_point->file_type, 
+    fshndl->mount_point->device, fshndl->fd, full_path, path, bytes_remaining);
   }
 
 result_t stream_create(const char *path, stream_p *stream)
@@ -463,8 +473,8 @@ result_t stream_create(const char *path, stream_p *stream)
   // open the file handle by skipping to the start of the filename
   // relative to the mount point
   const char *fs_path = path + strlen(mount->mount_point);
-  int fd;
-  if (failed(result = mount->file_type->create(mount->device, fs_path, 0, 0, &fd)))
+  uint32_t fd;
+  if (failed(result = mount->file_type->create(mount->file_type, mount->device, fs_path, &fd)))
     return result;
 
   file_stream_t *file_stream = (file_stream_t *)neutron_malloc(sizeof(file_stream_t));
@@ -503,8 +513,8 @@ result_t stream_open(const char *path, stream_p *stream)
   // open the file handle by skipping to the start of the filename
   // relative to the mount point
   const char *fs_path = path + strlen(mount->mount_point);
-  int fd;
-  if (failed(result = mount->file_type->open(mount->device, fs_path, 0, 0, &fd)))
+  uint32_t fd;
+  if (failed(result = mount->file_type->open(mount->file_type, mount->device, fs_path, &fd)))
     return result;
 
   file_stream_t *file_stream = (file_stream_t *)neutron_malloc(sizeof(file_stream_t));
@@ -539,7 +549,8 @@ result_t stream_rename(stream_p stream, const char *new_filename)
   if (failed(result = as_file_stream((stream_handle_t *)stream, &fshndl)))
     return result;
 
-  return fshndl->mount_point->file_type->rename(fshndl->mount_point->device, fshndl->fd, new_filename);
+  return fshndl->mount_point->file_type->rename(fshndl->mount_point->file_type, 
+    fshndl->mount_point->device, fshndl->fd, new_filename);
   }
 
 result_t create_directory(const char *path)
@@ -558,7 +569,7 @@ result_t create_directory(const char *path)
   // open the file handle by skipping to the start of the filename
   // relative to the mount point
   const char *fs_path = path + strlen(mount->mount_point);
-  return mount->file_type->mkdir(mount->device, fs_path);
+  return mount->file_type->mkdir(mount->file_type, mount->device, fs_path);
   }
 
 result_t remove_directory(const char *path)
@@ -577,12 +588,12 @@ result_t remove_directory(const char *path)
   // open the file handle by skipping to the start of the filename
   // relative to the mount point
   const char *fs_path = path + strlen(mount->mount_point);
-  return mount->file_type->rmdir(mount->device, fs_path);
+  return mount->file_type->rmdir(mount->file_type, mount->device, fs_path);
   }
 
 typedef struct _dirp_t {
   size_t version;
-  int dirp;
+  uint32_t dirp;
   mount_point_t *mount;
   } dirp_t;
 
@@ -600,8 +611,8 @@ result_t open_directory(const char *dirname, handle_t *dirp)
   // open the file handle by skipping to the start of the filename
   // relative to the mount point
   const char *fs_path = dirname + strlen(mount->mount_point);
-  int fs_dirp;
-  if (failed(result = mount->file_type->opendir(mount->device, fs_path, &fs_dirp)))
+  uint32_t fs_dirp;
+  if (failed(result = mount->file_type->opendir(mount->file_type, mount->device, fs_path, &fs_dirp)))
     return result;
 
   dirp_t *dir = (dirp_t *)neutron_malloc(sizeof(dirp_t));
@@ -638,7 +649,7 @@ result_t read_directory(handle_t hndl, dir_entry_type *et, char *buffer, size_t 
   if (failed(result = validate_dirp(hndl, &dirp)))
     return result;
 
-  return dirp->mount->file_type->readdir(dirp->mount->device, dirp->dirp, et, buffer, len);
+  return dirp->mount->file_type->readdir(dirp->mount->file_type, dirp->mount->device, dirp->dirp, et, buffer, len);
   }
 
 result_t rewind_directory(handle_t hndl)
@@ -649,7 +660,7 @@ result_t rewind_directory(handle_t hndl)
   if (failed(result = validate_dirp(hndl, &dirp)))
     return result;
 
-  return dirp->mount->file_type->rewinddir(dirp->mount->device, dirp->dirp);
+  return dirp->mount->file_type->rewinddir(dirp->mount->file_type, dirp->mount->device, dirp->dirp);
   }
 
 result_t close_directory(handle_t hndl)
@@ -676,7 +687,7 @@ result_t stream_sync(stream_p stream)
   if (failed(result = as_file_stream((stream_handle_t *)stream, &fshndl)))
     return result;
 
-  return fshndl->mount_point->file_type->sync(fshndl->mount_point->device, fshndl->fd);
+  return fshndl->mount_point->file_type->sync(fshndl->mount_point->file_type, fshndl->mount_point->device, fshndl->fd);
   }
 
 result_t freespace(const char *path, uint32_t *space)
@@ -694,7 +705,7 @@ result_t freespace(const char *path, uint32_t *space)
   // relative to the mount point
   const char *fs_path = path + strlen(mount->mount_point);
 
-  return mount->file_type->freespace(mount->device, fs_path, space);
+  return mount->file_type->freespace(mount->file_type, mount->device, fs_path, space);
   }
 
 result_t totalspace(const char *path, uint32_t *space)
@@ -712,5 +723,5 @@ result_t totalspace(const char *path, uint32_t *space)
   // relative to the mount point
   const char *fs_path = path + strlen(mount->mount_point);
 
-  return mount->file_type->totalspace(mount->device, fs_path, space);
+  return mount->file_type->totalspace(mount->file_type, mount->device, fs_path, space);
   }

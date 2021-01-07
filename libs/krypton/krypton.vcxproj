@@ -22,6 +22,7 @@
     <ClCompile Include="comm_device.c" />
     <ClCompile Include="deque.c" />
     <ClCompile Include="fb.c" />
+    <ClCompile Include="filesystem.c" />
     <ClCompile Include="init.c" />
     <ClCompile Include="screen.c" />
   </ItemGroup>

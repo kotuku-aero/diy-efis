@@ -413,34 +413,37 @@ enum seek_pos {
   seek_end
   };
 
+struct _filesystem_t;
+typedef struct _filesystem_t *filesystem_p;
 
 // this defines a plugable file system for neutron
 // the bsp has the api to register a file system
 typedef struct _filesystem_t {
-  result_t (*mount)(nand_device_t *device);
-  result_t (*unmount)(nand_device_t *device);
-  result_t (*fssync)(nand_device_t *device);
-  result_t (*open)(nand_device_t *device, const char *path, int *fd);
-  result_t (*create)(nand_device_t *device, const char *path, int *fd);
-  result_t (*close)(nand_device_t *device, int fd);
-  result_t (*fsync)(nand_device_t *device, int fd);
-  result_t (*read)(nand_device_t *device, int fd, uint32_t pos, void *buf, uint32_t nbyte, uint32_t *read);
-  result_t (*write)(nand_device_t *device, int fd, uint32_t pos, const void *buf, uint32_t nbyte, uint32_t *written);
-  result_t (*truncate)(nand_device_t *device, int fd, uint32_t new_size);
-  result_t (*unlink)(nand_device_t *device, int fd);
-  result_t (*rename)(nand_device_t *device, int fd, const char *name);
-  result_t (*stat)(nand_device_t *device, int fd, stat_t *buf);
-  result_t (*getpath)(nand_device_t *device, int fd, bool full_path, char *buffer, size_t size);
-  result_t (*mkdir)(nand_device_t *device, const char *path);
-  result_t (*rmdir)(nand_device_t *device, const char *path);
-  result_t (*opendir)(nand_device_t *device, const char *dirname, int *dirp);
-  result_t (*readdir)(nand_device_t *device, int dirp, dir_entry_type *et, char *buffer, size_t len);
-  result_t (*rewinddir)(nand_device_t *device, int dirp);
-  result_t (*closedir)(nand_device_t *device, int dirp);
-  result_t (*format)(nand_device_t *device);
-  result_t (*sync)(nand_device_t *device, int fshndl);
-  result_t (*freespace)(nand_device_t *device, const char *path, uint32_t *space);
-  result_t (*totalspace)(nand_device_t *device, const char *path, uint32_t *space);
+  size_t version;
+  result_t (*mount)(filesystem_p fs, nand_device_t *device);
+  result_t (*unmount)(filesystem_p fs, nand_device_t *device);
+  result_t (*fssync)(filesystem_p fs, nand_device_t *device);
+  result_t (*open)(filesystem_p fs, nand_device_t *device, const char *path, uint32_t *fd);
+  result_t (*create)(filesystem_p fs, nand_device_t *device, const char *path, uint32_t *fd);
+  result_t (*close)(filesystem_p fs, nand_device_t *device, uint32_t fd);
+  result_t (*fsync)(filesystem_p fs, nand_device_t *device, uint32_t fd);
+  result_t (*read)(filesystem_p fs, nand_device_t *device, uint32_t fd, uint32_t pos, void *buf, uint32_t nbyte, uint32_t *read);
+  result_t (*write)(filesystem_p fs, nand_device_t *device, uint32_t fd, uint32_t pos, const void *buf, uint32_t nbyte, uint32_t *written);
+  result_t (*truncate)(filesystem_p fs, nand_device_t *device, uint32_t fd, uint32_t new_size);
+  result_t (*unlink)(filesystem_p fs, nand_device_t *device, uint32_t fd);
+  result_t (*rename)(filesystem_p fs, nand_device_t *device, uint32_t fd, const char *name);
+  result_t (*stat)(filesystem_p fs, nand_device_t *device, uint32_t fd, stat_t *buf);
+  result_t (*getpath)(filesystem_p fs, nand_device_t *device, uint32_t fd, bool full_path, char *buffer, size_t size);
+  result_t (*mkdir)(filesystem_p fs, nand_device_t *device, const char *path);
+  result_t (*rmdir)(filesystem_p fs, nand_device_t *device, const char *path);
+  result_t (*opendir)(filesystem_p fs, nand_device_t *device, const char *dirname, uint32_t *dirp);
+  result_t (*readdir)(filesystem_p fs, nand_device_t *device, uint32_t dirp, dir_entry_type *et, char *buffer, size_t len);
+  result_t (*rewinddir)(filesystem_p fs, nand_device_t *device, uint32_t dirp);
+  result_t (*closedir)(filesystem_p fs, nand_device_t *device, uint32_t dirp);
+  result_t (*format)(filesystem_p fs, nand_device_t *device);
+  result_t (*sync)(filesystem_p fs, nand_device_t *device, uint32_t fshndl);
+  result_t (*freespace)(filesystem_p fs, nand_device_t *device, const char *path, uint32_t *space);
+  result_t (*totalspace)(filesystem_p fs, nand_device_t *device, const char *path, uint32_t *space);
   } filesystem_t;
 
 extern const filesystem_t *yaffs_filesystem;

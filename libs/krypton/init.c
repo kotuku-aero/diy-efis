@@ -1,3 +1,38 @@
+/*
+diy-efis
+Copyright (C) 2016 Kotuku Aerospace Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+If a file does not contain a copyright header, either because it is incomplete
+or a binary file then the above copyright notice will apply.
+
+Portions of this repository may have further copyright notices that may be
+identified in the respective files.  In those cases the above copyright notice and
+the GPL3 are subservient to that copyright notice.
+
+Portions of this repository contain code fragments from the following
+providers.
+
+
+If any file has a copyright notice or portions of code have been used
+and the original copyright notice is not yet transcribed to the repository
+then the original copyright notice is to be respected.
+
+If any material is included in the repository that is not open source
+it must be removed as soon as possible after the code fragment is identified.
+*/
 #include "krypton.h"
 #include "../neutron/neutron.h"
 #include "../neutron/bsp.h"
@@ -90,11 +125,12 @@ static const char *help =
 "  -c <size>      Create a new registry with <size> blocks, old path will be deleted\n"
 "  -x <x-pixels>  Set the screen width to x-pixels\n"
 "  -y <y-pixels>  Set the screen height to y-pixels\n"
+"  -f <path>      Use <path> as the base of the filesystem"
 "  -h             Print this help message\n"
 " Values for MSH:\n"
-" diy-efis -c 32768 -x 320 -y 240 diy-efis.reg\n"
+" diy-efis -c 32768 -x 320 -y 240 -d <path> diy-efis.reg\n"
 " Values for PI-TFT:\n"
-" diy-efis -c 32768 -f /dev/fb1 -x 480 -y 320 -d /dev/i2c-1 diy-efis.reg\n";
+" diy-efis -c 32768 -f /dev/fb1 -x 480 -y 320 -f /diy-efis -d /dev/i2c-1 diy-efis.reg\n";
 
 static result_t print_error(const char *msg, result_t result)
   {
@@ -105,6 +141,8 @@ static result_t print_error(const char *msg, result_t result)
 extern const char *i2c_device_s;
 extern const char *screen_x_s;
 extern const char *screen_y_s;
+
+extern result_t krypton_fs_init(const char *root_path, filesystem_p *handle);
 
 result_t krypton_init(int argc, char **argv)
   {
@@ -118,8 +156,10 @@ result_t krypton_init(int argc, char **argv)
   const char *width = "320";
   const char *height = "240";
 
+  const char *fs_path = 0;
+
   int opt;
-  while ((opt = getopt(argc, argv, "hc:f:x:y:d:")) != -1)
+  while ((opt = getopt(argc, argv, "hc:f:x:y:d:f:")) != -1)
     {
     switch (opt)
       {
@@ -135,6 +175,9 @@ result_t krypton_init(int argc, char **argv)
         break;
       case 'y':
         height = optarg;
+        break;
+      case 'f' :
+        fs_path = optarg;
         break;
       default:
         print_error(help, s_false);
@@ -156,25 +199,37 @@ result_t krypton_init(int argc, char **argv)
     result != e_path_not_found)
     return result;
 
-  // see if we have a screen defined
-  memid_t proton_key;
-  if (succeeded(reg_open_key(0, "proton", &proton_key)))
+  handle_t fshndl;
+  if (fs_path != 0)
     {
-    uint16_t x;
-    uint16_t y;
-    if (succeeded(reg_get_uint16(proton_key, "screen-x", &x)) &&
-      succeeded(reg_get_uint16(proton_key, "screen-y", &y)))
+    char root_path[MAX_PATH];
+
+    if (GetFullPathName(fs_path, MAX_PATH, root_path, NULL) == 0)
+      printf("Cannot get the path of the root filesystem, ignoring parameter.  No filesystem loaded");
+    else
       {
-      uint32_t size = x * y * sizeof(color_t);
-      // this creates the emulator
-      fb_buffer = (uint8_t *)malloc(size);
+      filesystem_p fs;
+      if (failed(result = krypton_fs_init(root_path, &fs)))
+        return result;
 
-      memset(fb_buffer, 0, size);
-
-      start_fb(x, y, fb_buffer);
+      // register the filesystem
+      if (failed(result = mount("/", fs, 0, &fshndl)))
+        return result;
       }
     }
 
+  uint16_t x = (uint16_t) atoi(width);
+  uint16_t y = (uint16_t) atoi(height);
+
+  // see if we have a screen defined
+
+  uint32_t size = x * y * sizeof(color_t);
+  // this creates the emulator
+  fb_buffer = (uint8_t *)malloc(size);
+
+  memset(fb_buffer, 0, size);
+
+  start_fb(x, y, fb_buffer);
 
   return factory_reset ? s_false : s_ok;
   }
