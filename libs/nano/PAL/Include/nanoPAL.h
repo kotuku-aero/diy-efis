@@ -15,50 +15,41 @@
 #include "../Include/nanoPAL_PerformanceCounters.h"
 #include "../Include/nanoPAL_COM.h"
 
-//
-//#include <Display_decl.h>
-//#include <Power_decl.h> (must be before events_decl.h)
-//#include <events_decl.h>
-//#include <palevent_decl.h>
-//#include <heap_decl.h>
-// This function returns location of the CLR heap.
-void HeapLocation(unsigned char*& BaseAddress, unsigned int& SizeInBytes);
+#ifdef __cplusplus
+  extern "C" {
+#endif
 
-//
-// !!! KEEP IN SYNC WITH Microsoft.SPOT.Hardware.PowerLevel !!!
-//
-enum POWER_LEVEL
-  {
-  POWER_LEVEL__HIGH_POWER = 0x10,
-  POWER_LEVEL__MID_POWER = 0x20,
-  POWER_LEVEL__LOW_POWER = 0x30,
-  };
-#if defined(PLATFORM_ARM) || defined(PLATFORM_ESP32)
+  //
+  //#include <Display_decl.h>
+  //#include <Power_decl.h> (must be before events_decl.h)
+  //#include <events_decl.h>
+  //#include <palevent_decl.h>
+  //#include <heap_decl.h>
+  // This function returns location of the CLR heap.
+  void HeapLocation(unsigned char *&BaseAddress, unsigned int &SizeInBytes);
 
-#define strcpy    DoNotUse_*strcpy  []
-#define strncpy   DoNotUse_*strcpy  []
-#define strlen    DoNotUse_*strlen  []
-#define strncmp   DoNotUse_*strncmp  []
+  //
+  // !!! KEEP IN SYNC WITH Microsoft.SPOT.Hardware.PowerLevel !!!
+  //
+  enum POWER_LEVEL
+    {
+    POWER_LEVEL__HIGH_POWER = 0x10,
+    POWER_LEVEL__MID_POWER = 0x20,
+    POWER_LEVEL__LOW_POWER = 0x30,
+    };
 
-int hal_strcpy_s(char* strDst, size_t sizeInBytes, const char* strSrc);
-int hal_strncpy_s(char* strDst, size_t sizeInBytes, const char* strSrc, size_t count);
-size_t hal_strlen_s(const char* str);
-int hal_strncmp_s(const char* str1, const char* str2, size_t num);
-
-#elif defined(_WIN32)
-
-int hal_vprintf(const char* format, va_list arg);
-int hal_vfprintf(COM_HANDLE stream, const char* format, va_list arg);
-int hal_snprintf(char* buffer, size_t len, const char* format, ...);
-int hal_vsnprintf(char* buffer, size_t len, const char* format, va_list arg);
+  int hal_vprintf(const char *format, va_list arg);
+  int hal_vfprintf(COM_HANDLE stream, const char *format, va_list arg);
+  int hal_snprintf(char *buffer, size_t len, const char *format, ...);
+  int hal_vsnprintf(char *buffer, size_t len, const char *format, va_list arg);
 
 #define hal_strcpy_s(strDst, sizeInBytes, strSrc) strcpy_s(strDst, sizeInBytes, strSrc)
 #define hal_strncpy_s(strDst, sizeInBytes, strSrc, count) strncpy_s(strDst, sizeInBytes, strSrc, count)
 #define hal_strlen_s(str) strlen(str)
 #define hal_strncmp_s(str1, str2, num) strncmp(str1, str2, num)
 
-#else
-!ERROR
+#ifdef __cplusplus
+  }
 #endif
 
 //#include <SD_decl.h>

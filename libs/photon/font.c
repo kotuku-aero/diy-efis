@@ -34,6 +34,7 @@ If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
 #include "../neutron/bsp.h"
+#include "window.h"
 
 extern color_t aplha_blend(color_t pixel, color_t back, uint8_t weighting);
 // a glyph is stored as a vector of alpha values (255 = opaque, 0 = transparent)

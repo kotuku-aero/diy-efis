@@ -1,41 +1,41 @@
-#include "HeapBlockDispatcher.h"
+#include "CanFlyEventDispatcher.h"
 #include "CLR_Message.h"
 
-CLR_RT_DblLinkedList CLR_RT_HeapBlock_CanFlyMsgDispatcher::eventList;
+CLR_RT_DblLinkedList CanFlyEventDispatcher::eventList;
 
-void CLR_RT_HeapBlock_CanFlyMsgDispatcher::HandlerMethod_Initialize()
+void CanFlyEventDispatcher::HandlerMethod_Initialize()
   {
-  CLR_RT_HeapBlock_CanFlyMsgDispatcher::eventList.DblLinkedList_Initialize();
+  CanFlyEventDispatcher::eventList.DblLinkedList_Initialize();
   }
 
-void CLR_RT_HeapBlock_CanFlyMsgDispatcher::HandlerMethod_RecoverFromGC()
+void CanFlyEventDispatcher::HandlerMethod_RecoverFromGC()
   {
 
-  NANOCLR_FOREACH_NODE(CLR_RT_HeapBlock_CanFlyMsgDispatcher, event, CLR_RT_HeapBlock_CanFlyMsgDispatcher::eventList)
+  NANOCLR_FOREACH_NODE(CanFlyEventDispatcher, event, CanFlyEventDispatcher::eventList)
     {
     event->RecoverFromGC();
     }
   NANOCLR_FOREACH_NODE_END();
   }
 
-void CLR_RT_HeapBlock_CanFlyMsgDispatcher::HandlerMethod_CleanUp()
+void CanFlyEventDispatcher::HandlerMethod_CleanUp()
   {
-  CLR_RT_HeapBlock_CanFlyMsgDispatcher* event;
+  CanFlyEventDispatcher* event;
 
-  while (NULL != (event = (CLR_RT_HeapBlock_CanFlyMsgDispatcher*)CLR_RT_HeapBlock_CanFlyMsgDispatcher::eventList.FirstValidNode()))
+  while (NULL != (event = (CanFlyEventDispatcher*)CanFlyEventDispatcher::eventList.FirstValidNode()))
     {
     event->DetachAll();
     event->ReleaseWhenDeadEx();
     }
   }
 
-HRESULT CLR_RT_HeapBlock_CanFlyMsgDispatcher::CreateInstance(CLR_RT_HeapBlock& owner, CLR_RT_HeapBlock& eventRef)
+HRESULT CanFlyEventDispatcher::CreateInstance(CLR_RT_HeapBlock& owner, CLR_RT_HeapBlock& eventRef)
   {
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock_CanFlyMsgDispatcher* event = NULL;
+  CanFlyEventDispatcher* event = NULL;
 
-  event = EVENTCACHE_EXTRACT_NODE(g_CLR_RT_EventCache, CLR_RT_HeapBlock_CanFlyMsgDispatcher, DATATYPE_IO_PORT); CHECK_ALLOCATION(event);
+  event = EVENTCACHE_EXTRACT_NODE(g_CLR_RT_EventCache, CanFlyEventDispatcher, DATATYPE_IO_PORT); CHECK_ALLOCATION(event);
 
   {
 
@@ -60,32 +60,32 @@ HRESULT CLR_RT_HeapBlock_CanFlyMsgDispatcher::CreateInstance(CLR_RT_HeapBlock& o
   NANOCLR_CLEANUP_END();
   }
 
-HRESULT CLR_RT_HeapBlock_CanFlyMsgDispatcher::ExtractInstance(CLR_RT_HeapBlock& ref, CLR_RT_HeapBlock_CanFlyMsgDispatcher*& event)
+HRESULT CanFlyEventDispatcher::ExtractInstance(CLR_RT_HeapBlock& ref, CanFlyEventDispatcher*& event)
   {
   NANOCLR_HEADER();
 
   CLR_RT_ObjectToEvent_Source* src = CLR_RT_ObjectToEvent_Source::ExtractInstance(ref);
   FAULT_ON_NULL(src);
 
-  event = (CLR_RT_HeapBlock_CanFlyMsgDispatcher*)src->m_eventPtr;
+  event = (CanFlyEventDispatcher*)src->m_eventPtr;
 
   NANOCLR_NOCLEANUP();
   }
 
-void CLR_RT_HeapBlock_CanFlyMsgDispatcher::RecoverFromGC()
+void CanFlyEventDispatcher::RecoverFromGC()
   {
   CheckAll();
 
   ReleaseWhenDeadEx();
   }
 
-bool CLR_RT_HeapBlock_CanFlyMsgDispatcher::ReleaseWhenDeadEx()
+bool CanFlyEventDispatcher::ReleaseWhenDeadEx()
   {
   if (!IsReadyForRelease()) 
     return false;
 
   //remove any queued messages
-  NANOCLR_FOREACH_NODE(CLR_RT_CanFlyMsgEvent, message, g_CLR_Message.m_MessageData.m_applicationQueue)
+  NANOCLR_FOREACH_NODE(CanFlyMsgEvent, message, g_CLR_Message.m_MessageData.m_applicationQueue)
     {
     if (this == message->m_message.context)
       {
@@ -101,7 +101,7 @@ bool CLR_RT_HeapBlock_CanFlyMsgDispatcher::ReleaseWhenDeadEx()
   return ReleaseWhenDead();
   }
 
-void CLR_RT_HeapBlock_CanFlyMsgDispatcher::RemoveFromProtonQueue()
+void CanFlyEventDispatcher::RemoveFromIonQueue()
   {
   // Since we are going to analyze and update the queue we need to disable interrupts.
   // Interrupt service routines add records to this queue.
@@ -134,7 +134,7 @@ void CLR_RT_HeapBlock_CanFlyMsgDispatcher::RemoveFromProtonQueue()
     }
   }
 
-void CLR_RT_HeapBlock_CanFlyMsgDispatcher::SaveToProtonQueue(const canmsg_t *msg)
+void CanFlyEventDispatcher::SaveToIonQueue(const canmsg_t *msg)
   {
   NATIVE_PROFILE_CLR_IOPORT();
 
@@ -156,17 +156,17 @@ void CLR_RT_HeapBlock_CanFlyMsgDispatcher::SaveToProtonQueue(const canmsg_t *msg
   //::Events_Set(SYSTEM_EVENT_HW_INTERRUPT);
   }
 
-void SaveNativeEventToHALQueue(CLR_RT_HeapBlock_CanFlyMsgDispatcher* pContext, const canmsg_t *msg)
+void SaveNativeEventToHALQueue(CanFlyEventDispatcher* pContext, const canmsg_t *msg)
   {
-  pContext->SaveToProtonQueue(msg);
+  pContext->SaveToIonQueue(msg);
   }
 
-void CleanupNativeEventsFromHALQueue(CLR_RT_HeapBlock_CanFlyMsgDispatcher* pContext)
+void CleanupNativeEventsFromHALQueue(CanFlyEventDispatcher* pContext)
   {
-  pContext->RemoveFromProtonQueue();
+  pContext->RemoveFromIonQueue();
   }
 
-HRESULT CLR_RT_HeapBlock_CanFlyMsgDispatcher::StartDispatch(CLR_RT_CanFlyMsgEvent* eventMessage, CLR_RT_Thread* th)
+HRESULT CanFlyEventDispatcher::StartDispatch(CanFlyMsgEvent *eventMessage, CLR_RT_Thread* th)
   {
   NANOCLR_HEADER();
 
@@ -176,7 +176,7 @@ HRESULT CLR_RT_HeapBlock_CanFlyMsgDispatcher::StartDispatch(CLR_RT_CanFlyMsgEven
   CLR_RT_HeapBlock* event;
   const CLR_UINT64 c_UTCMask = 0x8000000000000000ULL;
 
-  CanFlyMsgEvent & message = eventMessage->m_message;
+  CanFlyMsgEventData & message = eventMessage->m_message;
 
   NANOCLR_CHECK_HRESULT(RecoverManagedObject(event));
   dlg = event[Library_CanFly_CoreLibrary_CanFly_CanFlyEventDispatcher::FIELD__threadSpawn].DereferenceDelegate(); 
@@ -206,23 +206,22 @@ HRESULT CLR_RT_HeapBlock_CanFlyMsgDispatcher::StartDispatch(CLR_RT_CanFlyMsgEven
   args[7].SetInteger(message.msg.raw[6]);
   args[8].SetInteger(message.msg.raw[7]);
 
-  th->m_terminationCallback = CLR_RT_HeapBlock_CanFlyMsgDispatcher::ThreadTerminationCallback;
+  th->m_terminationCallback = CanFlyEventDispatcher::ThreadTerminationCallback;
   th->m_terminationParameter = eventMessage;
 
   NANOCLR_NOCLEANUP();
   }
 
-void CLR_RT_HeapBlock_CanFlyMsgDispatcher::ThreadTerminationCallback(void* arg)
+void CanFlyEventDispatcher::ThreadTerminationCallback(void* arg)
   {
-  CLR_RT_CanFlyMsgEvent* eventMessage = (CLR_RT_CanFlyMsgEvent*)arg;
-  CLR_RT_HeapBlock_CanFlyMsgDispatcher::CanFlyMsgEvent &message = eventMessage->m_message;
+  CanFlyMsgEvent *eventMessage = (CanFlyMsgEvent *)arg;
 
   CLR_RT_Memory::Release(eventMessage);
 
   g_CLR_Message.SpawnDispatcher();
   }
 
-HRESULT CLR_RT_HeapBlock_CanFlyMsgDispatcher::RecoverManagedObject(CLR_RT_HeapBlock*& event)
+HRESULT CanFlyEventDispatcher::RecoverManagedObject(CLR_RT_HeapBlock*& event)
   {
   NATIVE_PROFILE_CLR_IOPORT();
 

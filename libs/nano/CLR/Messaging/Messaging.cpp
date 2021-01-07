@@ -312,12 +312,7 @@ void CLR_Messaging::Cleanup()
   if (!m_fInitialized)
     return;
 
-  // Some devices cannot reset the USB controller so we need to allow them to skip uninitialization
-  // of the debug transport
-  if (!g_fDoNotUninitializeDebuggerPort)
-    {
-    DebuggerPort_Uninitialize(m_port);
-    }
+  DebuggerPort_Uninitialize(m_port);
 
   m_fDebuggerInitialized = false;
 

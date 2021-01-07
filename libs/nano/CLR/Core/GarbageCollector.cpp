@@ -758,8 +758,9 @@ void CLR_RT_GarbageCollector::RecoverEventsFromGC()
   {
   NATIVE_PROFILE_CLR_CORE();
 
-  CLR_RT_HeapBlock_EndPoint::HandlerMethod_RecoverFromGC();
-  CLR_RT_HeapBlock_NativeEventDispatcher::HandlerMethod_RecoverFromGC();
+  // TODO: fix this....
+  // CLR_RT_HeapBlock_EndPoint::HandlerMethod_RecoverFromGC();
+  // CLR_RT_HeapBlock_NativeEventDispatcher::HandlerMethod_RecoverFromGC();
 
   NANOCLR_FOREACH_NODE(CLR_RT_HeapBlock_Timer, timer, g_CLR_RT_ExecutionEngine.m_timers)
     {

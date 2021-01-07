@@ -19,23 +19,23 @@
 typedef uint32_t GPIO_PIN;
 
 typedef enum SYSTEM_STATE
-{
-    SYSTEM_STATE_ISR,
-    SYSTEM_STATE_NO_CONTINUATIONS,
-    SYSTEM_STATE_TOTAL_STATES
-} SYSTEM_STATE_type;
+  {
+  SYSTEM_STATE_ISR,
+  SYSTEM_STATE_NO_CONTINUATIONS,
+  SYSTEM_STATE_TOTAL_STATES
+  } SYSTEM_STATE_type;
 
 //////////////////////////////////////////////////////////////////
 // !!! KEEP IN SYNC WITH Microsoft.SPOT.Hardware.SleepLevel !!! //
 //////////////////////////////////////////////////////////////////
 typedef enum SLEEP_LEVEL
-{
-    SLEEP_LEVEL__AWAKE = 0x00,
-    SLEEP_LEVEL__SELECTIVE_OFF = 0x10,
-    SLEEP_LEVEL__SLEEP = 0x20,
-    SLEEP_LEVEL__DEEP_SLEEP = 0x30,
-    SLEEP_LEVEL__OFF = 0x40,
-} SLEEP_LEVEL_type;
+  {
+  SLEEP_LEVEL__AWAKE = 0x00,
+  SLEEP_LEVEL__SELECTIVE_OFF = 0x10,
+  SLEEP_LEVEL__SLEEP = 0x20,
+  SLEEP_LEVEL__DEEP_SLEEP = 0x30,
+  SLEEP_LEVEL__OFF = 0x40,
+  } SLEEP_LEVEL_type;
 
 // These events match emulator events in Framework\Tools\Emulator\Events.cs
 
@@ -95,98 +95,54 @@ typedef enum SLEEP_LEVEL
 #define PAL_EVENT_KEY   0x2
 #define PAL_EVENT_MOUSE 0x4
 
-////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////
-
-// COM_HANDLE Defines a type representing both a port type or "transport" and a port number
-// The COM_HANDLE is a multi bit field value with the following bit fields usage
-//    |--------+--------+--------+--------|
-//    |33222222|22221111|111111  |        |
-//    |10987654|32109876|54321098|76543210| bit position
-//    |--------+--------+--------+--------|
-//    |00000000|00000000|TTTTTTTT|pppppppp| ( transport != USB_TRANSPORT )
-//    |--------+--------+--------+--------|
-//    |00000000|00000000|TTTTTTTT|cccppppp| ( transport == USB_TRANSPORT )
-//    |--------+--------+--------+--------|
-//
-// where:
-//    T => Transport type
-//              USART_TRANSPORT => 1
-//                USB_TRANSPORT => 2
-//             SOCKET_TRANSPORT => 3
-//              DEBUG_TRANSPORT => 4
-//                LCD_TRANSPORT => 5
-//        FLASH_WRITE_TRANSPORT => 6
-//          MESSAGING_TRANSPORT => 7
-//            GENERIC_TRANSPORT => 8
-//    p => port instance number
-//        Port instances in the handle are 1 based. (e.g. p == 0 is invalid except when T == 0 )
-//    c -> Controller instance number ( USB_TRANSPORT only )
-//
-//    NULL_PORT => T==0 && p == 0
-//
-// GENERIC_TRANSPORT is any custom port that isn't one of the above, they
-// are implemented for the DebugPort_xxxx APIs and the port number is
-// an index into a const global table of port interfaces (structure of
-// function pointers) These allow custom extensions to the normal transports
-// without needing to continue defining additional transport types and modifying
-// switch on transport code. To keep compatibility high and code churn low, the
-// previous legacy transports remain though they should be considered deprecated.
-typedef int COM_HANDLE;
+typedef uint32_t COM_HANDLE;
 
 typedef struct HAL_DRIVER_CONFIG_HEADER
-{
-    unsigned int Enable;
-} HAL_DRIVER_CONFIG_HEADER;
+  {
+  unsigned int Enable;
+  } HAL_DRIVER_CONFIG_HEADER;
 
 typedef struct HAL_SYSTEM_MEMORY_CONFIG
-{
-    unsigned int Base;
-    unsigned int Size;
-} HAL_SYSTEM_MEMORY_CONFIG;
+  {
+  unsigned int Base;
+  unsigned int Size;
+  } HAL_SYSTEM_MEMORY_CONFIG;
 
 typedef struct HAL_SYSTEM_CONFIG
-{
-    HAL_DRIVER_CONFIG_HEADER Header;
+  {
+  HAL_DRIVER_CONFIG_HEADER Header;
 
-    //--//
+  COM_HANDLE DebuggerPort;
+  // communication channel for debug messages in the debugger
+  // which may be VS, MFDEPLOY, etc... Accessed via debug_printf
+  // in the HAL/PAL and System.Diagnostics.Debug.Print() in managed
+  // applications
+  COM_HANDLE DebugTextPort;
 
-    COM_HANDLE DebuggerPort;
-    // communication channel for debug messages in the debugger
-    // which may be VS, MFDEPLOY, etc... Accessed via debug_printf
-    // in the HAL/PAL and System.Diagnostics.Debug.Print() in managed
-    // applications
-    COM_HANDLE DebugTextPort;
+  COM_HANDLE stdio;
 
-    unsigned int USART_DefaultBaudRate;
-    // internal HAL/PAL debug/tracing channel, this is separate
-    // to allow tracing messages in the driver that implements
-    // the transport for the Debugger and DebugTextPort. This
-    // channel is accessed via hal_printf() in the HAL/PAL
-    COM_HANDLE stdio;
+  HAL_SYSTEM_MEMORY_CONFIG RAM1;
+  HAL_SYSTEM_MEMORY_CONFIG FLASH1;
 
-    HAL_SYSTEM_MEMORY_CONFIG RAM1;
-    HAL_SYSTEM_MEMORY_CONFIG FLASH1;
+  } HAL_SYSTEM_CONFIG;
 
-} HAL_SYSTEM_CONFIG;
-
-extern HAL_SYSTEM_CONFIG HalSystemConfig;
 
 #ifdef __cplusplus
 extern "C"
-{
+  {
 #endif
+  extern HAL_SYSTEM_CONFIG HalSystemConfig;
 
-    void nanoHAL_Initialize_C();
-    void nanoHAL_Uninitialize_C();
-    void HeapLocation_C(unsigned char **baseAddress, unsigned int *sizeInBytes);
+  void nanoHAL_Initialize_C();
+  void nanoHAL_Uninitialize_C();
+  void HeapLocation_C(unsigned char **baseAddress, unsigned int *sizeInBytes);
 
-    // Call to the external memory configuration and initialization function
-    // If a target has external memory it has to provide the implementation for it.
-    void Target_ExternalMemoryInit();
+  // Call to the external memory configuration and initialization function
+  // If a target has external memory it has to provide the implementation for it.
+  void Target_ExternalMemoryInit();
 
 #ifdef __cplusplus
-}
+  }
 #endif
 /*
 #ifdef __cplusplus
@@ -209,15 +165,15 @@ extern "C"
 //
 #ifdef __cplusplus
 extern "C"
-{
+  {
 #endif
 
-    void *platform_malloc(size_t size);
-    void platform_free(void *ptr);
-    void *platform_realloc(void *ptr, size_t size);
+  void *platform_malloc(size_t size);
+  void platform_free(void *ptr);
+  void *platform_realloc(void *ptr, size_t size);
 
 #ifdef __cplusplus
-}
+  }
 #endif
 
 void SystemState_Set(SYSTEM_STATE_type newState);
@@ -228,15 +184,15 @@ bool SystemState_Query(SYSTEM_STATE_type state);
 
 #ifdef __cplusplus
 extern "C"
-{
+  {
 #endif
 
-    void SystemState_SetNoLock(SYSTEM_STATE_type state);
-    void SystemState_ClearNoLock(SYSTEM_STATE_type state);
-    bool SystemState_QueryNoLock(SYSTEM_STATE_type state);
+  void SystemState_SetNoLock(SYSTEM_STATE_type state);
+  void SystemState_ClearNoLock(SYSTEM_STATE_type state);
+  bool SystemState_QueryNoLock(SYSTEM_STATE_type state);
 
 #ifdef __cplusplus
-}
+  }
 #endif
 
 // these macros are to be used at entry/exit of native interrupt handlers
@@ -263,15 +219,15 @@ extern "C"
 
 #ifdef __cplusplus
 extern "C"
-{
+  {
 #endif
 
-    void HAL_Assert(const char *Func, int Line, const char *File);
-    // HAL_AssertEx is to be defined at platform layer
-    void HAL_AssertEx();
+  void HAL_Assert(const char *Func, int Line, const char *File);
+  // HAL_AssertEx is to be defined at platform layer
+  void HAL_AssertEx();
 
 #ifdef __cplusplus
-}
+  }
 #endif
 
 #if defined(PLATFORM_ARM) || defined(PLATFORM_ESP32)
@@ -331,23 +287,23 @@ extern "C"
 
 #ifdef __cplusplus
 extern "C"
-{
+  {
 #endif
 
 #if !defined(BUILD_RTM)
 
-    void debug_printf(const char *format, ...);
+  void debug_printf(const char *format, ...);
 
 #else
 
-__inline void debug_printf(const char *format, ...)
-{
-}
+  __inline void debug_printf(const char *format, ...)
+    {
+    }
 
 #endif // !defined(BUILD_RTM)
 
 #ifdef __cplusplus
-}
+  }
 #endif
 //--//
 

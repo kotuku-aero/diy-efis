@@ -66,6 +66,16 @@ typedef struct _can_field_definition_t {
 	uint8_t data_type;              // type of data stored or published
 	} field_definition_t;
   
+typedef struct _field_int8_t {
+	field_definition_t hdr;
+	int8_t value;
+	} field_int8_t;
+  
+typedef struct _field_uint8_t {
+	field_definition_t hdr;
+	uint8_t value;
+	} field_uint8_t;
+  
 typedef struct _field_int16_t {
 	field_definition_t hdr;
 	int16_t value;
@@ -142,6 +152,8 @@ typedef struct _field_stream_t {
 
 typedef union {
   field_key_t key_f;
+  field_int8_t int8_f;
+  field_uint8_t uint8_f;
   field_int16_t int16_f;
   field_uint16_t uint16_f;
   field_int32_t int32_f;

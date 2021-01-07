@@ -35,12 +35,12 @@ it must be removed as soon as possible after the code fragment is identified.
 */
 // Basic can aerospace framework support files
 #include "../../libs/electron/electron.h"
-#include "../../libs/proton/proton.h"
 #include "../../libs/muon/muon.h"
 #include "../../libs/neutron/stream.h"
 #include "../../libs/neutron/slcan.h"
 
-#include "../../libs/ion/interpreter.h"
+#include "../../libs/nano/HAL/Include/nanoHAL_v2.h"
+
 #include "msh_cli.h"
 
 #include <stdio.h>
@@ -51,7 +51,7 @@ it must be removed as soon as possible after the code fragment is identified.
 #include <termios.h>
 #include <sys/stat.h>
 #else
-extern result_t krypton_init(const char *reg_path, bool factory_reset);
+extern result_t krypton_init(int argc, const char**argv);
 #include <Windows.h>
 #endif
 
@@ -372,6 +372,9 @@ static void fb_sync(void *parg)
     }
   }
 
+// TODO:init the services
+HAL_SYSTEM_CONFIG HalSystemConfig;
+
 int main(int argc, char **argv)
   {
 #ifdef __linux__
@@ -492,11 +495,10 @@ int main(int argc, char **argv)
   channel.parser.cfg.console_out = &channel.stream;
   channel.parser.cfg.console_err = &channel.stream;
 
-  proton_args_t args;
-
   ion_init();
 
   // start proton if the key exists
+  /*
   memid_t proton_key;
   if(succeeded(reg_open_key(0, "proton", &proton_key)))
     {
@@ -508,6 +510,7 @@ int main(int argc, char **argv)
 
     task_create("PROTON", DEFAULT_STACK_SIZE * 4, run_proton, &args, NORMAL_PRIORITY, 0);
     }
+    */
 
   if (failed(cli_init(&channel.parser.cfg, &channel.parser)))
     {
@@ -563,4 +566,75 @@ result_t recv_can_id_type_session_val1_val2_val3_val4_action(cli_t *context,
   // enqueue the message onto the can bus.
   publish_local(&msg);
   return s_ok;
+  }
+
+void Watchdog_Reset()
+  {
+
+  }
+
+/*
+    static const CLR_UINT32 c_CapabilityFlags_FloatingPoint = 0x00000001;
+    static const CLR_UINT32 c_CapabilityFlags_SourceLevelDebugging = 0x00000002;
+    static const CLR_UINT32 c_CapabilityFlags_AppDomains = 0x00000004;
+    static const CLR_UINT32 c_CapabilityFlags_ExceptionFilters = 0x00000008;
+    static const CLR_UINT32 c_CapabilityFlags_IncrementalDeployment = 0x00000010;
+    static const CLR_UINT32 c_CapabilityFlags_SoftReboot = 0x00000020;
+    static const CLR_UINT32 c_CapabilityFlags_Profiling = 0x00000040;
+    static const CLR_UINT32 c_CapabilityFlags_Profiling_Allocations = 0x00000080;
+    static const CLR_UINT32 c_CapabilityFlags_Profiling_Calls = 0x00000100;
+    static const CLR_UINT32 c_CapabilityFlags_ThreadCreateEx = 0x00000400;
+    static const CLR_UINT32 c_CapabilityFlags_ConfigBlockRequiresErase = 0x00000800;
+*/
+
+uint32_t GetPlatformCapabilities()
+  {
+  return 0x00000023L;
+    ;
+  }
+
+
+void CPU_Sleep()
+  {
+  yield();
+  }
+
+void CPU_Reset()
+  {
+  DebugBreak();
+  }
+
+bool CPU_IsSoftRebootSupported()
+  {
+  return true;
+  }
+
+void *platform_malloc(size_t size)
+  {
+  return malloc(size);
+  }
+
+void platform_free(void *arg)
+  {
+  free(arg);
+  }
+
+
+int hal_snprintf(char *buffer, size_t len, const char *format, ...)
+  {
+  va_list arg_ptr;
+  int chars;
+
+  va_start(arg_ptr, format);
+
+  chars = hal_vsnprintf(buffer, len, format, arg_ptr);
+
+  va_end(arg_ptr);
+
+  return chars;
+  }
+
+int hal_vsnprintf(char *buffer, size_t len, const char *format, va_list arg)
+  {
+  return _vsnprintf_s(buffer, len, len - 1 /* force space for trailing zero*/, format, arg);
   }

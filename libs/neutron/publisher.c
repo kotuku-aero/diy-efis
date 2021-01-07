@@ -141,7 +141,7 @@ typedef struct _filter_datapoint_t
   float gain;
   filter_params_t filter[];
   } filter_datapoint_t;
-    
+
 static inline uint16_t sizeof_boxcar(uint16_t filter_length)
   {
   return sizeof(boxcar_datapoint_t) + 
@@ -1079,8 +1079,270 @@ void publish_task(void *parg)
     }
   }
 
+static tm_t current_time = { 1970, 01, 01, 00, 00, 00, 00 };
+static bool date_set = false;
+static bool time_set = false;
+static uint32_t last_fix;
+
+static void on_utc_date(const canmsg_t *msg)
+  {
+  if (msg->canas.data_type != CANAS_DATATYPE_UCHAR4)
+    return;
+
+  current_time.day = msg->canas.data[0];
+  current_time.month = msg->canas.data[1];
+  current_time.year = (msg->canas.data[2] * 100) + msg->canas.data[3];
+
+  date_set = true;
+  }
+
+static void on_utc_time(const canmsg_t *msg)
+  {
+  if (msg->canas.data_type != CANAS_DATATYPE_UCHAR3)
+    return;
+
+  current_time.hour = msg->canas.data[0];
+  current_time.minute = msg->canas.data[1];
+  current_time.second = msg->canas.data[2];
+
+  current_time.milliseconds = 0;
+  time_set = true;
+
+  }
+
+result_t now(tm_t *tm)
+  {
+  if (tm == 0)
+    return e_bad_pointer;
+
+  // this if the date fix is too old allow for 60 seconds
+  if (!date_set || !time_set)
+    return e_unexpected;
+
+  memcpy(tm, &current_time, sizeof(tm_t));
+  }
+
+static const uint32_t cumulative_days_for_month[13] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 };
+static const uint32_t days_in_month[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
+static inline bool is_leap_year(uint32_t year)
+  {
+  return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
+  }
+
+// number of lear years since 1970
+static inline uint32_t number_of_leap_years(uint32_t year)
+  {
+  // years since 1900
+  year -= 1600;
+  // note 2000 is a leap year
+  // 44 is ((1970 - 1600) /4) ((1970 - 1600) % 100)
+  return (((year / 4) - (year % 100)) + (year % 400)) - 44;
+  }
+
+static inline uint32_t number_of_years(uint32_t year)
+  {
+  return year - 1970;
+  }
+
+static inline uint32_t years_to_days(uint32_t year)
+  {
+  return (number_of_years(year) * 365) + number_of_leap_years(year);
+  }
+
+static inline month_to_days(uint32_t year, uint32_t month)
+  {
+  return cumulative_days_for_month[month - 1] + (is_leap_year(year) && (month > 2)) ? 1 : 0;
+  }
+
+static inline days_for_month(uint32_t year, uint32_t month)
+  {
+  return days_in_month[month] + (is_leap_year(year) && (month > 2)) ? 1 : 0;
+  }
+
+result_t gmtime(const tm_t *tm, uint32_t *time)
+  {
+  if (time == 0)
+    return e_bad_pointer;
+
+  if (tm != 0 && 
+    (tm->year < 1970 ||
+     tm->month < 1 ||
+    tm->month > 12 ||
+    tm->day < 1 ||
+    tm->day > days_for_month(tm->year, tm->month) ||
+    tm->hour > 23 ||
+    tm->minute > 59 ||
+    tm->second > 59))
+    return e_bad_parameter;
+
+  if (tm == 0)
+    tm = &current_time;
+
+  *time = years_to_days(tm->year) * (24 * 60 * 60);
+  *time += month_to_days(tm->year, tm->month) * (24 * 60 * 60);
+  *time += (tm->day -1) * (24 * 60 * 60);
+  *time += tm->hour * (60 * 60);
+  *time += tm->minute * 60;
+  *time += tm->second * 60;
+
+  return s_ok;
+  }
+
+result_t gmtime_ns(const tm_t *tm, uint64_t *time)
+  {
+  if (time == 0)
+    return e_bad_pointer;
+
+  if (tm == 0)
+    tm = &current_time;
+
+  uint32_t short_time;
+  result_t result;
+  if(failed(result = gmtime(tm, &short_time)))
+    return result;
+
+  *time = ((uint64_t)short_time) * 1000000ll;
+  *time += tm->milliseconds * 1000ll;
+
+  return s_ok;
+  }
+
+result_t settime(const tm_t *tm)
+  {
+  if (tm == 0)
+    return e_bad_pointer;
+
+  if (tm->year < 1970 ||
+    tm->month < 1 ||
+    tm->month > 12 ||
+    tm->day < 1 ||
+    tm->day > days_for_month(tm->year, tm->month) ||
+    tm->hour > 23 ||
+    tm->minute > 59 ||
+    tm->second > 59)
+    return e_bad_parameter;
+
+  memcpy(tm, &current_time, sizeof(tm_t));
+  return s_ok;
+  }
+
+result_t settime_ns(uint64_t time)
+  {
+  time /= 1000;
+  current_time.milliseconds = (uint16_t)(time % 1000);
+  time /= 1000;
+  current_time.second = (uint16_t)(time % 60);
+  time /= 60;
+  current_time.minute = (uint16_t)(time % 60);
+  time /= 60;
+  current_time.hour = (uint16_t)(time % 24);
+  time /= 24;
+
+  // whats left is days since 1970
+  uint32_t days = (uint32_t)time;
+
+  // brute force!
+  current_time.year = 1970;
+  current_time.month = 1;
+  current_time.day = 1;
+
+  while (days > 0)
+    {
+    uint32_t yd = years_to_days(current_time.year);
+
+    if (days < yd)
+      break;
+    
+    days -= yd;
+    current_time.year++;
+    }
+
+  while (days > 0)
+    {
+    uint32_t md = days_for_month(current_time.year, current_time.month);
+
+    if (days < md)
+      break;
+
+    days -= md;
+    current_time.month++;
+    }
+
+  current_time.day += days;
+
+  return s_ok;
+  }
+
+static uint32_t last_hook = 0;
+void rtc_hook()
+  {
+  uint32_t hook_ticks = ticks();
+
+  // calculate the time in seconds the last time stored
+  uint64_t interval = hook_ticks - last_hook;
+  current_time.milliseconds += interval;
+
+  // fast hook till msec overflow
+  if (current_time.milliseconds < 1000)
+    return;
+
+  // time overlow
+  uint32_t seconds = current_time.milliseconds / 1000;
+  current_time.milliseconds %= 1000;
+
+  current_time.second += (uint16_t) seconds;
+  if (current_time.second < 60)
+    return;
+
+  uint32_t minutes = current_time.second / 60;
+  current_time.second %= 60;
+
+  current_time.minute += (uint16_t) minutes;
+  if (current_time.minute < 60)
+    return;
+
+  uint32_t hours = current_time.minute / 60;
+  current_time.hour += hours;
+  if (current_time.hour < 24)
+    return;
+
+  uint32_t days = current_time.hour / 24;
+  current_time.day += days;
+
+  // the greatest number that can be described using a 1khz tick is 24.85 days to we cannot add more
+  // than 1 month to the calendar
+
+  uint32_t days_in_month = days_for_month(current_time.year, current_time.month);
+  if (current_time.day <= days_in_month)
+    return;
+
+  uint32_t day_next_month = current_time.day - 1;
+  day_next_month -= days_in_month;
+
+  current_time.day = day_next_month + 1;
+  current_time.month++;
+  if (current_time.month <= 12)
+    return;
+
+  current_time.year++;
+  current_time.month -= 12;
+  }
+
 static bool alarm_hook(const canmsg_t *msg, void *parg)
   {
+  if (get_can_id(msg) == id_def_date)
+    {
+    on_utc_date(msg);
+    return true;
+    }
+
+  if (get_can_id(msg) == id_def_utc)
+    {
+    on_utc_time(msg);
+    return true;
+    }
+
   uint16_t num_datapoints;
 
   if(failed(vector_count(published_datapoints, &num_datapoints)))
@@ -1207,7 +1469,7 @@ result_t neutron_init(const neutron_parameters_t *params, bool init_mode, bool c
                           : params->publisher_stack_length,
                        publish_task, 0,
                        NORMAL_PRIORITY, &task_handle);
-  
+
   return s_ok;
   }
 

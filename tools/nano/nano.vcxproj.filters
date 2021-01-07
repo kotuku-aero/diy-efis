@@ -67,9 +67,6 @@
     <Filter Include="PAL\Include">
       <UniqueIdentifier>{696347dc-0136-45ca-a2d8-9379297860f6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="PAL\Profiler">
-      <UniqueIdentifier>{9a696c1a-bab2-4cd2-92cd-67c4c35f78ad}</UniqueIdentifier>
-    </Filter>
     <Filter Include="System.Collections">
       <UniqueIdentifier>{f0de1504-4bfb-4dbd-a8dc-b0d6c9113e6f}</UniqueIdentifier>
     </Filter>
@@ -81,13 +78,7 @@
     <ClCompile Include="..\..\libs\nano\CLR\Core\Serialization\BinaryFormatter.cpp">
       <Filter>CLR\Core\Serialization</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\nano\CLR\Core\Serialization\BinaryFormatter_stub.cpp">
-      <Filter>CLR\Core\Serialization</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libs\nano\CLR\Core\RPC\CLR_RT_HeapBlock_EndPoint.cpp">
-      <Filter>CLR\Core\RPC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\nano\CLR\Core\RPC\RPC_stub.cpp">
       <Filter>CLR\Core\RPC</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libs\nano\CLR\Core\Cache.cpp">
@@ -330,9 +321,6 @@
     <ClCompile Include="..\..\libs\nano\CLR\Debugger\Debugger_full.cpp">
       <Filter>CLR\Debugger</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\nano\CLR\Diagnostics\Diagnostics_stub.cpp">
-      <Filter>CLR\Diagnostics</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libs\nano\CLR\Diagnostics\Info.cpp">
       <Filter>CLR\Diagnostics</Filter>
     </ClCompile>
@@ -351,9 +339,6 @@
     <ClCompile Include="..\..\libs\nano\CLR\Messaging\Messaging.cpp">
       <Filter>CLR\Messaging</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\nano\CLR\Messaging\Messaging_stub.cpp">
-      <Filter>CLR\Messaging</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libs\nano\CLR\Startup\CLRStartup.cpp">
       <Filter>CLR\Startup</Filter>
     </ClCompile>
@@ -363,9 +348,6 @@
     <ClCompile Include="..\..\libs\nano\CLR\System.Math\nf_native_system_math_System_Math.cpp">
       <Filter>CLR\System.Math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\nano\CLR\WireProtocol\targetHAL_time.cpp">
-      <Filter>CLR\WireProtocol</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libs\nano\CLR\WireProtocol\WireProtocol_App_Interface.c">
       <Filter>CLR\WireProtocol</Filter>
     </ClCompile>
@@ -374,9 +356,6 @@
     </ClCompile>
     <ClCompile Include="..\..\libs\nano\HAL\nanoHAL_Time.cpp">
       <Filter>HAL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\nano\PAL\AsyncProcCall\Async_stubs.cpp">
-      <Filter>PAL\AsyncProcCall</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libs\nano\PAL\AsyncProcCall\AsyncCompletions.cpp">
       <Filter>PAL\AsyncProcCall</Filter>
@@ -389,9 +368,6 @@
     </ClCompile>
     <ClCompile Include="..\..\libs\nano\PAL\Double\nanoPAL_NativeDouble.cpp">
       <Filter>PAL\Double</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\nano\PAL\Profiler\nanoPAL_PerformanceCounters_stubs.cpp">
-      <Filter>PAL\Profiler</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libs\nano\System.Collections\nf_system_collections_System_Collections_Queue.cpp">
       <Filter>System.Collections</Filter>
@@ -410,6 +386,15 @@
     </ClCompile>
     <ClCompile Include="..\..\libs\nano\System.Text\nf_system_text.cpp">
       <Filter>System.Text</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Runtime_CompilerServices_RuntimeHelpers.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Runtime_Remoting_RemotingServices.cpp">
+      <Filter>CLR\CoreLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\nano\HAL\nanoHAL_SystemInformation.cpp">
+      <Filter>HAL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1296,6 +1296,66 @@ extern "C" {
    * This is used to force a context switch.
   */
   extern void yield();
+
+  typedef struct _tm_t {
+    uint16_t year;
+    uint16_t month;
+    uint16_t day;
+    uint16_t hour;
+    uint16_t minute;
+    uint16_t second;
+    uint16_t milliseconds;
+    } tm_t;
+
+  /**
+  * @function now(tm_t *tm)
+  * This function returns the current time based on a gps time fix.
+  * @param tm   Where to receive the time.
+  * @return s_ok if the time is known.
+  * @remark This function will return e_unexpected if the CanFly messages with the
+  * utc date and utc time have not been received.
+  */
+  extern result_t now(tm_t *tm);
+  /**
+  * @function gmtime(const tm_t *tm, uint32_t *time)
+  * convert a tm to a 32bit time format
+  * @param tm the time to covert, if 0 then the system time is used
+  * @param time resulting time
+  * @return s_ok if the tm is valid (times greater than 1970-01-01)
+  * @remark this differs from the unix time which is signed
+  */
+  extern result_t gmtime(const tm_t *tm, uint32_t *time);
+  /**
+  * @function gmtime(const tm_t *tm, uint64_t *time)
+  * convert a tm to a 64 bit time format where is 10^-6 seconds
+  * @param tm the time to covert, if 0 then the system time is used
+  * @param time resulting time
+  * @return s_ok if the tm is valid (times greater than 1970-01-01)
+  */
+  extern result_t gmtime_ns(const tm_t *tm, uint64_t *time);
+  /**
+  * @function settime(const tm_t *tm)
+  * set the time of the clock.  If a canfly time or date message is received it will update this
+  * @param tm values to assign
+  * @return s_ok if a valid time
+  */
+  extern result_t settime(const tm_t *tm);
+  /**
+  * @function settime_ns(uint64_t time)
+  * set the time of the clock based on the ns since 1970-01-01
+  * @param time  time in ns
+  * @return s_ok if set ok
+  */
+  extern result_t settime_ns(uint64_t time);
+  /**
+  * @function rtc_hook()
+  * Update the real-time clock
+  * @remark if more frequent time updates are required, other than the gps position
+  * fix time update the framework should call this every second, or as often as the
+  * current_time should be updated.  The exact tick time will be used to increment the real-time clock
+  */
+  extern void rtc_hook();
+
   ///////////////////////////////////////////////////////////////////////////////
   //
   // Vector functions
@@ -1630,6 +1690,8 @@ extern "C" {
     field_none,                     // no definition
     field_key,											// a key is a parent of other fields
     field_bool,                     // a boolean field (see notes)
+    field_int8,
+    field_uint8,
     field_int16,
     field_uint16,
     field_int32,

@@ -1,18 +1,20 @@
 #include "../nano/CLR/Include/nanoCLR_Headers.h"
 #include "../nano/HAL/Include/nanoHAL_v2.h"
 
+#include "targetHAL.h"
+
 void HAL_AssertEx()
   {
-  NonoDebugBreak();
-
-  while (true)
-    {
-    }
+  NanoDebugBreak();
   }
 
 #ifdef _WIN32
 void NanoDebugBreak()
   {
-  return DebugBreak();
+  // DebugBreak();
+
+  while (true)
+    {
+    }
   }
 #endif

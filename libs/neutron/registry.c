@@ -1132,6 +1132,59 @@ result_t reg_delete_value(memid_t memid, const char *name)
   return exit_registry(reg_delete_value_impl(memid, name));
   }
 
+result_t reg_get_int8(memid_t parent, const char *name, int8_t *value)
+  {
+  result_t result;
+  if (value == 0)
+    return e_bad_parameter;
+
+  uint8_t data_type = field_int8;
+  uint16_t buffer_len = sizeof(field_int8_t);
+
+  field_int8_t field;
+
+  enter_registry();
+  if (failed(result = reg_get_value(parent, name, &data_type, 0, 0, &buffer_len, &field)))
+    return exit_registry(result);
+
+  exit_registry(result);
+
+  *value = field.value;
+  return s_ok;
+  }
+
+result_t reg_set_int8(memid_t parent, const char *name, int8_t value)
+  {
+  enter_registry();
+  return exit_registry(reg_set_value(parent, name, field_int8, sizeof(int8_t), &value, 0));
+  }
+
+result_t reg_get_uint8(memid_t parent, const char *name, uint8_t *value)
+  {
+  result_t result;
+  if (value == 0)
+    return e_bad_parameter;
+
+  uint8_t data_type = field_uint8;
+  uint8_t buffer_len = sizeof(field_uint8_t);
+
+  field_uint8_t field;
+
+  enter_registry();
+  if (failed(result = reg_get_value(parent, name, &data_type, 0, 0, &buffer_len, &field)))
+    return exit_registry(result);
+
+  exit_registry(result);
+
+  *value = field.value;
+  return s_ok;
+  }
+
+result_t reg_set_uint8(memid_t parent, const char *name, uint8_t value)
+  {
+  enter_registry();
+  return exit_registry(reg_set_value(parent, name, field_uint8, sizeof(uint8_t), &value, 0));
+  }
 
 result_t reg_get_int16(memid_t parent, const char *name, int16_t *value)
   {

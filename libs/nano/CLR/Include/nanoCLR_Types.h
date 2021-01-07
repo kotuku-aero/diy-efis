@@ -489,7 +489,7 @@ inline CLR_UINT32 CLR_UncompressMethodToken(CLR_UINT32 tk)
 
 #if defined(_WIN32)
 
-CLR_UINT32 CLR_ReadTokenCompressed(CLR_PMETADATA& ip, CLR_OPCODE opcode);
+extern CLR_UINT32 CLR_ReadTokenCompressed(CLR_PMETADATA& ip, CLR_OPCODE opcode);
 
 #endif
 

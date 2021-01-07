@@ -44,8 +44,8 @@ extern "C" {
   }
 
 // include the runtime interface
-#include "runtime/HeapBlockDispatcher.h"
-
+#include "runtime/CanFlyEventDispatcher.h"
+#include "runtime/CLR_Message.h"
 #include "../nano/CLR/Include/WireProtocol_Message.h"
 
 static semaphore_p ion_mutex;
@@ -59,7 +59,9 @@ CLR_RT_TypeSystem          g_CLR_RT_TypeSystem;
 CLR_RT_EventCache          g_CLR_RT_EventCache;
 CLR_RT_GarbageCollector    g_CLR_RT_GarbageCollector;
 
-CLR_RT_HeapBlock_CanFlyMsgDispatcher g_CLR_MessageDispatcher;
+CanFlyEventDispatcher g_CLR_MessageDispatcher;
+CLR_Message               g_CLR_Message;
+CLR_UINT32 g_buildCRC = 0xBAADF00D;
 
 static uint8_t *heap_base = 0;
 static size_t heap_size = 0;
@@ -126,7 +128,7 @@ extern result_t ion_close(ion_context_t *ion)
 
 result_t ion_queue_message(struct _ion_context_t *ion, const canmsg_t *msg)
   {
-  g_CLR_MessageDispatcher.SaveToProtonQueue(msg);
+  g_CLR_MessageDispatcher.SaveToIonQueue(msg);
   return s_ok;
   }
 
@@ -389,6 +391,9 @@ result_t ion_create(memid_t home,
     return result;
     }
 
+  CanFlyEventDispatcher::HandlerMethod_Initialize();
+
+
   // enable the debugger
   bool debugger_enabled = false;
   if (succeeded(reg_get_bool(ion_home, "debugger", &debugger_enabled)))
@@ -532,3 +537,131 @@ result_t ion_run(memid_t key)
 
   return s_ok;
   }
+
+extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_mscorlib;
+extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_canflylib;
+
+// table of native assembly handlers
+
+const CLR_RT_NativeAssemblyData *g_CLR_InteropAssembliesNativeData[] =
+  {
+    &g_CLR_AssemblyNative_mscorlib,
+    &g_CLR_AssemblyNative_canflylib,
+    NULL
+  };
+
+uint16_t g_CLR_InteropAssembliesCount = ARRAYSIZE(g_CLR_InteropAssembliesNativeData) - 1;
+
+void NFReleaseInfo::Init(
+  NFReleaseInfo &NFReleaseInfo,
+  unsigned short int major,
+  unsigned short int minor,
+  unsigned short int build,
+  unsigned short int revision,
+  const char *info,
+  size_t infoLen,
+  const char *target,
+  size_t targetLen,
+  const char *platform,
+  size_t platformLen)
+  {
+  }
+
+uint64_t  HAL_Time_CurrentDateTime(bool datePartOnly)
+  {
+  tm_t time;
+  result_t result;
+  if (failed(result = now(&time)))
+    return 0;
+
+  SYSTEMTIME st;
+  st.wYear = time.year;
+  st.wMonth = time.month;
+  st.wDay = time.day;
+
+  if (datePartOnly)
+    {
+    st.wHour = 0;
+    st.wMinute = 0;
+    st.wSecond = 0;
+    st.wMilliseconds = 0;
+    }
+  else
+    {
+    st.wHour = time.hour;
+    st.wMinute = time.minute;
+    st.wSecond = time.second;
+    st.wMilliseconds = time.milliseconds;
+    }
+
+  // problem is different epoch's
+  return HAL_Time_ConvertFromSystemTime(&st);
+  }
+
+bool DateTimeToString(const int64_t &time, char *&buf, size_t &len)
+  {
+  SYSTEMTIME st;
+  HAL_Time_ToSystemTime(time, &st);
+
+
+  return CLR_SafeSprintf(buf, len, "%4d-%02d-%02d %02d:%02d:%02d.%03d", st.wYear,
+    st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
+  }
+
+bool HAL_Time_TimeSpanToStringEx(const int64_t &_ticks, char *&buf, size_t &len)
+  {
+  int64_t ticks = _ticks;
+  bool minus = ticks < 0;
+  if (minus)
+    ticks *= -1;
+
+  // convert .1 ns to ms
+  ticks /= 10000;
+
+  uint32_t msec = (uint32_t)( ticks % 1000);
+  ticks /= 1000;
+  uint32_t secs = (uint32_t)(ticks % 1000);
+  ticks /= 1000;
+  uint32_t min = (uint32_t)(ticks % 60);
+  ticks /= 60;
+  uint32_t hours = (uint32_t)(ticks % 60);
+  ticks /= 60;
+  uint32_t days = (uint32_t)(ticks % 24);
+
+  if (minus)
+    return CLR_SafeSprintf(buf, len, "-%05d %02d:%02d:%02d.%03d", days, hours, min, secs, msec);
+
+  return CLR_SafeSprintf(buf, len, "%05d %02d:%02d:%02d.%03d", days, hours, min, secs, msec);
+  }
+
+char *DateTimeToString(const int64_t &time)
+  {
+  static char rgBuffer[128];
+  char *szBuffer = rgBuffer;
+  size_t iBuffer = ARRAYSIZE(rgBuffer);
+
+  DateTimeToString(time, szBuffer, iBuffer);
+
+  return rgBuffer;
+  }
+
+const char *HAL_Time_CurrentDateTimeToString()
+  {
+  return DateTimeToString(HAL_Time_CurrentDateTime(false));
+  }
+
+uint64_t CPU_MillisecondsToTicks(uint64_t ticks)
+  {
+  return ticks;
+  }
+
+uint64_t HAL_Time_SysTicksToTime(unsigned int sysTicks)
+  {
+  return ((uint64_t)sysTicks) * 10000;
+  }
+
+uint32_t HAL_Time_CurrentSysTicks()
+  {
+  return ticks();
+  }
+

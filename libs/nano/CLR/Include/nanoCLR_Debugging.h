@@ -208,17 +208,17 @@ struct CLR_DBG_Commands
     static const CLR_UINT32 c_CapabilityFlags_HasNanoBooter = 0x00001000;
     /////////////////////////////////////////////////////////////////////////////////
 
-    static const CLR_UINT32 c_CapabilityFlags_PlatformCapabiliy_0 = 0x01000000;
-    static const CLR_UINT32 c_CapabilityFlags_PlatformCapabiliy_1 = 0x02000000;
-    static const CLR_UINT32 c_CapabilityFlags_PlatformCapabiliy_2 = 0x04000000;
-    static const CLR_UINT32 c_CapabilityFlags_PlatformCapabiliy_3 = 0x08000000;
-    static const CLR_UINT32 c_CapabilityFlags_PlatformCapabiliy_Mask = 0x0F000000;
+    static const CLR_UINT32 c_CapabilityFlags_PlatformCapability_0 = 0x01000000;
+    static const CLR_UINT32 c_CapabilityFlags_PlatformCapability_1 = 0x02000000;
+    static const CLR_UINT32 c_CapabilityFlags_PlatformCapability_2 = 0x04000000;
+    static const CLR_UINT32 c_CapabilityFlags_PlatformCapability_3 = 0x08000000;
+    static const CLR_UINT32 c_CapabilityFlags_PlatformCapability_Mask = 0x0F000000;
 
-    static const CLR_UINT32 c_CapabilityFlags_TargetCapabiliy_0 = 0x10000000;
-    static const CLR_UINT32 c_CapabilityFlags_TargetCapabiliy_1 = 0x20000000;
-    static const CLR_UINT32 c_CapabilityFlags_TargetCapabiliy_2 = 0x40000000;
-    static const CLR_UINT32 c_CapabilityFlags_TargetCapabiliy_3 = 0x80000000;
-    static const CLR_UINT32 c_CapabilityFlags_TargetCapabiliy_Mask = 0xF0000000;
+    static const CLR_UINT32 c_CapabilityFlags_TargetCapability_0 = 0x10000000;
+    static const CLR_UINT32 c_CapabilityFlags_TargetCapability_1 = 0x20000000;
+    static const CLR_UINT32 c_CapabilityFlags_TargetCapability_2 = 0x40000000;
+    static const CLR_UINT32 c_CapabilityFlags_TargetCapability_3 = 0x80000000;
+    static const CLR_UINT32 c_CapabilityFlags_TargetCapability_Mask = 0xF0000000;
 
     CLR_UINT32 m_cmd;
 
@@ -903,27 +903,15 @@ struct CLR_DBG_Debugger
 
     static bool Monitor_Ping(WP_Message* msg);
     static bool Monitor_Reboot(WP_Message* msg);
-    static bool Monitor_TargetInfo(WP_Message* msg);
     static bool Debugging_Execution_QueryCLRCapabilities(WP_Message* msg);
-
     static bool Monitor_ReadMemory(WP_Message* msg);
     static bool Monitor_WriteMemory(WP_Message* msg);
-    static bool Monitor_CheckMemory(WP_Message* msg);
-    static bool Monitor_EraseMemory(WP_Message* msg);
     static bool Monitor_Execute(WP_Message* msg);
     static bool Monitor_MemoryMap(WP_Message* msg);
-    static bool Monitor_FlashSectorMap(WP_Message* msg);
-    static bool Monitor_DeploymentMap(WP_Message* msg);
     static bool Monitor_QueryConfiguration(WP_Message* msg);
-    static bool Monitor_UpdateConfiguration(WP_Message* msg);
-
-
     static bool Debugging_Execution_BasePtr(WP_Message* msg);
     static bool Debugging_Execution_ChangeConditions(WP_Message* msg);
-
     static bool Debugging_Execution_Allocate(WP_Message* msg);
-
-    static bool Debugging_UpgradeToSsl(WP_Message* msg);
 #if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
     static bool Debugging_Execution_Breakpoints(WP_Message* msg);
     static bool Debugging_Execution_BreakpointStatus(WP_Message* msg);
@@ -956,9 +944,7 @@ struct CLR_DBG_Debugger
     static bool Debugging_Value_Assign(WP_Message* msg);
 
     static bool Debugging_TypeSys_Assemblies(WP_Message* msg);
-    static bool Debugging_TypeSys_AppDomains(WP_Message* msg);
 
-    static bool Debugging_Resolve_AppDomain(WP_Message* msg);
     static bool Debugging_Resolve_Assembly(WP_Message* msg);
     static bool Debugging_Resolve_Type(WP_Message* msg);
     static bool Debugging_Resolve_Field(WP_Message* msg);

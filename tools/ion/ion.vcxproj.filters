@@ -110,7 +110,7 @@
     <ClInclude Include="..\..\libs\ion\runtime\CLR_Message.h">
       <Filter>runtime</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\libs\ion\runtime\HeapBlockDispatcher.h">
+    <ClInclude Include="..\..\libs\ion\runtime\CanFlyEventDispatcher.h">
       <Filter>runtime</Filter>
     </ClInclude>
   </ItemGroup>

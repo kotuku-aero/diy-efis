@@ -295,6 +295,7 @@ extern void publish_task(void *pargs);
 /// If a c# runtime is required then ion and nano will be required
 
 typedef struct _screen_t screen_t;
+
 typedef struct _photon_parameters_t {
   screen_t *screen;         // actual screen.  Created by a call to create_screen
   } photon_parameters_t;

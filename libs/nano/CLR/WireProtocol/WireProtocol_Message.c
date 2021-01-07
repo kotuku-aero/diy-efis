@@ -8,6 +8,8 @@
 #include "../Include/nanoSupport.h"
 #include "../Include/WireProtocol_Message.h"
 
+#include "../../HAL/Include/nanoHAL_Time.h"
+
 uint8_t receptionBuffer[sizeof(WP_Packet) + WP_PACKET_SIZE];
 static uint16_t lastOutboundMessage = 65535;
 static uint8_t *marker;
@@ -17,7 +19,7 @@ static uint8_t *marker;
 static const uint64_t c_PayloadTimeout = 50000000;
 
 extern void debug_printf(const char *format, ...);
-extern uint64_t HAL_Time_SysTicksToTime_C(unsigned int sysTicks);
+
 
 //////////////////////////////////////////
 // helper functions
@@ -328,7 +330,7 @@ int WP_Message_Process(WP_Message *message)
       // If the time between consecutive payload bytes exceeds the timeout threshold then assume that
       // the rest of the payload is not coming. Reinitialize to synch on the next header. 
 
-      if (HAL_Time_SysTicksToTime_C(curTicks - message->m_payloadTicks) < c_PayloadTimeout)
+      if (HAL_Time_SysTicksToTime((unsigned int)(curTicks - message->m_payloadTicks)) < c_PayloadTimeout)
         {
         message->m_payloadTicks = curTicks;
 

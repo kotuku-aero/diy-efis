@@ -24,24 +24,16 @@ const CLR_Messaging_CommandHandlerLookup c_Debugger_Lookup_Request[] = {
     DEFINE_CMD2(Ping),
     DEFINE_CMD2(ReadMemory),
     DEFINE_CMD2(WriteMemory),
-    DEFINE_CMD2(CheckMemory),
-    DEFINE_CMD2(EraseMemory),
     DEFINE_CMD2(QueryConfiguration),
-    DEFINE_CMD2(UpdateConfiguration),
     //
     DEFINE_CMD2(Execute),
     DEFINE_CMD2(Reboot),
     DEFINE_CMD2(MemoryMap),
-    DEFINE_CMD2(FlashSectorMap),
-    DEFINE_CMD2(TargetInfo),
-    DEFINE_CMD2(DeploymentMap),
     //
     DEFINE_CMD(Execution_BasePtr),
     DEFINE_CMD(Execution_ChangeConditions),
     //
     DEFINE_CMD(Execution_Allocate),
-
-    DEFINE_CMD(UpgradeToSsl),
 
 #if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
     DEFINE_CMD(Execution_SetCurrentAppDomain),
@@ -75,9 +67,6 @@ const CLR_Messaging_CommandHandlerLookup c_Debugger_Lookup_Request[] = {
     DEFINE_CMD(Value_Assign),
     //
     DEFINE_CMD(TypeSys_Assemblies),
-    DEFINE_CMD(TypeSys_AppDomains),
-    //
-    DEFINE_CMD(Resolve_AppDomain),
     DEFINE_CMD(Resolve_Assembly),
     DEFINE_CMD(Resolve_Type),
     DEFINE_CMD(Resolve_Field),

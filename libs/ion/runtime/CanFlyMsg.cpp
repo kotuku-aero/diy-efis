@@ -924,3 +924,20 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_CanFlyMsg::DispatchMessage___STATIC__V
 
   NANOCLR_NOCLEANUP();
   }
+
+
+HRESULT Library_CanFly_CoreLibrary_CanFly_CanFlyMsg::ToString___STRING__STRING(CLR_RT_StackFrame &stack)
+  {
+  NANOCLR_HEADER(); hr = S_OK;
+  {
+
+  const char *param0;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_LPCSTR(stack, 1, param0));
+
+  const char *retValue = "Not Implemented";
+
+  NANOCLR_CHECK_HRESULT(hr);
+  SetResult_LPCSTR(stack, retValue);
+  }
+  NANOCLR_NOCLEANUP();
+  }

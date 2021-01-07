@@ -383,25 +383,5 @@ result_t ion_debug_name_action(cli_t *context, const char * path)
 
 result_t ion_exec_name_action(cli_t *context, const char * name)
   {
-  result_t result;
-  memid_t parent = 0;
-
-  if (name != 0 &&
-    failed(result = reg_open_key(0, ion_s, &parent)))
-      return result;
-
-  struct _ion_context_t *ion;
-  if (failed(ion_create(parent, name, context->cfg.console_in, context->cfg.console_out,
-    context->cfg.console_err, 0, &ion)))
-    {
-    stream_printf(context->cfg.console_err, "Error when loading ion in interactive mode\r\n");
-    return result;
-    }
-
-  if (failed(result = ion_exec(ion)))
-    {
-    stream_printf(context->cfg.console_err, "Error when loading running ion in interactive mode\r\n");
-    }
-
-  return ion_close(ion);
+  return e_not_implemented;
   }

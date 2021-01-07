@@ -37,9 +37,6 @@ const CLR_RT_NativeAssemblyData *GetAssemblyNativeData(const char *lpszAssemblyN
   extern const CLR_RT_NativeAssemblyData *g_CLR_InteropAssembliesNativeData[];
 
   // This will return NULL if there is no registered interop assembly of that name
-  return LookUpAssemblyNativeDataByName(
-    g_CLR_InteropAssembliesNativeData,
-    lpszAssemblyName
-  );
+  return LookUpAssemblyNativeDataByName(g_CLR_InteropAssembliesNativeData, lpszAssemblyName);
   }
 

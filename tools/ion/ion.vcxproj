@@ -48,7 +48,7 @@
     <ClInclude Include="..\..\libs\ion\ion_cli.h" />
     <ClInclude Include="..\..\libs\ion\ion_cli_impl.h" />
     <ClInclude Include="..\..\libs\ion\runtime\CLR_Message.h" />
-    <ClInclude Include="..\..\libs\ion\runtime\HeapBlockDispatcher.h" />
+    <ClInclude Include="..\..\libs\ion\runtime\CanFlyEventDispatcher.h" />
     <ClInclude Include="..\..\libs\ion\targetHAL.h" />
     <ClInclude Include="..\..\libs\ion\target_os.h" />
   </ItemGroup>

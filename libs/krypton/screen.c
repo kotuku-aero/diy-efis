@@ -1,6 +1,6 @@
 #include <Windows.h>
 #include "../neutron/neutron.h"
-#include "../proton/proton.h"
+#include "../photon/photon.h"
 
 #define BITS_PER_PIXEL 32
 #define PIXELS_PER_LONG 1
@@ -19,7 +19,7 @@ static uint16_t dimy;
 
 extern const uint32_t *fb_buffer;
 
-static LRESULT CALLBACK wndproc(HWND   hwnd, UINT   uMsg, WPARAM wParam, LPARAM lParam)
+static LRESULT CALLBACK _wndproc(HWND   hwnd, UINT   uMsg, WPARAM wParam, LPARAM lParam)
   {
   switch (uMsg)
     {
@@ -95,7 +95,7 @@ static void worker(void *argv)
   {
   WNDCLASS wndclass;
   memset(&wndclass, 0, sizeof(WNDCLASS));
-  wndclass.lpfnWndProc = wndproc;
+  wndclass.lpfnWndProc = _wndproc;
   wndclass.lpszClassName = className;
 
   RegisterClass(&wndclass);

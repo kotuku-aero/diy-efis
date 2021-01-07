@@ -3117,7 +3117,6 @@ struct CLR_RT_Thread : public CLR_RT_ObjectToEvent_Destination // EVENT HEAP - N
 extern size_t LinkArraySize();
 extern size_t LinkMRUArraySize();
 extern size_t PayloadArraySize();
-extern size_t InterruptRecords();
 #ifndef CLR_NO_IL_INLINE
 extern size_t InlineBufferCount();
 #endif
@@ -3592,8 +3591,8 @@ struct CLR_RT_ExecutionEngine
 
   //--//
 
-  CLR_RT_Thread* m_interruptThread; // EVENT HEAP - NO RELOCATION
-  CLR_RT_Thread* m_timerThread;     // EVENT HEAP - NO RELOCATION
+  CLR_RT_Thread *m_canFlyEventThread; // EVENT HEAP - NO RELOCATION
+  CLR_RT_Thread *m_timerThread;     // EVENT HEAP - NO RELOCATION
 
   //--//
 

@@ -679,7 +679,7 @@ result_t stream_sync(stream_p stream)
   return fshndl->mount_point->file_type->sync(fshndl->mount_point->device, fshndl->fd);
   }
 
-result_t freespace(const char *path, off_t *space)
+result_t freespace(const char *path, uint32_t *space)
   {
   if (path == 0 || space == 0)
     return e_bad_pointer;
@@ -697,7 +697,7 @@ result_t freespace(const char *path, off_t *space)
   return mount->file_type->freespace(mount->device, fs_path, space);
   }
 
-result_t totalspace(const char *path, off_t *space)
+result_t totalspace(const char *path, uint32_t *space)
   {
   if (path == 0 || space == 0)
     return e_bad_pointer;

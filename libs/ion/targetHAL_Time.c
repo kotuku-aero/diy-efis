@@ -1,18 +1,6 @@
 #include "../neutron/neutron.h"
 #include "../nano/HAL/Include/nanoHAL_Time.h"
 
-// Converts neutron Tickcount to .NET ticks (100 nanoseconds)
-uint64_t HAL_Time_SysTicksToTime(unsigned int sysTicks)
-  {
-  // neutron ticks are 1msec so 10-3 to 10-7
-  return ((uint64_t)sysTicks) * 10000LL;
-  }
-
-uint32_t HAL_Time_CurrentSysTicks()
-  {
-  return ticks();
-  }
-
 static semaphore_p wakeup;
 static task_p wakeup_task;
 static uint32_t next_wakeup;

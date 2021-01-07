@@ -4,8 +4,16 @@
 // See LICENSE file in the project root for full license information.
 //
 
-#include <nanoHAL.h>
-#include <targetHAL.h>
+#include "Include/nanoHAL.h"
+
+#define VERSION_MAJOR 1
+#define VERSION_MINOR 0
+#define VERSION_BUILD 0
+#define VERSION_REVISION 0
+#define OEMSYSTEMINFOSTRING "CanFly"
+#define TARGETNAMESTRING "CanFly"
+#define PLATFORMNAMESTRING "CanFly"
+#define TARGETINFOSTRING "CanFly"
 
 bool GetHalSystemInfo(HalSystemInfo &systemInfo)
 {

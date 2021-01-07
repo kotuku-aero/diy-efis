@@ -194,18 +194,9 @@ extern "C"
   int Monitor_WriteMemory(WP_Message* message);
   int Monitor_ReadMemory(WP_Message* message);
   int Monitor_Reboot(WP_Message* message);
-  int Monitor_EraseMemory(WP_Message* message);
   int Monitor_QueryConfiguration(WP_Message* message);
-  int Monitor_UpdateConfiguration(WP_Message* message);
-  int Monitor_CheckMemory(WP_Message* message);
   int Monitor_MemoryMap(WP_Message* message);
-  int Monitor_FlashSectorMap(WP_Message* message);
   int Monitor_TargetInfo(WP_Message* message);
-
-  // helper functions
-  int AccessMemory(uint32_t location, uint32_t lengthInBytes, uint8_t* buffer, int32_t mode, uint32_t* errorCode);
-  int nanoBooter_GetTargetInfo(TargetInfo* targetInfo);
-  int NanoBooter_GetReleaseInfo(ReleaseInfo* releaseInfo);
 
 #ifdef __cplusplus
   }

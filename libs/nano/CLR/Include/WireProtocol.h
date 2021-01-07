@@ -29,8 +29,8 @@
 #define MARKER_PACKET_V1   "NFPKTV1" // Used to identify the start of a packet.
 
 #ifndef WP_PACKET_SIZE
-// no Wire Protocol defined at target_common, set to default as 1024
-#define WP_PACKET_SIZE      1024U
+// no Wire Protocol defined at target_common, set to default as 128 bytes
+#define WP_PACKET_SIZE      128U
 #endif
 
 // enum with Wire Protocol flags

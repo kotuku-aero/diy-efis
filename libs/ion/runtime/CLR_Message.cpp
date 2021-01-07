@@ -1,11 +1,17 @@
 #include "CLR_Message.h"
-#include "HeapBlockDispatcher.h"
+#include "CanFlyEventDispatcher.h"
+
+#define NUMBER_MESSAGES 32
+
+size_t InterruptRecords() { return NUMBER_MESSAGES; }
+
+static CLR_Message::CLRMessage canMsgStorage[(NUMBER_MESSAGES * NUMBER_MESSAGES)];
 
 HRESULT CLR_Message::Message_Initialize()
   {
   NANOCLR_HEADER();
 
-  m_MessageData.m_HalQueue.Initialize((CLR_Message::CLRMessage*)&g_scratchInterruptDispatchingStorage, 128);
+  m_MessageData.m_HalQueue.Initialize((CLR_Message::CLRMessage *)&canMsgStorage, NUMBER_MESSAGES);
 
   m_MessageData.m_applicationQueue.DblLinkedList_Initialize();
 
@@ -20,9 +26,9 @@ HRESULT CLR_Message::SpawnDispatcher()
 
   NANOCLR_HEADER();
 
-  CLR_RT_ApplicationInterrupt* interrupt;
-  CLR_RT_HeapBlock_NativeEventDispatcher* ioPort;
-  CLR_RT_HeapBlock_NativeEventDispatcher::InterruptPortInterrupt* interruptData;
+  CanFlyMsgEvent *canFlyEvent;
+  CanFlyEventDispatcher * canFlyEventDispatcher;
+  CanFlyEventDispatcher::CanFlyMsgEventData * canFlyEventData;
 
   // if reboot is in progress, just bail out
   if (CLR_EE_DBG_IS(RebootPending))
@@ -30,27 +36,27 @@ HRESULT CLR_Message::SpawnDispatcher()
     return S_OK;
     }
 
-  interrupt = (CLR_RT_ApplicationInterrupt*)m_MessageData.m_applicationQueue.FirstValidNode();
+  canFlyEvent = (CanFlyMsgEvent *)m_MessageData.m_applicationQueue.FirstValidNode();
 
-  if ((interrupt == NULL) || !g_CLR_RT_ExecutionEngine.EnsureSystemThread(g_CLR_RT_ExecutionEngine.m_interruptThread, ThreadPriority::System_Highest))
+  if ((canFlyEvent == NULL) || !g_CLR_RT_ExecutionEngine.EnsureSystemThread(g_CLR_RT_ExecutionEngine.m_canFlyEventThread, ThreadPriority::System_Highest))
     {
     return S_OK;
     }
 
-  interrupt->Unlink();
+  canFlyEvent->Unlink();
 
-  interruptData = &interrupt->m_interruptPortInterrupt;
-  ioPort = interruptData->context;
+  canFlyEventData = &canFlyEvent->m_message;
+  canFlyEventDispatcher = canFlyEventData->context;
 
-  CLR_RT_ProtectFromGC gc1(*ioPort);
+  CLR_RT_ProtectFromGC gc1(*canFlyEventDispatcher);
 
-  NANOCLR_SET_AND_LEAVE(ioPort->StartDispatch(interrupt, g_CLR_RT_ExecutionEngine.m_interruptThread));
+  NANOCLR_SET_AND_LEAVE(canFlyEventDispatcher->StartDispatch(canFlyEvent, g_CLR_RT_ExecutionEngine.m_canFlyEventThread));
 
   NANOCLR_CLEANUP();
 
   if (FAILED(hr))
     {
-    ioPort->ThreadTerminationCallback(interrupt);
+    canFlyEventDispatcher->ThreadTerminationCallback(canFlyEvent);
     }
 
   --m_MessageData.m_queuedMessages;
@@ -58,7 +64,7 @@ HRESULT CLR_Message::SpawnDispatcher()
   NANOCLR_CLEANUP_END();
   }
 
-HRESULT CLR_Message::TransferAllInterruptsToApplicationQueue()
+HRESULT CLR_Message::TransferAllMessagesToApplicationQueue()
   {
   NATIVE_PROFILE_CLR_HARDWARE();
 
@@ -79,7 +85,7 @@ HRESULT CLR_Message::TransferAllInterruptsToApplicationQueue()
     if (rec == NULL) 
       break;
 
-    CLR_RT_CanFlyMsgEvent *queueRec = (CLR_RT_CanFlyMsgEvent *)CLR_RT_Memory::Allocate_And_Erase(sizeof(CLR_RT_CanFlyMsgEvent), CLR_RT_HeapBlock::HB_CompactOnFailure);  
+    CanFlyMsgEvent *queueRec = (CanFlyMsgEvent *)CLR_RT_Memory::Allocate_And_Erase(sizeof(CanFlyMsgEvent), CLR_RT_HeapBlock::HB_CompactOnFailure);  
     CHECK_ALLOCATION(queueRec);
 
     queueRec->m_message.msg.flags = rec->msg.flags;
@@ -92,7 +98,7 @@ HRESULT CLR_Message::TransferAllInterruptsToApplicationQueue()
     queueRec->m_message.msg.raw[6] = rec->msg.raw[6];
     queueRec->m_message.msg.raw[7] = rec->msg.raw[7];
 
-    queueRec->m_message.context = (CLR_RT_HeapBlock_CanFlyMsgDispatcher *)rec->m_context;
+    queueRec->m_message.context = (CanFlyEventDispatcher *)rec->m_context;
 
     m_MessageData.m_applicationQueue.LinkAtBack(queueRec); ++m_MessageData.m_queuedMessages;
 
@@ -136,7 +142,7 @@ HRESULT CLR_Message::ProcessInterrupts()
 
   NANOCLR_HEADER();
 
-  NANOCLR_CHECK_HRESULT(TransferAllInterruptsToApplicationQueue());
+  NANOCLR_CHECK_HRESULT(TransferAllMessagesToApplicationQueue());
 
   SpawnDispatcher();
 

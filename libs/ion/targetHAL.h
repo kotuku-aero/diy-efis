@@ -14,14 +14,7 @@ extern "C" {
 #endif
   extern void NanoDebugBreak();
 #define NANOCLR_STOP() ::NanoDebugBreak()
-  extern bool Target_ConfigUpdateRequiresErase();
-  extern bool Target_HasNanoBooter();
-  extern bool Target_IFUCapable();
-  extern bool Target_HasProprietaryBooter();
   extern uint32_t GetPlatformCapabilities();
-  extern uint32_t GetTargetCapabilities();
-  extern bool RequestToLaunchProprietaryBootloader();
-  extern bool RequestToLaunchNanoBooter();
   extern void CPU_Sleep();
   extern void CPU_Reset();
   extern void Watchdog_Reset();

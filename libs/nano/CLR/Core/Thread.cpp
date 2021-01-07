@@ -319,8 +319,8 @@ bool CLR_RT_Thread::ReleaseWhenDeadEx()
 
   if (this == g_CLR_RT_ExecutionEngine.m_finalizerThread)
     g_CLR_RT_ExecutionEngine.m_finalizerThread = NULL;
-  if (this == g_CLR_RT_ExecutionEngine.m_interruptThread)
-    g_CLR_RT_ExecutionEngine.m_interruptThread = NULL;
+  if (this == g_CLR_RT_ExecutionEngine.m_canFlyEventThread)
+    g_CLR_RT_ExecutionEngine.m_canFlyEventThread = NULL;
   if (this == g_CLR_RT_ExecutionEngine.m_timerThread)
     g_CLR_RT_ExecutionEngine.m_timerThread = NULL;
   if (this == g_CLR_RT_ExecutionEngine.m_cctorThread)

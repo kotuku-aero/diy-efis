@@ -33,14 +33,17 @@
     <ProjectReference Include="..\muon\muon.vcxproj">
       <Project>{4692af85-e696-481e-8ffb-5135bdce2326}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\nano\nano.vcxproj">
+      <Project>{f975bed3-96e4-4eff-b967-fb7daba4b82e}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\neutron\neutron.vcxproj">
       <Project>{eacccfa7-bd61-449f-ba60-f398ff0780ae}</Project>
     </ProjectReference>
     <ProjectReference Include="..\photon\photon.vcxproj">
       <Project>{943f213f-305d-4476-8b00-4e18bc7e0e16}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\proton\proton.vcxproj">
-      <Project>{eb965c9f-0179-46ce-9f33-f2991b423515}</Project>
+    <ProjectReference Include="..\yaffs\yaffs.vcxproj">
+      <Project>{27848db5-da68-483a-b5c8-1ce2173a8e78}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

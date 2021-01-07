@@ -17,14 +17,16 @@
 #include "../../neutron/neutron.h"
 #include "../../photon/photon.h"
 
-#include "HeapBlockDispatcher.h"
+#include "CanFlyEventDispatcher.h"
 
 
 extern "C" {
   static result_t screen_wndproc(handle_t hwnd, const canmsg_t *msg)
     {
     // post this to the message queue
-    g_CLR_MessageDispatcher.SaveToProtonQueue(msg);
+    g_CLR_MessageDispatcher.SaveToIonQueue(msg);
+
+    return s_ok;
     }
   }
 

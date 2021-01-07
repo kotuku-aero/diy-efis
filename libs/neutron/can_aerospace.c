@@ -536,7 +536,7 @@ const matrix_t identity_matrix = {
     }
   };
 
-void matrix_multiply(matrix_t mat, const matrix_t a, const matrix_t b)
+const matrix_t *matrix_multiply(const matrix_t *a, const matrix_t *b, matrix_t *mat)
   {
   int x;
   int y;
@@ -548,10 +548,10 @@ void matrix_multiply(matrix_t mat, const matrix_t a, const matrix_t b)
     for(y = 0; y < 3; y++)
       {
       for(w = 0; w < 3; w++)
-        op[w] = a.v[x][w] * b.v[w][y];
+        op[w] = a->v[x][w] * b->v[w][y];
 
-      mat.v[x][y] = 0;
-      mat.v[x][y] = op[0] + op[1] + op[2];
+      mat->v[x][y] = 0;
+      mat->v[x][y] = op[0] + op[1] + op[2];
       }
     }
   }

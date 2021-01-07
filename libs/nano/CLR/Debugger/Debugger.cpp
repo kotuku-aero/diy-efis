@@ -391,27 +391,6 @@ bool CLR_DBG_Debugger::Monitor_Ping(WP_Message *msg)
     cmdReply.Flags |= Monitor_Ping_c_PacketSize_1024;
 #endif
 
-    // capability flags
-    if (::Target_HasNanoBooter())
-      {
-      cmdReply.Flags |= Monitor_Ping_c_HasNanoBooter;
-      }
-
-    if (::Target_HasProprietaryBooter())
-      {
-      cmdReply.Flags |= Monitor_Ping_c_HasProprietaryBooter;
-      }
-
-    if (::Target_IFUCapable())
-      {
-      cmdReply.Flags |= Monitor_Ping_c_IFUCapable;
-      }
-
-    if (::Target_ConfigUpdateRequiresErase())
-      {
-      cmdReply.Flags |= Monitor_Ping_c_ConfigBlockRequiresErase;
-      }
-
     // done, send reply
     WP_ReplyToCommand(msg, true, false, &cmdReply, sizeof(cmdReply));
     }
@@ -434,25 +413,6 @@ bool CLR_DBG_Debugger::Monitor_Ping(WP_Message *msg)
   return true;
   }
 
-bool CLR_DBG_Debugger::Monitor_FlashSectorMap(WP_Message *msg)
-  {
-  NATIVE_PROFILE_CLR_DEBUGGER();
-
-
-  return true;
-  }
-
-bool CLR_DBG_Debugger::Monitor_TargetInfo(WP_Message *msg)
-  {
-  Monitor_TargetInfo_Reply cmdReply;
-
-  bool fOK = nanoBooter_GetTargetInfo(&cmdReply.m_TargetInfo) != 0;
-
-  WP_ReplyToCommand(msg, fOK, false, &cmdReply, sizeof(cmdReply));
-
-  return true;
-  }
-
 bool CLR_DBG_Debugger::Monitor_Execute(WP_Message *msg)
   {
   NATIVE_PROFILE_CLR_DEBUGGER();
@@ -471,6 +431,17 @@ bool CLR_DBG_Debugger::Monitor_Execute(WP_Message *msg)
   return true;
   }
 
+bool CLR_DBG_Debugger::Monitor_ReadMemory(WP_Message *msg)
+  {
+  return true;
+  }
+
+bool CLR_DBG_Debugger::Monitor_WriteMemory(WP_Message *msg)
+  {
+  return true;
+  }
+
+
 bool CLR_DBG_Debugger::Monitor_Reboot(WP_Message *msg)
   {
   NATIVE_PROFILE_CLR_DEBUGGER();
@@ -481,18 +452,6 @@ bool CLR_DBG_Debugger::Monitor_Reboot(WP_Message *msg)
 
   if (NULL != cmd)
     {
-    if (CLR_DBG_Commands::Monitor_Reboot::c_EnterNanoBooter ==
-      (cmd->m_flags & CLR_DBG_Commands::Monitor_Reboot::c_EnterNanoBooter))
-      {
-      success = RequestToLaunchNanoBooter();
-      }
-    else if (
-      CLR_DBG_Commands::Monitor_Reboot::c_EnterProprietaryBooter ==
-      (cmd->m_flags & CLR_DBG_Commands::Monitor_Reboot::c_EnterProprietaryBooter))
-      {
-      success = RequestToLaunchProprietaryBootloader();
-      }
-
     g_CLR_RT_ExecutionEngine.m_iReboot_Options = cmd->m_flags;
     }
 
@@ -511,6 +470,7 @@ bool CLR_DBG_Debugger::Monitor_MemoryMap(WP_Message *msg)
   {
   NATIVE_PROFILE_CLR_DEBUGGER();
 
+#ifndef _WIN32
   MemoryMap_Range map[2];
 
   map[0].m_address = HalSystemConfig.RAM1.Base;
@@ -522,13 +482,7 @@ bool CLR_DBG_Debugger::Monitor_MemoryMap(WP_Message *msg)
   map[1].m_flags = Monitor_MemoryMap_c_FLASH;
 
   WP_ReplyToCommand(msg, true, false, map, sizeof(map));
-
-  return true;
-  }
-
-bool CLR_DBG_Debugger::Monitor_DeploymentMap(WP_Message *msg)
-  {
-  (void)msg;
+#endif
 
   return true;
   }
@@ -636,58 +590,6 @@ bool CLR_DBG_Debugger::Monitor_QueryConfiguration(WP_Message *message)
 
   return success;
   }
-
-bool CLR_DBG_Debugger::Monitor_UpdateConfiguration(WP_Message *message)
-  {
-  NATIVE_PROFILE_CLR_DEBUGGER();
-
-  bool success = false;
-
-  // include handling of configuration block only if feature is available
-#if (HAS_CONFIG_BLOCK == TRUE)
-
-  Monitor_UpdateConfiguration_Command *cmd = (Monitor_UpdateConfiguration_Command *)message->m_payload;
-  Monitor_UpdateConfiguration_Reply cmdReply;
-
-  switch ((DeviceConfigurationOption)cmd->Configuration)
-    {
-    case DeviceConfigurationOption_Network:
-    case DeviceConfigurationOption_Wireless80211Network:
-    case DeviceConfigurationOption_X509CaRootBundle:
-    case DeviceConfigurationOption_All:
-      if (ConfigurationManager_StoreConfigurationBlock(
-        cmd->Data,
-        (DeviceConfigurationOption)cmd->Configuration,
-        cmd->BlockIndex,
-        cmd->Length,
-        cmd->Offset,
-        cmd->Done) == true)
-        {
-        cmdReply.ErrorCode = 0;
-        success = true;
-        }
-      else
-        {
-        cmdReply.ErrorCode = 100;
-        }
-      break;
-
-    default:
-      cmdReply.ErrorCode = 10;
-    }
-
-  WP_ReplyToCommand(message, success, false, &cmdReply, sizeof(cmdReply));
-
-#else
-
-  (void)message;
-
-#endif // (HAS_CONFIG_BLOCK == TRUE)
-
-  return success;
-  }
-
-//--//
 
 bool CLR_DBG_Debugger::Debugging_Execution_BasePtr(WP_Message *msg)
   {
@@ -912,25 +814,10 @@ bool CLR_DBG_Debugger::Debugging_Execution_QueryCLRCapabilities(WP_Message *msg)
           CLR_DBG_Commands::Debugging_Execution_QueryCLRCapabilities::c_CapabilityFlags_SoftReboot;
         }
 
-      if (::Target_ConfigUpdateRequiresErase())
-        {
-        reply.u_capsFlags |= CLR_DBG_Commands::Debugging_Execution_QueryCLRCapabilities::
-          c_CapabilityFlags_ConfigBlockRequiresErase;
-        }
-
-      if (::Target_HasNanoBooter())
-        {
-        reply.u_capsFlags |=
-          CLR_DBG_Commands::Debugging_Execution_QueryCLRCapabilities::c_CapabilityFlags_HasNanoBooter;
-        }
 
       reply.u_capsFlags |=
         (::GetPlatformCapabilities() &
-          CLR_DBG_Commands::Debugging_Execution_QueryCLRCapabilities::c_CapabilityFlags_PlatformCapabiliy_Mask);
-
-      reply.u_capsFlags |=
-        (::GetTargetCapabilities() &
-          CLR_DBG_Commands::Debugging_Execution_QueryCLRCapabilities::c_CapabilityFlags_TargetCapabiliy_Mask);
+          CLR_DBG_Commands::Debugging_Execution_QueryCLRCapabilities::c_CapabilityFlags_PlatformCapability_Mask);
 
       data = (CLR_UINT8 *)&reply.u_capsFlags;
       size = sizeof(reply.u_capsFlags);
@@ -1059,26 +946,6 @@ bool CLR_DBG_Debugger::Debugging_Execution_Allocate(WP_Message *msg)
   WP_ReplyToCommand(msg, true, false, &reply, sizeof(reply));
 
   return true;
-  }
-
-bool CLR_DBG_Debugger::Debugging_UpgradeToSsl(WP_Message *msg)
-  {
-
-  CLR_DBG_Commands::Debugging_UpgradeToSsl *cmd = (CLR_DBG_Commands::Debugging_UpgradeToSsl *)msg->m_payload;
-  CLR_DBG_Commands::Debugging_UpgradeToSsl::Reply reply;
-
-  if (!DebuggerPort_IsSslSupported(HalSystemConfig.DebuggerPort))
-    {
-    return false;
-    }
-
-  reply.m_success = 1;
-
-  WP_ReplyToCommand(msg, true, true, &reply, sizeof(reply));
-
-  CPU_Sleep();
-
-  return true == DebuggerPort_UpgradeToSsl(HalSystemConfig.DebuggerPort, cmd->m_flags);
   }
 
 #if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
@@ -2605,91 +2472,6 @@ bool CLR_DBG_Debugger::Debugging_TypeSys_Assemblies(WP_Message *msg)
   WP_ReplyToCommand(msg, true, false, assemblies, sizeof(CLR_RT_Assembly_Index) * num);
 
   return true;
-  }
-
-bool CLR_DBG_Debugger::Debugging_TypeSys_AppDomains(WP_Message *msg)
-  {
-  NATIVE_PROFILE_CLR_DEBUGGER();
-#if defined(NANOCLR_APPDOMAINS)
-
-  int num = 0;
-  CLR_UINT32 appDomainIDs[256];
-
-  NANOCLR_FOREACH_NODE(CLR_RT_AppDomain, appDomain, g_CLR_RT_ExecutionEngine.m_appDomains)
-    {
-    appDomainIDs[num++] = appDomain->m_id;
-
-    if (num >= ARRAYSIZE(appDomainIDs))
-      break;
-    }
-  NANOCLR_FOREACH_NODE_END();
-
-  WP_ReplyToCommand(msg, true, false, appDomainIDs, sizeof(CLR_UINT32) * num);
-
-  return true;
-#else
-  (void)msg;
-  return false;
-#endif
-  }
-
-//--//
-
-bool CLR_DBG_Debugger::Debugging_Resolve_AppDomain(WP_Message *msg)
-  {
-  NATIVE_PROFILE_CLR_DEBUGGER();
-#if defined(NANOCLR_APPDOMAINS)
-
-  CLR_DBG_Commands::Debugging_Resolve_AppDomain *cmd =
-    (CLR_DBG_Commands::Debugging_Resolve_AppDomain *)msg->m_payload;
-  CLR_RT_AppDomain *appDomain = g_CLR_DBG_Debugger->GetAppDomainFromID(cmd->m_id);
-  CLR_UINT32 numAssemblies = 0;
-  CLR_DBG_Commands::Debugging_Resolve_AppDomain::Reply *cmdReply;
-  CLR_UINT8
-    buf[sizeof(CLR_DBG_Commands::Debugging_Resolve_AppDomain::Reply) +
-    sizeof(CLR_RT_Assembly_Index) * CLR_RT_TypeSystem::c_MaxAssemblies];
-  size_t count;
-  const char *name;
-  CLR_RT_Assembly_Index *pAssemblyIndex;
-
-  if (appDomain)
-    {
-    cmdReply = (CLR_DBG_Commands::Debugging_Resolve_AppDomain::Reply *)&buf;
-
-    cmdReply->m_state = appDomain->m_state;
-
-    name = appDomain->m_strName->StringText();
-    count = __min(hal_strlen_s(name) + 1, sizeof(cmdReply->m_szName) - 1);
-
-    hal_strncpy_s(cmdReply->m_szName, ARRAYSIZE(cmdReply->m_szName), name, count);
-
-    pAssemblyIndex = (CLR_RT_Assembly_Index *)(&cmdReply->m_assemblies);
-
-    NANOCLR_FOREACH_ASSEMBLY_IN_APPDOMAIN(appDomain)
-      {
-      pAssemblyIndex->Set(pASSM->m_idx);
-      pAssemblyIndex++;
-      numAssemblies++;
-      }
-    NANOCLR_FOREACH_ASSEMBLY_IN_APPDOMAIN_END();
-
-    WP_ReplyToCommand(
-      msg,
-      true,
-      false,
-      cmdReply,
-      sizeof(*cmdReply) + sizeof(CLR_RT_Assembly_Index) * (numAssemblies - 1));
-    }
-  else
-    {
-    WP_ReplyToCommand(msg, false, false, NULL, 0);
-    }
-
-  return true;
-#else
-  (void)msg;
-  return false;
-#endif
   }
 
 bool CLR_DBG_Debugger::Debugging_Resolve_Assembly(WP_Message *msg)

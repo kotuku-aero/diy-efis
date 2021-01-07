@@ -66,10 +66,10 @@ HRESULT CLR_RT_ExecutionEngine::ExecutionEngine_Initialize()
 
   m_currentUICulture = NULL; // CLR_RT_HeapBlock*                   m_currentUICulture;
 
-  CLR_RT_HeapBlock_EndPoint::HandlerMethod_Initialize();
-  CLR_RT_HeapBlock_NativeEventDispatcher::HandlerMethod_Initialize();
+  // CLR_RT_HeapBlock_EndPoint::HandlerMethod_Initialize();
+  // CLR_RT_HeapBlock_NativeEventDispatcher::HandlerMethod_Initialize();
 
-  m_interruptThread = NULL; // CLR_RT_Thread                       m_interruptThread;
+  m_canFlyEventThread = NULL; // CLR_RT_Thread                       m_interruptThread;
 
 #if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
   m_scratchPadArray = NULL; // CLR_RT_HeapBlock_Array*             m_scratchPadArray;
@@ -237,10 +237,10 @@ void CLR_RT_ExecutionEngine::ExecutionEngine_Cleanup()
   m_globalLock = NULL;
 #endif
 
-  CLR_RT_HeapBlock_EndPoint::HandlerMethod_CleanUp();
-  CLR_RT_HeapBlock_NativeEventDispatcher::HandlerMethod_CleanUp();
+  // CLR_RT_HeapBlock_EndPoint::HandlerMethod_CleanUp();
+  // CLR_RT_HeapBlock_NativeEventDispatcher::HandlerMethod_CleanUp();
 
-  m_interruptThread = NULL;
+  m_canFlyEventThread = NULL;
 
   m_heap.DblLinkedList_Initialize();
   }

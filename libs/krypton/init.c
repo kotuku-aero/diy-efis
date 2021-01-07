@@ -405,3 +405,13 @@ void yield()
   {
   Sleep(0);         // allow a context switch
   }
+
+void *ion_malloc(size_t len)
+  {
+  return malloc(len);
+  }
+
+void ion_free(void *buffer)
+  {
+  free(buffer);
+  }

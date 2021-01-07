@@ -26,6 +26,7 @@ struct CLR_Message
   struct MessageData
     {
     Hal_Queue_UnknownSize<CLRMessage> m_HalQueue;
+    // queue of CanFlyMsgEvent
     CLR_RT_DblLinkedList m_applicationQueue;
     CLR_UINT32 m_queuedMessages;
     };
@@ -56,7 +57,7 @@ struct CLR_Message
   HRESULT ManagedMessage_Initialize();
   HRESULT ProcessInterrupts();
   HRESULT SpawnDispatcher();
-  HRESULT TransferAllInterruptsToApplicationQueue();
+  HRESULT TransferAllMessagesToApplicationQueue();
   };
 
 // the global CLR CanFly Message handler
