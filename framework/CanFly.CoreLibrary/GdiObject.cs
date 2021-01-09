@@ -198,8 +198,11 @@ namespace CanFly
     /// <param name="src_pt">Orgin on canvas</param>
     /// <param name="txt_clip_rect">Rectangle to clip to</param>
     /// <param name="format">Format flags</param>
-    public void DrawText(Font font, uint fg, uint bg, string str, Point src_pt, Rect txt_clip_rect, TextOutStyle format)
+    public void DrawText(Font font, uint fg, uint bg, string str, Point src_pt, Rect txt_clip_rect = null, TextOutStyle format = TextOutStyle.Clipped)
     {
+      if (txt_clip_rect == null)
+        txt_clip_rect = ClipRect;
+
       Photon.DrawText(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom,
         font.Handle, fg, bg, str, src_pt.X, src_pt.Y, 
         txt_clip_rect.Left, txt_clip_rect.Top, txt_clip_rect.Right, txt_clip_rect.Bottom, (ushort) format);

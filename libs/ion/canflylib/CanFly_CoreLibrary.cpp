@@ -189,6 +189,8 @@ static const CLR_RT_MethodHandler method_lookup[] =
     NULL,
     NULL,
     NULL,
+    NULL,
+    NULL,
     Library_CanFly_CoreLibrary_CanFly_Neutron::RegCreateKey___STATIC__U4__U4__STRING,
     Library_CanFly_CoreLibrary_CanFly_Neutron::RegOpenKey___STATIC__U4__U4__STRING,
     Library_CanFly_CoreLibrary_CanFly_Neutron::RegGetInt8___STATIC__I1__U4__STRING,
@@ -209,6 +211,9 @@ static const CLR_RT_MethodHandler method_lookup[] =
     Library_CanFly_CoreLibrary_CanFly_Neutron::RegSetFloat___STATIC__VOID__U4__STRING__R4,
     Library_CanFly_CoreLibrary_CanFly_Neutron::RegGetBool___STATIC__BOOLEAN__U4__STRING,
     Library_CanFly_CoreLibrary_CanFly_Neutron::RegSetBool___STATIC__VOID__U4__STRING__BOOLEAN,
+    NULL,
+    NULL,
+    NULL,
     NULL,
     NULL,
     NULL,
@@ -239,6 +244,9 @@ static const CLR_RT_MethodHandler method_lookup[] =
     Library_CanFly_CoreLibrary_CanFly_Photon::GetOrientation___STATIC__U2__U4,
     Library_CanFly_CoreLibrary_CanFly_Photon::SetOrientation___STATIC__VOID__U4__U2,
     Library_CanFly_CoreLibrary_CanFly_Photon::CreatePen___STATIC__U4__U4__U2__U2,
+    Library_CanFly_CoreLibrary_CanFly_Photon::GetPenColor___STATIC__U4__U4,
+    Library_CanFly_CoreLibrary_CanFly_Photon::GetPenWidth___STATIC__U2__U4,
+    Library_CanFly_CoreLibrary_CanFly_Photon::GetPenStyle___STATIC__U2__U4,
     Library_CanFly_CoreLibrary_CanFly_Photon::DisposePen___STATIC__VOID__U4,
     Library_CanFly_CoreLibrary_CanFly_Photon::Polyline___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4,
     Library_CanFly_CoreLibrary_CanFly_Photon::Ellipse___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__I4__I4__I4__I4,
@@ -359,12 +367,18 @@ static const CLR_RT_MethodHandler method_lookup[] =
     NULL,
     NULL,
     NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
 };
 
 const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_canflylib =
 {
     "CanFly.CoreLibrary",
-    0x8B0513F8,
+    0x0F0767BE,
     method_lookup,
     { 1, 0, 0, 0 }
 };

@@ -728,6 +728,30 @@ extern result_t register_font(const uint8_t *buffer, uint16_t length);
 */
 extern result_t pen_create(color_t color, uint16_t width, pen_style style, handle_t *hndl);
 /**
+* @function get_pen_color(handle_t *hndl, color_t *color)
+* return the color of a pen
+* @param hndl pen handle
+* @param color pen color
+* @return s_ok if a valid handle
+*/
+extern result_t get_pen_color(handle_t hndl, color_t *color);
+/**
+* @function get_pen_width(handle_t *hndl, color_t *color)
+* return the width of a pen
+* @param hndl pen handle
+* @param width line width
+* @return s_ok if a valid handle
+*/
+extern result_t get_pen_width(handle_t hndl, uint16_t *width);
+/**
+* @function get_pen_style(handle_t *hndl, color_t *color)
+* return the style of a pen
+* @param hndl pen handle
+* @param style drawing style of the pen
+* @return s_ok if a valid handle
+*/
+extern result_t get_pen_style(handle_t hndl, pen_style *style);
+/**
 * @function pen_release(handle_t *hndl)
 * @param hndl handle to the pen
 * @return s_ok if release completed

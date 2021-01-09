@@ -96,5 +96,15 @@ namespace CanFly
         return new Extent(Math.Abs(_right - _left), Math.Abs(_bottom - _top));
       }
     }
+
+    public Point BottomRight
+    {
+      get { return new Point(_right, _bottom); }
+    }
+
+    public Point TopLeft
+    {
+      get { return new Point(_right, _top); }
+    }
   };
 }

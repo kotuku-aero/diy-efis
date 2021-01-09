@@ -1,10 +1,3 @@
-namespace CanFly.Proton
-{
-  public class HSIWidget
-  {
-    
-  }
-}
 /*
 diy-efis
 Copyright (C) 2016 Kotuku Aerospace Limited
@@ -39,468 +32,382 @@ then the original copyright notice is to be respected.
 
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
+*/
+using System;
 
-#include "../photon/widget.h"
-#include "pens.h"
-#include "spatial.h"
-
-const pen_t track_pen = { color_gray, 1, ps_dot };
-
-enum {
-  ds_course,
-  ds_heading,
-  };
-
-typedef struct _hsi_window_t {
-  uint16_t version;
-
-  int16_t direction;
-  int16_t course;
-  int16_t deviation;
-  int16_t track;
-  int16_t distance_to_waypoint;
-  int16_t time_to_waypoint;
-  int16_t wind_direction; // always true
-  int16_t magnetic_variation;
-  int16_t wind_speed;
-  char waypoint_name[17];
-  int16_t heading_bug;
-  int16_t heading;
-  color_t background_color;
-  bool draw_border;
-  handle_t  font;
-  } hsi_window_t;
-
-static result_t widget_wndproc(handle_t hwnd, const canmsg_t *data);
-
-result_t create_hsi_window(handle_t parent, memid_t key, handle_t *hwnd)
+namespace CanFly.Proton
+{
+  public sealed class HSIWidget : Widget
   {
-  result_t result;
+    private Pen track_pen = new Pen(Colors.Gray, 1, PenStyle.Dot );
 
-  // create our window
-  if (failed(result = create_child_widget(parent, key, widget_wndproc, hwnd)))
-    return result;
+    enum HSIMode {
+      ds_course,
+      ds_heading,
+    };
 
-  // create the window data.
-  hsi_window_t *wnd = (hsi_window_t *)neutron_malloc(sizeof(hsi_window_t));
-  memset(wnd, 0, sizeof(hsi_window_t));
+    private short _direction;
+    private short course;
+    private short deviation;
+    private short track;
+    private short distance_to_waypoint;
+    private short time_to_waypoint;
+    private short wind_direction; // always true
+    private short magnetic_variation;
+    private short wind_speed;
+    private string waypoint_name;
+    private short heading_bug;
+    private short heading;
+    private uint background_color;
+    private bool draw_border;
+    private Font font;
 
-  wnd->version = sizeof(hsi_window_t);
-
-  if (failed(lookup_color(key, "background-color", &wnd->background_color)))
-    wnd->background_color = color_black;
-
-  reg_get_bool(key, "draw-border", &wnd->draw_border);
-
-  if (failed(lookup_font(key, "font", &wnd->font)))
+    public HSIWidget(Widget parent, Rect bounds, ushort id, uint key)
+    : base(parent, bounds, id)
     {
-    // we always have the neo font.
-    if (failed(result = open_font("neo", 9, &wnd->font)))
-      return result;
+      if (!LookupColor(key, "background-color", out background_color))
+        background_color = Colors.Black;
+
+      TryRegGetBool(key, "draw-border", out draw_border);
+
+      if (!LookupFont(key, "font", out font))
+        OpenFont("neo", 9, out font);
+
+      CanFlyMsgSink.AddEventListener(CanFlyID.id_magnetic_heading, OnMagneticHeading);
+      CanFlyMsgSink.AddEventListener(CanFlyID.id_heading, OnHeading);
+      CanFlyMsgSink.AddEventListener(CanFlyID.id_heading_angle, OnHeadingAngle);
+      CanFlyMsgSink.AddEventListener(CanFlyID.id_deviation, OnDeviation);
+      CanFlyMsgSink.AddEventListener(CanFlyID.id_selected_course, OnSelectedCourse);
+      CanFlyMsgSink.AddEventListener(CanFlyID.id_track, OnTrack);
+      CanFlyMsgSink.AddEventListener(CanFlyID.id_wind_speed, OnWindSpeed);
+      CanFlyMsgSink.AddEventListener(CanFlyID.id_wind_direction, OnWindDirection);
+      CanFlyMsgSink.AddEventListener(CanFlyID.id_distance_to_next, OnDistanceToNext);
+      CanFlyMsgSink.AddEventListener(CanFlyID.id_magnetic_variation, OnMagneticVariation);
+      CanFlyMsgSink.AddEventListener(CanFlyID.id_estimated_time_to_next, OnEstimatedTimeToNext);
+
+      InvalidateRect();
     }
 
-  // store the parameters for the window
-  set_wnddata(*hwnd, wnd);
-
-  rect_t rect;
-  get_window_rect(*hwnd, &rect);
-  invalidate_rect(*hwnd, &rect);
-
-  return s_ok;
-  }
-
-static void update_window(handle_t hwnd, hsi_window_t *wnd)
-  {
-  rect_t wnd_rect;
-  get_window_rect(hwnd, &wnd_rect);
-
-  extent_t ex;
-  rect_extents(&wnd_rect, &ex);
-
-  point_t pt;
-  rect_t rect;
-  // fill without a border
-  rectangle(hwnd, &wnd_rect, 0, wnd->background_color, &wnd_rect);
-
-  if (wnd->draw_border)
-    round_rect(hwnd, &wnd_rect, &gray_pen, color_hollow, &wnd_rect, 12);
-
-  /////////////////////////////////////////////////////////////////////////////
-  //
-  // Draw the HSI Indicator
-
-  const gdi_dim_t mark_start = 12;
-  const gdi_dim_t center_x = ex.dx >> 1;
-  const gdi_dim_t center_y = ex.dy >> 1;
-  const gdi_dim_t window_x = ex.dx;
-  const gdi_dim_t window_y = ex.dy;
-  const gdi_dim_t border = 10;
-  const gdi_dim_t pixels_per_nm_cdi = 6;
-  const point_t median = { center_x, center_y };
-  const gdi_dim_t major_mark = mark_start + 16;
-  const gdi_dim_t minor_mark = mark_start + 8;
-  const gdi_dim_t font_x_y = 19;
-  const gdi_dim_t font_center = (font_x_y >> 1) + 1;
-  const gdi_dim_t font_ordinal = major_mark + font_center;
-
-  // start at 0
-  gdi_dim_t i = 0;
-  gdi_dim_t index;
-  for (index = -wnd->direction; i < 12; index += 30, i++)
+    private void OnEstimatedTimeToNext(CanFlyMsg e)
     {
-    while (index > 359)
-      index -= 360;
-
-    while (index < 0)
-      index += 360;
-
-    // draw the marker
-    point_t pts[2];
-
-    pts[0].x = center_x; pts[0].y = mark_start;
-    pts[1].x = center_x; pts[1].y = major_mark;
-    rotate_point(&median, &pts[0], index);
-    rotate_point(&median, &pts[1], index);
-
-    polyline(hwnd, &wnd_rect, &white_pen, 2, pts);
-
-    bool do_minor_mark = false;
-    int16_t minor_index;
-    for (minor_index = 0; minor_index < 30; minor_index += 5)
+      short value = e.GetInt16();
+      if (time_to_waypoint != value)
       {
-      pts[0].x = center_x; pts[0].y = mark_start;
-      pts[1].x = center_x; pts[1].y = do_minor_mark ? minor_mark : major_mark;
+        time_to_waypoint = value;
+        InvalidateRect();
+      }
+    }
 
-      rotate_point(&median, &pts[0], index + minor_index);
-      rotate_point(&median, &pts[1], index + minor_index);
+    private void OnMagneticVariation(CanFlyMsg e)
+    {
+      float v = e.GetFloat();
+      short value = (short)RadiansToDegrees(v);
+      if (magnetic_variation != value)
+      {
+        magnetic_variation = value;
+        InvalidateRect();
+      }
+    }
 
-      polyline(hwnd, &wnd_rect, &white_pen, 2, pts);
+    private void OnDistanceToNext(CanFlyMsg e)
+    {
+      float v = e.GetFloat();
+      
+      short value = (short)MetersToNM(v);
+      if (distance_to_waypoint != value)
+      {
+        distance_to_waypoint = value;
+        InvalidateRect();
+      }
+    }
 
-      do_minor_mark = !do_minor_mark;
+    private void OnWindDirection(CanFlyMsg e)
+    {
+      float v = e.GetFloat();
+      short value = (short)RadiansToDegrees(v);
+      if (wind_direction != value)
+      {
+        wind_direction = value;
+        InvalidateRect();
+      }
+    }
+
+    private void OnWindSpeed(CanFlyMsg e)
+    {
+      float v = e.GetFloat();
+      short value = (short)MetersPerSecondToKnots(v);
+      if (wind_speed != value)
+      {
+        wind_speed = value;
+        InvalidateRect();
+      }
+    }
+
+    private void OnTrack(CanFlyMsg e)
+    {
+      short value = e.GetInt16();
+      if (track != value)
+      {
+        track = value;
+        InvalidateRect();
+      }
+    }
+
+    private void OnSelectedCourse(CanFlyMsg e)
+    {
+      short value = e.GetInt16();
+      if (course != value)
+      {
+        course = value;
+        InvalidateRect();
+      }
+    }
+
+    private void OnDeviation(CanFlyMsg e)
+    {
+      short value = e.GetInt16();
+      if (deviation != value)
+      {
+        deviation = value;
+        // the deviation is +/- * 10
+        InvalidateRect();
+      }
+    }
+
+    private void OnHeadingAngle(CanFlyMsg e)
+    {
+      short value = e.GetInt16();
+      if (heading != value)
+      {
+        heading = value;
+        InvalidateRect();
+      }
+    }
+
+    private void OnHeading(CanFlyMsg e)
+    {
+      short value = e.GetInt16();
+      if (heading_bug != value)
+      {
+        heading_bug = value;
+        InvalidateRect();
+      }
+    }
+
+    private void OnMagneticHeading(CanFlyMsg e)
+    {
+      short direction = e.GetInt16();
+
+      while (direction < 0)
+        direction += 360;
+      while (direction > 359)
+        direction -= 360;
+
+      if (_direction != direction)
+      {
+        _direction = direction;
+        InvalidateRect();
+      }
+    }
+
+    protected override void OnPaint()
+    {
+      Rect wnd_rect = WindowRect;
+      Extent ex = wnd_rect.Extent;
+
+      Rectangle(null, background_color, WindowRect);
+
+      if (draw_border)
+        RoundRect(Pens.GrayPen, Colors.Hollow, WindowRect, 12);
+
+      Point pt;
+      Rect rect;
+
+      /////////////////////////////////////////////////////////////////////////////
+      //
+      // Draw the HSI Indicator
+
+      int mark_start = 12;
+      int center_x = ex.Dx >> 1;
+      int center_y = ex.Dy >> 1;
+      int window_x = ex.Dx;
+      int window_y = ex.Dy;
+      int border = 10;
+      int pixels_per_nm_cdi = 6;
+      Point median = new Point( center_x, center_y);
+      int major_mark = mark_start + 16;
+      int minor_mark = mark_start + 8;
+      int font_x_y = 19;
+      int font_center = (font_x_y >> 1) + 1;
+      int font_ordinal = major_mark + font_center;
+
+      // start at 0
+      int i = 0;
+      int index;
+      for (index = -_direction; i < 12; index += 30, i++)
+      {
+        while (index > 359)
+          index -= 360;
+
+        while (index < 0)
+          index += 360;
+
+        // draw the marker
+        Polyline(Pens.WhitePen, 
+          RotatePoint(median, new Point(center_x, mark_start), index), 
+          RotatePoint(median, new Point(center_x, major_mark), index));
+
+        bool do_minor_mark = false;
+        short minor_index;
+        for (minor_index = 0; minor_index < 30; minor_index += 5)
+        {
+          Polyline(Pens.WhitePen,
+            RotatePoint(median, new Point(center_x, mark_start), index + minor_index),
+            RotatePoint(median, new Point(center_x, do_minor_mark ? minor_mark : major_mark), index + minor_index));
+
+          do_minor_mark = !do_minor_mark;
+        }
+
+        // we now draw the text onto the canvas.  The text has a 23x23 pixel
+        // block so the center is 12, 12.
+        Point fontPt = RotatePoint(median, new Point(center_x, font_ordinal), (index < 0) ? index + 360 : index);
+
+        DrawText(font, Colors.White, Colors.Black, i.ToString(),
+          new Point(fontPt.X - font_center, fontPt.Y - font_center));
       }
 
-    // we now draw the text onto the canvas.  The text has a 23x23 pixel
-    // block so the center is 12, 12.
-    pts[0].x = center_x; pts[0].y = font_ordinal;
-    int16_t rotn = (index < 0) ? index + 360 : index;
-    rotate_point(&median, &pts[0], rotn);
+      ///////////////////////////////////////////////////////////////////////////
+      // Draw the Track
 
-    draw_text(hwnd, &wnd_rect, wnd->font, color_white, color_black,
-      (char *)&i, 1,
-      make_point(pts[0].x - font_center, pts[0].y - font_center, &pt),
-      0, 0, 0);
+      int rotation = track - _direction;
+
+      // the marker is a dashed line
+      Polygon(Pens.GrayPen, Colors.Hollow,
+        RotatePoint(median, new Point(center_x, center_y - 88), rotation),
+        RotatePoint(median, new Point(center_x - 7, center_y - 95), rotation),
+        RotatePoint(median, new Point(center_x + 7, center_y - 95), rotation),
+        RotatePoint(median, new Point(center_x, center_y - 88), rotation));
+
+      Polyline(track_pen,
+        RotatePoint(median, new Point(center_x, center_y - 88), rotation),
+        RotatePoint(median, new Point(median.X, median.Y), rotation));
+
+      ///////////////////////////////////////////////////////////////////////////
+      // Draw the CDI
+
+      rotation = course - _direction;
+
+      int dist;
+      for (dist = -10; dist < 11; dist += 2)
+      {
+        if (dist == 0)
+          continue;
+
+        Polyline(Pens.GreenPen3,
+          RotatePoint(median, new Point(center_x + (pixels_per_nm_cdi * dist), center_y - 5), rotation),
+          RotatePoint(median, new Point(center_x + (pixels_per_nm_cdi * dist), center_y + 5), rotation));
+      }
+
+      //RotatePoint(median, new Point(), rotation)
+
+      // draw the CDI Marker head next
+      Polygon(null, Colors.Green,
+        RotatePoint(median, new Point(center_x, center_y - 97), rotation),
+        RotatePoint(median, new Point(center_x - 6, center_y - 88), rotation),
+        RotatePoint(median, new Point(center_x + 6, center_y - 88), rotation),
+        RotatePoint(median, new Point(center_x, center_y - 97), rotation));
+
+      // we now convert the deviation to pixels.
+      // 1 degree = 24 pixels
+      double cdi_var = pixels_per_nm_cdi * ((double)deviation / 10);
+
+      int cdi = (int)Math.Max(-66, Math.Min(66, Math.Round(cdi_var)));
+
+      Polyline(Pens.GreenPen3,
+        RotatePoint(median, new Point(center_x, center_y - 98), rotation),
+        RotatePoint(median, new Point(center_x, center_y - 50), rotation));
+
+      Polyline(Pens.GreenPen3,
+        RotatePoint(median, new Point(center_x, center_y + 50), rotation),
+        RotatePoint(median, new Point(center_x, center_y + 98), rotation));
+
+      Polyline(Pens.GreenPen3,
+        RotatePoint(median, new Point(center_x + cdi, center_y - 48), rotation),
+        RotatePoint(median, new Point(center_x + cdi, center_y + 48), rotation));
+
+      /////////////////////////////////////////////////////////////////////////////
+      //	Draw the heading bug.
+
+      int hdg = heading - _direction;
+
+      Polyline(Pens.MagentaPen,
+        RotatePoint(median, new Point(center_x - 15, 3), rotation),
+        RotatePoint(median, new Point(center_x - 5, 3), rotation),
+        RotatePoint(median, new Point(center_x, 10), rotation),
+        RotatePoint(median, new Point(center_x + 5, 3), rotation),
+        RotatePoint(median, new Point(center_x + 15, 3), rotation),
+        RotatePoint(median, new Point(center_x + 15, 12), rotation),
+        RotatePoint(median, new Point(center_x - 15, 12), rotation),
+        RotatePoint(median, new Point(center_x - 15, 3), rotation));
+
+      Polygon(Pens.WhitePen, Colors.White,
+        new Point(center_x - 5, 0),
+        new Point(center_x + 5, 0),
+        new Point(center_x, 10),
+        new Point(center_x - 5, 0));
+
+      /////////////////////////////////////////////////////////////////////////////
+      // Draw the wind direction indicator.
+      // it is in the top left of the HSI and has an arrow that is
+      // relative to the magnetic heading of the aircraft and the
+      // speed/magnetic heading in the form deg/speed so
+      // so for a wind of 15 knots at 50 degrees magnetic we would
+      // show 050/15.  If the aircraft heading is 240 degrees magnetic we
+      // would see a wind vector on the tail of 40 degrees toward the aircraft
+      // the wind direction is shown as a yellow triangle around the HSI indicator
+      // the text allows for 3 characters with an maximum width of 23 pixels each
+      // so the allowance is 69 by 64 pixels
+
+      int relative_wind = _direction + magnetic_variation - _direction;
+      while (relative_wind < 0)
+        relative_wind += 360;
+
+      // draw the wind first
+      Polyline(Pens.YellowPen,
+        RotatePoint(median, new Point(center_x - 15, 2), relative_wind),
+        RotatePoint(median, new Point(center_x + 15, 2), relative_wind),
+        RotatePoint(median, new Point(center_x, 12), relative_wind),
+        RotatePoint(median, new Point(center_x - 15, 2), relative_wind));
+
+      // now the text in upper left
+
+      string msg = string.Format("{0:3d", _direction + magnetic_variation);
+
+      Extent pixels = TextExtent(font, msg);
+
+      DrawText(font, Colors.Yellow, Colors.Hollow, msg, new Point(25 - (pixels.Dx >> 1), 2));
+
+      msg = wind_speed.ToString();
+      pixels = TextExtent(font, msg);
+
+      DrawText(font, Colors.Yellow, Colors.Hollow, msg, new Point(25 - (pixels.Dx >> 1), 13));
+
+      /////////////////////////////////////////////////////////////////////////////
+      // Draw the estimated time to waypoint.
+      // drawn in top right as distance/time
+      msg = distance_to_waypoint.ToString();
+      pixels = TextExtent(font, msg);
+      DrawText(font, Colors.Yellow, Colors.Hollow, msg, new Point(window_x - 25 - (pixels.Dx >> 1), 2));
+
+      msg = string.Format("{0:2d}:{1:2d}", time_to_waypoint / 60, time_to_waypoint % 60);
+      pixels = TextExtent(font, msg);
+      DrawText(font, Colors.Yellow, Colors.Hollow, msg, new Point(window_x - 25 - (pixels.Dx >> 1), 13));
+
+      if (waypoint_name != null)
+      {
+        pixels = TextExtent(font, waypoint_name);
+        DrawText(font, Colors.Yellow, Colors.Hollow, waypoint_name, new Point(window_x - 25 - (pixels.Dx >> 1), 24));
+      }
     }
-
-  ///////////////////////////////////////////////////////////////////////////
-  // Draw the Track
-
-  int rotation = wnd->track - wnd->direction;
-
-  // the marker is a dashed line
-  point_t track_marker[4] = {
-    { center_x, center_y - 88 },
-    { center_x - 7, center_y - 95 },
-    { center_x + 7, center_y - 95 },
-    { center_x, center_y - 88 }
-    };
-
-  for (i = 0; i < 4; i++)
-    rotate_point(&median, &track_marker[i], rotation);
-
-  polygon(hwnd, &wnd_rect, &gray_pen, color_hollow, 4, track_marker);
-
-  point_t track_line[2] = {
-    { center_x, center_y - 88 },
-    { median.x, median.y }
-    };
-
-  rotate_point(&median, &track_line[0], rotation);
-
-  polyline(hwnd, &wnd_rect, &track_pen, 2, track_line);
-
-  ///////////////////////////////////////////////////////////////////////////
-  // Draw the CDI
-
-  rotation = wnd->course - wnd->direction;
-
-  gdi_dim_t dist;
-  for (dist = -10; dist < 11; dist += 2)
-    {
-    if (dist == 0)
-      continue;
-
-    point_t pts[2] = {
-      { center_x + (pixels_per_nm_cdi * dist), center_y - 5 },
-      { center_x + (pixels_per_nm_cdi * dist), center_y + 5 }
-      };
-
-    rotate_point(&median, &pts[0], rotation);
-    rotate_point(&median, &pts[1], rotation);
-
-    polyline(hwnd, &wnd_rect, &green_pen_3, 2, pts);
-    }
-
-  // draw the CDI Marker head next
-  point_t cdi_pts[4] = {
-    { center_x, center_y - 97 },
-    { center_x - 6, center_y - 88 },
-    { center_x + 6, center_y - 88 },
-    { center_x, center_y - 97 }
-    };
-
-  for (i = 0; i < 4; i++)
-    rotate_point(&median, &cdi_pts[i], rotation);
-
-  polygon(hwnd, &wnd_rect, 0, color_green, 4, cdi_pts);
-
-  // we now convert the deviation to pixels.
-  // 1 degree = 24 pixels
-  double cdi_var = pixels_per_nm_cdi *((double)wnd->deviation / 10);
-
-  gdi_dim_t cdi = (gdi_dim_t) max(-66, min(66, roundf(cdi_var)));
-
-  point_t pts[4];
-  pts[0].x = center_x; pts[0].y = center_y - 98;
-  pts[1].x = center_x; pts[1].y = center_y - 50;
-
-  rotate_point(&median, &pts[0], rotation);
-  rotate_point(&median, &pts[1], rotation);
-
-  polyline(hwnd, &wnd_rect, &green_pen_3, 2, pts);
-
-  pts[0].x = center_x; pts[0].y = center_y + 50;
-  pts[1].x = center_x; pts[1].y = center_y + 98;
-
-  rotate_point(&median, &pts[0], rotation);
-  rotate_point(&median, &pts[1], rotation);
-
-  polyline(hwnd, &wnd_rect, &green_pen_3, 2, pts);
-
-  pts[0].x = center_x + cdi; pts[0].y = center_y - 48;
-  pts[1].x = pts[0].x; pts[1].y = center_y + 48;
-
-  rotate_point(&median, &pts[0], rotation);
-  rotate_point(&median, &pts[1], rotation);
-
-  polyline(hwnd, &wnd_rect, &green_pen_3, 2, pts);
-
-  /////////////////////////////////////////////////////////////////////////////
-  //	Draw the heading bug.
-
-  int hdg = wnd->heading - wnd->direction;
-
-  point_t heading_points[8] = {
-    { center_x - 15, 3 },
-    { center_x - 5, 3 },
-    { center_x, 10 },
-    { center_x + 5, 3 },
-    { center_x + 15, 3 },
-    { center_x + 15, 12 },
-    { center_x - 15, 12 },
-    { center_x - 15, 3 }
-    };
-
-  for (i = 0; i < 8; i++)
-    rotate_point(&median, &heading_points[i], hdg);
-
-  polyline(hwnd, &wnd_rect, &magenta_pen, 8, heading_points);
-
-  heading_points[0].x = center_x - 5; heading_points[0].y = 0;
-  heading_points[1].x = center_x + 5; heading_points[1].y = 0;
-  heading_points[2].x = center_x; heading_points[2].y = 10;
-  heading_points[3].x = center_x - 5; heading_points[3].y = 0;
-
-  polygon(hwnd, &wnd_rect, &white_pen, color_white, 4, heading_points);
-
-  /////////////////////////////////////////////////////////////////////////////
-  // Draw the wind direction indicator.
-  // it is in the top left of the HSI and has an arrow that is
-  // relative to the magnetic heading of the aircraft and the
-  // speed/magnetic heading in the form deg/speed so
-  // so for a wind of 15 knots at 50 degrees magnetic we would
-  // show 050/15.  If the aircraft heading is 240 degrees magnetic we
-  // would see a wind vector on the tail of 40 degrees toward the aircraft
-  // the wind direction is shown as a yellow triangle around the HSI indicator
-  // the text allows for 3 characters with an maximum width of 23 pixels each
-  // so the allowance is 69 by 64 pixels
-
-  int16_t relative_wind = wnd->direction + wnd->magnetic_variation - wnd->direction;
-  while (relative_wind < 0)
-    relative_wind += 360;
-
-  // draw the wind first
-  point_t wind_bug[4] =
-    {
-    { center_x - 15, 2 },
-    { center_x + 15, 2 },
-    { center_x, 12 },
-    { center_x - 15, 2 }
-    };
-
-  for (i = 0; i < 4; i++)
-    rotate_point(&median, &wind_bug[i], relative_wind);
-
-  polyline(hwnd, &wnd_rect, &yellow_pen, 4, wind_bug);
-
-  // now the text in upper left
-
-  char msg[32];
-  sprintf(msg, "%03.3d", wnd->direction + wnd->magnetic_variation);
-  size_t length = strlen(msg);
-
-  extent_t pixels;
-  text_extent(wnd, wnd->font, msg, length, &pixels);
-  draw_text(hwnd, &wnd_rect, wnd->font, color_yellow, color_hollow,
-    msg, length, make_point(25 - (pixels.dx >> 1), 2, &pt), 0, 0, 0);
-
-  sprintf(msg, "%d", wnd->wind_speed);
-  length = strlen(msg);
-  text_extent(wnd, wnd->font, msg, length, &pixels);
-  draw_text(hwnd, &wnd_rect, wnd->font, color_yellow, color_hollow,
-    msg, length, make_point(25 - (pixels.dx >> 1), 13, &pt), 0, 0, 0);
-
-  /////////////////////////////////////////////////////////////////////////////
-  // Draw the estimated time to waypoint.
-  // drawn in top right as distance/time
-  sprintf(msg, "%d", wnd->distance_to_waypoint);
-  length = strlen(msg);
-  text_extent(wnd, wnd->font, msg, length, &pixels);
-  draw_text(hwnd, &wnd_rect, wnd->font, color_yellow, color_hollow,
-    msg, length, make_point(window_x - 25 - (pixels.dx >> 1), 2, &pt), 0, 0, 0);
-
-  sprintf(msg, "%02.2d:%02.2d", wnd->time_to_waypoint / 60, wnd->time_to_waypoint % 60);
-  length = strlen(msg);
-  text_extent(wnd, wnd->font, msg, length, &pixels);
-  draw_text(hwnd, &wnd_rect, wnd->font, color_yellow, color_hollow,
-    msg, length, make_point(window_x - 25 - (pixels.dx >> 1), 13, &pt), 0, 0, 0);
-
-  sprintf(msg, "%s", wnd->waypoint_name);
-  length = strlen(msg);
-  text_extent(wnd, wnd->font, msg, length, &pixels);
-  draw_text(hwnd, &wnd_rect, wnd->font, color_yellow, color_hollow,
-    msg, length, make_point(window_x - 25 - (pixels.dx >> 1), 24, &pt), 0, 0, 0);
   }
-
-
-result_t widget_wndproc(handle_t hwnd, const canmsg_t *msg)
-  {
-  bool changed = false;
-  hsi_window_t *wnd;
-  get_wnddata(hwnd, (void **)&wnd);
-
-  switch (get_can_id(msg))
-    {
-    case id_magnetic_heading:
-    {
-    int16_t direction;
-    get_param_int16(msg, 0, &direction);
-
-    while (direction < 0)
-      direction += 360;
-    while (direction > 359)
-      direction -= 360;
-
-    changed = wnd->direction != direction;
-    wnd->direction = direction;
-    }
-    break;
-    case id_heading:
-    {
-    int16_t value;
-    get_param_int16(msg, 0, &value);
-    changed = wnd->heading_bug != value;
-    wnd->heading_bug = value;
-    }
-    break;
-    case id_heading_angle:
-    {
-    int16_t value;
-    get_param_int16(msg, 0, &value);
-    changed = wnd->heading != value;
-    wnd->heading = value;
-    }
-    break;
-    case id_deviation:
-    {
-    int16_t value;
-    get_param_int16(msg, 0, &value);
-    changed = wnd->deviation != value;
-    wnd->deviation = value;
-    // the deviation is +/- * 10
-    }
-    break;
-    case id_selected_course:
-    {
-    int16_t value;
-    get_param_int16(msg, 0, &value);
-    changed = wnd->course != value;
-    wnd->course = value;
-    }
-    break;
-    case id_track:
-    {
-    int16_t value;
-    get_param_int16(msg, 0, &value);
-    changed = wnd->track != value;
-    wnd->track = value;
-    }
-    break;
-    case id_wind_speed:
-    {
-    float v;
-    get_param_float(msg, &v);
-    int16_t value = (int16_t)meters_per_second_to_knots(v);
-    changed = wnd->wind_speed != value;
-    wnd->wind_speed = value;
-    }
-    break;
-    case id_wind_direction:
-    {
-    float v;
-    get_param_float(msg, &v);
-    int16_t value = (int16_t)radians_to_degrees(v);
-    changed = wnd->wind_direction != value;
-    wnd->wind_direction != value;
-    }
-    break;
-    case id_distance_to_next:
-    {
-    float v;
-    get_param_float(msg, &v);
-    int16_t value = (int16_t)meters_to_nm(v);
-    changed = wnd->distance_to_waypoint != value;
-    wnd->distance_to_waypoint = value;
-    }
-    break;
-    case id_magnetic_variation:
-    {
-    float v;
-    get_param_float(msg, &v);
-    int16_t value = (int16_t)radians_to_degrees(v);
-    changed = wnd->magnetic_variation != value;
-    wnd->magnetic_variation = value;
-    }
-    break;
-    case id_estimated_time_to_next:
-    {
-    int16_t value;
-    get_param_int16(msg, 0, &value);
-    changed = wnd->time_to_waypoint != value;
-    wnd->time_to_waypoint = value;
-    }
-    break;
-    case id_paint:
-      begin_paint(hwnd);
-      update_window(hwnd, wnd);
-      end_paint(hwnd);
-      break;
-    default:
-      return defwndproc(hwnd, msg);
-    }
-
-  if (changed)
-    invalidate_rect(hwnd, 0);
-
-  return s_ok;
-  }
-*/
+}

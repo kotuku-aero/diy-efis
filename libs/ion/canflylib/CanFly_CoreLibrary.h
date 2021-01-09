@@ -9,9 +9,9 @@
 #ifndef _CANFLY_CORELIBRARY_H_
 #define _CANFLY_CORELIBRARY_H_
 
-#include "../../nano/CLR/Include/nanoCLR_Interop.h"
-#include "../../nano/CLR/Include/nanoCLR_Runtime.h"
-#include "../../nano/CLR/Include/nanoPackStruct.h"
+#include <nanoCLR_Interop.h>
+#include <nanoCLR_Runtime.h>
+#include <nanoPackStruct.h>
 
 typedef enum __nfpack DataType
 {
@@ -536,6 +536,9 @@ struct Library_CanFly_CoreLibrary_CanFly_Photon
     NANOCLR_NATIVE_DECLARE(GetOrientation___STATIC__U2__U4);
     NANOCLR_NATIVE_DECLARE(SetOrientation___STATIC__VOID__U4__U2);
     NANOCLR_NATIVE_DECLARE(CreatePen___STATIC__U4__U4__U2__U2);
+    NANOCLR_NATIVE_DECLARE(GetPenColor___STATIC__U4__U4);
+    NANOCLR_NATIVE_DECLARE(GetPenWidth___STATIC__U2__U4);
+    NANOCLR_NATIVE_DECLARE(GetPenStyle___STATIC__U2__U4);
     NANOCLR_NATIVE_DECLARE(DisposePen___STATIC__VOID__U4);
     NANOCLR_NATIVE_DECLARE(Polyline___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4);
     NANOCLR_NATIVE_DECLARE(Ellipse___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__I4__I4__I4__I4);

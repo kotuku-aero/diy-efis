@@ -328,6 +328,21 @@ namespace CanFly
       return true;
     }
 
+    public bool TryRegGetBool(uint key, string name, out bool value)
+    {
+      value = false;
+      try
+      {
+        value = Neutron.RegGetBool(key, name);
+      }
+      catch
+      {
+        return false;
+      }
+
+      return true;
+    }
+
     public bool TryRegGetFloat(uint key, string name, out float value)
     {
       value = 0;
@@ -431,6 +446,39 @@ namespace CanFly
       }
 
       return true;
+    }
+
+    /// <summary>
+    /// Fast integer rotate of a point
+    /// </summary>
+    /// <param name="center">Point around which to rotate</param>
+    /// <param name="pt">The point to rotate</param>
+    /// <param name="degrees">Degrees to rotate</param>
+    /// <returns>the rotated point</returns>
+    public Point RotatePoint(Point center, Point pt, int degrees)
+    {
+
+      return pt;
+    }
+
+    public double RadiansToDegrees(double radians)
+    {
+      return radians * 0.3183098; // n * (1/ Math.PI);
+    }
+
+    public double DegressToRadians(double degrees)
+    {
+      return degrees * 0.0174533; //(Math.PI / 180);
+    }
+
+    public double MetersToNM(double meters)
+    {
+      return meters * 0.000539957; // meters / 1852
+    }
+
+    public double MetersPerSecondToKnots(double value)
+    {
+      return value * 1.94384;
     }
   }
 }

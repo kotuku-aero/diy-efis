@@ -1,10 +1,3 @@
-namespace CanFly.Proton
-{
-  public class AnnunciatorWidget
-  {
-    
-  }
-}
 /*
 diy-efis
 Copyright (C) 2016 Kotuku Aerospace Limited
@@ -39,259 +32,171 @@ then the original copyright notice is to be respected.
 
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
-
-#include "../photon/widget.h"
-#include "pens.h"
-
-static const point_t clock_pt = { 1, 10 };
-static const point_t hrs_pt = { 1, 55 };
-static const point_t qnh_pt = { 1, 100 };
-static const point_t oat_pt = { 1, 145 };
-static const point_t cas_pt = { 1, 190 };
-
-static const char *hours_value = "TTS";
-static const char *qnh_value = "QNH";
-
-typedef struct _annunciator_window_t {
-  size_t version;
-
-  bool draw_border;
-  uint32_t hours; // hobbs hours, stored in AHRS as hours * 100
-  uint16_t qnh; // qnh, stored in AHRS
-  uint16_t clock;
-  int16_t oat;
-  uint16_t cas;
-
-  handle_t  small_font;
-  handle_t  large_font;
-  } annunciator_window_t;
-
-static void draw_annunciator(handle_t hwnd, const rect_t *wnd_rect, annunciator_window_t *wnd, const point_t *pt, const char *label, const char *value);
-
-static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *can_msg)
-  {
-  bool changed = false;
-  annunciator_window_t *wnd = (annunciator_window_t *)proxy->parg;
-
-  begin_paint(hwnd);
-
-  rect_t wnd_rect;
-  get_window_rect(hwnd, &wnd_rect);
-
-  extent_t ex;
-  rect_extents(&wnd_rect, &ex);
-
-  rect_t rect;
-  if (wnd->draw_border)
-    round_rect(hwnd, &wnd_rect, &white_pen, color_hollow, &wnd_rect, 12);
-  char msg[10];
-
-  sprintf(msg, "%02.2d:%02.2d", wnd->clock / 60, wnd->clock % 60);
-  draw_annunciator(hwnd, &wnd_rect, wnd, &clock_pt, "UTC", msg);
-
-  double hrs = ((double)wnd->hours) / 100;
-
-  sprintf(msg, "%06.1f", wnd->hours);
-  draw_annunciator(hwnd, &wnd_rect, wnd, &hrs_pt, "Hrs", msg);
-
-  sprintf(msg, "%d", wnd->qnh);
-  draw_annunciator(hwnd, &wnd_rect, wnd, &qnh_pt, "QNH", msg);
-
-  sprintf(msg, "%d", wnd->oat);
-  draw_annunciator(hwnd, &wnd_rect, wnd, &oat_pt, "OAT", msg);
-
-  sprintf(msg, "%d", wnd->cas);
-  draw_annunciator(hwnd, &wnd_rect, wnd, &cas_pt, "CAS", msg);
-
-  end_paint(hwnd);
-  return s_ok;
-  }
-
-static result_t on_def_utc(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
-  {
-  bool changed = false;
-  annunciator_window_t *wnd = (annunciator_window_t *)proxy->parg;
-
-  uint8_t v;
-  uint16_t minutes;
-  get_param_uint8(msg, 0, &v);
-  minutes = v * 60;
-  get_param_uint8(msg, 1, &v);
-  minutes += v;
-
-  changed = wnd->clock != minutes;
-  wnd->clock = minutes;
-
-  if (changed)
-    invalidate_rect(hwnd, 0);
-
-  return s_ok;
-  }
-
-static result_t on_qnh(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
-  {
-  bool changed = false;
-  annunciator_window_t *wnd = (annunciator_window_t *)proxy->parg;
-
-  uint16_t value;
-  get_param_uint16(msg, 0, &value);
-  changed = wnd->qnh != value;
-  wnd->qnh = value;
-
-  if (changed)
-    invalidate_rect(hwnd, 0);
-
-  return s_ok;
-  }
-
-static result_t on_true_airspeed(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
-  {
-  bool changed = false;
-  annunciator_window_t *wnd = (annunciator_window_t *)proxy->parg;
-
-  uint16_t value;
-  get_param_uint16(msg, 0, &value);
-  changed = wnd->cas != value;
-  wnd->cas = value;
-
-  if (changed)
-    invalidate_rect(hwnd, 0);
-
-  return s_ok;
-  }
-
-static result_t on_outside_air_temperature(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
-  {
-  bool changed = false;
-  annunciator_window_t *wnd = (annunciator_window_t *)proxy->parg;
-
-  int16_t value;
-  get_param_int16(msg, 0, &value);
-  changed = wnd->oat != value;
-  wnd->oat = value;
-
-  if (changed)
-    invalidate_rect(hwnd, 0);
-
-  return s_ok;
-  }
-
-static result_t on_air_time(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
-  {
-  bool changed = false;
-  annunciator_window_t *wnd = (annunciator_window_t *)proxy->parg;
-
-  uint32_t value;
-  get_param_uint32(msg, &value);
-  changed = wnd->hours != value;
-  wnd->hours = value;
-
-  if (changed)
-    invalidate_rect(hwnd, 0);
-
-  return s_ok;
-  }
-
-static void draw_annunciator(handle_t hwnd,
-  const rect_t *wnd_rect,
-  annunciator_window_t *wnd,
-  const point_t *pt,
-  const char *label,
-  const char *value)
-  {
-  // calculate the size of the label
-  rect_t clip_rect = { pt->x, pt->y, pt->x + 75, pt->y + 50 };
- 
-  size_t text_len = strlen(label);
-
-  rect_t rect;
-
-  extent_t label_size;
-  text_extent(hwnd, wnd->small_font, label, text_len, &label_size);
-
-  gdi_dim_t width = rect_width(wnd_rect);
-  gdi_dim_t text_start = pt->x + width - (label_size.dx + 3);
-  gdi_dim_t right = pt->x + width;
-
-  rectangle(hwnd, wnd_rect, 0, color_gray, make_rect(pt->x, pt->y + 1, right, pt->y + 4, &rect));
-  rectangle(hwnd, wnd_rect, 0, color_gray, make_rect(pt->x, pt->y + 4, pt->x + 3, pt->y + 28, &rect));
-  rectangle(hwnd, wnd_rect, 0, color_gray, make_rect(right - 3, pt->y + 4, right, pt->y + 45, &rect));
-  rectangle(hwnd, wnd_rect, 0, color_gray, make_rect(pt->x, pt->y + 28, right, pt->y + 31, &rect));
-  rectangle(hwnd, wnd_rect, 0, color_gray, make_rect(text_start - 6, pt->y + 31, right, pt->y + 45, &rect));
-
-  rectangle(hwnd, wnd_rect, 0, color_black, make_rect(pt->x + 3, pt->y + 4, right - 3, pt->y + 28, &rect));
-
-  point_t label_origin = { text_start, pt->y + 30 };
-
-  make_rect(text_start, pt->y + 30,
-    text_start + label_size.dx,
-    pt->y + 30 + label_size.dy,
-    &rect);
-
-  draw_text(hwnd, wnd_rect, wnd->small_font, color_white, color_black,
-    label, 0, &label_origin, &rect, 0, 0);
-
-  extent_t text_size;
-  text_extent(hwnd, wnd->large_font, value, 0, &text_size);
-
-  // center of the text is 37, 16
-  point_t origin = {
-    pt->x + 37 - (text_size.dx >> 1),
-    pt->y + 16 - (text_size.dy >> 1)
-    };
-
-  make_rect_pt(&origin, &text_size, &rect);
-
-  draw_text(hwnd, wnd_rect, wnd->large_font, color_white, color_hollow,
-    value, 0, &origin, &rect, 0, 0);
-  }
-
-result_t create_annunciator_window(handle_t parent, memid_t key, handle_t *hwnd)
-  {
-  result_t result;
-
-  // create our window
-  if (failed(result = create_child_widget(parent, key, defwndproc, hwnd)))
-    return result;
-
-  // create the window data.
-  annunciator_window_t *wnd = (annunciator_window_t *)neutron_malloc(sizeof(annunciator_window_t));
-  memset(wnd, 0, sizeof(annunciator_window_t));
-
-  wnd->version = sizeof(annunciator_window_t);
-
-
-  reg_get_bool(key, "draw-border", &wnd->draw_border);
-
-  // store the parameters for the window
-  set_wnddata(*hwnd, wnd);
-
-  rect_t rect;
-  get_window_rect(*hwnd, &rect);
-  invalidate_rect(*hwnd, &rect);
-
-  // get the small font
-  if (failed(lookup_font(key, "small-font", wnd->small_font)))
-    {
-    // we always have the neo font.
-    if (failed(result = open_font("neo", 9, &wnd->small_font)))
-      return result;
-    }
-
-  if (failed(lookup_font(key, "large-font", wnd->large_font)))
-    {
-    // we always have the neo font.
-    if (failed(result = open_font("neo", 15, &wnd->large_font)))
-      return result;
-    }
-
-  add_event(*hwnd, id_paint, wnd, 0, on_paint);
-  add_event(*hwnd, id_def_utc, wnd, 0, on_def_utc);
-  add_event(*hwnd, id_qnh, wnd, 0, on_qnh);
-  add_event(*hwnd, id_true_airspeed, wnd, 0, on_true_airspeed);
-  add_event(*hwnd, id_outside_air_temperature, wnd, 0, on_outside_air_temperature);
-  add_event(*hwnd, id_air_time, wnd, 0, on_air_time);
-
-  return s_ok;
-  }
 */
+using System;
+
+namespace CanFly.Proton
+{
+  public sealed class AnnunciatorWidget : Widget
+  {
+    private bool draw_border;
+    private uint hours; // hobbs hours, stored in AHRS as hours * 100
+    private ushort qnh; // qnh, stored in AHRS
+    private ushort clock;
+    private short oat;
+    private ushort cas;
+
+    private Font small_font;
+    private Font large_font;
+
+    private Point clock_pt = new Point(1, 10 );
+    private Point hrs_pt = new Point(1, 55 );
+    private Point qnh_pt = new Point(1, 100 );
+    private Point oat_pt = new Point(1, 145 );
+    private Point cas_pt = new Point(1, 190 );
+
+    private readonly string hours_value = "TTS";
+    private readonly string qnh_value = "QNH";
+
+    public AnnunciatorWidget(Widget parent, Rect bounds, ushort id, uint key)
+  : base(parent, bounds, id)
+    {
+      if (!TryRegGetBool(key, "draw-border", out draw_border))
+        draw_border = true;
+
+      if (!LookupFont(key, "small-font", out small_font))
+      {
+        // we always have the neo font.
+        OpenFont("neo", 9, out small_font);
+      }
+
+      if (!LookupFont(key, "large-font", out large_font))
+      {
+        // we always have the neo font.
+        OpenFont("neo", 15, out large_font);
+      }
+
+      CanFlyMsgSink.AddEventListener(CanFlyID.id_def_utc, OnDefUtc);
+      CanFlyMsgSink.AddEventListener(CanFlyID.id_qnh, OnQnh);
+      CanFlyMsgSink.AddEventListener(CanFlyID.id_true_airspeed, OnTrueAirspeed);
+      CanFlyMsgSink.AddEventListener(CanFlyID.id_outside_air_temperature, OnOutsideAirTemperature);
+      CanFlyMsgSink.AddEventListener(CanFlyID.id_air_time, OnAirTime);
+    }
+
+    private void OnAirTime(CanFlyMsg e)
+    {
+      uint value = e.GetUInt32();
+
+      if(hours != value)
+      {
+        hours = value;
+        InvalidateRect();
+      }
+    }
+
+    private void OnOutsideAirTemperature(CanFlyMsg e)
+    {
+      short value = e.GetInt16();
+
+      if(oat != value)
+      {
+        oat = value;
+        InvalidateRect();
+      }
+    }
+
+    private void OnTrueAirspeed(CanFlyMsg e)
+    {
+      ushort value = e.GetUInt16();
+      if(cas != value)
+      {
+        cas = value;
+        InvalidateRect();
+      }
+    }
+
+    private void OnQnh(CanFlyMsg e)
+    {
+      ushort value = e.GetUInt16();
+
+      if(qnh != value)
+      {
+        qnh = value;
+        InvalidateRect();
+      }
+    }
+
+    private void OnDefUtc(CanFlyMsg e)
+    {
+      byte[] values = e.GetUInt8Array();
+      if(values.Length == 3)
+      {
+        ushort minutes = 0;
+        minutes += (ushort)(values[0] * 60);
+        minutes += (ushort)(values[1]);
+
+        if(clock != minutes)
+        {
+          clock = minutes;
+          InvalidateRect();
+        }
+      }
+    }
+
+    protected override void OnPaint()
+    {
+      bool changed = false;
+      BeginPaint();
+
+      Rect wnd_rect = WindowRect;
+
+      if (draw_border)
+        RoundRect(Pens.WhitePen, Colors.Hollow, wnd_rect, 12);
+
+      DrawAnnunciator(wnd_rect, clock_pt, "UTC", string.Format("{0:d2}:{1:d2}", clock / 60, clock % 60));
+      DrawAnnunciator(wnd_rect, hrs_pt, "Hrs", string.Format("{0:f6.1", ((double)hours) / 100));
+      DrawAnnunciator(wnd_rect, qnh_pt, "QNH", string.Format("{0:d}", qnh));
+      DrawAnnunciator(wnd_rect, oat_pt, "OAT", string.Format("{0:d}", oat));
+      DrawAnnunciator(wnd_rect, cas_pt, "CAS", string.Format("{0:d}", cas));
+
+      EndPaint();
+    }
+
+    private void DrawAnnunciator(Rect wnd_rect, Point pt, string label, string value)
+    {
+      // calculate the size of the label
+      Rect clip_rect = new Rect(pt.X, pt.Y, pt.X + 75, pt.Y + 50 );
+
+      Rect rect;
+
+      Extent label_size = TextExtent(small_font, label);
+
+      int width = wnd_rect.Width;
+      int text_start = pt.X + width - (label_size.Dx + 3);
+      int right = pt.X + width;
+
+      Rectangle(null, Colors.Gray, new Rect(pt.X, pt.Y + 1, right, pt.Y + 4));
+      Rectangle(null, Colors.Gray, new Rect(pt.X, pt.Y + 4, pt.X + 3, pt.Y + 28));
+      Rectangle(null, Colors.Gray, new Rect(right - 3, pt.Y + 4, right, pt.Y + 45));
+      Rectangle(null, Colors.Gray, new Rect(pt.X, pt.Y + 28, right, pt.Y + 31));
+      Rectangle(null, Colors.Gray, new Rect(text_start - 6, pt.Y + 31, right, pt.Y + 45));
+
+      Rectangle(null, Colors.Black, new Rect(pt.X + 3, pt.Y + 4, right - 3, pt.Y + 28));
+
+      Point label_origin = new Point(text_start, pt.Y + 30 );
+
+      Rect txtRect = new Rect(text_start, pt.Y + 30, text_start + label_size.Dx, pt.Y + 30 + label_size.Dy);
+
+      DrawText(small_font, Colors.White, Colors.Black, label, label_origin, txtRect, TextOutStyle.Clipped);
+
+      Extent text_size = TextExtent(large_font, value);
+
+      // center of the text is 37, 16
+      Point origin = new Point(pt.X + 37 - (text_size.Dx >> 1), pt.Y + 16 - (text_size.Dy >> 1));
+
+      txtRect = new Rect(origin, text_size);
+
+      DrawText(large_font, Colors.White, Colors.Hollow, value, origin, txtRect, TextOutStyle.Clipped);
+    }
+  }
+}

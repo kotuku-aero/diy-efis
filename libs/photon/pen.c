@@ -108,6 +108,54 @@ result_t check_pen(handle_t hndl, pen_t **pen)
   return s_ok;
   }
 
+result_t get_pen_color(handle_t hndl, color_t *color)
+  {
+  result_t result;
+  pen_t *pen;
+
+  if (failed(result = check_pen(hndl, &pen)))
+    return result;
+
+  if (color == 0)
+    return e_bad_pointer;
+
+  *color = pen->color;
+
+  return s_ok;
+  }
+
+result_t get_pen_width(handle_t hndl, uint16_t *width)
+  {
+  result_t result;
+  pen_t *pen;
+
+  if (failed(result = check_pen(hndl, &pen)))
+    return result;
+
+  if (width == 0)
+    return e_bad_pointer;
+
+  *width = pen->width;
+
+  return s_ok;
+  }
+
+result_t get_pen_style(handle_t hndl, pen_style *style)
+  {
+  result_t result;
+  pen_t *pen;
+
+  if (failed(result = check_pen(hndl, &pen)))
+    return result;
+
+  if (style == 0)
+    return e_bad_pointer;
+
+  *style = pen->style;
+
+  return s_ok;
+  }
+
 result_t pen_release(handle_t hndl)
   {
   result_t result;

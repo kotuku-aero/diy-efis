@@ -1,10 +1,3 @@
-namespace CanFly.Proton
-{
-  public class GaugeWidget
-  {
-    
-  }
-}
 /*
 diy-efis
 Copyright (C) 2016 Kotuku Aerospace Limited
@@ -39,90 +32,34 @@ then the original copyright notice is to be respected.
 
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
+ */
+using System;
+using System.Collections;
 
-#include "../photon/widget.h"
-#include "spatial.h"
-#include "pens.h"
-
-typedef enum 
+namespace CanFly.Proton
+{
+  public sealed class GaugeWidget : Widget
   {
-  gs_pointer,         // a simple line
-  gs_sweep,           // a pie sweep
-  gs_bar,             // line sweep
-  gs_point,           // simple-pointer
-  gs_pointer_minmax,  // a pointer with min-max markers
-  gs_point_minmax,    // simple-pointer with min-max markers
-  gs_hbar,            // small horizonatal bar
-  // bar graph styles
-  bgs_point, // simple-pointer
-  bgs_pointer_minmax, // a pointer with min-max markers
-  bgs_pointer_max, // simple-pointer with max markers
-  bgs_pointer_min,
-  bgs_small,            // vertical bars with tick marks
-  } gauge_style;
+    public enum gauge_style
+    {
+      gs_pointer,         // a simple line
+      gs_sweep,           // a pie sweep
+      gs_bar,             // line sweep
+      gs_point,           // simple-pointer
+      gs_pointer_minmax,  // a pointer with min-max markers
+      gs_point_minmax,    // simple-pointer with min-max markers
+      gs_hbar,            // small horizonatal bar
+                          // bar graph styles
+      bgs_point, // simple-pointer
+      bgs_pointer_minmax, // a pointer with min-max markers
+      bgs_pointer_max, // simple-pointer with max markers
+      bgs_pointer_min,
+      bgs_small,            // vertical bars with tick marks
+    };
 
-typedef struct 
-  {
-  int16_t value;
-  pen_t pen;
-  color_t gauge_color;
-  } step_t;
-
-typedef struct 
-  {
-  int16_t value;
-  char text[REG_STRING_MAX+1];
-  } tick_mark_t;
-
-typedef struct _gauge_window_t {
-  uint16_t version;
-  
-  char name[REG_STRING_MAX +1];
-  color_t name_color;
-  handle_t  name_font;
-  point_t name_pt;
-  bool draw_name;
-  
-  color_t background_color;
-  pen_t border_pen;
-  bool draw_border;
-  handle_t  font;
-
-  
-  uint16_t num_values;
-  // this is updated on each window message
-  float values[4];
-  float min_values[4];
-  float max_values[4];
-  uint16_t labels[4];
-
-  uint16_t reset_label;
-  uint16_t label;
-
-  point_t center;
-  gdi_dim_t gauge_radii;
-
-  uint16_t arc_begin;
-  uint16_t arc_range;
-  float reset_value;
-
-  gauge_style style;
-  uint16_t width;          // pointer or sweep width
-
-  bool draw_value;         // draw the value
-  handle_t value_font;       // what font to draw a value in
-  rect_t value_rect;
-
-  vector_p steps;
-  vector_p ticks;
-
-  float scale;
-  float offset;
-
-  } gauge_window_t;
-
-static const char *gauge_style_values[] =
-  {
+    // needs to be same order as above
+    internal string[] gauge_style_values =
+    {
       "gs_pointer",
       "gs_sweep",
       "gs_bar",
@@ -135,990 +72,792 @@ static const char *gauge_style_values[] =
       "bgs_pointer_max",
       "bgs_pointer_min",
       "bgs_small"
-  };
-
-#define num_elements(p) (sizeof(p) / sizeof(p[0]))
-static bool is_bar_style(gauge_window_t *wnd);
-
-static int calculate_rotation(gauge_window_t *wnd, float value);
-static const pen_t *calculate_pen(gauge_window_t *wnd, uint16_t width, float value, pen_t *pen);
-static color_t calculate_color(gauge_window_t *wnd, float value);
-
-static void update_dial_gauge(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect);
-static void update_bar_gauge(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect);
-static void draw_pointer(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect, const pen_t *pen, int rotation);
-static void draw_sweep(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect, const pen_t *pen, color_t fill, int rotation);
-static void draw_bar(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect, const pen_t *pen, int rotation);
-static void draw_point(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect, const pen_t *pen, int rotation);
-static void draw_graph_value(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect, const pen_t *pen, size_t index, gdi_dim_t offset);
-static void draw_bar_graph(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect, const rect_t *rect);
-
-static result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
-  {
-  begin_paint(hwnd);
-
-  gauge_window_t *wnd = (gauge_window_t *)proxy->parg;
-  rect_t wnd_rect;
-  get_window_rect(hwnd, &wnd_rect);
-  
-  extent_t ex;
-  rect_extents(&wnd_rect, &ex);
-  
-  // fill without a border
-  rectangle(hwnd, &wnd_rect, 0, wnd->background_color, &wnd_rect);
-
-  if (wnd->draw_border)
-    round_rect(hwnd, &wnd_rect, &wnd->border_pen, color_hollow, &wnd_rect, 12);
-
-  if(is_bar_style(wnd))
-    update_bar_gauge(hwnd, wnd, &wnd_rect);
-  else
-    update_dial_gauge(hwnd, wnd, &wnd_rect);
-
-  end_paint(hwnd);
-  return s_ok;
-  }
-
-static result_t on_reset_label(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
-  {
-  bool changed = false;
-  gauge_window_t *wnd = (gauge_window_t *)proxy->parg;
-
-  size_t i;
-  for (i = 0; i < 4; i++)
-    {
-    wnd->min_values[i] = wnd->reset_value;
-    wnd->max_values[i] = wnd->min_values[i];
-    }
-  changed = true;
-
-  if (changed)
-    invalidate_rect(hwnd, 0);
-
-  return s_ok;
-  }
-
-static result_t on_value_label(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg)
-  {
-  bool changed = false;
-  gauge_window_t *wnd = (gauge_window_t *)proxy->parg;
-
-  size_t i;
-  for (i = 0; i < wnd->num_values; i++)
-    {
-    if (get_can_id(msg) == wnd->labels[i])
-      {
-      float float_value;
-      if (succeeded(get_param_float(msg, &float_value)))
-        {
-
-        float_value *= wnd->scale;
-        float_value += wnd->offset;
-
-        changed = wnd->values[i] != float_value;
-        wnd->values[i] = float_value;
-
-        wnd->min_values[i] = min(wnd->min_values[i], wnd->values[i]);
-        wnd->max_values[i] = max(wnd->max_values[i], wnd->values[i]);
-        }
-
-      break;
-      }
-    }
-
-
-  if (changed)
-    invalidate_rect(hwnd, 0);
-
-  return s_ok;
-  }
-
-void update_bar_gauge(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect)
-  {
-  // we support up to 4 ID's.
-
-  // each bar is drawn with the following dimensions:
-  //
-  //  *****************
-  //                5 pixels
-  //        ********
-  //        *      *
-  //        *      *
-  //   +    *      *
-  //   |\   *      *
-  //   | \  *      *
-  //   |  * *      *
-  //   | /  *      *
-  //   |/   *      *
-  //   +    *      *
-  //        ********
-  //                5 pixels
-  //  *****************
-  //  ^ ^  ^    ^    ^
-  //  | |  |    |    +- 2 Pixels
-  //  | |  |    +------ 6 Pixels
-  //  | |  +----------- 1 Pixel
-  //  | +-------------- 5 Pixels
-  //  +---------------- 1 Pixel
-  //
-  //
-  rect_t graph =
-    { wnd_rect->left, wnd_rect->top, wnd_rect->left + 14, rect_height(wnd_rect) };
-
-  size_t i;
-  for(i = 0; i < wnd->num_values; i++)
-    {
-    draw_bar_graph(hwnd, wnd, wnd_rect, &graph);
-    graph.left += 14;
-    graph.right += 14;
-    }
-
-  if(wnd->draw_name)
-    {
-    extent_t sz;
-    text_extent(hwnd, wnd->font, wnd->name, 0, &sz);
-    point_t pt;
-    bottom_right(wnd_rect, &pt);
-
-    pt.x -= 4;
-    pt.x -= sz.dx;
-    pt.y -= sz.dy;
-
-    draw_text(hwnd, wnd_rect, wnd->font,
-              wnd->name_color, wnd->background_color,
-              wnd->name, 0, &pt, 0, 0, 0);
-    }
-
-  gdi_dim_t height = rect_height(&graph) - 12;
-
-  if(wnd->ticks != 0)
-    {
-    uint16_t num_ticks;
-
-    vector_count(wnd->ticks, &num_ticks);
-
-    tick_mark_t first_tick;
-    tick_mark_t last_tick;
-
-    vector_at(wnd->ticks, 0, &first_tick);
-    vector_at(wnd->ticks, num_ticks-1, &last_tick);
-
-    int16_t range = last_tick.value - first_tick.value;
-    float pixels_per_unit = ((float) height) / ((float) range);
-    size_t i;
-    for (i = 0; i < num_ticks; i++)
-      {
-      vector_at(wnd->ticks, i, &last_tick);
-      if(last_tick.text[0] == 0)
-        continue;
-
-      long value = last_tick.value;
-
-      extent_t sz;
-      text_extent(hwnd, wnd->font, last_tick.text, 0, &sz);
-
-      float relative_value = value - first_tick.value;
-      float pixels = relative_value * pixels_per_unit;
-      point_t pt =
-        { graph.left + 2,
-          (graph.bottom - pixels) - 7 - (sz.dy >> 1)
-        };
-
-      draw_text(hwnd, wnd_rect, wnd->font,
-                wnd->name_color, wnd->background_color,
-                last_tick.text, 0, &pt, 0, 0, 0);
-      }
-    }
-  
-  gdi_dim_t offset = 1;
-
-  for (i = 0; i < wnd->num_values; i++)
-    {
-    draw_graph_value(hwnd, wnd, wnd_rect, &lightblue_pen, i, offset);
-    offset += 14;
-    }
-  }
-
-void update_dial_gauge(handle_t hwnd, gauge_window_t *wnd, const rect_t *wnd_rect)
-  {
-  if (wnd->draw_name)
-    {
-//    font(name_font);
-//    background_color(color_black);
-//    text_color(color_white);
-    point_t name_pt;
-    copy_point(&wnd->name_pt, &name_pt);
-
-    extent_t sz;
-    text_extent(hwnd, wnd->name_font, wnd->name, 0, &sz);
-
-    name_pt.x -= sz.dx >> 1;
-    name_pt.y -= sz.dy >>1;
-
-    draw_text(hwnd, wnd_rect, wnd->name_font,
-              wnd->name_color, wnd->background_color,
-              wnd->name, 0, &name_pt, 0, 0, 0);
-    }
-
-  int16_t min_range = 0;
-  int16_t max_range = 0;
-  float degrees_per_unit = 1.0;
-  
-    // we now draw an arc.  The range is the last value in the arc
-    // minus the first value.  Note that the values can be -
-    // the range of the gauge is gauge_y - 360 degrees
-  if(wnd->steps != 0)
-    {
-    uint16_t num_steps;
-    vector_count(wnd->steps, &num_steps);
-    
-    step_t first_step;
-    step_t last_step;
-    
-    vector_at(wnd->steps, 0, &first_step);
-    vector_at(wnd->steps, num_steps-1, &last_step);
-    
-    min_range = first_step.value;
-    max_range = last_step.value;
-
-    int16_t steps_range = max_range - min_range;
-
-    degrees_per_unit = ((float) wnd->arc_range) / steps_range;
-
-    float arc_start = wnd->arc_begin;
-    uint16_t i;
-
-//    font(_font);
-//    background_color(color_black);
-//    text_color(color_white);
-//
-    for (i = 1; i < num_steps; i++)
-      {
-      vector_at(wnd->steps, i, &last_step);
-      // the arc angle is the step end
-      float arc_end = (last_step.value - min_range) * degrees_per_unit;
-      arc_end += wnd->arc_begin;
-
-      // the arc starts a point(0, -1) which is 0 degrees
-      // so ranges from 0..270 are 90->360 and needs to
-      // be split to draw 270..360
-      // draw arc
-      int arc_angles[3] = { (int)arc_start+90, (int)arc_end+90, -1 };
-
-      if(arc_angles[0] > 360 )
-        {
-        arc_angles[0] -= 360;
-        arc_angles[1] -= 360;
-        }
-      else if(arc_angles[1] > 360)
-        {
-        arc_angles[2] = arc_angles[1] - 360;
-        arc_angles[1] = 360;
-        }
-
-      arc(hwnd, wnd_rect, &last_step.pen, &wnd->center,
-          wnd->gauge_radii, arc_angles[0], arc_angles[1]);
-
-      if(arc_angles[2] >= 0)
-        arc(hwnd, wnd_rect, &last_step.pen, &wnd->center,
-            wnd->gauge_radii, 0, arc_angles[2]);
-
-      arc_start = arc_end;
-      }
-    }
-
-  if(wnd->ticks != 0)
-    {
-    uint16_t num_ticks;
-    vector_count(wnd->ticks, &num_ticks);
-    uint16_t i;
-    // we now draw the tick marks.  They are a line from the point 5 pixels long.
-
-    // we create a white pen for this
-    //pen(&white_pen_2);
-
-    gdi_dim_t line_start = wnd->gauge_radii;
-    line_start += wnd->width >> 1;              // add the line half width
-
-    gdi_dim_t line_end = line_start - wnd->width - 5;
-    float arc_start;
-
-    for (i = 0; i < num_ticks; i++)
-      {
-      tick_mark_t tick;
-      vector_at(wnd->ticks, i, &tick);
-      
-      arc_start = (tick.value - min_range) * degrees_per_unit;
-      arc_start += wnd->arc_begin;
-      // make it point to correct spot....
-      arc_start += 180;
-
-      point_t pts[2];
-
-      copy_point(&wnd->center, &pts[0]);
-      pts[0].y -= line_start;
-
-      rotate_point(&wnd->center, &pts[0], arc_start);
-
-      copy_point(&wnd->center, &pts[1]);
-      pts[1].y -= line_end;
-
-      rotate_point(&wnd->center, &pts[1], arc_start);
-
-      polyline(hwnd, wnd_rect, &white_pen, 2, pts);
-
-      if (tick.text[0] != 0 && wnd->font != 0)
-        {
-        // write the text at the point
-        extent_t size;
-        text_extent(hwnd, wnd->font, tick.text, 0, &size);
-
-        // the text is below the tick marks
-        point_t top_left = {
-          wnd->center.x,
-          wnd->center.y - line_end + (size.dy >> 1)
-          };
-        
-        rotate_point(&wnd->center, &top_left, arc_start);
-
-        top_left.x -= (size.dx >> 1);
-        top_left.y -= (size.dy >> 1);
-
-        draw_text(hwnd, wnd_rect, wnd->font, color_white, wnd->background_color,
-                  tick.text, 0, &top_left, 0, 0, 0);
-        }
-      }
-    }
-
-    // we now calculate the range of the segments.  There are 8 segments
-    // around a 240 degree arc.  We draw the nearest based on the range
-    // of the gauge.
-    pen_t pointer_pen;
-
-    switch (wnd->style)
-      {
-    case gs_pointer_minmax:
-      draw_point(hwnd, wnd, wnd_rect,
-                 calculate_pen(wnd, 1, wnd->min_values[0], &pointer_pen), 
-                 calculate_rotation(wnd, wnd->min_values[0]));
-      draw_point(hwnd, wnd, wnd_rect,
-                 calculate_pen(wnd, 1, wnd->max_values[0], &pointer_pen),
-                 calculate_rotation(wnd, wnd->max_values[0]));
-      break;
-    case gs_pointer:
-      draw_pointer(hwnd, wnd, wnd_rect,
-                   calculate_pen(wnd, wnd->width, wnd->values[0], &pointer_pen),
-                   calculate_rotation(wnd, wnd->values[0]));
-      break;
-    case gs_sweep:
-      draw_sweep(hwnd, wnd, wnd_rect,
-                 calculate_pen(wnd, wnd->width, wnd->values[0], &pointer_pen),
-                 calculate_color(wnd, wnd->values[0]), calculate_rotation(wnd, wnd->values[0]));
-      break;
-    case gs_bar:
-      draw_bar(hwnd, wnd, wnd_rect,
-               calculate_pen(wnd, wnd->width, wnd->values[0], &pointer_pen),
-               calculate_rotation(wnd, wnd->values[0]));
-      break;
-    case gs_point_minmax:
-      draw_point(hwnd, wnd, wnd_rect,
-                 calculate_pen(wnd, 1, wnd->min_values[0], &pointer_pen),
-                 calculate_rotation(wnd, wnd->min_values[0]));
-      draw_point(hwnd, wnd, wnd_rect,
-                 calculate_pen(wnd, 1, wnd->max_values[0], &pointer_pen),
-                 calculate_rotation(wnd, wnd->max_values[0]));
-    case gs_point:
-      draw_point(hwnd, wnd, wnd_rect,
-                 calculate_pen(wnd, 1, wnd->values[0], &pointer_pen),
-                 calculate_rotation(wnd, wnd->values[0]));
-      break;
-      }
-    // draw the value of the gauge as a text string
-    if (wnd->draw_value && wnd->value_font != 0)
-      {
-//      font(_value_font);
-//      text_color(color_lightblue);
-//      background_color(color_black);
-
-      char str[32];
-      sprintf(str, "%d", (int) wnd->values[0]);
-
-      size_t len = strlen(str);
-      extent_t size;
-      text_extent(hwnd, wnd->value_font, str, len, &size);
-
-//      pen(&gray_pen);
-//      background_color(color_black);
-
-      // draw a rectangle around the text
-      rectangle(hwnd, wnd_rect, &gray_pen, color_black, &wnd->value_rect);
-
-      point_t pt = {
-        wnd->value_rect.right - (size.dx + 2),
-        wnd->value_rect.top + 2 };
-
-      draw_text(hwnd, wnd_rect, wnd->value_font, color_lightblue, color_black,
-                str, len, &pt, &wnd->value_rect, eto_clipped, 0);
-      }
-  }
-
-bool is_bar_style(gauge_window_t *wnd)
-  {
-  return wnd->style >= bgs_point;
-  }
-
-static void draw_pointer(handle_t hwnd,
-                         gauge_window_t *wnd,
-                         const rect_t *wnd_rect, 
-                         const pen_t *outline_pen,
-                         int rotation)
-  {
-  // draw the marker line
-  point_t pts[2] =
-    {
-    { wnd->center.x, wnd->center.y - 5 },
-    { wnd->center.x, wnd->center.y - wnd->gauge_radii + 5}
     };
 
-  rotate_point(&wnd->center, &pts[0], rotation+180);
-  rotate_point(&wnd->center, &pts[1], rotation+180);
-  
-  polyline(hwnd, wnd_rect, outline_pen, 2, pts);
-  }
-
-static void draw_sweep(handle_t hwnd,
-                       gauge_window_t *wnd,
-                       const rect_t *wnd_rect,
-                       const pen_t *outline_pen,
-                       color_t fill_color,
-                       int rotation)
-  {
-  pie(hwnd,
-      wnd_rect,
-      outline_pen,
-      fill_color,
-      &wnd->center,
-      wnd->arc_begin+90,
-      rotation+90,
-      wnd->center.y - wnd->gauge_radii + 5,
-      5);
-  }
-
-static void draw_bar(handle_t hwnd,
-                     gauge_window_t *wnd,
-                     const rect_t *wnd_rect,
-                     const pen_t *outline_pen,
-                     int rotation)
-  {
-  int arc_angles[3] = { wnd->arc_begin + 90, rotation + 90, -1 };
-
-  if(arc_angles[0] > 360)
+    internal class step_t
     {
-    arc_angles[0] -= 360;
-    arc_angles[1] -= 360;
-    }
-  else if(arc_angles[1] > 360)
-    {
-    arc_angles[2] = arc_angles[1] - 360;
-    arc_angles[1] = 360;
-    }
-
-  gdi_dim_t radii = wnd->gauge_radii - (wnd->width >> 1);
-  radii -= outline_pen->width >> 1;
-
-  arc(hwnd, wnd_rect, outline_pen, &wnd->center, radii, arc_angles[0], arc_angles[1]);
-
-  if(arc_angles[2] > 0)
-    arc(hwnd, wnd_rect, outline_pen, &wnd->center, radii, 0, arc_angles[2]);
-  }
-
-static void draw_point(handle_t hwnd,
-                       gauge_window_t *wnd,
-                       const rect_t *wnd_rect,
-                       const pen_t *outline_pen,
-                       int rotation)
-  {
-  point_t pts[4] =
-    {
-    { wnd->center.x, wnd->center.y - wnd->gauge_radii + 5 },
-    { wnd->center.x - 6, wnd->center.y - wnd->gauge_radii + 11 },
-    { wnd->center.x + 6, wnd->center.y - wnd->gauge_radii + 11 },
-    { wnd->center.x, wnd->center.y - wnd->gauge_radii + 5 }
+      public short value;
+      public Pen pen;
+      public uint gauge_color;
     };
 
-  float rotn = degrees_to_radians(rotation+90);
-  rotate_point(&wnd->center, &pts[0], rotn);
-  rotate_point(&wnd->center, &pts[1], rotn);
-  rotate_point(&wnd->center, &pts[2], rotn);
-  copy_point(&pts[0], &pts[3]);
-
-  polygon(hwnd, wnd_rect, outline_pen, outline_pen->color, 4, pts);
-  }
-
-static int calculate_rotation(gauge_window_t *wnd, float value)
-  {
-  step_t first_step;
-  step_t last_step;
-  
-  if(wnd->steps == 0)
-    return 0;
-  
-  uint16_t count;
-  vector_count(wnd->steps, &count);
-  
-  vector_at(wnd->steps, 0, &first_step);
-  vector_at(wnd->steps, count-1, &last_step);
-  
-  float min_range = first_step.value;
-  float max_range = last_step.value;
-
-  // get the percent that the gauge is displaying
-  float percent = (max(min(value, max_range), min_range) - min_range) / (max_range - min_range);
-
-  float rotation;
-  rotation = wnd->arc_begin + (wnd->arc_range * percent);
-
-  return (int)rotation;
-  }
-
-static const pen_t *calculate_pen(gauge_window_t *wnd,
-                                    uint16_t width,
-                                    float value,
-                                    pen_t *pen)
-  {
-  pen->style = ps_solid;
-  pen->color = color_hollow;
-  pen->width = width;
-  
-  step_t step;
-  uint16_t count;
-  
-  if(wnd->steps == 0)
-    return pen;
-  
-  vector_count(wnd->steps, &count);
-  if(count == 0)
-    return pen;
- 
-  size_t i;
-  // step 0 is only used to set the minimum value for the gauge
-  // so it is ignored
-  for (i = 1; i < count; i++)
+    internal class tick_mark_t
     {
-    // get the next one, and see if we are done.
-    vector_at(wnd->steps, i, &step);
-    // assume this is our color.
-    pen->color = step.gauge_color;
-    if(value <= step.value)
-      break;    
-    }
-
-  return pen;
-  }
-
-static color_t calculate_color(gauge_window_t *wnd, float value)
-  {
-  color_t fill_color = color_lightblue;
-  step_t step;
-  uint16_t count;
-  
-  if(wnd->steps == 0)
-    return fill_color;
-  
-  vector_count(wnd->steps, &count);
-  if(count == 0)
-    return fill_color;
-  
-  vector_at(wnd->steps, 0, &step);
-
-  size_t i;
-  for (i = 0; i < count; i++)
-    {
-    fill_color = step.gauge_color;
-    
-    vector_at(wnd->steps, i, &step);
-    if(value >= step.value)
-      break;    
-    }
-
-  return fill_color;
-  }
-
-static void draw_bar_graph(handle_t hwnd,
-                     gauge_window_t *wnd, 
-                     const rect_t *wnd_rect,
-                     const rect_t *rect)
-  {
-  uint16_t count;
-   
-  vector_count(wnd->steps, &count);
-  
-  if (count < 2)
-    return;
-
-  // calculate the height of the graph.
-  long height = rect_height(rect) - 12;
-  
-  step_t first_step;
-  step_t last_step;
-  
-  vector_at(wnd->steps, 0, &first_step);
-  vector_at(wnd->steps, count-1, &last_step);
-
-  long range = last_step.value - first_step.value;
-  
-  float pixels_per_unit = ((float) height) / ((float) range);
-
-  // so we now have the increment, just start at the bottom
-  rect_t drawing_rect = {
-    rect->left + 8,
-    rect->top + 3,
-    rect->right - 2,
-    rect->bottom - 7
+      public short value;
+      public string text;
     };
 
-  size_t i;
-  for (i = 1; i < count; i++)
+    private string name;
+    private uint name_color;
+    private Font name_font;
+    private Point name_pt;
+    private bool draw_name;
+
+    private uint background_color;
+    private Pen border_pen;
+    private bool draw_border;
+    private Font font;
+
+    private ushort num_values;
+
+    // a gauge supports up to 4 values
+    // this is updated on each window message
+    private float[] values = new float[4];
+    private float[] min_values = new float[4];
+    private float[] max_values = new float[4];
+    private ushort[] labels = new ushort[4];
+
+    private ushort reset_label;
+    private ushort label;
+
+    private Point center;
+    private int gauge_radii;
+
+    private ushort arc_begin;
+    private ushort arc_range;
+    private float reset_value;
+
+    private gauge_style style;
+    private ushort width;          // pointer or sweep width
+
+    private bool draw_value;         // draw the value
+    private Font value_font;       // what font to draw a value in
+    private Rect value_rect;
+
+    private ArrayList steps;
+    private ArrayList ticks;
+
+    private float scale;
+    private float offset;
+
+    public GaugeWidget(Widget parent, Rect bounds, ushort id, uint key)
+  : base(parent, bounds, id)
     {
-    vector_at(wnd->steps, i, &last_step);
-    
-    float relative_value = last_step.value - first_step.value;
-    memcpy(&first_step, &last_step, sizeof(step_t));
-    
-    float pixels = relative_value * pixels_per_unit;
-    drawing_rect.top = drawing_rect.bottom - (gdi_dim_t) (pixels);
-    
-    rectangle(hwnd, wnd_rect, 0, last_step.pen.color, &drawing_rect);
-    drawing_rect.bottom = drawing_rect.top;
-    }
-  }
+      Rect rect_wnd = WindowRect;
 
-static void draw_graph_value(handle_t hwnd,
-                       gauge_window_t *wnd,
-                       const rect_t *wnd_rect,
-                       const pen_t *outline_pen,
-                       size_t index, 
-                       gdi_dim_t offset)
-  {
-  // calculate the height of the graph.
-  gdi_dim_t height = rect_height(wnd_rect) - 12;
-  uint16_t count;
-   
-  vector_count(wnd->steps, &count);
-  
-  if (count < 2)
-    return;
-  
-  step_t first_step;
-  step_t last_step;
-  
-  vector_at(wnd->steps, 0, &first_step);
-  vector_at(wnd->steps, count-1, &last_step);
+      if (!TryRegGetFloat(key, "scale", out scale))
+        scale = 1.0f;
 
-  gdi_dim_t range = last_step.value - first_step.value;
-  float pixels_per_unit = ((float) height) / ((float) range);
+      if (!TryRegGetFloat(key, "offset", out offset))
+        offset = 0;
 
-  float min_range = first_step.value;
+      int enumValue;
+      if (!LookupEnum(key, "style", gauge_style_values, out enumValue))
+        style = gauge_style.gs_pointer;
+      else
+        style = (gauge_style)enumValue;
 
-  float value = wnd->values[index];
-  value = max(value, min_range);
-  value = min(value, min_range + range);
+      // get the ID's of the reset can msg
+      TryRegGetUint16(key, "reset-id", out reset_label);
+      TryRegGetFloat(key, "reset-value", out reset_value);
 
-  float relative_value = value - min_range;
-  gdi_dim_t position = height - (relative_value * pixels_per_unit) - 8;
+      if (!LookupFont(key, "font", out font))
+        // we always have the neo font.
+        OpenFont("neo", 9, out font);
 
-  position = max(position, 5);
+      short int_value;
+      if (!TryRegGetInt16(key, "center-x", out int_value))
+        center.X = rect_wnd.Width >> 1;
+      else
+        center.X = int_value;
 
-  point_t pts[4] =
-    {
-      { offset, position + 5 },
-      { offset + 5, position },
-      { offset, position - 5 },
-      { offset, position + 5 }
-    };
+      if (!TryRegGetInt16(key, "center-y", out int_value))
+        center.Y = rect_wnd.Height >> 1;
+      else
+        center.Y = int_value;
 
-  polygon(hwnd, wnd_rect, outline_pen, outline_pen->color, 4, pts);
+      // get the details for the name
+      if (!TryRegGetBool(key, "draw-name", out draw_name))
+        draw_name = true;
 
-  if (wnd->style == bgs_pointer_minmax || wnd->style == bgs_pointer_max)
-    {
-    relative_value = wnd->max_values[index] - min_range;
-    if (relative_value >= 0.0)
+      if (draw_name && TryRegGetString(key, "name", out name))
       {
-      position = height - (relative_value * pixels_per_unit) - 8;
-      position = max(position, 5);
 
-      pts[0].x = offset; pts[0].y = position + 5;
-      pts[1].x = offset + 5; pts[1].y = position;
-      pts[2].x = offset; pts[2].y = position - 5;
-      pts[3].x = offset; pts[3].y = position + 5;
+        if (!LookupColor(key, "name-color", out name_color))
+          name_color = Colors.White;
 
-      polygon(hwnd, wnd_rect, outline_pen, color_hollow, 4, pts);
-      }
-    }
+        if (!LookupFont(key, "name-font", out name_font))
+          // we always have the neo font.
+          OpenFont("neo", 9, out name_font);
 
-  if (wnd->style == bgs_pointer_minmax || wnd->style == bgs_pointer_min)
-    {
-    relative_value = wnd->min_values[index] - min_range;
-    if (relative_value >= 0.0)
-      {
-      position = height - (relative_value * pixels_per_unit) - 8;
-      position = max(position, 5);
+        if (!TryRegGetInt16(key, "name-x", out int_value))
+          name_pt.X = center.X;
+        else
+          name_pt.X = int_value;
 
-      pts[0].x = offset; pts[0].y = position + 5;
-      pts[1].x = offset + 5; pts[1].y = position;
-      pts[2].x = offset; pts[2].y = position - 5;
-      pts[3].x = offset; pts[3].y =  position + 5;
-
-      polygon(hwnd, wnd_rect, outline_pen, color_hollow, 4, pts);
-      }
-    }
-  }
-
-result_t create_gauge_window(handle_t parent, memid_t key, handle_t *hwnd)
-  {
-  result_t result;
-  int16_t int_value;
-  uint16_t uint_value;
-
-  // create our window
-  if (failed(result = create_child_widget(parent, key, defwndproc, hwnd)))
-    return result;
-
-  // create the window data.
-  gauge_window_t *wnd = (gauge_window_t *)neutron_malloc(sizeof(gauge_window_t));
-  memset(wnd, 0, sizeof(gauge_window_t));
-
-  wnd->version = sizeof(gauge_window_t);
-
-  rect_t rect_wnd;
-
-  get_window_rect(*hwnd, &rect_wnd);
-
-  uint16_t len = REG_STRING_MAX + 1;
-  if (failed(reg_get_float(key, "scale", &wnd->scale)))
-    wnd->scale = 1.0;
-
-  if (failed(reg_get_float(key, "offset", &wnd->offset)))
-    wnd->offset = 0.0;
-
-  if (failed(lookup_enum(key, "style", gauge_style_values, num_elements(gauge_style_values), (int *)&wnd->style)))
-    wnd->style = gs_pointer;
-
-  reg_get_uint16(key, "reset-id", &wnd->reset_label);
-  reg_get_float(key, "reset-value", &wnd->reset_value);
-
-  if (failed(lookup_font(key, "font", &wnd->font)))
-    {
-    // we always have the neo font.
-    if (failed(result = open_font("neo", 9, &wnd->font)))
-      return result;
-    }
-
-  if (failed(reg_get_int16(key, "center-x", &int_value)))
-    wnd->center.x = rect_width(&rect_wnd) >> 1;
-  else
-    wnd->center.x = (gdi_dim_t)int_value;
-
-  if (failed(reg_get_int16(key, "center-y", &int_value)))
-    wnd->center.y = rect_height(&rect_wnd) >> 1;
-  else
-    wnd->center.y = (gdi_dim_t)int_value;
-
-  // get the details for the name
-  if (failed(reg_get_bool(key, "draw-name", &wnd->draw_name)))
-    wnd->draw_name = true;
-
-  if (wnd->draw_name)
-    {
-    reg_get_string(key, "name", wnd->name, &len);
-
-    if (failed(lookup_color(key, "name-color", &wnd->name_color)))
-      wnd->name_color = color_white;
-
-    if (failed(lookup_font(key, "name-font", &wnd->name_font)))
-      {
-      // we always have the neo font.
-      if (failed(result = open_font("neo", 9, &wnd->name_font)))
-        return result;
+        if (!TryRegGetInt16(key, "name-y", out int_value))
+          name_pt.Y = center.Y;
+        else
+          name_pt.Y = int_value;
       }
 
-    if (failed(reg_get_int16(key, "name-x", &int_value)))
-      wnd->name_pt.x = wnd->center.x;
-    else
-      wnd->name_pt.x = (gdi_dim_t)int_value;
+      if (!TryRegGetUint16(key, "arc-begin", out arc_begin))
+        arc_begin = 120;
 
-    if (failed(reg_get_int16(key, "name-y", &int_value)))
-      wnd->name_pt.y = wnd->center.y;
-    else
-      wnd->name_pt.y = (gdi_dim_t)int_value;
-    }
+      if (!TryRegGetUint16(key, "arc-range", out arc_range))
+        arc_range = 270;
 
-  if (failed(reg_get_uint16(key, "arc-begin", &wnd->arc_begin)))
-    wnd->arc_begin = 120;
+      if (!TryRegGetUint16(key, "width", out width))
+        width = 7;
 
-  if (failed(reg_get_uint16(key, "arc-range", &wnd->arc_range)))
-    wnd->arc_range = 270;
+      if (!TryRegGetBool(key, "draw-value", out draw_value))
+        draw_value = true;
 
-  if (failed(reg_get_uint16(key, "width", &wnd->width)))
-    wnd->width = 7;
+      ushort uint_value;
 
-  if (failed(reg_get_bool(key, "draw-value", &wnd->draw_value)))
-    wnd->draw_value = true;
-
-  if (wnd->draw_value)
-    {
-    if (failed(lookup_font(key, "value-font", &wnd->value_font)))
+      if (draw_value)
       {
-      // we always have the neo font.
-      if (failed(result = open_font("neo", 9, &wnd->value_font)))
-        return result;
+        if (!LookupFont(key, "value-font", out value_font))
+          OpenFont("neo", 9, out value_font);
+
+        // default values
+        value_rect.Bottom = rect_wnd.Bottom;
+        value_rect.Left = center.X + 2;
+        value_rect.Top = value_rect.Bottom - 25;
+        value_rect.Right = rect_wnd.Right;
+
+        if (TryRegGetInt16(key, "value-x", out int_value))
+          value_rect.Left = (int)int_value;
+
+        if (TryRegGetUint16(key, "value-y", out uint_value))
+          value_rect.Top = (int)uint_value;
+
+        if (TryRegGetUint16(key, "value-w", out uint_value))
+          value_rect.Right = (int)uint_value + value_rect.Left;
+
+        if (TryRegGetUint16(key, "value-h", out uint_value))
+          value_rect.Bottom = (int)uint_value + value_rect.Top;
       }
 
-    // default values
-    wnd->value_rect.bottom = rect_wnd.bottom;
-    wnd->value_rect.left = wnd->center.x + 2;
-    wnd->value_rect.top = wnd->value_rect.bottom - 25;
-    wnd->value_rect.right = rect_wnd.right;
-
-    if (succeeded(reg_get_int16(key, "value-x", &int_value)))
-      wnd->value_rect.left = (gdi_dim_t)int_value;
-
-    if (succeeded(reg_get_uint16(key, "value-y", &uint_value)))
-      wnd->value_rect.top = (gdi_dim_t)uint_value;
-
-    if (succeeded(reg_get_uint16(key, "value-w", &uint_value)))
-      wnd->value_rect.right = (gdi_dim_t)uint_value + wnd->value_rect.left;
-
-    if (succeeded(reg_get_uint16(key, "value-h", &uint_value)))
-      wnd->value_rect.bottom = (gdi_dim_t)uint_value + wnd->value_rect.top;
-    }
-
-  char temp_name[REG_NAME_MAX + 1];
-  if (failed(reg_get_uint16(key, "can-id", &uint_value)))
-    {
-    // could be can value 0..3
-    for (wnd->num_values = 0; wnd->num_values < 4; wnd->num_values++)
+      if (!TryRegGetUint16(key, "can-id", out uint_value))
       {
-      snprintf(temp_name, sizeof(temp_name), "can-id-%d", wnd->num_values);
-
-      if (failed(reg_get_uint16(key, temp_name, &uint_value)))
-        break;
-
-      wnd->labels[wnd->num_values] = uint_value;
-      wnd->values[wnd->num_values] = wnd->reset_value;
-      wnd->min_values[wnd->num_values] = wnd->reset_value;
-      wnd->max_values[wnd->num_values] = wnd->reset_value;
-      }
-    }
-  else
-    {
-    wnd->labels[0] = uint_value;
-    wnd->values[0] = wnd->reset_value;
-    wnd->min_values[0] = wnd->reset_value;
-    wnd->max_values[0] = wnd->reset_value;
-    wnd->num_values = 1;
-    }
-
-  if (failed(reg_get_uint16(key, "radii", &uint_value)))
-    uint_value = (rect_width(&rect_wnd) >> 1) - 5;
-
-  wnd->gauge_radii = (gdi_dim_t)uint_value;
-
-  // open a step key
-  memid_t step_key;
-
-  if (succeeded(reg_open_key(key, "step", &step_key)))
-    {
-    vector_create(sizeof(step_t), &wnd->steps);
-
-    int i;
-    // only support 99 ticks/steps
-    for (i = 0; i < 99; i++)
-      {
-      snprintf(temp_name, 32, "%d", i);
-
-      memid_t child_key;
-
-      if (succeeded(reg_open_key(step_key, temp_name, &child_key)))
+        // could be can value 0..3
+        for (num_values = 0; num_values < 4; num_values++)
         {
-        step_t new_step;
-        memset(&new_step, 0, sizeof(new_step));
+          string temp_name = string.Format("can-id-{0}", num_values);
 
-        reg_get_int16(child_key, "value", &new_step.value);
-        lookup_color(child_key, "color", &new_step.gauge_color);
+          if (!TryRegGetUint16(key, temp_name, out uint_value))
+            break;
 
-        memid_t pen_key;
-        if (failed(reg_open_key(child_key, "pen", &pen_key)) ||
-          failed(lookup_pen(pen_key, &new_step.pen)))
+          labels[num_values] = uint_value;
+          values[num_values] = reset_value;
+          min_values[num_values] = reset_value;
+          max_values[num_values] = reset_value;
+        }
+      }
+      else
+      {
+        labels[0] = uint_value;
+        values[0] = reset_value;
+        min_values[0] = reset_value;
+        max_values[0] = reset_value;
+        num_values = 1;
+      }
+
+      if (!TryRegGetUint16(key, "radii", out uint_value))
+        uint_value = (ushort)((rect_wnd.Width >> 1) - 5);
+
+      gauge_radii = uint_value;
+
+      // open a step key
+      uint step_key;
+
+      try
+      {
+        step_key = Neutron.RegOpenKey(key, "step");
+
+        steps = new ArrayList();
+
+        int i;
+        // only support 99 ticks/steps
+        for (i = 0; i < 99; i++)
+        {
+          // this stops as soon as the first key is not found
+          uint child_key = Neutron.RegOpenKey(step_key, i.ToString());
+
+          step_t new_step = new step_t();
+
+          TryRegGetInt16(child_key, "value", out new_step.value);
+          LookupColor(child_key, "color", out new_step.gauge_color);
+          if (!LookupPen(child_key, "pen", out new_step.pen))
+            new_step.pen = Pens.LightbluePen;
+
+          steps.Add(new_step);
+        }
+      }
+      catch
+      {
+
+      }
+
+      try
+      {
+        uint ticks_key = Neutron.RegOpenKey(key, "tick");
+
+        ticks = new ArrayList();
+
+        for (int i = 0; i < 99; i++)
+        {
+          uint child_key = Neutron.RegOpenKey(ticks_key, i.ToString());
+
+          // tick-0=650, 650
+          // param1 . tick point
+          // param2 . tick label
+          tick_mark_t new_tick = new tick_mark_t();
+
+          if (!TryRegGetInt16(child_key, "value", out new_tick.value))
+            new_tick.value = 0;
+
+          TryRegGetString(child_key, "text", out new_tick.text);
+
+          ticks.Add(new_tick);
+        }
+      }
+      catch
+      {
+
+      }
+
+      if (!LookupColor(key, "background-color", out background_color))
+        background_color = Colors.Black;
+
+      TryRegGetBool(key, "draw-border", out draw_border);
+
+      if (!LookupPen(key, "border-pen", out border_pen))
+        border_pen = Pens.GrayPen;
+
+
+      if (reset_label != 0)
+        CanFlyMsgSink.AddEventListener(reset_label, OnResetLabel);
+
+      for (int i = 0; i < num_values; i++)
+        CanFlyMsgSink.AddEventListener(labels[i], OnValueLabel);
+
+      InvalidateRect();
+    }
+
+    private bool LookupEnum(uint key, string name, string[] values, out int index)
+    {
+      for (index = 0; index < values.Length; index++)
+        if (values[index] == name)
+          return true;
+
+      return false;
+    }
+
+    private void OnValueLabel(CanFlyMsg msg)
+    {
+      try
+      {
+        float float_value = msg.GetFloat();
+
+        for (int i = 0; i < num_values; i++)
+        {
+          if (msg.Id == labels[i])
           {
-          new_step.pen.color = color_lightblue;
-          new_step.pen.width = 5;
-          new_step.pen.style = ps_solid;
+
+            float_value *= scale;
+            float_value += offset;
+
+            if (values[i] != float_value)
+            {
+              values[i] = float_value;
+
+              min_values[i] = Math.Min(min_values[i], values[i]);
+              max_values[i] = Math.Max(max_values[i], values[i]);
+
+              InvalidateRect();
+            }
+            break;
+          }
+        }
+      }
+      catch
+      {
+
+      }
+    }
+
+    private void OnResetLabel(CanFlyMsg e)
+    {
+      for (int i = 0; i < num_values; i++)
+      {
+        min_values[i] = reset_value;
+        max_values[i] = reset_value;
+      }
+
+      InvalidateRect();
+    }
+
+    protected override void OnPaint()
+    {
+      BeginPaint();
+
+      Rect wnd_rect = WindowRect;
+
+      // fill without a border
+      Rectangle(null, background_color, wnd_rect);
+
+      if (draw_border)
+        RoundRect(border_pen, Colors.Hollow, wnd_rect, 12);
+
+      if (IsBarStyle)
+        UpdateBarGauge();
+      else
+        UpdateDialGauge();
+
+      EndPaint();
+    }
+
+    private void UpdateBarGauge()
+    {
+      // we support up to 4 ID's.
+
+      // each bar is drawn with the following dimensions:
+      //
+      //  *****************
+      //                5 pixels
+      //        ********
+      //        *      *
+      //        *      *
+      //   +    *      *
+      //   |\   *      *
+      //   | \  *      *
+      //   |  * *      *
+      //   | /  *      *
+      //   |/   *      *
+      //   +    *      *
+      //        ********
+      //                5 pixels
+      //  *****************
+      //  ^ ^  ^    ^    ^
+      //  | |  |    |    +- 2 Pixels
+      //  | |  |    +------ 6 Pixels
+      //  | |  +----------- 1 Pixel
+      //  | +-------------- 5 Pixels
+      //  +---------------- 1 Pixel
+      //
+      //
+      if (steps == null || steps.Count < 2)
+        return;
+
+      Rect wnd_rect = WindowRect;
+      Rect graph = new Rect(wnd_rect.Left, wnd_rect.Top, wnd_rect.Left + 14, wnd_rect.Height);
+
+      for (uint i = 0; i < num_values; i++)
+      {
+        step_t first_step = (step_t)steps[0];
+        step_t last_step = (step_t)steps[steps.Count - 1];
+
+        long range = last_step.value - first_step.value;
+
+        float pixels_per_unit = ((float)graph.Height - 12) / ((float)range);
+
+        // so we now have the increment, just start at the bottom
+        Rect drawing_rect = new Rect(
+          graph.Left + 8,
+          graph.Top + 3,
+          graph.Right - 2,
+          graph.Bottom - 7);
+
+        for (int step = 1; step < steps.Count; step++)
+        {
+          last_step = (step_t)steps[step];
+
+          float relative_value = last_step.value - first_step.value;
+          first_step = last_step;
+
+          float pixels = relative_value * pixels_per_unit;
+          drawing_rect.Top = drawing_rect.Bottom - (int)(pixels);
+
+          Rectangle(null, last_step.pen.Color, drawing_rect);
+          drawing_rect.Bottom = drawing_rect.Top;
+        }
+
+        graph.Left += 14;
+        graph.Right += 14;
+      }
+
+      if (draw_name)
+      {
+        Extent sz = TextExtent(font, name);
+        Point pt = wnd_rect.BottomRight;
+
+        pt.X -= 4;
+        pt.X -= sz.Dx;
+        pt.Y -= sz.Dy;
+
+        DrawText(font, name_color, background_color, name, pt);
+      }
+
+      int height = graph.Height - 12;
+
+      if (ticks != null)
+      {
+        int num_ticks = ticks.Count;
+
+
+        tick_mark_t first_tick = (tick_mark_t)ticks[0];
+        tick_mark_t last_tick = (tick_mark_t)ticks[num_ticks - 1];
+
+        int range = last_tick.value - first_tick.value;
+        float pixels_per_unit = ((float)height) / ((float)range);
+
+        for (int i = 0; i < num_ticks; i++)
+        {
+          last_tick = (tick_mark_t)ticks[i];
+
+          if (last_tick.text == null)
+            continue;
+
+          short value = last_tick.value;
+
+          Extent sz = TextExtent(font, last_tick.text);
+
+          float relative_value = value - first_tick.value;
+          float pixels = relative_value * pixels_per_unit;
+          Point pt = new Point(graph.Left + 2, (graph.Bottom - (int)pixels) - 7 - (sz.Dy >> 1));
+
+          DrawText(font, name_color, background_color, last_tick.text, pt);
+        }
+      }
+
+      int offset = 1;
+
+      for (int i = 0; i < num_values; i++)
+      {
+        step_t first_step = (step_t)steps[0];
+        step_t last_step = (step_t)steps[steps.Count - 1];
+
+        int drawingHeight = wnd_rect.Height - 12;
+        int range = last_step.value - first_step.value;
+        float pixels_per_unit = ((float)drawingHeight) / ((float)range);
+
+        float min_range = first_step.value;
+
+        float value = values[i];
+        value = Math.Max(value, min_range);
+        value = Math.Min(value, min_range + range);
+
+        float relative_value = value - min_range;
+        int position = (int)(-(relative_value * pixels_per_unit) - 8);
+
+        position = Math.Max(position, 5);
+
+        Polygon(Pens.LightbluePen, Colors.LightBlue,
+          new Point(offset, position + 5),
+          new Point(offset + 5, position),
+          new Point(offset, position - 5),
+          new Point(offset, position + 5));
+
+        if (style == gauge_style.bgs_pointer_minmax || style == gauge_style.bgs_pointer_max)
+        {
+          relative_value = max_values[i] - min_range;
+          if (relative_value >= 0.0)
+          {
+            position = (int)(drawingHeight - (relative_value * pixels_per_unit) - 8);
+            position = Math.Max(position, 5);
+
+            Polygon(Pens.LightbluePen, Colors.LightBlue,
+              new Point(offset, position + 5),
+              new Point(offset + 5, position),
+              new Point(offset, position - 5),
+              new Point(offset, position + 5));
+
+          }
+        }
+
+        if (style == gauge_style.bgs_pointer_minmax || style == gauge_style.bgs_pointer_min)
+        {
+          relative_value = min_values[i] - min_range;
+          if (relative_value >= 0.0)
+          {
+            position = (int)(drawingHeight - (relative_value * pixels_per_unit) - 8);
+            position = Math.Max(position, 5);
+
+            Polygon(Pens.LightbluePen, Colors.Hollow,
+              new Point(offset, position + 5),
+              new Point(offset + 5, position),
+              new Point(offset, position - 5),
+              new Point(offset, position + 5));
+          }
+        }
+        offset += 14;
+      }
+    }
+
+    private void UpdateDialGauge()
+    {
+      Rect wnd_rect = WindowRect;
+      if (draw_name)
+      {
+        Extent sz = TextExtent(name_font, name);
+
+        name_pt.X -= sz.Dx >> 1;
+        name_pt.Y -= sz.Dy >> 1;
+
+        DrawText(name_font, name_color, background_color, name, name_pt);
+      }
+
+      short min_range = 0;
+      short max_range = 0;
+      float degrees_per_unit = 1.0f;
+
+      // we now draw an arc.  The range is the last value in the arc
+      // minus the first value.  Note that the values can be -
+      // the range of the gauge is gauge_y - 360 degrees
+      if (steps != null)
+      {
+        int num_steps = steps.Count;
+
+        step_t first_step = (step_t)steps[0];
+        step_t last_step = (step_t)steps[num_steps - 1];
+
+        min_range = first_step.value;
+        max_range = last_step.value;
+
+        int steps_range = max_range - min_range;
+
+        degrees_per_unit = ((float)arc_range) / steps_range;
+
+        float arc_start = arc_begin;
+        ushort i;
+
+        //    font(_font);
+        //    background_color(Colors.Black);
+        //    text_color(Colors.White);
+        //
+        for (i = 1; i < num_steps; i++)
+        {
+          last_step = (step_t)steps[i];
+
+          // the arc angle is the step end
+          float arc_end = (last_step.value - min_range) * degrees_per_unit;
+          arc_end += arc_begin;
+
+          // the arc starts a point(0, -1) which is 0 degrees
+          // so ranges from 0..270 are 90.360 and needs to
+          // be split to draw 270..360
+          // draw arc
+          int[] arc_angles = { (int)arc_start + 90, (int)arc_end + 90, -1 };
+
+          if (arc_angles[0] > 360)
+          {
+            arc_angles[0] -= 360;
+            arc_angles[1] -= 360;
+          }
+          else if (arc_angles[1] > 360)
+          {
+            arc_angles[2] = arc_angles[1] - 360;
+            arc_angles[1] = 360;
           }
 
-        vector_push_back(wnd->steps, &new_step);
+          Arc(last_step.pen, center, gauge_radii, arc_angles[0], arc_angles[1]);
+
+          if (arc_angles[2] >= 0)
+            Arc(last_step.pen, center, gauge_radii, 0, arc_angles[2]);
+
+          arc_start = arc_end;
         }
       }
-    }
 
-  if (succeeded(reg_open_key(key, "tick", &step_key)))
-    {
-    vector_create(sizeof(tick_mark_t), &wnd->ticks);
-
-    int i;
-    for (i = 0; i < 99; i++)
+      if (ticks != null)
       {
-      snprintf(temp_name, 32, "%d", i);
+        int num_ticks = ticks.Count;
 
-      memid_t child_key;
+        // we now draw the tick marks.  They are a line from the point 5 pixels long.
 
-      if (succeeded(reg_open_key(step_key, temp_name, &child_key)))
+        // we create a white pen for this
+        //pen(&white_pen_2);
+
+        int line_start = gauge_radii;
+        line_start += width >> 1;              // add the line half width
+
+        int line_end = line_start - width - 5;
+        float arc_start;
+
+        for (int i = 0; i < num_ticks; i++)
         {
+          tick_mark_t tick = (tick_mark_t)ticks[i];
 
-        // the step is a series of settings in the form:
-        // tick-0=650, 650
-        // param1 -> tick point
-        // param2 -> tick label
-        tick_mark_t new_tick;
-        memset(&new_tick, 0, sizeof(tick_mark_t));
+          arc_start = (tick.value - min_range) * degrees_per_unit;
+          arc_start += arc_begin;
+          // make it point to correct spot....
+          arc_start += 180;
 
-        if (failed(reg_get_int16(child_key, "value", &new_tick.value)))
-          new_tick.value = 0;
+          Polyline(Pens.WhitePen,
+            RotatePoint(center, new Point(center.X, center.Y - line_start), (int)arc_start),
+          RotatePoint(center, new Point(center.X, center.Y - line_end), (int)arc_start));
 
-        reg_get_string(child_key, "text", new_tick.text, 0);
+          if (tick.text != null && font != null)
+          {
+            // write the text at the point
+            Extent size = TextExtent(font, tick.text);
 
-        vector_push_back(wnd->ticks, &new_tick);
+            // the text is below the tick marks
+            Point top_left = RotatePoint(center, new Point(center.X, center.Y - line_end + (size.Dy >> 1)), (int)arc_start);
+
+            top_left.X -= (size.Dx >> 1);
+            top_left.Y -= (size.Dy >> 1);
+
+            DrawText(font, Colors.White, background_color, tick.text, top_left);
+
+          }
         }
+      }
+
+      // we now calculate the range of the segments.  There are 8 segments
+      // around a 240 degree arc.  We draw the nearest based on the range
+      // of the gauge.
+      Pen pointer_pen;
+      int rotation;
+
+      switch (style)
+      {
+        case gauge_style.gs_pointer_minmax:
+          DrawPoint(wnd_rect, CalculatePen(width, min_values[0]), CalculateRotation(min_values[0]));
+          DrawPoint(wnd_rect, CalculatePen(1, max_values[0]), CalculateRotation(max_values[0]));
+          break;
+        case gauge_style.gs_pointer:
+          rotation = CalculateRotation(values[0]);
+          Polyline(CalculatePen(width, values[0]),
+            RotatePoint(center, new Point(center.X, center.Y - 5), rotation),
+            RotatePoint(center, new Point(center.X, center.Y - gauge_radii + 5), rotation));
+          break;
+        case gauge_style.gs_sweep:
+          Pie(CalculatePen(width, values[0]),
+            CalculateColor(values[0]),
+            center, arc_begin + 90,
+            CalculateRotation(values[0]) + 90,
+            center.Y - gauge_radii + 5, 5);
+          break;
+        case gauge_style.gs_bar:
+          Pen outlinePen = CalculatePen(width, values[0]);
+          rotation = CalculateRotation(values[0]);
+
+          int[] arc_angles = new int[3] { arc_begin + 90, rotation + 90, -1 };
+
+          if (arc_angles[0] > 360)
+          {
+            arc_angles[0] -= 360;
+            arc_angles[1] -= 360;
+          }
+          else if (arc_angles[1] > 360)
+          {
+            arc_angles[2] = arc_angles[1] - 360;
+            arc_angles[1] = 360;
+          }
+
+          int radii = gauge_radii - (width >> 1);
+          radii -= outlinePen.Width >> 1;
+
+          Arc(outlinePen, center, radii, arc_angles[0], arc_angles[1]);
+
+          if (arc_angles[2] > 0)
+            Arc(outlinePen, center, radii, 0, arc_angles[2]);
+          break;
+        case gauge_style.gs_point_minmax:
+          DrawPoint(wnd_rect, CalculatePen(1, min_values[0]), CalculateRotation(min_values[0]));
+          DrawPoint(wnd_rect, CalculatePen(1, max_values[0]), CalculateRotation(max_values[0]));
+          DrawPoint(wnd_rect, CalculatePen(1, values[0]), CalculateRotation(values[0]));
+          break;
+        case gauge_style.gs_point:
+          DrawPoint(wnd_rect, CalculatePen(1, values[0]), CalculateRotation(values[0]));
+          break;
+      }
+
+      // draw the value of the gauge as a text string
+      if (draw_value && value_font != null)
+      {
+        string str = ((int)values[0]).ToString();
+        Extent size = TextExtent(value_font, str);
+
+        // draw a rectangle around the text
+        Rectangle(Pens.GrayPen, Colors.Black, value_rect);
+
+        DrawText(value_font, Colors.LightBlue, Colors.Black, str,
+          new Point(value_rect.Right - (size.Dx + 2), value_rect.Top + 2), value_rect, TextOutStyle.Clipped);
       }
     }
 
-  if (failed(lookup_color(key, "background-color", &wnd->background_color)))
-    wnd->background_color = color_black;
-
-  reg_get_bool(key, "draw-border", &wnd->draw_border);
-
-  memid_t pen_key;
-  if(failed(reg_open_key(key, "border-pen", &pen_key)) ||
-     failed(lookup_pen(pen_key, &wnd->border_pen)))
-    memcpy(&wnd->border_pen, &gray_pen, sizeof(pen_t));
-
-  // store the parameters for the window
-  set_wnddata(*hwnd, wnd);
-
-  // add all of the properties now
-  add_event(*hwnd, id_paint, wnd, 0, on_paint);
-
-  if(wnd->reset_label != 0)
-    add_event(*hwnd, wnd->reset_label, wnd, 0, on_reset_label);
-
-  uint16_t i;
-  for (i = 0; i < wnd->num_values; i++)
+    private bool IsBarStyle
     {
-    add_event(*hwnd, wnd->labels[i], wnd, 0, on_value_label);
-    }      
+      get { return (int)style >= (int)gauge_style.bgs_point; }
+    }
 
-  invalidate_rect(*hwnd, &rect_wnd);
 
-  return s_ok;
+    private void DrawPoint(Rect rect, Pen outLine, int rotation)
+    {
+      int rotn = (int)DegressToRadians(rotation + 90);
+      Polygon(outLine, outLine.Color,
+        RotatePoint(center, new Point(center.X, center.Y - gauge_radii + 5), rotn),
+        RotatePoint(center, new Point(center.X - 6, center.Y - gauge_radii + 11), rotn),
+        RotatePoint(center, new Point(center.X + 6, center.Y - gauge_radii + 11), rotn),
+        RotatePoint(center, new Point(center.X, center.Y - gauge_radii + 5), rotn));
+    }
+
+    private int CalculateRotation(double value)
+    {
+
+      if (steps == null)
+        return 0;
+
+      int count = steps.Count;
+
+      step_t first_step = (step_t)steps[0];
+      step_t last_step = (step_t)steps[count - 1];
+
+      double min_range = first_step.value;
+      double max_range = last_step.value;
+
+      // get the percent that the gauge is displaying
+      double percent = (Math.Max(Math.Min(value, max_range), min_range) - min_range) / (max_range - min_range);
+
+      return (int)(arc_begin + (arc_range * percent));
+    }
+
+    private Pen CalculatePen(ushort width, float value)
+    {
+      if (steps == null || steps.Count == 0)
+        return new Pen(Colors.Hollow, width, PenStyle.Solid);
+
+      uint color = Colors.Hollow;
+      // step 0 is only used to set the minimum value for the gauge
+      // so it is ignored
+      for (int i = 1; i < steps.Count; i++)
+      {
+        // get the next one, and see if we are done.
+        step_t step = (step_t)steps[i];
+
+        // assume this is our color.
+        color = step.gauge_color;
+        if (value <= step.value)
+          break;
+      }
+
+      return new Pen(color, width, PenStyle.Solid);
+    }
+
+    private uint CalculateColor(float value)
+    {
+      uint fill_color = Colors.LightBlue;
+
+      if (steps == null || steps.Count == 0)
+        return fill_color;
+
+      step_t step = (step_t)steps[0];
+
+      for (int i = 0; i < steps.Count; i++)
+      {
+        fill_color = step.gauge_color;
+
+        step = (step_t)steps[i];
+
+        if (value >= step.value)
+          break;
+      }
+
+      return fill_color;
+    }
   }
-*/
+}

@@ -1,10 +1,3 @@
-namespace CanFly.Proton
-{
-  public class GpsWidget
-  {
-    
-  }
-}
 /*
 diy-efis
 Copyright (C) 2016 Kotuku Aerospace Limited
@@ -39,10 +32,15 @@ then the original copyright notice is to be respected.
 
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
-
-
-#include "../photon/widget.h"
-#include "pens.h"
+*/
+namespace CanFly.Proton
+{
+  public sealed class GpsWidget
+  {
+    
+  }
+}
+/*
 
 static const rect_t waypoint = { 4, 10, 130, 55 };
 static const rect_t waypoint_text = { 7, 15, 126, 50 };

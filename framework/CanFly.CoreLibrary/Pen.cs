@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace CanFly
 {
@@ -29,6 +30,21 @@ namespace CanFly
     public uint Handle
     {
       get { return _handle; }
+    }
+
+    public ushort Width
+    {
+      get { return Photon.GetPenWidth(Handle); }
+    }
+
+    public uint Color
+    {
+      get { return Photon.GetPenColor(Handle); }
+    }
+
+    public PenStyle Style
+    {
+      get { return (PenStyle) Photon.GetPenStyle(Handle); }
     }
   };
 }

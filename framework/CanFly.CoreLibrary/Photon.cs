@@ -98,6 +98,12 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern uint CreatePen(uint color, ushort width, ushort style);
     [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern uint GetPenColor(uint handle);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern ushort GetPenWidth(uint handle);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern ushort GetPenStyle(uint handle);
+    [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void DisposePen(uint handle);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void Polyline(uint canvas,

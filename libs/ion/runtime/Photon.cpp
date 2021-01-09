@@ -545,6 +545,54 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::CreatePen___STATIC__U4__U4__U2
   NANOCLR_NOCLEANUP();
   }
 
+HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::GetPenColor___STATIC__U4__U4(CLR_RT_StackFrame &stack)
+  {
+  NANOCLR_HEADER(); hr = S_OK;
+  {
+
+  unsigned int param0;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+
+  unsigned int retValue;
+  hr = get_pen_color((handle_t)param0, (color_t *) &retValue);
+  NANOCLR_CHECK_HRESULT(hr);
+  SetResult_UINT32(stack, retValue);
+  }
+  NANOCLR_NOCLEANUP();
+  }
+
+HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::GetPenWidth___STATIC__U2__U4(CLR_RT_StackFrame &stack)
+  {
+  NANOCLR_HEADER(); hr = S_OK;
+  {
+
+  unsigned int param0;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+
+  uint16_t retValue;
+  hr = get_pen_width((handle_t)param0, &retValue);
+  NANOCLR_CHECK_HRESULT(hr);
+  SetResult_UINT16(stack, retValue);
+  }
+  NANOCLR_NOCLEANUP();
+  }
+
+HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::GetPenStyle___STATIC__U2__U4(CLR_RT_StackFrame &stack)
+  {
+  NANOCLR_HEADER(); hr = S_OK;
+  {
+
+  unsigned int param0;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+
+  uint16_t retValue;
+  hr = get_pen_style((handle_t)param0, (pen_style *)&retValue);
+  NANOCLR_CHECK_HRESULT(hr);
+  SetResult_UINT16(stack, retValue);
+  }
+  NANOCLR_NOCLEANUP();
+  }
+
 HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::DisposePen___STATIC__VOID__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;

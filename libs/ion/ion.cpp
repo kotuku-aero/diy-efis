@@ -107,13 +107,6 @@ result_t ion_init()
       return result;
     }
 
-  memid_t parent;
-  if (failed(result = reg_open_key(ion_home, event_s, &parent)))
-    {
-    if (failed(result = reg_create_key(ion_home, event_s, &parent)))
-      return result;
-    }
-
   return s_ok;
   }
 
