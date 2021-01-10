@@ -80,9 +80,10 @@ extern result_t ion_init();
    * Queue a message to the worker to process.
    * @param ion     Context for the interpreter
    * @param handler Registered name for the message (MUST be static variable)
+   * @param hwnd    Optional handle of window to receive the message
    * @param msg     Message to queue
   */
-  extern result_t ion_queue_message(struct _ion_context_t *ion, const canmsg_t *msg);
+  extern result_t ion_queue_message(struct _ion_context_t *ion, uint32_t hwnd, const canmsg_t *msg);
 
   extern result_t ion_close(struct _ion_context_t *ion);
   /**

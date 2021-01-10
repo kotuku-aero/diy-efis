@@ -73,17 +73,17 @@ namespace CanFly.Proton
       if (!LookupFont(key, "font", out font))
         OpenFont("neo", 9, out font);
 
-      CanFlyMsgSink.AddEventListener(CanFlyID.id_magnetic_heading, OnMagneticHeading);
-      CanFlyMsgSink.AddEventListener(CanFlyID.id_heading, OnHeading);
-      CanFlyMsgSink.AddEventListener(CanFlyID.id_heading_angle, OnHeadingAngle);
-      CanFlyMsgSink.AddEventListener(CanFlyID.id_deviation, OnDeviation);
-      CanFlyMsgSink.AddEventListener(CanFlyID.id_selected_course, OnSelectedCourse);
-      CanFlyMsgSink.AddEventListener(CanFlyID.id_track, OnTrack);
-      CanFlyMsgSink.AddEventListener(CanFlyID.id_wind_speed, OnWindSpeed);
-      CanFlyMsgSink.AddEventListener(CanFlyID.id_wind_direction, OnWindDirection);
-      CanFlyMsgSink.AddEventListener(CanFlyID.id_distance_to_next, OnDistanceToNext);
-      CanFlyMsgSink.AddEventListener(CanFlyID.id_magnetic_variation, OnMagneticVariation);
-      CanFlyMsgSink.AddEventListener(CanFlyID.id_estimated_time_to_next, OnEstimatedTimeToNext);
+      AddEventListener(CanFlyID.id_magnetic_heading, OnMagneticHeading);
+      AddEventListener(CanFlyID.id_heading, OnHeading);
+      AddEventListener(CanFlyID.id_heading_angle, OnHeadingAngle);
+      AddEventListener(CanFlyID.id_deviation, OnDeviation);
+      AddEventListener(CanFlyID.id_selected_course, OnSelectedCourse);
+      AddEventListener(CanFlyID.id_track, OnTrack);
+      AddEventListener(CanFlyID.id_wind_speed, OnWindSpeed);
+      AddEventListener(CanFlyID.id_wind_direction, OnWindDirection);
+      AddEventListener(CanFlyID.id_distance_to_next, OnDistanceToNext);
+      AddEventListener(CanFlyID.id_magnetic_variation, OnMagneticVariation);
+      AddEventListener(CanFlyID.id_estimated_time_to_next, OnEstimatedTimeToNext);
 
       InvalidateRect();
     }
@@ -210,7 +210,7 @@ namespace CanFly.Proton
       }
     }
 
-    protected override void OnPaint()
+    protected override void OnPaint(CanFlyMsg e)
     {
       Rect wnd_rect = WindowRect;
       Extent ex = wnd_rect.Extent;

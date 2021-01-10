@@ -328,10 +328,10 @@ namespace CanFly.Proton
 
 
       if (reset_label != 0)
-        CanFlyMsgSink.AddEventListener(reset_label, OnResetLabel);
+        AddEventListener(reset_label, OnResetLabel);
 
       for (int i = 0; i < num_values; i++)
-        CanFlyMsgSink.AddEventListener(labels[i], OnValueLabel);
+        AddEventListener(labels[i], OnValueLabel);
 
       InvalidateRect();
     }
@@ -389,7 +389,7 @@ namespace CanFly.Proton
       InvalidateRect();
     }
 
-    protected override void OnPaint()
+    protected override void OnPaint(CanFlyMsg e)
     {
       BeginPaint();
 

@@ -258,6 +258,7 @@ public sealed class CanFlyMsg
   {
     // these are required by the native implementation
 #pragma warning disable 0169
+    private ushort _canId;
     private ushort _flags;
     private byte _data0;
     private byte _data1;
@@ -282,8 +283,9 @@ public sealed class CanFlyMsg
     {
     }
 
-    internal CanFlyMsg(ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7)
+    internal CanFlyMsg(ushort can_id, ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7)
     {
+      _canId = can_id;
       _flags = flags;
       _data0 = b0;
       _data1 = b1;
@@ -464,7 +466,7 @@ public sealed class CanFlyMsg
     /// <param name="widget">Widget to receive the message</param>
     public void SendMessage(Widget widget)
     {
-      SendMessage(widget.Handle);
+      SendMessage(widget.InternalHandle);
     }
 
     /// <summary>
@@ -473,7 +475,7 @@ public sealed class CanFlyMsg
     /// <param name="widget"></param>
     public void PostMessage(Widget widget)
     {
-      PostMessage(widget.Handle, 0);
+      PostMessage(widget.InternalHandle, 0);
     }
     /// <summary>
     /// Post a message to the window queue.  Returns as soon as the message is sent
@@ -481,7 +483,7 @@ public sealed class CanFlyMsg
     /// <param name="widget"></param>
     public void PostMessage(Widget widget, uint maxWait)
     {
-      PostMessage(widget.Handle, maxWait);
+      PostMessage(widget.InternalHandle, maxWait);
     }
     /// <summary>
     /// Get a message from the screen queue along with the window it was

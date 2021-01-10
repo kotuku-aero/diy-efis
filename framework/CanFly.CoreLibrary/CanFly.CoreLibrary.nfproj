@@ -24,11 +24,8 @@
   </PropertyGroup>
   <Import Project="$(NanoFrameworkProjectSystemPath)NFProjectSystem.props" Condition="Exists('$(NanoFrameworkProjectSystemPath)NFProjectSystem.props')" />
   <ItemGroup>
-    <Compile Include="CanFlyEvent.cs" />
-    <Compile Include="CanFlyEventDispatcher.cs" />
     <Compile Include="Canvas.cs" />
     <Compile Include="Color.cs" />
-    <Compile Include="CanFlyMsgSink.cs" />
     <Compile Include="DirectoryEnumerator.cs" />
     <Compile Include="Extent.cs" />
     <Compile Include="Font.cs" />

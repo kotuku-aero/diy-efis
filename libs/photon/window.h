@@ -140,11 +140,10 @@ static inline result_t as_window(handle_t handle, window_t **window)
  * @param hwnd    Window to hook
  * @param id      ID of the event to handle
  * @param parg    Optional argument to be passed to the callback
- * @param func    Optional function name to be passed to the callback
  * @param callback  Function to call when the event occurs
  * @return s_ok if the event is hooked.
  */
-extern result_t add_event(handle_t hwnd, uint16_t id, void *parg, const char *func, event_handler_fn callback);
+extern result_t add_event(handle_t hwnd, uint16_t id, void *parg, event_handler_fn callback);
 /**
  * @function result_t remove_event(uint16_t id, proxy_t *previous)
  * Remove an event handler
@@ -163,41 +162,6 @@ extern result_t remove_event(handle_t hwnd, uint16_t id, bool head_only);
  * @return s_ok if the handler was found ok
  */
 extern result_t find_event(handle_t hwnd, uint16_t id, event_proxy_t **details);
-
-typedef struct _variant_t {
-  field_datatype dt;
-  union {
-    bool v_bool;
-    uint16_t v_uint16;
-    int16_t v_int16;
-    uint32_t v_uint32;
-    int32_t v_int32;
-    float v_float;
-    xyz_t v_xyz;
-    matrix_t v_matrix;
-    lla_t v_lla;
-    qtn_t v_qtn;
-    const char *v_string;
-  };
-  } variant_t;
-
-typedef void (*free_fn)(variant_t *value);
-
-typedef result_t (*getter_fn)(handle_t hwnd, variant_t *value);
-typedef result_t (*setter_fn)(handle_t hwnd, const variant_t *value);
-
-/**
- * @function result_t add_property(handle_t hwnd, const char *property_name, void *parg, getter_fn getter, setter_fn setter)
- * As a widget is created it can have optional ECMA Scripts attached to the event subsystem.  To enable the
- * script to access the arguments on the widget that are built-in the function allows properties to be defined
- * @param hwnd    Opaque handle to the window
- * @param property_name   Name of the property.  Must conform to javascript property type
- * @param parg    Opaque pointer passed into the function
- * @param getter  Callback to get the value of a property
- * @param setter  Callback to set the value of a property
- * @return s_ok if the property added ok.
-*/
-extern result_t add_property(handle_t hwnd, const char *property_name, getter_fn getter, setter_fn setter, field_datatype dt);
 
 extern result_t get_canvas(handle_t hwnd, canvas_t **canvas);
 

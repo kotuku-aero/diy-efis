@@ -1,15 +1,57 @@
 using System;
 using System.Collections;
+using System.Runtime.CompilerServices;
 
 namespace CanFly
 {
+  public delegate void CanFlyEventHandler(ushort can_id, ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7);
+
+  public delegate void CanFlyMsgHandler(CanFlyMsg msg);
+
   public abstract class Widget : GdiObject
   {
+    protected CanFlyEventHandler threadSpawn = null;
+
+    private static ArrayList eventInfoTable = null;
+    private class EventInfo
+    {
+      // the canfly msg ID of this event
+      private ushort eventID;
+      private CanFlyMsgHandler handler;
+      
+      public EventInfo(ushort eventId)
+      {
+        this.eventID = eventId;
+      }
+
+      public ushort EventID {  get { return eventID; } }
+      public void OnMessage(CanFlyMsg msg)
+      {
+        handler?.Invoke(msg);
+      }
+
+      public event CanFlyMsgHandler Handler
+      {
+        add { handler += value; }
+        remove { handler -= value; }
+
+      }
+    }
+
+    public event CanFlyMsgHandler BeforePaint = null;
+    public event CanFlyMsgHandler AfterPaint = null;
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    static extern Widget();
+
     internal Widget(uint hwnd) : base(hwnd)
     {
       Photon.SetWindowData(Handle, this);
 
       ClipRect = WindowRect;
+
+      // create this widgets handler
+      threadSpawn = new CanFlyEventHandler(OnMessage);
     }
 
     /// <summary>
@@ -24,13 +66,102 @@ namespace CanFly
       Photon.SetWindowData(Handle, this);
       // default clipping rectangle
       ClipRect = WindowRect;
+
+      // hook the paint message
+      AddEventListener(PhotonID.id_paint, OnPaint);
     }
 
-    protected abstract void OnPaint();
-    
+    private void OnPaintMsg(CanFlyMsg e)
+    {
+      try
+      {
+        if (BeforePaint != null)
+          BeforePaint(e);
+
+        OnPaint(e);
+
+        if (AfterPaint != null)
+          AfterPaint(e);
+      }
+      catch
+      {
+      }
+    }
+
+    protected abstract void OnPaint(CanFlyMsg e);
+
     protected override void OnDispose()
     {
       Photon.CloseWindow(Handle);
+    }
+
+    /// <summary>
+    /// Add an event handler to the current widget message queue
+    /// </summary>
+    /// <param name="message_id">Id of message to handle</param>
+    /// <param name="eventListener">Callback</param>
+    public void AddEventListener(ushort message_id, CanFlyMsgHandler eventListener)
+    {
+      EventInfo eventInfo = FindEvent(message_id);
+      if (eventInfo == null)
+      {
+        eventInfo = new EventInfo(message_id);
+      }
+
+      eventInfo.Handler += eventListener;
+    }
+    /// <summary>
+    /// Remove an event handler
+    /// </summary>
+    /// <param name="message_id"></param>
+    /// <param name="eventListener"></param>
+    public void RemoveEventListener(ushort message_id, CanFlyMsgHandler eventListener)
+    {
+      EventInfo eventInfo = FindEvent(message_id);
+      if (eventInfo != null)
+        eventInfo.Handler -= eventListener;
+    }
+ 
+    private static EventInfo FindEvent(ushort eventID)
+    {
+      for (int i = 0; i < eventInfoTable.Count; i++)
+      {
+        EventInfo theHandler = (EventInfo)eventInfoTable[i];
+
+        if (eventID == theHandler.EventID)
+          return theHandler;
+      }
+
+      return null;
+    }
+
+    /// <summary>
+    /// Handle a new message that has been sent to the widget
+    /// </summary>
+    /// <param name="id">Can ID of the message</param>
+    /// <param name="e"></param>
+    protected virtual void DefaultMsgHandler(CanFlyMsg e)
+    {
+      EventInfo eventInfo = FindEvent(e.Id);
+
+      if (eventInfo != null)
+      {
+        try
+        {
+          eventInfo.OnMessage(e);
+        }
+        catch
+        {
+        }
+      }
+    }
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    private extern void AddEvent(uint handle, ushort id);
+
+    private void OnMessage(ushort id, ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7)
+    {
+      DefaultMsgHandler(new CanFlyMsg(id, flags, b0, b1, b2, b3, b4, b5, b6, b7));
     }
 
     /// <summary>
@@ -69,6 +200,17 @@ namespace CanFly
       }
       set { Photon.SetWindowPos(Handle, value.Left, value.Right, value.Top, value.Bottom); ; }
     }
+
+    public void SendMessage(CanFlyMsg msg)
+    {
+      Photon.SendMessage(Handle, msg);
+    }
+
+    public void PostMessage(CanFlyMsg msg)
+    {
+      Photon.PostMessage(Handle, msg);
+    }
+
     /// <summary>
     /// 
     /// </summary>

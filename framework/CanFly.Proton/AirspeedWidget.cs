@@ -132,7 +132,7 @@ namespace CanFly.Proton
         _pen = new Pen(Colors.White, 1, PenStyle.Solid);
 
       // hook the canbus messages
-      CanFlyMsgSink.AddEventListener(CanFlyID.id_indicated_airspeed, OnIndicatedAirspeed);
+      AddEventListener(CanFlyID.id_indicated_airspeed, OnIndicatedAirspeed);
       
       InvalidateRect();
     }
@@ -155,7 +155,7 @@ namespace CanFly.Proton
       }
     }
 
-    protected override void OnPaint()
+    protected override void OnPaint(CanFlyMsg e)
     {
       BeginPaint();
 

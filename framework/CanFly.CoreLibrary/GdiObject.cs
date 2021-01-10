@@ -21,7 +21,12 @@ namespace CanFly
       _clip_rect = new Rect(new Point(0, 0), Extents);
     }
 
-    internal uint Handle
+    protected uint Handle
+    {
+      get { return _hndl; }
+    }
+
+    internal uint InternalHandle
     {
       get { return _hndl; }
     }

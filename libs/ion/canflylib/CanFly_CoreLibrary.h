@@ -61,20 +61,6 @@ typedef enum __nfpack TextOutStyle
     TextOutStyle_Opaque = 4,
 } TextOutStyle;
 
-struct Library_CanFly_CoreLibrary_CanFly_CanFlyEventDispatcher
-{
-    static const int FIELD__threadSpawn = 1;
-    static const int FIELD__callbacks = 2;
-    static const int FIELD__disposed = 3;
-    static const int FIELD___CanFlyEventDispatcher = 4;
-
-    NANOCLR_NATIVE_DECLARE(Dispose___VOID__BOOLEAN);
-    NANOCLR_NATIVE_DECLARE(_ctor___VOID);
-
-    //--//
-
-};
-
 struct Library_CanFly_CoreLibrary_CanFly_CanFlyID
 {
     static const int FIELD_STATIC__id_unused = 0;
@@ -269,15 +255,16 @@ struct Library_CanFly_CoreLibrary_CanFly_CanFlyID
 
 struct Library_CanFly_CoreLibrary_CanFly_CanFlyMsg
 {
-    static const int FIELD___flags = 1;
-    static const int FIELD___data0 = 2;
-    static const int FIELD___data1 = 3;
-    static const int FIELD___data2 = 4;
-    static const int FIELD___data3 = 5;
-    static const int FIELD___data4 = 6;
-    static const int FIELD___data5 = 7;
-    static const int FIELD___data6 = 8;
-    static const int FIELD___data7 = 9;
+    static const int FIELD___canId = 1;
+    static const int FIELD___flags = 2;
+    static const int FIELD___data0 = 3;
+    static const int FIELD___data1 = 4;
+    static const int FIELD___data2 = 5;
+    static const int FIELD___data3 = 6;
+    static const int FIELD___data4 = 7;
+    static const int FIELD___data5 = 8;
+    static const int FIELD___data6 = 9;
+    static const int FIELD___data7 = 10;
 
     NANOCLR_NATIVE_DECLARE(ToString___STRING);
     NANOCLR_NATIVE_DECLARE(_ctor___VOID__U2__U2__U4);
@@ -331,58 +318,38 @@ struct Library_CanFly_CoreLibrary_CanFly_CanFlyMsg
 
 };
 
-struct Library_CanFly_CoreLibrary_CanFly_CanFlyMsgSink__EventInfo
-{
-    static const int FIELD__EventListener = 1;
-    static const int FIELD__EventID = 2;
-
-    //--//
-
-};
-
-struct Library_CanFly_CoreLibrary_CanFly_CanFlyMsgSink
-{
-    static const int FIELD_STATIC__s_eventSink = 185;
-    static const int FIELD_STATIC__s_eventInfoTable = 186;
-
-    NANOCLR_NATIVE_DECLARE(EventConfig___VOID);
-
-    //--//
-
-};
-
 struct Library_CanFly_CoreLibrary_CanFly_Colors
 {
-    static const int FIELD_STATIC__White = 187;
-    static const int FIELD_STATIC__Black = 188;
-    static const int FIELD_STATIC__Gray = 189;
-    static const int FIELD_STATIC__LightGray = 190;
-    static const int FIELD_STATIC__DarkGray = 191;
-    static const int FIELD_STATIC__Red = 192;
-    static const int FIELD_STATIC__Pink = 193;
-    static const int FIELD_STATIC__Blue = 194;
-    static const int FIELD_STATIC__Green = 195;
-    static const int FIELD_STATIC__LightGreen = 196;
-    static const int FIELD_STATIC__Yellow = 197;
-    static const int FIELD_STATIC__Magenta = 198;
-    static const int FIELD_STATIC__Cyan = 199;
-    static const int FIELD_STATIC__PaleYellow = 200;
-    static const int FIELD_STATIC__LightYellow = 201;
-    static const int FIELD_STATIC__LimeGreen = 202;
-    static const int FIELD_STATIC__Teal = 203;
-    static const int FIELD_STATIC__DarkGreen = 204;
-    static const int FIELD_STATIC__Maroon = 205;
-    static const int FIELD_STATIC__Purple = 206;
-    static const int FIELD_STATIC__Orange = 207;
-    static const int FIELD_STATIC__Khaki = 208;
-    static const int FIELD_STATIC__Olive = 209;
-    static const int FIELD_STATIC__Brown = 210;
-    static const int FIELD_STATIC__Navy = 211;
-    static const int FIELD_STATIC__LightBlue = 212;
-    static const int FIELD_STATIC__FadedBlue = 213;
-    static const int FIELD_STATIC__LightGrey = 214;
-    static const int FIELD_STATIC__DarkGrey = 215;
-    static const int FIELD_STATIC__Hollow = 216;
+    static const int FIELD_STATIC__White = 185;
+    static const int FIELD_STATIC__Black = 186;
+    static const int FIELD_STATIC__Gray = 187;
+    static const int FIELD_STATIC__LightGray = 188;
+    static const int FIELD_STATIC__DarkGray = 189;
+    static const int FIELD_STATIC__Red = 190;
+    static const int FIELD_STATIC__Pink = 191;
+    static const int FIELD_STATIC__Blue = 192;
+    static const int FIELD_STATIC__Green = 193;
+    static const int FIELD_STATIC__LightGreen = 194;
+    static const int FIELD_STATIC__Yellow = 195;
+    static const int FIELD_STATIC__Magenta = 196;
+    static const int FIELD_STATIC__Cyan = 197;
+    static const int FIELD_STATIC__PaleYellow = 198;
+    static const int FIELD_STATIC__LightYellow = 199;
+    static const int FIELD_STATIC__LimeGreen = 200;
+    static const int FIELD_STATIC__Teal = 201;
+    static const int FIELD_STATIC__DarkGreen = 202;
+    static const int FIELD_STATIC__Maroon = 203;
+    static const int FIELD_STATIC__Purple = 204;
+    static const int FIELD_STATIC__Orange = 205;
+    static const int FIELD_STATIC__Khaki = 206;
+    static const int FIELD_STATIC__Olive = 207;
+    static const int FIELD_STATIC__Brown = 208;
+    static const int FIELD_STATIC__Navy = 209;
+    static const int FIELD_STATIC__LightBlue = 210;
+    static const int FIELD_STATIC__FadedBlue = 211;
+    static const int FIELD_STATIC__LightGrey = 212;
+    static const int FIELD_STATIC__DarkGrey = 213;
+    static const int FIELD_STATIC__Hollow = 214;
 
     //--//
 
@@ -514,6 +481,8 @@ struct Library_CanFly_CoreLibrary_CanFly_Photon
     NANOCLR_NATIVE_DECLARE(CreateWindow___STATIC__U4__U4__I4__I4__I4__I4__U2);
     NANOCLR_NATIVE_DECLARE(CreateChildWindow___STATIC__U4__U4__I4__I4__I4__I4__U2);
     NANOCLR_NATIVE_DECLARE(CloseWindow___STATIC__VOID__U4);
+    NANOCLR_NATIVE_DECLARE(SendMessage___STATIC__VOID__U4__CanFlyCanFlyMsg);
+    NANOCLR_NATIVE_DECLARE(PostMessage___STATIC__VOID__U4__CanFlyCanFlyMsg);
     NANOCLR_NATIVE_DECLARE(GetWindowRect___STATIC__VOID__U4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4);
     NANOCLR_NATIVE_DECLARE(GetWindowPos___STATIC__VOID__U4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4);
     NANOCLR_NATIVE_DECLARE(SetWindowPos___STATIC__VOID__U4__I4__I4__I4__I4);
@@ -564,26 +533,28 @@ struct Library_CanFly_CoreLibrary_CanFly_Photon
 
 struct Library_CanFly_CoreLibrary_CanFly_PhotonID
 {
-    static const int FIELD_STATIC__id_photon = 217;
-    static const int FIELD_STATIC__id_paint = 218;
-    static const int FIELD_STATIC__id_create = 219;
-    static const int FIELD_STATIC__id_close = 220;
-    static const int FIELD_STATIC__id_timer = 221;
-    static const int FIELD_STATIC__id_key0 = 222;
-    static const int FIELD_STATIC__id_key1 = 223;
-    static const int FIELD_STATIC__id_key2 = 224;
-    static const int FIELD_STATIC__id_key3 = 225;
-    static const int FIELD_STATIC__id_key4 = 226;
-    static const int FIELD_STATIC__id_decka = 227;
-    static const int FIELD_STATIC__id_deckb = 228;
-    static const int FIELD_STATIC__id_menu_up = 229;
-    static const int FIELD_STATIC__id_menu_dn = 230;
-    static const int FIELD_STATIC__id_menu_left = 231;
-    static const int FIELD_STATIC__id_menu_right = 232;
-    static const int FIELD_STATIC__id_menu_ok = 233;
-    static const int FIELD_STATIC__id_menu_cancel = 234;
-    static const int FIELD_STATIC__id_menu_select = 235;
-    static const int FIELD_STATIC__id_buttonpress = 236;
+    static const int FIELD_STATIC__id_photon = 215;
+    static const int FIELD_STATIC__id_paint = 216;
+    static const int FIELD_STATIC__id_timer = 217;
+    static const int FIELD_STATIC__id_key0 = 218;
+    static const int FIELD_STATIC__id_key1 = 219;
+    static const int FIELD_STATIC__id_key2 = 220;
+    static const int FIELD_STATIC__id_key3 = 221;
+    static const int FIELD_STATIC__id_key4 = 222;
+    static const int FIELD_STATIC__id_key5 = 223;
+    static const int FIELD_STATIC__id_key6 = 224;
+    static const int FIELD_STATIC__id_key7 = 225;
+    static const int FIELD_STATIC__id_decka = 226;
+    static const int FIELD_STATIC__id_deckb = 227;
+    static const int FIELD_STATIC__id_menu_up = 228;
+    static const int FIELD_STATIC__id_menu_dn = 229;
+    static const int FIELD_STATIC__id_menu_left = 230;
+    static const int FIELD_STATIC__id_menu_right = 231;
+    static const int FIELD_STATIC__id_menu_ok = 232;
+    static const int FIELD_STATIC__id_menu_cancel = 233;
+    static const int FIELD_STATIC__id_menu_select = 234;
+    static const int FIELD_STATIC__id_buttonpress = 235;
+    static const int FIELD_STATIC__id_cancel = 236;
 
     //--//
 
@@ -651,6 +622,30 @@ struct Library_CanFly_CoreLibrary_CanFly_Stream
     NANOCLR_NATIVE_DECLARE(StreamPath___STATIC__STRING__U4__BOOLEAN);
     NANOCLR_NATIVE_DECLARE(StreamClose___STATIC__VOID__U4);
     NANOCLR_NATIVE_DECLARE(StreamDelete___STATIC__VOID__U4);
+
+    //--//
+
+};
+
+struct Library_CanFly_CoreLibrary_CanFly_Widget__EventInfo
+{
+    static const int FIELD__eventID = 1;
+    static const int FIELD__handler = 2;
+
+    //--//
+
+};
+
+struct Library_CanFly_CoreLibrary_CanFly_Widget
+{
+    static const int FIELD_STATIC__eventInfoTable = 239;
+
+    static const int FIELD__threadSpawn = 3;
+    static const int FIELD__BeforePaint = 4;
+    static const int FIELD__AfterPaint = 5;
+
+    NANOCLR_NATIVE_DECLARE(AddEvent___VOID__U4__U2);
+    NANOCLR_NATIVE_DECLARE(_cctor___STATIC__VOID);
 
     //--//
 

@@ -14,24 +14,26 @@ namespace CanFly
   {
     public static readonly ushort id_photon = 1750;
     public static readonly ushort id_paint = 1751;
-    public static readonly ushort id_create = 1752;
-    public static readonly ushort id_close = 1753;
     public static readonly ushort id_timer = 1754;
     public static readonly ushort id_key0 = 1755;
     public static readonly ushort id_key1 = 1756;
     public static readonly ushort id_key2 = 1757;
     public static readonly ushort id_key3 = 1758;
     public static readonly ushort id_key4 = 1759;
-    public static readonly ushort id_decka = 1760;
-    public static readonly ushort id_deckb = 1761;
-    public static readonly ushort id_menu_up = 1762;
-    public static readonly ushort id_menu_dn = 1763;
-    public static readonly ushort id_menu_left = 1764;
-    public static readonly ushort id_menu_right = 1765;
-    public static readonly ushort id_menu_ok = 1766;
-    public static readonly ushort id_menu_cancel = 1767;
-    public static readonly ushort id_menu_select = 1768;
-    public static readonly ushort id_buttonpress = 1769;
+    public static readonly ushort id_key5 = 1760;
+    public static readonly ushort id_key6 = 1761;
+    public static readonly ushort id_key7 = 1762;
+    public static readonly ushort id_decka = 1763;
+    public static readonly ushort id_deckb = 1764;
+    public static readonly ushort id_menu_up = 1765;
+    public static readonly ushort id_menu_dn = 1766;
+    public static readonly ushort id_menu_left = 1767;
+    public static readonly ushort id_menu_right = 1768;
+    public static readonly ushort id_menu_ok = 1769;
+    public static readonly ushort id_menu_cancel = 1770;
+    public static readonly ushort id_menu_select = 1771;
+    public static readonly ushort id_buttonpress = 1772;
+    public static readonly ushort id_cancel = 1773;
   }
 
   public sealed class Photon
@@ -44,7 +46,11 @@ namespace CanFly
     internal static extern uint CreateChildWindow(uint parent, int left, int top, int right, int bottom, ushort id);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void CloseWindow(uint hwnd);
-    
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void SendMessage(uint hwnd, CanFlyMsg msg);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void PostMessage(uint hend, CanFlyMsg msg);
+
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void GetWindowRect(uint window, out int left, out int top, out int right, out int bottom);
 

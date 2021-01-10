@@ -27,10 +27,7 @@
     <ClCompile Include="..\..\libs\ion\ion.cpp" />
     <ClCompile Include="..\..\libs\ion\nanoCRT.cpp" />
     <ClCompile Include="..\..\libs\ion\neo.c" />
-    <ClCompile Include="..\..\libs\ion\runtime\CanFlyEventDispatcher.cpp" />
     <ClCompile Include="..\..\libs\ion\runtime\CanFlyMsg.cpp" />
-    <ClCompile Include="..\..\libs\ion\runtime\CanFlyMsgSink.cpp" />
-    <ClCompile Include="..\..\libs\ion\runtime\CLR_Message.cpp" />
     <ClCompile Include="..\..\libs\ion\runtime\DirectoryEnumerator.cpp" />
     <ClCompile Include="..\..\libs\ion\runtime\FileStream.cpp" />
     <ClCompile Include="..\..\libs\ion\runtime\Font.cpp" />
@@ -39,6 +36,7 @@
     <ClCompile Include="..\..\libs\ion\runtime\PointArray.cpp" />
     <ClCompile Include="..\..\libs\ion\runtime\RegistryStream.cpp" />
     <ClCompile Include="..\..\libs\ion\runtime\Stream.cpp" />
+    <ClCompile Include="..\..\libs\ion\runtime\Widget.cpp" />
     <ClCompile Include="..\..\libs\ion\targetHAL.c" />
     <ClCompile Include="..\..\libs\ion\targetHAL_Time.c" />
   </ItemGroup>
@@ -47,8 +45,6 @@
     <ClInclude Include="..\..\libs\ion\ion.h" />
     <ClInclude Include="..\..\libs\ion\ion_cli.h" />
     <ClInclude Include="..\..\libs\ion\ion_cli_impl.h" />
-    <ClInclude Include="..\..\libs\ion\runtime\CLR_Message.h" />
-    <ClInclude Include="..\..\libs\ion\runtime\CanFlyEventDispatcher.h" />
     <ClInclude Include="..\..\libs\ion\targetHAL.h" />
     <ClInclude Include="..\..\libs\ion\target_os.h" />
   </ItemGroup>

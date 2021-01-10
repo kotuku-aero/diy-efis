@@ -36,13 +36,7 @@
     <ClCompile Include="..\..\libs\ion\canflylib\CanFly_CoreLibrary.cpp">
       <Filter>canflylib</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\ion\runtime\CanFlyEventDispatcher.cpp">
-      <Filter>runtime</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libs\ion\runtime\CanFlyMsg.cpp">
-      <Filter>runtime</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\ion\runtime\CanFlyMsgSink.cpp">
       <Filter>runtime</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libs\ion\runtime\Font.cpp">
@@ -55,9 +49,6 @@
       <Filter>runtime</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libs\ion\runtime\PointArray.cpp">
-      <Filter>runtime</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\ion\runtime\CLR_Message.cpp">
       <Filter>runtime</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libs\ion\comm_service.c">
@@ -87,6 +78,9 @@
     <ClCompile Include="..\..\libs\ion\runtime\FileStream.cpp">
       <Filter>runtime</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\libs\ion\runtime\Widget.cpp">
+      <Filter>runtime</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libs\ion\ion_cli_impl.h">
@@ -106,12 +100,6 @@
     </ClInclude>
     <ClInclude Include="..\..\libs\ion\canflylib\CanFly_CoreLibrary.h">
       <Filter>canflylib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libs\ion\runtime\CLR_Message.h">
-      <Filter>runtime</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libs\ion\runtime\CanFlyEventDispatcher.h">
-      <Filter>runtime</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

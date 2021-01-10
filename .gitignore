@@ -78,3 +78,6 @@
 /libs/ion/canflylib/CanFly_CoreLibrary_CanFly_Stream.h
 /libs/ion/canflylib/CanFly_CoreLibrary_CanFly_DirectoryEnumerator_mshl.cpp
 /libs/ion/canflylib/CanFly_CoreLibrary_CanFly_Stream_mshl.cpp
+/libs/ion/canflylib/CanFly_CoreLibrary_CanFly_Widget.cpp
+/libs/ion/canflylib/CanFly_CoreLibrary_CanFly_Widget.h
+/libs/ion/canflylib/CanFly_CoreLibrary_CanFly_Widget_mshl.cpp

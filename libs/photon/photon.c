@@ -95,8 +95,7 @@ static bool msg_hook(const canmsg_t *msg, void *parg)
 // this is defined in window.c
 extern result_t on_paint(handle_t hwnd, event_proxy_t *proxy, const canmsg_t *msg);
 
-result_t open_screen(uint16_t orientation, wndproc cb, uint16_t id,
-    handle_t *hwnd)
+result_t open_screen(uint16_t orientation, wndproc cb, uint16_t id, handle_t *hwnd)
   {
   result_t result;
   canvas_t *canvas;

@@ -76,11 +76,11 @@ namespace CanFly.Proton
         OpenFont("neo", 15, out large_font);
       }
 
-      CanFlyMsgSink.AddEventListener(CanFlyID.id_def_utc, OnDefUtc);
-      CanFlyMsgSink.AddEventListener(CanFlyID.id_qnh, OnQnh);
-      CanFlyMsgSink.AddEventListener(CanFlyID.id_true_airspeed, OnTrueAirspeed);
-      CanFlyMsgSink.AddEventListener(CanFlyID.id_outside_air_temperature, OnOutsideAirTemperature);
-      CanFlyMsgSink.AddEventListener(CanFlyID.id_air_time, OnAirTime);
+      AddEventListener(CanFlyID.id_def_utc, OnDefUtc);
+      AddEventListener(CanFlyID.id_qnh, OnQnh);
+      AddEventListener(CanFlyID.id_true_airspeed, OnTrueAirspeed);
+      AddEventListener(CanFlyID.id_outside_air_temperature, OnOutsideAirTemperature);
+      AddEventListener(CanFlyID.id_air_time, OnAirTime);
     }
 
     private void OnAirTime(CanFlyMsg e)
@@ -143,7 +143,7 @@ namespace CanFly.Proton
       }
     }
 
-    protected override void OnPaint()
+    protected override void OnPaint(CanFlyMsg e)
     {
       bool changed = false;
       BeginPaint();

@@ -17,19 +17,6 @@
 #include "../../neutron/neutron.h"
 #include "../../photon/photon.h"
 
-#include "CanFlyEventDispatcher.h"
-
-
-extern "C" {
-  static result_t screen_wndproc(handle_t hwnd, const canmsg_t *msg)
-    {
-    // post this to the message queue
-    g_CLR_MessageDispatcher.SaveToIonQueue(msg);
-
-    return s_ok;
-    }
-  }
-
 HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::OpenScreen___STATIC__U4__U2__U2(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
@@ -41,7 +28,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::OpenScreen___STATIC__U4__U2__U
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 1, param1));
 
   handle_t hwnd;
-  hr = open_screen(param0, screen_wndproc, param1, &hwnd);
+  hr = open_screen(param0, defwndproc, param1, &hwnd);
 
   NANOCLR_CHECK_HRESULT(hr);
 

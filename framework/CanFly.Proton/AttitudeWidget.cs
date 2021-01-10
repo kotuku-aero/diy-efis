@@ -101,9 +101,9 @@ namespace CanFly.Proton
         OpenFont("neo", 9, out _font);
       }
 
-      CanFlyMsgSink.AddEventListener(CanFlyID.id_yaw_angle, OnYawAngle);
-      CanFlyMsgSink.AddEventListener(CanFlyID.id_roll_angle, OnRollAngle);
-      CanFlyMsgSink.AddEventListener(CanFlyID.id_pitch_angle, OnPitchAngle);
+      AddEventListener(CanFlyID.id_yaw_angle, OnYawAngle);
+      AddEventListener(CanFlyID.id_roll_angle, OnRollAngle);
+      AddEventListener(CanFlyID.id_pitch_angle, OnPitchAngle);
     }
 
     private void OnPitchAngle(CanFlyMsg e)
@@ -176,7 +176,7 @@ namespace CanFly.Proton
       }
     }
 
-    protected override void OnPaint()
+    protected override void OnPaint(CanFlyMsg e)
     {
       BeginPaint();
 

@@ -35,17 +35,7 @@ it must be removed as soon as possible after the code fragment is identified.
 */
 #include "window.h"
 
-/*
-// call this to register the ION script functions.
-// normally passed in on ion_run()
-extern result_t register_photon_functions(duk_context *ctx, handle_t co);
- * */
-
-static const char *datatype_prop = "datatype";
-static const char *func_prop = "func";
-const char *handle_prop = "handle";
-
-result_t add_event(handle_t hwnd, uint16_t id, void *parg, const char *func, event_handler_fn callback)
+result_t add_event(handle_t hwnd, uint16_t id, void *parg, event_handler_fn callback)
   {
   result_t result;
   event_proxy_t *previous = 0;
@@ -78,20 +68,12 @@ result_t add_event(handle_t hwnd, uint16_t id, void *parg, const char *func, eve
       }
     }
 
-  size_t len = 0;
-  
-  if(func != 0)
-    len = strlen(func);
-
-  event_proxy_t *proxy = (event_proxy_t *)neutron_malloc(sizeof(event_proxy_t) + len);
-  memset(proxy, 0, sizeof(event_proxy_t) + len);
+  event_proxy_t *proxy = (event_proxy_t *)neutron_malloc(sizeof(event_proxy_t));
+  memset(proxy, 0, sizeof(event_proxy_t));
   proxy->callback = callback;
   proxy->parg = parg;
   proxy->msg_id = id;
   proxy->previous = previous;
-
-  if (func != 0)
-    strcpy(&proxy->func[0], func);
 
   if(previous != 0)
     {
@@ -630,164 +612,6 @@ result_t set_window_pos(handle_t hwnd, rect_t *rect)
 
   memcpy(&window->position, rect, sizeof(rect_t));
 
-  return s_ok;
-  }
-
-void free_variant(variant_t *value)
-  {
-
-  }
-
-/*
-static duk_ret_t photon_setter(duk_context *ctx)
-  {
-  // get the 'this' pointer
-  duk_push_this(ctx);
-  // and get the magic number
-  handle_t hwnd;
-  if (failed(get_handle(ctx, -1, &hwnd)))
-    return DUK_RET_TYPE_ERROR;
-
-  duk_push_current_function(ctx);
-
-  // get the datatype
-  duk_get_prop_string(ctx, -1, datatype_prop);
-  field_datatype dt = (field_datatype)duk_require_int(ctx, -2);
-
-  // get the function
-  duk_get_prop_string(ctx, -1, func_prop);
-  setter_fn setter = (setter_fn)duk_require_pointer(ctx, -3);
-
-  // the value is at top of stack
-  variant_t value;
-  value.dt = dt;
-  switch (dt)
-    {
-    case field_bool :
-      value.v_bool = duk_require_boolean(ctx, 0);
-      break;
-    case field_int16 :
-      value.v_int16 = (int16_t)duk_require_int(ctx, 0);
-      break;
-    case field_int32 :
-      value.v_int32 = duk_require_int(ctx, 0);
-      break;
-    case field_uint16 :
-      value.v_uint16 = (uint16_t)duk_require_uint(ctx, 0);
-      break;
-    case field_uint32:
-      value.v_uint32 = duk_require_uint(ctx, 0);
-      break;
-    case field_string :
-      value.v_string = duk_require_string(ctx, 0);
-      break;
-    case field_float :
-      value.v_float = (float)duk_require_number(ctx, 0);
-      break;
-    default :
-      return DUK_RET_TYPE_ERROR;
-    }
-
-  duk_pop_3(ctx);
-
-  if (failed((*setter)(hwnd, &value)))
-    return DUK_RET_TYPE_ERROR;
-
-  return 0;
-  }
-
-static duk_ret_t photon_getter(duk_context *ctx)
-  {
-  // get the 'this' pointer
-  duk_push_this(ctx);
-  // and get the magic number
-  handle_t hwnd;
-  if (failed(get_handle(ctx, -1, &hwnd)))
-    return DUK_RET_TYPE_ERROR;
-
-  duk_push_current_function(ctx);
-
-  // get the function
-  duk_get_prop_string(ctx, -1, func_prop);
-  getter_fn getter = (getter_fn)duk_require_pointer(ctx, -2);
-
-  duk_pop_2(ctx);
-
-  // the value is at top of stack
-  variant_t value;
-
-  if (failed((*getter)(hwnd, &value)))
-    {
-    return DUK_RET_TYPE_ERROR;
-    }
-
-  switch (value.dt)
-    {
-    case field_bool:
-      duk_push_boolean(ctx, value.v_bool);
-      break;
-    case field_int16:
-      duk_push_int(ctx, value.v_int16);
-      break;
-    case field_int32:
-      duk_push_int(ctx, value.v_int32);
-      break;
-    case field_uint16:
-      duk_push_uint(ctx, value.v_uint16);
-      break;
-    case field_uint32:
-      duk_push_uint(ctx, value.v_uint32);
-      break;
-    case field_string:
-      duk_push_string(ctx, value.v_string);
-      break;
-    case field_float:
-      duk_push_number(ctx, value.v_float);
-      break;
-    default:
-      return DUK_RET_TYPE_ERROR;
-    }
-
-  return 1;
-  }
- * */
-
-result_t add_property(handle_t hwnd, const char *property_name, getter_fn getter, setter_fn setter, field_datatype dt)
-  {
-  /*
-  result_t result;
-  handle_t hscreen;
-  screen_t *screen;
-  if (failed(result = get_screen(&hscreen)) ||
-    failed(result = as_screen(hscreen, &screen)))
-    return result;
-
-  // pushes the 'this' pointer
-  if (failed(result = get_duk_window(hwnd)))
-    return result;
-
-  duk_context *ctx = screen->context->ctx;
-
-  // add the property
-  duk_push_string(ctx, property_name);
-
-  // create the getter
-  duk_idx_t getter_idx = duk_push_c_function(ctx, photon_getter, 0);
-  duk_push_pointer(ctx, getter);
-  duk_put_prop_string(ctx, getter_idx, func_prop);
-
-  // create the setter
-  duk_idx_t setter_idx = duk_push_c_function(ctx, photon_setter, 1);
-  duk_push_int(ctx, dt);
-  duk_put_prop_string(ctx, setter_idx, datatype_prop);
-  duk_push_pointer(ctx, setter);
-  duk_put_prop_string(ctx, setter_idx, func_prop);
-
-  // add the property to the object (should be -1 index)
-  duk_def_prop(ctx, -1, DUK_DEFPROP_HAVE_GETTER | DUK_DEFPROP_HAVE_SETTER | DUK_DEFPROP_SET_ENUMERABLE);
-
-  duk_pop(ctx);       // remove the object
-*/
   return s_ok;
   }
 

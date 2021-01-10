@@ -26,9 +26,18 @@
     <Compile Include="GpsWidget.cs" />
     <Compile Include="HSIWidget.cs" />
     <Compile Include="Keys.cs" />
+    <Compile Include="KeysMap.cs" />
     <Compile Include="LayoutWidget.cs" />
     <Compile Include="Menu.cs" />
     <Compile Include="MenuItem.cs" />
+    <Compile Include="MenuItemCancel.cs" />
+    <Compile Include="MenuItemChecklist.cs" />
+    <Compile Include="MenuItemEdit.cs" />
+    <Compile Include="MenuItemEvent.cs" />
+    <Compile Include="MenuItemMenu.cs" />
+    <Compile Include="MenuItemOK.cs" />
+    <Compile Include="MenuItemPopup.cs" />
+    <Compile Include="MenuMap.cs" />
     <Compile Include="Pens.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -44,8 +44,7 @@ extern "C" {
   }
 
 // include the runtime interface
-#include "runtime/CanFlyEventDispatcher.h"
-#include "runtime/CLR_Message.h"
+#include "../nano/CLR/Include/nanoCLR_Runtime.h"
 #include "../nano/CLR/Include/WireProtocol_Message.h"
 
 static semaphore_p ion_mutex;
@@ -59,8 +58,6 @@ CLR_RT_TypeSystem          g_CLR_RT_TypeSystem;
 CLR_RT_EventCache          g_CLR_RT_EventCache;
 CLR_RT_GarbageCollector    g_CLR_RT_GarbageCollector;
 
-CanFlyEventDispatcher g_CLR_MessageDispatcher;
-CLR_Message               g_CLR_Message;
 CLR_UINT32 g_buildCRC = 0xBAADF00D;
 
 static uint8_t *heap_base = 0;
@@ -119,17 +116,11 @@ extern result_t ion_close(ion_context_t *ion)
   return s_ok;
   }
 
-result_t ion_queue_message(struct _ion_context_t *ion, const canmsg_t *msg)
-  {
-  g_CLR_MessageDispatcher.SaveToIonQueue(msg);
-  return s_ok;
-  }
-
 static bool ion_hook_handler(const canmsg_t* msg, void* parg)
   {
   // the hook handler discards messages so that if
   // the dispatcher is hung up the publisher is not stopped.
-  ion_queue_message(0, msg);
+  ion_queue_message(0, 0, msg);
 
   return false;
   }
@@ -383,9 +374,6 @@ result_t ion_create(memid_t home,
     trace_error("Ion cannot start the EE");
     return result;
     }
-
-  CanFlyEventDispatcher::HandlerMethod_Initialize();
-
 
   // enable the debugger
   bool debugger_enabled = false;

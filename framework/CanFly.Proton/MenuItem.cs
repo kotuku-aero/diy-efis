@@ -18,7 +18,7 @@ namespace CanFly.Proton
     MiaCloseItem, // either a popup or edit is closed
   };
 
-  public class MenuItem
+  public abstract class MenuItem
   {
     private MenuItemType _itemType;
     private string _caption;
@@ -37,12 +37,12 @@ namespace CanFly.Proton
     private LayoutWidget _widget;
 
 
-    public MenuItem(LayoutWidget widget)
+    protected MenuItem(LayoutWidget widget)
     {
       _widget = widget;
     }
 
-    public LayoutWidget Widget
+    public LayoutWidget LayoutWidget
     {
       get { return _widget; }
     }
@@ -70,10 +70,7 @@ namespace CanFly.Proton
     }
 
 
-    public virtual MenuItemActionResult Evaluate(CanFlyMsg msg)
-    {
-      return MenuItemActionResult.MiaCancel;
-    }
+    public abstract MenuItemActionResult Evaluate(CanFlyMsg msg);
 
     public virtual void Edit(MenuItem item, CanFlyMsg msg)
     {

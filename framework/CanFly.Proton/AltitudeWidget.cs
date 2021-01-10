@@ -107,14 +107,14 @@ namespace CanFly.Proton
 
       qnh = 1013;
 
-      CanFlyMsgSink.AddEventListener(CanFlyID.id_baro_corrected_altitude, on_baro_corrected_altitude);
-      CanFlyMsgSink.AddEventListener(CanFlyID.id_altitude_rate, on_altitude_rate);
-      CanFlyMsgSink.AddEventListener(CanFlyID.id_qnh, on_qnh);
+      AddEventListener(CanFlyID.id_baro_corrected_altitude, on_baro_corrected_altitude);
+      AddEventListener(CanFlyID.id_altitude_rate, on_altitude_rate);
+      AddEventListener(CanFlyID.id_qnh, on_qnh);
 
       InvalidateRect();
     }
 
-    protected override void OnPaint()
+    protected override void OnPaint(CanFlyMsg e)
     {
       BeginPaint();
 
