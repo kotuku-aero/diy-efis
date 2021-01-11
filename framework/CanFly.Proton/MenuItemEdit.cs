@@ -83,12 +83,7 @@ static MenuItem item_edit_load(LayoutWindow wnd,
 
     public override MenuItemActionResult Evaluate(CanFlyMsg msg)
     {
-      return MenuItemActionResult.MiaNothing;
-    }
-
-    public override void Event(CanFlyMsg msg)
-    {
-      /*
+     /*
       // check the enabler
       DefaultEnableHandler(wnd, item, msg);
 
@@ -97,6 +92,7 @@ static MenuItem item_edit_load(LayoutWindow wnd,
       if (edit.value_id == get_can_id(msg))
         memcpy(&edit.value, msg, sizeof(CanFlyMsg));
       */
+      return MenuItemActionResult.MiaNothing;
     }
   }
 }

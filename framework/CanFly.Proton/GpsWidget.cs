@@ -35,9 +35,17 @@ it must be removed as soon as possible after the code fragment is identified.
 */
 namespace CanFly.Proton
 {
-  public sealed class GpsWidget
+  public sealed class GpsWidget : Widget
   {
-    
+    internal GpsWidget(Widget parent, Rect bounds, ushort id, uint key)
+    : base(parent, bounds, id)
+    {
+    }
+
+    protected override void OnPaint(CanFlyMsg e)
+    {
+      throw new System.NotImplementedException();
+    }
   }
 }
 /*

@@ -381,3 +381,25 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Neutron::RegSetBool___STATIC__VOID__U4
 
   NANOCLR_NOCLEANUP();
   }
+
+
+HRESULT Library_CanFly_CoreLibrary_CanFly_Neutron::RegEnumKey___STATIC__STRING__U4__BYREF_U4(CLR_RT_StackFrame &stack)
+  {
+  NANOCLR_HEADER(); hr = S_OK;
+  {
+
+  unsigned int param0;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+
+  char retValue[REG_NAME_MAX+1];
+  uint16_t child = stack.Arg2().NumericByRef().u2;
+  field_datatype dt = field_datatype::field_key;
+
+  hr = reg_enum_key(param0, &dt, 0, 0, REG_NAME_MAX, retValue, &child);
+
+  NANOCLR_CHECK_HRESULT(hr);
+  stack.Arg2().NumericByRef().u2 = child;
+  SetResult_LPCSTR(stack, retValue);
+  }
+  NANOCLR_NOCLEANUP();
+  }

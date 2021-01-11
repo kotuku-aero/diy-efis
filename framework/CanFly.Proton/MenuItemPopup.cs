@@ -4,6 +4,7 @@ namespace CanFly.Proton
 {
   public sealed class MenuItemPopup : MenuItem
   {
+    private Menu popupMenu;
     public MenuItemPopup(LayoutWidget widget, uint key)
           : base(widget)
     {
@@ -11,7 +12,13 @@ namespace CanFly.Proton
 
     public override MenuItemActionResult Evaluate(CanFlyMsg msg)
     {
-      throw new NotImplementedException();
+      return MenuItemActionResult.MiaNothing;
+    }
+
+    public Menu PopupMenu
+    {
+      get { return popupMenu; }
+      set { popupMenu = value; }
     }
   }
 }

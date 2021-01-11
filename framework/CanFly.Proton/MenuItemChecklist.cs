@@ -46,11 +46,6 @@ static MenuItem item_checklist_load(LayoutWindow wnd,
 
     public override MenuItemActionResult Evaluate(CanFlyMsg msg)
     {
-      return MenuItemActionResult.MiaNothing;
-    }
-
-    public override void Event(CanFlyMsg msg)
-    {
       /*
 static void item_checklist_event(LayoutWindow wnd, MenuItem item, CanFlyMsg msg)
   {
@@ -80,7 +75,7 @@ static void item_checklist_event(LayoutWindow wnd, MenuItem item, CanFlyMsg msg)
     }
   }
        */
-      base.Event(msg);
+      return MenuItemActionResult.MiaNothing;
     }
   }
 }

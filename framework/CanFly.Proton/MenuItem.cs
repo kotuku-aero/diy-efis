@@ -18,6 +18,8 @@ namespace CanFly.Proton
     MiaCloseItem, // either a popup or edit is closed
   };
 
+  public delegate void MenuItemMsgHandler(MenuItem menuItem, CanFlyMsg msg);
+
   public abstract class MenuItem
   {
     private MenuItemType _itemType;
@@ -35,6 +37,8 @@ namespace CanFly.Proton
 
     //private Regex _patBuff;
     private LayoutWidget _widget;
+
+    private MenuItemMsgHandler msgHandler;
 
 
     protected MenuItem(LayoutWidget widget)
@@ -79,12 +83,17 @@ namespace CanFly.Proton
 
     public virtual bool Enabled(CanFlyMsg msg)
     {
-      return false;
+      if (ControllingParam == 0 ||
+          EnableRegex == null)
+        return true;
+
+      // we now determine a match against the controlling regular expression
+      return Match(ControllingVariable.ToString(EnableFormat));
     }
 
-    public virtual void Event(CanFlyMsg msg)
+    public void EventHandler(MenuItemMsgHandler handler)
     {
-
+      msgHandler = handler;
     }
 
     public MenuItemType ItemType

@@ -193,6 +193,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
     Library_CanFly_CoreLibrary_CanFly_Neutron::RegSetFloat___STATIC__VOID__U4__STRING__R4,
     Library_CanFly_CoreLibrary_CanFly_Neutron::RegGetBool___STATIC__BOOLEAN__U4__STRING,
     Library_CanFly_CoreLibrary_CanFly_Neutron::RegSetBool___STATIC__VOID__U4__STRING__BOOLEAN,
+    Library_CanFly_CoreLibrary_CanFly_Neutron::RegEnumKey___STATIC__STRING__U4__BYREF_U4,
     NULL,
     NULL,
     NULL,
@@ -204,8 +205,8 @@ static const CLR_RT_MethodHandler method_lookup[] =
     Library_CanFly_CoreLibrary_CanFly_Photon::CreateWindow___STATIC__U4__U4__I4__I4__I4__I4__U2,
     Library_CanFly_CoreLibrary_CanFly_Photon::CreateChildWindow___STATIC__U4__U4__I4__I4__I4__I4__U2,
     Library_CanFly_CoreLibrary_CanFly_Photon::CloseWindow___STATIC__VOID__U4,
-    Library_CanFly_CoreLibrary_CanFly_Photon::SendMessage___STATIC__VOID__U4__CanFlyCanFlyMsg,
-    Library_CanFly_CoreLibrary_CanFly_Photon::PostMessage___STATIC__VOID__U4__CanFlyCanFlyMsg,
+    Library_CanFly_CoreLibrary_CanFly_Photon::SendMessage___STATIC__VOID__U4__U2__U2__U1__U1__U1__U1__U1__U1__U1__U1,
+    Library_CanFly_CoreLibrary_CanFly_Photon::PostMessage___STATIC__VOID__U4__U2__U2__U1__U1__U1__U1__U1__U1__U1__U1,
     Library_CanFly_CoreLibrary_CanFly_Photon::GetWindowRect___STATIC__VOID__U4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4,
     Library_CanFly_CoreLibrary_CanFly_Photon::GetWindowPos___STATIC__VOID__U4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4,
     Library_CanFly_CoreLibrary_CanFly_Photon::SetWindowPos___STATIC__VOID__U4__I4__I4__I4__I4,
@@ -373,6 +374,9 @@ static const CLR_RT_MethodHandler method_lookup[] =
     NULL,
     NULL,
     NULL,
+    NULL,
+    NULL,
+    NULL,
     Library_CanFly_CoreLibrary_CanFly_Widget::_cctor___STATIC__VOID,
     NULL,
 };
@@ -380,7 +384,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
 const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_canflylib =
 {
     "CanFly.CoreLibrary",
-    0x3A3DEC9F,
+    0x8C229EBB,
     method_lookup,
     { 1, 0, 0, 0 }
 };

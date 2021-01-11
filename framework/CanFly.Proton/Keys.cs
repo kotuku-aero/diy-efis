@@ -7,6 +7,9 @@ namespace CanFly.Proton
     private MenuItem _key2;
     private MenuItem _key3;
     private MenuItem _key4;
+    private MenuItem _key5;
+    private MenuItem _key6;
+    private MenuItem _key7;
     private MenuItem _deckaUp;
     private MenuItem _deckaDn;
     private MenuItem _deckbUp;
@@ -52,6 +55,33 @@ namespace CanFly.Proton
         _key4 = value;
       }
     }
+
+    public MenuItem Key5
+    {
+      get { return _key5; }
+      set
+      {
+        _key5 = value;
+      }
+    }
+
+    public MenuItem Key6
+    {
+      get { return _key6; }
+      set
+      {
+        _key6 = value;
+      }
+    }
+    public MenuItem Key7
+    {
+      get { return _key7; }
+      set
+      {
+        _key7 = value;
+      }
+    }
+
     public MenuItem DeckaUp
     {
       get { return _deckaUp; }

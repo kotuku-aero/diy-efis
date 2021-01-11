@@ -45,5 +45,10 @@ namespace CanFly.Proton
     {
       return MenuItemActionResult.MiaCancel;
     }
+
+    public Menu Menu
+    {
+      get { return menu; }
+    }
   }
 }

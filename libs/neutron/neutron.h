@@ -1686,7 +1686,7 @@ extern "C" {
   extern result_t reg_open_key(memid_t parent, const char *name, memid_t *key);
 
   // these are the hdr.data_type values for a field
-  typedef enum {
+  typedef enum  {
     field_none,                     // no definition
     field_key,											// a key is a parent of other fields
     field_bool,                     // a boolean field (see notes)

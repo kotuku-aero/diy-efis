@@ -1428,3 +1428,119 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::EndPaint___STATIC__VOID__U4(CL
   }
   NANOCLR_NOCLEANUP();
   }
+
+HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::SendMessage___STATIC__VOID__U4__U2__U2__U1__U1__U1__U1__U1__U1__U1__U1(CLR_RT_StackFrame &stack)
+  {
+  NANOCLR_HEADER(); hr = S_OK;
+  {
+
+  unsigned int param0;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+
+  uint16_t param1;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 1, param1));
+
+  uint16_t param2;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 2, param2));
+
+  uint8_t param3;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT8(stack, 3, param3));
+
+  uint8_t param4;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT8(stack, 4, param4));
+
+  uint8_t param5;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT8(stack, 5, param5));
+
+  uint8_t param6;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT8(stack, 6, param6));
+
+  uint8_t param7;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT8(stack, 7, param7));
+
+  uint8_t param8;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT8(stack, 8, param8));
+
+  uint8_t param9;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT8(stack, 9, param9));
+
+  uint8_t param10;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT8(stack, 10, param10));
+
+  canmsg_t msg;
+  set_can_id(&msg, param1);
+  msg.flags = param2;
+  msg.raw[0] = param3;
+  msg.raw[1] = param4;
+  msg.raw[2] = param5;
+  msg.raw[3] = param6;
+  msg.raw[4] = param7;
+  msg.raw[5] = param8;
+  msg.raw[6] = param9;
+  msg.raw[7] = param10;
+
+  hr = send_message((handle_t)param9, &msg);
+  
+  NANOCLR_CHECK_HRESULT(hr);
+
+  }
+  NANOCLR_NOCLEANUP();
+  }
+
+HRESULT Library_CanFly_CoreLibrary_CanFly_Photon::PostMessage___STATIC__VOID__U4__U2__U2__U1__U1__U1__U1__U1__U1__U1__U1(CLR_RT_StackFrame &stack)
+  {
+  NANOCLR_HEADER(); hr = S_OK;
+  {
+
+  unsigned int param0;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+
+  uint16_t param1;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 1, param1));
+
+  uint16_t param2;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 2, param2));
+
+  uint8_t param3;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT8(stack, 3, param3));
+
+  uint8_t param4;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT8(stack, 4, param4));
+
+  uint8_t param5;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT8(stack, 5, param5));
+
+  uint8_t param6;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT8(stack, 6, param6));
+
+  uint8_t param7;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT8(stack, 7, param7));
+
+  uint8_t param8;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT8(stack, 8, param8));
+
+  uint8_t param9;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT8(stack, 9, param9));
+
+  uint8_t param10;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT8(stack, 10, param10));
+
+    canmsg_t msg;
+  set_can_id(&msg, param1);
+  msg.flags = param2;
+  msg.raw[0] = param3;
+  msg.raw[1] = param4;
+  msg.raw[2] = param5;
+  msg.raw[3] = param6;
+  msg.raw[4] = param7;
+  msg.raw[5] = param8;
+  msg.raw[6] = param9;
+  msg.raw[7] = param10;
+
+  hr = post_message((handle_t)param9, &msg, 0);
+
+  NANOCLR_CHECK_HRESULT(hr);
+
+  }
+  NANOCLR_NOCLEANUP();
+  }

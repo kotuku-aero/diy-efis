@@ -62,7 +62,7 @@ namespace CanFly.Proton
     private bool draw_border;
     private Font font;
 
-    public HSIWidget(Widget parent, Rect bounds, ushort id, uint key)
+    internal HSIWidget(Widget parent, Rect bounds, ushort id, uint key)
     : base(parent, bounds, id)
     {
       if (!LookupColor(key, "background-color", out background_color))

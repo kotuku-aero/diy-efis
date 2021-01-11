@@ -9,9 +9,9 @@
 #ifndef _CANFLY_CORELIBRARY_H_
 #define _CANFLY_CORELIBRARY_H_
 
-#include <nanoCLR_Interop.h>
-#include <nanoCLR_Runtime.h>
-#include <nanoPackStruct.h>
+#include "../../nano/CLR/Include/nanoCLR_Interop.h"
+#include "../../nano/CLR/Include/nanoCLR_Runtime.h"
+#include "../../nano/CLR/Include/nanoPackStruct.h"
 
 typedef enum __nfpack DataType
 {
@@ -462,6 +462,7 @@ struct Library_CanFly_CoreLibrary_CanFly_Neutron
     NANOCLR_NATIVE_DECLARE(RegSetFloat___STATIC__VOID__U4__STRING__R4);
     NANOCLR_NATIVE_DECLARE(RegGetBool___STATIC__BOOLEAN__U4__STRING);
     NANOCLR_NATIVE_DECLARE(RegSetBool___STATIC__VOID__U4__STRING__BOOLEAN);
+    NANOCLR_NATIVE_DECLARE(RegEnumKey___STATIC__STRING__U4__BYREF_U4);
 
     //--//
 
@@ -481,8 +482,8 @@ struct Library_CanFly_CoreLibrary_CanFly_Photon
     NANOCLR_NATIVE_DECLARE(CreateWindow___STATIC__U4__U4__I4__I4__I4__I4__U2);
     NANOCLR_NATIVE_DECLARE(CreateChildWindow___STATIC__U4__U4__I4__I4__I4__I4__U2);
     NANOCLR_NATIVE_DECLARE(CloseWindow___STATIC__VOID__U4);
-    NANOCLR_NATIVE_DECLARE(SendMessage___STATIC__VOID__U4__CanFlyCanFlyMsg);
-    NANOCLR_NATIVE_DECLARE(PostMessage___STATIC__VOID__U4__CanFlyCanFlyMsg);
+    NANOCLR_NATIVE_DECLARE(SendMessage___STATIC__VOID__U4__U2__U2__U1__U1__U1__U1__U1__U1__U1__U1);
+    NANOCLR_NATIVE_DECLARE(PostMessage___STATIC__VOID__U4__U2__U2__U1__U1__U1__U1__U1__U1__U1__U1);
     NANOCLR_NATIVE_DECLARE(GetWindowRect___STATIC__VOID__U4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4);
     NANOCLR_NATIVE_DECLARE(GetWindowPos___STATIC__VOID__U4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4);
     NANOCLR_NATIVE_DECLARE(SetWindowPos___STATIC__VOID__U4__I4__I4__I4__I4);

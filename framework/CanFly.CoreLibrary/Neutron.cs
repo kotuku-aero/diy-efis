@@ -46,6 +46,7 @@ namespace CanFly
     public static extern bool RegGetBool(uint parent, string name);
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void RegSetBool(uint parent, string name, bool value);
-    // Registry stream functions
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern string RegEnumKey(uint key, ref uint child);
   }
 }

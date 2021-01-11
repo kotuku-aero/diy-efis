@@ -116,17 +116,6 @@ extern result_t ion_close(ion_context_t *ion)
   return s_ok;
   }
 
-static bool ion_hook_handler(const canmsg_t* msg, void* parg)
-  {
-  // the hook handler discards messages so that if
-  // the dispatcher is hung up the publisher is not stopped.
-  ion_queue_message(0, 0, msg);
-
-  return false;
-  }
-
-static msg_hook_t ion_hook = { 0, 0, ion_hook_handler };
-
 struct assembly_loader_t
   {
   uint32_t length;
@@ -390,12 +379,6 @@ result_t ion_create(memid_t home,
 
   // start the debugger handlers.
   CLR_DBG_Debugger::Debugger_Discovery();
-
-  if (failed(result = subscribe(&ion_hook)))
-    {
-    trace_error("Ion cannot install hook");
-    return result;
-    }
 
   // load all of the assemblies defined in the startup registry key
   char startup_assembly[REG_STRING_MAX];

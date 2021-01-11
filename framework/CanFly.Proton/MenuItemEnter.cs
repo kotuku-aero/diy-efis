@@ -2,12 +2,13 @@
 
 namespace CanFly.Proton
 {
-  public sealed class MenuItemOK : MenuItem
+  public sealed class MenuItemEnter
+    : MenuItem
   {
     private ushort id;
     private short value;     // cancel value
 
-    public MenuItemOK(LayoutWidget widget, uint key)
+    public MenuItemEnter(LayoutWidget widget, uint key)
       : base(widget)
     {
       /*

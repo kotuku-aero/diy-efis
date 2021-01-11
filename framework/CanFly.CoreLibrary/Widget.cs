@@ -203,12 +203,12 @@ namespace CanFly
 
     public void SendMessage(CanFlyMsg msg)
     {
-      Photon.SendMessage(Handle, msg);
+      Photon.SendMessage(Handle, msg.Id, (ushort) msg.Flags, msg.Data0, msg.Data1, msg.Data2, msg.Data3, msg.Data4, msg.Data5, msg.Data6, msg.Data7);
     }
 
     public void PostMessage(CanFlyMsg msg)
     {
-      Photon.PostMessage(Handle, msg);
+      Photon.PostMessage(Handle, msg.Id, (ushort)msg.Flags, msg.Data0, msg.Data1, msg.Data2, msg.Data3, msg.Data4, msg.Data5, msg.Data6, msg.Data7);
     }
 
     /// <summary>
@@ -574,6 +574,21 @@ namespace CanFly
 
       return true;
     }
+   
+    public bool TryRegGetInt16(uint key, string name, out int value)
+    {
+      value = 0;
+      try
+      {
+        value = Neutron.RegGetInt16(key, name);
+      }
+      catch
+      {
+        return false;
+      }
+
+      return true;
+    }
     
     public bool TryRegGetInt32(uint key, string name, out int value)
     {
@@ -581,6 +596,50 @@ namespace CanFly
       try
       {
         value = Neutron.RegGetInt32(key, name);
+      }
+      catch
+      {
+        return false;
+      }
+
+      return true;
+    }
+
+    public bool TryRegGetRect(uint key, out Rect rect)
+    {
+      rect = new Rect();
+
+      int value;
+      if (!TryRegGetInt32(key, "left", out value))
+        value = 0;
+
+      rect.Left = value;
+
+      if (!TryRegGetInt32(key, "top", out value))
+        value = 0;
+
+      rect.Top = value;
+
+      if (!TryRegGetInt32(key, "width", out value))
+        value = 0;
+
+      rect.Right = value + rect.Left;
+
+      if (!TryRegGetInt32(key, "height", out value))
+        value = 0;
+
+      rect.Bottom = value + rect.Top;
+
+      return true;
+    }
+
+    public bool TryRegOpenKey(uint key, string name, out uint child)
+    {
+      child = 0;
+
+      try
+      {
+        child = Neutron.RegOpenKey(key, name);
       }
       catch
       {

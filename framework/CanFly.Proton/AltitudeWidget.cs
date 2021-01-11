@@ -66,7 +66,7 @@ namespace CanFly.Proton
     private Font large_roller;  // 15 pixel
 
 
-    protected AltitudeWidget(Widget parent, Rect bounds, ushort id, uint key)
+    internal AltitudeWidget(Widget parent, Rect bounds, ushort id, uint key)
       : base(parent, bounds, id)
     {
       if (!TryRegGetFloat(key, "scale", out scale))

@@ -47,9 +47,9 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void CloseWindow(uint hwnd);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SendMessage(uint hwnd, CanFlyMsg msg);
+    internal static extern void SendMessage(uint hwnd, ushort id, ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void PostMessage(uint hend, CanFlyMsg msg);
+    internal static extern void PostMessage(uint hend, ushort id, ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void GetWindowRect(uint window, out int left, out int top, out int right, out int bottom);

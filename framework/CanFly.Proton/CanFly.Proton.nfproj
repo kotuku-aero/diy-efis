@@ -35,7 +35,8 @@
     <Compile Include="MenuItemEdit.cs" />
     <Compile Include="MenuItemEvent.cs" />
     <Compile Include="MenuItemMenu.cs" />
-    <Compile Include="MenuItemOK.cs" />
+    <Compile Include="MenuItemEnter.cs" />
+    <Compile Include="MenuItemItem.cs" />
     <Compile Include="MenuItemPopup.cs" />
     <Compile Include="MenuMap.cs" />
     <Compile Include="Pens.cs" />
