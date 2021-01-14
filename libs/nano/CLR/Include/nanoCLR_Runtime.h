@@ -2851,6 +2851,7 @@ struct CLR_RT_ExceptionHandler
     }
   };
 
+#if 0
 //
 // Directly from the .NET enumerator.
 //
@@ -2868,6 +2869,23 @@ struct ThreadPriority
   // We do not expose this priority to C# applications.
   static const int System_Highest = 5;
   };
+#endif
+
+#ifndef _CORLIB_NATIVE_H_
+extern "C" {
+
+  typedef enum ThreadPriority
+    {
+    ThreadPriority_Lowest = 0,
+    ThreadPriority_BelowNormal = 1,
+    ThreadPriority_Normal = 2,
+    ThreadPriority_AboveNormal = 3,
+    ThreadPriority_Highest = 4,
+    ThreadPriority_System_Highest = 5
+    } ThreadPriority;
+
+  }
+#endif
 
 struct CLR_RT_Thread : public CLR_RT_ObjectToEvent_Destination // EVENT HEAP - NO RELOCATION -
   {
@@ -3067,6 +3085,7 @@ struct CLR_RT_Thread : public CLR_RT_ObjectToEvent_Destination // EVENT HEAP - N
     return CurrentSubThread()->m_priority + m_executionCounter;
     }
 
+#ifndef _CORLIB_NATIVE_H_
   // QuantumDebit is update for execution counter for each quantum:
   // System_Highest       - 1
   // Highest              - 2
@@ -3076,8 +3095,9 @@ struct CLR_RT_Thread : public CLR_RT_ObjectToEvent_Destination // EVENT HEAP - N
   // Lowest               - 32
   int GetQuantumDebit() const
     {
-    return 1 << (ThreadPriority::System_Highest - GetThreadPriority());
+    return 1 << (ThreadPriority_System_Highest - GetThreadPriority());
     }
+#endif
 
   // If thread was sleeping and get too far behind on updating of m_executionCounter
   // Then we make m_executionCounter 4 quantums above m_GlobalExecutionCounter;

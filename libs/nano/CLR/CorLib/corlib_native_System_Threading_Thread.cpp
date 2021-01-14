@@ -17,7 +17,7 @@ HRESULT Library_corlib_native_System_Threading_Thread::_ctor___VOID__SystemThrea
   pThis[FIELD___delegate].Assign(stack.Arg1());
 
   // Thread is always constructed with normal priority.
-  pThis[FIELD___priority].NumericByRef().s4 = ThreadPriority::Normal;
+  pThis[FIELD___priority].NumericByRef().s4 = ThreadPriority_Normal;
 
   // Book a Thread ID
   pThis[FIELD___id].NumericByRef().s4 = g_CLR_RT_ExecutionEngine.GetNextThreadId();
@@ -182,8 +182,8 @@ HRESULT Library_corlib_native_System_Threading_Thread::get_Priority___SystemThre
   // The highest value should be 4 ( ThreadPriority.highest ), but we allow higher values.
   // Users cannot create threads with values outside the Lowest-Highest range; we exceed that
   // range internally, but we can't expose those values to managed code.
-  if (pri < ThreadPriority::Lowest) pri = ThreadPriority::Lowest;
-  else if (pri > ThreadPriority::Highest) pri = ThreadPriority::Highest;
+  if (pri < ThreadPriority_Lowest) pri = ThreadPriority_Lowest;
+  else if (pri > ThreadPriority_Highest) pri = ThreadPriority_Highest;
 
   // Return value back to C# code.
   stack.SetResult_I4(pri);
@@ -201,9 +201,9 @@ HRESULT Library_corlib_native_System_Threading_Thread::set_Priority___VOID__Syst
 
     CLR_RT_HeapBlock* pThis = stack.This(); FAULT_ON_NULL(pThis);
 
-    // Get argument for priority. Check the range - should be between ThreadPriority::Highest and ThreadPriority::Lowest ( 0 - 4 )  
+    // Get argument for priority. Check the range - should be between ThreadPriority_Highest and ThreadPriority_Lowest ( 0 - 4 )  
     int pri = stack.Arg1().NumericByRef().s4;
-    if (pri < ThreadPriority::Lowest || pri > ThreadPriority::Highest)
+    if (pri < ThreadPriority_Lowest || pri > ThreadPriority_Highest)
       {
       NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
       }

@@ -123,7 +123,6 @@ result_t mount(const char *mount_point, filesystem_t *file_type, nand_device_t *
   // check the params
   if (mount_point == 0 ||
     file_type == 0 ||
-    device == 0 ||
     fshndl == 0)
     return e_bad_parameter;
 
@@ -266,7 +265,7 @@ static result_t file_stream_eof(stream_handle_t *stream)
   if (failed(result = fshndl->mount_point->file_type->stat(fshndl->mount_point->file_type, fshndl->mount_point->device, fshndl->fd, &fd_stat)))
     return result;
 
-  return fshndl->position >= fd_stat.st_size;
+  return fshndl->position >= fd_stat.st_size ? s_ok : s_false;
   }
 
 static result_t file_stream_read(stream_handle_t *stream, void *buffer, uint16_t size, uint16_t *read)
@@ -484,6 +483,7 @@ result_t stream_create(const char *path, stream_p *stream)
 
   file_stream->fd = fd;
   file_stream->mount_point = mount;
+  file_stream->position = 0;
   file_stream->stream.version = sizeof(file_stream_t);
   file_stream->stream.stream_close = file_stream_close;
   file_stream->stream.stream_delete = file_stream_delete;
@@ -495,6 +495,8 @@ result_t stream_create(const char *path, stream_p *stream)
   file_stream->stream.stream_setpos = file_stream_setpos;
   file_stream->stream.stream_truncate = file_stream_truncate;
   file_stream->stream.stream_write = file_stream_write;
+
+  *stream = file_stream;
 
   return s_ok;
   }
@@ -523,6 +525,7 @@ result_t stream_open(const char *path, stream_p *stream)
     return e_not_enough_memory;
 
   file_stream->fd = fd;
+  file_stream->position = 0;
   file_stream->mount_point = mount;
   file_stream->stream.version = sizeof(file_stream_t);
   file_stream->stream.stream_close = file_stream_close;
@@ -536,6 +539,7 @@ result_t stream_open(const char *path, stream_p *stream)
   file_stream->stream.stream_truncate = file_stream_truncate;
   file_stream->stream.stream_write = file_stream_write;
 
+  *stream = file_stream;
   return s_ok;
   }
 

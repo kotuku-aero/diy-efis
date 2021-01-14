@@ -35,6 +35,9 @@ void CLR_Debug::SaveMessage(std::string str)
     }
 
   s_messageString = str;
+
+  ::OutputDebugStringA(str.c_str());
+  ::OutputDebugStringA("\n");
   }
 
 HRESULT NANOCLR_DEBUG_PROCESS_EXCEPTION(HRESULT hr, const char* szFunc, const char* szFile, int line)

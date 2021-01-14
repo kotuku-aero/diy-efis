@@ -594,7 +594,7 @@ HRESULT CLR_RT_ExecutionEngine::Execute(wchar_t *entryPointArgs, int maxContextS
   {
   CLR_RT_ProtectFromGC gc(ref);
 
-  NANOCLR_CHECK_HRESULT(NewThread(thMain, ref.DereferenceDelegate(), ThreadPriority::Normal, -1));
+  NANOCLR_CHECK_HRESULT(NewThread(thMain, ref.DereferenceDelegate(), ThreadPriority_Normal, -1));
   }
 
   {
@@ -736,7 +736,7 @@ void CLR_RT_ExecutionEngine::SpawnTimer()
     {
     if (timer->m_flags & CLR_RT_HeapBlock_Timer::c_Triggered)
       {
-      if (EnsureSystemThread(m_timerThread, ThreadPriority::Normal))
+      if (EnsureSystemThread(m_timerThread, ThreadPriority_Normal))
         {
         // only fire one timer at a time
 
@@ -918,7 +918,7 @@ void CLR_RT_ExecutionEngine::SpawnStaticConstructor(CLR_RT_Thread *&pCctorThread
   NATIVE_PROFILE_CLR_CORE();
   CLR_RT_HeapBlock_Delegate *dlg = NULL;
 
-  if (!EnsureSystemThread(pCctorThread, ThreadPriority::System_Highest))
+  if (!EnsureSystemThread(pCctorThread, ThreadPriority_System_Highest))
     return;
 
   dlg = pCctorThread->m_dlg;
@@ -995,7 +995,7 @@ void CLR_RT_ExecutionEngine::SpawnFinalizer()
     (void)SetCurrentAppDomain(fin->m_appDomain);
 #endif
 
-    if (EnsureSystemThread(m_finalizerThread, ThreadPriority::BelowNormal))
+    if (EnsureSystemThread(m_finalizerThread, ThreadPriority_BelowNormal))
       {
       if (SUCCEEDED(CLR_RT_HeapBlock_Delegate::CreateInstance(delegate, fin->m_md, NULL)))
         {

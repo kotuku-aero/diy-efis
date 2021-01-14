@@ -73,6 +73,9 @@
     <Filter Include="System.Text">
       <UniqueIdentifier>{db8e22fa-901c-4128-9623-8fcd7d2ba1ca}</UniqueIdentifier>
     </Filter>
+    <Filter Include="CLR\CoreLib\mscorlib">
+      <UniqueIdentifier>{1fd4906d-7821-4084-8089-de1cd1ee29d4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\libs\nano\CLR\Core\Serialization\BinaryFormatter.cpp">
@@ -206,9 +209,6 @@
     </ClCompile>
     <ClCompile Include="..\..\libs\nano\CLR\Core\Various.cpp">
       <Filter>CLR\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native.cpp">
-      <Filter>CLR\CoreLib</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_AppDomain.cpp">
       <Filter>CLR\CoreLib</Filter>
@@ -396,6 +396,9 @@
     <ClCompile Include="..\..\libs\nano\HAL\nanoHAL_SystemInformation.cpp">
       <Filter>HAL</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\mscorlib\corlib_native.cpp">
+      <Filter>CLR\CoreLib\mscorlib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libs\nano\CLR\Core\Core.h">
@@ -405,9 +408,6 @@
       <Filter>CLR\Core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libs\nano\CLR\CorLib\CorLib.h">
-      <Filter>CLR\CoreLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libs\nano\CLR\CorLib\corlib_native.h">
       <Filter>CLR\CoreLib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libs\nano\CLR\Debugger\Debugger.h">
@@ -553,6 +553,9 @@
     </ClInclude>
     <ClInclude Include="..\..\libs\nano\System.Text\nf_system_text.h">
       <Filter>System.Text</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\nano\CLR\CorLib\mscorlib\corlib_native.h">
+      <Filter>CLR\CoreLib\mscorlib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

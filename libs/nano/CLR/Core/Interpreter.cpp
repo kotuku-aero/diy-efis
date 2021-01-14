@@ -631,7 +631,7 @@ HRESULT CLR_RT_Thread::Execute()
   _ASSERTE(!CLR_EE_DBG_IS(Stopped));
 #endif //#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
 
-  
+
   //::Events_SetBoolTimer((bool *)&m_timeQuantumExpired, CLR_RT_Thread::c_TimeQuantum_Milliseconds);
 
   while (/* m_timeQuantumExpired == false && */ !CLR_EE_DBG_IS(Stopped))

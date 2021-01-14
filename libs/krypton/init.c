@@ -33,6 +33,11 @@ then the original copyright notice is to be respected.
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
+
+#ifdef _DEBUG
+#define _CRTDBG_MAP_ALLOC
+#endif
+
 #include "krypton.h"
 #include "../neutron/neutron.h"
 #include "../neutron/bsp.h"
@@ -128,7 +133,7 @@ static const char *help =
 "  -f <path>      Use <path> as the base of the filesystem"
 "  -h             Print this help message\n"
 " Values for MSH:\n"
-" diy-efis -c 32768 -x 320 -y 240 -d <path> diy-efis.reg\n"
+" diy-efis -c 32768 -x 320 -y 240 -f <path> diy-efis.reg\n"
 " Values for PI-TFT:\n"
 " diy-efis -c 32768 -f /dev/fb1 -x 480 -y 320 -f /diy-efis -d /dev/i2c-1 diy-efis.reg\n";
 
@@ -231,7 +236,7 @@ result_t krypton_init(int argc, char **argv)
 
   start_fb(x, y, fb_buffer);
 
-  return factory_reset ? s_false : s_ok;
+  return s_ok;
   }
 
 #define BLOCK_SHIFT 5

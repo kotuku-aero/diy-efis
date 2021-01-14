@@ -88,6 +88,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);NANOCLR_SYSTEM_COLLECTIONS;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\peter\Projects\canfly\diy-efis\libs\nano\CLR\CorLib\mscorlib;C:\Users\peter\Projects\canfly\diy-efis\libs\nano\CLR\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -183,7 +184,6 @@
     <ClCompile Include="..\..\libs\nano\CLR\Core\TypeSystem.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\Core\TypeSystemLookup.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\Core\Various.cpp" />
-    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_AppDomain.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Array.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Attribute.cpp" />
@@ -221,6 +221,7 @@
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_TimeSpan.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_ValueType.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_WeakReference.cpp" />
+    <ClCompile Include="..\..\libs\nano\CLR\CorLib\mscorlib\corlib_native.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\Debugger\Debugger.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\Debugger\Debugger_full.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\Diagnostics\Info.cpp" />
@@ -251,7 +252,7 @@
     <ClInclude Include="..\..\libs\nano\CLR\Core\Core.h" />
     <ClInclude Include="..\..\libs\nano\CLR\Core\corhdr_private.h" />
     <ClInclude Include="..\..\libs\nano\CLR\CorLib\CorLib.h" />
-    <ClInclude Include="..\..\libs\nano\CLR\CorLib\corlib_native.h" />
+    <ClInclude Include="..\..\libs\nano\CLR\CorLib\mscorlib\corlib_native.h" />
     <ClInclude Include="..\..\libs\nano\CLR\Debugger\Debugger.h" />
     <ClInclude Include="..\..\libs\nano\CLR\Diagnostics\Diagnostics.h" />
     <ClInclude Include="..\..\libs\nano\CLR\Helpers\Base64\base64.h" />

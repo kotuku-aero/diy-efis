@@ -61,7 +61,8 @@ CLR_RT_GarbageCollector    g_CLR_RT_GarbageCollector;
 CLR_UINT32 g_buildCRC = 0xBAADF00D;
 
 static uint8_t *heap_base = 0;
-static size_t heap_size = 0;
+// 8mb
+#define HEAP_SIZE  8388608
 
 // this defines the RTL heap.
 void HeapLocation(unsigned char *&base_address, unsigned int &size_in_bytes)
@@ -69,12 +70,11 @@ void HeapLocation(unsigned char *&base_address, unsigned int &size_in_bytes)
   if (heap_base == 0)
     {
     // allocate 8mb of memory to the heap
-    heap_size = 8192 * 1024 * 1024;
-    heap_base = (uint8_t *)ion_malloc(heap_size);
+    heap_base = (uint8_t *)ion_malloc(HEAP_SIZE);
     }
 
   base_address = heap_base;
-  size_in_bytes = heap_size;
+  size_in_bytes = HEAP_SIZE;
   }
 
 // these interface from the nano debugger
@@ -86,25 +86,6 @@ int WP_ReceiveBytes(uint8_t *ptr, unsigned short *size)
 int WP_TransmitMessage(WP_Message *message)
   {
   return 0;
-  }
-
-
-result_t ion_init()
-  {
-  result_t result;
-  if (failed(result = semaphore_create(&ion_mutex)) ||
-    failed(semaphore_signal(ion_mutex)))
-    return result;
-
-  // create the ion keys
-  memid_t ion_home;
-  if (failed(result = reg_open_key(0, ion_s, &ion_home)))
-    {
-    if (failed(result = reg_create_key(0, ion_s, &ion_home)))
-      return result;
-    }
-
-  return s_ok;
   }
 
 extern result_t ion_close(ion_context_t *ion)
@@ -145,7 +126,7 @@ static result_t set_byte_assembly(handle_t parg, uint32_t offset, uint8_t data)
   }
 
 // the stream is assumed to be at the start of a local_file in an zip archive
-static result_t expand_zip_local_file(stream_p stream, assembly_loader_t* loader, uint32_t *compressed_size)
+static result_t expand_zip_local_file(stream_p stream, assembly_loader_t* loader, uint32_t *entry_size)
   {
   if (stream == 0 || loader == 0)
     return e_bad_parameter;
@@ -170,42 +151,34 @@ static result_t expand_zip_local_file(stream_p stream, assembly_loader_t* loader
   if (failed(result = stream_read(stream, file_4, 4, 0)))
     return result;
 
-  if (file_4[0] != 0x04 ||
-    file_4[1] != 0x03 ||
-    file_4[2] != 0x4b ||
-    file_4[3] != 0x50)
+  if (file_4[3] != 0x04 ||
+    file_4[2] != 0x03 ||
+    file_4[1] != 0x4b ||
+    file_4[0] != 0x50)
     {
     // check to see if this is the central directory header
-    if (file_4[0] != 0x02 ||
-      file_4[1] != 0x01 ||
-      file_4[2] != 0x4b ||
-      file_4[3] != 0x50)
+    if (file_4[3] == 0x02 ||
+      file_4[2] == 0x01 ||
+      file_4[1] == 0x4b ||
+      file_4[0] == 0x50)
       return e_not_found;
     // nope file corrupt
     return e_bad_parameter;
     }
 
   uint8_t file_2[2];
+  // version needed to extract
   if (failed(result = stream_read(stream, file_2, 2, 0)))
     return result;
-
+  // General flags
   if (failed(result = stream_read(stream, file_2, 2, 0)))
     return result;
-
-  // only support deflate.
-  if (file_2[0] != 2 ||
-    file_2[1] != 0)
-    return e_bad_parameter;
-
+  // compression method
   if (failed(result = stream_read(stream, file_2, 2, 0)))
     return result;
-
-  if (failed(result = stream_read(stream, file_2, 2, 0)))
-    return result;
-
   // only Deflate is supported
-  if (file_2[0] != 0 ||
-    file_2[1] != 9)
+  if (file_2[1] != 0 ||
+    file_2[0] != 8)
     return e_bad_parameter;
 
   // skip to uncompressed_size
@@ -215,21 +188,22 @@ static result_t expand_zip_local_file(stream_p stream, assembly_loader_t* loader
     failed(result = stream_read(stream, file_4, 4, 0)))       // compressed size
     return result;
 
-  if(compressed_size != 0)
-    *compressed_size = (((uint32_t)file_4[0]) << 24) | (((uint32_t)file_4[1]) << 16) | (((uint32_t)file_4[2]) << 8) | ((uint32_t)file_4[3]);
+  if(entry_size != 0)
+    *entry_size = (((uint32_t)file_4[3]) << 24) | (((uint32_t)file_4[2]) << 16) | (((uint32_t)file_4[1]) << 8) | ((uint32_t)file_4[0]);
 
   // read decomressed size
   if (failed(result = stream_read(stream, file_4, 4, 0)))
     return result;
 
-  loader->length = (((size_t)file_4[0]) << 24) | (((size_t)file_4[1]) << 16) | (((size_t)file_4[2]) << 8) | ((size_t)file_4[3]);
+  loader->length = (((size_t)file_4[3]) << 24) | (((size_t)file_4[2]) << 16) | (((size_t)file_4[1]) << 8) | ((size_t)file_4[0]);
 
+  // filename length
   if (failed(result = stream_read(stream, file_2, 2, 0)))
     return result;
 
-  size_t filename_size = (((size_t)file_2[0]) << 8) | ((size_t)file_2[1]);
+  size_t filename_size = (((size_t)file_2[1]) << 8) | ((size_t)file_2[0]);
 
-
+  // extra lenth
   if (failed(result = stream_read(stream, file_2, 2, 0)))
     return result;
 
@@ -239,7 +213,9 @@ static result_t expand_zip_local_file(stream_p stream, assembly_loader_t* loader
   if (failed(result = stream_getpos(stream, &pos)))
     return result;
 
-  pos += extra_size;
+  pos += extra_size + filename_size;
+  // add header size to the variable bits
+  *entry_size = *entry_size + extra_size + filename_size + 30;
   if (failed(result = stream_setpos(stream, pos)))
     return result;
 
@@ -267,12 +243,12 @@ static result_t load_application(stream_p stream)
   result_t result;
   // allocate a block of memory in the CLR heap area to expand the stream into
   assembly_loader_t loader;
-  uint32_t compressed_size = 0;
+  uint32_t entry_size = 0;
   uint32_t header_position = 0;
   CLR_RT_Assembly *assembly;
   do
   {
-    result = expand_zip_local_file(stream, &loader, &compressed_size);
+    result = expand_zip_local_file(stream, &loader, &entry_size);
     if (result == e_not_found)
       break;      // end of compressed files in the archive
 
@@ -283,6 +259,9 @@ static result_t load_application(stream_p stream)
       }
 
     const CLR_RT_NativeAssemblyData* pNativeAssmData = GetAssemblyNativeData(assembly->m_szName);
+
+    trace_info("Load assembly %s\n", assembly->m_szName);
+
     // If pNativeAssmData not NULL- means this assembly has native calls and there is pointer to table with native calls.
     if (pNativeAssmData != NULL)
       {
@@ -314,26 +293,25 @@ static result_t load_application(stream_p stream)
     g_CLR_RT_TypeSystem.Link(assembly);
 
     // skip to the next file entry
-    header_position += compressed_size;
+    header_position += entry_size;
     if (failed(result = stream_setpos(stream, header_position)))
       return result;
 
     } while (failed(stream_eof(stream)));
 
 
-  return result;
+  return s_ok;
   }
 
-result_t ion_create(memid_t home,
-                    const char *path,
-                    handle_t ci,
-                    handle_t co,
-                    handle_t cerr,
-                    struct _ion_context_t **ion)
+result_t ion_create(ion_context_t *ion_context)
   {
   result_t result;
 
   trace_info("ion runtime start");
+
+  if (failed(result = semaphore_create(&ion_mutex)) ||
+    failed(semaphore_signal(ion_mutex)))
+    return result;
 
   // load the neo font which is always available
   if (failed(register_font(neo, neo_length)))
@@ -342,20 +320,12 @@ result_t ion_create(memid_t home,
     return result;
     }
 
-  // enumerate the ion keys
-  memid_t ion_home;
-  if (failed(result = reg_open_key(0, ion_s, &ion_home)))
-    {
-    if (failed(result = reg_create_key(0, ion_s, &ion_home)))
-      {
-      trace_error("Unable to create the ion key when starting ion");
-      return result;
-      }
-    }
-
   // set the global nano options
   g_CLR_RT_ExecutionEngine.m_fPerformGarbageCollection = true;
   g_CLR_RT_ExecutionEngine.m_fPerformHeapCompaction = true;
+
+  // init the heap
+  CLR_RT_Memory::Reset();
 
   // load the CLR engine
   if (failed(result = CLR_RT_ExecutionEngine::CreateInstance()))
@@ -366,7 +336,7 @@ result_t ion_create(memid_t home,
 
   // enable the debugger
   bool debugger_enabled = false;
-  if (succeeded(reg_get_bool(ion_home, "debugger", &debugger_enabled)))
+  if (succeeded(reg_get_bool(ion_context->home, "debugger", &debugger_enabled)))
     {
     CLR_EE_DBG_SET(Enabled);
     }
@@ -382,9 +352,9 @@ result_t ion_create(memid_t home,
 
   // load all of the assemblies defined in the startup registry key
   char startup_assembly[REG_STRING_MAX];
-  if (failed(result = reg_get_string(ion_home, "start", startup_assembly, 0)))
+  if (failed(result = reg_get_string(ion_context->home, "start", startup_assembly, 0)))
     {
-    trace_warning("No startup assembly defined");
+    trace_warning("No startup assembly defined\n");
     return result;
     }
 
@@ -392,7 +362,7 @@ result_t ion_create(memid_t home,
   // we only support loading of assemblies from the file system (never the registry)
   if(failed(result = stream_open(startup_assembly, &startup_stream)))
     {
-    trace_error("The startup assembly for ion %s cannot be found", startup_assembly);
+    trace_error("The startup assembly for ion %s cannot be found\n", startup_assembly);
     return result;
     }
 
@@ -407,17 +377,17 @@ result_t ion_create(memid_t home,
     return result;
     }
 
-  trace_info("Load the type system");
+  trace_info("Load the type system\n");
 
   if (failed(result = g_CLR_RT_TypeSystem.ResolveAll()))
     {
-    trace_error("Cannot resolve all types when starting CLR");
+    trace_error("Cannot resolve all types when starting CLR\n");
     return result;
     }
 
   if (failed(result = g_CLR_RT_TypeSystem.PrepareForExecution()))
     {
-    trace_error("Cannot prepare CLR application for execution");
+    trace_error("Cannot prepare CLR application for execution\n");
     return result;
     }
 
@@ -433,23 +403,22 @@ result_t ion_create(memid_t home,
     }
 #endif
 
-  trace_info("CLR started ok, ion ready");
+  trace_info("CLR started ok, ion ready\n");
   return result;
   }
 
-result_t ion_run(memid_t key)
+void ion_run(void *arg)
   {
   result_t result;
-  memid_t ion_home;
-  if (failed(result = reg_open_key(0, ion_s, &ion_home)))
-    return result;
+  
+  ion_context_t *ion_context = (ion_context_t *)arg;
 
   int32_t max_context_switches;
-  if (failed(result = reg_get_int32(ion_home, "max-switches", &max_context_switches)))
+  if (failed(result = reg_get_int32(ion_context->home, "max-switches", &max_context_switches)))
     max_context_switches = 50;
 
   bool enter_debugger_after_exit;
-  if (failed(result = reg_get_bool(ion_home, "debug-after-exit", &enter_debugger_after_exit)))
+  if (failed(result = reg_get_bool(ion_context->home, "debug-after-exit", &enter_debugger_after_exit)))
     enter_debugger_after_exit = false;
   
   while (true)
@@ -463,7 +432,7 @@ result_t ion_run(memid_t key)
       CLR_RT_Assembly::InitString();
       CLR_RT_Memory::Reset();
 
-      trace_info("Starting CLR");
+      trace_info("Starting CLR\n");
 
       result_t result = g_CLR_RT_ExecutionEngine.Execute(NULL, max_context_switches);
 
@@ -499,7 +468,8 @@ result_t ion_run(memid_t key)
       } while (softReboot);
     }
 
-  return s_ok;
+  // release the context
+  neutron_free(ion_context);
   }
 
 extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_mscorlib;

@@ -38,6 +38,7 @@ it must be removed as soon as possible after the code fragment is identified.
 #include "../../libs/muon/muon.h"
 #include "../../libs/neutron/stream.h"
 #include "../../libs/neutron/slcan.h"
+#include "../../libs/ion/ion.h"
 
 #include "../../libs/nano/HAL/Include/nanoHAL_v2.h"
 
@@ -495,22 +496,84 @@ int main(int argc, char **argv)
   channel.parser.cfg.console_out = &channel.stream;
   channel.parser.cfg.console_err = &channel.stream;
 
-  ion_init();
+  stream_p splash_screen;
+  manifest_create(splash_base64, &splash_screen);
 
-  // start proton if the key exists
-  /*
-  memid_t proton_key;
-  if(succeeded(reg_open_key(0, "proton", &proton_key)))
+  // this creates the display and loads the screen
+
+  handle_t main_window;
+  result_t result;
+  uint16_t orientation = 0;
+
+  ion_context_t *context = (ion_context_t *)neutron_malloc(sizeof(ion_context_t));
+
+  if (failed(reg_open_key(0, "ion", &context->home)))
     {
-    manifest_create(splash_base64, &args.stream);
-
-    args.ci = &channel.stream;
-    args.co = &channel.stream;
-    args.cerr = &channel.stream;
-
-    task_create("PROTON", DEFAULT_STACK_SIZE * 4, run_proton, &args, NORMAL_PRIORITY, 0);
+    if (failed(reg_create_key(0, "ion", &context->home)))
+      {
+      trace_error("Cannot create the ion root key");
+      return -1;
+      }
     }
-    */
+
+  bool start_ion = true;
+  char startup_assembly[REG_STRING_MAX];
+  if (failed(result = reg_get_string(context->home, "start", startup_assembly, 0)))
+    {
+    trace_warning("No startup assembly defined, ion will not start");
+    start_ion = false;
+    }
+
+  // try to start the screen.  This is hardware dependent and will be
+  // implemented in the hardware abstraction
+  if (succeeded(result = open_screen(orientation, defwndproc, 0, &main_window)))
+    {
+    // see if a splash screen is loaded
+    if (splash_screen != 0)
+      {
+      // determine if the destination window is suitable for
+      // expanding the PNG.  We must have a color that
+      // is 32 bits.  If not we create a canvas that is
+      // guaranteed to be 32 bits
+      extent_t ex;
+      uint16_t bpp;
+      if (succeeded(get_canvas_extents(main_window, &ex, &bpp)) &&
+        bpp < 32)
+        {
+        handle_t canvas = 0;
+        if (succeeded(create_rect_canvas(&ex, &canvas)) &&
+          succeeded(load_png(canvas, splash_screen, 0)))
+          {
+          rect_t wnd_rect = { 0, 0, ex.dx, ex.dy };
+          point_t pt = { 0, 0 };
+
+          // copy the rendered bitmap over
+          bit_blt(main_window, &wnd_rect, &wnd_rect, canvas, &wnd_rect, &pt);
+          }
+        canvas_close(canvas);
+        }
+      else
+        load_png(main_window, splash_screen, 0);
+
+      stream_close(splash_screen);
+      }
+    }
+
+  if (start_ion)
+    {
+    // start ion
+    context->console_in = &channel.stream;
+    context->console_out = &channel.stream;
+    context->console_err = &channel.stream;
+
+    if (failed(ion_create(context)))
+      {
+      trace_error("Unable to start ion");
+      return -1;
+      }
+
+    task_create("PROTON", DEFAULT_STACK_SIZE * 4, ion_run, context, NORMAL_PRIORITY, &context->worker);
+    }
 
   if (failed(cli_init(&channel.parser.cfg, &channel.parser)))
     {

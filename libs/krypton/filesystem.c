@@ -39,17 +39,17 @@ it must be removed as soon as possible after the code fragment is identified.
 
 typedef struct _krypton_fs_t {
   filesystem_t fs;
-  char file_base[MAX_PATH];
+  char file_base[MAX_PATH+1];
   } krypton_fs_t;
 
 static result_t krypton_mount(filesystem_p fs, nand_device_t *device) 
   {
-  return e_not_implemented; 
+  return s_ok; 
   }
 
 static result_t krypton_unmount(filesystem_p fs, nand_device_t *device) 
   {
-  return e_not_implemented; 
+  return s_ok;
   }
 
 static result_t krypton_fssync(filesystem_p fs, nand_device_t *device) 
@@ -109,7 +109,12 @@ static result_t path_combine(const char *path_in, const char *path_more, char *p
   // don't use autoincrement in assign as we want path_out to point to the
   // last char
   for (; len > 0 && *path_in != 0; len--, path_out++, path_in++)
-    *path_out = tolower(*path_in);
+    {
+    if (*path_in == '\\')
+      *path_out = '/';
+    else
+      *path_out = tolower(*path_in);
+    }
 
   if (*path_out != '/')
     {
@@ -123,11 +128,11 @@ static result_t path_combine(const char *path_in, const char *path_more, char *p
     goto exit_copy;
 
   // skip a possible leading '.'
-  if (*path_in == '/')
-    path_in++;
+  if (*path_more == '/')
+    path_more++;
 
-  for (; len > 0 && *path_in != 0; len--)
-    *path_out++ = tolower(*path_in++);
+  for (; len > 0 && *path_more != 0; len--)
+    *path_out++ = tolower(*path_more++);
 
 exit_copy:
   // this was always available from above
@@ -219,6 +224,9 @@ static result_t krypton_read(filesystem_p fs, nand_device_t *device, uint32_t fd
   else
     result = s_ok;
 
+  if (read != 0)
+    *read = bytes_read;
+
   return result; 
   }
 
@@ -290,7 +298,17 @@ static result_t krypton_rename(filesystem_p fs, nand_device_t *device, uint32_t 
 
 static result_t krypton_stat(filesystem_p fs, nand_device_t *device, uint32_t fd, stat_t *buf) 
   {
-  return e_not_implemented; 
+  if (fs == 0 || fd == 0 || buf == 0)
+    return e_bad_parameter;
+
+  memset(buf, 0, sizeof(stat_t));
+
+  // not fully implemented
+  LARGE_INTEGER sz;
+  GetFileSizeEx((HANDLE)fd, &sz);
+  buf->st_size = sz.LowPart;
+
+  return s_ok;
   }
 
 static result_t krypton_getpath(filesystem_p fs, nand_device_t *device, uint32_t fd, bool full_path, char *buffer, size_t size) 
@@ -358,6 +376,8 @@ result_t krypton_fs_init(const char *root_path, filesystem_p *handle)
   filesystem->fs.unlink = krypton_unlink;
   filesystem->fs.unmount = krypton_unmount;
   filesystem->fs.write = krypton_write;
+
+  lstrcpyn(filesystem->file_base, root_path, MAX_PATH);
   
   // ensure files are ansi
   SetFileApisToANSI();

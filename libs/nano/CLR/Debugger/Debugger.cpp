@@ -1287,7 +1287,7 @@ static HRESULT Debugging_Thread_Create_Helper(CLR_RT_MethodDef_Index &md, CLR_RT
   NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_Delegate::CreateInstance(ref, md, NULL));
 
   NANOCLR_CHECK_HRESULT(
-    g_CLR_RT_ExecutionEngine.NewThread(th, ref.DereferenceDelegate(), ThreadPriority::Highest, -1));
+    g_CLR_RT_ExecutionEngine.NewThread(th, ref.DereferenceDelegate(), ThreadPriority_Highest, -1));
 
   if (realThread)
     {

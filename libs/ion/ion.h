@@ -50,32 +50,13 @@ extern "C" {
     task_p worker;                // worker script.  This runs the nanoFramework
     } ion_context_t;
 
-  // this is the type of message passed to the callback functions.
-  typedef struct _ion_request {
-    canmsg_t msg;
-    } ion_request_t;
-
-  extern const char *ion_s;
-  extern const char *event_s;
-  extern const char *ion_name;
-
-extern result_t ion_init();
   /**
-   * Setup the ECMA Script 5 interpreter
-   * @param home      home key to refer all load funcs to
-   * @param path      path to the script to run
-   * @param ci        console in
-   * @param co        console out handler
-   * @param cerr      console error
+  * @function ion_create(ion_context_t *ion, const char *path)
+   * Setup the nanoFramework interpreter
    * @param ion       resulting interactive interpreter
    * @return 
    */
-  extern result_t ion_create(memid_t home, 
-                             const char *path,
-                             handle_t ci,
-                             handle_t co,
-                             handle_t cerr,
-                             struct _ion_context_t **ion);
+  extern result_t ion_create(ion_context_t *ion);
   /**
    * Queue a message to the worker to process.
    * @param ion     Context for the interpreter
@@ -83,17 +64,12 @@ extern result_t ion_init();
    * @param hwnd    Optional handle of window to receive the message
    * @param msg     Message to queue
   */
-  extern result_t ion_queue_message(struct _ion_context_t *ion, uint32_t hwnd, const canmsg_t *msg);
+  extern result_t ion_queue_message(ion_context_t *ion_context, uint32_t hwnd, const canmsg_t *msg);
 
-  extern result_t ion_close(struct _ion_context_t *ion);
-  /**
-   * @function ion_run(memid_t key)
-   * Run the ion event handler code.  Usually the last thing to do
-   * Never returns
-   * @param key Optional key to the registry for ion
-   * 
-   */
-  extern result_t ion_run(memid_t key);
+  extern result_t ion_close(ion_context_t *ion_context);
+
+  // this will free the context when it exits
+  extern void ion_run(void *ion_context);
 
   /**
    * @function ion_malloc(size_t len)

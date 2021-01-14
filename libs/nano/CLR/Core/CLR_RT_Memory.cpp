@@ -25,10 +25,6 @@ void CLR_RT_Memory::Reset()
   {
   NATIVE_PROFILE_CLR_CORE();
   ::HeapLocation(s_CLR_RT_Heap.m_location, s_CLR_RT_Heap.m_size);
-
-#if defined(NANOCLR_TRACE_MALLOC)
-  s_TotalAllocated = 0;
-#endif
   }
 
 void *CLR_RT_Memory::SubtractFromSystem(size_t len)
