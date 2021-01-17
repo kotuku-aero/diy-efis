@@ -41,39 +41,6 @@ HRESULT Library_corlib_native_System_Runtime_CompilerServices_RuntimeHelpers::In
 #if !defined(NETMF_TARGET_BIG_ENDIAN)
   memcpy(ptrDst, ptrSrc, lenSrc * sizeDst);
 
-#if defined(NANOCLR_EMULATED_FLOATINGPOINT)
-  switch (array->m_typeOfElement)
-    {
-    case DATATYPE_R4:
-    {
-    CLR_RT_HeapBlock tmp;
-    CLR_UINT32* ptr = (CLR_UINT32*)ptrDst;
-
-    for (; lenSrc; lenSrc--, ptr++)
-      {
-      NANOCLR_CHECK_HRESULT(tmp.SetFloatIEEE754(*ptr));
-
-      *ptr = tmp.NumericByRef().u4;
-      }
-    }
-    break;
-
-    case DATATYPE_R8:
-    {
-    CLR_RT_HeapBlock tmp;
-    CLR_UINT64* ptr = (CLR_UINT64*)ptrDst;
-
-    for (; lenSrc; lenSrc--, ptr++)
-      {
-      NANOCLR_CHECK_HRESULT(tmp.SetDoubleIEEE754(*ptr));
-
-      *ptr = tmp.NumericByRef().u8;
-      }
-    }
-    break;
-    }
-#endif
-
 #else
   // FIXME GJS - WOuld it be possible to move the endian swap to pe compile time to get rid of this?
   // If this is a numeric dataype of datatype size other than a byte then byteswap the entries

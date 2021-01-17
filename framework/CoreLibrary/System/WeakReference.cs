@@ -6,42 +6,38 @@
 
 namespace System
 {
-    using Runtime.CompilerServices;
+  /// <summary>
+  /// Represents a weak reference, which references an object while still allowing that object to be reclaimed by garbage collection.
+  /// </summary>
+  [Serializable]
+  public class WeakReference
+  {
     /// <summary>
-    /// Represents a weak reference, which references an object while still allowing that object to be reclaimed by garbage collection.
+    /// Initializes a new instance of the WeakReference class, referencing the specified object.
     /// </summary>
-    [Serializable]
-    public class WeakReference
+    /// <param name="target">The object to track or null.</param>
+    public WeakReference(Object target)
     {
-        /// <summary>
-        /// Initializes a new instance of the WeakReference class, referencing the specified object.
-        /// </summary>
-        /// <param name="target">The object to track or null.</param>
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public extern WeakReference(Object target);
-
-        /// <summary>
-        /// Gets an indication whether the object referenced by the current WeakReference object has been garbage collected.
-        /// </summary>
-        /// <value>true if the object referenced by the current WeakReference object has not been garbage collected and is still accessible; otherwise, false.</value>
-        public virtual extern bool IsAlive
-        {
-            [MethodImpl(MethodImplOptions.InternalCall)]
-            get;
-        }
-
-        /// <summary>
-        /// Gets or sets the object (the target) referenced by the current WeakReference object.
-        /// </summary>
-        /// <value>null if the object referenced by the current WeakReference object has been garbage collected; otherwise, a reference to the object referenced by the current WeakReference object.</value>
-        public virtual extern Object Target
-        {
-            [MethodImpl(MethodImplOptions.InternalCall)]
-            get;
-
-            [MethodImpl(MethodImplOptions.InternalCall)]
-            set;
-        }
-
+      CanFly.Runtime.WeakReferenceCtor(this, target);
     }
+
+    /// <summary>
+    /// Gets an indication whether the object referenced by the current WeakReference object has been garbage collected.
+    /// </summary>
+    /// <value>true if the object referenced by the current WeakReference object has not been garbage collected and is still accessible; otherwise, false.</value>
+    public virtual bool IsAlive
+    {
+      get { return CanFly.Runtime.WeakReferenceIsAlive(this); }
+    }
+
+    /// <summary>
+    /// Gets or sets the object (the target) referenced by the current WeakReference object.
+    /// </summary>
+    /// <value>null if the object referenced by the current WeakReference object has been garbage collected; otherwise, a reference to the object referenced by the current WeakReference object.</value>
+    public virtual Object Target
+    {
+      get { return CanFly.Runtime.GetWeakReferenceTarget(this); }
+      set { CanFly.Runtime.SetWeakReferenceTarget(this, value); }
+    }
+  }
 }

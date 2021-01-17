@@ -6,31 +6,30 @@
 
 namespace System.Threading
 {
-    using Runtime.CompilerServices;
+  /// <summary>
+  /// Notifies one or more waiting threads that an event has occurred. This class cannot be inherited.
+  /// </summary>
+  public sealed class ManualResetEvent : WaitHandle
+  {
     /// <summary>
-    /// Notifies one or more waiting threads that an event has occurred. This class cannot be inherited.
+    /// Initializes a new instance of the ManualResetEvent class with a Boolean value indicating whether to set the initial state to signaled.
     /// </summary>
-    public sealed class ManualResetEvent : WaitHandle
+    /// <param name="initialState">true to set the initial state signaled; false to set the initial state to nonsignaled.</param>
+    public ManualResetEvent(bool initialState)
     {
-        /// <summary>
-        /// Initializes a new instance of the ManualResetEvent class with a Boolean value indicating whether to set the initial state to signaled.
-        /// </summary>
-        /// <param name="initialState">true to set the initial state signaled; false to set the initial state to nonsignaled.</param>
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public extern ManualResetEvent(bool initialState);
-
-        /// <summary>
-        /// Sets the state of the event to nonsignaled, causing threads to block.
-        /// </summary>
-        /// <returns>true if the operation succeeds; otherwise, false.</returns>
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public extern bool Reset();
-
-        /// <summary>
-        /// Sets the state of the event to signaled, allowing one or more waiting threads to proceed.
-        /// </summary>
-        /// <returns>true if the operation succeeds; otherwise, false.</returns>
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public extern bool Set();
+      CanFly.Runtime.ManualResetEventCtor(this, initialState);
     }
+
+    /// <summary>
+    /// Sets the state of the event to nonsignaled, causing threads to block.
+    /// </summary>
+    /// <returns>true if the operation succeeds; otherwise, false.</returns>
+    public bool Reset() { return CanFly.Runtime.ManualResetEventReset(this); }
+
+    /// <summary>
+    /// Sets the state of the event to signaled, allowing one or more waiting threads to proceed.
+    /// </summary>
+    /// <returns>true if the operation succeeds; otherwise, false.</returns>
+    public bool Set() { return CanFly.Runtime.ManualResetEventSet(this); }
+  }
 }

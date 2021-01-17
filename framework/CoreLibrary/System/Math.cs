@@ -6,17 +6,13 @@
 
 namespace System
 {
-    using Runtime.CompilerServices;
 
-    internal static class MathInternal
-    {
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        internal static extern int Abs(int val);
+  internal static class MathInternal
+  {
+    internal static int Abs(int val) { return CanFly.Runtime.Abs(val); }
 
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        internal static extern int Min(int val1, int val2);
+    internal static int Min(int val1, int val2) { return CanFly.Runtime.Min(val1, val2); }
 
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        internal static extern int Max(int val1, int val2);
-    }
+    internal static int Max(int val1, int val2) { return CanFly.Runtime.Max(val1, val2); }
+  }
 }

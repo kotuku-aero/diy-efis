@@ -4,29 +4,28 @@
 // See LICENSE file in the project root for full license information.
 //
 
-using System.Runtime.CompilerServices;
-
 namespace System.Diagnostics
 {
+  /// <summary>
+  /// Enables communication with a debugger. This class cannot be inherited.
+  /// </summary>
+  public static class Debugger
+  {
     /// <summary>
-    /// Enables communication with a debugger. This class cannot be inherited.
+    /// Gets a value that indicates whether a debugger is attached to the process.
     /// </summary>
-    public static class Debugger
+    /// <value>true if a debugger is attached; otherwise, false.</value>
+    public static bool IsAttached
     {
-        /// <summary>
-        /// Gets a value that indicates whether a debugger is attached to the process.
-        /// </summary>
-        /// <value>true if a debugger is attached; otherwise, false.</value>
-        public static extern bool IsAttached
-        {
-            [MethodImpl(MethodImplOptions.InternalCall)]
-            get;
-        }
-
-        /// <summary>
-        /// Signals a breakpoint to an attached debugger.
-        /// </summary>
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Break();
+      get { return CanFly.Runtime.DebuggerIsAttached(); }
     }
+
+    /// <summary>
+    /// Signals a breakpoint to an attached debugger.
+    /// </summary>
+    public static void Break()
+    {
+      CanFly.Runtime.DebuggerBreak();
+    }
+  }
 }

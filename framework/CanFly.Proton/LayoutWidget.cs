@@ -75,10 +75,10 @@ namespace CanFly.Proton
     private uint _key; // window key
 
     // map of root _menus
-    private KeysMap _keyMappings;
+    private Hashtable _keyMappings;
 
     // map of _menus
-    private MenuMap _menus;
+    private Hashtable _menus;
 
     // stack of menu's
     private ArrayList _menuStack;
@@ -110,11 +110,11 @@ namespace CanFly.Proton
 
       // the hive must have series of hives that form windows
 
-      uint menu = Neutron.RegOpenKey(hive, "menu");
+      uint menu = Syscall.RegOpenKey(hive, "menu");
       // this stores a cache of loaded keys.
-      _keyMappings = new KeysMap();
+      _keyMappings = new Hashtable();
       _menuStack = new ArrayList();
-      _menus = new MenuMap();
+      _menus = new Hashtable();
       _menuItems = new ArrayList();
 
       if (!TryRegGetInt16(menu, "menu-rect-x", out _menuRectX))
@@ -158,7 +158,7 @@ namespace CanFly.Proton
       uint child = 0;
       string widgetName;
       ushort nextDefaultId = 0x8000;
-      while ((widgetName = Neutron.RegEnumKey(hive, ref child)) != null)
+      while ((widgetName = Syscall.RegEnumKey(hive, ref child)) != null)
       {
         string widgetType;
         if (!TryRegGetString(child, "type", out widgetType))
@@ -240,7 +240,7 @@ namespace CanFly.Proton
       activeKeys = null;
       try
       {
-        uint root_keys_key = Neutron.RegOpenKey(menu, root_keys_s);
+        uint root_keys_key = Syscall.RegOpenKey(menu, root_keys_s);
 
         return true;
       }
@@ -808,7 +808,7 @@ namespace CanFly.Proton
 
     private void DefaultMsgHandler(MenuItem menuItem, CanFlyMsg msg)
     {
-      if (menuItem.ControllingParam == msg.Id)
+      if (menuItem.ControllingParam == msg.CanID)
         menuItem.ControllingVariable = msg;
     }
 
@@ -1020,7 +1020,7 @@ static MenuItem MenuItemAt(Menu menu, ushort index)
 
         uint child = 0;
         string itemName;
-        while ((itemName = Neutron.RegEnumKey(key, ref child)) != null)
+        while ((itemName = Syscall.RegEnumKey(key, ref child)) != null)
         {
           // the protocol assumes all child keys are menu items
           MenuItem item = ParseItem(child);

@@ -16,7 +16,7 @@
 //
 //#include <nanoCLR_ParseOptions.h>
 //
-#include "../CorLib/corlib_native.h"
+#include "../CorLib/mscorlib/corlib_native.h"
 //#include <SPOT_native.h>
 //#include <SPOT_hardware_native.h>
 #include "../Include/nanoCLR_Runtime__HeapBlock.h"

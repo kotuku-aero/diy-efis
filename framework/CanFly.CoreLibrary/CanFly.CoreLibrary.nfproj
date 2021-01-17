@@ -24,40 +24,8 @@
   </PropertyGroup>
   <Import Project="$(NanoFrameworkProjectSystemPath)NFProjectSystem.props" Condition="Exists('$(NanoFrameworkProjectSystemPath)NFProjectSystem.props')" />
   <ItemGroup>
-    <Compile Include="Canvas.cs" />
-    <Compile Include="Color.cs" />
-    <Compile Include="DirectoryEnumerator.cs" />
-    <Compile Include="Extent.cs" />
-    <Compile Include="Font.cs" />
-    <Compile Include="GdiObject.cs" />
-    <Compile Include="CanFlyMsg.cs" />
-    <Compile Include="Neutron.cs" />
-    <Compile Include="Pen.cs" />
-    <Compile Include="Photon.cs" />
-    <Compile Include="Point.cs" />
-    <Compile Include="PointArray.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Rect.cs" />
-    <Compile Include="Screen.cs" />
-    <Compile Include="Stream.cs" />
-    <Compile Include="Widget.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="mscorlib, Version=1.7.3.5, Culture=neutral, PublicKeyToken=c07d481e9758c731">
-      <HintPath>..\..\packages\nanoFramework.CoreLibrary.NoReflection.1.7.3\lib\mscorlib.dll</HintPath>
-      <Private>True</Private>
-      <SpecificVersion>True</SpecificVersion>
-    </Reference>
-    <Reference Include="nanoFramework.System.Collections, Version=1.1.0.2, Culture=neutral, PublicKeyToken=c07d481e9758c731">
-      <HintPath>..\..\packages\nanoFramework.System.Collections.1.1.0\lib\nanoFramework.System.Collections.dll</HintPath>
-      <Private>True</Private>
-      <SpecificVersion>True</SpecificVersion>
-    </Reference>
-    <Reference Include="System.Math, Version=1.3.0.3, Culture=neutral, PublicKeyToken=c07d481e9758c731">
-      <HintPath>..\..\packages\nanoFramework.System.Math.1.3.0\lib\System.Math.dll</HintPath>
-      <Private>True</Private>
-      <SpecificVersion>True</SpecificVersion>
-    </Reference>
+    <Compile Include="Syscall.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

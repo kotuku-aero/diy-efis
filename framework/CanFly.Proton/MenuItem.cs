@@ -87,8 +87,10 @@ namespace CanFly.Proton
           EnableRegex == null)
         return true;
 
+      // build an enabler from the format string
+
       // we now determine a match against the controlling regular expression
-      return Match(ControllingVariable.ToString(EnableFormat));
+      return Match(string.Format(EnableFormat, ControllingVariable.Value));
     }
 
     public void EventHandler(MenuItemMsgHandler handler)

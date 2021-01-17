@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-
 namespace System.Runtime.Remoting
 {
     /// <summary>
@@ -12,7 +10,6 @@ namespace System.Runtime.Remoting
         /// </summary>
         /// <param name="proxy">The reference to the object to check.</param>
         /// <returns>A Boolean value that indicates whether the object specified in the proxy parameter is a transparent proxy or a real object.</returns>
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool IsTransparentProxy(Object proxy);
+        public static bool IsTransparentProxy(Object proxy) { return CanFly.Runtime.IsTransparentProxy(proxy); }
     }
 }

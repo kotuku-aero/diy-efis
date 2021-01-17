@@ -19,6 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\libs\ion\builtin\canfly_corelibrary.c" />
+    <ClCompile Include="..\..\libs\ion\builtin\mscorlib.c" />
+    <ClCompile Include="..\..\libs\ion\builtin\system_collections.c" />
+    <ClCompile Include="..\..\libs\ion\builtin\system_math.c" />
+    <ClCompile Include="..\..\libs\ion\builtin\system_text.c" />
+    <ClCompile Include="..\..\libs\ion\builtin\system_threading.c" />
     <ClCompile Include="..\..\libs\ion\canflylib\CanFly_CoreLibrary.cpp" />
     <ClCompile Include="..\..\libs\ion\comm_service.c" />
     <ClCompile Include="..\..\libs\ion\debug_service.c" />

@@ -1,9 +1,10 @@
-﻿using System.Reflection;
-using System.Runtime.InteropServices;
-
-// General Information about an assembly is controlled through the following 
+﻿// General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+
 [assembly: AssemblyTitle("CanFly")]
 [assembly: AssemblyDescription("Core Canfly interface for the nanoFramework")]
 [assembly: AssemblyConfiguration("")]
@@ -36,3 +37,7 @@ using System.Runtime.InteropServices;
 // update this whenever the native assembly signature changes  //
 [assembly: AssemblyNativeVersion("1.0.0.0")]
 /////////////////////////////////////////////////////////////////
+
+[assembly: InternalsVisibleTo("CanFly.Proton")]
+[assembly: InternalsVisibleTo("CanFly.Photon")]
+[assembly: InternalsVisibleTo("CanFly.Neutron")]

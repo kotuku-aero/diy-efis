@@ -75,7 +75,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Widget::_cctor___STATIC__VOID(CLR_RT_S
   NANOCLR_HEADER(); hr = S_OK;
 
   // create the message worker thread
-  if (!g_CLR_RT_ExecutionEngine.EnsureSystemThread(canFlyEventThread, ThreadPriority::System_Highest))
+  if (!g_CLR_RT_ExecutionEngine.EnsureSystemThread(canFlyEventThread, ThreadPriority_System_Highest))
     return S_OK;
 
   // stop more than 1 use of the thread.

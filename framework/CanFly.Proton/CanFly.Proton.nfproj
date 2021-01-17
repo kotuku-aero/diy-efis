@@ -26,7 +26,6 @@
     <Compile Include="GpsWidget.cs" />
     <Compile Include="HSIWidget.cs" />
     <Compile Include="Keys.cs" />
-    <Compile Include="KeysMap.cs" />
     <Compile Include="LayoutWidget.cs" />
     <Compile Include="Menu.cs" />
     <Compile Include="MenuItem.cs" />
@@ -38,37 +37,17 @@
     <Compile Include="MenuItemEnter.cs" />
     <Compile Include="MenuItemItem.cs" />
     <Compile Include="MenuItemPopup.cs" />
-    <Compile Include="MenuMap.cs" />
     <Compile Include="Pens.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="mscorlib, Version=1.7.3.5, Culture=neutral, PublicKeyToken=c07d481e9758c731">
-      <HintPath>..\..\packages\nanoFramework.CoreLibrary.1.7.3\lib\mscorlib.dll</HintPath>
-      <Private>True</Private>
-      <SpecificVersion>True</SpecificVersion>
-    </Reference>
-    <Reference Include="nanoFramework.System.Collections, Version=1.1.0.2, Culture=neutral, PublicKeyToken=c07d481e9758c731">
-      <HintPath>..\..\packages\nanoFramework.System.Collections.1.1.0\lib\nanoFramework.System.Collections.dll</HintPath>
-      <Private>True</Private>
-      <SpecificVersion>True</SpecificVersion>
-    </Reference>
-    <Reference Include="nanoFramework.System.Text, Version=1.1.0.2, Culture=neutral, PublicKeyToken=c07d481e9758c731">
-      <HintPath>..\..\packages\nanoFramework.System.Text.1.1.0\lib\nanoFramework.System.Text.dll</HintPath>
-      <Private>True</Private>
-      <SpecificVersion>True</SpecificVersion>
-    </Reference>
-    <Reference Include="System.Math, Version=1.3.0.3, Culture=neutral, PublicKeyToken=c07d481e9758c731">
-      <HintPath>..\..\packages\nanoFramework.System.Math.1.3.0\lib\System.Math.dll</HintPath>
-      <Private>True</Private>
-      <SpecificVersion>True</SpecificVersion>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CanFly.CoreLibrary\CanFly.CoreLibrary.nfproj" />
+    <ProjectReference Include="..\CoreLibrary\CoreLibrary.nfproj" />
+    <ProjectReference Include="..\System.Collections\System.Collections.nfproj" />
+    <ProjectReference Include="..\System.Math\System.Math.nfproj" />
+    <ProjectReference Include="..\System.Text\System.Text.nfproj" />
   </ItemGroup>
   <Import Project="$(NanoFrameworkProjectSystemPath)NFProjectSystem.CSharp.targets" Condition="Exists('$(NanoFrameworkProjectSystemPath)NFProjectSystem.CSharp.targets')" />
   <ProjectExtensions>

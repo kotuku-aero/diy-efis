@@ -264,7 +264,7 @@ namespace CanFly.Proton
 
       try
       {
-        step_key = Neutron.RegOpenKey(key, "step");
+        step_key = Syscall.RegOpenKey(key, "step");
 
         steps = new ArrayList();
 
@@ -273,7 +273,7 @@ namespace CanFly.Proton
         for (i = 0; i < 99; i++)
         {
           // this stops as soon as the first key is not found
-          uint child_key = Neutron.RegOpenKey(step_key, i.ToString());
+          uint child_key = Syscall.RegOpenKey(step_key, i.ToString());
 
           step_t new_step = new step_t();
 
@@ -292,13 +292,13 @@ namespace CanFly.Proton
 
       try
       {
-        uint ticks_key = Neutron.RegOpenKey(key, "tick");
+        uint ticks_key = Syscall.RegOpenKey(key, "tick");
 
         ticks = new ArrayList();
 
         for (int i = 0; i < 99; i++)
         {
-          uint child_key = Neutron.RegOpenKey(ticks_key, i.ToString());
+          uint child_key = Syscall.RegOpenKey(ticks_key, i.ToString());
 
           // tick-0=650, 650
           // param1 . tick point
@@ -353,7 +353,7 @@ namespace CanFly.Proton
 
         for (int i = 0; i < num_values; i++)
         {
-          if (msg.Id == labels[i])
+          if (msg.CanID == labels[i])
           {
 
             float_value *= scale;

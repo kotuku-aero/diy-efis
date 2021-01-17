@@ -19,6 +19,9 @@
     <Filter Include="runtime">
       <UniqueIdentifier>{59bc259c-f689-433a-b8e5-ce83ac717344}</UniqueIdentifier>
     </Filter>
+    <Filter Include="builtin">
+      <UniqueIdentifier>{4aa8b87f-9cdb-4213-bc4b-e6a4d78f923c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\libs\ion\ion_cli_impl.c">
@@ -80,6 +83,24 @@
     </ClCompile>
     <ClCompile Include="..\..\libs\ion\runtime\Widget.cpp">
       <Filter>runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\builtin\canfly_corelibrary.c">
+      <Filter>builtin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\builtin\mscorlib.c">
+      <Filter>builtin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\builtin\system_collections.c">
+      <Filter>builtin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\builtin\system_math.c">
+      <Filter>builtin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\builtin\system_text.c">
+      <Filter>builtin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\builtin\system_threading.c">
+      <Filter>builtin</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

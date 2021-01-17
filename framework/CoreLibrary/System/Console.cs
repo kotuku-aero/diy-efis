@@ -6,35 +6,30 @@
 
 namespace System
 {
-    using Runtime.CompilerServices;
+  /// <summary>
+  /// Represents the standard input, output, and error streams for console applications. This class cannot be inherited.
+  /// </summary>
+  [Serializable]
+  public static class Console
+  {
+    /// <summary>
+    /// Writes the specified string value to the standard output stream.
+    /// </summary>
+    /// <param name="value">The value to write.</param>
+    [Obsolete("This method is going to be removed in a future version. Call Debug.Write instead.")]
+    public static void Write(string value)
+    {
+      CanFly.Runtime.OutNative(value, false);
+    }
 
     /// <summary>
-    /// Represents the standard input, output, and error streams for console applications. This class cannot be inherited.
+    /// Writes the specified string value, followed by the current line terminator, to the standard output stream.
     /// </summary>
-    [Serializable]
-    public static class Console
+    /// <param name="value">The value to write.</param>
+    [Obsolete("This method is going to be removed in a future version. Call Debug.Write instead.")]
+    public static void WriteLine(string value)
     {
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        extern static private void OutNative(string text, bool addLineFeed);
-
-        /// <summary>
-        /// Writes the specified string value to the standard output stream.
-        /// </summary>
-        /// <param name="value">The value to write.</param>
-        [Obsolete("This method is going to be removed in a future version. Call Debug.Write instead.")]
-        public static void Write(string value)
-        {
-            OutNative(value, false);
-        }
-
-        /// <summary>
-        /// Writes the specified string value, followed by the current line terminator, to the standard output stream.
-        /// </summary>
-        /// <param name="value">The value to write.</param>
-        [Obsolete("This method is going to be removed in a future version. Call Debug.Write instead.")]
-        public static void WriteLine(string value)
-        {
-            OutNative(value, true);
-        }
+      CanFly.Runtime.OutNative(value, true);
     }
+  }
 }
