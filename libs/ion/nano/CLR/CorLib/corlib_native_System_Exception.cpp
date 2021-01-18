@@ -13,8 +13,6 @@ struct ExceptionLookup
   };
 
 
-static StackTrace *GetStackTrace(CLR_RT_HeapBlock *obj, CLR_UINT32 &depth);
-
 static const ExceptionLookup c_ExceptionLookup[] =
   {
   #define EL(hr,fld) { hr, &g_CLR_RT_WellKnownTypes.fld }
@@ -154,7 +152,7 @@ HRESULT ExceptionCreateInstance(CLR_RT_HeapBlock &ref, HRESULT hrIn, CLR_RT_Stac
   return ExceptionCreateInstance(ref, *cls, hrIn, stack);
   }
 
-CLR_RT_HeapBlock *GetTarget(CLR_RT_HeapBlock &ref)
+CLR_RT_HeapBlock *ExceptionGetTarget(CLR_RT_HeapBlock &ref)
   {
   NATIVE_PROFILE_CLR_CORE();
   return CLR_RT_ExecutionEngine::IsInstanceOf(ref, g_CLR_RT_WellKnownTypes.m_Exception) ? ref.Dereference() : NULL;

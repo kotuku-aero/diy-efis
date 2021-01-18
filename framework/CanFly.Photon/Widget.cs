@@ -220,11 +220,11 @@ namespace CanFly
 
     public void PostMessage(CanFlyMsg msg)
     {
-      Syscall.PostMessage(InternalHandle, 0, (ushort) msg.RoutingFlags, msg.CanID, msg.Data0, msg.Data1, msg.Data2, msg.Data3, msg.Data4, msg.Data5, msg.Data6, msg.Data7);
+      Syscall.PostMessage(InternalHandle, 0, msg.CanID, msg.Data0, msg.Data1, msg.Data2, msg.Data3, msg.Data4, msg.Data5, msg.Data6, msg.Data7);
     }
     public void PostMessage(CanFlyMsg msg, uint maxWait)
     {
-      Syscall.PostMessage(InternalHandle, 0, (ushort) msg.RoutingFlags, msg.CanID, msg.Data0, msg.Data1, msg.Data2, msg.Data3, msg.Data4, msg.Data5, msg.Data6, msg.Data7);
+      Syscall.PostMessage(InternalHandle, 0, msg.CanID, msg.Data0, msg.Data1, msg.Data2, msg.Data3, msg.Data4, msg.Data5, msg.Data6, msg.Data7);
     }
 
     /// <summary>

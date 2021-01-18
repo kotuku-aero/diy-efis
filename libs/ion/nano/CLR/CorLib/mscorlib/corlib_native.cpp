@@ -197,8 +197,6 @@ static const CLR_RT_MethodHandler method_lookup[] =
     Library_corlib_native_CanFly_Syscall::CreateWindow___STATIC__U4__U4__I4__I4__I4__I4__U2,
     Library_corlib_native_CanFly_Syscall::CreateChildWindow___STATIC__U4__U4__I4__I4__I4__I4__U2,
     Library_corlib_native_CanFly_Syscall::CloseWindow___STATIC__VOID__U4,
-    Library_corlib_native_CanFly_Syscall::SendMessage___STATIC__VOID__U4__U2__U2__U1__U1__U1__U1__U1__U1__U1__U1,
-    Library_corlib_native_CanFly_Syscall::PostMessage___STATIC__VOID__U4__U2__U2__U1__U1__U1__U1__U1__U1__U1__U1,
     Library_corlib_native_CanFly_Syscall::GetWindowRect___STATIC__VOID__U4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4,
     Library_corlib_native_CanFly_Syscall::GetWindowPos___STATIC__VOID__U4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4,
     Library_corlib_native_CanFly_Syscall::SetWindowPos___STATIC__VOID__U4__I4__I4__I4__I4,
@@ -243,11 +241,12 @@ static const CLR_RT_MethodHandler method_lookup[] =
     Library_corlib_native_CanFly_Syscall::BeginPaint___STATIC__VOID__U4,
     Library_corlib_native_CanFly_Syscall::EndPaint___STATIC__VOID__U4,
     Library_corlib_native_CanFly_Syscall::GetMessage___STATIC__BOOLEAN__U4__BYREF_U4__BYREF_U2__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1,
-    Library_corlib_native_CanFly_Syscall::DispatchMessage___STATIC__VOID__U4__U2__U2__U1__U1__U1__U1__U1__U1__U1__U1,
-    Library_corlib_native_CanFly_Syscall::PostMessage___STATIC__VOID__U4__U4__U2__U2__U1__U1__U1__U1__U1__U1__U1__U1,
-    Library_corlib_native_CanFly_Syscall::Send___STATIC__VOID__U2__U2__U1__U1__U1__U1__U1__U1__U1__U1,
-    Library_corlib_native_CanFly_Syscall::SendRaw___STATIC__VOID__U2__U2__U1__U1__U1__U1__U1__U1__U1__U1,
-    Library_corlib_native_CanFly_Syscall::SendReply___STATIC__VOID__U2__U2__U1__U1__U1__U1__U1__U1__U1__U1,
+    Library_corlib_native_CanFly_Syscall::DispatchMessage___STATIC__VOID__U4__U2__U1__U1__U1__U1__U1__U1__U1__U1,
+    Library_corlib_native_CanFly_Syscall::SendMessage___STATIC__VOID__U4__U2__U1__U1__U1__U1__U1__U1__U1__U1,
+    Library_corlib_native_CanFly_Syscall::PostMessage___STATIC__VOID__U4__U4__U2__U1__U1__U1__U1__U1__U1__U1__U1,
+    Library_corlib_native_CanFly_Syscall::Send___STATIC__VOID__U2__U1__U1__U1__U1__U1__U1__U1__U1,
+    Library_corlib_native_CanFly_Syscall::SendRaw___STATIC__VOID__U2__U1__U1__U1__U1__U1__U1__U1__U1,
+    Library_corlib_native_CanFly_Syscall::SendReply___STATIC__VOID__U2__U1__U1__U1__U1__U1__U1__U1__U1,
     Library_corlib_native_CanFly_Syscall::GetFloat___STATIC__R4__U1__U1__U1__U1,
     Library_corlib_native_CanFly_Syscall::GetInt32___STATIC__I4__U1__U1__U1__U1,
     Library_corlib_native_CanFly_Syscall::GetUInt32___STATIC__U4__U1__U1__U1__U1,
@@ -954,7 +953,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
 const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_mscorlib =
 {
     "mscorlib",
-    0x8CB28CE2,
+    0x06843E4E,
     method_lookup,
     { 100, 5, 0, 3 }
 };

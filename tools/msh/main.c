@@ -40,7 +40,7 @@ it must be removed as soon as possible after the code fragment is identified.
 #include "../../libs/neutron/slcan.h"
 #include "../../libs/ion/ion.h"
 
-#include "../../libs/nano/HAL/Include/nanoHAL_v2.h"
+#include "../../libs/ion/nano/HAL/Include/nanoHAL_v2.h"
 
 #include "msh_cli.h"
 

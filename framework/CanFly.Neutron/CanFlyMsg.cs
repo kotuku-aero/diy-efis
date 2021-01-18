@@ -244,18 +244,10 @@ public enum CanFlyDataType
   UserDefinedEnd = 255,
 };
 
-[Flags]
-public enum CanFlyFlags
-{
-  Loopback   = 0x0002,
-  Broadcast  = 0x0004
-}
-
 public sealed class CanFlyMsg
   {
     // these are required by the native implementation
     private ushort _canId;
-    private CanFlyFlags _routingFlags;
     // same coding as CanAerospace
     // Bits 15:12 - Length
     // Bit 11 - Reply
@@ -361,7 +353,7 @@ public sealed class CanFlyMsg
     internal CanFlyMsg(ushort can_id, ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7)
     {
       _canId = can_id;
-      _routingFlags = (CanFlyFlags) flags;
+      _flags = flags;
       _b0 = b0;
       _b1 = b1;
       _b2 = b2;
@@ -370,14 +362,6 @@ public sealed class CanFlyMsg
       _b5 = b5;
       _b6 = b6;
       _b7 = b7;
-    }
-    /// <summary>
-    /// CalFly routing flags
-    /// </summary>
-    public CanFlyFlags RoutingFlags 
-    {
-      get { return _routingFlags; } 
-      set { _routingFlags = value; }
     }
     /// <summary>
     /// CanFly node id
@@ -415,12 +399,12 @@ public sealed class CanFlyMsg
 
     internal void SendMessage(uint handle)
     {
-      Syscall.SendMessage(handle, _canId, (ushort) _routingFlags, _b0, _b1, _b2, _b3, _b4, _b5, _b6, _b7);
+      Syscall.SendMessage(handle, _canId, _flags, _b0, _b1, _b2, _b3, _b4, _b5, _b6, _b7);
     }
 
     internal void PostMessage(uint handle)
     {
-      Syscall.PostMessage(handle, _canId, (ushort)_routingFlags, _b0, _b1, _b2, _b3, _b4, _b5, _b6, _b7);
+      Syscall.PostMessage(handle, _canId, _flags, _b0, _b1, _b2, _b3, _b4, _b5, _b6, _b7);
     }
 
     /// <summary>

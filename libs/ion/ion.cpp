@@ -473,14 +473,12 @@ void ion_run(void *arg)
   }
 
 extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_mscorlib;
-extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_canflylib;
 
 // table of native assembly handlers
 
 const CLR_RT_NativeAssemblyData *g_CLR_InteropAssembliesNativeData[] =
   {
     &g_CLR_AssemblyNative_mscorlib,
-    &g_CLR_AssemblyNative_canflylib,
     NULL
   };
 

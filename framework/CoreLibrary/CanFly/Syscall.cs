@@ -59,11 +59,6 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void CloseWindow(uint hwnd);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SendMessage(uint hwnd, ushort id, ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void PostMessage(uint hend, ushort id, ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7);
-
-    [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void GetWindowRect(uint window, out int left, out int top, out int right, out int bottom);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -184,15 +179,17 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern bool GetMessage(uint hwnd, out uint msg_for, ref ushort flags, ref byte b0, ref byte b1, ref byte b2, ref byte b3, ref byte b4, ref byte b5, ref byte b6, ref byte b7);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void DispatchMessage(uint hwnd, ushort routing_flags, ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7);
+    internal static extern void DispatchMessage(uint hwnd, ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void PostMessage(uint hwnd, uint max_wait, ushort routing_flags, ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7);
+    internal static extern void SendMessage(uint hwnd, ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void Send(ushort routing_flags, ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7);
+    internal static extern void PostMessage(uint hwnd, uint max_wait, ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SendRaw(ushort routing_flags, ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7);
+    internal static extern void Send(ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SendReply(ushort routing_flags, ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7);
+    internal static extern void SendRaw(ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void SendReply(ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern float GetFloat(byte b0, byte b1, byte b2, byte b3);
     [MethodImpl(MethodImplOptions.InternalCall)]

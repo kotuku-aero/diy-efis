@@ -686,7 +686,17 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringCompareTo___STATIC__I4__STRI
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  NANOCLR_SET_AND_LEAVE(Library_corlib_native_CanFly_Runtime::StringCompare___STATIC__I4__STRING__STRING(stack));
+  NANOCLR_SET_AND_LEAVE(StringCompare___STATIC__I4__STRING__STRING(stack));
+
+  NANOCLR_NOCLEANUP();
+  }
+
+HRESULT Library_corlib_native_CanFly_Runtime::StringCompareTo___STATIC__I4__STRING__STRING(CLR_RT_StackFrame& stack)
+  {
+  NATIVE_PROFILE_CLR_CORE();
+  NANOCLR_HEADER();
+
+  NANOCLR_SET_AND_LEAVE(StringCompare___STATIC__I4__STRING__STRING(stack));
 
   NANOCLR_NOCLEANUP();
   }
@@ -1015,6 +1025,16 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringLastIndexOf___STATIC__I4__ST
   }
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringLastIndexOfAny___STATIC__I4__SZARRAY_CHAR(CLR_RT_StackFrame& stack)
+  {
+  NATIVE_PROFILE_CLR_CORE();
+  NANOCLR_HEADER();
+
+  NANOCLR_SET_AND_LEAVE(IndexOf(stack, c_IndexOf__MultipleChars | c_IndexOf__Last));
+
+  NANOCLR_NOCLEANUP();
+  }
+
+HRESULT Library_corlib_native_CanFly_Runtime::StringLastIndexOfAny___STATIC__I4__STRING__SZARRAY_CHAR(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
