@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Runtime.CompilerServices;
 
 namespace CanFly
 {
@@ -39,11 +40,13 @@ namespace CanFly
     public event CanFlyMsgHandler BeforePaint = null;
     public event CanFlyMsgHandler AfterPaint = null;
 
+    [MethodImpl(MethodImplOptions.InternalCall)]
     static Widget()
     {
       // ask the system to create photon as widgets are being used
-      Syscall.IncarnatePhoton();
     }
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void AddEvent(uint handle, ushort id);
 
     internal Widget(uint hwnd) : base(hwnd)
     {

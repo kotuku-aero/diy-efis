@@ -1,8 +1,9 @@
-#include "../canflylib/CanFly_CoreLibrary.h"
+#include "../nano/CLR/CorLib/mscorlib/corlib_native.h"
 
 #include "../../neutron/neutron.h"
 #include "../../photon/photon.h"
 
+/*
 static void CopyCanMsg(const canmsg_t* msg, CLR_RT_HeapBlock* pThis)
   {
   pThis[Library_CanFly_CoreLibrary_CanFly_CanFlyMsg::FIELD___flags].NumericByRef().u2 = msg->flags;
@@ -28,4 +29,4 @@ static void CopyCanMsg(const CLR_RT_HeapBlock* pThis, canmsg_t* msg)
   msg->raw[6] = pThis[Library_CanFly_CoreLibrary_CanFly_CanFlyMsg::FIELD___b6].NumericByRefConst().u1;
   msg->raw[7] = pThis[Library_CanFly_CoreLibrary_CanFly_CanFlyMsg::FIELD___b7].NumericByRefConst().u1;
   }
-
+  */

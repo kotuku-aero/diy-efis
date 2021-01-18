@@ -9,12 +9,10 @@ namespace CanFly
     {
     }
 
-
     protected override void OnPaint(CanFlyMsg e)
     {
       // screen does nothing, as is a canvas only.
     }
-
 
     private class WidgetLock { };
     private static WidgetLock widgetLock = new WidgetLock();

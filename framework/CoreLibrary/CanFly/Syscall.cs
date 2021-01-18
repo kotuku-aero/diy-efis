@@ -3,10 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace CanFly
 {
-  /// <summary>
-  /// Class holding all system calls.  The order of this class never changes.
-  /// Methods can be added to the end of it, but never removed.
-  /// </summary>
+
   internal static class Syscall
   {
     /*******************************************************/
@@ -286,10 +283,5 @@ namespace CanFly
     internal static extern int PointArrayIndexOf(uint handle, int x, int y);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void PointArrayRemoveAt(uint handle, uint index);
-
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void IncarnatePhoton();
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void AddEvent(uint handle, ushort id);
   }
 }

@@ -1,9 +1,8 @@
-#include "../canflylib/CanFly_CoreLibrary.h"
-
+#include "../nano/CLR/CorLib/mscorlib/corlib_native.h"
 #include "../../neutron/neutron.h"
 #include "../../photon/photon.h"
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_PointArray::PointArrayCreate___STATIC__U4__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::PointArrayCreate___STATIC__U4__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -21,7 +20,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_PointArray::PointArrayCreate___STATIC_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_PointArray::PointArrayRelease___STATIC__VOID__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::PointArrayRelease___STATIC__VOID__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -33,7 +32,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_PointArray::PointArrayRelease___STATIC
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_PointArray::PointArraySetPoint___STATIC__VOID__U4__U4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::PointArraySetPoint___STATIC__VOID__U4__U4__I4__I4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   unsigned int param0;
@@ -56,7 +55,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_PointArray::PointArraySetPoint___STATI
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_PointArray::PointArrayClear___STATIC__VOID__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::PointArrayClear___STATIC__VOID__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   unsigned int param0;
@@ -68,7 +67,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_PointArray::PointArrayClear___STATIC__
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_PointArray::PointArraySize___STATIC__U4__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::PointArraySize___STATIC__U4__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -86,7 +85,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_PointArray::PointArraySize___STATIC__U
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_PointArray::PointArrayResize___STATIC__VOID__U4__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::PointArrayResize___STATIC__VOID__U4__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -104,7 +103,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_PointArray::PointArrayResize___STATIC_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_PointArray::PointArrayAppend___STATIC__U4__U4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::PointArrayAppend___STATIC__U4__U4__I4__I4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -132,7 +131,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_PointArray::PointArrayAppend___STATIC_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_PointArray::PointArrayInsertAt___STATIC__VOID__U4__U4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::PointArrayInsertAt___STATIC__VOID__U4__U4__I4__I4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -158,7 +157,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_PointArray::PointArrayInsertAt___STATI
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_PointArray::PointArrayGetPoint___STATIC__VOID__U4__U4__BYREF_I4__BYREF_I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::PointArrayGetPoint___STATIC__VOID__U4__U4__BYREF_I4__BYREF_I4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -180,7 +179,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_PointArray::PointArrayGetPoint___STATI
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_PointArray::PointArrayIndexOf___STATIC__I4__U4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::PointArrayIndexOf___STATIC__I4__U4__I4__I4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -219,7 +218,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_PointArray::PointArrayIndexOf___STATIC
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_PointArray::PointArrayRemoveAt___STATIC__VOID__U4__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::PointArrayRemoveAt___STATIC__VOID__U4__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 

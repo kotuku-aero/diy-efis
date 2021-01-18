@@ -1,6 +1,6 @@
 #include "../neutron/neutron.h"
 
-#include "../nano/PAL/Include/nanoPAL_COM.h"
+#include "nano/PAL/Include/nanoPAL_COM.h"
 
 bool GenericPort_Initialize(int comPortNum)
   {

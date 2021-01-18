@@ -1,4 +1,4 @@
-#include "../nano/HAL/Include/nanoHAL.h"
+#include "nano/HAL/Include/nanoHAL.h"
 
 // because debug_printf needs to be called in both C and C++ we need a proxy to allow it to be called in 'C'
 extern "C" {

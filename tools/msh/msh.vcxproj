@@ -33,9 +33,6 @@
     <ProjectReference Include="..\muon\muon.vcxproj">
       <Project>{4692af85-e696-481e-8ffb-5135bdce2326}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\nano\nano.vcxproj">
-      <Project>{f975bed3-96e4-4eff-b967-fb7daba4b82e}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\neutron\neutron.vcxproj">
       <Project>{eacccfa7-bd61-449f-ba60-f398ff0780ae}</Project>
     </ProjectReference>

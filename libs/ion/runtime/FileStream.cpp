@@ -1,14 +1,8 @@
-/*
-#include "../../nano/CLR/Include/nanoCLR_Interop.h"
-#include "../../nano/CLR/Include/nanoCLR_Runtime.h"
-#include "../../nano/CLR/Include/nanoPackStruct.h"
-*/
-#include "../canflylib/CanFly_CoreLibrary.h"
-
+#include "../nano/CLR/CorLib/mscorlib/corlib_native.h"
 #include "../../neutron/neutron.h"
 
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_FileStream::FileStreamOpen___STATIC__U4__STRING(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::FileStreamOpen___STATIC__U4__STRING(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -25,7 +19,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_FileStream::FileStreamOpen___STATIC__U
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_FileStream::FileStreamCreate___STATIC__U4__STRING(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::FileStreamCreate___STATIC__U4__STRING(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -41,7 +35,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_FileStream::FileStreamCreate___STATIC_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_FileStream::CreateDirectory___STATIC__VOID__STRING(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::CreateDirectory___STATIC__VOID__STRING(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -56,7 +50,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_FileStream::CreateDirectory___STATIC__
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_FileStream::RemoveDirectory___STATIC__VOID__STRING(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::RemoveDirectory___STATIC__VOID__STRING(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -71,7 +65,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_FileStream::RemoveDirectory___STATIC__
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_FileStream::GetDirectoryEnumertor___STATIC__U4__STRING(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetDirectoryEnumerator___STATIC__U4__STRING(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {

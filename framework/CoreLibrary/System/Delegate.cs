@@ -62,7 +62,7 @@ namespace System
     /// <returns>true if d1 is equal to d2; otherwise, false.</returns>
     public static bool operator ==(Delegate d1, Delegate d2)
     {
-      return CanFly.Runtime.DelegateEquals(d1, d2);
+      return d1.Equals(d2);
     }
 
     /// <summary>
@@ -73,7 +73,7 @@ namespace System
     /// <returns>true if d1 is not equal to d2; otherwise, false.</returns>
     public static bool operator !=(Delegate d1, Delegate d2)
     {
-      return CanFly.Runtime.DelegateNotEquals(d1, d2);
+      return !d1.Equals(d2);
     }
   }
 }

@@ -1,14 +1,8 @@
-/*
-#include "../../nano/CLR/Include/nanoCLR_Interop.h"
-#include "../../nano/CLR/Include/nanoCLR_Runtime.h"
-#include "../../nano/CLR/Include/nanoPackStruct.h"
-*/
-#include "../canflylib/CanFly_CoreLibrary.h"
-
+#include "../nano/CLR/CorLib/mscorlib/corlib_native.h"
 #include "../../neutron/neutron.h"
 
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_DirectoryEnumerator::GetDirectoryEntry___STATIC__BOOLEAN__U4__BYREF_STRING__BYREF_STRING(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetDirectoryEntry___STATIC__BOOLEAN__U4__BYREF_STRING__BYREF_STRING(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -55,7 +49,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_DirectoryEnumerator::GetDirectoryEntry
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_DirectoryEnumerator::RewindDirectoryEntry___STATIC__VOID__U4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::RewindDirectoryEntry___STATIC__VOID__U4(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {

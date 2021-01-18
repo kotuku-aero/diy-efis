@@ -1,11 +1,6 @@
-/*
-#include "../../nano/CLR/Include/nanoCLR_Interop.h"
-#include "../../nano/CLR/Include/nanoCLR_Runtime.h"
-#include "../../nano/CLR/Include/nanoPackStruct.h"
-*/
-
-#include "../canflylib/CanFly_CoreLibrary.h"
-
+#include "CanFly.Photon/CanFly_Photon.h"
+#include "../nano/CLR/CorLib/mscorlib/corlib_native.h"
+#include "../../neutron/neutron.h"
 #include "../../photon/photon.h"
 #include "../../photon/window.h"
 
@@ -35,7 +30,7 @@ static result_t photon_event(handle_t hwnd, struct _event_proxy_t *proxy, const 
   CLR_RT_HeapBlock *widgetObject = (CLR_RT_HeapBlock *)wndData;
   CLR_RT_HeapBlock_Delegate *dlg;
   CLR_RT_MethodDef_Instance inst;
-  dlg = widgetObject[Library_CanFly_CoreLibrary_CanFly_Widget::FIELD__threadSpawn].DereferenceDelegate();
+  dlg = widgetObject[Library_CanFly_Photon_CanFly_Widget::FIELD__threadSpawn].DereferenceDelegate();
   if (dlg == 0)
     return s_false;
 
@@ -70,12 +65,12 @@ static result_t photon_event(handle_t hwnd, struct _event_proxy_t *proxy, const 
   return s_ok;
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Widget::_cctor___STATIC__VOID(CLR_RT_StackFrame &stack)
+HRESULT Library_CanFly_Photon_CanFly_Widget::_cctor___STATIC__VOID(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
   // create the message worker thread
-  if (!g_CLR_RT_ExecutionEngine.EnsureSystemThread(canFlyEventThread, ThreadPriority_System_Highest))
+  if (!g_CLR_RT_ExecutionEngine.EnsureSystemThread(canFlyEventThread, ThreadPriority_Highest+1))
     return S_OK;
 
   // stop more than 1 use of the thread.
@@ -86,7 +81,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Widget::_cctor___STATIC__VOID(CLR_RT_S
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Widget::AddEvent___VOID__U4__U2(CLR_RT_StackFrame &stack)
+HRESULT Library_CanFly_Photon_CanFly_Widget::AddEvent___STATIC__VOID__U4__U2(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   uint32_t param0;

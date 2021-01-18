@@ -210,13 +210,7 @@
     <ClCompile Include="..\..\libs\nano\CLR\Core\Various.cpp">
       <Filter>CLR\Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_AppDomain.cpp">
-      <Filter>CLR\CoreLib</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Array.cpp">
-      <Filter>CLR\CoreLib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Attribute.cpp">
       <Filter>CLR\CoreLib</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_BitConverter.cpp">
@@ -235,9 +229,6 @@
       <Filter>CLR\CoreLib</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Delegate.cpp">
-      <Filter>CLR\CoreLib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Diagnostics_Debug.cpp">
       <Filter>CLR\CoreLib</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Diagnostics_Debugger.cpp">
@@ -262,9 +253,6 @@
       <Filter>CLR\CoreLib</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Guid.cpp">
-      <Filter>CLR\CoreLib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_MarshalByRefObject.cpp">
       <Filter>CLR\CoreLib</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_MathInternal.cpp">
@@ -304,9 +292,6 @@
       <Filter>CLR\CoreLib</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Threading_WaitHandle.cpp">
-      <Filter>CLR\CoreLib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_TimeSpan.cpp">
       <Filter>CLR\CoreLib</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_ValueType.cpp">

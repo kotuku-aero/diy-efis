@@ -1,14 +1,8 @@
-/*
-#include "../../nano/CLR/Include/nanoCLR_Interop.h"
-#include "../../nano/CLR/Include/nanoCLR_Runtime.h"
-#include "../../nano/CLR/Include/nanoPackStruct.h"
-*/
-#include "../canflylib/CanFly_CoreLibrary.h"
-
+#include "../nano/CLR/CorLib/mscorlib/corlib_native.h"
 #include "../../neutron/neutron.h"
 
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Stream::StreamEof___STATIC__BOOLEAN__U4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::StreamEof___STATIC__BOOLEAN__U4(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -31,7 +25,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Stream::StreamEof___STATIC__BOOLEAN__U
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Stream::StreamRead___STATIC__SZARRAY_U1__U4__U2(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::StreamRead___STATIC__SZARRAY_U1__U4__U2(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -65,7 +59,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Stream::StreamRead___STATIC__SZARRAY_U
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Stream::StreamWrite___STATIC__VOID__U4__SZARRAY_U1(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::StreamWrite___STATIC__VOID__U4__SZARRAY_U1(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -84,7 +78,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Stream::StreamWrite___STATIC__VOID__U4
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Stream::StreamGetPos___STATIC__U4__U4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::StreamGetPos___STATIC__U4__U4(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -101,7 +95,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Stream::StreamGetPos___STATIC__U4__U4(
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Stream::StreamSetPos___STATIC__VOID__U4__U4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::StreamSetPos___STATIC__VOID__U4__U4(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -119,7 +113,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Stream::StreamSetPos___STATIC__VOID__U
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Stream::StreamLength___STATIC__U4__U4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::StreamLength___STATIC__U4__U4(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -136,7 +130,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Stream::StreamLength___STATIC__U4__U4(
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Stream::StreamTruncate___STATIC__VOID__U4__U4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::StreamTruncate___STATIC__VOID__U4__U4(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -154,7 +148,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Stream::StreamTruncate___STATIC__VOID_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Stream::StreamCopy___STATIC__VOID__U4__U4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::StreamCopy___STATIC__VOID__U4__U4(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -172,7 +166,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Stream::StreamCopy___STATIC__VOID__U4_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Stream::StreamPath___STATIC__STRING__U4__BOOLEAN(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::StreamPath___STATIC__STRING__U4__BOOLEAN(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -199,7 +193,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Stream::StreamPath___STATIC__STRING__U
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Stream::StreamClose___STATIC__VOID__U4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::StreamClose___STATIC__VOID__U4(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -213,7 +207,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Stream::StreamClose___STATIC__VOID__U4
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Stream::StreamDelete___STATIC__VOID__U4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::StreamDelete___STATIC__VOID__U4(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {

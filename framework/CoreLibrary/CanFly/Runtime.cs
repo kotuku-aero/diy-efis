@@ -148,12 +148,6 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern Delegate DelegateRemove(Delegate source, Delegate value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern bool DelegateEquals(Delegate d1, Delegate d2);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern bool DelegateNotEquals(Delegate d1, Delegate d2);
-
-
-    [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void SetCapacity(System.Collections.ArrayList list, int capacity);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern object ArrayListGet(System.Collections.ArrayList list, int index);

@@ -44,8 +44,8 @@ extern "C" {
   }
 
 // include the runtime interface
-#include "../nano/CLR/Include/nanoCLR_Runtime.h"
-#include "../nano/CLR/Include/WireProtocol_Message.h"
+#include "nano/CLR/Include/nanoCLR_Runtime.h"
+#include "nano/CLR/Include/WireProtocol_Message.h"
 
 static semaphore_p ion_mutex;
 

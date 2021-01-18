@@ -19,13 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\libs\ion\builtin\canfly_corelibrary.c" />
     <ClCompile Include="..\..\libs\ion\builtin\mscorlib.c" />
-    <ClCompile Include="..\..\libs\ion\builtin\system_collections.c" />
-    <ClCompile Include="..\..\libs\ion\builtin\system_math.c" />
-    <ClCompile Include="..\..\libs\ion\builtin\system_text.c" />
-    <ClCompile Include="..\..\libs\ion\builtin\system_threading.c" />
-    <ClCompile Include="..\..\libs\ion\canflylib\CanFly_CoreLibrary.cpp" />
     <ClCompile Include="..\..\libs\ion\comm_service.c" />
     <ClCompile Include="..\..\libs\ion\debug_service.c" />
     <ClCompile Include="..\..\libs\ion\ion_cli.c" />
@@ -33,6 +27,7 @@
     <ClCompile Include="..\..\libs\ion\ion.cpp" />
     <ClCompile Include="..\..\libs\ion\nanoCRT.cpp" />
     <ClCompile Include="..\..\libs\ion\neo.c" />
+    <ClCompile Include="..\..\libs\ion\runtime\CanFly.Photon\CanFly_Photon.cpp" />
     <ClCompile Include="..\..\libs\ion\runtime\CanFlyMsg.cpp" />
     <ClCompile Include="..\..\libs\ion\runtime\DirectoryEnumerator.cpp" />
     <ClCompile Include="..\..\libs\ion\runtime\FileStream.cpp" />
@@ -45,17 +40,172 @@
     <ClCompile Include="..\..\libs\ion\runtime\Widget.cpp" />
     <ClCompile Include="..\..\libs\ion\targetHAL.c" />
     <ClCompile Include="..\..\libs\ion\targetHAL_Time.c" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\Cache.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\Checks.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\CLR_RT_DblLinkedList.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\CLR_RT_HeapBlock.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\CLR_RT_HeapBlock_Array.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\CLR_RT_HeapBlock_ArrayList.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\CLR_RT_HeapBlock_BinaryBlob.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\CLR_RT_HeapBlock_Delegate.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\CLR_RT_HeapBlock_Delegate_List.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\CLR_RT_HeapBlock_Finalizer.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\CLR_RT_HeapBlock_Lock.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\CLR_RT_HeapBlock_LockRequest.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\CLR_RT_HeapBlock_Node.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\CLR_RT_HeapBlock_Queue.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\CLR_RT_HeapBlock_Stack.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\CLR_RT_HeapBlock_String.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\CLR_RT_HeapBlock_Timer.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\CLR_RT_HeapBlock_WaitForObject.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\CLR_RT_HeapCluster.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\CLR_RT_Interop.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\CLR_RT_Memory.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\CLR_RT_ObjectToEvent_Destination.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\CLR_RT_ObjectToEvent_Source.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\CLR_RT_RuntimeMemory.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\CLR_RT_StackFrame.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\CLR_RT_SystemAssembliesTable.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\CLR_RT_UnicodeHelper.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\Execution.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\GarbageCollector.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\GarbageCollector_Compaction.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\GarbageCollector_ComputeReachabilityGraph.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\GarbageCollector_Info.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\Interpreter.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\nanoSupport_CRC32.c" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\Random.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\RPC\CLR_RT_HeapBlock_EndPoint.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\Serialization\BinaryFormatter.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\Streams.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\StringTable.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\StringTableData.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\Thread.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\TypeSystem.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\TypeSystemLookup.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Core\Various.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_Array.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_BitConverter.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_Collections_ArrayList.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_Console.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_Convert.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_DateTime.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_Delegate.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_Diagnostics_Debugger.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_Double.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_Enum.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_Exception.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_GC.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_Globalization_CultureInfo.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_Globalization_DateTimeFormat.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_Guid.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_MathInternal.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_MulticastDelegate.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_Number.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_Object.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_Random.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_Runtime_CompilerServices_RuntimeHelpers.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_Runtime_Remoting_RemotingServices.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_String.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_Threading_AutoResetEvent.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_Threading_Interlocked.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_Threading_ManualResetEvent.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_Threading_Monitor.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_Threading_Thread.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_Threading_Timer.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_Threading_WaitHandle.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_ValueType.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_WeakReference.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\mscorlib\corlib_native.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Debugger\Debugger.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Debugger\Debugger_full.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Diagnostics\Info.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Diagnostics\Profile.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Diagnostics\Profiler.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Helpers\Base64\base64.c" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Helpers\TinyPrintf\printf.c" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Messaging\Messaging.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\Startup\CLRStartup.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\System.Math\nf_native_system_math.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\System.Math\nf_native_system_math_System_Math.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\WireProtocol\WireProtocol_App_Interface.c" />
+    <ClCompile Include="..\..\libs\ion\nano\CLR\WireProtocol\WireProtocol_Message.c" />
+    <ClCompile Include="..\..\libs\ion\nano\HAL\nanoHAL_SystemInformation.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\HAL\nanoHAL_Time.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\PAL\AsyncProcCall\AsyncCompletions.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\PAL\AsyncProcCall\AsyncContinuations.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\PAL\COM\ComDirector.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\PAL\Double\nanoPAL_NativeDouble.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\System.Collections\nf_system_collections.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\System.Collections\nf_system_collections_System_Collections_Queue.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\System.Collections\nf_system_collections_System_Collections_Stack.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\System.Text\nf_system_text.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\System.Text\nf_system_text_System_Text_UTF8Decoder.cpp" />
+    <ClCompile Include="..\..\libs\ion\nano\System.Text\nf_system_text_System_Text_UTF8Encoding.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\libs\ion\canflylib\CanFly_CoreLibrary.h" />
     <ClInclude Include="..\..\libs\ion\ion.h" />
     <ClInclude Include="..\..\libs\ion\ion_cli.h" />
     <ClInclude Include="..\..\libs\ion\ion_cli_impl.h" />
+    <ClInclude Include="..\..\libs\ion\runtime\CanFly.Photon\CanFly_Photon.h" />
     <ClInclude Include="..\..\libs\ion\targetHAL.h" />
     <ClInclude Include="..\..\libs\ion\target_os.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Core\Core.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Core\corhdr_private.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\CorLib\CorLib.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\CorLib\mscorlib\corlib_native.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Debugger\Debugger.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Diagnostics\Diagnostics.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Helpers\Base64\base64.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Helpers\TinyPrintf\printf.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_Application.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_Checks.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_Debugging.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_ErrorCodes.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_Hardware.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_Headers.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_Interop.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_Messaging.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_ParseOptions.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_PlatformDef.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_Profiling.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_Runtime.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_Runtime__HeapBlock.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_Runtime__Serialization.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_Types.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_Win32.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoPackStruct.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoSupport.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoVersion.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoWeak.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nf_errors_exceptions.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\WireProtocol.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\WireProtocol_App_Interface.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\WireProtocol_HAL_Interface.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\WireProtocol_Message.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\WireProtocol_MonitorCommands.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\Startup\CLRStartup.h" />
+    <ClInclude Include="..\..\libs\ion\nano\CLR\System.Math\nf_native_system_math.h" />
+    <ClInclude Include="..\..\libs\ion\nano\HAL\Include\nanoHAL.h" />
+    <ClInclude Include="..\..\libs\ion\nano\HAL\Include\nanoHAL_ReleaseInfo.h" />
+    <ClInclude Include="..\..\libs\ion\nano\HAL\Include\nanoHAL_Time.h" />
+    <ClInclude Include="..\..\libs\ion\nano\HAL\Include\nanoHAL_Types.h" />
+    <ClInclude Include="..\..\libs\ion\nano\HAL\Include\nanoHAL_v2.h" />
+    <ClInclude Include="..\..\libs\ion\nano\PAL\Include\CPU_GPIO_decl.h" />
+    <ClInclude Include="..\..\libs\ion\nano\PAL\Include\CPU_SPI_decl.h" />
+    <ClInclude Include="..\..\libs\ion\nano\PAL\Include\nanoCRT.h" />
+    <ClInclude Include="..\..\libs\ion\nano\PAL\Include\nanoPAL.h" />
+    <ClInclude Include="..\..\libs\ion\nano\PAL\Include\nanoPAL_AsyncProcCalls_decl.h" />
+    <ClInclude Include="..\..\libs\ion\nano\PAL\Include\nanoPAL_COM.h" />
+    <ClInclude Include="..\..\libs\ion\nano\PAL\Include\nanoPAL_NativeDouble.h" />
+    <ClInclude Include="..\..\libs\ion\nano\PAL\Include\nanoPAL_PerformanceCounters.h" />
+    <ClInclude Include="..\..\libs\ion\nano\PAL\Include\nanoPAL_Time.h" />
+    <ClInclude Include="..\..\libs\ion\nano\System.Collections\nf_system_collections.h" />
+    <ClInclude Include="..\..\libs\ion\nano\System.Text\nf_system_text.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\libs\ion\ion.cli" />
+    <None Include="..\..\libs\ion\nano\CLR\Include\opcode.def" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -130,8 +280,8 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions);NANOCLR_SYSTEM_COLLECTIONS;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)libs\ion\nano\CLR\CoreLib\mscorlib;$(SolutionDir)libs\ion\nano\CLR\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -145,8 +295,8 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions);NANOCLR_SYSTEM_COLLECTIONS;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)libs\ion\nano\CLR\CoreLib\mscorlib;$(SolutionDir)libs\ion\nano\CLR\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

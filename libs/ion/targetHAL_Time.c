@@ -1,5 +1,5 @@
 #include "../neutron/neutron.h"
-#include "../nano/HAL/Include/nanoHAL_Time.h"
+#include "nano/HAL/Include/nanoHAL_Time.h"
 
 static semaphore_p wakeup;
 static task_p wakeup_task;

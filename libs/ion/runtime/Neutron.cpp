@@ -1,14 +1,8 @@
-/*
-#include "../../nano/CLR/Include/nanoCLR_Interop.h"
-#include "../../nano/CLR/Include/nanoCLR_Runtime.h"
-#include "../../nano/CLR/Include/nanoPackStruct.h"
-*/
-#include "../canflylib/CanFly_CoreLibrary.h"
-
+#include "../nano/CLR/CorLib/mscorlib/corlib_native.h"
 #include "../../neutron/neutron.h"
 
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegCreateKey___STATIC__U4__U4__STRING(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::RegCreateKey___STATIC__U4__U4__STRING(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   unsigned int param0;
@@ -26,7 +20,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegCreateKey___STATIC__U4__U4
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegOpenKey___STATIC__U4__U4__STRING(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::RegOpenKey___STATIC__U4__U4__STRING(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   unsigned int param0;
@@ -44,7 +38,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegOpenKey___STATIC__U4__U4__
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegGetInt8___STATIC__I1__U4__STRING(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::RegGetInt8___STATIC__I1__U4__STRING(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   unsigned int param0;
@@ -62,7 +56,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegGetInt8___STATIC__I1__U4__
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegSetInt8___STATIC__VOID__U4__STRING__I1(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::RegSetInt8___STATIC__VOID__U4__STRING__I1(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   
@@ -82,7 +76,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegSetInt8___STATIC__VOID__U4
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegGetUint8___STATIC__U1__U4__STRING(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::RegGetUint8___STATIC__U1__U4__STRING(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -101,7 +95,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegGetUint8___STATIC__U1__U4_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegSetUint8___STATIC__VOID__U4__STRING__U1(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::RegSetUint8___STATIC__VOID__U4__STRING__U1(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   unsigned int param0;
@@ -119,7 +113,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegSetUint8___STATIC__VOID__U
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegGetInt16___STATIC__I2__U4__STRING(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::RegGetInt16___STATIC__I2__U4__STRING(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -138,7 +132,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegGetInt16___STATIC__I2__U4_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegSetInt16___STATIC__VOID__U4__STRING__I2(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::RegSetInt16___STATIC__VOID__U4__STRING__I2(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -158,7 +152,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegSetInt16___STATIC__VOID__U
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegGetUint16___STATIC__U2__U4__STRING(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::RegGetUint16___STATIC__U2__U4__STRING(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -176,7 +170,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegGetUint16___STATIC__U2__U4
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegSetUint16___STATIC__VOID__U4__STRING__U2(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::RegSetUint16___STATIC__VOID__U4__STRING__U2(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -195,7 +189,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegSetUint16___STATIC__VOID__
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegGetInt32___STATIC__I4__U4__STRING(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::RegGetInt32___STATIC__I4__U4__STRING(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -213,7 +207,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegGetInt32___STATIC__I4__U4_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegSetInt32___STATIC__VOID__U4__STRING__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::RegSetInt32___STATIC__VOID__U4__STRING__I4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -232,7 +226,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegSetInt32___STATIC__VOID__U
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegGetUint32___STATIC__U4__U4__STRING(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::RegGetUint32___STATIC__U4__U4__STRING(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -250,7 +244,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegGetUint32___STATIC__U4__U4
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegSetUint32___STATIC__VOID__U4__STRING__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::RegSetUint32___STATIC__VOID__U4__STRING__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -269,7 +263,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegSetUint32___STATIC__VOID__
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegGetString___STATIC__STRING__U4__STRING(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::RegGetString___STATIC__STRING__U4__STRING(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -289,7 +283,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegGetString___STATIC__STRING
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegSetString___STATIC__VOID__U4__STRING__STRING(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::RegSetString___STATIC__VOID__U4__STRING__STRING(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -308,7 +302,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegSetString___STATIC__VOID__
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegGetFloat___STATIC__R4__U4__STRING(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::RegGetFloat___STATIC__R4__U4__STRING(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -326,7 +320,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegGetFloat___STATIC__R4__U4_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegSetFloat___STATIC__VOID__U4__STRING__R4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::RegSetFloat___STATIC__VOID__U4__STRING__R4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -345,7 +339,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegSetFloat___STATIC__VOID__U
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegGetBool___STATIC__BOOLEAN__U4__STRING(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::RegGetBool___STATIC__BOOLEAN__U4__STRING(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -363,7 +357,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegGetBool___STATIC__BOOLEAN_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegSetBool___STATIC__VOID__U4__STRING__BOOLEAN(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::RegSetBool___STATIC__VOID__U4__STRING__BOOLEAN(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -383,7 +377,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegSetBool___STATIC__VOID__U4
   }
 
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RegEnumKey___STATIC__STRING__U4__BYREF_U4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::RegEnumKey___STATIC__STRING__U4__BYREF_U4(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {

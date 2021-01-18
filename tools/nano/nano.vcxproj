@@ -184,16 +184,13 @@
     <ClCompile Include="..\..\libs\nano\CLR\Core\TypeSystem.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\Core\TypeSystemLookup.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\Core\Various.cpp" />
-    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_AppDomain.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Array.cpp" />
-    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Attribute.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_BitConverter.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Collections_ArrayList.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Console.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Convert.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_DateTime.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Delegate.cpp" />
-    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Diagnostics_Debug.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Diagnostics_Debugger.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Double.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Enum.cpp" />
@@ -202,7 +199,6 @@
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Globalization_CultureInfo.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Globalization_DateTimeFormat.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Guid.cpp" />
-    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_MarshalByRefObject.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_MathInternal.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_MulticastDelegate.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Number.cpp" />
@@ -218,7 +214,6 @@
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Threading_Thread.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Threading_Timer.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_Threading_WaitHandle.cpp" />
-    <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_TimeSpan.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_ValueType.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\corlib_native_System_WeakReference.cpp" />
     <ClCompile Include="..\..\libs\nano\CLR\CorLib\mscorlib\corlib_native.cpp" />

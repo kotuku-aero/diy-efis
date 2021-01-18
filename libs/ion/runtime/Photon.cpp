@@ -1,10 +1,5 @@
-/*
-#include "../../nano/CLR/Include/nanoCLR_Interop.h"
-#include "../../nano/CLR/Include/nanoCLR_Runtime.h"
-#include "../../nano/CLR/Include/nanoPackStruct.h"
-*/
-
-#include "../canflylib/CanFly_CoreLibrary.h"
+#include "../nano/CLR/CorLib/mscorlib/corlib_native.h"
+#include "../../neutron/neutron.h"
 
 #ifdef RGB
 #undef RGB
@@ -14,10 +9,9 @@
 #undef HWND_BROADCAST
 #endif
 
-#include "../../neutron/neutron.h"
 #include "../../photon/photon.h"
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::OpenScreen___STATIC__U4__U2__U2(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::OpenScreen___STATIC__U4__U2__U2(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -36,7 +30,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::OpenScreen___STATIC__U4__U2__
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::CreateWindow___STATIC__U4__U4__I4__I4__I4__I4__U2(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::CreateWindow___STATIC__U4__U4__I4__I4__I4__I4__U2(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -73,7 +67,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::CreateWindow___STATIC__U4__U4
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::CreateChildWindow___STATIC__U4__U4__I4__I4__I4__I4__U2(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::CreateChildWindow___STATIC__U4__U4__I4__I4__I4__I4__U2(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   unsigned int param0;
@@ -110,7 +104,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::CreateChildWindow___STATIC__U
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::CloseWindow___STATIC__VOID__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::CloseWindow___STATIC__VOID__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -123,7 +117,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::CloseWindow___STATIC__VOID__U
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetWindowRect___STATIC__VOID__U4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetWindowRect___STATIC__VOID__U4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -142,7 +136,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetWindowRect___STATIC__VOID_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetWindowPos___STATIC__VOID__U4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetWindowPos___STATIC__VOID__U4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -161,7 +155,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetWindowPos___STATIC__VOID__
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::SetWindowPos___STATIC__VOID__U4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::SetWindowPos___STATIC__VOID__U4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -193,7 +187,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::SetWindowPos___STATIC__VOID__
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetWindowData___STATIC__OBJECT__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetWindowData___STATIC__OBJECT__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   
@@ -211,7 +205,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetWindowData___STATIC__OBJEC
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::SetWindowData___STATIC__VOID__U4__OBJECT(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::SetWindowData___STATIC__VOID__U4__OBJECT(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -224,7 +218,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::SetWindowData___STATIC__VOID_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetParent___STATIC__U4__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetParent___STATIC__U4__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -239,7 +233,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetParent___STATIC__U4__U4(CL
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetWindowById___STATIC__U4__U4__U2(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetWindowById___STATIC__U4__U4__U2(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   unsigned int param0;
@@ -257,7 +251,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetWindowById___STATIC__U4__U
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetFirstChild___STATIC__U4__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetFirstChild___STATIC__U4__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -273,7 +267,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetFirstChild___STATIC__U4__U
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetNextSibling___STATIC__U4__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetNextSibling___STATIC__U4__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -289,7 +283,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetNextSibling___STATIC__U4__
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetPreviousSibling___STATIC__U4__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetPreviousSibling___STATIC__U4__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -305,7 +299,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetPreviousSibling___STATIC__
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::InsertBefore___STATIC__VOID__U4__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::InsertBefore___STATIC__VOID__U4__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -322,7 +316,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::InsertBefore___STATIC__VOID__
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::InsertAfter___STATIC__VOID__U4__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::InsertAfter___STATIC__VOID__U4__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -338,7 +332,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::InsertAfter___STATIC__VOID__U
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetZOrder___STATIC__U1__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetZOrder___STATIC__U1__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
@@ -353,7 +347,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetZOrder___STATIC__U1__U4(CL
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::SetZOrder___STATIC__VOID__U4__U1(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::SetZOrder___STATIC__VOID__U4__U1(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -371,7 +365,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::SetZOrder___STATIC__VOID__U4_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::CanvasClose___STATIC__VOID__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::CanvasClose___STATIC__VOID__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -386,7 +380,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::CanvasClose___STATIC__VOID__U
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::CreateRectCanvas___STATIC__U4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::CreateRectCanvas___STATIC__U4__I4__I4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -410,7 +404,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::CreateRectCanvas___STATIC__U4
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::CreatePngCanvas___STATIC__U4__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::CreatePngCanvas___STATIC__U4__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -427,7 +421,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::CreatePngCanvas___STATIC__U4_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::LoadPng___STATIC__VOID__U4__U4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::LoadPng___STATIC__VOID__U4__U4__I4__I4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -455,7 +449,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::LoadPng___STATIC__VOID__U4__U
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetCanvasExtents___STATIC__VOID__U4__BYREF_U2__BYREF_I4__BYREF_I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetCanvasExtents___STATIC__VOID__U4__BYREF_U2__BYREF_I4__BYREF_I4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -475,7 +469,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetCanvasExtents___STATIC__VO
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetOrientation___STATIC__U2__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetOrientation___STATIC__U2__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -491,7 +485,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetOrientation___STATIC__U2__
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::SetOrientation___STATIC__VOID__U4__U2(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::SetOrientation___STATIC__VOID__U4__U2(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -509,7 +503,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::SetOrientation___STATIC__VOID
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::CreatePen___STATIC__U4__U4__U2__U2(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::CreatePen___STATIC__U4__U4__U2__U2(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -532,7 +526,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::CreatePen___STATIC__U4__U4__U
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetPenColor___STATIC__U4__U4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetPenColor___STATIC__U4__U4(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -548,7 +542,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetPenColor___STATIC__U4__U4(
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetPenWidth___STATIC__U2__U4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetPenWidth___STATIC__U2__U4(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -564,7 +558,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetPenWidth___STATIC__U2__U4(
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetPenStyle___STATIC__U2__U4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetPenStyle___STATIC__U2__U4(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -580,7 +574,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetPenStyle___STATIC__U2__U4(
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::DisposePen___STATIC__VOID__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::DisposePen___STATIC__VOID__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -595,7 +589,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::DisposePen___STATIC__VOID__U4
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::Polyline___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::Polyline___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -649,7 +643,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::Polyline___STATIC__VOID__U4__
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::Ellipse___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::Ellipse___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -713,7 +707,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::Ellipse___STATIC__VOID__U4__I
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::Polygon___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::Polygon___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -773,7 +767,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::Polygon___STATIC__VOID__U4__I
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::Rectangle___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::Rectangle___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -836,7 +830,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::Rectangle___STATIC__VOID__U4_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RoundRect___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__I4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::RoundRect___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__I4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -902,7 +896,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::RoundRect___STATIC__VOID__U4_
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::BitBlt___STATIC__VOID__U4__I4__I4__I4__I4__I4__I4__I4__I4__U4__I4__I4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::BitBlt___STATIC__VOID__U4__I4__I4__I4__I4__I4__I4__I4__I4__U4__I4__I4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -988,7 +982,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::BitBlt___STATIC__VOID__U4__I4
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetPixel___STATIC__U4__U4__I4__I4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetPixel___STATIC__U4__U4__I4__I4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -1035,7 +1029,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::GetPixel___STATIC__U4__U4__I4
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::SetPixel___STATIC__U4__U4__I4__I4__I4__I4__I4__I4__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::SetPixel___STATIC__U4__U4__I4__I4__I4__I4__I4__I4__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -1087,7 +1081,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::SetPixel___STATIC__U4__U4__I4
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::Arc___STATIC__VOID__U4__I4__I4__I4__I4__U4__I4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::Arc___STATIC__VOID__U4__I4__I4__I4__I4__U4__I4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -1145,7 +1139,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::Arc___STATIC__VOID__U4__I4__I
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::Pie___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__I4__I4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::Pie___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__I4__I4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -1211,7 +1205,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::Pie___STATIC__VOID__U4__I4__I
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::OpenFont___STATIC__U4__STRING__U2(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::OpenFont___STATIC__U4__STRING__U2(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -1230,7 +1224,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::OpenFont___STATIC__U4__STRING
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::DrawText___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__U4__STRING__I4__I4__I4__I4__I4__I4__U2(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::DrawText___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__U4__STRING__I4__I4__I4__I4__I4__I4__U2(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -1314,7 +1308,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::DrawText___STATIC__VOID__U4__
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::TextExtent___STATIC__VOID__U4__U4__STRING__BYREF_I4__BYREF_I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::TextExtent___STATIC__VOID__U4__U4__STRING__BYREF_I4__BYREF_I4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -1344,7 +1338,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::TextExtent___STATIC__VOID__U4
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::InvalidateRect___STATIC__VOID__U4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::InvalidateRect___STATIC__VOID__U4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -1378,7 +1372,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::InvalidateRect___STATIC__VOID
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::IsValid___STATIC__BOOLEAN__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::IsValid___STATIC__BOOLEAN__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -1395,7 +1389,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::IsValid___STATIC__BOOLEAN__U4
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::BeginPaint___STATIC__VOID__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::BeginPaint___STATIC__VOID__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -1412,7 +1406,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::BeginPaint___STATIC__VOID__U4
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::EndPaint___STATIC__VOID__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::EndPaint___STATIC__VOID__U4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -1429,7 +1423,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::EndPaint___STATIC__VOID__U4(C
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::SendMessage___STATIC__VOID__U4__U2__U2__U1__U1__U1__U1__U1__U1__U1__U1(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::SendMessage___STATIC__VOID__U4__U2__U2__U1__U1__U1__U1__U1__U1__U1__U1(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -1487,7 +1481,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::SendMessage___STATIC__VOID__U
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_Syscall::PostMessage___STATIC__VOID__U4__U2__U2__U1__U1__U1__U1__U1__U1__U1__U1(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::PostMessage___STATIC__VOID__U4__U2__U2__U1__U1__U1__U1__U1__U1__U1__U1(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {

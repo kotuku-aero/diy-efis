@@ -1,14 +1,7 @@
-/*
-#include "../../nano/CLR/Include/nanoCLR_Interop.h"
-#include "../../nano/CLR/Include/nanoCLR_Runtime.h"
-#include "../../nano/CLR/Include/nanoPackStruct.h"
-*/
-#include "../canflylib/CanFly_CoreLibrary.h"
-
+#include "../nano/CLR/CorLib/mscorlib/corlib_native.h"
 #include "../../neutron/neutron.h"
 
-
-HRESULT Library_CanFly_CoreLibrary_CanFly_RegistryStream::RegStreamOpen___STATIC__U4__U4__STRING(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::RegStreamOpen___STATIC__U4__U4__STRING(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {
@@ -27,7 +20,7 @@ HRESULT Library_CanFly_CoreLibrary_CanFly_RegistryStream::RegStreamOpen___STATIC
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_CanFly_CoreLibrary_CanFly_RegistryStream::RegStreamCreate___STATIC__U4__U4__STRING(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::RegStreamCreate___STATIC__U4__U4__STRING(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
   {

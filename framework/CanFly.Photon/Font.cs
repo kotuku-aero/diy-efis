@@ -13,7 +13,7 @@ namespace CanFly
 
     public void Dispose()
     {
-      ReleaseFont(_hndl);
+      CanFly.Syscall.ReleaseFont(_hndl);
       _hndl = 0;
     }
     /// <summary>
@@ -23,14 +23,14 @@ namespace CanFly
     /// <param name="pointSize">Size of the font requested</param>
     public Font(string fontName, uint pointSize)
     {
-      _hndl = GetFont(fontName, pointSize);
+      _hndl = CanFly.Syscall.GetFont(fontName, pointSize);
       if (_hndl == 0)
         throw new InvalidOperationException();
     }
 
     public static void LoadFont(Stream fontStream)
     {
-      LoadFont(fontStream.Handle);
+      CanFly.Syscall.LoadFont(fontStream.Handle);
     }
   }
 }

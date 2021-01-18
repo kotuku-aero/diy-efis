@@ -442,7 +442,10 @@ namespace System
     /// </value>
     public int DayOfYear
     {
-      get => GetDateTimePart(DateTimePart.DayOfYear);
+      get
+      {
+        return GetDateTimePart(DateTimePart.DayOfYear);
+      }
     }
 
     /// <summary>
@@ -453,7 +456,10 @@ namespace System
     /// </value>
     public int Hour
     {
-      get => GetDateTimePart(DateTimePart.Hour);
+      get
+      {
+        return GetDateTimePart(DateTimePart.Hour);
+      }
     }
 
     /// <summary>
@@ -475,7 +481,10 @@ namespace System
     /// </value>
     public int Millisecond
     {
-      get => GetDateTimePart(DateTimePart.Millisecond);
+      get
+      {
+        return GetDateTimePart(DateTimePart.Millisecond);
+      }
     }
 
     /// <summary>
@@ -486,7 +495,10 @@ namespace System
     /// </value>
     public int Minute
     {
-      get => GetDateTimePart(DateTimePart.Minute);
+      get
+      {
+        return GetDateTimePart(DateTimePart.Minute);
+      }
     }
 
     /// <summary>
@@ -497,7 +509,10 @@ namespace System
     /// </value>
     public int Month
     {
-      get => GetDateTimePart(DateTimePart.Month);
+      get
+      {
+        return GetDateTimePart(DateTimePart.Month);
+      }
     }
 
     /// <summary>
@@ -571,7 +586,10 @@ namespace System
     /// </value>
     public int Year
     {
-      get => GetDateTimePart(DateTimePart.Year);
+      get
+      {
+        return GetDateTimePart(DateTimePart.Year);
+      }
     }
 
     /// <summary>

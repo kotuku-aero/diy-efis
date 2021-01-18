@@ -16,6 +16,10 @@
     <AssemblyName>CanFly.Photon</AssemblyName>
     <TargetFrameworkVersion>v1.0</TargetFrameworkVersion>
   </PropertyGroup>
+  <PropertyGroup Label="nanoFramework">
+    <NFMDP_GENERATE_STUBS>true</NFMDP_GENERATE_STUBS>
+    <NF_GenerateStubsDirectory>C:\Users\peter\Projects\canfly\diy-efis\libs\ion\runtime</NF_GenerateStubsDirectory>
+  </PropertyGroup>
   <Import Project="$(NanoFrameworkProjectSystemPath)NFProjectSystem.props" Condition="Exists('$(NanoFrameworkProjectSystemPath)NFProjectSystem.props')" />
   <ItemGroup>
     <Compile Include="Canvas.cs" />
@@ -39,6 +43,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CanFly.Neutron\CanFly.Neutron.nfproj" />
     <ProjectReference Include="..\CoreLibrary\CoreLibrary.nfproj" />
+    <ProjectReference Include="..\System.Math\System.Math.nfproj" />
   </ItemGroup>
   <Import Project="$(NanoFrameworkProjectSystemPath)NFProjectSystem.CSharp.targets" Condition="Exists('$(NanoFrameworkProjectSystemPath)NFProjectSystem.CSharp.targets')" />
   <ProjectExtensions>

@@ -7,7 +7,7 @@
 #define _TARGET_HAL_H_
 
 // #include <nanoHAL_Power.h>
-#include "../nano/HAL/Include/nanoHAL_v2.h"
+#include "nano/HAL/Include/nanoHAL_v2.h"
 
 #ifdef __cplusplus
 extern "C" {
