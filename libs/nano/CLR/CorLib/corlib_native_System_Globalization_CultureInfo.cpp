@@ -6,7 +6,7 @@
 #include "CorLib.h"
 
 
-HRESULT Library_corlib_native_System_Globalization_CultureInfo::get_CurrentUICultureInternal___STATIC__SystemGlobalizationCultureInfo(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::GetCurrentUICultureInternal___STATIC__SystemGlobalizationCultureInfo(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -16,7 +16,7 @@ HRESULT Library_corlib_native_System_Globalization_CultureInfo::get_CurrentUICul
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_corlib_native_System_Globalization_CultureInfo::set_CurrentUICultureInternal___STATIC__VOID__SystemGlobalizationCultureInfo(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::SetCurrentUICultureInternal___STATIC__VOID__SystemGlobalizationCultureInfo(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();

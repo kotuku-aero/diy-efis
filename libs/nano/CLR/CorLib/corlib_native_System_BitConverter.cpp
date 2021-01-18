@@ -28,7 +28,7 @@ char *ByteArrayToHex(unsigned char *pInput, int index, int length)
   }
 
 
-HRESULT Library_corlib_native_System_BitConverter::get_IsLittleEndian___STATIC__BOOLEAN(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::IsLittleEndian___STATIC__BOOLEAN(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -40,7 +40,7 @@ HRESULT Library_corlib_native_System_BitConverter::get_IsLittleEndian___STATIC__
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_corlib_native_System_BitConverter::DoubleToInt64Bits___STATIC__I8__R8(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::DoubleToInt64Bits___STATIC__I8__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -56,7 +56,7 @@ HRESULT Library_corlib_native_System_BitConverter::DoubleToInt64Bits___STATIC__I
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_corlib_native_System_BitConverter::GetBytes___STATIC__SZARRAY_U1__BOOLEAN(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__BOOLEAN(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -71,7 +71,7 @@ HRESULT Library_corlib_native_System_BitConverter::GetBytes___STATIC__SZARRAY_U1
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_BitConverter::GetBytes___STATIC__SZARRAY_U1__CHAR(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__CHAR(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -86,7 +86,7 @@ HRESULT Library_corlib_native_System_BitConverter::GetBytes___STATIC__SZARRAY_U1
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_BitConverter::GetBytes___STATIC__SZARRAY_U1__R8(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -109,7 +109,7 @@ HRESULT Library_corlib_native_System_BitConverter::GetBytes___STATIC__SZARRAY_U1
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_BitConverter::GetBytes___STATIC__SZARRAY_U1__R4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__R4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -132,7 +132,7 @@ HRESULT Library_corlib_native_System_BitConverter::GetBytes___STATIC__SZARRAY_U1
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_BitConverter::GetBytes___STATIC__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -147,7 +147,7 @@ HRESULT Library_corlib_native_System_BitConverter::GetBytes___STATIC__SZARRAY_U1
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_BitConverter::GetBytes___STATIC__SZARRAY_U1__I8(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__I8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -162,7 +162,7 @@ HRESULT Library_corlib_native_System_BitConverter::GetBytes___STATIC__SZARRAY_U1
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_BitConverter::GetBytes___STATIC__SZARRAY_U1__I2(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__I2(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -177,7 +177,7 @@ HRESULT Library_corlib_native_System_BitConverter::GetBytes___STATIC__SZARRAY_U1
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_BitConverter::GetBytes___STATIC__SZARRAY_U1__U4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__U4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -192,7 +192,7 @@ HRESULT Library_corlib_native_System_BitConverter::GetBytes___STATIC__SZARRAY_U1
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_BitConverter::GetBytes___STATIC__SZARRAY_U1__U8(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__U8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -207,7 +207,7 @@ HRESULT Library_corlib_native_System_BitConverter::GetBytes___STATIC__SZARRAY_U1
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_BitConverter::GetBytes___STATIC__SZARRAY_U1__U2(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__U2(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -222,7 +222,7 @@ HRESULT Library_corlib_native_System_BitConverter::GetBytes___STATIC__SZARRAY_U1
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_BitConverter::Int64BitsToDouble___STATIC__R8__I8(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::Int64BitsToDouble___STATIC__R8__I8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -238,7 +238,7 @@ HRESULT Library_corlib_native_System_BitConverter::Int64BitsToDouble___STATIC__R
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_corlib_native_System_BitConverter::ToBoolean___STATIC__BOOLEAN__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ToBoolean___STATIC__BOOLEAN__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -262,7 +262,7 @@ HRESULT Library_corlib_native_System_BitConverter::ToBoolean___STATIC__BOOLEAN__
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_BitConverter::ToChar___STATIC__CHAR__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ToChar___STATIC__CHAR__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -289,7 +289,7 @@ HRESULT Library_corlib_native_System_BitConverter::ToChar___STATIC__CHAR__SZARRA
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_BitConverter::ToDouble___STATIC__R8__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ToDouble___STATIC__R8__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -318,7 +318,7 @@ HRESULT Library_corlib_native_System_BitConverter::ToDouble___STATIC__R8__SZARRA
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_BitConverter::ToSingle___STATIC__R4__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ToSingle___STATIC__R4__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -347,7 +347,7 @@ HRESULT Library_corlib_native_System_BitConverter::ToSingle___STATIC__R4__SZARRA
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_BitConverter::ToInt16___STATIC__I2__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ToInt16___STATIC__I2__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -375,7 +375,7 @@ HRESULT Library_corlib_native_System_BitConverter::ToInt16___STATIC__I2__SZARRAY
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_BitConverter::ToInt32___STATIC__I4__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ToInt32___STATIC__I4__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -404,7 +404,7 @@ HRESULT Library_corlib_native_System_BitConverter::ToInt32___STATIC__I4__SZARRAY
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_BitConverter::ToInt64___STATIC__I8__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ToInt64___STATIC__I8__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -434,7 +434,7 @@ HRESULT Library_corlib_native_System_BitConverter::ToInt64___STATIC__I8__SZARRAY
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_BitConverter::ToUInt16___STATIC__U2__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ToUInt16___STATIC__U2__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -461,7 +461,7 @@ HRESULT Library_corlib_native_System_BitConverter::ToUInt16___STATIC__U2__SZARRA
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_BitConverter::ToUInt32___STATIC__U4__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ToUInt32___STATIC__U4__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -488,7 +488,7 @@ HRESULT Library_corlib_native_System_BitConverter::ToUInt32___STATIC__U4__SZARRA
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_BitConverter::ToUInt64___STATIC__U8__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ToUInt64___STATIC__U8__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -517,7 +517,7 @@ HRESULT Library_corlib_native_System_BitConverter::ToUInt64___STATIC__U8__SZARRA
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_BitConverter::ToString___STATIC__STRING__SZARRAY_U1(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ToString___STATIC__STRING__SZARRAY_U1(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -540,7 +540,7 @@ HRESULT Library_corlib_native_System_BitConverter::ToString___STATIC__STRING__SZ
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_BitConverter::ToString___STATIC__STRING__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ToString___STATIC__STRING__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -568,7 +568,7 @@ HRESULT Library_corlib_native_System_BitConverter::ToString___STATIC__STRING__SZ
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_BitConverter::ToString___STATIC__STRING__SZARRAY_U1__I4__I4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ToString___STATIC__STRING__SZARRAY_U1__I4__I4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();

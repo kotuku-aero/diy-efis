@@ -2302,7 +2302,6 @@ struct CLR_RT_StackFrame : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOC
   HRESULT SetResult_String(const char* val);
 
   HRESULT SetupTimeoutFromTicks(CLR_RT_HeapBlock& input, CLR_INT64*& output);
-  HRESULT SetupTimeoutFromTimeSpan(CLR_RT_HeapBlock& inputTimeSpan, CLR_INT64*& output);
 
   void ConvertResultToBoolean();
   void NegateResult();
@@ -2851,42 +2850,6 @@ struct CLR_RT_ExceptionHandler
     }
   };
 
-#if 0
-//
-// Directly from the .NET enumerator.
-//
-struct ThreadPriority
-  {
-  /*=========================================================================
-  ** Constants for thread priorities.
-  =========================================================================*/
-  static const int Lowest = 0;
-  static const int BelowNormal = 1;
-  static const int Normal = 2;
-  static const int AboveNormal = 3;
-  static const int Highest = 4;
-  // One more priority for internal creation of managed code threads.
-  // We do not expose this priority to C# applications.
-  static const int System_Highest = 5;
-  };
-#endif
-
-#ifndef _CORLIB_NATIVE_H_
-extern "C" {
-
-  typedef enum ThreadPriority
-    {
-    ThreadPriority_Lowest = 0,
-    ThreadPriority_BelowNormal = 1,
-    ThreadPriority_Normal = 2,
-    ThreadPriority_AboveNormal = 3,
-    ThreadPriority_Highest = 4,
-    ThreadPriority_System_Highest = 5
-    } ThreadPriority;
-
-  }
-#endif
-
 struct CLR_RT_Thread : public CLR_RT_ObjectToEvent_Destination // EVENT HEAP - NO RELOCATION -
   {
   typedef void (*ThreadTerminationCallback)(void* arg);
@@ -3085,7 +3048,6 @@ struct CLR_RT_Thread : public CLR_RT_ObjectToEvent_Destination // EVENT HEAP - N
     return CurrentSubThread()->m_priority + m_executionCounter;
     }
 
-#ifndef _CORLIB_NATIVE_H_
   // QuantumDebit is update for execution counter for each quantum:
   // System_Highest       - 1
   // Highest              - 2
@@ -3095,9 +3057,8 @@ struct CLR_RT_Thread : public CLR_RT_ObjectToEvent_Destination // EVENT HEAP - N
   // Lowest               - 32
   int GetQuantumDebit() const
     {
-    return 1 << (ThreadPriority_System_Highest - GetThreadPriority());
+    return 1 << (5 - GetThreadPriority());
     }
-#endif
 
   // If thread was sleeping and get too far behind on updating of m_executionCounter
   // Then we make m_executionCounter 4 quantums above m_GlobalExecutionCounter;

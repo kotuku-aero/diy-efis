@@ -161,7 +161,8 @@ HRESULT CLR_RT_HeapBlock_ArrayList::SetCapacity(CLR_UINT32 newCapacity)
     CLR_RT_HeapBlock        newItemsHB;
     CLR_RT_HeapBlock_Array *newItems;
 
-    if (newCapacity < size) NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
+    if (newCapacity < size) 
+      NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
 
     if (newCapacity < c_DefaultCapacity)
       {

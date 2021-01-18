@@ -265,9 +265,12 @@ HRESULT CLR_RT_HeapBlock_Timer::ConfigureObject(CLR_RT_StackFrame &stack, CLR_UI
       timer->m_timeExpire = args[0].NumericByRef().s4;
       timer->m_timeFrequency = args[1].NumericByRef().s4;
 
-      if (timer->m_timeExpire == -1) timer->m_timeExpire = TIMEOUT_INFINITE;
-      if (timer->m_timeFrequency == -1) timer->m_timeFrequency = TIMEOUT_INFINITE;
+      if (timer->m_timeExpire == -1)
+        timer->m_timeExpire = TIMEOUT_INFINITE;
+      if (timer->m_timeFrequency == -1)
+        timer->m_timeFrequency = TIMEOUT_INFINITE;
       }
+    /*
     else if (flags & CLR_RT_HeapBlock_Timer::c_INPUT_TimeSpan)
       {
       CLR_INT64 *pVal;
@@ -280,6 +283,7 @@ HRESULT CLR_RT_HeapBlock_Timer::ConfigureObject(CLR_RT_StackFrame &stack, CLR_UI
       if (*pVal == -c_TickPerMillisecond) timer->m_timeFrequency = TIMEOUT_INFINITE;
       else timer->m_timeFrequency = *pVal;
       }
+      */
 
     if (timer->m_timeExpire == TIMEOUT_INFINITE)
       {

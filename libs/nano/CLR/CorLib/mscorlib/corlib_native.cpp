@@ -44,7 +44,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
     Library_corlib_native_CanFly_Runtime::IsNegativeInfinity___STATIC__BOOLEAN__R8,
     Library_corlib_native_CanFly_Runtime::IsPositiveInfinity___STATIC__BOOLEAN__R8,
     Library_corlib_native_CanFly_Runtime::HasFlag___STATIC__BOOLEAN__SystemEnum__SystemEnum,
-    NULL,
+    Library_corlib_native_CanFly_Runtime::GetStackTrace___STATIC__STRING__SystemException,
     Library_corlib_native_CanFly_Runtime::AnyPendingFinalizers___STATIC__BOOLEAN,
     Library_corlib_native_CanFly_Runtime::SuppressFinalize___STATIC__VOID__OBJECT,
     Library_corlib_native_CanFly_Runtime::ReRegisterForFinalize___STATIC__VOID__OBJECT,
@@ -59,8 +59,6 @@ static const CLR_RT_MethodHandler method_lookup[] =
     Library_corlib_native_CanFly_Runtime::DelegateEquals___STATIC__BOOLEAN__SystemDelegate__OBJECT,
     Library_corlib_native_CanFly_Runtime::DelegateCombine___STATIC__SystemDelegate__SystemDelegate__SystemDelegate,
     Library_corlib_native_CanFly_Runtime::DelegateRemove___STATIC__SystemDelegate__SystemDelegate__SystemDelegate,
-    Library_corlib_native_CanFly_Runtime::DelegateEquals___STATIC__BOOLEAN__SystemDelegate__SystemDelegate,
-    Library_corlib_native_CanFly_Runtime::DelegateNotEquals___STATIC__BOOLEAN__SystemDelegate__SystemDelegate,
     Library_corlib_native_CanFly_Runtime::SetCapacity___STATIC__VOID__SystemCollectionsArrayList__I4,
     Library_corlib_native_CanFly_Runtime::ArrayListGet___STATIC__OBJECT__SystemCollectionsArrayList__I4,
     Library_corlib_native_CanFly_Runtime::ArrayListSet___STATIC__VOID__SystemCollectionsArrayList__I4__OBJECT,
@@ -958,7 +956,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
 const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_mscorlib =
 {
     "mscorlib",
-    0xA46BD266,
+    0x9418846C,
     method_lookup,
     { 100, 5, 0, 3 }
 };

@@ -11,6 +11,13 @@ struct ExceptionLookup
   CLR_RT_TypeDef_Index *ptr;
   };
 
+static HRESULT ExceptionCreateInstance(CLR_RT_HeapBlock &ref, HRESULT hr, CLR_RT_StackFrame *stack);
+
+static HRESULT SetStackTrace(CLR_RT_HeapBlock &ref, CLR_RT_StackFrame *stack);
+
+static CLR_RT_HeapBlock *GetTarget(CLR_RT_HeapBlock &ref);
+static StackTrace *GetStackTrace(CLR_RT_HeapBlock *obj, CLR_UINT32 &depth);
+
 static const ExceptionLookup c_ExceptionLookup[] =
   {
   #define EL(hr,fld) { hr, &g_CLR_RT_WellKnownTypes.fld }
@@ -31,9 +38,154 @@ static const ExceptionLookup c_ExceptionLookup[] =
   #undef EL
   };
 
+static HRESULT SetStackTrace(CLR_RT_HeapBlock &ref, CLR_RT_StackFrame *stack)
+  {
+  NATIVE_PROFILE_CLR_CORE();
+  NANOCLR_HEADER();
+
+  if (stack)
+    {
+    CLR_RT_HeapBlock *obj;
+    CLR_RT_HeapBlock_Array *the_array;
+    StackTrace *dst;
+    CLR_UINT32              depth;
+
+    if (CLR_RT_ExecutionEngine::IsInstanceOf(ref, g_CLR_RT_WellKnownTypes.m_Exception) == false)
+      NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
+
+    //--//
+
+    obj = ref.Dereference();
+    depth = 0;
+
+    NANOCLR_FOREACH_NODE_BACKWARD__DIRECT(CLR_RT_StackFrame, stackSub, stack)
+      {
+      depth++;
+      }
+    NANOCLR_FOREACH_NODE_BACKWARD_END();
+
+    //--//
+
+    NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_Array::CreateInstance(obj[Library_corlib_native_System_Exception::FIELD___stackTrace], depth * sizeof(StackTrace), g_CLR_RT_WellKnownTypes.m_UInt8));
+
+    //--//
+
+    the_array = obj[Library_corlib_native_System_Exception::FIELD___stackTrace].DereferenceArray();
+    dst = (StackTrace *)the_array->GetFirstElement();
+
+    NANOCLR_FOREACH_NODE_BACKWARD__DIRECT(CLR_RT_StackFrame, stackSub, stack)
+      {
+      dst->m_md = stackSub->m_call;
+      dst->m_IP = (CLR_UINT32)(stackSub->m_IP - stackSub->m_IPstart);
+
+      dst++;
+      }
+    NANOCLR_FOREACH_NODE_BACKWARD_END();
+
+#if !defined(BUILD_RTM)
+    //shutting down the EE happens by Thread->Abort.  These exceptions are by design, and 
+    //don't need to be logged, or written to the console....
+    if (!g_CLR_RT_ExecutionEngine.m_fShuttingDown)
+#endif
+      {
+      CLR_RT_DUMP::EXCEPTION(*stack, ref);
+      }
+    }
+
+  NANOCLR_NOCLEANUP();
+  }
+
+/*
+    This function will always succeed.
+    Return values
+        - S_OK.
+        - S_FALSE.  ref points to the pre-allocated OutOfMemory exception
+*/
+HRESULT ExceptionCreateInstance(CLR_RT_HeapBlock &ref, const CLR_RT_TypeDef_Index &cls, HRESULT hrIn, CLR_RT_StackFrame *stack)
+  {
+  NATIVE_PROFILE_CLR_CORE();
+  NANOCLR_HEADER();
+
+  CLR_RT_HeapBlock *obj;
+
+  _ASSERTE(CLR_RT_ExecutionEngine::IsInstanceOf(cls, g_CLR_RT_WellKnownTypes.m_Exception));
+
+  if (FAILED(hr = g_CLR_RT_ExecutionEngine.NewObjectFromIndex(ref, cls)))
+    {
+#if defined(NANOCLR_APPDOMAINS)
+    ref.SetObjectReference(g_CLR_RT_ExecutionEngine.GetCurrentAppDomain()->m_outOfMemoryException);
+#else
+    ref.SetObjectReference(g_CLR_RT_ExecutionEngine.m_outOfMemoryException);
+#endif
+
+    hrIn = CLR_E_OUT_OF_MEMORY;
+    hr = S_FALSE;
+    }
+
+  obj = ref.Dereference();
+
+  obj[Library_corlib_native_System_Exception::FIELD__HResult].SetInteger((CLR_UINT32)hrIn);
+
+  if (hr == S_OK)
+    {
+    (void)SetStackTrace(ref, stack);
+    }
+
+#if defined(NANOCLR_APPDOMAINS)
+  (void)g_CLR_RT_ExecutionEngine.SetCurrentAppDomain(appDomainSav);
+#endif
+
+  NANOCLR_NOCLEANUP_NOLABEL();
+  }
+
+static HRESULT ExceptionCreateInstance(CLR_RT_HeapBlock &ref, HRESULT hrIn, CLR_RT_StackFrame *stack)
+  {
+  NATIVE_PROFILE_CLR_CORE();
+  CLR_RT_TypeDef_Index *cls = &g_CLR_RT_WellKnownTypes.m_Exception;
+
+  _ASSERTE(FAILED(hrIn));
+
+  for (uint32_t i = 0; i < ARRAYSIZE(c_ExceptionLookup); i++)
+    {
+    if (c_ExceptionLookup[i].hr == hrIn)
+      {
+      cls = c_ExceptionLookup[i].ptr;
+      break;
+      }
+    }
+
+  return ExceptionCreateInstance(ref, *cls, hrIn, stack);
+  }
+
+static CLR_RT_HeapBlock *GetTarget(CLR_RT_HeapBlock &ref)
+  {
+  NATIVE_PROFILE_CLR_CORE();
+  return CLR_RT_ExecutionEngine::IsInstanceOf(ref, g_CLR_RT_WellKnownTypes.m_Exception) ? ref.Dereference() : NULL;
+  }
+
+static StackTrace *GetStackTrace(CLR_RT_HeapBlock *obj, CLR_UINT32 &depth)
+  {
+  NATIVE_PROFILE_CLR_CORE();
+  if (obj)
+    {
+    CLR_RT_HeapBlock_Array *array = obj[Library_corlib_native_System_Exception::FIELD___stackTrace].DereferenceArray();
+
+    if (array)
+      {
+      depth = array->m_numOfElements / sizeof(StackTrace);
+
+      return (StackTrace *)array->GetFirstElement();
+      }
+    }
+
+  depth = 0;
+
+  return NULL;
+  }
+
 //--//
 
-HRESULT Library_corlib_native_System_Exception::get_StackTrace___STRING(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::GetStackTrace___STATIC__STRING__SystemException(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -49,7 +201,7 @@ HRESULT Library_corlib_native_System_Exception::get_StackTrace___STRING(CLR_RT_S
   int                       depth = 0;
   CLR_RT_HeapBlock *pThis = stack.This();         FAULT_ON_NULL(pThis);
 
-  pArray = pThis[FIELD___stackTrace].DereferenceArray();
+  pArray = pThis[Library_corlib_native_System_Exception::FIELD___stackTrace].DereferenceArray();
 
   if (pArray)
     {
@@ -80,157 +232,9 @@ HRESULT Library_corlib_native_System_Exception::get_StackTrace___STRING(CLR_RT_S
     pBlkString++;
     }
 
-  NANOCLR_SET_AND_LEAVE(Library_corlib_native_System_String::Concat(stack, (CLR_RT_HeapBlock *)tmpArray.DereferenceArray()->GetFirstElement(), depth));
+  NANOCLR_SET_AND_LEAVE(StringConcat(stack, (CLR_RT_HeapBlock *)tmpArray.DereferenceArray()->GetFirstElement(), depth));
 
   NANOCLR_NOCLEANUP();
   }
 
 //--//
-
-/*
-    This function will always succeed.
-    Return values
-        - S_OK.
-        - S_FALSE.  ref points to the pre-allocated OutOfMemory exception
-*/
-HRESULT Library_corlib_native_System_Exception::CreateInstance(CLR_RT_HeapBlock &ref, const CLR_RT_TypeDef_Index &cls, HRESULT hrIn, CLR_RT_StackFrame *stack)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
-
-#if defined(NANOCLR_APPDOMAINS)
-  CLR_RT_AppDomain *appDomainSav = g_CLR_RT_ExecutionEngine.SetCurrentAppDomain(stack->m_appDomain);
-#endif
-
-  CLR_RT_HeapBlock *obj;
-
-  _ASSERTE(CLR_RT_ExecutionEngine::IsInstanceOf(cls, g_CLR_RT_WellKnownTypes.m_Exception));
-
-  if (FAILED(hr = g_CLR_RT_ExecutionEngine.NewObjectFromIndex(ref, cls)))
-    {
-#if defined(NANOCLR_APPDOMAINS)
-    ref.SetObjectReference(g_CLR_RT_ExecutionEngine.GetCurrentAppDomain()->m_outOfMemoryException);
-#else
-    ref.SetObjectReference(g_CLR_RT_ExecutionEngine.m_outOfMemoryException);
-#endif
-
-    hrIn = CLR_E_OUT_OF_MEMORY;
-    hr = S_FALSE;
-    }
-
-  obj = ref.Dereference();
-
-  obj[FIELD__HResult].SetInteger((CLR_UINT32)hrIn);
-
-  if (hr == S_OK)
-    {
-    (void)SetStackTrace(ref, stack);
-    }
-
-#if defined(NANOCLR_APPDOMAINS)
-  (void)g_CLR_RT_ExecutionEngine.SetCurrentAppDomain(appDomainSav);
-#endif
-
-  NANOCLR_NOCLEANUP_NOLABEL();
-  }
-
-HRESULT Library_corlib_native_System_Exception::CreateInstance(CLR_RT_HeapBlock &ref, HRESULT hrIn, CLR_RT_StackFrame *stack)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_TypeDef_Index *cls = &g_CLR_RT_WellKnownTypes.m_Exception;
-
-  _ASSERTE(FAILED(hrIn));
-
-  for (uint32_t i = 0; i < ARRAYSIZE(c_ExceptionLookup); i++)
-    {
-    if (c_ExceptionLookup[i].hr == hrIn)
-      {
-      cls = c_ExceptionLookup[i].ptr;
-      break;
-      }
-    }
-
-  return CreateInstance(ref, *cls, hrIn, stack);
-  }
-
-HRESULT Library_corlib_native_System_Exception::SetStackTrace(CLR_RT_HeapBlock &ref, CLR_RT_StackFrame *stack)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
-
-  if (stack)
-    {
-    CLR_RT_HeapBlock *obj;
-    CLR_RT_HeapBlock_Array *array;
-    StackTrace *dst;
-    CLR_UINT32              depth;
-
-    if (CLR_RT_ExecutionEngine::IsInstanceOf(ref, g_CLR_RT_WellKnownTypes.m_Exception) == false) NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
-
-    //--//
-
-    obj = ref.Dereference();
-    depth = 0;
-
-    NANOCLR_FOREACH_NODE_BACKWARD__DIRECT(CLR_RT_StackFrame, stackSub, stack)
-      {
-      depth++;
-      }
-    NANOCLR_FOREACH_NODE_BACKWARD_END();
-
-    //--//
-
-    NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_Array::CreateInstance(obj[FIELD___stackTrace], depth * sizeof(StackTrace), g_CLR_RT_WellKnownTypes.m_UInt8));
-
-    //--//
-
-    array = obj[FIELD___stackTrace].DereferenceArray();
-    dst = (StackTrace *)array->GetFirstElement();
-
-    NANOCLR_FOREACH_NODE_BACKWARD__DIRECT(CLR_RT_StackFrame, stackSub, stack)
-      {
-      dst->m_md = stackSub->m_call;
-      dst->m_IP = (CLR_UINT32)(stackSub->m_IP - stackSub->m_IPstart);
-
-      dst++;
-      }
-    NANOCLR_FOREACH_NODE_BACKWARD_END();
-
-#if !defined(BUILD_RTM)
-    //shutting down the EE happens by Thread->Abort.  These exceptions are by design, and 
-    //don't need to be logged, or written to the console....
-    if (!g_CLR_RT_ExecutionEngine.m_fShuttingDown)
-#endif
-      {
-      CLR_RT_DUMP::EXCEPTION(*stack, ref);
-      }
-    }
-
-  NANOCLR_NOCLEANUP();
-  }
-
-CLR_RT_HeapBlock *Library_corlib_native_System_Exception::GetTarget(CLR_RT_HeapBlock &ref)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  return CLR_RT_ExecutionEngine::IsInstanceOf(ref, g_CLR_RT_WellKnownTypes.m_Exception) ? ref.Dereference() : NULL;
-  }
-
-Library_corlib_native_System_Exception::StackTrace *Library_corlib_native_System_Exception::GetStackTrace(CLR_RT_HeapBlock *obj, CLR_UINT32 &depth)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  if (obj)
-    {
-    CLR_RT_HeapBlock_Array *array = obj[FIELD___stackTrace].DereferenceArray();
-
-    if (array)
-      {
-      depth = array->m_numOfElements / sizeof(StackTrace);
-
-      return (StackTrace *)array->GetFirstElement();
-      }
-    }
-
-  depth = 0;
-
-  return NULL;
-  }

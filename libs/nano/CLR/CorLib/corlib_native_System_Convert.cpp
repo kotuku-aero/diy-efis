@@ -8,7 +8,75 @@
 #include <ctype.h>
 #include "../Helpers/Base64/base64.h"
 
-HRESULT Library_corlib_native_System_Convert::NativeToInt64___STATIC__I8__STRING__BOOLEAN__I8__I8__I4(CLR_RT_StackFrame &stack)
+static double GetDoubleFractionalPart(char *str, int length)
+  {
+  double place = 1;
+  double returnValue = 0.0;
+
+  for (int i = 0; i < length; i++)
+    {
+    // move decimal place to the right
+    place /= 10.0;
+
+    returnValue += ((int)(*str++) - '0') * place;
+    }
+
+  return returnValue;
+  }
+
+static int64_t GetIntegerPart(char *str, int length)
+  {
+  int64_t returnValue = 0;
+
+  for (int i = 0; i < length; i++)
+    {
+    returnValue = returnValue * 10 + (*str - '0');
+    str++;
+
+    // check for terminator, in case this is being called in 'guess' mode
+    if (*str == '\0')
+      {
+      break;
+      }
+    }
+
+  return returnValue;
+  }
+
+static int64_t GetIntegerFromHexString(char *str)
+  {
+  int64_t returnValue = 0;
+
+  if ((*str == '0') && (*(str + 1) == 'x'))
+    {
+    // there a 0x at the begining of the string, so move pointer forward 2 notches
+    str += 2;
+    }
+
+  while (*str != '\0')
+    {
+    char c = toupper(*str++);
+
+    if ((c < '0') || (c > 'F') || ((c > '9') && (c < 'A')))
+      {
+      // there is an invalid char in the string
+      break;
+      }
+
+    c -= '0';
+
+    if (c > 9)
+      {
+      c -= 7;
+      }
+
+    returnValue = (returnValue << 4) + c;
+    }
+
+  return returnValue;
+  }
+
+HRESULT Library_corlib_native_CanFly_Runtime::NativeToInt64___STATIC__I8__STRING__BOOLEAN__I8__I8__I4(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER();
   {
@@ -133,7 +201,7 @@ HRESULT Library_corlib_native_System_Convert::NativeToInt64___STATIC__I8__STRING
 
   }
 
-HRESULT Library_corlib_native_System_Convert::NativeToDouble___STATIC__R8__STRING(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::NativeToDouble___STATIC__R8__STRING(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER();
   {
@@ -324,7 +392,7 @@ HRESULT Library_corlib_native_System_Convert::NativeToDouble___STATIC__R8__STRIN
 
   }
 
-HRESULT Library_corlib_native_System_Convert::ToBase64String___STATIC__STRING__SZARRAY_U1__I4__I4__BOOLEAN(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ToBase64String___STATIC__STRING__SZARRAY_U1__I4__I4__BOOLEAN(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER();
 
@@ -440,7 +508,7 @@ HRESULT Library_corlib_native_System_Convert::ToBase64String___STATIC__STRING__S
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Convert::FromBase64CharArray___STATIC__SZARRAY_U1__SZARRAY_CHAR__I4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::FromBase64CharArray___STATIC__SZARRAY_U1__SZARRAY_CHAR__I4(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER();
 
@@ -524,72 +592,4 @@ HRESULT Library_corlib_native_System_Convert::FromBase64CharArray___STATIC__SZAR
   platform_free(outArray);
 
   NANOCLR_NOCLEANUP();
-  }
-
-double Library_corlib_native_System_Convert::GetDoubleFractionalPart(char *str, int length)
-  {
-  double place = 1;
-  double returnValue = 0.0;
-
-  for (int i = 0; i < length; i++)
-    {
-    // move decimal place to the right
-    place /= 10.0;
-
-    returnValue += ((int)(*str++) - '0') * place;
-    }
-
-  return returnValue;
-  }
-
-int64_t Library_corlib_native_System_Convert::GetIntegerPart(char *str, int length)
-  {
-  int64_t returnValue = 0;
-
-  for (int i = 0; i < length; i++)
-    {
-    returnValue = returnValue * 10 + (*str - '0');
-    str++;
-
-    // check for terminator, in case this is being called in 'guess' mode
-    if (*str == '\0')
-      {
-      break;
-      }
-    }
-
-  return returnValue;
-  }
-
-int64_t Library_corlib_native_System_Convert::GetIntegerFromHexString(char *str)
-  {
-  int64_t returnValue = 0;
-
-  if ((*str == '0') && (*(str + 1) == 'x'))
-    {
-    // there a 0x at the begining of the string, so move pointer forward 2 notches
-    str += 2;
-    }
-
-  while (*str != '\0')
-    {
-    char c = toupper(*str++);
-
-    if ((c < '0') || (c > 'F') || ((c > '9') && (c < 'A')))
-      {
-      // there is an invalid char in the string
-      break;
-      }
-
-    c -= '0';
-
-    if (c > 9)
-      {
-      c -= 7;
-      }
-
-    returnValue = (returnValue << 4) + c;
-    }
-
-  return returnValue;
   }

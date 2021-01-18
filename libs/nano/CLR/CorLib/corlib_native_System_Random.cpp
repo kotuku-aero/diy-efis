@@ -5,28 +5,45 @@
 //
 #include "CorLib.h"
 
+static HRESULT GetRandom(CLR_RT_StackFrame &stack, CLR_RT_Random *&rand, bool create)
+  {
+  NANOCLR_HEADER();
 
-HRESULT Library_corlib_native_System_Random::Next___I4(CLR_RT_StackFrame& stack)
+  CLR_RT_HeapBlock *pThis = stack.Arg0().Dereference();
+  FAULT_ON_NULL(pThis);
+
+  if (create)
+    {
+    NANOCLR_CHECK_HRESULT(
+      CLR_RT_HeapBlock_BinaryBlob::CreateInstance(pThis[Library_corlib_native_System_Random::FIELD___random], sizeof(CLR_RT_Random), NULL, NULL, 0));
+    }
+
+  rand = (CLR_RT_Random *)pThis[Library_corlib_native_System_Random::FIELD___random].DereferenceBinaryBlob()->GetData();
+
+  NANOCLR_NOCLEANUP();
+  }
+
+HRESULT Library_corlib_native_CanFly_Runtime::RandomNext___STATIC__I4__SystemRandom(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER();
 
   CLR_RT_Random* rand;
 
-  NANOCLR_CHECK_HRESULT(GetRandom(stack, rand));
+  NANOCLR_CHECK_HRESULT(GetRandom(stack, rand, false));
 
   stack.SetResult_I4(rand->Next() & 0x7FFFFFFF);
 
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Random::Next___I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::RandomNext___STATIC__I4__SystemRandom__I4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER();
 
   CLR_RT_Random* rand;
   CLR_INT32      maxValue;
 
-  NANOCLR_CHECK_HRESULT(GetRandom(stack, rand));
+  NANOCLR_CHECK_HRESULT(GetRandom(stack, rand, false));
 
   maxValue = stack.Arg1().NumericByRef().s4;
 
@@ -37,7 +54,7 @@ HRESULT Library_corlib_native_System_Random::Next___I4__I4(CLR_RT_StackFrame& st
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Random::NextDouble___R8(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::RandomNextDouble___STATIC__R8__SystemRandom(CLR_RT_StackFrame& stack)
   {
 
 
@@ -53,7 +70,7 @@ HRESULT Library_corlib_native_System_Random::NextDouble___R8(CLR_RT_StackFrame& 
 
 #endif
 
-  NANOCLR_CHECK_HRESULT(GetRandom(stack, rand));
+  NANOCLR_CHECK_HRESULT(GetRandom(stack, rand, false));
 
   nextDouble = rand->NextDouble();
 
@@ -64,14 +81,14 @@ HRESULT Library_corlib_native_System_Random::NextDouble___R8(CLR_RT_StackFrame& 
 
   }
 
-HRESULT Library_corlib_native_System_Random::NextBytes___VOID__SZARRAY_U1(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::RandomNextBytes___STATIC__VOID__SystemRandom__SZARRAY_U1(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER();
 
   CLR_RT_Random* rand;
   CLR_RT_HeapBlock_Array* buffer;
 
-  NANOCLR_CHECK_HRESULT(GetRandom(stack, rand));
+  NANOCLR_CHECK_HRESULT(GetRandom(stack, rand, false));
 
   buffer = stack.Arg1().DereferenceArray(); FAULT_ON_NULL(buffer);
 
@@ -80,7 +97,7 @@ HRESULT Library_corlib_native_System_Random::NextBytes___VOID__SZARRAY_U1(CLR_RT
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Random::_ctor___VOID(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::RandomCtor___STATIC__VOID__SystemRandom(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER();
 
@@ -93,7 +110,7 @@ HRESULT Library_corlib_native_System_Random::_ctor___VOID(CLR_RT_StackFrame& sta
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Random::_ctor___VOID__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::RandomCtor___STATIC__VOID__SystemRandom__I4(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER();
 
@@ -107,19 +124,3 @@ HRESULT Library_corlib_native_System_Random::_ctor___VOID__I4(CLR_RT_StackFrame&
   }
 
 //--//
-
-HRESULT Library_corlib_native_System_Random::GetRandom(CLR_RT_StackFrame& stack, CLR_RT_Random*& rand, bool create)
-  {
-  NANOCLR_HEADER();
-
-  CLR_RT_HeapBlock* pThis = stack.This(); FAULT_ON_NULL(pThis);
-
-  if (create)
-    {
-    NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_BinaryBlob::CreateInstance(pThis[FIELD___random], sizeof(CLR_RT_Random), NULL, NULL, 0));
-    }
-
-  rand = (CLR_RT_Random*)pThis[FIELD___random].DereferenceBinaryBlob()->GetData();
-
-  NANOCLR_NOCLEANUP();
-  }

@@ -6,9 +6,7 @@
 #include "CorLib.h"
 #include "../../PAL/Include/nanoPAL_NativeDouble.h"
 
-#if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
-
-HRESULT Library_corlib_native_System_Double::CompareTo___STATIC__I4__R8__R8(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::CompareTo___STATIC__I4__R8__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -22,7 +20,7 @@ HRESULT Library_corlib_native_System_Double::CompareTo___STATIC__I4__R8__R8(CLR_
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_corlib_native_System_Double::IsInfinity___STATIC__BOOLEAN__R8(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::IsInfinity___STATIC__BOOLEAN__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -35,7 +33,7 @@ HRESULT Library_corlib_native_System_Double::IsInfinity___STATIC__BOOLEAN__R8(CL
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_corlib_native_System_Double::IsNaN___STATIC__BOOLEAN__R8(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::IsNaN___STATIC__BOOLEAN__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -48,7 +46,7 @@ HRESULT Library_corlib_native_System_Double::IsNaN___STATIC__BOOLEAN__R8(CLR_RT_
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_corlib_native_System_Double::IsNegativeInfinity___STATIC__BOOLEAN__R8(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::IsNegativeInfinity___STATIC__BOOLEAN__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -61,7 +59,7 @@ HRESULT Library_corlib_native_System_Double::IsNegativeInfinity___STATIC__BOOLEA
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_corlib_native_System_Double::IsPositiveInfinity___STATIC__BOOLEAN__R8(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::IsPositiveInfinity___STATIC__BOOLEAN__R8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -74,39 +72,3 @@ HRESULT Library_corlib_native_System_Double::IsPositiveInfinity___STATIC__BOOLEA
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-#else
-
-HRESULT Library_corlib_native_System_Double::CompareTo___STATIC__I4__R8__R8(CLR_RT_StackFrame &stack)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
-
-  CLR_INT64 left = stack.Arg0().NumericByRef().s8;
-  CLR_INT64 right = stack.Arg1().NumericByRef().s8;
-
-  stack.SetResult_I4((left < right) ? -1 : (left > right) ? 1 : 0);
-
-  NANOCLR_NOCLEANUP_NOLABEL();
-  }
-
-HRESULT Library_corlib_native_System_Double::IsInfinity___STATIC__BOOLEAN__R8(CLR_RT_StackFrame &stack)
-  {
-  stack.NotImplementedStub();
-  }
-
-HRESULT Library_corlib_native_System_Double::IsNaN___STATIC__BOOLEAN__R8(CLR_RT_StackFrame &stack)
-  {
-  stack.NotImplementedStub();
-  }
-
-HRESULT Library_corlib_native_System_Double::IsNegativeInfinity___STATIC__BOOLEAN__R8(CLR_RT_StackFrame &stack)
-  {
-  stack.NotImplementedStub();
-  }
-
-HRESULT Library_corlib_native_System_Double::IsPositiveInfinity___STATIC__BOOLEAN__R8(CLR_RT_StackFrame &stack)
-  {
-  stack.NotImplementedStub();
-  }
-
-#endif

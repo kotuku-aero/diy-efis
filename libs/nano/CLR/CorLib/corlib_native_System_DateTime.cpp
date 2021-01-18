@@ -30,13 +30,14 @@ enum DateTimePart
 CLR_INT64 s_UTCMask = ULONGLONGCONSTANT(0x8000000000000000);
 CLR_INT64 s_TickMask = ULONGLONGCONSTANT(0x7FFFFFFFFFFFFFFF);
 
-HRESULT Library_corlib_native_System_DateTime::_ctor___VOID__I4__I4__I4__I4__I4__I4__I4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ToTicks___STATIC__U8__I4__I4__I4__I4__I4__I4__I4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock *pArg = &(stack.Arg1());
+  CLR_RT_HeapBlock *pArg = &(stack.Arg0());
   SYSTEMTIME        st;
+  CLR_INT64 value;
 
   NANOCLR_CLEAR(st);
   st.wYear = pArg[0].NumericByRef().s4;
@@ -70,12 +71,14 @@ HRESULT Library_corlib_native_System_DateTime::_ctor___VOID__I4__I4__I4__I4__I4_
     NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
     }
 
-  Compress(stack, st);
+
+  value = (CLR_INT64)HAL_Time_ConvertFromSystemTime(&st) | s_UTCMask;
+  stack.SetResult_I8(value);
 
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_DateTime::GetDateTimePart___I4__SystemDateTimeDateTimePart(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::GetDateTimePart___STATIC__I4__U8__I4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -83,65 +86,60 @@ HRESULT Library_corlib_native_System_DateTime::GetDateTimePart___I4__SystemDateT
   signed int days;
   SYSTEMTIME st;
 
+  CLR_INT64 value = stack.Arg0().NumericByRef().s8;
   DateTimePart dateTimePart = (DateTimePart)stack.Arg1().NumericByRef().s4;
 
-  if (Expand(stack, st))
+  HAL_Time_ToSystemTime(value, &st);
+
+  switch (dateTimePart)
     {
-    switch (dateTimePart)
-      {
-      case DateTimePart_Year:
-        stack.SetResult_I4(st.wYear);
-        break;
+    case DateTimePart_Year:
+      stack.SetResult_I4(st.wYear);
+      break;
 
-      case DateTimePart_Month:
-        stack.SetResult_I4(st.wMonth);
-        break;
+    case DateTimePart_Month:
+      stack.SetResult_I4(st.wMonth);
+      break;
 
-      case DateTimePart_Day:
-        stack.SetResult_I4(st.wDay);
-        break;
+    case DateTimePart_Day:
+      stack.SetResult_I4(st.wDay);
+      break;
 
-      case DateTimePart_DayOfWeek:
-        stack.SetResult_I4(st.wDayOfWeek);
-        break;
+    case DateTimePart_DayOfWeek:
+      stack.SetResult_I4(st.wDayOfWeek);
+      break;
 
-      case DateTimePart_DayOfYear:
-        NANOCLR_CHECK_HRESULT(HAL_Time_AccDaysInMonth(st.wYear, st.wMonth, &days));
-        days += st.wDay;
-        stack.SetResult_I4(days);
-        break;
+    case DateTimePart_DayOfYear:
+      NANOCLR_CHECK_HRESULT(HAL_Time_AccDaysInMonth(st.wYear, st.wMonth, &days));
+      days += st.wDay;
+      stack.SetResult_I4(days);
+      break;
 
-      case DateTimePart_Hour:
-        stack.SetResult_I4(st.wHour);
-        break;
+    case DateTimePart_Hour:
+      stack.SetResult_I4(st.wHour);
+      break;
 
-      case DateTimePart_Minute:
-        stack.SetResult_I4(st.wMinute);
-        break;
+    case DateTimePart_Minute:
+      stack.SetResult_I4(st.wMinute);
+      break;
 
-      case DateTimePart_Second:
-        stack.SetResult_I4(st.wSecond);
-        break;
+    case DateTimePart_Second:
+      stack.SetResult_I4(st.wSecond);
+      break;
 
-      case DateTimePart_Millisecond:
-        stack.SetResult_I4(st.wMilliseconds);
-        break;
+    case DateTimePart_Millisecond:
+      stack.SetResult_I4(st.wMilliseconds);
+      break;
 
-      default:
-        NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
-        break;
-      }
-    }
-  else
-    {
-    // expand call failed for whatever reason
-    NANOCLR_SET_AND_LEAVE(CLR_E_FAIL);
+    default:
+      NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
+      break;
     }
 
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_DateTime::DaysInMonth___STATIC__I4__I4__I4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::DaysInMonth___STATIC__I4__I4__I4(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -157,126 +155,15 @@ HRESULT Library_corlib_native_System_DateTime::DaysInMonth___STATIC__I4__I4__I4(
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_DateTime::get_UtcNow___STATIC__SystemDateTime(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::UtcNow___STATIC__U8(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_TypeDescriptor dtType;
-  CLR_INT64 *val;
+  CLR_INT64 val;
 
-  CLR_RT_HeapBlock &ref = stack.PushValue();
-
-  // initialize <DateTime> type descriptor
-  NANOCLR_CHECK_HRESULT(dtType.InitializeFromType(g_CLR_RT_WellKnownTypes.m_DateTime));
-
-  // create an instance of <DateTime>
-  NANOCLR_CHECK_HRESULT(g_CLR_RT_ExecutionEngine.NewObject(ref, dtType.m_handlerCls));
-
-  val = GetValuePtr(ref);
-
-  // load with full date&time
-  // including UTC flag
-  *val = HAL_Time_CurrentDateTime(false) | s_UTCMask;
+  val = HAL_Time_CurrentDateTime(false) | s_UTCMask;
+  stack.SetResult_I8(val);
 
   NANOCLR_NOCLEANUP();
-  }
-
-HRESULT Library_corlib_native_System_DateTime::get_Today___STATIC__SystemDateTime(CLR_RT_StackFrame &stack)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
-
-  CLR_RT_TypeDescriptor dtType;
-  CLR_INT64 *val;
-
-  CLR_RT_HeapBlock &ref = stack.PushValue();
-
-  // initialize <DateTime> type descriptor
-  NANOCLR_CHECK_HRESULT(dtType.InitializeFromType(g_CLR_RT_WellKnownTypes.m_DateTime));
-
-  // create an instance of <DateTime>
-  NANOCLR_CHECK_HRESULT(g_CLR_RT_ExecutionEngine.NewObject(ref, dtType.m_handlerCls));
-
-  val = GetValuePtr(ref);
-
-  // load with date part only
-  // including UTC flag
-  *val = HAL_Time_CurrentDateTime(true) | s_UTCMask;
-
-  NANOCLR_NOCLEANUP();
-  }
-
-//--//
-
-CLR_INT64 *Library_corlib_native_System_DateTime::GetValuePtr(CLR_RT_StackFrame &stack)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  return GetValuePtr(stack.Arg0());
-  }
-
-CLR_INT64 *Library_corlib_native_System_DateTime::GetValuePtr(CLR_RT_HeapBlock &ref)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_HeapBlock *obj = &ref;
-  CLR_DataType      dt = obj->DataType();
-
-  if (dt == DATATYPE_OBJECT || dt == DATATYPE_BYREF)
-    {
-    obj = obj->Dereference(); if (!obj) return NULL;
-    dt = obj->DataType();
-    }
-
-  // after dereferencing the object if it's pointing to another Object 
-  // need to do it again because this DateTime instance is most likely boxed
-  if (dt == DATATYPE_OBJECT)
-    {
-    obj = obj->Dereference(); if (!obj) return NULL;
-    dt = obj->DataType();
-    }
-
-  if (dt == DATATYPE_DATETIME)
-    {
-    return (CLR_INT64 *)&obj->NumericByRef().s8;
-    }
-
-  if (dt == DATATYPE_I8)
-    {
-    return (CLR_INT64 *)&obj->NumericByRef().s8;
-    }
-
-  if (dt == DATATYPE_VALUETYPE && obj->ObjectCls().m_data == g_CLR_RT_WellKnownTypes.m_DateTime.m_data)
-    {
-    return (CLR_INT64 *)&obj[FIELD___ticks].NumericByRef().s8;
-    }
-
-  return NULL;
-  }
-
-bool Library_corlib_native_System_DateTime::Expand(CLR_RT_StackFrame &stack, SYSTEMTIME &st)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_INT64 *val = GetValuePtr(stack);
-
-  if (val)
-    {
-    CLR_INT64 ticks = *val & s_TickMask;
-    HAL_Time_ToSystemTime(ticks, &st);
-
-    return true;
-    }
-
-  return false;
-  }
-
-// Compress function always creates UTC time.
-void Library_corlib_native_System_DateTime::Compress(CLR_RT_StackFrame &stack, const SYSTEMTIME &st)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_INT64 *val = GetValuePtr(stack);
-
-  if (val)
-    {
-    *val = HAL_Time_ConvertFromSystemTime(&st) | s_UTCMask;
-    }
   }

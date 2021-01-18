@@ -6,12 +6,12 @@
 #include "CorLib.h"
 
 
-HRESULT Library_corlib_native_System_Threading_ManualResetEvent::_ctor___VOID__BOOLEAN(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ManualResetEventCtor___STATIC__VOID__SystemThreadingManualResetEvent__BOOLEAN(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock* pThis = stack.This();
+  CLR_RT_HeapBlock* pThis = stack.Arg0().Dereference();
 
   if (stack.Arg1().NumericByRef().s4)
     {
@@ -21,22 +21,22 @@ HRESULT Library_corlib_native_System_Threading_ManualResetEvent::_ctor___VOID__B
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_corlib_native_System_Threading_ManualResetEvent::Reset___BOOLEAN(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ManualResetEventReset___STATIC__BOOLEAN__SystemThreadingManualResetEvent(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  Library_corlib_native_System_Threading_WaitHandle::Reset(stack);
+  EventReset(stack);
 
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_corlib_native_System_Threading_ManualResetEvent::Set___BOOLEAN(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ManualResetEventSet___STATIC__BOOLEAN__SystemThreadingManualResetEvent(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  Library_corlib_native_System_Threading_WaitHandle::Set(stack);
+  EventSet(stack);
 
   NANOCLR_NOCLEANUP_NOLABEL();
   }

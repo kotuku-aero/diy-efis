@@ -5,34 +5,120 @@
 //
 #include "CorLib.h"
 
+
+static CLR_RT_ObjectToEvent_Source *GetThreadReference(CLR_RT_StackFrame &stack)
+  {
+  NATIVE_PROFILE_CLR_CORE();
+  CLR_RT_HeapBlock *pThis = stack.This();
+
+  return CLR_RT_ObjectToEvent_Source::ExtractInstance(pThis[Library_corlib_native_System_Threading_Thread::FIELD___thread]);
+  }
+
+static void ResetThreadReference(CLR_RT_StackFrame &stack)
+  {
+  NATIVE_PROFILE_CLR_CORE();
+  CLR_RT_ObjectToEvent_Source *src = GetThreadReference(stack);
+  if (src)
+    {
+    src->Detach();
+    }
+  }
+
+static HRESULT SetThread(CLR_RT_StackFrame &stack, CLR_RT_Thread *th)
+  {
+  NATIVE_PROFILE_CLR_CORE();
+  NANOCLR_HEADER();
+
+  CLR_RT_HeapBlock *pThis = stack.This();
+
+  ResetThreadReference(stack);
+
+  NANOCLR_SET_AND_LEAVE(CLR_RT_ObjectToEvent_Source::CreateInstance(th, *pThis, pThis[Library_corlib_native_System_Threading_Thread::FIELD___thread]));
+
+  NANOCLR_NOCLEANUP();
+  }
+
+static HRESULT GetThread(CLR_RT_StackFrame &stack, CLR_RT_Thread *&th, bool mustBeStarted, bool noSystemThreads)
+  {
+  NATIVE_PROFILE_CLR_CORE();
+  NANOCLR_HEADER();
+  CLR_RT_ObjectToEvent_Source *src = GetThreadReference(stack);
+
+  th = (src == NULL) ? NULL : (CLR_RT_Thread *)src->m_eventPtr;
+  if (th == NULL)
+    {
+    if (mustBeStarted)
+      {
+      NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
+      }
+    }
+  else if (noSystemThreads && th->m_flags & CLR_RT_Thread::TH_F_System)
+    {
+    NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_OPERATION);
+    }
+
+  NANOCLR_NOCLEANUP();
+  }
+
+static HRESULT Join(CLR_RT_StackFrame &stack, const CLR_INT64 &timeExpire)
+  {
+  NATIVE_PROFILE_CLR_CORE();
+  NANOCLR_HEADER();
+
+  CLR_RT_Thread *th;
+  bool fRes = true;
+
+  NANOCLR_CHECK_HRESULT(GetThread(stack, th, true, false));
+
+  //Don't let programs join from system threads like interrupts or finalizers
+  if (stack.m_owningThread->m_flags & CLR_RT_Thread::TH_F_System)
+    {
+    NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_OPERATION);
+    }
+
+  //
+  // You cannot join yourself.
+  //
+  if (th == stack.m_owningThread)
+    {
+    NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
+    }
+
+  if (th->m_status != CLR_RT_Thread::TH_S_Terminated)
+    {
+    NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_WaitForObject::WaitForSignal(stack, timeExpire, stack.ThisRef()));
+
+    fRes = (stack.m_owningThread->m_waitForObject_Result != CLR_RT_Thread::TH_WAIT_RESULT_TIMEOUT);
+    }
+
+  stack.SetResult_Boolean(fRes);
+
+  NANOCLR_NOCLEANUP();
+  }
+
+
 //--//
 
-HRESULT Library_corlib_native_System_Threading_Thread::_ctor___VOID__SystemThreadingThreadStart(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ThreadCtor___STATIC__VOID__SystemThreadingThread__SystemThreadingThreadStart(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
   CLR_RT_HeapBlock* pThis = stack.This();
 
-  pThis[FIELD___delegate].Assign(stack.Arg1());
+  pThis[Library_corlib_native_System_Threading_Thread::FIELD___delegate].Assign(stack.Arg1());
 
   // Thread is always constructed with normal priority.
-  pThis[FIELD___priority].NumericByRef().s4 = ThreadPriority_Normal;
+  pThis[Library_corlib_native_System_Threading_Thread::FIELD___priority].NumericByRef().s4 = ThreadPriority_Normal;
 
   // Book a Thread ID
-  pThis[FIELD___id].NumericByRef().s4 = g_CLR_RT_ExecutionEngine.GetNextThreadId();
+  pThis[Library_corlib_native_System_Threading_Thread::FIELD___id].NumericByRef().s4 = g_CLR_RT_ExecutionEngine.GetNextThreadId();
 
 
-#if defined(NANOCLR_APPDOMAINS)
-  NANOCLR_CHECK_HRESULT(CLR_RT_ObjectToEvent_Source::CreateInstance(g_CLR_RT_ExecutionEngine.GetCurrentAppDomain(), *pThis, pThis[FIELD___appDomain]));
-  NANOCLR_NOCLEANUP();
-#else
   NANOCLR_NOCLEANUP_NOLABEL();
-#endif
-
   }
 
-HRESULT Library_corlib_native_System_Threading_Thread::Start___VOID(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ThreadStart___STATIC__VOID__SystemThreadingThread(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -52,23 +138,23 @@ HRESULT Library_corlib_native_System_Threading_Thread::Start___VOID(CLR_RT_Stack
     }
 
   pThis = stack.This();                                     FAULT_ON_NULL(pThis);
-  dlg = pThis[FIELD___delegate].DereferenceDelegate(); FAULT_ON_NULL(dlg);
+  dlg = pThis[Library_corlib_native_System_Threading_Thread::FIELD___delegate].DereferenceDelegate(); FAULT_ON_NULL(dlg);
 
   // Set priority of new sub-thread to the priority stored in the thread C# object.
   // The new sub-thread becames the current one, it should always match priority stored in Thread C# object 
 
-  pri = pThis[FIELD___priority].NumericByRef().s4;
+  pri = pThis[Library_corlib_native_System_Threading_Thread::FIELD___priority].NumericByRef().s4;
 
   pThis->ResetFlags(CLR_RT_HeapBlock::HB_Signaled);
 
-  NANOCLR_CHECK_HRESULT(g_CLR_RT_ExecutionEngine.NewThread(th, dlg, pri, pThis[FIELD___id].NumericByRef().s4));
+  NANOCLR_CHECK_HRESULT(g_CLR_RT_ExecutionEngine.NewThread(th, dlg, pri, pThis[Library_corlib_native_System_Threading_Thread::FIELD___id].NumericByRef().s4));
 
   NANOCLR_SET_AND_LEAVE(SetThread(stack, th));
 
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Threading_Thread::Abort___VOID(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ThreadAbort___STATIC__VOID__SystemThreadingThread(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -87,7 +173,7 @@ HRESULT Library_corlib_native_System_Threading_Thread::Abort___VOID(CLR_RT_Stack
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Threading_Thread::Suspend___VOID(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ThreadSuspend___STATIC__VOID__SystemThreadingThread(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -133,7 +219,7 @@ HRESULT Library_corlib_native_System_Threading_Thread::Suspend___VOID(CLR_RT_Sta
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Threading_Thread::Resume___VOID(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ThreadResume___STATIC__VOID__SystemThreadingThread(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -147,7 +233,7 @@ HRESULT Library_corlib_native_System_Threading_Thread::Resume___VOID(CLR_RT_Stac
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Threading_Thread::get_Priority___SystemThreadingThreadPriority(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::GetThreadPriority___STATIC__SystemThreadingThreadPriority__SystemThreadingThread(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -156,10 +242,11 @@ HRESULT Library_corlib_native_System_Threading_Thread::get_Priority___SystemThre
   int pri;
 
   // Get C# thread object
-  CLR_RT_HeapBlock* pThis = stack.This(); FAULT_ON_NULL(pThis);
+  CLR_RT_HeapBlock* pThis = stack.This();
+  FAULT_ON_NULL(pThis);
 
   // Reads priority stored in C# object. 
-  pri = pThis[FIELD___priority].NumericByRef().s4;
+  pri = pThis[Library_corlib_native_System_Threading_Thread::FIELD___priority].NumericByRef().s4;
 
   // Here we check consistency of values stored in C# and internal thread objects.
   // Get thread associated with C# thread object. It might be NULL if thread was not started.
@@ -175,7 +262,7 @@ HRESULT Library_corlib_native_System_Threading_Thread::get_Priority___SystemThre
     pri = th->GetThreadPriority();
 
     // We store it back to managed object to keep values consistent.
-    pThis[FIELD___priority].NumericByRef().s4 = pri;
+    pThis[Library_corlib_native_System_Threading_Thread::FIELD___priority].NumericByRef().s4 = pri;
     }
 
   // Zero priority correspond is equal to managed. ThreadPriority.Lowest.
@@ -190,7 +277,7 @@ HRESULT Library_corlib_native_System_Threading_Thread::get_Priority___SystemThre
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Threading_Thread::set_Priority___VOID__SystemThreadingThreadPriority(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::SetThreadPriority___STATIC__VOID__SystemThreadingThread__SystemThreadingThreadPriority(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -212,7 +299,7 @@ HRESULT Library_corlib_native_System_Threading_Thread::set_Priority___VOID__Syst
     NANOCLR_CHECK_HRESULT(GetThread(stack, th, false, true));
 
     // Save priority to managed C# object
-    pThis[FIELD___priority].NumericByRef().s4 = pri;
+    pThis[Library_corlib_native_System_Threading_Thread::FIELD___priority].NumericByRef().s4 = pri;
 
     if (th)
       {
@@ -233,7 +320,7 @@ HRESULT Library_corlib_native_System_Threading_Thread::set_Priority___VOID__Syst
 
   }
 
-HRESULT Library_corlib_native_System_Threading_Thread::get_ManagedThreadId___I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::GetManagedThreadId___STATIC__I4__SystemThreadingThread(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -244,7 +331,7 @@ HRESULT Library_corlib_native_System_Threading_Thread::get_ManagedThreadId___I4(
   CLR_RT_HeapBlock* pThis = stack.This(); FAULT_ON_NULL(pThis);
 
   // Reads priority stored in C# object. 
-  id = pThis[FIELD___id].NumericByRef().s4;
+  id = pThis[Library_corlib_native_System_Threading_Thread::FIELD___id].NumericByRef().s4;
 
   // Return value back to C# code.
   stack.SetResult_I4(id);
@@ -252,7 +339,7 @@ HRESULT Library_corlib_native_System_Threading_Thread::get_ManagedThreadId___I4(
   }
 
 
-HRESULT Library_corlib_native_System_Threading_Thread::get_IsAlive___BOOLEAN(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ThreadIsAlive___STATIC__BOOLEAN__SystemThreadingThread(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -266,7 +353,7 @@ HRESULT Library_corlib_native_System_Threading_Thread::get_IsAlive___BOOLEAN(CLR
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_corlib_native_System_Threading_Thread::Join___VOID(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ThreadJoin___STATIC__VOID__SystemThreadingThread(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -276,7 +363,7 @@ HRESULT Library_corlib_native_System_Threading_Thread::Join___VOID(CLR_RT_StackF
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Threading_Thread::Join___BOOLEAN__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ThreadJoin___STATIC__BOOLEAN__SystemThreadingThread__I4(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -290,24 +377,7 @@ HRESULT Library_corlib_native_System_Threading_Thread::Join___BOOLEAN__I4(CLR_RT
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Threading_Thread::Join___BOOLEAN__SystemTimeSpan(CLR_RT_StackFrame& stack)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
-
-  CLR_INT64* timeExpireIn;
-  CLR_INT64  timeExpireOut;
-
-  timeExpireIn = Library_corlib_native_System_TimeSpan::GetValuePtr(stack.Arg1()); FAULT_ON_NULL(timeExpireIn);
-
-  NANOCLR_CHECK_HRESULT(g_CLR_RT_ExecutionEngine.InitTimeout(timeExpireOut, *timeExpireIn));
-
-  NANOCLR_SET_AND_LEAVE(Join(stack, timeExpireOut));
-
-  NANOCLR_NOCLEANUP();
-  }
-
-HRESULT Library_corlib_native_System_Threading_Thread::get_ThreadState___SystemThreadingThreadState(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::GetThreadState___STATIC__SystemThreadingThreadState__SystemThreadingThread(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
 
@@ -350,7 +420,7 @@ HRESULT Library_corlib_native_System_Threading_Thread::get_ThreadState___SystemT
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Threading_Thread::Sleep___STATIC__VOID__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ThreadSleep___STATIC__VOID__I4(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -397,7 +467,7 @@ HRESULT Library_corlib_native_System_Threading_Thread::Sleep___STATIC__VOID__I4(
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Threading_Thread::get_CurrentThread___STATIC__SystemThreadingThread(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::GetCurrentThread___STATIC__SystemThreadingThread(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -421,17 +491,7 @@ HRESULT Library_corlib_native_System_Threading_Thread::get_CurrentThread___STATI
     bool fFound = false;
     _ASSERTE(pManagedThread != NULL);
 
-#if defined(NANOCLR_APPDOMAINS)
-    {
-    CLR_RT_ObjectToEvent_Source* appDomainSrc = CLR_RT_ObjectToEvent_Source::ExtractInstance(pManagedThread[FIELD___appDomain]);
-
-    FAULT_ON_NULL_HR(appDomainSrc, CLR_E_FAIL);
-
-    fFound = (appDomainSrc->m_eventPtr == g_CLR_RT_ExecutionEngine.GetCurrentAppDomain());
-    }
-#else
     fFound = true;
-#endif
 
     if (fFound)
       {
@@ -453,7 +513,7 @@ HRESULT Library_corlib_native_System_Threading_Thread::get_CurrentThread___STATI
 
   pRes = top.Dereference();
 
-  NANOCLR_CHECK_HRESULT(CLR_RT_ObjectToEvent_Source::CreateInstance(thread, *pRes, pRes[FIELD___thread]));
+  NANOCLR_CHECK_HRESULT(CLR_RT_ObjectToEvent_Source::CreateInstance(thread, *pRes, pRes[Library_corlib_native_System_Threading_Thread::FIELD___thread]));
 
 #if defined(NANOCLR_APPDOMAINS)
   NANOCLR_CHECK_HRESULT(CLR_RT_ObjectToEvent_Source::CreateInstance(g_CLR_RT_ExecutionEngine.GetCurrentAppDomain(), *pRes, pRes[FIELD___appDomain]));
@@ -462,114 +522,4 @@ HRESULT Library_corlib_native_System_Threading_Thread::get_CurrentThread___STATI
   NANOCLR_NOCLEANUP();
   }
 
-#if (NANOCLR_REFLECTION == TRUE)
-
-HRESULT Library_corlib_native_System_Threading_Thread::GetDomain___STATIC__SystemAppDomain(CLR_RT_StackFrame& stack)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
-
-#if !defined(NANOCLR_APPDOMAINS)    
-  NANOCLR_SET_AND_LEAVE(stack.NotImplementedStub());
-#else
-  CLR_RT_AppDomain* appDomain = g_CLR_RT_ExecutionEngine.GetCurrentAppDomain();
-
-  NANOCLR_CHECK_HRESULT(appDomain->GetManagedObject(stack.PushValue()));
-#endif    
-
-  NANOCLR_NOCLEANUP();
-  }
-#endif // NANOCLR_REFLECTION
-
 //--//
-
-CLR_RT_ObjectToEvent_Source* Library_corlib_native_System_Threading_Thread::GetThreadReference(CLR_RT_StackFrame& stack)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_HeapBlock* pThis = stack.This();
-
-  return CLR_RT_ObjectToEvent_Source::ExtractInstance(pThis[FIELD___thread]);
-  }
-
-void Library_corlib_native_System_Threading_Thread::ResetThreadReference(CLR_RT_StackFrame& stack)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_ObjectToEvent_Source* src = GetThreadReference(stack);
-  if (src)
-    {
-    src->Detach();
-    }
-  }
-
-HRESULT Library_corlib_native_System_Threading_Thread::SetThread(CLR_RT_StackFrame& stack, CLR_RT_Thread* th)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
-
-  CLR_RT_HeapBlock* pThis = stack.This();
-
-  ResetThreadReference(stack);
-
-  NANOCLR_SET_AND_LEAVE(CLR_RT_ObjectToEvent_Source::CreateInstance(th, *pThis, pThis[FIELD___thread]));
-
-  NANOCLR_NOCLEANUP();
-  }
-
-HRESULT Library_corlib_native_System_Threading_Thread::GetThread(CLR_RT_StackFrame& stack, CLR_RT_Thread*& th, bool mustBeStarted, bool noSystemThreads)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
-  CLR_RT_ObjectToEvent_Source* src = GetThreadReference(stack);
-
-  th = (src == NULL) ? NULL : (CLR_RT_Thread*)src->m_eventPtr;
-  if (th == NULL)
-    {
-    if (mustBeStarted)
-      {
-      NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
-      }
-    }
-  else if (noSystemThreads && th->m_flags & CLR_RT_Thread::TH_F_System)
-    {
-    NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_OPERATION);
-    }
-
-  NANOCLR_NOCLEANUP();
-  }
-
-HRESULT Library_corlib_native_System_Threading_Thread::Join(CLR_RT_StackFrame& stack, const CLR_INT64& timeExpire)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
-
-  CLR_RT_Thread* th;
-  bool fRes = true;
-
-  NANOCLR_CHECK_HRESULT(GetThread(stack, th, true, false));
-
-  //Don't let programs join from system threads like interrupts or finalizers
-  if (stack.m_owningThread->m_flags & CLR_RT_Thread::TH_F_System)
-    {
-    NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_OPERATION);
-    }
-
-  //
-  // You cannot join yourself.
-  //
-  if (th == stack.m_owningThread)
-    {
-    NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
-    }
-
-  if (th->m_status != CLR_RT_Thread::TH_S_Terminated)
-    {
-    NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_WaitForObject::WaitForSignal(stack, timeExpire, stack.ThisRef()));
-
-    fRes = (stack.m_owningThread->m_waitForObject_Result != CLR_RT_Thread::TH_WAIT_RESULT_TIMEOUT);
-    }
-
-  stack.SetResult_Boolean(fRes);
-
-  NANOCLR_NOCLEANUP();
-  }
-

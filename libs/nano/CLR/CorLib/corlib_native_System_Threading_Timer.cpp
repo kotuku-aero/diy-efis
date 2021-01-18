@@ -6,7 +6,24 @@
 #include "CorLib.h"
 
 
-HRESULT Library_corlib_native_System_Threading_Timer::Dispose___VOID(CLR_RT_StackFrame& stack)
+static bool CheckDisposed(CLR_RT_StackFrame &stack)
+  {
+  NATIVE_PROFILE_CLR_CORE();
+
+  return CLR_RT_HeapBlock_Timer::CheckDisposed(stack);
+  }
+
+static HRESULT SetValues(CLR_RT_StackFrame &stack, CLR_UINT32 flags)
+  {
+  NATIVE_PROFILE_CLR_CORE();
+  NANOCLR_HEADER();
+
+  NANOCLR_SET_AND_LEAVE(CLR_RT_HeapBlock_Timer::ConfigureObject(stack, flags));
+
+  NANOCLR_NOCLEANUP();
+  }
+
+HRESULT Library_corlib_native_CanFly_Runtime::TimerDispose___STATIC__VOID__SystemThreadingTimer(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -16,7 +33,7 @@ HRESULT Library_corlib_native_System_Threading_Timer::Dispose___VOID(CLR_RT_Stac
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_corlib_native_System_Threading_Timer::_ctor___VOID__SystemThreadingTimerCallback__OBJECT__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::TimerCtor___STATIC__VOID__SystemThreadingTimer__SystemThreadingTimerCallback__OBJECT__I4__I4(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -26,7 +43,8 @@ HRESULT Library_corlib_native_System_Threading_Timer::_ctor___VOID__SystemThread
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Threading_Timer::_ctor___VOID__SystemThreadingTimerCallback__OBJECT__SystemTimeSpan__SystemTimeSpan(CLR_RT_StackFrame& stack)
+/*
+HRESULT Library_corlib_native_CanFly_Runtime::_ctor___VOID__SystemThreadingTimerCallback__OBJECT__SystemTimeSpan__SystemTimeSpan(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -35,8 +53,9 @@ HRESULT Library_corlib_native_System_Threading_Timer::_ctor___VOID__SystemThread
 
   NANOCLR_NOCLEANUP();
   }
+  */
 
-HRESULT Library_corlib_native_System_Threading_Timer::Change___BOOLEAN__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::TimerChange___STATIC__BOOLEAN__SystemThreadingTimer__I4__I4(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -53,7 +72,8 @@ HRESULT Library_corlib_native_System_Threading_Timer::Change___BOOLEAN__I4__I4(C
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Threading_Timer::Change___BOOLEAN__SystemTimeSpan__SystemTimeSpan(CLR_RT_StackFrame& stack)
+/*
+HRESULT Library_corlib_native_CanFly_Runtime::Change___BOOLEAN__SystemTimeSpan__SystemTimeSpan(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -69,23 +89,6 @@ HRESULT Library_corlib_native_System_Threading_Timer::Change___BOOLEAN__SystemTi
 
   NANOCLR_NOCLEANUP();
   }
+  */
 
 //--//
-
-bool Library_corlib_native_System_Threading_Timer::CheckDisposed(CLR_RT_StackFrame& stack)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-
-  return CLR_RT_HeapBlock_Timer::CheckDisposed(stack);
-  }
-
-
-HRESULT Library_corlib_native_System_Threading_Timer::SetValues(CLR_RT_StackFrame& stack, CLR_UINT32 flags)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
-
-  NANOCLR_SET_AND_LEAVE(CLR_RT_HeapBlock_Timer::ConfigureObject(stack, flags));
-
-  NANOCLR_NOCLEANUP();
-  }

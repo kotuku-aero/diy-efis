@@ -5,6 +5,46 @@
 //
 #include "CorLib.h"
 
+void EventSet(CLR_RT_StackFrame &stack)
+  {
+  NATIVE_PROFILE_CLR_CORE();
+  CLR_RT_HeapBlock *pThis = stack.Arg0().Dereference();
+
+  CLR_RT_HeapBlock_WaitForObject::SignalObject(*pThis);
+
+  stack.SetResult_Boolean(true);
+  }
+
+void EventReset(CLR_RT_StackFrame &stack)
+  {
+  NATIVE_PROFILE_CLR_CORE();
+  CLR_RT_HeapBlock *pThis = stack.Arg0().Dereference();
+
+  pThis->ResetFlags(CLR_RT_HeapBlock::HB_Signaled);
+
+  stack.SetResult_Boolean(true);
+  }
+
+HRESULT EventWait(CLR_RT_StackFrame &stack,
+  CLR_RT_HeapBlock &blkTimeout, 
+  CLR_RT_HeapBlock &blkExitContext, 
+  CLR_RT_HeapBlock *objects,
+  int cObjects,
+  bool fWaitAll)
+  {
+  (void)blkExitContext;
+
+  NATIVE_PROFILE_CLR_CORE();
+  NANOCLR_HEADER();
+
+  CLR_INT64 timeExpire;
+
+  NANOCLR_CHECK_HRESULT(g_CLR_RT_ExecutionEngine.InitTimeout(timeExpire, blkTimeout.NumericByRef().s4));
+
+  NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_WaitForObject::WaitForSignal(stack, timeExpire, objects, cObjects, fWaitAll));
+
+  NANOCLR_NOCLEANUP();
+  }
 
 HRESULT Library_corlib_native_System_Threading_WaitHandle::WaitOne___BOOLEAN__I4__BOOLEAN(CLR_RT_StackFrame& stack)
   {
@@ -33,39 +73,3 @@ HRESULT Library_corlib_native_System_Threading_WaitHandle::WaitMultiple___STATIC
   }
 
 //--//
-
-void Library_corlib_native_System_Threading_WaitHandle::Set(CLR_RT_StackFrame& stack)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_HeapBlock* pThis = stack.This();
-
-  CLR_RT_HeapBlock_WaitForObject::SignalObject(*pThis);
-
-  stack.SetResult_Boolean(true);
-  }
-
-void Library_corlib_native_System_Threading_WaitHandle::Reset(CLR_RT_StackFrame& stack)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_HeapBlock* pThis = stack.This();
-
-  pThis->ResetFlags(CLR_RT_HeapBlock::HB_Signaled);
-
-  stack.SetResult_Boolean(true);
-  }
-
-HRESULT Library_corlib_native_System_Threading_WaitHandle::Wait(CLR_RT_StackFrame& stack, CLR_RT_HeapBlock& blkTimeout, CLR_RT_HeapBlock& blkExitContext, CLR_RT_HeapBlock* objects, int cObjects, bool fWaitAll)
-  {
-  (void)blkExitContext;
-
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
-
-  CLR_INT64 timeExpire;
-
-  NANOCLR_CHECK_HRESULT(g_CLR_RT_ExecutionEngine.InitTimeout(timeExpire, blkTimeout.NumericByRef().s4));
-
-  NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_WaitForObject::WaitForSignal(stack, timeExpire, objects, cObjects, fWaitAll));
-
-  NANOCLR_NOCLEANUP();
-  }

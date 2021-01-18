@@ -12,7 +12,7 @@
 //  http://guid.one/guid/make
 
 
-HRESULT Library_corlib_native_System_Guid::GenerateNewGuid___STATIC__SZARRAY_U1(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::GenerateNewGuid___STATIC__SZARRAY_U1(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER();
 

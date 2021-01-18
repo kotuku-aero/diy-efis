@@ -165,7 +165,7 @@ HRESULT CLR_RT_HeapBlock_WeakReference::SetTarget(CLR_RT_HeapBlock& targetRefere
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_WeakReference::get_IsAlive___BOOLEAN(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::WeakReferenceIsAlive___STATIC__BOOLEAN__WEAKCLASS(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -180,7 +180,7 @@ HRESULT Library_corlib_native_System_WeakReference::get_IsAlive___BOOLEAN(CLR_RT
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_WeakReference::get_Target___OBJECT(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::GetWeakReferenceTarget___STATIC__OBJECT__WEAKCLASS(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -195,7 +195,7 @@ HRESULT Library_corlib_native_System_WeakReference::get_Target___OBJECT(CLR_RT_S
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_WeakReference::set_Target___VOID__OBJECT(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::SetWeakReferenceTarget___STATIC__VOID__WEAKCLASS__OBJECT(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -210,7 +210,7 @@ HRESULT Library_corlib_native_System_WeakReference::set_Target___VOID__OBJECT(CL
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_WeakReference::_ctor___VOID__OBJECT(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::WeakReferenceCtor___STATIC__VOID__WEAKCLASS__OBJECT(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();

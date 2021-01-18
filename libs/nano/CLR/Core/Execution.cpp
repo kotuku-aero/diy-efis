@@ -6,6 +6,7 @@
 #include "Core.h"
 
 static const CLR_INT64 c_MaximumTimeToActive = (TIME_CONVERSION__ONEMINUTE * TIME_CONVERSION__TO_SECONDS);
+extern HRESULT ExceptionCreateInstance(CLR_RT_HeapBlock &ref, const CLR_RT_TypeDef_Index &cls, HRESULT hr, CLR_RT_StackFrame *stack);
 
 //--//
 
@@ -918,7 +919,7 @@ void CLR_RT_ExecutionEngine::SpawnStaticConstructor(CLR_RT_Thread *&pCctorThread
   NATIVE_PROFILE_CLR_CORE();
   CLR_RT_HeapBlock_Delegate *dlg = NULL;
 
-  if (!EnsureSystemThread(pCctorThread, ThreadPriority_System_Highest))
+  if (!EnsureSystemThread(pCctorThread, (ThreadPriority)ThreadPriority_Highest +1))
     return;
 
   dlg = pCctorThread->m_dlg;
@@ -1071,8 +1072,7 @@ void CLR_DebuggerBreak()
     ///
     if (obj == NULL)
       {
-      Library_corlib_native_System_Exception::CreateInstance(
-        g_CLR_RT_ExecutionEngine.m_currentThread->m_currentException,
+      ExceptionCreateInstance(        g_CLR_RT_ExecutionEngine.m_currentThread->m_currentException,
         g_CLR_RT_WellKnownTypes.m_WatchdogException,
         CLR_E_WATCHDOG_TIMEOUT,
         g_CLR_RT_ExecutionEngine.m_currentThread->CurrentFrame());
@@ -2646,8 +2646,7 @@ void CLR_RT_ExecutionEngine::CheckThreads(CLR_INT64 &timeoutMin, CLR_RT_DblLinke
         {
         if (IsTimeExpired(s_compensation.Adjust(sth->m_timeConstraint), timeoutMin))
           {
-          (void)Library_corlib_native_System_Exception::CreateInstance(
-            th->m_currentException,
+          ExceptionCreateInstance(th->m_currentException,
             g_CLR_RT_WellKnownTypes.m_ConstraintException,
             S_OK,
             th->CurrentFrame());

@@ -117,9 +117,9 @@ void CLR_RT_Thread::BringExecCounterToDate(int iGlobalExecutionCounter)
   // 33 for ThreadPriority::Highest gives up to 16 cycles to catch up.
   // 33 for ThreadPriority::Lowest we provide only 1 cycle to catch up.
   // If thread was sleeping for some time we forefeet the time it was sleeping and not updating execution counter.
-  if (m_executionCounter - iGlobalExecutionCounter > (int)((1 << ThreadPriority_System_Highest) + 1))
+  if (m_executionCounter - iGlobalExecutionCounter > (int)((1 << (ThreadPriority)ThreadPriority_Highest + 1) + 1))
     {
-    m_executionCounter = iGlobalExecutionCounter + (int)((1 << ThreadPriority_System_Highest) + 1);
+    m_executionCounter = iGlobalExecutionCounter + (int)((1 << (ThreadPriority)ThreadPriority_Highest + 1) + 1);
     }
   }
 

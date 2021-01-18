@@ -6,6 +6,7 @@
 #ifndef _NANOCLR_CORE_H_
 #define _NANOCLR_CORE_H_
 
+#include "../CorLib/mscorlib/corlib_native.h"
 #include "../Include/nanoCLR_Runtime.h"
 #include "../Include/nanoCLR_Checks.h"
 //#include <nanoCLR_Diagnostics.h>
@@ -16,7 +17,6 @@
 //
 //#include <nanoCLR_ParseOptions.h>
 //
-#include "../CorLib/mscorlib/corlib_native.h"
 //#include <SPOT_native.h>
 //#include <SPOT_hardware_native.h>
 #include "../Include/nanoCLR_Runtime__HeapBlock.h"

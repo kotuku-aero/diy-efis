@@ -6,7 +6,7 @@
 #include "CorLib.h"
 
 
-HRESULT Library_corlib_native_System_GC::AnyPendingFinalizers___STATIC__BOOLEAN(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::AnyPendingFinalizers___STATIC__BOOLEAN(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -17,7 +17,7 @@ HRESULT Library_corlib_native_System_GC::AnyPendingFinalizers___STATIC__BOOLEAN(
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_corlib_native_System_GC::SuppressFinalize___STATIC__VOID__OBJECT(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::SuppressFinalize___STATIC__VOID__OBJECT(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -29,7 +29,7 @@ HRESULT Library_corlib_native_System_GC::SuppressFinalize___STATIC__VOID__OBJECT
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_GC::ReRegisterForFinalize___STATIC__VOID__OBJECT(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::ReRegisterForFinalize___STATIC__VOID__OBJECT(CLR_RT_StackFrame &stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();

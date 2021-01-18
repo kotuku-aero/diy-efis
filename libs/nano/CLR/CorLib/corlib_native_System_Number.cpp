@@ -96,7 +96,7 @@ void nf_RemovePrependedZeros(char* floatStr)
     }
   }
 
-HRESULT Library_corlib_native_System_Number::FormatNative___STATIC__STRING__OBJECT__CHAR__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::FormatNative___STATIC__STRING__OBJECT__CHAR__I4(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();

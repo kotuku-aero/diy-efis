@@ -6,12 +6,12 @@
 #include "CorLib.h"
 
 
-HRESULT Library_corlib_native_System_Threading_AutoResetEvent::_ctor___VOID__BOOLEAN(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::AutoResetEventCtor___STATIC__VOID__SystemThreadingAutoResetEvent__BOOLEAN(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  CLR_RT_HeapBlock* pThis = stack.This();
+  CLR_RT_HeapBlock* pThis = stack.Arg0().Dereference();
 
   pThis->SetFlags(CLR_RT_HeapBlock::HB_SignalAutoReset);
 
@@ -23,22 +23,22 @@ HRESULT Library_corlib_native_System_Threading_AutoResetEvent::_ctor___VOID__BOO
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_corlib_native_System_Threading_AutoResetEvent::Reset___BOOLEAN(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::AutoResetEventReset___STATIC__BOOLEAN__SystemThreadingAutoResetEvent(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  Library_corlib_native_System_Threading_WaitHandle::Reset(stack);
+  EventReset(stack);
 
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_corlib_native_System_Threading_AutoResetEvent::Set___BOOLEAN(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::AutoResetEventSet___STATIC__BOOLEAN__SystemThreadingAutoResetEvent(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
 
-  Library_corlib_native_System_Threading_WaitHandle::Set(stack);
+  EventSet(stack);
 
   NANOCLR_NOCLEANUP_NOLABEL();
   }

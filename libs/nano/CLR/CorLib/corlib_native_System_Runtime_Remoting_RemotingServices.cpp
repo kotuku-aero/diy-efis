@@ -6,7 +6,7 @@
 #include "CorLib.h"
 
 
-HRESULT Library_corlib_native_System_Runtime_Remoting_RemotingServices::IsTransparentProxy___STATIC__BOOLEAN__OBJECT(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::IsTransparentProxy___STATIC__BOOLEAN__OBJECT(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();

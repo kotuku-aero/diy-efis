@@ -5,7 +5,7 @@
 //
 #include "CorLib.h"
 
-HRESULT Library_corlib_native_System_Enum::HasFlag___BOOLEAN__SystemEnum(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Runtime::HasFlag___STATIC__BOOLEAN__SystemEnum__SystemEnum(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER();
 
@@ -17,7 +17,7 @@ HRESULT Library_corlib_native_System_Enum::HasFlag___BOOLEAN__SystemEnum(CLR_RT_
   CLR_RT_HeapBlock *flagValue;
 
   // get Enum value from 'This'
-  pEnum = &(stack.ThisRef());
+  pEnum = &(stack.Arg0());
   enumValue = pEnum;
 
   // need to unbox Enum to get value

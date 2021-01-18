@@ -5,7 +5,7 @@
 //
 #include "CorLib.h"
 
-HRESULT Library_corlib_native_System_MathInternal::Abs___STATIC__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::Abs___STATIC__I4__I4(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -18,7 +18,7 @@ HRESULT Library_corlib_native_System_MathInternal::Abs___STATIC__I4__I4(CLR_RT_S
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_corlib_native_System_MathInternal::Max___STATIC__I4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::Max___STATIC__I4__I4__I4(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -32,7 +32,7 @@ HRESULT Library_corlib_native_System_MathInternal::Max___STATIC__I4__I4__I4(CLR_
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT Library_corlib_native_System_MathInternal::Min___STATIC__I4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::Min___STATIC__I4__I4__I4(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();

@@ -6,7 +6,7 @@
 #include "CorLib.h"
 
 
-HRESULT Library_corlib_native_System_Threading_Interlocked::Increment___STATIC__I4__BYREF_I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::Increment___STATIC__I4__BYREF_I4(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -25,7 +25,7 @@ HRESULT Library_corlib_native_System_Threading_Interlocked::Increment___STATIC__
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_System_Threading_Interlocked::Decrement___STATIC__I4__BYREF_I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::Decrement___STATIC__I4__BYREF_I4(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -45,7 +45,7 @@ HRESULT Library_corlib_native_System_Threading_Interlocked::Decrement___STATIC__
   }
 
 
-HRESULT Library_corlib_native_System_Threading_Interlocked::Exchange___STATIC__I4__BYREF_I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::Exchange___STATIC__I4__BYREF_I4__I4(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
@@ -67,7 +67,7 @@ HRESULT Library_corlib_native_System_Threading_Interlocked::Exchange___STATIC__I
   }
 
 
-HRESULT Library_corlib_native_System_Threading_Interlocked::CompareExchange___STATIC__I4__BYREF_I4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Runtime::CompareExchange___STATIC__I4__BYREF_I4__I4__I4(CLR_RT_StackFrame& stack)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();

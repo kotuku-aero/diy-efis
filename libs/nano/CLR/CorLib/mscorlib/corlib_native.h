@@ -185,6 +185,7 @@ struct Library_corlib_native_CanFly_Runtime
     NANOCLR_NATIVE_DECLARE(IsNegativeInfinity___STATIC__BOOLEAN__R8);
     NANOCLR_NATIVE_DECLARE(IsPositiveInfinity___STATIC__BOOLEAN__R8);
     NANOCLR_NATIVE_DECLARE(HasFlag___STATIC__BOOLEAN__SystemEnum__SystemEnum);
+    NANOCLR_NATIVE_DECLARE(GetStackTrace___STATIC__STRING__SystemException);
     NANOCLR_NATIVE_DECLARE(AnyPendingFinalizers___STATIC__BOOLEAN);
     NANOCLR_NATIVE_DECLARE(SuppressFinalize___STATIC__VOID__OBJECT);
     NANOCLR_NATIVE_DECLARE(ReRegisterForFinalize___STATIC__VOID__OBJECT);
@@ -199,8 +200,6 @@ struct Library_corlib_native_CanFly_Runtime
     NANOCLR_NATIVE_DECLARE(DelegateEquals___STATIC__BOOLEAN__SystemDelegate__OBJECT);
     NANOCLR_NATIVE_DECLARE(DelegateCombine___STATIC__SystemDelegate__SystemDelegate__SystemDelegate);
     NANOCLR_NATIVE_DECLARE(DelegateRemove___STATIC__SystemDelegate__SystemDelegate__SystemDelegate);
-    NANOCLR_NATIVE_DECLARE(DelegateEquals___STATIC__BOOLEAN__SystemDelegate__SystemDelegate);
-    NANOCLR_NATIVE_DECLARE(DelegateNotEquals___STATIC__BOOLEAN__SystemDelegate__SystemDelegate);
     NANOCLR_NATIVE_DECLARE(SetCapacity___STATIC__VOID__SystemCollectionsArrayList__I4);
     NANOCLR_NATIVE_DECLARE(ArrayListGet___STATIC__OBJECT__SystemCollectionsArrayList__I4);
     NANOCLR_NATIVE_DECLARE(ArrayListSet___STATIC__VOID__SystemCollectionsArrayList__I4__OBJECT);
