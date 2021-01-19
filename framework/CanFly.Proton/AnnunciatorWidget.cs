@@ -145,7 +145,6 @@ namespace CanFly.Proton
 
     protected override void OnPaint(CanFlyMsg e)
     {
-      bool changed = false;
       BeginPaint();
 
       Rect wnd_rect = WindowRect;
@@ -166,8 +165,6 @@ namespace CanFly.Proton
     {
       // calculate the size of the label
       Rect clip_rect = new Rect(pt.X, pt.Y, pt.X + 75, pt.Y + 50 );
-
-      Rect rect;
 
       Extent label_size = TextExtent(small_font, label);
 

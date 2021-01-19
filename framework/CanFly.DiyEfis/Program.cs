@@ -11,10 +11,10 @@ namespace CanFly.DiyEfis
       try
       {
         // all except orientation are required
-        protonKey = Neutron.RegOpenKey(0, "proton");
-        layoutName = Neutron.RegGetString(protonKey, "layout");
-        layoutKey = Neutron.RegOpenKey(protonKey, layoutName);
-        orientation = Neutron.RegGetUint16(protonKey, "orientation");
+        protonKey = Syscall.RegOpenKey(0, "proton");
+        layoutName = Syscall.RegGetString(protonKey, "layout");
+        layoutKey = Syscall.RegOpenKey(protonKey, layoutName);
+        orientation = Syscall.RegGetUint16(protonKey, "orientation");
       }
       catch
       {

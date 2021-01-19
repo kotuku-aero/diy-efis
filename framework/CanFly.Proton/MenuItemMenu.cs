@@ -6,10 +6,8 @@ namespace CanFly.Proton
   {
     // if this is a checklist popup then this holds the ushort value
     // that is matched to create the checklist option.
-    private ushort value;
 
     // if a checklist item then this has no value
-    private string caption;
     private Menu menu;
 
     internal MenuItemMenu(LayoutWidget widget, uint key, bool isChecklist)

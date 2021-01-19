@@ -25,6 +25,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CanFly.Neutron\CanFly.Neutron.nfproj" />
+    <ProjectReference Include="..\CanFly.Photon\CanFly.Photon.nfproj" />
     <ProjectReference Include="..\CanFly.Proton\CanFly.Proton.nfproj" />
     <ProjectReference Include="..\CoreLibrary\CoreLibrary.nfproj" />
     <ProjectReference Include="..\System.Collections\System.Collections.nfproj" />

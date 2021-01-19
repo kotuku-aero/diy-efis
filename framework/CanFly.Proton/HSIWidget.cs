@@ -55,12 +55,12 @@ namespace CanFly.Proton
     private short wind_direction; // always true
     private short magnetic_variation;
     private short wind_speed;
-    private string waypoint_name;
     private short heading_bug;
     private short heading;
     private uint background_color;
     private bool draw_border;
     private Font font;
+    private string waypoint_name;
 
     internal HSIWidget(Widget parent, Rect bounds, ushort id, uint key)
     : base(parent, bounds, id)
@@ -220,9 +220,6 @@ namespace CanFly.Proton
       if (draw_border)
         RoundRect(Pens.GrayPen, Colors.Hollow, WindowRect, 12);
 
-      Point pt;
-      Rect rect;
-
       /////////////////////////////////////////////////////////////////////////////
       //
       // Draw the HSI Indicator
@@ -232,7 +229,6 @@ namespace CanFly.Proton
       int center_y = ex.Dy >> 1;
       int window_x = ex.Dx;
       int window_y = ex.Dy;
-      int border = 10;
       int pixels_per_nm_cdi = 6;
       Point median = new Point( center_x, center_y);
       int major_mark = mark_start + 16;

@@ -21,13 +21,9 @@ namespace CanFly.Proton
   class MenuItemEdit : MenuItem
   {
     private ushort value_id;
-    private CanFlyMsg value;
 
     private ushort set_id;
-    private bool integer_type;
 
-    private ushort precision;       // number of digits after decimal point to edit
-    private ushort digits;          // number of digits to the left of the decimal point
 
     private float min_value;
     private float max_value;

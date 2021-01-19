@@ -50,8 +50,8 @@ namespace CanFly.Proton
     private float _AOADegreesPerMark;
     private short _glideslope;
     private short _localizer;
+    private Point _widgetMedian;
     private bool _glideslopeAquired;
-    private bool _localizerAquired;
     private ushort _criticalAOA;
     private ushort _approachAOA;
     private ushort _climbAOA;
@@ -59,7 +59,7 @@ namespace CanFly.Proton
     private ushort _yawMax;
     private bool _showAOA;
     private bool _showGlideslope;
-    private Point _widgetMedian;
+    private bool _localizerAquired;
     private Font _font;
 
     public AttitudeWidget(Widget parent, Rect bounds, ushort id, uint key)
@@ -181,7 +181,6 @@ namespace CanFly.Proton
       BeginPaint();
 
       Rect wnd_rect = WindowRect;
-      Rect rect;
       // first step is to draw the background.  Then we can rotate it correctly
       // the background is 240x240 pixels with 20 pixels being the median line
 

@@ -7,14 +7,10 @@ namespace CanFly.Proton
   // to be displayed as the popup menu selected item
   public sealed class MenuItemChecklist : MenuItem
   {
-    ushort value_id;
     CanFlyMsg value;
 
     // item that is selected in the list.
     short selected_item;
-
-    // this holds the checklist items
-    MenuItemPopup popup;
 
     public MenuItemChecklist(LayoutWidget widget, uint key)
       : base(widget)

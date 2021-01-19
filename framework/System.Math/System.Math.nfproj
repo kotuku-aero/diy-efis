@@ -18,6 +18,9 @@
   </PropertyGroup>
   <PropertyGroup Label="nanoFramework">
     <NFMDP_GENERATE_STUBS>true</NFMDP_GENERATE_STUBS>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <Import Project="$(NanoFrameworkProjectSystemPath)NFProjectSystem.props" Condition="Exists('$(NanoFrameworkProjectSystemPath)NFProjectSystem.props')" />
   <ItemGroup>

@@ -272,7 +272,6 @@ namespace CanFly.Proton
       string vsStr = vs.ToString();
 
       size = TextExtent(font, vsStr);
-      Point pt;
 
       DrawText(vsi_rect, font, Colors.Green, Colors.Black, vsStr,
                new Point(vsi_rect.Left + (vsi_rect.Width >> 1) - (size.Dx >> 1),

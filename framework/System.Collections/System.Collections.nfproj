@@ -15,6 +15,7 @@
     <RootNamespace>System.Collections</RootNamespace>
     <AssemblyName>System.Collections</AssemblyName>
     <TargetFrameworkVersion>v1.0</TargetFrameworkVersion>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <Import Project="$(NanoFrameworkProjectSystemPath)NFProjectSystem.props" Condition="Exists('$(NanoFrameworkProjectSystemPath)NFProjectSystem.props')" />
   <ItemGroup>

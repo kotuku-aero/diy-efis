@@ -167,24 +167,6 @@ namespace System
       throw new NotSupportedException();
     }
 
-#if NANOCLR_REFLECTION
-
-        /// <summary>
-        /// Creates a shallow copy of the <see cref="Array"/>.
-        /// </summary>
-        /// <returns>A shallow copy of the <see cref="Array"/>.</returns>
-        /// <remarks>Available only in mscorlib build with support for System.Reflection.</remarks>
-        public Object Clone()
-        {
-            var length = Length;
-            var destArray = CreateInstance(GetType().GetElementType(), length);
-            Copy(this, destArray, length);
-
-            return destArray;
-        }
-
-#endif  // NANOCLR_REFLECTION
-
     /// <summary>
     /// Searches an entire one-dimensional sorted Array for a value using the specified IComparer interface.
     /// </summary>

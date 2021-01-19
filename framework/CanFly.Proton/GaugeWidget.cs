@@ -709,7 +709,6 @@ namespace CanFly.Proton
       // we now calculate the range of the segments.  There are 8 segments
       // around a 240 degree arc.  We draw the nearest based on the range
       // of the gauge.
-      Pen pointer_pen;
       int rotation;
 
       switch (style)

@@ -161,7 +161,6 @@ namespace CanFly.Proton
 
       Rect wndRect = WindowRect;
       Extent ex = Extents;
-      Rect rect;
 
       Rectangle(null, _backgroundColor, new Rect(8, 8, ex.Dx - 9, ex.Dy - 8));
 
@@ -192,7 +191,6 @@ namespace CanFly.Proton
         {
           string str = ((int) asiLine / _pixelsPerUnit).ToString();
           Extent size = TextExtent(_font, str);
-          Point pt;
 
           DrawText(_font, _textColor, _backgroundColor,
             str, new Point(width - 20 - size.Dx, markerLine - (size.Dy >> 1)),

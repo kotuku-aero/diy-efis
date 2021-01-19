@@ -94,7 +94,6 @@ namespace CanFly.Proton
     private uint _selectedColor;
     private Pen _borderPen;
     private Font _font;
-    private ushort _orentation;
 
     /// <summary>
     /// This is called by the runtime.  It cannot be called directly
@@ -760,7 +759,6 @@ namespace CanFly.Proton
 
       Extent ex = wndRect.Extent;
 
-      Rect rect;
       if (_currentMenu != null)
       {
         // draw the root menu

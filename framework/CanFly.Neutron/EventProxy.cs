@@ -17,6 +17,7 @@ namespace CanFly
     public EventProxy(ushort canId, CanFlyMsgHandler callback)
     {
       _canId = canId;
+      _callback = callback;
       Syscall.AddEvent(canId, OnMessage);
     }
 

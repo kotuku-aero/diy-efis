@@ -4,6 +4,8 @@
 // See LICENSE file in the project root for full license information.
 //
 
+using System.Reflection;
+
 namespace System.Collections
 {
   /// <summary>
@@ -15,7 +17,6 @@ namespace System.Collections
     private Object[] _items;
     private int _size;
 
-    // Keep in-sync with c_DefaultCapacity in CLR_RT_HeapBlock_ArrayList in NANOCLR_Runtime__HeapBlock.h
     private const int DefaultCapacity = 4;
 
     /// <summary>
@@ -100,13 +101,11 @@ namespace System.Collections
     /// </summary>
     /// <param name="index">The zero-based index of the element to get or set.</param>
     /// <returns></returns>
-    public object this[int index]
+    public Object this[int index]
     {
       get { return CanFly.Runtime.ArrayListGet(this, index); }
       set { CanFly.Runtime.ArrayListSet(this, index, value); }
     }
-
-
     /// <summary>
     /// Adds an object to the end of the <see cref="ArrayList"/>.
     /// </summary>
