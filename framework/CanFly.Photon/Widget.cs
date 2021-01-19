@@ -1,16 +1,16 @@
+using System;
 using System.Collections;
 using System.Runtime.CompilerServices;
 
 namespace CanFly
 {
-  public delegate void CanFlyEventHandler(ushort can_id, ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7);
-
-  public delegate void CanFlyMsgHandler(CanFlyMsg msg);
-
+  /// <summary>
+  /// A Widget is a class that can handle messages from the internal
+  /// can message bus, as well as haviond child windows.
+  /// </summary>
   public abstract class Widget : GdiObject
   {
-    protected CanFlyEventHandler threadSpawn = null;
-
+    // list of events this widget is registered to receive
     private static ArrayList eventInfoTable = null;
     private class EventInfo
     {
@@ -18,9 +18,10 @@ namespace CanFly
       private ushort eventID;
       private CanFlyMsgHandler handler;
       
-      public EventInfo(ushort eventId)
+      public EventInfo(Widget widget, ushort eventId)
       {
         this.eventID = eventId;
+        Syscall.AddWidgetEvent(widget.InternalHandle, eventID);
       }
 
       public ushort EventID {  get { return eventID; } }
@@ -40,22 +41,15 @@ namespace CanFly
     public event CanFlyMsgHandler BeforePaint = null;
     public event CanFlyMsgHandler AfterPaint = null;
 
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    static Widget()
-    {
-      // ask the system to create photon as widgets are being used
-    }
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void AddEvent(uint handle, ushort id);
-
+    /// <summary>
+    /// Private constructor for the screen
+    /// </summary>
+    /// <param name="hwnd"></param>
     internal Widget(uint hwnd) : base(hwnd)
     {
-      Syscall.SetWindowData(Handle, this);
+      Syscall.SetWindowData(Handle, this, OnMessage);
 
       ClipRect = WindowRect;
-
-      // create this widgets handler
-      threadSpawn = new CanFlyEventHandler(OnMessage);
     }
 
     /// <summary>
@@ -67,7 +61,7 @@ namespace CanFly
     protected Widget(Widget parent, Rect bounds, ushort id)
       : base(Syscall.CreateChildWindow(parent.Handle, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom, id))
     {
-      Syscall.SetWindowData(Handle, this);
+      Syscall.SetWindowData(Handle, this, OnMessage);
       // default clipping rectangle
       ClipRect = WindowRect;
 
@@ -109,7 +103,7 @@ namespace CanFly
       EventInfo eventInfo = FindEvent(message_id);
       if (eventInfo == null)
       {
-        eventInfo = new EventInfo(message_id);
+        eventInfo = new EventInfo(this, message_id);
       }
 
       eventInfo.Handler += eventListener;
@@ -126,7 +120,7 @@ namespace CanFly
         eventInfo.Handler -= eventListener;
     }
  
-    private static EventInfo FindEvent(ushort eventID)
+    private EventInfo FindEvent(ushort eventID)
     {
       foreach (EventInfo theHandler in eventInfoTable)
       {
@@ -137,45 +131,23 @@ namespace CanFly
       return null;
     }
 
-    /// <summary>
-    /// Handle a new message that has been sent to the widget
-    /// </summary>
-    /// <param name="id">Can ID of the message</param>
-    /// <param name="e"></param>
-    protected virtual void DefaultMsgHandler(CanFlyMsg e)
+    private void OnMessage(ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7)
     {
-      EventInfo eventInfo = FindEvent(e.CanID);
+      CanFlyMsg msg = new CanFlyMsg(flags, b0, b1, b2, b3, b4, b5, b6, b7);
 
-      if (eventInfo != null)
+      // find the handler for the message (if any)
+      EventInfo handler = FindEvent(msg.CanID);
+      if (handler != null)
       {
         try
         {
-          eventInfo.OnMessage(e);
+          handler.OnMessage(msg);
         }
         catch
         {
         }
       }
     }
-
-    /// <summary>
-    /// Callback from CanFly implementation with a new CanFly message
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="flags"></param>
-    /// <param name="b0"></param>
-    /// <param name="b1"></param>
-    /// <param name="b2"></param>
-    /// <param name="b3"></param>
-    /// <param name="b4"></param>
-    /// <param name="b5"></param>
-    /// <param name="b6"></param>
-    /// <param name="b7"></param>
-    private void OnMessage(ushort id, ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7)
-    {
-      DefaultMsgHandler(new CanFlyMsg(id, flags, b0, b1, b2, b3, b4, b5, b6, b7));
-    }
-
     /// <summary>
     /// 
     /// </summary>
@@ -215,16 +187,12 @@ namespace CanFly
 
     public void SendMessage(CanFlyMsg msg)
     {
-      msg.SendMessage(Handle);
+      Syscall.SendMessage(InternalHandle, msg.Flags, msg.Data0, msg.Data1, msg.Data2, msg.Data3, msg.Data4, msg.Data5, msg.Data6, msg.Data7);
     }
 
-    public void PostMessage(CanFlyMsg msg)
+    public void PostMessage(CanFlyMsg msg, uint maxWait = 0)
     {
-      Syscall.PostMessage(InternalHandle, 0, msg.CanID, msg.Data0, msg.Data1, msg.Data2, msg.Data3, msg.Data4, msg.Data5, msg.Data6, msg.Data7);
-    }
-    public void PostMessage(CanFlyMsg msg, uint maxWait)
-    {
-      Syscall.PostMessage(InternalHandle, 0, msg.CanID, msg.Data0, msg.Data1, msg.Data2, msg.Data3, msg.Data4, msg.Data5, msg.Data6, msg.Data7);
+      Syscall.PostMessage(InternalHandle, maxWait, msg.Flags, msg.Data0, msg.Data1, msg.Data2, msg.Data3, msg.Data4, msg.Data5, msg.Data6, msg.Data7);
     }
 
     /// <summary>

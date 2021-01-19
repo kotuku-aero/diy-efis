@@ -221,10 +221,6 @@ result_t defwndproc(handle_t hwnd, const canmsg_t *msg)
   {
   uint16_t count;
   uint16_t item;
-
-
-  // now we work through the event handlers.  These can either be 
-  // the built in ones, or overloaded javascript handlers.
   window_t *window;
   if (succeeded(as_window(hwnd, &window)))
     {
@@ -237,6 +233,7 @@ result_t defwndproc(handle_t hwnd, const canmsg_t *msg)
         vector_at(window->events, item, &proxy);
         if(proxy != 0 && proxy->msg_id == get_can_id(msg))
           {
+          // special case for a paint event
           if(get_can_id(msg) == id_paint)
             {
             if(window->invalid)

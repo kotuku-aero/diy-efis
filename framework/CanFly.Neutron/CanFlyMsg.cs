@@ -246,8 +246,6 @@ public enum CanFlyDataType
 
 public sealed class CanFlyMsg
   {
-    // these are required by the native implementation
-    private ushort _canId;
     // same coding as CanAerospace
     // Bits 15:12 - Length
     // Bit 11 - Reply
@@ -286,14 +284,15 @@ public sealed class CanFlyMsg
       get { return (ushort)(_flags & 0x07FF); }
       set { _flags = (ushort)((_flags & 0xF800) | (value & 0x07FF)); }
     }
-    public byte Data0 { get { return _b0; } }
-    public byte Data1 { get { return _b1; } }
-    public byte Data2 { get { return _b2; } }
-    public byte Data3 { get { return _b3; } }
-    public byte Data4 { get { return _b4; } }
-    public byte Data5 { get { return _b5; } }
-    public byte Data6 { get { return _b6; } }
-    public byte Data7 { get { return _b7; } }
+    internal ushort Flags {  get { return _flags; } }
+    internal byte Data0 { get { return _b0; } }
+    internal byte Data1 { get { return _b1; } }
+    internal byte Data2 { get { return _b2; } }
+    internal byte Data3 { get { return _b3; } }
+    internal byte Data4 { get { return _b4; } }
+    internal byte Data5 { get { return _b5; } }
+    internal byte Data6 { get { return _b6; } }
+    internal byte Data7 { get { return _b7; } }
     /// <summary>
     /// Return the message as a boxed value
     /// </summary>
@@ -347,12 +346,10 @@ public sealed class CanFlyMsg
     {
       CanID = id;
       Length = 8;
-
     }
 
-    internal CanFlyMsg(ushort can_id, ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7)
+    internal CanFlyMsg(ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7)
     {
-      _canId = can_id;
       _flags = flags;
       _b0 = b0;
       _b1 = b1;
@@ -394,17 +391,6 @@ public sealed class CanFlyMsg
     {
       get { return _b3; } 
       set { _b3 = value; }
-    }
-
-
-    internal void SendMessage(uint handle)
-    {
-      Syscall.SendMessage(handle, _canId, _flags, _b0, _b1, _b2, _b3, _b4, _b5, _b6, _b7);
-    }
-
-    internal void PostMessage(uint handle)
-    {
-      Syscall.PostMessage(handle, _canId, _flags, _b0, _b1, _b2, _b3, _b4, _b5, _b6, _b7);
     }
 
     /// <summary>

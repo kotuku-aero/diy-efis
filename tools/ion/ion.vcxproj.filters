@@ -97,9 +97,6 @@
     <Filter Include="nano\System.Text">
       <UniqueIdentifier>{841cf483-159f-4cda-9d17-b0e0170c86b9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="runtime\CanFly.Photon">
-      <UniqueIdentifier>{ba254476-23dd-4f6f-9749-7678ae8b5014}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\libs\ion\ion_cli_impl.c">
@@ -154,9 +151,6 @@
       <Filter>runtime</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libs\ion\runtime\FileStream.cpp">
-      <Filter>runtime</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\ion\runtime\Widget.cpp">
       <Filter>runtime</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libs\ion\builtin\mscorlib.c">
@@ -468,9 +462,6 @@
     <ClCompile Include="..\..\libs\ion\nano\System.Text\nf_system_text_System_Text_UTF8Encoding.cpp">
       <Filter>nano\System.Text</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\ion\runtime\CanFly.Photon\CanFly_Photon.cpp">
-      <Filter>runtime\CanFly.Photon</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libs\ion\ion_cli_impl.h">
@@ -643,9 +634,6 @@
     </ClInclude>
     <ClInclude Include="..\..\libs\ion\nano\System.Text\nf_system_text.h">
       <Filter>nano\System.Text</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libs\ion\runtime\CanFly.Photon\CanFly_Photon.h">
-      <Filter>runtime\CanFly.Photon</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

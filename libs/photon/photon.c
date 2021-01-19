@@ -234,7 +234,7 @@ result_t get_message(handle_t hscreen, handle_t *hwnd, canmsg_t *msg)
   if (failed(result = as_screen(hscreen, &screen)))
     return result;
 
-  if(hwnd == 0)
+  if(hwnd == 0 || msg == 0)
     return e_bad_parameter;
 
   uint16_t queue_count;

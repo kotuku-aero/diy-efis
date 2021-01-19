@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace CanFly
 {
-
+  public delegate void CanFlyEventHandler(ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7);
   internal static class Syscall
   {
     /*******************************************************/
@@ -69,7 +69,9 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern object GetWindowData(uint window);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetWindowData(uint window, object wnd_data);
+    internal static extern void SetWindowData(uint window, object wnd_data, CanFlyEventHandler wndproc);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void AddWidgetEvent(uint window, ushort canId);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern uint GetParent(uint window);
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -177,10 +179,6 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void EndPaint(uint hwnd);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern bool GetMessage(uint hwnd, out uint msg_for, ref ushort flags, ref byte b0, ref byte b1, ref byte b2, ref byte b3, ref byte b4, ref byte b5, ref byte b6, ref byte b7);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void DispatchMessage(uint hwnd, ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7);
-    [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void SendMessage(uint hwnd, ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void PostMessage(uint hwnd, uint max_wait, ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7);
@@ -280,5 +278,9 @@ namespace CanFly
     internal static extern int PointArrayIndexOf(uint handle, int x, int y);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void PointArrayRemoveAt(uint handle, uint index);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void AddEvent(ushort canId, CanFlyEventHandler handler);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void RemoveEvent(ushort canID, CanFlyEventHandler handler);
   }
 }

@@ -17,8 +17,8 @@
     <TargetFrameworkVersion>v1.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Label="nanoFramework">
-    <NFMDP_GENERATE_STUBS>true</NFMDP_GENERATE_STUBS>
-    <NF_GenerateStubsDirectory>C:\Users\peter\Projects\canfly\diy-efis\libs\ion\runtime</NF_GenerateStubsDirectory>
+    <NF_GenerateStubsDirectory>
+    </NF_GenerateStubsDirectory>
   </PropertyGroup>
   <Import Project="$(NanoFrameworkProjectSystemPath)NFProjectSystem.props" Condition="Exists('$(NanoFrameworkProjectSystemPath)NFProjectSystem.props')" />
   <ItemGroup>

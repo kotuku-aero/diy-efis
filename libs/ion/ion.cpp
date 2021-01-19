@@ -303,6 +303,8 @@ static result_t load_application(stream_p stream)
   return s_ok;
   }
 
+extern result_t neutron_clr_init();
+
 result_t ion_create(ion_context_t *ion_context)
   {
   result_t result;
@@ -310,7 +312,7 @@ result_t ion_create(ion_context_t *ion_context)
   trace_info("ion runtime start");
 
   if (failed(result = semaphore_create(&ion_mutex)) ||
-    failed(semaphore_signal(ion_mutex)))
+    failed(result = semaphore_signal(ion_mutex)))
     return result;
 
   // load the neo font which is always available
@@ -402,6 +404,13 @@ result_t ion_create(ion_context_t *ion_context)
     CLR_EE_DBG_SET(StateResolutionFailed);
     }
 #endif
+
+  // start the event handler
+  if (failed(result = neutron_clr_init()))
+    {
+    trace_error("cannot start the clr integration");
+    return result;
+    }
 
   trace_info("CLR started ok, ion ready\n");
   return result;

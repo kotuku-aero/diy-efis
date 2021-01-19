@@ -3,61 +3,6 @@
 #include "../../neutron/neutron.h"
 #include "../../photon/photon.h"
 
-HRESULT Library_corlib_native_CanFly_Syscall::GetMessage___STATIC__BOOLEAN__U4__BYREF_U4__BYREF_U2__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1(CLR_RT_StackFrame &stack)
-  {
-  NANOCLR_HEADER();
-
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
-
-  handle_t hwnd;
-  canmsg_t msg;
-  if (!get_message((handle_t) param0, &hwnd, &msg) != s_ok)
-    {
-    SetResult_bool(stack, false);
-    return S_OK;
-    }
-
-  stack.Arg1().NumericByRef().u4 = (CLR_UINT32) hwnd;
-  stack.Arg1().NumericByRef().u2 = msg.flags;
-  stack.Arg2().NumericByRef().u1 = msg.raw[0];
-  stack.Arg3().NumericByRef().u1 = msg.raw[1];
-  stack.Arg4().NumericByRef().u1 = msg.raw[2];
-  stack.Arg5().NumericByRef().u1 = msg.raw[3];
-  stack.Arg6().NumericByRef().u1 = msg.raw[4];
-  stack.Arg7().NumericByRef().u1 = msg.raw[5];
-  stack.ArgN(8).NumericByRef().u1 = msg.raw[6];
-  stack.ArgN(9).NumericByRef().u1 = msg.raw[7];
-
-  hr = S_OK;
-  NANOCLR_NOCLEANUP();
-  }
-
-HRESULT Library_corlib_native_CanFly_Syscall::DispatchMessage___STATIC__VOID__U4__U2__U1__U1__U1__U1__U1__U1__U1__U1(CLR_RT_StackFrame &stack)
-  {
-  NANOCLR_HEADER();
-
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
-
-  unsigned short param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 1, param1));
-
-  canmsg_t msg;
-  msg.flags = param1;
-  msg.raw[0] = stack.ArgN(2).NumericByRef().u1;
-  msg.raw[1] = stack.ArgN(3).NumericByRef().u1;
-  msg.raw[2] = stack.ArgN(4).NumericByRef().u1;
-  msg.raw[3] = stack.ArgN(4).NumericByRef().u1;
-  msg.raw[4] = stack.ArgN(4).NumericByRef().u1;
-  msg.raw[5] = stack.ArgN(4).NumericByRef().u1;
-  msg.raw[6] = stack.ArgN(4).NumericByRef().u1;
-  msg.raw[7] = stack.ArgN(4).NumericByRef().u1;
-
-  hr = send_message((handle_t)param0, &msg);
-  NANOCLR_NOCLEANUP();
-  }
-
 HRESULT Library_corlib_native_CanFly_Syscall::SendMessage___STATIC__VOID__U4__U2__U1__U1__U1__U1__U1__U1__U1__U1(CLR_RT_StackFrame &stack)
   {
   NANOCLR_HEADER();

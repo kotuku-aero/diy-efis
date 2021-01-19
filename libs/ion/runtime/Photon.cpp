@@ -10,6 +10,43 @@
 #endif
 
 #include "../../photon/photon.h"
+#include "../../photon/window.h"
+
+static semaphore_p screen_init = 0;
+
+struct canfly_wnddata_t {
+  CLR_RT_HeapBlock *obj;
+  CLR_RT_HeapBlock_Delegate *wndproc;
+  };
+
+HRESULT CreatePhotonInstance(CLR_RT_StackFrame &stack)
+  {
+  NANOCLR_HEADER(); hr = S_OK;
+
+  semaphore_create(&screen_init);
+
+  // create the window proc, this will be released when the scren is opened
+
+  NANOCLR_CHECK_HRESULT(hr);
+  NANOCLR_NOCLEANUP();
+  }
+
+static handle_t screen;
+
+result_t RunPhoton()
+  {
+  // initialize photon
+
+  // wait till photon is ready
+  semaphore_wait(screen_init, INDEFINITE_WAIT);
+  canmsg_t msg;
+  result_t result;
+  handle_t hwnd = 0;
+  while (succeeded(result = get_message(screen, &hwnd, &msg)))
+    dispatch_message(hwnd, &msg);
+
+  return result;
+  }
 
 HRESULT Library_corlib_native_CanFly_Syscall::OpenScreen___STATIC__U4__U2__U2(CLR_RT_StackFrame& stack)
   {
@@ -111,7 +148,14 @@ HRESULT Library_corlib_native_CanFly_Syscall::CloseWindow___STATIC__VOID__U4(CLR
   unsigned int param0;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
 
-  hr = close_window((handle_t)param0);
+  handle_t hwnd = (handle_t)param0;
+  void *wnddata;
+  hr = get_wnddata(hwnd, &wnddata);
+  NANOCLR_CHECK_HRESULT(hr);
+
+  neutron_free(wnddata);
+
+  hr = close_window(hwnd);
   NANOCLR_CHECK_HRESULT(hr);
 
   NANOCLR_NOCLEANUP();
@@ -195,24 +239,31 @@ HRESULT Library_corlib_native_CanFly_Syscall::GetWindowData___STATIC__OBJECT__U4
   unsigned int param0;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
 
-  void *wnd_data;
-  hr = get_wnddata((handle_t)param0, &wnd_data);
+  canfly_wnddata_t *wnd_data;
+  hr = get_wnddata((handle_t)param0, (void **) &wnd_data);
 
   NANOCLR_CHECK_HRESULT(hr);
  
-  stack.SetResult_Object((CLR_RT_HeapBlock *)wnd_data);  
+  stack.SetResult_Object(wnd_data->obj);  
 
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::SetWindowData___STATIC__VOID__U4__OBJECT(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::SetWindowData___STATIC__VOID__U4__OBJECT__CanFlyCanFlyEventHandler(CLR_RT_StackFrame& stack)
   {
   NANOCLR_HEADER(); hr = S_OK;
 
   unsigned int param0;
   NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
 
-  hr = set_wnddata((handle_t)param0, stack.Arg1().Dereference());
+  CLR_RT_HeapBlock *obj = stack.Arg1().Dereference();
+  CLR_RT_HeapBlock_Delegate *del = stack.Arg2().DereferenceDelegate();
+
+  canfly_wnddata_t *wnddata = (canfly_wnddata_t *)neutron_malloc(sizeof(canfly_wnddata_t));
+  wnddata->obj = obj;
+  wnddata->wndproc = del;
+
+  hr = set_wnddata((handle_t)param0, wnddata);
   NANOCLR_CHECK_HRESULT(hr);
 
   NANOCLR_NOCLEANUP();
@@ -1420,5 +1471,39 @@ HRESULT Library_corlib_native_CanFly_Syscall::EndPaint___STATIC__VOID__U4(CLR_RT
   NANOCLR_CHECK_HRESULT(hr);
 
   }
+  NANOCLR_NOCLEANUP();
+  }
+
+extern result_t queue_callback(CLR_RT_HeapBlock_Delegate *dlg, const canmsg_t *msg);
+
+static result_t photon_event(handle_t hwnd, struct _event_proxy_t *proxy, const canmsg_t *msg)
+  {
+  result_t result;
+  // find the hwnd wnd data
+  canfly_wnddata_t *wndData;
+  if (failed(result = get_wnddata(hwnd, (void **) &wndData)))
+    return result;
+
+  if (wndData->wndproc == 0)
+    return s_false;
+
+  return queue_callback(wndData->wndproc, msg);
+  }
+
+HRESULT Library_corlib_native_CanFly_Syscall::AddWidgetEvent___STATIC__VOID__U4__U2(CLR_RT_StackFrame &stack)
+  {
+  NANOCLR_HEADER(); hr = S_OK;
+  uint32_t param0;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 1, param0));
+
+  uint16_t param1;
+  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 2, param1));
+
+  CLR_RT_HeapBlock *widgetObject = stack.This();
+
+  add_event((handle_t)param0, param1, widgetObject, photon_event);
+
+  NANOCLR_CHECK_HRESULT(hr);
+
   NANOCLR_NOCLEANUP();
   }
