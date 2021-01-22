@@ -142,15 +142,8 @@ HRESULT Interop_Marshal_INT8(const CLR_RT_StackFrame& stackFrame, unsigned int p
 HRESULT Interop_Marshal_INT16(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, signed short int& param);
 HRESULT Interop_Marshal_INT32(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, signed int& param);
 HRESULT Interop_Marshal_INT64(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, signed __int64& param);
-#if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
 HRESULT Interop_Marshal_float(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, float& param);
 HRESULT Interop_Marshal_double(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, double& param);
-
-#else
-HRESULT Interop_Marshal_float(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, signed int& param);
-HRESULT Interop_Marshal_double(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, signed __int64& param);
-#endif
-
 HRESULT Interop_Marshal_LPCSTR(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, const char*& param);
 // For unsupported types we set param to NULL. 
 HRESULT Interop_Marshal_UNSUPPORTED_TYPE(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, UNSUPPORTED_TYPE& param);
@@ -189,16 +182,8 @@ template <class T> class CLR_RT_TypedArray
   friend HRESULT Interop_Marshal_INT16_ARRAY(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, CLR_RT_TypedArray<signed short int>& typedArray);
   friend HRESULT Interop_Marshal_INT32_ARRAY(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, CLR_RT_TypedArray<signed int>& typedArray);
   friend HRESULT Interop_Marshal_INT64_ARRAY(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, CLR_RT_TypedArray<signed __int64>& typedArray);
-
-#if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
   friend HRESULT Interop_Marshal_float_ARRAY(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, CLR_RT_TypedArray<float>& typedArray);
   friend HRESULT Interop_Marshal_double_ARRAY(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, CLR_RT_TypedArray<double>& typedArray);
-#else
-  friend HRESULT Interop_Marshal_float_ARRAY(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, CLR_RT_TypedArray<signed int>& typedArray);
-  friend HRESULT Interop_Marshal_double_ARRAY(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, CLR_RT_TypedArray<signed __int64>& typedArray);
-
-#endif
-
 
   public:
     CLR_RT_TypedArray() { m_pData = NULL; m_ElemCount = 0; }
@@ -224,15 +209,8 @@ typedef CLR_RT_TypedArray<signed char>   CLR_RT_TypedArray_INT8;
 typedef CLR_RT_TypedArray<signed short int>  CLR_RT_TypedArray_INT16;
 typedef CLR_RT_TypedArray<signed int>  CLR_RT_TypedArray_INT32;
 typedef CLR_RT_TypedArray<signed __int64>  CLR_RT_TypedArray_INT64;
-#if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
 typedef CLR_RT_TypedArray<float>  CLR_RT_TypedArray_float;
 typedef CLR_RT_TypedArray<double> CLR_RT_TypedArray_double;
-#else
-typedef CLR_RT_TypedArray<signed int>  CLR_RT_TypedArray_float;
-typedef CLR_RT_TypedArray<signed __int64>  CLR_RT_TypedArray_double;
-
-
-#endif
 
 HRESULT Interop_Marshal_bool_ARRAY(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_UINT8& typedArray);
 HRESULT Interop_Marshal_UINT8_ARRAY(const CLR_RT_StackFrame& stackFrame, unsigned int paramIndex, CLR_RT_TypedArray_UINT8& typedArray);
@@ -268,15 +246,8 @@ void SetResult_UINT8(CLR_RT_StackFrame& stackFrame, unsigned char  value);
 void SetResult_UINT16(CLR_RT_StackFrame& stackFrame, unsigned short int value);
 void SetResult_UINT32(CLR_RT_StackFrame& stackFrame, unsigned int value);
 void SetResult_UINT64(CLR_RT_StackFrame& stackFrame, unsigned __int64 value);
-#if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
 void SetResult_float(CLR_RT_StackFrame& stackFrame, float  value);
 void SetResult_double(CLR_RT_StackFrame& stackFrame, double value);
-#else
-void SetResult_float(CLR_RT_StackFrame& stackFrame, signed int value);
-void SetResult_double(CLR_RT_StackFrame& stackFrame, signed __int64 value);
-
-#endif
-
 void SetResult_LPCSTR(CLR_RT_StackFrame& stackFrame, const char* value);
 
 /**********************************************************************
@@ -451,18 +422,6 @@ struct CLR_RT_DriverInterruptMethods
 // Randomly generated 32 bit number.
 // This check sum validates that m_pNativeMethods points to CLR_RT_DriverInterruptMethods structure
 #define DRIVER_INTERRUPT_METHODS_CHECKSUM   0xf32f4c3e
-
-// Creates instance of CLR_RT_HeapBlock_NativeEventDispatcher.
-CLR_RT_HeapBlock_NativeEventDispatcher* CreateNativeEventInstance(CLR_RT_StackFrame& stack);
-
-// Saves data from ISR. The data from this queue is used to call managed callbacks.
-// Should be called from ISR.
-void SaveNativeEventToHALQueue(CLR_RT_HeapBlock_NativeEventDispatcher* pContext, uint32_t data1, uint32_t data2);
-
-void SaveCanFlyEventToHALQueue(CLR_RT_HeapBlock_NativeEventDispatcher* pContext, uint16_t flags, uint8_t b0, uint8_t b1, uint8_t b2, uint8_t b3, uint8_t b4, uint8_t b5, uint8_t b6, uint8_t b7);
-
-// Cleans up the data in the queue after interrupts were closed and no managed callbacks are expected.
-void CleanupNativeEventsFromHALQueue(CLR_RT_HeapBlock_NativeEventDispatcher* pContext);
 
 void CLR_RetrieveCurrentMethod(unsigned int& assmIdx, unsigned int& methodIdx);
 

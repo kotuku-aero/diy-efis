@@ -21,14 +21,13 @@ struct canfly_wnddata_t {
 
 HRESULT CreatePhotonInstance(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
+  HRESULT hr;
 
   semaphore_create(&screen_init);
 
   // create the window proc, this will be released when the scren is opened
 
-  NANOCLR_CHECK_HRESULT(hr);
-  NANOCLR_NOCLEANUP();
+  return S_OK;
   }
 
 static handle_t screen;
@@ -48,46 +47,62 @@ result_t RunPhoton()
   return result;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::OpenScreen___STATIC__U4__U2__U2(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::OpenScreen___STATIC__I4__U2__U2__BYREF_U4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
+  HRESULT hr;
 
   uint16_t param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 0, param0));
-
   uint16_t param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 1, param1));
+  if (FAILED(hr = Interop_Marshal_UINT16(stack, 0, param0)) ||
+    FAILED(hr = Interop_Marshal_UINT16(stack, 1, param1)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
+
+  if (stack.Arg2().Dereference() == 0)
+    {
+    SetResult_INT32(stack, e_bad_pointer);
+    return S_OK;
+    }
 
   handle_t hwnd;
   hr = open_screen(param0, defwndproc, param1, &hwnd);
+  SetResult_INT32(stack, hr);
 
-  NANOCLR_CHECK_HRESULT(hr);
+  if (succeeded(hr))
+    stack.Arg2().Dereference()->SetInteger((CLR_UINT32)hwnd);
 
-  SetResult_UINT32(stack, (unsigned int) hwnd);
-  NANOCLR_NOCLEANUP();
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::CreateWindow___STATIC__U4__U4__I4__I4__I4__I4__U2(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::CreateWindow___STATIC__I4__U4__I4__I4__I4__I4__U2__BYREF_U4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
-
-  signed int param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 1, param1));
-
-  signed int param2;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 2, param2));
-
-  signed int param3;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 3, param3));
-
-  signed int param4;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 4, param4));
-
+  uint32_t param0;
+  int32_t param1;
+  int32_t param2;
+  int32_t param3;
+  int32_t param4;
   uint16_t param5;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 5, param5));
+
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 1, param1)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 2, param2)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 3, param3)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 4, param4)) ||
+    FAILED(hr = Interop_Marshal_UINT16(stack, 5, param5)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
+
+  if (stack.Arg6().Dereference() == 0)
+    {
+    SetResult_INT32(stack, e_bad_pointer);
+    return S_OK;
+    }
 
   rect_t bounds;
   bounds.left = param1;
@@ -97,33 +112,39 @@ HRESULT Library_corlib_native_CanFly_Syscall::CreateWindow___STATIC__U4__U4__I4_
   handle_t hwnd;
 
   hr = create_window((handle_t)param0, &bounds, defwndproc, param5, &hwnd);
+  SetResult_INT32(stack, hr);
 
-  NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT32(stack, (unsigned int)hwnd);
+  if (succeeded(hr))
+    stack.Arg6().Dereference()->SetInteger((CLR_UINT32)hwnd);
 
-  NANOCLR_NOCLEANUP();
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::CreateChildWindow___STATIC__U4__U4__I4__I4__I4__I4__U2(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::CreateChildWindow___STATIC__I4__U4__I4__I4__I4__I4__U2__BYREF_U4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
-
-  signed int param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 1, param1));
-
-  signed int param2;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 2, param2));
-
-  signed int param3;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 3, param3));
-
-  signed int param4;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 4, param4));
-
+  HRESULT hr;
+  uint32_t param0;
+  int32_t param1;
+  int32_t param2;
+  int32_t param3;
+  int32_t param4;
   uint16_t param5;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 5, param5));
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 1, param1)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 2, param2)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 3, param3)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 4, param4)) ||
+    FAILED(hr = Interop_Marshal_UINT16(stack, 5, param5)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
+
+  if (stack.Arg6().Dereference() == 0)
+    {
+    SetResult_INT32(stack, e_bad_pointer);
+    return S_OK;
+    }
 
   rect_t bounds;
   bounds.left = param1;
@@ -134,89 +155,126 @@ HRESULT Library_corlib_native_CanFly_Syscall::CreateChildWindow___STATIC__U4__U4
   handle_t hwnd;
 
   hr = create_child_window((handle_t)param0, &bounds, defwndproc, param5, &hwnd);
+  SetResult_INT32(stack, hr);
 
-  NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT32(stack, (unsigned int)hwnd);
+  if (succeeded(hr))
+    stack.Arg6().Dereference()->SetInteger((CLR_UINT32)hwnd);
 
-  NANOCLR_NOCLEANUP();
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::CloseWindow___STATIC__VOID__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::CloseWindow___STATIC__I4__U4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+  uint32_t param0;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
 
   handle_t hwnd = (handle_t)param0;
   void *wnddata;
   hr = get_wnddata(hwnd, &wnddata);
-  NANOCLR_CHECK_HRESULT(hr);
 
   neutron_free(wnddata);
 
-  hr = close_window(hwnd);
-  NANOCLR_CHECK_HRESULT(hr);
+  stack.SetResult_I4(close_window(hwnd));
 
-  NANOCLR_NOCLEANUP();
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::GetWindowRect___STATIC__VOID__U4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetWindowRect___STATIC__I4__U4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+  uint32_t param0;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
+
+  if (stack.Arg1().Dereference() == 0 ||
+    stack.Arg2().Dereference() == 0 ||
+    stack.Arg3().Dereference() == 0 ||
+    stack.Arg4().Dereference() == 0)
+    {
+    SetResult_INT32(stack, e_bad_pointer);
+    return S_OK;
+    }
 
   rect_t wnd_rect;
   hr = get_window_rect((handle_t)param0, &wnd_rect);
-  NANOCLR_CHECK_HRESULT(hr);
 
-  stack.Arg2().NumericByRef().s4 = wnd_rect.left;
-  stack.Arg3().NumericByRef().s4 = wnd_rect.top;
-  stack.Arg4().NumericByRef().s4 = wnd_rect.right;
-  stack.Arg5().NumericByRef().s4 = wnd_rect.bottom;
+  SetResult_INT32(stack, hr);
 
-  NANOCLR_NOCLEANUP();
+  if (succeeded(hr))
+    {
+    stack.Arg1().Dereference()->SetInteger(wnd_rect.left);
+    stack.Arg2().Dereference()->SetInteger(wnd_rect.top);
+    stack.Arg3().Dereference()->SetInteger(wnd_rect.right);
+    stack.Arg4().Dereference()->SetInteger(wnd_rect.bottom);
+    }
+
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::GetWindowPos___STATIC__VOID__U4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetWindowPos___STATIC__I4__U4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+  uint32_t param0;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
+
+  if (stack.Arg1().Dereference() == 0 ||
+    stack.Arg2().Dereference() == 0 ||
+    stack.Arg3().Dereference() == 0 ||
+    stack.Arg4().Dereference() == 0)
+    {
+    SetResult_INT32(stack, e_bad_pointer);
+    return S_OK;
+    }
 
   rect_t pos;
   hr = get_window_pos((handle_t)param0, &pos);
-  NANOCLR_CHECK_HRESULT(hr);
 
-  stack.Arg2().NumericByRef().s4 = pos.left;
-  stack.Arg3().NumericByRef().s4 = pos.top;
-  stack.Arg4().NumericByRef().s4 = pos.right;
-  stack.Arg5().NumericByRef().s4 = pos.bottom;
+  SetResult_INT32(stack, hr);
 
-  NANOCLR_NOCLEANUP();
+  if (succeeded(hr))
+    {
+    stack.Arg1().Dereference()->SetInteger(pos.left);
+    stack.Arg2().Dereference()->SetInteger(pos.top);
+    stack.Arg3().Dereference()->SetInteger(pos.right);
+    stack.Arg4().Dereference()->SetInteger(pos.bottom);
+    }
+
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::SetWindowPos___STATIC__VOID__U4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::SetWindowPos___STATIC__I4__U4__I4__I4__I4__I4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
-
-  signed int param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 1, param1));
-
-  signed int param2;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 2, param2));
-
-  signed int param3;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 3, param3));
-
-  signed int param4;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 4, param4));
+  uint32_t param0;
+  int32_t param1;
+  int32_t param2;
+  int32_t param3;
+  int32_t param4;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 1, param1)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 2, param2)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 3, param3)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 4, param4)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
 
   rect_t rect;
   rect.left = param1;
@@ -224,37 +282,54 @@ HRESULT Library_corlib_native_CanFly_Syscall::SetWindowPos___STATIC__VOID__U4__I
   rect.right = param3;
   rect.bottom = param4;
 
-  hr = set_window_pos((handle_t)param0, &rect);
-  
-  NANOCLR_CHECK_HRESULT(hr);
+  stack.SetResult_I4(set_window_pos((handle_t)param0, &rect));
 
-  NANOCLR_NOCLEANUP();
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::GetWindowData___STATIC__OBJECT__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetWindowData___STATIC__I4__U4__BYREF_OBJECT(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
-  
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+  uint32_t param0;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
+
+  if (stack.Arg1().Dereference() == 0)
+    {
+    SetResult_INT32(stack, e_bad_pointer);
+    return S_OK;
+    }
 
   canfly_wnddata_t *wnd_data;
-  hr = get_wnddata((handle_t)param0, (void **) &wnd_data);
+  hr = get_wnddata((handle_t)param0, (void **)&wnd_data);
+  SetResult_INT32(stack, hr);
 
-  NANOCLR_CHECK_HRESULT(hr);
- 
-  stack.SetResult_Object(wnd_data->obj);  
+  if (succeeded(hr))
+    stack.Arg1().Dereference()->SetObjectReference(wnd_data->obj);
 
-  NANOCLR_NOCLEANUP();
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::SetWindowData___STATIC__VOID__U4__OBJECT__CanFlyCanFlyEventHandler(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::SetWindowData___STATIC__I4__U4__OBJECT__CanFlyCanFlyEventHandler(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+  uint32_t param0;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
+
+  if (stack.Arg1().Dereference() == 0)
+    {
+    SetResult_INT32(stack, e_bad_pointer);
+    return S_OK;
+    }
 
   CLR_RT_HeapBlock *obj = stack.Arg1().Dereference();
   CLR_RT_HeapBlock_Delegate *del = stack.Arg2().DereferenceDelegate();
@@ -263,184 +338,264 @@ HRESULT Library_corlib_native_CanFly_Syscall::SetWindowData___STATIC__VOID__U4__
   wnddata->obj = obj;
   wnddata->wndproc = del;
 
-  hr = set_wnddata((handle_t)param0, wnddata);
-  NANOCLR_CHECK_HRESULT(hr);
+  stack.SetResult_I4(set_wnddata((handle_t)param0, wnddata));
 
-  NANOCLR_NOCLEANUP();
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::GetParent___STATIC__U4__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetParent___STATIC__I4__U4__BYREF_U4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+  uint32_t param0;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
+
+  if (stack.Arg1().Dereference() == 0)
+    {
+    SetResult_INT32(stack, e_bad_pointer);
+    return S_OK;
+    }
 
   handle_t hwnd;
   hr = get_parent((handle_t)param0, &hwnd);
-  NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT32(stack, (unsigned int)hwnd);
+  SetResult_INT32(stack, hr);
 
-  NANOCLR_NOCLEANUP();
+  if (succeeded(hr))
+    stack.Arg1().Dereference()->SetInteger((CLR_UINT32)hwnd);
+
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::GetWindowById___STATIC__U4__U4__U2(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetWindowById___STATIC__I4__U4__U2__BYREF_U4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
-
+  HRESULT hr;
+  uint32_t param0;
   uint16_t param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 1, param1));
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)) ||
+    FAILED(hr = Interop_Marshal_UINT16(stack, 1, param1)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
+
+  if (stack.Arg2().Dereference() == 0)
+    {
+    SetResult_INT32(stack, e_bad_pointer);
+    return S_OK;
+    }
 
   handle_t hndl;
   hr = get_window_by_id((handle_t)param0, param1, &hndl);
 
-  NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT32(stack, (unsigned int)hndl);
+  SetResult_INT32(stack, hr);
 
-  NANOCLR_NOCLEANUP();
+  if (succeeded(hr))
+    stack.Arg2().Dereference()->SetInteger((CLR_UINT32)hndl);
+
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::GetFirstChild___STATIC__U4__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetFirstChild___STATIC__I4__U4__BYREF_U4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+  uint32_t param0;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
+
+  if (stack.Arg1().Dereference() == 0)
+    {
+    SetResult_INT32(stack, e_bad_pointer);
+    return S_OK;
+    }
 
   handle_t hndl;
   hr = get_first_child((handle_t)param0, &hndl);
+  SetResult_INT32(stack, hr);
 
-  NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT32(stack, (unsigned int)hndl);
-  
-  NANOCLR_NOCLEANUP();
+  if (succeeded(hr))
+    stack.Arg1().Dereference()->SetInteger((CLR_UINT32)hndl);
+
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::GetNextSibling___STATIC__U4__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetNextSibling___STATIC__I4__U4__BYREF_U4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+  uint32_t param0;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
+
+  if (stack.Arg1().Dereference() == 0)
+    {
+    SetResult_INT32(stack, e_bad_pointer);
+    return S_OK;
+    }
 
   handle_t hndl;
   hr = get_next_sibling((handle_t)param0, &hndl);
 
-  NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT32(stack, (unsigned int)hndl);
+  SetResult_INT32(stack, hr);
 
-  NANOCLR_NOCLEANUP();
+  if (succeeded(hr))
+    stack.Arg1().Dereference()->SetInteger((CLR_UINT32)hndl);
+
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::GetPreviousSibling___STATIC__U4__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetPreviousSibling___STATIC__I4__U4__BYREF_U4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+  uint32_t param0;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
+
+  if (stack.Arg1().Dereference() == 0)
+    {
+    SetResult_INT32(stack, e_bad_pointer);
+    return S_OK;
+    }
 
   handle_t hndl;
   hr = get_previous_sibling((handle_t)param0, &hndl);
+  SetResult_INT32(stack, hr);
 
-  NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT32(stack, (unsigned int)hndl);
+  if (succeeded(hr))
+    stack.Arg1().Dereference()->SetInteger((CLR_UINT32)hndl);
 
-  NANOCLR_NOCLEANUP();
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::InsertBefore___STATIC__VOID__U4__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::InsertBefore___STATIC__I4__U4__U4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+  uint32_t param0;
+  uint32_t param1;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)) ||
+    FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
 
-  unsigned int param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+  stack.SetResult_I4(insert_before((handle_t)param0, (handle_t)param1));
 
-  hr = insert_before((handle_t)param0, (handle_t) param1);
-
-  NANOCLR_CHECK_HRESULT(hr);
-
-  NANOCLR_NOCLEANUP();
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::InsertAfter___STATIC__VOID__U4__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::InsertAfter___STATIC__I4__U4__U4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+  uint32_t param0;
+  uint32_t param1;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)) ||
+    FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
 
-  unsigned int param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+  stack.SetResult_I4(insert_after((handle_t)param0, (handle_t)param1));
 
-  hr = insert_after((handle_t)param0, (handle_t)param1);
-
-  NANOCLR_CHECK_HRESULT(hr);
-  NANOCLR_NOCLEANUP();
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::GetZOrder___STATIC__U1__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetZOrder___STATIC__I4__U4__BYREF_U1(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+  uint32_t param0;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
+
+  if (stack.Arg1().Dereference() == 0)
+    {
+    SetResult_INT32(stack, e_bad_pointer);
+    return S_OK;
+    }
 
   uint8_t retValue;
   hr = get_z_order((handle_t)param0, &retValue);
-  NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT8(stack, retValue);
+  SetResult_INT32(stack, hr);
 
-  NANOCLR_NOCLEANUP();
+  if (succeeded(hr))
+    stack.Arg1().Dereference()->SetInteger(retValue);
+
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::SetZOrder___STATIC__VOID__U4__U1(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::SetZOrder___STATIC__I4__U4__U1(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
-  {
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
-
+  uint32_t param0;
   uint8_t param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT8(stack, 1, param1));
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)) ||
+    FAILED(hr = Interop_Marshal_UINT8(stack, 1, param1)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
 
-  hr = set_z_order((handle_t)param0, param1);
-  NANOCLR_CHECK_HRESULT(hr);
+  stack.SetResult_I4(set_z_order((handle_t)param0, param1));
 
-  }
-  NANOCLR_NOCLEANUP();
-  }
-
-HRESULT Library_corlib_native_CanFly_Syscall::CanvasClose___STATIC__VOID__U4(CLR_RT_StackFrame& stack)
-  {
-  NANOCLR_HEADER(); hr = S_OK;
-  {
-
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
-
-  hr = canvas_close((handle_t)param0);
-  NANOCLR_CHECK_HRESULT(hr);
-
-  }
-  NANOCLR_NOCLEANUP();
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::CreateRectCanvas___STATIC__U4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::CanvasClose___STATIC__I4__U4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
+  HRESULT hr;
+
+  uint32_t param0;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
+
+  stack.SetResult_I4(canvas_close((handle_t)param0));
+
+  return S_OK;
+  }
+
+HRESULT Library_corlib_native_CanFly_Syscall::CreateRectCanvas___STATIC__I4__I4__I4__BYREF_U4(CLR_RT_StackFrame &stack)
   {
+  HRESULT hr;
 
-  signed int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 0, param0));
+  int32_t param0;
+  int32_t param1;
+  if (FAILED(hr = Interop_Marshal_INT32(stack, 0, param0)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 1, param1)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
 
-  signed int param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 1, param1));
+  if (stack.Arg2().Dereference() == 0)
+    {
+    SetResult_INT32(stack, e_bad_pointer);
+    return S_OK;
+    }
 
   extent_t size;
   size.dx = param0;
@@ -448,223 +603,300 @@ HRESULT Library_corlib_native_CanFly_Syscall::CreateRectCanvas___STATIC__U4__I4_
 
   handle_t hndl;
   hr = create_rect_canvas(&size, &hndl);
+  SetResult_INT32(stack, hr);
 
-    NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT32(stack, (unsigned int)hndl);
+  if (succeeded(hr))
+    stack.Arg2().Dereference()->SetInteger((CLR_UINT32)hndl);
+
+  return S_OK;
   }
-  NANOCLR_NOCLEANUP();
-  }
 
-HRESULT Library_corlib_native_CanFly_Syscall::CreatePngCanvas___STATIC__U4__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::CreatePngCanvas___STATIC__I4__U4__BYREF_U4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
-  {
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+  uint32_t param0;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
+
+  if (stack.Arg1().Dereference() == 0)
+    {
+    SetResult_INT32(stack, e_bad_pointer);
+    return S_OK;
+    }
 
   handle_t hndl;
   hr = create_png_canvas((handle_t)param0, &hndl);
+  SetResult_INT32(stack, hr);
 
-  NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT32(stack, (unsigned int)hndl);
+  if (succeeded(hr))
+    stack.Arg1().Dereference()->SetInteger((CLR_UINT32)hndl);
+
+  return S_OK;
   }
-  NANOCLR_NOCLEANUP();
-  }
 
-HRESULT Library_corlib_native_CanFly_Syscall::LoadPng___STATIC__VOID__U4__U4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::LoadPng___STATIC__I4__U4__U4__I4__I4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
+  HRESULT hr;
   {
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
-
-  unsigned int param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 1, param1));
-
-  signed int param2;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 2, param2));
-
-  signed int param3;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 3, param3));
+  uint32_t param0;
+  uint32_t param1;
+  int32_t param2;
+  int32_t param3;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)) ||
+    FAILED(hr = Interop_Marshal_UINT32(stack, 1, param1)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 2, param2)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 3, param3)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
 
   point_t pt;
   pt.x = param2;
   pt.y = param3;
 
   hr = load_png((handle_t)param0, (handle_t)param1, &pt);
-  NANOCLR_CHECK_HRESULT(hr);
+
 
   }
-  NANOCLR_NOCLEANUP();
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::GetCanvasExtents___STATIC__VOID__U4__BYREF_U2__BYREF_I4__BYREF_I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetCanvasExtents___STATIC__I4__U4__BYREF_U2__BYREF_I4__BYREF_I4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
-  {
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+  uint32_t param0;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
+
+  if (stack.Arg1().Dereference() == 0 ||
+    stack.Arg2().Dereference() == 0 ||
+    stack.Arg3().Dereference() == 0)
+    {
+    SetResult_INT32(stack, e_bad_pointer);
+    return S_OK;
+    }
 
   extent_t ex;
   uint16_t bpp;
   hr = get_canvas_extents((handle_t)param0, &ex, &bpp);
-  NANOCLR_CHECK_HRESULT(hr);
 
-  stack.Arg1().NumericByRef().s2 = bpp;
-  stack.Arg2().NumericByRef().s4 = ex.dx;
-  stack.Arg3().NumericByRef().s4 = ex.dy;
+  SetResult_INT32(stack, hr);
+
+  if (succeeded(hr))
+    {
+    stack.Arg1().Dereference()->SetInteger(bpp);
+    stack.Arg2().Dereference()->SetInteger(ex.dx);
+    stack.Arg3().Dereference()->SetInteger(ex.dy);
+    }
+
+  return S_OK;
   }
-  NANOCLR_NOCLEANUP();
-  }
 
-HRESULT Library_corlib_native_CanFly_Syscall::GetOrientation___STATIC__U2__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetOrientation___STATIC__I4__U4__BYREF_U2(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
-  {
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+  uint32_t param0;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
+
+  if (stack.Arg1().Dereference() == 0)
+    {
+    SetResult_INT32(stack, e_bad_pointer);
+    return S_OK;
+    }
 
   uint16_t orientation;
   hr = get_orientation((handle_t)param0, &orientation);
-  NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT16(stack, orientation);
+  SetResult_INT32(stack, hr);
+
+  if (succeeded(hr))
+    stack.Arg1().Dereference()->SetInteger(orientation);
+
+  return S_OK;
   }
-  NANOCLR_NOCLEANUP();
-  }
 
-HRESULT Library_corlib_native_CanFly_Syscall::SetOrientation___STATIC__VOID__U4__U2(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::SetOrientation___STATIC__I4__U4__U2(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
-  {
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
-
+  uint32_t param0;
   uint16_t param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 1, param1));
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)) ||
+    FAILED(hr = Interop_Marshal_UINT16(stack, 1, param1)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
 
-  hr = set_orientation((handle_t)param0, param1);
-  NANOCLR_CHECK_HRESULT(hr);
+  stack.SetResult_I4(set_orientation((handle_t)param0, param1));
 
+  return S_OK;
   }
-  NANOCLR_NOCLEANUP();
-  }
 
-HRESULT Library_corlib_native_CanFly_Syscall::CreatePen___STATIC__U4__U4__U2__U2(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::CreatePen___STATIC__I4__U4__U2__U2__BYREF_U4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
-  {
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
-
+  uint32_t param0;
   uint16_t param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 1, param1));
-
   uint16_t param2;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 2, param2));
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)) ||
+    FAILED(hr = Interop_Marshal_UINT16(stack, 1, param1)) ||
+    FAILED(hr = Interop_Marshal_UINT16(stack, 2, param2)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
+
+  if (stack.Arg3().Dereference() == 0)
+    {
+    SetResult_INT32(stack, e_bad_pointer);
+    return S_OK;
+    }
 
   handle_t pen;
-  hr = pen_create(param0, param1, (pen_style) param2, &pen);
+  hr = pen_create(param0, param1, (pen_style)param2, &pen);
+  SetResult_INT32(stack, hr);
 
-  NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT32(stack, (unsigned int)pen);
-  }
-  NANOCLR_NOCLEANUP();
-  }
+  if (succeeded(hr))
+    stack.Arg3().Dereference()->SetInteger((CLR_UINT32)pen);
 
-HRESULT Library_corlib_native_CanFly_Syscall::GetPenColor___STATIC__U4__U4(CLR_RT_StackFrame &stack)
-  {
-  NANOCLR_HEADER(); hr = S_OK;
-  {
-
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
-
-  unsigned int retValue;
-  hr = get_pen_color((handle_t)param0, (color_t *) &retValue);
-  NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT32(stack, retValue);
-  }
-  NANOCLR_NOCLEANUP();
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::GetPenWidth___STATIC__U2__U4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetPenColor___STATIC__I4__U4__BYREF_U4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
-  {
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+  uint32_t param0;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
+
+  if (stack.Arg1().Dereference() == 0)
+    {
+    SetResult_INT32(stack, e_bad_pointer);
+    return S_OK;
+    }
+
+  uint32_t retValue;
+  hr = get_pen_color((handle_t)param0, (color_t *)&retValue);
+  SetResult_INT32(stack, hr);
+
+  if (succeeded(hr))
+    stack.Arg1().Dereference()->SetInteger(retValue);
+
+  return S_OK;
+  }
+
+HRESULT Library_corlib_native_CanFly_Syscall::GetPenWidth___STATIC__I4__U4__BYREF_U2(CLR_RT_StackFrame &stack)
+  {
+  HRESULT hr;
+
+  uint32_t param0;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
+
+  if (stack.Arg1().Dereference() == 0)
+    {
+    SetResult_INT32(stack, e_bad_pointer);
+    return S_OK;
+    }
 
   uint16_t retValue;
   hr = get_pen_width((handle_t)param0, &retValue);
-  NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT16(stack, retValue);
-  }
-  NANOCLR_NOCLEANUP();
+  SetResult_INT32(stack, hr);
+
+  if (succeeded(hr))
+    stack.Arg1().Dereference()->SetInteger(retValue);
+
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::GetPenStyle___STATIC__U2__U4(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetPenStyle___STATIC__I4__U4__BYREF_U2(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
-  {
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+  uint32_t param0;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
+
+  if (stack.Arg1().Dereference() == 0)
+    {
+    SetResult_INT32(stack, e_bad_pointer);
+    return S_OK;
+    }
 
   uint16_t retValue;
   hr = get_pen_style((handle_t)param0, (pen_style *)&retValue);
-  NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT16(stack, retValue);
-  }
-  NANOCLR_NOCLEANUP();
-  }
+  SetResult_INT32(stack, hr);
 
-HRESULT Library_corlib_native_CanFly_Syscall::DisposePen___STATIC__VOID__U4(CLR_RT_StackFrame& stack)
-  {
-  NANOCLR_HEADER(); hr = S_OK;
-  {
+  if (succeeded(hr))
+    stack.Arg1().Dereference()->SetInteger(retValue);
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
-
-  hr = pen_release((handle_t)param0);
-  NANOCLR_CHECK_HRESULT(hr);
-
-  }
-  NANOCLR_NOCLEANUP();
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::Polyline___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::DisposePen___STATIC__I4__U4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
+  HRESULT hr;
+
+  uint32_t param0;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
+
+  stack.SetResult_I4(pen_release((handle_t)param0));
+
+  return S_OK;
+  }
+
+HRESULT Library_corlib_native_CanFly_Syscall::Polyline___STATIC__I4__U4__I4__I4__I4__I4__U4__U4(CLR_RT_StackFrame &stack)
   {
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
-
-  signed int param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 1, param1));
-
-  signed int param2;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 2, param2));
-
-  signed int param3;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 3, param3));
-
-  signed int param4;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 4, param4));
-
-  unsigned int param5;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 5, param5));
-
-  unsigned int param6;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 6, param6));
+  uint32_t param0;
+  int32_t param1;
+  int32_t param2;
+  int32_t param3;
+  int32_t param4;
+  uint32_t param5;
+  uint32_t param6;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 1, param1)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 2, param2)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 3, param3)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 4, param4)) ||
+    FAILED(hr = Interop_Marshal_UINT32(stack, 5, param5)) ||
+    FAILED(hr = Interop_Marshal_UINT32(stack, 6, param6)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
 
   // param0 is a canvas handle
   handle_t canvas = (handle_t)param0;
@@ -682,55 +914,49 @@ HRESULT Library_corlib_native_CanFly_Syscall::Polyline___STATIC__VOID__U4__I4__I
   vector_p hndl = (vector_p)param6;
 
   const point_t *pts;
-  hr = vector_begin(hndl, (void **) &pts);
-  NANOCLR_CHECK_HRESULT(hr);
   uint16_t count;
-  hr = vector_count(hndl, &count);
+  if (failed(hr = vector_begin(hndl, (void **)&pts)) ||
+    failed(hr = vector_count(hndl, &count)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
 
-  hr = polyline(canvas, &clip_rect, pen, count, pts);
-  NANOCLR_CHECK_HRESULT(hr);
+  stack.SetResult_I4(polyline(canvas, &clip_rect, pen, count, pts));
 
+  return S_OK;
   }
-  NANOCLR_NOCLEANUP();
-  }
 
-HRESULT Library_corlib_native_CanFly_Syscall::Ellipse___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::Ellipse___STATIC__I4__U4__I4__I4__I4__I4__U4__U4__I4__I4__I4__I4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
-  {
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
-
-  signed int param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 1, param1));
-
-  signed int param2;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 2, param2));
-
-  signed int param3;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 3, param3));
-
-  signed int param4;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 4, param4));
-
-  unsigned int param5;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 5, param5));
-
-  unsigned int param6;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 6, param6));
-
-  signed int param7;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 7, param7));
-
-  signed int param8;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 8, param8));
-
-  signed int param9;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 9, param9));
-
-  signed int param10;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 10, param10));
+  uint32_t param0;
+  int32_t param1;
+  int32_t param2;
+  int32_t param3;
+  int32_t param4;
+  uint32_t param5;
+  uint32_t param6;
+  int32_t param7;
+  int32_t param8;
+  int32_t param9;
+  int32_t param10;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 1, param1)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 2, param2)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 3, param3)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 4, param4)) ||
+    FAILED(hr = Interop_Marshal_UINT32(stack, 5, param5)) ||
+    FAILED(hr = Interop_Marshal_UINT32(stack, 6, param6)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 7, param7)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 8, param8)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 9, param9)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 10, param10)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
 
 
   // param0 is a canvas handle
@@ -751,41 +977,36 @@ HRESULT Library_corlib_native_CanFly_Syscall::Ellipse___STATIC__VOID__U4__I4__I4
   rect.right = param9;
   rect.bottom = param10;
 
-  hr = ellipse(canvas, &clip_rect, pen, color, &rect);
-  NANOCLR_CHECK_HRESULT(hr);
+  stack.SetResult_I4(ellipse(canvas, &clip_rect, pen, color, &rect));
 
+
+  return S_OK;
   }
-  NANOCLR_NOCLEANUP();
-  }
 
-HRESULT Library_corlib_native_CanFly_Syscall::Polygon___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::Polygon___STATIC__I4__U4__I4__I4__I4__I4__U4__U4__U4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
-  {
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
-
-  signed int param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 1, param1));
-
-  signed int param2;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 2, param2));
-
-  signed int param3;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 3, param3));
-
-  signed int param4;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 4, param4));
-
-  unsigned int param5;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 5, param5));
-
-  unsigned int param6;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 6, param6));
-
-  unsigned int param7;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 7, param7));
+  uint32_t param0;
+  int32_t param1;
+  int32_t param2;
+  int32_t param3;
+  int32_t param4;
+  uint32_t param5;
+  uint32_t param6;
+  uint32_t param7;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 1, param1)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 2, param2)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 3, param3)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 4, param4)) ||
+    FAILED(hr = Interop_Marshal_UINT32(stack, 5, param5)) ||
+    FAILED(hr = Interop_Marshal_UINT32(stack, 6, param6)) ||
+    FAILED(hr = Interop_Marshal_UINT32(stack, 7, param7)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
 
   // param0 is a canvas handle
   handle_t canvas = (handle_t)param0;
@@ -805,56 +1026,49 @@ HRESULT Library_corlib_native_CanFly_Syscall::Polygon___STATIC__VOID__U4__I4__I4
   vector_p hndl = (vector_p)param7;
 
   const point_t *pts;
-  hr = vector_begin(hndl, (void **)&pts);
-  NANOCLR_CHECK_HRESULT(hr);
   uint16_t count;
-  hr = vector_count(hndl, &count);
+  if (failed(hr = vector_begin(hndl, (void **)&pts)) ||
+    failed(hr = vector_count(hndl, &count)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
 
-  hr = polygon(canvas, &clip_rect, pen, color, count, pts);
+  stack.SetResult_I4(polygon(canvas, &clip_rect, pen, color, count, pts));
 
-  NANOCLR_CHECK_HRESULT(hr);
-
+  return S_OK;
   }
-  NANOCLR_NOCLEANUP();
-  }
 
-HRESULT Library_corlib_native_CanFly_Syscall::Rectangle___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::Rectangle___STATIC__I4__U4__I4__I4__I4__I4__U4__U4__I4__I4__I4__I4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
-  {
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
-
-  signed int param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 1, param1));
-
-  signed int param2;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 2, param2));
-
-  signed int param3;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 3, param3));
-
-  signed int param4;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 4, param4));
-
-  unsigned int param5;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 5, param5));
-
-  unsigned int param6;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 6, param6));
-
-  signed int param7;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 7, param7));
-
-  signed int param8;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 8, param8));
-
-  signed int param9;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 9, param9));
-
-  signed int param10;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 10, param10));
+  uint32_t param0;
+  int32_t param1;
+  int32_t param2;
+  int32_t param3;
+  int32_t param4;
+  uint32_t param5;
+  uint32_t param6;
+  int32_t param7;
+  int32_t param8;
+  int32_t param9;
+  int32_t param10;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 1, param1)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 2, param2)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 3, param3)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 4, param4)) ||
+    FAILED(hr = Interop_Marshal_UINT32(stack, 5, param5)) ||
+    FAILED(hr = Interop_Marshal_UINT32(stack, 6, param6)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 7, param7)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 8, param8)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 9, param9)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 10, param10)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
 
   // param0 is a canvas handle
   handle_t canvas = (handle_t)param0;
@@ -874,53 +1088,43 @@ HRESULT Library_corlib_native_CanFly_Syscall::Rectangle___STATIC__VOID__U4__I4__
   rect.right = param9;
   rect.bottom = param10;
 
-  hr = rectangle(canvas, &clip_rect, pen, color, &rect);
-  NANOCLR_CHECK_HRESULT(hr);
+  stack.SetResult_I4(rectangle(canvas, &clip_rect, pen, color, &rect));
 
-  }
-  NANOCLR_NOCLEANUP();
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::RoundRect___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__I4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::RoundRect___STATIC__I4__U4__I4__I4__I4__I4__U4__U4__I4__I4__I4__I4__I4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
-  {
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
-
-  signed int param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 1, param1));
-
-  signed int param2;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 2, param2));
-
-  signed int param3;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 3, param3));
-
-  signed int param4;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 4, param4));
-
-  unsigned int param5;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 5, param5));
-
-  unsigned int param6;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 6, param6));
-
-  signed int param7;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 7, param7));
-
-  signed int param8;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 8, param8));
-
-  signed int param9;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 9, param9));
-
-  signed int param10;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 10, param10));
-
-  signed int param11;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 11, param11));
+  uint32_t param0;
+  int32_t param1;
+  int32_t param2;
+  int32_t param3;
+  int32_t param4;
+  uint32_t param5;
+  uint32_t param6;
+  int32_t param7;
+  int32_t param8;
+  int32_t param9;
+  int32_t param10;
+  int32_t param11;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 1, param1)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 2, param2)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 3, param3)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 4, param4)) ||
+    FAILED(hr = Interop_Marshal_UINT32(stack, 5, param5)) ||
+    FAILED(hr = Interop_Marshal_UINT32(stack, 6, param6)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 7, param7)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 8, param8)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 9, param9)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 10, param10)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 11, param11)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
 
   // param0 is a canvas handle
   handle_t canvas = (handle_t)param0;
@@ -940,65 +1144,52 @@ HRESULT Library_corlib_native_CanFly_Syscall::RoundRect___STATIC__VOID__U4__I4__
   rect.right = param9;
   rect.bottom = param10;
 
-  hr = round_rect(canvas, &clip_rect, pen, color, &rect, param11);
-  NANOCLR_CHECK_HRESULT(hr);
+  stack.SetResult_I4(round_rect(canvas, &clip_rect, pen, color, &rect, param11));
 
-  }
-  NANOCLR_NOCLEANUP();
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::BitBlt___STATIC__VOID__U4__I4__I4__I4__I4__I4__I4__I4__I4__U4__I4__I4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::BitBlt___STATIC__I4__U4__I4__I4__I4__I4__I4__I4__I4__I4__U4__I4__I4__I4__I4__I4__I4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
-  {
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+  uint32_t param0;
+  int32_t param1;
+  int32_t param2;
+  int32_t param3;
+  int32_t param4;
+  int32_t param5;
+  int32_t param6;
+  int32_t param7;
+  int32_t param8;
+  uint32_t param9;
+  int32_t param10;
+  int32_t param11;
+  int32_t param12;
+  int32_t param13;
+  int32_t param14;
+  int32_t param15;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 1, param1)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 2, param2)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 3, param3)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 4, param4)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 5, param5)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 6, param6)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 7, param7)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 8, param8)) ||
+    FAILED(hr = Interop_Marshal_UINT32(stack, 9, param9)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 10, param10)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 11, param11)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 12, param12)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 13, param13)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 14, param14)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 15, param15)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
 
-  signed int param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 1, param1));
-
-  signed int param2;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 2, param2));
-
-  signed int param3;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 3, param3));
-
-  signed int param4;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 4, param4));
-
-  signed int param5;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 5, param5));
-
-  signed int param6;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 6, param6));
-
-  signed int param7;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 7, param7));
-
-  signed int param8;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 8, param8));
-
-  unsigned int param9;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 9, param9));
-
-  signed int param10;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 10, param10));
-
-  signed int param11;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 11, param11));
-
-  signed int param12;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 12, param12));
-
-  signed int param13;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 13, param13));
-
-  signed int param14;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 14, param14));
-
-  signed int param15;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 15, param15));
   // param0 is a canvas handle
   handle_t canvas = (handle_t)param0;
 
@@ -1026,38 +1217,39 @@ HRESULT Library_corlib_native_CanFly_Syscall::BitBlt___STATIC__VOID__U4__I4__I4_
   src_pt.x = param14;
   src_pt.y = param15;
 
-  hr = bit_blt(canvas, &clip_rect, &dest_rect, src_canvas, &src_clip_rect, &src_pt);
-  NANOCLR_CHECK_HRESULT(hr);
+  stack.SetResult_I4(bit_blt(canvas, &clip_rect, &dest_rect, src_canvas, &src_clip_rect, &src_pt));
 
-  }
-  NANOCLR_NOCLEANUP();
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::GetPixel___STATIC__U4__U4__I4__I4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::GetPixel___STATIC__I4__U4__I4__I4__I4__I4__I4__I4__BYREF_U4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
-  {
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+  uint32_t param0;
+  int32_t param1;
+  int32_t param2;
+  int32_t param3;
+  int32_t param4;
+  int32_t param5;
+  int32_t param6;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 1, param1)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 2, param2)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 3, param3)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 4, param4)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 5, param5)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 6, param6)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
 
-  signed int param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 1, param1));
-
-  signed int param2;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 2, param2));
-
-  signed int param3;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 3, param3));
-
-  signed int param4;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 4, param4));
-
-  signed int param5;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 5, param5));
-
-  signed int param6;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 6, param6));
+  if (stack.Arg7().Dereference() == 0)
+    {
+    SetResult_INT32(stack, e_bad_pointer);
+    return S_OK;
+    }
 
   // param0 is a canvas handle
   handle_t canvas = (handle_t)param0;
@@ -1072,42 +1264,40 @@ HRESULT Library_corlib_native_CanFly_Syscall::GetPixel___STATIC__U4__U4__I4__I4_
   pt.x = param5;
   pt.y = param6;
 
-  unsigned int retValue;
+  uint32_t retValue;
   hr = get_pixel(canvas, &clip_rect, &pt, (color_t *)&retValue);
-  NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT32(stack, retValue);
+  SetResult_INT32(stack, hr);
+
+  if (succeeded(hr))
+    stack.Arg7().Dereference()->SetInteger(retValue);
+
+  return S_OK;
   }
-  NANOCLR_NOCLEANUP();
-  }
 
-HRESULT Library_corlib_native_CanFly_Syscall::SetPixel___STATIC__U4__U4__I4__I4__I4__I4__I4__I4__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::SetPixel___STATIC__I4__U4__I4__I4__I4__I4__I4__I4__U4__BYREF_U4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
-  {
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
-
-  signed int param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 1, param1));
-
-  signed int param2;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 2, param2));
-
-  signed int param3;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 3, param3));
-
-  signed int param4;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 4, param4));
-
-  signed int param5;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 5, param5));
-
-  signed int param6;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 6, param6));
-
-  unsigned int param7;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 7, param7));
+  uint32_t param0;
+  int32_t param1;
+  int32_t param2;
+  int32_t param3;
+  int32_t param4;
+  int32_t param5;
+  int32_t param6;
+  uint32_t param7;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 1, param1)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 2, param2)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 3, param3)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 4, param4)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 5, param5)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 6, param6)) ||
+    FAILED(hr = Interop_Marshal_UINT32(stack, 7, param7)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
 
   // param0 is a canvas handle
   handle_t canvas = (handle_t)param0;
@@ -1124,51 +1314,43 @@ HRESULT Library_corlib_native_CanFly_Syscall::SetPixel___STATIC__U4__U4__I4__I4_
 
   color_t color = param7;
 
-  unsigned int retValue;
-  hr = set_pixel(canvas, &clip_rect, &pt, color, (color_t *)&retValue);
-  NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT32(stack, retValue);
-  }
-  NANOCLR_NOCLEANUP();
+  uint32_t retValue;
+  stack.SetResult_I4(set_pixel(canvas, &clip_rect, &pt, color, (color_t *)&retValue));
+
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::Arc___STATIC__VOID__U4__I4__I4__I4__I4__U4__I4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::Arc___STATIC__I4__U4__I4__I4__I4__I4__U4__I4__I4__I4__I4__I4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
-  {
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+  uint32_t param0;
+  int32_t param1;
+  int32_t param2;
+  int32_t param3;
+  int32_t param4;
+  uint32_t param5;
+  int32_t param6;
+  int32_t param7;
+  int32_t param8;
+  int32_t param9;
+  int32_t param10;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 1, param1)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 2, param2)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 3, param3)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 4, param4)) ||
+    FAILED(hr = Interop_Marshal_UINT32(stack, 5, param5)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 6, param6)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 7, param7)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 8, param8)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 9, param9)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 10, param10)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
 
-  signed int param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 1, param1));
-
-  signed int param2;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 2, param2));
-
-  signed int param3;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 3, param3));
-
-  signed int param4;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 4, param4));
-
-  unsigned int param5;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 5, param5));
-
-  signed int param6;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 6, param6));
-
-  signed int param7;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 7, param7));
-
-  signed int param8;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 8, param8));
-
-  signed int param9;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 9, param9));
-
-  signed int param10;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 10, param10));
   handle_t canvas = (handle_t)param0;
 
   rect_t clip_rect;
@@ -1183,56 +1365,46 @@ HRESULT Library_corlib_native_CanFly_Syscall::Arc___STATIC__VOID__U4__I4__I4__I4
   pt.x = param6;
   pt.y = param7;
 
-  hr = arc(canvas, &clip_rect, pen, &pt, param8, param9, param10);
-  NANOCLR_CHECK_HRESULT(hr);
+  SetResult_INT32(stack, arc(canvas, &clip_rect, pen, &pt, param8, param9, param10));
 
-  }
-  NANOCLR_NOCLEANUP();
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::Pie___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__I4__I4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::Pie___STATIC__I4__U4__I4__I4__I4__I4__U4__U4__I4__I4__I4__I4__I4__I4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
-  {
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+  uint32_t param0;
+  int32_t param1;
+  int32_t param2;
+  int32_t param3;
+  int32_t param4;
+  uint32_t param5;
+  uint32_t param6;
+  int32_t param7;
+  int32_t param8;
+  int32_t param9;
+  int32_t param10;
+  int32_t param11;
+  int32_t param12;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 1, param1)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 2, param2)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 3, param3)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 4, param4)) ||
+    FAILED(hr = Interop_Marshal_UINT32(stack, 5, param5)) ||
+    FAILED(hr = Interop_Marshal_UINT32(stack, 6, param6)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 7, param7)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 8, param8)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 9, param9)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 10, param10)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 11, param11)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 12, param12)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
 
-  signed int param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 1, param1));
-
-  signed int param2;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 2, param2));
-
-  signed int param3;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 3, param3));
-
-  signed int param4;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 4, param4));
-
-  unsigned int param5;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 5, param5));
-
-  unsigned int param6;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 6, param6));
-
-  signed int param7;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 7, param7));
-
-  signed int param8;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 8, param8));
-
-  signed int param9;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 9, param9));
-
-  signed int param10;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 10, param10));
-
-  signed int param11;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 11, param11));
-
-  signed int param12;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 12, param12));
   handle_t canvas = (handle_t)param0;
 
   rect_t clip_rect;
@@ -1249,84 +1421,78 @@ HRESULT Library_corlib_native_CanFly_Syscall::Pie___STATIC__VOID__U4__I4__I4__I4
   pt.x = param7;
   pt.y = param8;
 
-  hr = pie(canvas, &clip_rect, pen, color, &pt, param9, param10, param11, param12);
-  NANOCLR_CHECK_HRESULT(hr);
-
-  }
-  NANOCLR_NOCLEANUP();
+  SetResult_INT32(stack, pie(canvas, &clip_rect, pen, color, &pt, param9, param10, param11, param12));
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::OpenFont___STATIC__U4__STRING__U2(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::OpenFont___STATIC__I4__STRING__U2__BYREF_U4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
-  {
+  HRESULT hr;
 
-  const char* param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_LPCSTR(stack, 0, param0));
-
+  const char *param0;
   uint16_t param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 1, param1));
+  if (FAILED(hr = Interop_Marshal_LPCSTR(stack, 0, param0)) ||
+    FAILED(hr = Interop_Marshal_UINT16(stack, 1, param1)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
 
-  unsigned int retValue;
+  if (stack.Arg2().Dereference() == 0)
+    {
+    SetResult_INT32(stack, e_bad_pointer);
+    return S_OK;
+    }
+
+  uint32_t retValue;
   hr = open_font(param0, param1, (handle_t *)&retValue);
-  NANOCLR_CHECK_HRESULT(hr);
-  SetResult_UINT32(stack, retValue);
+  SetResult_INT32(stack, hr);
+  if (succeeded(hr))
+    stack.Arg2().Dereference()->SetInteger(retValue);
+
+  return S_OK;
   }
-  NANOCLR_NOCLEANUP();
-  }
 
-HRESULT Library_corlib_native_CanFly_Syscall::DrawText___STATIC__VOID__U4__I4__I4__I4__I4__U4__U4__U4__STRING__I4__I4__I4__I4__I4__I4__U2(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::DrawText___STATIC__I4__U4__I4__I4__I4__I4__U4__U4__U4__STRING__I4__I4__I4__I4__I4__I4__U2(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
-  {
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
-
-  signed int param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 1, param1));
-
-  signed int param2;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 2, param2));
-
-  signed int param3;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 3, param3));
-
-  signed int param4;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 4, param4));
-
-  unsigned int param5;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 5, param5));
-
-  unsigned int param6;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 6, param6));
-
-  unsigned int param7;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 7, param7));
-
-  const char* param8;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_LPCSTR(stack, 8, param8));
-
-  signed int param9;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 9, param9));
-
-  signed int param10;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 10, param10));
-
-  signed int param11;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 11, param11));
-
-  signed int param12;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 12, param12));
-
-  signed int param13;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 13, param13));
-
-  signed int param14;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 14, param14));
-
+  uint32_t param0;
+  int32_t param1;
+  int32_t param2;
+  int32_t param3;
+  int32_t param4;
+  uint32_t param5;
+  uint32_t param6;
+  uint32_t param7;
+  const char *param8;
+  int32_t param9;
+  int32_t param10;
+  int32_t param11;
+  int32_t param12;
+  int32_t param13;
+  int32_t param14;
   unsigned short int param15;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 15, param15));
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 1, param1)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 2, param2)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 3, param3)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 4, param4)) ||
+    FAILED(hr = Interop_Marshal_UINT32(stack, 5, param5)) ||
+    FAILED(hr = Interop_Marshal_UINT32(stack, 6, param6)) ||
+    FAILED(hr = Interop_Marshal_UINT32(stack, 7, param7)) ||
+    FAILED(hr = Interop_Marshal_LPCSTR(stack, 8, param8)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 9, param9)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 10, param10)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 11, param11)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 12, param12)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 13, param13)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 14, param14)) ||
+    FAILED(hr = Interop_Marshal_UINT16(stack, 15, param15)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
 
   handle_t canvas = (handle_t)param0;
 
@@ -1351,63 +1517,63 @@ HRESULT Library_corlib_native_CanFly_Syscall::DrawText___STATIC__VOID__U4__I4__I
   txt_clip_rect.right = param13;
   txt_clip_rect.bottom = param14;
 
-  hr = draw_text(canvas, &clip_rect, font, fg, bg, param8, 0, &pt, &txt_clip_rect, param15, 0);
+  SetResult_INT32(stack, draw_text(canvas, &clip_rect, font, fg, bg, param8, 0, &pt, &txt_clip_rect, param15, 0));
 
-  NANOCLR_CHECK_HRESULT(hr);
-
-  }
-  NANOCLR_NOCLEANUP();
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::TextExtent___STATIC__VOID__U4__U4__STRING__BYREF_I4__BYREF_I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::TextExtent___STATIC__I4__U4__U4__STRING__BYREF_I4__BYREF_I4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
-  {
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
-
-  unsigned int param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 1, param1));
-
-  const char* param2;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_LPCSTR(stack, 2, param2));
+  uint32_t param0;
+  uint32_t param1;
+  const char *param2;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)) ||
+    FAILED(hr = Interop_Marshal_UINT32(stack, 1, param1)) ||
+    FAILED(hr = Interop_Marshal_LPCSTR(stack, 2, param2)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
 
   handle_t canvas = (handle_t)param0;
 
   handle_t font = (handle_t)param1;
-  
+
   extent_t ex;
 
   hr = text_extent(canvas, font, param2, 0, &ex);
-  NANOCLR_CHECK_HRESULT(hr);
+  SetResult_INT32(stack, hr);
 
-  stack.Arg3().NumericByRef().s4 = ex.dx;
-  stack.Arg4().NumericByRef().s4 = ex.dy;
+  if (succeeded(hr))
+    {
+    stack.Arg3().NumericByRef().s4 = ex.dx;
+    stack.Arg4().NumericByRef().s4 = ex.dy;
+    }
 
+  return S_OK;
   }
-  NANOCLR_NOCLEANUP();
-  }
 
-HRESULT Library_corlib_native_CanFly_Syscall::InvalidateRect___STATIC__VOID__U4__I4__I4__I4__I4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::InvalidateRect___STATIC__I4__U4__I4__I4__I4__I4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
-  {
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+  uint32_t param0;
+  int32_t param1;
+  int32_t param2;
+  int32_t param3;
+  int32_t param4;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 1, param1)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 2, param2)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 3, param3)) ||
+    FAILED(hr = Interop_Marshal_INT32(stack, 4, param4)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
 
-  signed int param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 1, param1));
-
-  signed int param2;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 2, param2));
-
-  signed int param3;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 3, param3));
-
-  signed int param4;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_INT32(stack, 4, param4));
   handle_t hwnd = (handle_t)param0;
 
   rect_t rect;
@@ -1416,62 +1582,70 @@ HRESULT Library_corlib_native_CanFly_Syscall::InvalidateRect___STATIC__VOID__U4_
   rect.right = param3;
   rect.bottom = param4;
 
-  hr = invalidate_rect(hwnd, &rect);
-  NANOCLR_CHECK_HRESULT(hr);
+  SetResult_INT32(stack, invalidate_rect(hwnd, &rect));
 
-  }
-  NANOCLR_NOCLEANUP();
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::IsValid___STATIC__BOOLEAN__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::IsInvalid___STATIC__I4__U4__BYREF_BOOLEAN(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
-  {
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+  uint32_t param0;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
+
+  if (stack.Arg1().Dereference() == 0)
+    {
+    SetResult_INT32(stack, e_bad_pointer);
+    return S_OK;
+    }
 
   handle_t hwnd = (handle_t)param0;
-
   bool retValue = is_invalid(hwnd) == s_ok;
-  
-  SetResult_bool(stack, retValue);
-  }
-  NANOCLR_NOCLEANUP();
+  stack.Arg1().Dereference()->SetBoolean(retValue);
+  SetResult_INT32(stack, s_ok);
+
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::BeginPaint___STATIC__VOID__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::BeginPaint___STATIC__I4__U4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
-  {
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+  uint32_t param0;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
 
   handle_t hwnd = (handle_t)param0;
 
-  hr = begin_paint(hwnd);
-  NANOCLR_CHECK_HRESULT(hr);
+  SetResult_INT32(stack, begin_paint(hwnd));
 
-  }
-  NANOCLR_NOCLEANUP();
+  return S_OK;
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::EndPaint___STATIC__VOID__U4(CLR_RT_StackFrame& stack)
+HRESULT Library_corlib_native_CanFly_Syscall::EndPaint___STATIC__I4__U4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
-  {
+  HRESULT hr;
 
-  unsigned int param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 0, param0));
+  uint32_t param0;
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
 
   handle_t hwnd = (handle_t)param0;
 
-  hr = end_paint(hwnd);
-  NANOCLR_CHECK_HRESULT(hr);
+  SetResult_INT32(stack, end_paint(hwnd));
 
-  }
-  NANOCLR_NOCLEANUP();
+  return S_OK;
   }
 
 extern result_t queue_callback(CLR_RT_HeapBlock_Delegate *dlg, const canmsg_t *msg);
@@ -1481,7 +1655,7 @@ static result_t photon_event(handle_t hwnd, struct _event_proxy_t *proxy, const 
   result_t result;
   // find the hwnd wnd data
   canfly_wnddata_t *wndData;
-  if (failed(result = get_wnddata(hwnd, (void **) &wndData)))
+  if (failed(result = get_wnddata(hwnd, (void **)&wndData)))
     return result;
 
   if (wndData->wndproc == 0)
@@ -1490,20 +1664,21 @@ static result_t photon_event(handle_t hwnd, struct _event_proxy_t *proxy, const 
   return queue_callback(wndData->wndproc, msg);
   }
 
-HRESULT Library_corlib_native_CanFly_Syscall::AddWidgetEvent___STATIC__VOID__U4__U2(CLR_RT_StackFrame &stack)
+HRESULT Library_corlib_native_CanFly_Syscall::AddWidgetEvent___STATIC__I4__U4__U2(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER(); hr = S_OK;
+  HRESULT hr;
   uint32_t param0;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT32(stack, 1, param0));
-
   uint16_t param1;
-  NANOCLR_CHECK_HRESULT(Interop_Marshal_UINT16(stack, 2, param1));
+  if (FAILED(hr = Interop_Marshal_UINT32(stack, 0, param0)) ||
+    FAILED(hr = Interop_Marshal_UINT16(stack, 1, param1)))
+    {
+    SetResult_INT32(stack, hr);
+    return S_OK;
+    }
 
   CLR_RT_HeapBlock *widgetObject = stack.This();
 
-  add_event((handle_t)param0, param1, widgetObject, photon_event);
+  SetResult_INT32(stack, add_event((handle_t)param0, param1, widgetObject, photon_event));
 
-  NANOCLR_CHECK_HRESULT(hr);
-
-  NANOCLR_NOCLEANUP();
+  return S_OK;
   }

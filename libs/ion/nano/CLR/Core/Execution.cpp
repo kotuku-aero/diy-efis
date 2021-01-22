@@ -59,10 +59,8 @@ HRESULT CLR_RT_ExecutionEngine::ExecutionEngine_Initialize()
                                                   // CLR_RT_Thread*                      m_finalizerThread;
                                                   // CLR_RT_Thread*                      m_cctorThread;
                                                   //
-#if !defined(NANOCLR_APPDOMAINS)
   m_globalLock = NULL;           // CLR_RT_HeapBlock*                   m_globalLock;
   m_outOfMemoryException = NULL; // CLR_RT_HeapBlock*                   m_outOfMemoryException;
-#endif                             //
 
   m_currentUICulture = NULL; // CLR_RT_HeapBlock*                   m_currentUICulture;
 
@@ -74,13 +72,6 @@ HRESULT CLR_RT_ExecutionEngine::ExecutionEngine_Initialize()
 #if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
   m_scratchPadArray = NULL; // CLR_RT_HeapBlock_Array*             m_scratchPadArray;
 #endif                        //#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
-
-#if defined(NANOCLR_APPDOMAINS)
-  m_appDomains.DblLinkedList_Initialize(); // CLR_RT_DblLinkedList                m_appDomains;
-
-  m_appDomainCurrent = NULL;                     // CLR_AppDomainCurrent*               m_appDomainCurrent;
-  m_appDomainIdNext = c_AppDomainId_Invalid + 1; // int                                 m_appDomainIdNext;
-#endif
 
   m_currentThread = NULL;
 
@@ -109,10 +100,6 @@ HRESULT CLR_RT_ExecutionEngine::ExecutionEngine_Initialize()
 
 #if defined(NANOCLR_PROFILE_NEW)
   NANOCLR_CHECK_HRESULT(CLR_PRF_Profiler::CreateInstance());
-#endif
-
-#if defined(NANOCLR_APPDOMAINS)
-  NANOCLR_CHECK_HRESULT(CLR_RT_AppDomain::CreateInstance("default", m_appDomainCurrent));
 #endif
 
   m_startTime = HAL_Time_CurrentTime();
@@ -233,9 +220,7 @@ void CLR_RT_ExecutionEngine::ExecutionEngine_Cleanup()
   g_CLR_RT_TypeSystem.TypeSystem_Cleanup();
   g_CLR_RT_EventCache.EventCache_Cleanup();
 
-#if !defined(NANOCLR_APPDOMAINS)
   m_globalLock = NULL;
-#endif
 
   // CLR_RT_HeapBlock_EndPoint::HandlerMethod_CleanUp();
   // CLR_RT_HeapBlock_NativeEventDispatcher::HandlerMethod_CleanUp();
@@ -393,10 +378,8 @@ void CLR_RT_ExecutionEngine::Relocate()
   CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_scratchPadArray);
 #endif //#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
 
-#if !defined(NANOCLR_APPDOMAINS)
   CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_globalLock);
   // CLR_RT_GarbageCollector::Heap_Relocate( (void**)&m_outOfMemoryException );
-#endif
 
   CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_currentUICulture);
 
@@ -404,96 +387,6 @@ void CLR_RT_ExecutionEngine::Relocate()
   }
 
 //--//
-
-#if defined(NANOCLR_APPDOMAINS)
-
-void CLR_RT_ExecutionEngine::TryToUnloadAppDomains_Helper_Threads(CLR_RT_DblLinkedList &threads)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_FOREACH_NODE(CLR_RT_Thread, th, threads)
-    {
-    if (th->m_flags & CLR_RT_Thread::TH_F_ContainsDoomedAppDomain)
-      {
-      NANOCLR_FOREACH_NODE(CLR_RT_StackFrame, stack, th->m_stackFrames)
-        {
-        stack->m_appDomain->m_fCanBeUnloaded = false;
-        }
-      NANOCLR_FOREACH_NODE_END();
-      }
-    }
-  NANOCLR_FOREACH_NODE_END();
-  }
-
-void CLR_RT_ExecutionEngine::TryToUnloadAppDomains_Helper_Finalizers(CLR_RT_DblLinkedList &finalizers, bool fAlive)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_FOREACH_NODE(CLR_RT_HeapBlock_Finalizer, fin, finalizers)
-    {
-    if (!fin->m_appDomain->IsLoaded())
-      {
-      if (fAlive)
-        {
-        // When an AppDomain is being unloaded, all live finalizers are run, regardless
-        // of whether or not they are still reachable.
-        m_finalizersPending.LinkAtBack(fin);
-        }
-
-      fin->m_appDomain->m_fCanBeUnloaded = false;
-      }
-    }
-  NANOCLR_FOREACH_NODE_END();
-  }
-
-bool CLR_RT_ExecutionEngine::TryToUnloadAppDomains()
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  bool fAnyAppDomainsUnloaded = false;
-
-  NANOCLR_FOREACH_NODE(CLR_RT_AppDomain, appDomain, m_appDomains)
-    {
-    appDomain->m_fCanBeUnloaded = true;
-    }
-  NANOCLR_FOREACH_NODE_END();
-
-  TryToUnloadAppDomains_Helper_Finalizers(m_finalizersAlive, true);
-  TryToUnloadAppDomains_Helper_Finalizers(m_finalizersPending, false);
-
-  TryToUnloadAppDomains_Helper_Threads(m_threadsReady);
-  TryToUnloadAppDomains_Helper_Threads(m_threadsWaiting);
-
-  CLR_EE_CLR(UnloadingAppDomain);
-
-  NANOCLR_FOREACH_NODE(CLR_RT_AppDomain, appDomain, m_appDomains)
-    {
-    if (appDomain->m_state == CLR_RT_AppDomain::AppDomainState_Unloading)
-      {
-      if (appDomain->m_fCanBeUnloaded)
-        {
-        appDomain->m_state = CLR_RT_AppDomain::AppDomainState_Unloaded;
-        appDomain->AppDomain_Uninitialize();
-        fAnyAppDomainsUnloaded = true;
-        }
-      else
-        {
-        CLR_EE_SET(UnloadingAppDomain);
-        }
-      }
-    }
-  NANOCLR_FOREACH_NODE_END();
-
-  if (fAnyAppDomainsUnloaded)
-    {
-    SignalEvents(Event_AppDomain);
-#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
-    Breakpoint_Assemblies_Loaded();
-#endif //#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
-    }
-
-  return fAnyAppDomainsUnloaded;
-  }
-
-#endif
-
 HRESULT CLR_RT_ExecutionEngine::WaitForDebugger()
   {
   NATIVE_PROFILE_CLR_CORE();
@@ -759,123 +652,6 @@ void CLR_RT_ExecutionEngine::StaticConstructorTerminationCallback(void *arg)
   g_CLR_RT_ExecutionEngine.SpawnStaticConstructor(g_CLR_RT_ExecutionEngine.m_cctorThread);
   }
 
-#if defined(NANOCLR_APPDOMAINS)
-bool CLR_RT_ExecutionEngine::SpawnStaticConstructorHelper(
-  CLR_RT_AppDomain *appDomain,
-  CLR_RT_AppDomainAssembly *appDomainAssembly,
-  const CLR_RT_MethodDef_Index &idx)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_MethodDef_Index idxNext;
-
-  _ASSERTE(m_cctorThread != NULL);
-  //_ASSERTE(m_cctorThread->CanThreadBeReused());
-
-  idxNext.m_data = idx.m_data;
-
-  _ASSERTE(appDomainAssembly != NULL);
-
-  // find next method with static constructor
-  if (appDomainAssembly->m_assembly->FindNextStaticConstructor(idxNext))
-    {
-    CLR_RT_HeapBlock_Delegate *dlg;
-    CLR_RT_HeapBlock refDlg;
-    refDlg.SetObjectReference(NULL);
-    CLR_RT_ProtectFromGC gc(refDlg);
-
-    if (SUCCEEDED(CLR_RT_HeapBlock_Delegate::CreateInstance(refDlg, idxNext, NULL)))
-      {
-      dlg = refDlg.DereferenceDelegate();
-      dlg->m_appDomain = appDomain;
-
-      if (SUCCEEDED(m_cctorThread->PushThreadProcDelegate(dlg)))
-        {
-        m_cctorThread->m_terminationCallback = CLR_RT_ExecutionEngine::StaticConstructorTerminationCallback;
-
-        return true;
-        }
-      }
-    }
-
-  appDomainAssembly->m_flags |= CLR_RT_AppDomainAssembly::StaticConstructorsExecuted;
-  return false;
-  }
-
-void CLR_RT_ExecutionEngine::SpawnStaticConstructor(CLR_RT_Thread *&pCctorThread)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_HeapBlock_Delegate *dlg = NULL;
-
-  if (!EnsureSystemThread(pCctorThread, ThreadPriority::System_Highest))
-    return;
-
-  dlg = pCctorThread->m_dlg;
-
-  if (dlg != NULL)
-    {
-    CLR_RT_AppDomainAssembly *appDomainAssembly;
-    CLR_RT_MethodDef_Index idx = dlg->DelegateFtn();
-    CLR_RT_MethodDef_Instance inst;
-
-    // Find next static constructor for given idx
-    _ASSERTE(NANOCLR_INDEX_IS_VALID(idx));
-    _SIDE_ASSERTE(inst.InitializeFromIndex(idx));
-
-    appDomainAssembly = dlg->m_appDomain->FindAppDomainAssembly(inst.m_assm);
-
-    _ASSERTE(appDomainAssembly != NULL);
-    _ASSERTE(appDomainAssembly->m_assembly == inst.m_assm);
-
-    // This is ok if idx is no longer valid.  SpawnStaticConstructorHelper will call FindNextStaticConstructor
-    // which will fail
-    idx.m_data++;
-
-    // This is not the first static constructor run in this appDomain
-    if (SpawnStaticConstructorHelper(dlg->m_appDomain, appDomainAssembly, idx))
-      return;
-    }
-
-  // first, find the AppDomainAssembly to run. (what about appdomains!!!)
-  NANOCLR_FOREACH_NODE(CLR_RT_AppDomain, appDomain, g_CLR_RT_ExecutionEngine.m_appDomains)
-    {
-    NANOCLR_FOREACH_NODE(CLR_RT_AppDomainAssembly, appDomainAssembly, appDomain->m_appDomainAssemblies)
-      {
-      CLR_RT_Assembly *assembly = appDomainAssembly->m_assembly;
-
-      // Find an AppDomainAssembly that does not have it's static constructor bit set...
-      if ((appDomainAssembly->m_flags & CLR_RT_AppDomainAssembly::StaticConstructorsExecuted) == 0)
-        {
-        CLR_RT_MethodDef_Index idx;
-        idx.Set(assembly->m_idx, 0);
-
-#ifdef DEBUG
-
-        // Check that all dependent assemblies have had static constructors run.
-        CLR_RT_AssemblyRef_CrossReference *ar = assembly->m_pCrossReference_AssemblyRef;
-        for (int i = 0; i < assembly->m_pTablesSize[TBL_AssemblyRef]; i++, ar++)
-          {
-          CLR_RT_AppDomainAssembly *appDomainAssemblyRef = appDomain->FindAppDomainAssembly(ar->m_target);
-
-          _ASSERTE(appDomainAssemblyRef != NULL);
-          _ASSERTE(appDomainAssemblyRef->m_flags & CLR_RT_AppDomainAssembly::StaticConstructorsExecuted);
-          }
-#endif
-
-        if (SpawnStaticConstructorHelper(appDomain, appDomainAssembly, idx))
-          return;
-        }
-      }
-    NANOCLR_FOREACH_NODE_END();
-    }
-  NANOCLR_FOREACH_NODE_END();
-
-  // No more static constructors needed...
-  // Perform 1 action:
-  // 1. Destroy constructor thread.
-  pCctorThread->DestroyInstance();
-  }
-#else  // NANOCLR_APPDOMAINS
-
 bool CLR_RT_ExecutionEngine::SpawnStaticConstructorHelper(CLR_RT_Assembly *assembly, const CLR_RT_MethodDef_Index &idx)
   {
   NATIVE_PROFILE_CLR_CORE();
@@ -970,7 +746,6 @@ void CLR_RT_ExecutionEngine::SpawnStaticConstructor(CLR_RT_Thread *&pCctorThread
   // no more static constructors needed...
   pCctorThread->DestroyInstance();
   }
-#endif // NANOCLR_APPDOMAINS
 
 void CLR_RT_ExecutionEngine::FinalizerTerminationCallback(void *arg)
   {
@@ -990,10 +765,6 @@ void CLR_RT_ExecutionEngine::SpawnFinalizer()
     CLR_RT_HeapBlock delegate;
     delegate.SetObjectReference(NULL);
     CLR_RT_ProtectFromGC gc(delegate);
-
-#if defined(NANOCLR_APPDOMAINS)
-    (void)SetCurrentAppDomain(fin->m_appDomain);
-#endif
 
     if (EnsureSystemThread(m_finalizerThread, ThreadPriority_BelowNormal))
       {
@@ -1083,10 +854,6 @@ HRESULT CLR_RT_ExecutionEngine::ScheduleThreads(int maxContextSwitch)
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
-
-#if defined(NANOCLR_APPDOMAINS)
-  CLR_RT_AppDomain *appDomainSav = g_CLR_RT_ExecutionEngine.GetCurrentAppDomain();
-#endif
 
   // We run threads based on the m_executionCounter.
   // The thread with highest m_executionCounter is chosen for execution.
@@ -1233,23 +1000,6 @@ HRESULT CLR_RT_ExecutionEngine::ScheduleThreads(int maxContextSwitch)
   NANOCLR_SET_AND_LEAVE(CLR_S_QUANTUM_EXPIRED);
 
   NANOCLR_CLEANUP();
-
-#if defined(NANOCLR_APPDOMAINS)
-
-  if (CLR_EE_IS(UnloadingAppDomain))
-    {
-    if (TryToUnloadAppDomains())
-      {
-      // If we are successful in unloading an AppDomain, return CLR_S_QUANTUM_EXPIRED
-      // to cause ScheduleThreads to be called again.  This allows the somewhat expensive operation
-      // of trying to unload an AppDomain once every ScheduleThread call, rather than once every context switch
-
-      hr = CLR_S_QUANTUM_EXPIRED;
-      }
-    }
-
-  g_CLR_RT_ExecutionEngine.SetCurrentAppDomain(appDomainSav);
-#endif
 
   NANOCLR_CLEANUP_END();
   }
@@ -1685,19 +1435,7 @@ CLR_RT_HeapBlock *CLR_RT_ExecutionEngine::AccessStaticField(const CLR_RT_FieldDe
 
   if (inst.InitializeFromIndex(fd) && inst.m_target->flags & CLR_RECORD_FIELDDEF::FD_Static)
     {
-#if defined(NANOCLR_APPDOMAINS)
-        {
-        CLR_RT_AppDomainAssembly *appDomainAssembly =
-          g_CLR_RT_ExecutionEngine.GetCurrentAppDomain()->FindAppDomainAssembly(inst.m_assm);
-
-        if (appDomainAssembly)
-          {
-          return &appDomainAssembly->m_pStaticFields[inst.CrossReference().m_offset];
-          }
-        }
-#else
     return &inst.m_assm->m_pStaticFields[inst.CrossReference().m_offset];
-#endif
     }
 
   return NULL;
@@ -2313,11 +2051,6 @@ CLR_RT_HeapBlock_Lock *CLR_RT_ExecutionEngine::FindLockObject(CLR_RT_DblLinkedLi
     NANOCLR_FOREACH_NODE(CLR_RT_HeapBlock_Lock, lock, th->m_locks)
       {
       CLR_RT_HeapBlock &res = lock->m_resource;
-
-#if defined(NANOCLR_APPDOMAINS)
-      if (lock->m_appDomain != GetCurrentAppDomain())
-        continue;
-#endif
 
       if (CLR_RT_HeapBlock::ObjectsEqual(res, object, true))
         {
@@ -3596,93 +3329,6 @@ void CLR_RT_ExecutionEngine::Breakpoint_Exception_Intercepted(CLR_RT_StackFrame 
   }
 
 #endif //#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#if defined(NANOCLR_APPDOMAINS)
-
-CLR_RT_AppDomain *CLR_RT_ExecutionEngine::SetCurrentAppDomain(CLR_RT_AppDomain *appDomain)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_AppDomain *ad = m_appDomainCurrent;
-
-  m_appDomainCurrent = appDomain;
-
-  return ad;
-  }
-
-CLR_RT_AppDomain *CLR_RT_ExecutionEngine::GetCurrentAppDomain()
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  return m_appDomainCurrent;
-  }
-
-void CLR_RT_ExecutionEngine::PrepareThreadsForAppDomainUnload(
-  CLR_RT_AppDomain *appDomain,
-  CLR_RT_DblLinkedList &threads)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_FOREACH_NODE(CLR_RT_Thread, th, threads)
-    {
-    bool fFoundDoomedAppDomain = false;
-    bool fInjectThreadAbort = false;
-
-    NANOCLR_FOREACH_NODE(CLR_RT_StackFrame, stack, th->m_stackFrames)
-      {
-      if (!fFoundDoomedAppDomain)
-        {
-        if (stack->m_appDomain == appDomain)
-          {
-          // The first stack frame found in a doomed AppDomain
-          fFoundDoomedAppDomain = true;
-          fInjectThreadAbort = true;
-          stack->m_flags |= CLR_RT_StackFrame::c_AppDomainInjectException;
-          th->m_flags |= CLR_RT_Thread::TH_F_ContainsDoomedAppDomain;
-          }
-        }
-      else // fFoundDoomedAppDomain
-        {
-        if (stack->m_flags & CLR_RT_StackFrame::c_AppDomainInjectException)
-          {
-          // This thread is already being unwound due to an unloading AppDomain
-          stack->m_flags &= ~CLR_RT_StackFrame::c_AppDomainInjectException;
-          fInjectThreadAbort = false;
-          }
-        }
-      }
-    NANOCLR_FOREACH_NODE_END();
-
-    if (fInjectThreadAbort)
-      {
-      (void)th->Abort();
-      }
-    }
-  NANOCLR_FOREACH_NODE_END();
-  }
-
-HRESULT CLR_RT_ExecutionEngine::UnloadAppDomain(CLR_RT_AppDomain *appDomain, CLR_RT_Thread *th)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
-
-  // Check to make sure the current thread does not contain any doomed AppDomains
-  NANOCLR_FOREACH_NODE(CLR_RT_StackFrame, stack, th->m_stackFrames)
-    {
-    if (!stack->m_appDomain->IsLoaded() || stack->m_appDomain == appDomain)
-      NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
-    }
-  NANOCLR_FOREACH_NODE_END();
-
-  PrepareThreadsForAppDomainUnload(appDomain, m_threadsReady);
-  PrepareThreadsForAppDomainUnload(appDomain, m_threadsWaiting);
-
-  appDomain->m_state = CLR_RT_AppDomain::AppDomainState_Unloading;
-  CLR_EE_SET(UnloadingAppDomain);
-
-  NANOCLR_NOCLEANUP();
-  }
-
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

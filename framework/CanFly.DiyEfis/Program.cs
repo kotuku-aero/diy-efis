@@ -8,19 +8,14 @@ namespace CanFly.DiyEfis
       ushort orientation = 0;
       uint layoutKey = 0;
       string layoutName;
-      try
-      {
-        // all except orientation are required
-        protonKey = Syscall.RegOpenKey(0, "proton");
-        layoutName = Syscall.RegGetString(protonKey, "layout");
-        layoutKey = Syscall.RegOpenKey(protonKey, layoutName);
-        orientation = Syscall.RegGetUint16(protonKey, "orientation");
-      }
-      catch
-      {
-        if (layoutKey == 0)
-          return;
-      }
+      // all except orientation are required
+      if (Syscall.RegOpenKey(0, "proton", out protonKey) != 0 ||
+         Syscall.RegGetString(protonKey, "layout", out layoutName) != 0 ||
+         Syscall.RegOpenKey(protonKey, layoutName, out layoutKey) != 0)
+        return;
+
+      if (Syscall.RegGetUint16(protonKey, "orientation", out orientation) != 0)
+        orientation = 0;
 
       // load the main window
       Proton.LayoutWidget layoutWidget = new Proton.LayoutWidget(Screen.Instance, orientation, 0, layoutKey);

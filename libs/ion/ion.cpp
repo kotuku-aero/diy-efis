@@ -416,10 +416,14 @@ result_t ion_create(ion_context_t *ion_context)
   return result;
   }
 
+  extern "C" {
+    extern result_t pen_init();
+    }
+
 void ion_run(void *arg)
   {
   result_t result;
-  
+
   ion_context_t *ion_context = (ion_context_t *)arg;
 
   int32_t max_context_switches;
@@ -429,56 +433,56 @@ void ion_run(void *arg)
   bool enter_debugger_after_exit;
   if (failed(result = reg_get_bool(ion_context->home, "debug-after-exit", &enter_debugger_after_exit)))
     enter_debugger_after_exit = false;
-  
-  while (true)
+
+  bool softReboot;
+
+  do
     {
-    bool softReboot;
+    softReboot = false;
 
-    do
+    pen_init();
+
+    CLR_RT_Assembly::InitString();
+    CLR_RT_Memory::Reset();
+
+    trace_info("Starting CLR\n");
+
+    result_t result = g_CLR_RT_ExecutionEngine.Execute(NULL, max_context_switches);
+
+    // this could be a reboot
+    if (CLR_EE_DBG_IS_NOT(RebootPending))
       {
-      softReboot = false;
+      CLR_EE_DBG_SET_MASK(StateProgramExited, StateMask);
+      CLR_EE_DBG_EVENT_BROADCAST(CLR_DBG_Commands::c_Monitor_ProgramExit, 0, NULL, WP_Flags_c_NonCritical);
 
-      CLR_RT_Assembly::InitString();
-      CLR_RT_Memory::Reset();
 
-      trace_info("Starting CLR\n");
+      if (enter_debugger_after_exit)
+        CLR_DBG_Debugger::Debugger_WaitForCommands();
+      }
 
-      result_t result = g_CLR_RT_ExecutionEngine.Execute(NULL, max_context_switches);
+    // DO NOT USE 'ELSE IF' here because the state can change in Debugger_WaitForCommands() call
 
-      // this could be a reboot
-      if (CLR_EE_DBG_IS_NOT(RebootPending))
+    if (CLR_EE_DBG_IS(RebootPending))
+      {
+      if (CLR_EE_REBOOT_IS(ClrOnly))
         {
-        CLR_EE_DBG_SET_MASK(StateProgramExited, StateMask);
-        CLR_EE_DBG_EVENT_BROADCAST(CLR_DBG_Commands::c_Monitor_ProgramExit, 0, NULL, WP_Flags_c_NonCritical);
+        softReboot = true;
 
+        enter_debugger_after_exit = CLR_EE_REBOOT_IS(WaitForDebugger);
 
-        if (enter_debugger_after_exit)
-          CLR_DBG_Debugger::Debugger_WaitForCommands();
+        //nanoHAL_Uninitialize();
+
+        //re-init the hal for the reboot (initially it is called in bootentry)
+        //nanoHAL_Initialize();
         }
+      else
+        break;        // TODO: reset the device....
+      }
+    } while (softReboot);
 
-      // DO NOT USE 'ELSE IF' here because the state can change in Debugger_WaitForCommands() call
 
-      if (CLR_EE_DBG_IS(RebootPending))
-        {
-        if (CLR_EE_REBOOT_IS(ClrOnly))
-          {
-          softReboot = true;
-
-          enter_debugger_after_exit = CLR_EE_REBOOT_IS(WaitForDebugger);
-
-          //nanoHAL_Uninitialize();
-
-          //re-init the hal for the reboot (initially it is called in bootentry)
-          //nanoHAL_Initialize();
-          }
-        else
-          break;        // TODO: reset the device....
-        }
-      } while (softReboot);
-    }
-
-  // release the context
-  neutron_free(ion_context);
+    // release the context
+    neutron_free(ion_context);
   }
 
 extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_mscorlib;

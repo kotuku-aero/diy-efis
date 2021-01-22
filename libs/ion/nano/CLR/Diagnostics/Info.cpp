@@ -223,10 +223,6 @@ void CLR_Debug::Emit(const char* text, int len)
       {
       Watchdog_Reset();
 
-#if defined(PLATFORM_WINDOWS_EMULATOR)
-      HAL_Windows_Debug_Print(s_buffer);
-#endif
-
       if (CLR_EE_DBG_IS(Enabled) && !CLR_EE_DBG_IS(Quiet))
         {
         CLR_EE_DBG_EVENT_BROADCAST(

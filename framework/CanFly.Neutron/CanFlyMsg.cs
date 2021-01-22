@@ -604,13 +604,15 @@ public sealed class CanFlyMsg
       _b7 = (byte)c3;
     }
 
-    
     public float GetFloat()
     {
       if (DataType != CanFlyDataType.Float)
         throw new InvalidCastException();
 
-      return Syscall.GetFloat(_b4, _b5, _b6, _b7);
+      float value;
+      ExceptionHelper.ThrowIfFailed(Syscall.GetFloat(_b4, _b5, _b6, _b7, out value));
+
+      return value;
     }
     
     public int GetInt32()
@@ -618,16 +620,22 @@ public sealed class CanFlyMsg
       if (DataType != CanFlyDataType.Int32)
         throw new InvalidCastException();
 
-      return Syscall.GetInt32(_b4, _b5, _b6, _b7);
+      int value;
+      ExceptionHelper.ThrowIfFailed(Syscall.GetInt32(_b4, _b5, _b6, _b7, out value));
+
+      return value;
     }
 
-    
+
     public uint GetUInt32()
     {
       if (DataType != CanFlyDataType.UInt32)
         throw new InvalidCastException();
 
-      return Syscall.GetUInt32(_b4, _b5, _b6, _b7);
+      uint value;
+      ExceptionHelper.ThrowIfFailed(Syscall.GetUInt32(_b4, _b5, _b6, _b7, out value));
+
+      return value;
     }
 
 
@@ -636,7 +644,10 @@ public sealed class CanFlyMsg
       if (DataType != CanFlyDataType.Short)
         throw new InvalidCastException();
 
-      return Syscall.GetInt16(_b4, _b5);
+      short value;
+      ExceptionHelper.ThrowIfFailed(Syscall.GetInt16(_b4, _b5, out value));
+
+      return value;
     }
 
 
@@ -645,9 +656,11 @@ public sealed class CanFlyMsg
       if (DataType != CanFlyDataType.UShort)
         throw new InvalidCastException();
 
-      return Syscall.GetUInt16(_b4, _b5);
-    }
+      ushort value;
+      ExceptionHelper.ThrowIfFailed(Syscall.GetUInt16(_b4, _b5, out value));
 
+      return value;
+    }
 
     public sbyte GetInt8()
     {
@@ -672,11 +685,12 @@ public sealed class CanFlyMsg
       if (DataType != CanFlyDataType.Short2)
         throw new InvalidCastException();
 
-      return new short[]
-      {
-        Syscall.GetInt16(_b4, _b5),
-        Syscall.GetInt16(_b6, _b7)
-      };
+      short[] value = new short[2];
+      ExceptionHelper.ThrowIfFailed(Syscall.GetInt16(_b4, _b5, out value[0]));
+
+      ExceptionHelper.ThrowIfFailed(Syscall.GetInt16(_b6, _b7, out value[1]));
+
+      return value;
     }
 
 
@@ -685,11 +699,12 @@ public sealed class CanFlyMsg
       if (DataType != CanFlyDataType.UShort2)
         throw new InvalidCastException();
 
-      return new ushort[]
-      {
-        Syscall.GetUInt16(_b4, _b5),
-        Syscall.GetUInt16(_b6, _b7)
-      };
+      ushort[] value = new ushort[2];
+      ExceptionHelper.ThrowIfFailed(Syscall.GetUInt16(_b4, _b5, out value[0]));
+
+      ExceptionHelper.ThrowIfFailed(Syscall.GetUInt16(_b6, _b7, out value[1]));
+
+      return value;
     }
 
 

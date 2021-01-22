@@ -67,10 +67,10 @@ namespace CanFly.Proton
 
     private int _menuTimer; // as a press/rotate is given this sets the tick-timeout
 
-    private int _menuRectX;
-    private int _menuRectY;
-    private int _menuStartX;
-    private int _menuStartY;
+    private short _menuRectX;
+    private short _menuRectY;
+    private short _menuStartX;
+    private short _menuStartY;
 
     private uint _key; // window key
 
@@ -109,71 +109,75 @@ namespace CanFly.Proton
 
       // the hive must have series of hives that form windows
 
-      uint menu = Syscall.RegOpenKey(hive, "menu");
-      // this stores a cache of loaded keys.
-      _keyMappings = new Hashtable();
-      _menuStack = new ArrayList();
-      _menus = new Hashtable();
-      _menuItems = new ArrayList();
-
-      if (!TryRegGetInt16(menu, "menu-rect-x", out _menuRectX))
-        _menuRectX = 0;
-
-      if (!TryRegGetInt16(menu, "menu-rect-y", out _menuRectY))
-        _menuRectY = WindowRect.Bottom;
-
-      if (!TryRegGetInt16(menu, "menu-start-x", out _menuStartX))
-        _menuStartX = 0;
-
-      if (!TryRegGetInt16(menu, "menu-start-y", out _menuStartY))
-        _menuStartY = WindowRect.Bottom;
-
-      if (FindKeys(menu, "root-keys", out _activeKeys))
-        _menuTimer = 0;
-
-
-      if (LookupColor(menu, "bk-color", out _backgroundColor))
-        _backgroundColor = Colors.Black;
-
-      if (LookupColor(menu, "bk-selected", out _selectedBackgroundColor))
-        _selectedBackgroundColor = Colors.White;
-
-      if (LookupColor(menu, "selected-color", out _selectedColor))
-        _selectedColor = Colors.Magenta;
-
-      if (LookupColor(menu, "text-color", out _textColor))
-        _textColor = Colors.Green;
-
-      if (!LookupPen(menu, "pen", out _borderPen))
-        _borderPen = Pens.LightGrayPen;
-
-      // check for the font
-      if (!LookupFont(menu, "font", out _font))
-        OpenFont("neo", 9, out _font);
-
-      // attach all of our event handlers now
-
-      // must be 0 on first call
-      uint child = 0;
-      string widgetName;
-      ushort nextDefaultId = 0x8000;
-      while ((widgetName = Syscall.RegEnumKey(hive, ref child)) != null)
+      uint menu;
+      if (Syscall.RegOpenKey(hive, "menu", out menu) == 0)
       {
-        string widgetType;
-        if (!TryRegGetString(child, "type", out widgetType))
-          continue;
+        // this stores a cache of loaded keys.
+        _keyMappings = new Hashtable();
+        _menuStack = new ArrayList();
+        _menus = new Hashtable();
+        _menuItems = new ArrayList();
 
-        ushort widgetId;
+        if (!TryRegGetInt16(menu, "menu-rect-x", out _menuRectX))
+          _menuRectX = 0;
 
-        if (!TryRegGetUint16(child, "id", out widgetId))
-          widgetId = nextDefaultId++;
+        if (!TryRegGetInt16(menu, "menu-rect-y", out _menuRectY))
+          _menuRectY = (short) WindowRect.Bottom;
 
-        Rect bounds;
+        if (!TryRegGetInt16(menu, "menu-start-x", out _menuStartX))
+          _menuStartX = 0;
 
-        if (!TryRegGetRect(child, out bounds))
-          bounds = new Rect(WindowRect.TopLeft, new Extent(0, 0));
+        if (!TryRegGetInt16(menu, "menu-start-y", out _menuStartY))
+          _menuStartY = (short)WindowRect.Bottom;
 
-        Widget widget = CreateWidget(parent, child, widgetType, bounds, widgetId);
+        if (FindKeys(menu, "root-keys", out _activeKeys))
+          _menuTimer = 0;
+
+
+        if (LookupColor(menu, "bk-color", out _backgroundColor))
+          _backgroundColor = Colors.Black;
+
+        if (LookupColor(menu, "bk-selected", out _selectedBackgroundColor))
+          _selectedBackgroundColor = Colors.White;
+
+        if (LookupColor(menu, "selected-color", out _selectedColor))
+          _selectedColor = Colors.Magenta;
+
+        if (LookupColor(menu, "text-color", out _textColor))
+          _textColor = Colors.Green;
+
+        if (!LookupPen(menu, "pen", out _borderPen))
+          _borderPen = Pens.LightGrayPen;
+
+        // check for the font
+        if (!LookupFont(menu, "font", out _font))
+          OpenFont("neo", 9, out _font);
+
+        // attach all of our event handlers now
+
+        // must be 0 on first call
+        uint child = 0;
+        string widgetName;
+        ushort nextDefaultId = 0x8000;
+        string name;
+        while (Syscall.RegEnumKey(menu, ref child, out name) == 0)
+        {
+          string widgetType;
+          if (!TryRegGetString(child, "type", out widgetType))
+            continue;
+
+          ushort widgetId;
+
+          if (!TryRegGetUint16(child, "id", out widgetId))
+            widgetId = nextDefaultId++;
+
+          Rect bounds;
+
+          if (!TryRegGetRect(child, out bounds))
+            bounds = new Rect(WindowRect.TopLeft, new Extent(0, 0));
+
+          Widget widget = CreateWidget(parent, child, widgetType, bounds, widgetId);
+        }
       }
 
       Screen.Instance.AfterPaint += Instance_AfterPaint;
@@ -234,19 +238,18 @@ namespace CanFly.Proton
       return null;
     }
 
-    private bool FindKeys(uint menu, string root_keys_s, out Keys activeKeys)
+    private bool FindKeys(uint menu, string keys_name, out Keys activeKeys)
     {
       activeKeys = null;
-      try
+      uint hive;
+      if(Syscall.RegOpenKey(menu, keys_name, out hive)== 0)
       {
-        uint root_keys_key = Syscall.RegOpenKey(menu, root_keys_s);
-
+        // open the key
+        LoadFromRegistry(keys_name, hive);
         return true;
       }
-      catch
-      {
-        return false;
-      }
+
+      return false;
     }
 
     private void OnMenuOk(CanFlyMsg msg)
@@ -940,6 +943,55 @@ static MenuItem MenuItemAt(Menu menu, ushort index)
       return result;
     }
 
+    private Keys LoadFromRegistry(string name, uint keys_key)
+    {
+      Keys theKeys = new Keys();
+      _keyMappings.Add(name, theKeys);
+
+
+      // must be done before we load any items so if they recurse we don't get
+      // created more than once!
+
+      uint child;
+      if (TryRegOpenKey(keys_key, "key0", out child))
+        theKeys.Key0 = ParseItem(child);
+
+      if (TryRegOpenKey(keys_key, "key1", out child))
+        theKeys.Key1 = ParseItem(child);
+
+      if (TryRegOpenKey(keys_key, "key2", out child))
+        theKeys.Key2 = ParseItem(child);
+
+      if (TryRegOpenKey(keys_key, "key3", out child))
+        theKeys.Key3 = ParseItem(child);
+
+      if (TryRegOpenKey(keys_key, "key4", out child))
+        theKeys.Key4 = ParseItem(child);
+
+      if (TryRegOpenKey(keys_key, "key5", out child))
+        theKeys.Key5 = ParseItem(child);
+
+      if (TryRegOpenKey(keys_key, "key6", out child))
+        theKeys.Key6 = ParseItem(child);
+
+      if (TryRegOpenKey(keys_key, "key7", out child))
+        theKeys.Key7 = ParseItem(child);
+
+      if (TryRegOpenKey(keys_key, "decka-up", out child))
+        theKeys.DeckaUp = ParseItem(child);
+
+      if (TryRegOpenKey(keys_key, "decka-dn", out child))
+        theKeys.DeckaDn = ParseItem(child);
+
+      if (TryRegOpenKey(keys_key, "deckb-up", out child))
+        theKeys.DeckbUp = ParseItem(child);
+
+      if (TryRegOpenKey(keys_key, "deckb-dn", out child))
+        theKeys.DeckbDn = ParseItem(child);
+
+      return theKeys;
+    }
+
     private Keys LoadKeys(string name)
     {
       Keys theKeys = null;
@@ -952,49 +1004,7 @@ static MenuItem MenuItemAt(Menu menu, ushort index)
         if (!TryRegOpenKey(_key, name, out keys_key))
           return null;
 
-        theKeys = new Keys();
-        _keyMappings.Add(name, theKeys);
-
-
-        // must be done before we load any items so if they recurse we don't get
-        // created more than once!
-
-        uint child;
-        if (TryRegOpenKey(keys_key, "key0", out child))
-          theKeys.Key0 = ParseItem(child);
-
-        if (TryRegOpenKey(keys_key, "key1", out child))
-          theKeys.Key1 = ParseItem(child);
-
-        if (TryRegOpenKey(keys_key, "key2", out child))
-          theKeys.Key2 = ParseItem(child);
-
-        if (TryRegOpenKey(keys_key, "key3", out child))
-          theKeys.Key3 = ParseItem(child);
-
-        if (TryRegOpenKey(keys_key, "key4", out child))
-          theKeys.Key4 = ParseItem(child);
-
-        if (TryRegOpenKey(keys_key, "key5", out child))
-          theKeys.Key5 = ParseItem(child);
-
-        if (TryRegOpenKey(keys_key, "key6", out child))
-          theKeys.Key6 = ParseItem(child);
-
-        if (TryRegOpenKey(keys_key, "key7", out child))
-          theKeys.Key7 = ParseItem(child);
-
-        if (TryRegOpenKey(keys_key, "decka-up", out child))
-          theKeys.DeckaUp = ParseItem(child);
-
-        if (TryRegOpenKey(keys_key, "decka-dn", out child))
-          theKeys.DeckaDn = ParseItem(child);
-
-        if (TryRegOpenKey(keys_key, "deckb-up", out child))
-          theKeys.DeckbUp = ParseItem(child);
-
-        if (TryRegOpenKey(keys_key, "deckb-dn", out child))
-          theKeys.DeckbDn = ParseItem(child);
+        theKeys = LoadFromRegistry(name, keys_key);
       }
 
       return theKeys;
@@ -1018,7 +1028,7 @@ static MenuItem MenuItemAt(Menu menu, ushort index)
 
         uint child = 0;
         string itemName;
-        while ((itemName = Syscall.RegEnumKey(key, ref child)) != null)
+        while (Syscall.RegEnumKey(key, ref child, out itemName)== 0)
         {
           // the protocol assumes all child keys are menu items
           MenuItem item = ParseItem(child);

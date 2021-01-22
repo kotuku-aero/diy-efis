@@ -2419,10 +2419,6 @@ HRESULT CLR_RT_AppDomain::MarshalObject(CLR_RT_HeapBlock &src, CLR_RT_HeapBlock 
   fSimpleAssign = fSimpleAssign || (dtSrc <= DATATYPE_LAST_PRIMITIVE_TO_MARSHAL);
   fSimpleAssign = fSimpleAssign || (dtSrc == DATATYPE_OBJECT && src.Dereference() == NULL);
 
-#if !defined(NANOCLR_NO_ASSEMBLY_STRINGS)
-  fSimpleAssign = fSimpleAssign || (dtSrc == DATATYPE_STRING && !src.StringAssembly());
-#endif
-
   if (!fSimpleAssign)
     {
     if (dtSrc == DATATYPE_OBJECT)
@@ -4673,7 +4669,7 @@ HRESULT CLR_RT_AttributeParser::Next(Value *&res)
       CLR_UINT32 tk;
       NANOCLR_READ_UNALIGNED_UINT16(tk, m_blob);
 
-      CLR_RT_HeapBlock_String::CreateInstance(m_lastValue.m_value, CLR_TkFromType(TBL_Strings, tk), m_assm);
+      CLR_RT_HeapBlock_String::CreateInstance(m_lastValue.m_value, "System.String");
       }
     else
       {
@@ -4769,7 +4765,7 @@ HRESULT CLR_RT_AttributeParser::Next(Value *&res)
     CLR_UINT32 tk;
     NANOCLR_READ_UNALIGNED_UINT16(tk, m_blob);
 
-    CLR_RT_HeapBlock_String::CreateInstance(m_lastValue.m_value, CLR_TkFromType(TBL_Strings, tk), m_assm);
+    CLR_RT_HeapBlock_String::CreateInstance(m_lastValue.m_value, "System.String");
     }
   else
     {

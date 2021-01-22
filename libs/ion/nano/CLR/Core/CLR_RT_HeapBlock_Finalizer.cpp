@@ -35,10 +35,6 @@ HRESULT CLR_RT_HeapBlock_Finalizer::CreateInstance(CLR_RT_HeapBlock *object, con
 
         fin->m_md.Set(inst2.Assembly(), pos);
 
-#if defined(NANOCLR_APPDOMAINS)
-        fin->m_appDomain = g_CLR_RT_ExecutionEngine.GetCurrentAppDomain();
-#endif
-
         g_CLR_RT_ExecutionEngine.m_finalizersAlive.LinkAtBack(fin);
 
         break;

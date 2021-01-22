@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Runtime.CompilerServices;
 
 namespace CanFly
 {
@@ -48,8 +47,17 @@ namespace CanFly
     internal Widget(uint hwnd) : base(hwnd)
     {
       Syscall.SetWindowData(Handle, this, OnMessage);
+      eventInfoTable = new ArrayList();
 
       ClipRect = WindowRect;
+    }
+
+    private static uint CreateChildWindow(uint parent, int left, int top, int right, int bottom, ushort id)
+    {
+      uint handle;
+      ExceptionHelper.ThrowIfFailed(Syscall.CreateChildWindow(parent, left, top, right, bottom, id, out handle));
+
+      return handle;
     }
 
     /// <summary>
@@ -59,11 +67,13 @@ namespace CanFly
     /// <param name="bounds">Bounds relative to the parent</param>
     /// <param name="id">Window ID</param>
     protected Widget(Widget parent, Rect bounds, ushort id)
-      : base(Syscall.CreateChildWindow(parent.Handle, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom, id))
+      : base(CreateChildWindow(parent.Handle, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom, id))
     {
       Syscall.SetWindowData(Handle, this, OnMessage);
       // default clipping rectangle
       ClipRect = WindowRect;
+
+      eventInfoTable = new ArrayList();
 
       // hook the paint message
       AddEventListener(PhotonID.id_paint, OnPaint);
@@ -195,6 +205,17 @@ namespace CanFly
       Syscall.PostMessage(InternalHandle, maxWait, msg.Flags, msg.Data0, msg.Data1, msg.Data2, msg.Data3, msg.Data4, msg.Data5, msg.Data6, msg.Data7);
     }
 
+    private Widget GetWidget(uint handle)
+    {
+      if (handle == 0)
+        return null;
+
+      object wndData;
+      ExceptionHelper.ThrowIfFailed(Syscall.GetWindowData(handle, out wndData));
+
+      return (Widget)wndData;
+    }
+
     /// <summary>
     /// 
     /// </summary>
@@ -202,13 +223,10 @@ namespace CanFly
     {
       get
       {
-        uint parentHndl = Syscall.GetParent(Handle);
-        if (parentHndl == 0)
-          return null;
-        
-        Widget parent = (Widget) Syscall.GetWindowData(parentHndl);
-        
-        return parent;
+        uint parentHndl;
+        ExceptionHelper.ThrowIfFailed(Syscall.GetParent(Handle, out parentHndl));
+
+        return GetWidget(parentHndl);
       }
     }
     /// <summary>
@@ -219,11 +237,10 @@ namespace CanFly
     /// <returns></returns>
     public Widget GetWidgetById(ushort id)
     {
-      uint handle = Syscall.GetWindowById(Handle, id);
-      if (handle != 0)
-        return (Widget) Syscall.GetWindowData(handle);
+      uint handle;
+      ExceptionHelper.ThrowIfFailed(Syscall.GetWindowById(Handle, id, out handle));
 
-      return null;
+      return GetWidget(handle);
     }
     /// <summary>
     /// 
@@ -232,11 +249,10 @@ namespace CanFly
     {
       get
       {
-        uint handle = Syscall.GetFirstChild(Handle);
-        if(handle != 0)
-          return (Widget) Syscall.GetWindowData(handle);
+        uint handle;
+        ExceptionHelper.ThrowIfFailed(Syscall.GetFirstChild(Handle, out handle));
 
-        return null;
+        return GetWidget(handle);
       }
     }
     /// <summary>
@@ -246,11 +262,10 @@ namespace CanFly
     {
       get
       {
-        uint handle = Syscall.GetNextSibling(Handle);
-        if(handle != 0)
-          return (Widget) Syscall.GetWindowData(handle);
+        uint handle;
+        ExceptionHelper.ThrowIfFailed(Syscall.GetNextSibling(Handle, out handle));
 
-        return null;
+        return GetWidget(handle);
       }
     }
     /// <summary>
@@ -260,11 +275,10 @@ namespace CanFly
     {
       get
       {
-        uint handle = Syscall.GetPreviousSibling(Handle);
-        if(handle != 0)
-          return (Widget) Syscall.GetWindowData(handle);
+        uint handle;
+        ExceptionHelper.ThrowIfFailed(Syscall.GetPreviousSibling(Handle, out handle));
 
-        return null;
+        return GetWidget(handle);
       }
     }
     /// <summary>
@@ -290,8 +304,14 @@ namespace CanFly
     /// </summary>
     public byte ZOrder
     {
-      get { return Syscall.GetZOrder(Handle); }
-      set { Syscall.SetZOrder(Handle, value); }
+      get 
+      {
+        byte value;
+        ExceptionHelper.ThrowIfFailed(Syscall.GetZOrder(Handle, out value));
+
+        return value;
+      }
+      set { ExceptionHelper.ThrowIfFailed(Syscall.SetZOrder(Handle, value)); }
     }
     /// <summary>
     /// Invalidate the area of the canvas.
@@ -302,14 +322,20 @@ namespace CanFly
       if (rect == null)
         rect = WindowRect;
 
-      Syscall.InvalidateRect(Handle, rect.Left, rect.Right, rect.Top, rect.Bottom);
+      ExceptionHelper.ThrowIfFailed(Syscall.InvalidateRect(Handle, rect.Left, rect.Right, rect.Top, rect.Bottom));
     }
     /// <summary>
     /// Return true if the window is invalid
     /// </summary>
-    public bool IsValid
+    public bool IsInvalid
     {
-      get { return Syscall.IsValid(Handle); }
+      get
+      {
+        bool value;
+        ExceptionHelper.ThrowIfFailed(Syscall.IsInvalid(Handle, out value));
+
+        return value;
+      }
     }
     /// <summary>
     /// Notify the GDI a write operation is beginning
@@ -426,167 +452,63 @@ namespace CanFly
 
     public bool TryRegGetString(uint key, string name, out string value)
     {
-      value = null;
-      try
-      {
-        value = Syscall.RegGetString(key, name);
-      }
-      catch
-      {
-        return false;
-      }
-
-      return true;
+      return Syscall.RegGetString(key, name, out value) == 0;
     }
 
     public bool TryOpenFont(string name, ushort pixels, out Font font)
     {
       font = null;
-      try
-      {
-        Syscall.OpenFont(name, pixels);
-      }
-      catch
-      {
+      uint handle;
+      if (Syscall.OpenFont(name, pixels, out handle) != 0)
         return false;
-      }
+      font = new Font(handle);
 
       return true;
     }
 
     public bool TryRegGetBool(uint key, string name, out bool value)
     {
-      value = false;
-      try
-      {
-        value = Syscall.RegGetBool(key, name);
-      }
-      catch
-      {
-        return false;
-      }
-
-      return true;
+      return Syscall.RegGetBool(key, name, out value) == 0;
     }
 
     public bool TryRegGetFloat(uint key, string name, out float value)
     {
-      value = 0;
-      try
-      {
-        value = Syscall.RegGetFloat(key, name);
-      }
-      catch
-      {
-        return false;
-      }
-
-      return true;
+      return Syscall.RegGetFloat(key, name, out value) == 0;
     }
 
     public bool TryRegGetUint8(uint key, string name, out byte value)
     {
-      value = 0;
-      try
-      {
-        value = Syscall.RegGetUint8(key, name);
-      }
-      catch
-      {
-        return false;
-      }
-
-      return true;
+      return Syscall.RegGetUint8(key, name, out value)== 0;
     }
     
     public bool TryRegGetUint16(uint key, string name, out ushort value)
     {
-      value = 0;
-      try
-      {
-        value = Syscall.RegGetUint16(key, name);
-      }
-      catch
-      {
-        return false;
-      }
-
-      return true;
+      return Syscall.RegGetUint16(key, name, out value) == 0;
     }
     
     public bool TryRegGetUint32(uint key, string name, out uint value)
     {
-      value = 0;
-      try
-      {
-        value = Syscall.RegGetUint32(key, name);
-      }
-      catch
-      {
-        return false;
-      }
-
-      return true;
+      return Syscall.RegGetUint32(key, name, out value)== 0;
     }
 
     public bool TryRegGetInt8(uint key, string name, out sbyte value)
     {
-      value = 0;
-      try
-      {
-        value = Syscall.RegGetInt8(key, name);
-      }
-      catch
-      {
-        return false;
-      }
-
-      return true;
+      return Syscall.RegGetInt8(key, name, out value)== 0;
     }
     
     public bool TryRegGetInt16(uint key, string name, out short value)
     {
-      value = 0;
-      try
-      {
-        value = Syscall.RegGetInt16(key, name);
-      }
-      catch
-      {
-        return false;
-      }
-
-      return true;
+      return Syscall.RegGetInt16(key, name, out value)== 0;
     }
    
-    public bool TryRegGetInt16(uint key, string name, out int value)
+    public bool TryRegGetUInt16(uint key, string name, out ushort value)
     {
-      value = 0;
-      try
-      {
-        value = Syscall.RegGetInt16(key, name);
-      }
-      catch
-      {
-        return false;
-      }
-
-      return true;
+      return Syscall.RegGetUint16(key, name, out value)== 0;
     }
     
     public bool TryRegGetInt32(uint key, string name, out int value)
     {
-      value = 0;
-      try
-      {
-        value = Syscall.RegGetInt32(key, name);
-      }
-      catch
-      {
-        return false;
-      }
-
-      return true;
+      return Syscall.RegGetInt32(key, name, out value) == 0;
     }
 
     public bool TryRegGetRect(uint key, out Rect rect)
@@ -619,18 +541,7 @@ namespace CanFly
 
     public bool TryRegOpenKey(uint key, string name, out uint child)
     {
-      child = 0;
-
-      try
-      {
-        child = Syscall.RegOpenKey(key, name);
-      }
-      catch
-      {
-        return false;
-      }
-
-      return true;
+      return Syscall.RegOpenKey(key, name, out child) == 0;
     }
 
     /// <summary>

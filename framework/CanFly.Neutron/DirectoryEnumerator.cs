@@ -58,7 +58,9 @@ namespace CanFly
       {
         string path = null;
         string name = null;
-        bool isFile = Syscall.GetDirectoryEntry(_handle, ref path, ref name);
+        bool isFile;
+        ExceptionHelper.ThrowIfFailed(Syscall.GetDirectoryEntry(_handle, out path, out name, out isFile));
+
         _enumPos++;
 
         return new DirectoryEntry(path, name, isFile);
@@ -79,7 +81,7 @@ namespace CanFly
     {
       while(_enumPos > 0)
       {
-        Syscall.RewindDirectoryEntry(_handle);
+        ExceptionHelper.ThrowIfFailed(Syscall.RewindDirectoryEntry(_handle));
         _enumPos--;
       }
       _pos = 0;

@@ -29,7 +29,10 @@ namespace CanFly
           lock (widgetLock)
             if (_screen == null)
             {
-              _screen = new Screen(Syscall.OpenScreen(0, 0));
+              uint handle;
+              ExceptionHelper.ThrowIfFailed(Syscall.OpenScreen(0, 0, out handle));
+
+              _screen = new Screen(handle);
             }
         }
 

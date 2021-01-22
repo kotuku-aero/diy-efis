@@ -357,11 +357,7 @@ enum CLR_DataType // KEEP IN SYNC WITH Microsoft.SPOT.DataType!!
 
   DATATYPE_LAST_NONPOINTER = DATATYPE_TIMESPAN,      // This is the last type that doesn't need to be relocated.
   DATATYPE_LAST_PRIMITIVE_TO_PRESERVE = DATATYPE_R8, // All the above types don't need fix-up on assignment.
-#if defined(NANOCLR_NO_ASSEMBLY_STRINGS)
   DATATYPE_LAST_PRIMITIVE_TO_MARSHAL = DATATYPE_STRING, // All the above types can be marshaled by assignment.
-#else
-  DATATYPE_LAST_PRIMITIVE_TO_MARSHAL = DATATYPE_TIMESPAN, // All the above types can be marshaled by assignment.
-#endif
   DATATYPE_LAST_PRIMITIVE = DATATYPE_STRING, // All the above types don't need fix-up on assignment.
 
   DATATYPE_OBJECT,    // Shortcut for System.Object

@@ -40,10 +40,10 @@ static handle_t pen_cache;
 result_t pen_init()
   {
   result_t result;
-  if (failed(result = vector_create(sizeof(pen_t *), &pen_cache)))
-    return result;
+  if (pen_cache != 0)
+    return s_ok;
 
-  return s_ok;
+  return vector_create(sizeof(pen_t *), &pen_cache);
   }
 
 result_t pen_create(color_t color, uint16_t width, pen_style style, handle_t *hndl)
@@ -76,22 +76,26 @@ result_t pen_create(color_t color, uint16_t width, pen_style style, handle_t *hn
 
   if (begin == end)
     {
-    *begin = (pen_t *)neutron_malloc(sizeof(pen_t));
-    (*begin)->version = sizeof(pen_t);
-    (*begin)->refcnt = 0;
-    (*begin)->style = style;
-    (*begin)->width = width;
-    (*begin)->color = color;
+    pen_t *new_pen = (pen_t *)neutron_malloc(sizeof(pen_t));
+    new_pen->version = sizeof(pen_t);
+    new_pen->refcnt = 1;
+    new_pen->style = style;
+    new_pen->width = width;
+    new_pen->color = color;
 
     // store the new pen
-    vector_push_back(pen_cache, (*begin));
+    vector_push_back(pen_cache, &new_pen);
+    *hndl = new_pen;
+    }
+  else
+    {
+    (*begin)->refcnt++;
+    // return the pointer to the pen
+    *hndl = (*begin);
     }
 
-  (*begin)->refcnt++;
-  exit_critical;
+  exit_critical();
 
-  // return the pointer to the pen
-  *hndl = *begin;
 
   return s_ok;
   }

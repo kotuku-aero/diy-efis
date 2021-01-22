@@ -20,11 +20,7 @@ CLR_RT_HeapBlock_String *CLR_RT_HeapBlock_String::CreateInstance(CLR_RT_HeapBloc
     {
     char *szText = (char *)&str[1]; szText[0] = 0;
 
-#if defined(NANOCLR_NO_ASSEMBLY_STRINGS)
     str->SetStringText(szText);
-#else
-    str->SetStringText(szText, NULL);
-#endif     
 
     reference.SetObjectReference(str);
     }
@@ -74,14 +70,7 @@ HRESULT CLR_RT_HeapBlock_String::CreateInstance(CLR_RT_HeapBlock &reference, con
 
   reference.SetObjectReference(str);
 
-#if defined(NANOCLR_NO_ASSEMBLY_STRINGS)
-  (void)szText;
-  (void)assm;
-
   NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_String::CreateInstance(reference, szText));
-#else
-  str->SetStringText(szText, assm);
-#endif
 
   NANOCLR_NOCLEANUP();
   }

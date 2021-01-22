@@ -1,4 +1,6 @@
 
+using System;
+
 namespace CanFly
 {
   public class Canvas : GdiObject
@@ -21,7 +23,11 @@ namespace CanFly
     /// <returns>New Canvas</returns>
     public static Canvas Create(Extent extent)
     {
-      return new Canvas(Syscall.CreateRectCanvas(extent.Dx, extent.Dy));
+      uint handle;
+      if (Syscall.CreateRectCanvas(extent.Dx, extent.Dy, out handle) < 0)
+        throw new InvalidOperationException();
+
+      return new Canvas(handle);
     }
 
     /// <summary>
@@ -34,7 +40,9 @@ namespace CanFly
     /// </remarks>
     public static Canvas Create(Stream pngStream)
     {
-      return new Canvas(Syscall.CreatePngCanvas(pngStream.Handle));
+      uint handle;
+      ExceptionHelper.ThrowIfFailed(Syscall.CreatePngCanvas(pngStream.Handle, out handle));
+      return new Canvas(handle);
     }
   }
 }

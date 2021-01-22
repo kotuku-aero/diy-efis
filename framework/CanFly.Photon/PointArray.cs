@@ -15,7 +15,7 @@ namespace CanFly
     /// <param name="numPoints"></param>
     public PointArray(uint numPoints = 0)
     {
-      _handle = Syscall.PointArrayCreate(numPoints);
+      ExceptionHelper.ThrowIfFailed(Syscall.PointArrayCreate(numPoints, out _handle));
     }
     /// <summary>
     /// Create a point array from a list of points
@@ -27,7 +27,7 @@ namespace CanFly
         throw new ArgumentNullException();
 
       uint len = (uint)points.Length;
-      _handle = Syscall.PointArrayCreate(len);
+      ExceptionHelper.ThrowIfFailed(Syscall.PointArrayCreate(len, out _handle));
       for (uint i = 0; i < len; i++)
         this[i] = points[i];
     }
@@ -57,13 +57,20 @@ namespace CanFly
 
     public uint Count
     {
-      get { return Syscall.PointArraySize(_handle); }
+      get 
+      {
+        uint value;
+        ExceptionHelper.ThrowIfFailed(Syscall.PointArraySize(_handle, out value));
+        return value;
+      }
       set { Syscall.PointArrayResize(_handle, value); }
     }
 
     public uint Add(Point value)
     {
-      return Syscall.PointArrayAppend(_handle, value.X, value.Y);
+      uint size;
+      ExceptionHelper.ThrowIfFailed(Syscall.PointArrayAppend(_handle, value.X, value.Y, out size));
+      return size;
     }
 
     public void Clear()
@@ -73,7 +80,8 @@ namespace CanFly
 
     public bool Contains(Point value)
     {
-      return Syscall.PointArrayIndexOf(_handle, value.X, value.Y) >= 0;
+      uint index;
+      return Syscall.PointArrayIndexOf(_handle, value.X, value.Y, out index) == 0;
     }
     public void Dispose()
     {
@@ -117,9 +125,11 @@ namespace CanFly
       return new PointEnumerator(this);
     }
 
-    public int IndexOf(Point value)
+    public uint IndexOf(Point value)
     {
-      return Syscall.PointArrayIndexOf(_handle, value.X, value.Y);
+      uint index;
+      ExceptionHelper.ThrowIfFailed(Syscall.PointArrayIndexOf(_handle, value.X, value.Y, out index));
+      return index;
     }
 
     public void Insert(uint index, Point value)
@@ -129,7 +139,8 @@ namespace CanFly
 
     public void Remove(Point value)
     {
-      int index = Syscall.PointArrayIndexOf(_handle, value.X, value.Y);
+      uint index;
+      ExceptionHelper.ThrowIfFailed(Syscall.PointArrayIndexOf(_handle, value.X, value.Y, out index));
 
       if (index >= 0)
         Syscall.PointArrayRemoveAt(_handle, (uint) index);
@@ -137,7 +148,7 @@ namespace CanFly
 
     public void RemoveAt(uint index)
     {
-      Syscall.PointArrayRemoveAt(_handle, index);
+      ExceptionHelper.ThrowIfFailed(Syscall.PointArrayRemoveAt(_handle, index));
     }
   }
 }

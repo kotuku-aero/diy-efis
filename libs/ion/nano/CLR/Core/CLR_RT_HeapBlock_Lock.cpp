@@ -21,10 +21,6 @@ HRESULT CLR_RT_HeapBlock_Lock::CreateInstance(CLR_RT_HeapBlock_Lock *&lock, CLR_
   lock->m_owners.DblLinkedList_Initialize(); // CLR_RT_DblLinkedList    m_owners;
   lock->m_requests.DblLinkedList_Initialize(); // CLR_RT_DblLinkedList    m_requests;
 
-#if defined(NANOCLR_APPDOMAINS)
-  lock->m_appDomain = g_CLR_RT_ExecutionEngine.GetCurrentAppDomain();
-#endif
-
   //--//
 
   if (resource.DataType() == DATATYPE_OBJECT)

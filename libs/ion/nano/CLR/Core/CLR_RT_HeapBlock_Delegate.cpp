@@ -49,10 +49,6 @@ HRESULT CLR_RT_HeapBlock_Delegate::CreateInstance(CLR_RT_HeapBlock &reference, c
 
   dlg->m_object.SetObjectReference(NULL);
 
-#if defined(NANOCLR_APPDOMAINS)
-  dlg->m_appDomain = g_CLR_RT_ExecutionEngine.GetCurrentAppDomain();
-#endif
-
 #if defined(NANOCLR_DELEGATE_PRESERVE_STACK)
   if (call)
     {

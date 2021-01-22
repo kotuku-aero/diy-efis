@@ -20,17 +20,6 @@ HRESULT CLR_RT_StackFrame::Push(CLR_RT_Thread *th, const CLR_RT_MethodDef_Instan
   CLR_UINT32 sizeLocals;
   CLR_UINT32 sizeEvalStack;
 
-#if defined(PLATFORM_WINDOWS_EMULATOR)
-  if (s_CLR_RT_fTrace_SimulateSpeed > c_CLR_RT_Trace_None)
-    {
-    CLR_PROF_Handler::SuspendTime();
-
-    HAL_Windows_FastSleep(g_HAL_Configuration_Windows.TicksPerMethodCall);
-
-    CLR_PROF_Handler::ResumeTime();
-    }
-#endif
-
   assm = callInstPtr->m_assm;
   md = callInstPtr->m_target;
 
@@ -131,10 +120,6 @@ HRESULT CLR_RT_StackFrame::Push(CLR_RT_Thread *th, const CLR_RT_MethodDef_Instan
   stack->m_fNativeProfiled = stack->m_owningThread->m_fNativeProfiled;
 #endif
   CLR_RT_MethodHandler impl;
-
-#if defined(NANOCLR_APPDOMAINS)
-  stack->m_appDomain = g_CLR_RT_ExecutionEngine.GetCurrentAppDomain();
-#endif
 
   if (md->flags & CLR_RECORD_METHODDEF::MD_DelegateInvoke) // Special case for delegate calls.
     {
@@ -297,17 +282,6 @@ bool CLR_RT_StackFrame::PushInline(
 
   CLR_PMETADATA ipTmp = calleeInst.m_assm->GetByteCode(md->RVA);
 
-#if defined(PLATFORM_WINDOWS_EMULATOR)
-  if (s_CLR_RT_fTrace_SimulateSpeed > c_CLR_RT_Trace_None)
-    {
-    CLR_PROF_Handler::SuspendTime();
-
-    HAL_Windows_FastSleep(g_HAL_Configuration_Windows.TicksPerMethodCall);
-
-    CLR_PROF_Handler::ResumeTime();
-    }
-#endif
-
   // make backup
   m_inlineFrame->m_frame.m_IP = ip;
   m_inlineFrame->m_frame.m_IPStart = m_IPstart;
@@ -431,133 +405,6 @@ void CLR_RT_StackFrame::SaveStack(CLR_RT_InlineFrame &frame)
   }
 #endif
 
-#if defined(NANOCLR_APPDOMAINS)
-HRESULT CLR_RT_StackFrame::PopAppDomainTransition()
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
-
-  bool fException = false;
-  CLR_RT_HeapBlock exception;
-  CLR_RT_StackFrame *caller = this->Caller();
-
-  exception.SetObjectReference(NULL);
-
-  if (m_flags & CLR_RT_StackFrame::c_AppDomainInjectException)
-    {
-    // this is the last frame on the thread in a doomed AppDomain
-    // Convert the current ThreadAbortException into an AppDomainUnloaded exception
-
-    _ASSERTE(m_owningThread->m_flags & CLR_RT_Thread::TH_F_Aborted);
-    _ASSERTE(m_owningThread->m_flags & CLR_RT_Thread::TH_F_ContainsDoomedAppDomain);
-    _ASSERTE(m_owningThread->m_currentException.Dereference() != NULL);
-    _ASSERTE(
-      m_owningThread->m_currentException.Dereference()->ObjectCls().m_data ==
-      g_CLR_RT_WellKnownTypes.m_ThreadAbortException.m_data);
-    _ASSERTE(!m_appDomain->IsLoaded());
-
-    m_owningThread->m_flags &= ~(CLR_RT_Thread::TH_F_Aborted | CLR_RT_Thread::TH_F_ContainsDoomedAppDomain);
-
-    hr = CLR_E_APPDOMAIN_EXITED;
-    }
-  else if (m_owningThread->m_currentException.Dereference() == NULL)
-    {
-    _ASSERTE((m_flags & CLR_RT_StackFrame::c_AppDomainInjectException) == 0);
-
-    // Normal return.  No exception is in flight
-
-    if (m_flags & CLR_RT_StackFrame::c_AppDomainMethodInvoke)
-      {
-      //  For dynamic invoke,
-      //  we do not marshal byRef parameters back to the calling AppDomain
-      //  The caller is a native method (MethodBase::Invoke), and does not have the args on it's eval stack.
-      }
-    else
-      {
-      int cArgs = m_call.m_target->numArgs;
-
-      // First marshal the ref parameters
-      NANOCLR_CHECK_HRESULT(
-        caller->m_appDomain->MarshalParameters(&caller->m_evalStackPos[-cArgs], m_arguments, cArgs, true));
-
-      // Now, pop the caller's arguments off the eval stack
-      caller->m_evalStackPos -= cArgs;
-      }
-
-    // Now, push the return, if any.
-    if (m_call.m_target->retVal != DATATYPE_VOID)
-      {
-      CLR_RT_HeapBlock &dst = caller->PushValueAndClear();
-      CLR_RT_HeapBlock &src = this->TopValue();
-
-      NANOCLR_CHECK_HRESULT(caller->m_appDomain->MarshalObject(src, dst));
-
-      dst.Promote();
-      }
-    }
-  else // Exception
-    {
-    // Normal exceptions must be marshaled to the caller's AppDomain
-    NANOCLR_CHECK_HRESULT(caller->m_appDomain->MarshalObject(m_owningThread->m_currentException, exception));
-    fException = true;
-    }
-
-  NANOCLR_CLEANUP();
-
-  if (FAILED(hr) || fException)
-    {
-    if (FAILED(hr))
-      {
-      (void)Library_corlib_native_System_Exception::CreateInstance(exception, hr, caller);
-      }
-
-    m_owningThread->m_currentException.Assign(exception);
-    }
-
-  (void)g_CLR_RT_ExecutionEngine.SetCurrentAppDomain(caller->m_appDomain);
-
-  NANOCLR_CLEANUP_END();
-  }
-
-HRESULT CLR_RT_StackFrame::PushAppDomainTransition(
-  CLR_RT_Thread *th,
-  const CLR_RT_MethodDef_Instance &callInst,
-  CLR_RT_HeapBlock *pThis,
-  CLR_RT_HeapBlock *pArgs)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
-
-  CLR_RT_StackFrame *frame = NULL;
-  int cArgs = callInst.m_target->numArgs;
-  CLR_RT_HeapBlock *proxy;
-
-  _ASSERTE(pThis->IsTransparentProxy());
-
-  proxy = pThis->Dereference();
-
-  NANOCLR_CHECK_HRESULT(proxy->TransparentProxyValidate());
-
-  NANOCLR_CHECK_HRESULT(Push(th, callInst, cArgs));
-
-  frame = th->CurrentFrame();
-
-  frame->m_appDomain = proxy->TransparentProxyAppDomain();
-  frame->m_flags |= CLR_RT_StackFrame::c_AppDomainTransition;
-  frame->m_flags &= ~CLR_RT_StackFrame::c_CallerIsCompatibleForRet;
-
-  // Marshal the arguments from the caller (on the eval stack) to the callee, unitialized heapblocks that
-  // are set up by the extra blocks in CLR_RT_StackFrame::Push
-  NANOCLR_CHECK_HRESULT(frame->m_appDomain->MarshalObject(*pThis, frame->m_arguments[0]));
-  NANOCLR_CHECK_HRESULT(frame->m_appDomain->MarshalParameters(pArgs, &frame->m_arguments[1], cArgs - 1, false));
-
-  (void)g_CLR_RT_ExecutionEngine.SetCurrentAppDomain(frame->m_appDomain);
-
-  NANOCLR_NOCLEANUP();
-  }
-
-#endif // NANOCLR_APPDOMAINS
-
 HRESULT CLR_RT_StackFrame::MakeCall(
   CLR_RT_MethodDef_Instance md,
   CLR_RT_HeapBlock *obj,
@@ -628,33 +475,21 @@ HRESULT CLR_RT_StackFrame::MakeCall(
     mdR = md.m_target;
     }
 
-#if defined(NANOCLR_APPDOMAINS)
 
-  if (!fStatic && obj->IsTransparentProxy())
+  NANOCLR_CHECK_HRESULT(CLR_RT_StackFrame::Push(m_owningThread, md, md.m_target->numArgs));
+
+  stackSub = m_owningThread->CurrentFrame();
+
+  if (!fStatic)
     {
-    NANOCLR_CHECK_HRESULT(CLR_RT_StackFrame::PushAppDomainTransition(m_owningThread, md, obj, args));
-
-    stackSub = m_owningThread->CurrentFrame();
-
-    stackSub->m_flags |= CLR_RT_StackFrame::c_AppDomainMethodInvoke;
+    stackSub->m_arguments[0].Assign(*obj);
     }
-  else
-#endif
+
+  if (numArgs)
     {
-    NANOCLR_CHECK_HRESULT(CLR_RT_StackFrame::Push(m_owningThread, md, md.m_target->numArgs));
-
-    stackSub = m_owningThread->CurrentFrame();
-
-    if (!fStatic)
-      {
-      stackSub->m_arguments[0].Assign(*obj);
-      }
-
-    if (numArgs)
-      {
-      memcpy(&stackSub->m_arguments[argsOffset], args, sizeof(CLR_RT_HeapBlock) * numArgs);
-      }
+    memcpy(&stackSub->m_arguments[argsOffset], args, sizeof(CLR_RT_HeapBlock) * numArgs);
     }
+
 
   NANOCLR_CHECK_HRESULT(stackSub->FixCall());
 
@@ -756,13 +591,7 @@ HRESULT CLR_RT_StackFrame::HandleSynchronized(bool fAcquire, bool fGlobal)
     {
     obj = &ref;
 
-#if defined(NANOCLR_APPDOMAINS)
-    // With AppDomains enabled, the global lock is no longer global.  It is only global wrt the AppDomain/
-    // Do we need a GlobalGlobalLock? (an attribute on GloballySynchronized (GlobalAcrossAppDomain?)
-    ppGlobalLock = &g_CLR_RT_ExecutionEngine.GetCurrentAppDomain()->m_globalLock;
-#else
     ppGlobalLock = &g_CLR_RT_ExecutionEngine.m_globalLock;
-#endif
 
     pGlobalLock = *ppGlobalLock;
 
@@ -918,12 +747,6 @@ void CLR_RT_StackFrame::Pop()
           {
           // Do nothing here. Pushing return values onto stack frames that don't expect them are a bad idea.
           }
-#if defined(NANOCLR_APPDOMAINS)
-        else if ((m_flags & CLR_RT_StackFrame::c_AppDomainTransition) != 0)
-          {
-          (void)PopAppDomainTransition();
-          }
-#endif
         }
       else //! c_moreFlagsToCheck
         {

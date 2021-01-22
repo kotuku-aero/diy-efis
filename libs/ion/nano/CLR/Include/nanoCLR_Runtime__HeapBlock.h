@@ -1018,25 +1018,6 @@ struct CLR_RT_HeapBlock
       m_data.objectReference.ptr = (CLR_RT_HeapBlock *)ptr;
       }
 
-#if defined(NANOCLR_APPDOMAINS)
-    CLR_RT_AppDomain *TransparentProxyAppDomain() const
-      {
-      return m_data.transparentProxy.appDomain;
-      }
-    CLR_RT_HeapBlock *TransparentProxyDereference() const
-      {
-      return Dereference();
-      }
-
-    void SetTransparentProxyReference(CLR_RT_AppDomain *appDomain, CLR_RT_HeapBlock *ptr);
-    HRESULT TransparentProxyValidate() const;
-
-    bool IsTransparentProxy() const
-      {
-      return IsAReferenceOfThisType(DATATYPE_TRANSPARENT_PROXY);
-      }
-#endif
-
     void SetReference(CLR_RT_HeapBlock &dst)
       {
       CLR_RT_HeapBlock *obj;
@@ -1136,23 +1117,10 @@ struct CLR_RT_HeapBlock
       return m_data.string.m_text;
       }
 
-#if defined(NANOCLR_NO_ASSEMBLY_STRINGS)
     void SetStringText(const char *szText)
       {
       m_data.string.m_text = szText;
       }
-#else
-    void SetStringText(const char *szText, CLR_RT_Assembly *assm)
-      {
-      m_data.string.m_text = szText;
-      m_data.string.m_assm = assm;
-      }
-
-    CLR_RT_Assembly *StringAssembly() const
-      {
-      return m_data.string.m_assm;
-      }
-#endif
 
     //--//
 
@@ -1797,6 +1765,7 @@ struct CLR_RT_AVLTree
 struct CLR_RT_HeapBlock_String : public CLR_RT_HeapBlock
   {
   static CLR_RT_HeapBlock_String *CreateInstance(CLR_RT_HeapBlock &reference, CLR_UINT32 length);
+
   static HRESULT CreateInstance(CLR_RT_HeapBlock &reference, const char *szText);
   static HRESULT CreateInstance(CLR_RT_HeapBlock &reference, const char *szText, CLR_UINT32 length);
   static HRESULT CreateInstance(CLR_RT_HeapBlock &reference, CLR_UINT32 token, CLR_RT_Assembly *assm);

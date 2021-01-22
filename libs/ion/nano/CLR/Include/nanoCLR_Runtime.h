@@ -883,12 +883,6 @@ struct CLR_RT_MethodDef_DebuggingInfo
 
 #include "../../CLR/Include/nanoCLR_Runtime__HeapBlock.h"
 
-// TODO: Change this to an extern method that is defined in the HAL
-#if defined(PLATFORM_WINDOWS_EMULATOR)
-#define SYSTEM_CLOCK_HZ        g_HAL_Configuration_Windows.SystemClock
-#define SLOW_CLOCKS_PER_SECOND g_HAL_Configuration_Windows.SlowClockPerSecond
-#endif
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

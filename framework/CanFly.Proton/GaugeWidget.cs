@@ -261,11 +261,8 @@ namespace CanFly.Proton
 
       // open a step key
       uint step_key;
-
-      try
+      if (Syscall.RegOpenKey(key, "step", out step_key) == 0)
       {
-        step_key = Syscall.RegOpenKey(key, "step");
-
         steps = new ArrayList();
 
         int i;
@@ -273,49 +270,45 @@ namespace CanFly.Proton
         for (i = 0; i < 99; i++)
         {
           // this stops as soon as the first key is not found
-          uint child_key = Syscall.RegOpenKey(step_key, i.ToString());
+          uint child_key;
 
-          step_t new_step = new step_t();
+          while (Syscall.RegOpenKey(step_key, i.ToString(), out child_key) == 0)
+          {
+            step_t new_step = new step_t();
 
-          TryRegGetInt16(child_key, "value", out new_step.value);
-          LookupColor(child_key, "color", out new_step.gauge_color);
-          if (!LookupPen(child_key, "pen", out new_step.pen))
-            new_step.pen = Pens.LightbluePen;
+            TryRegGetInt16(child_key, "value", out new_step.value);
+            LookupColor(child_key, "color", out new_step.gauge_color);
+            if (!LookupPen(child_key, "pen", out new_step.pen))
+              new_step.pen = Pens.LightbluePen;
 
-          steps.Add(new_step);
+            steps.Add(new_step);
+          }
         }
       }
-      catch
+
+      uint ticks_key;
+      if (Syscall.RegOpenKey(key, "tick", out ticks_key) == 0)
       {
-
-      }
-
-      try
-      {
-        uint ticks_key = Syscall.RegOpenKey(key, "tick");
-
         ticks = new ArrayList();
 
         for (int i = 0; i < 99; i++)
         {
-          uint child_key = Syscall.RegOpenKey(ticks_key, i.ToString());
+          uint child_key;
+          while (Syscall.RegOpenKey(ticks_key, i.ToString(), out child_key) == 0)
+          {
+            // tick-0=650, 650
+            // param1 . tick point
+            // param2 . tick label
+            tick_mark_t new_tick = new tick_mark_t();
 
-          // tick-0=650, 650
-          // param1 . tick point
-          // param2 . tick label
-          tick_mark_t new_tick = new tick_mark_t();
+            if (!TryRegGetInt16(child_key, "value", out new_tick.value))
+              new_tick.value = 0;
 
-          if (!TryRegGetInt16(child_key, "value", out new_tick.value))
-            new_tick.value = 0;
+            TryRegGetString(child_key, "text", out new_tick.text);
 
-          TryRegGetString(child_key, "text", out new_tick.text);
-
-          ticks.Add(new_tick);
+            ticks.Add(new_tick);
+          }
         }
-      }
-      catch
-      {
-
       }
 
       if (!LookupColor(key, "background-color", out background_color))

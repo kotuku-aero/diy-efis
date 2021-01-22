@@ -198,7 +198,6 @@ HRESULT CLR_RT_HeapBlock::Convert_Internal(CLR_DataType et)
 
   if (scaleOut != scaleIn)
     {
-#if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
 
     double val = 0;
 
@@ -240,107 +239,6 @@ HRESULT CLR_RT_HeapBlock::Convert_Internal(CLR_DataType et)
         NumericByRef().r8 = val;
         break;
       }
-#else
-    CLR_INT64 val = 0;
-    CLR_INT64 orig = 0;
-
-    if ((dtlSrc.m_flags & CLR_RT_DataTypeLookup::c_Signed) == 0)
-      scaleIn = -1;
-    if ((dtlDst.m_flags & CLR_RT_DataTypeLookup::c_Signed) == 0)
-      scaleOut = -1;
-
-    switch (scaleIn)
-      {
-      case -1:
-        orig = ((CLR_INT64)((CLR_UINT64_TEMP_CAST)NumericByRef().u8));
-        val = orig << CLR_RT_HeapBlock::HB_DoubleShift;
-        break;
-      case 0:
-        orig = ((CLR_INT64)((CLR_INT64_TEMP_CAST)NumericByRef().s8));
-        val = orig << CLR_RT_HeapBlock::HB_DoubleShift;
-        break;
-      case 1:
-        orig = ((CLR_INT64)((CLR_INT32)NumericByRef().r4));
-        val = orig << (CLR_RT_HeapBlock::HB_DoubleShift - CLR_RT_HeapBlock::HB_FloatShift);
-        break;
-      case 2:
-        orig = ((CLR_INT64)NumericByRef().r8);
-        val = orig;
-        break;
-      }
-
-    switch (scaleOut)
-      {
-      // Direct casting of negative double to CLR_UINT64 is returns zero for RVDS 3.1 compiler.
-      // Double cast looks as most portable way.
-      case -1:
-        NumericByRef().u8 = (CLR_UINT64)(CLR_INT64)(val >> CLR_RT_HeapBlock::HB_DoubleShift);
-        break;
-      case 0:
-        NumericByRef().s8 = (CLR_INT64)(val >> CLR_RT_HeapBlock::HB_DoubleShift);
-        break;
-      case 1:
-        NumericByRef().r4 =
-          (CLR_INT64)(val >> (CLR_RT_HeapBlock::HB_DoubleShift - CLR_RT_HeapBlock::HB_FloatShift));
-        break;
-      case 2:
-        NumericByRef().r8 = val;
-        break;
-      }
-
-    if (scaleIn < 1 && scaleOut > 0)
-      {
-      switch (scaleOut)
-        {
-        case 1:
-        {
-        CLR_INT32 r4 = (CLR_INT32)NumericByRef().r4;
-
-        if ((orig != (((CLR_INT64)r4) >> CLR_RT_HeapBlock::HB_FloatShift)) || (orig > 0 && r4 < 0))
-          {
-          NumericByRef().r4 = orig < 0 ? 0x80000000 : 0x7FFFFFFF;
-
-          //
-          // Uncomment to produce an overflow exception for emulated floating points
-          //
-          // NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
-          }
-        }
-        break;
-        case 2:
-        {
-        CLR_INT64 r8 = (CLR_INT64)NumericByRef().r8;
-
-        if ((orig != (r8 >> CLR_RT_HeapBlock::HB_DoubleShift)) || (orig > 0 && r8 < 0))
-          {
-          NumericByRef().r8 =
-            orig < 0 ? ULONGLONGCONSTANT(0x8000000000000000) : ULONGLONGCONSTANT(0x7FFFFFFFFFFFFFFF);
-
-          //
-          // Uncomment to produce an overflow exception for emulated floating points
-          //
-          // NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
-          }
-        }
-        break;
-        }
-      }
-    else if (scaleIn == 2 && scaleOut == 1)
-      {
-      CLR_INT32 r4 = (CLR_INT64)NumericByRef().r4;
-
-      if ((orig != (((CLR_UINT64)r4) << (CLR_RT_HeapBlock::HB_DoubleShift - CLR_RT_HeapBlock::HB_FloatShift))) ||
-        (orig > 0 && r4 < 0))
-        {
-        NumericByRef().r4 = orig < 0 ? 0x80000000 : 0x7FFFFFFF;
-
-        //
-        // Uncomment to produce an overflow exception for emulated floating points
-        //
-        // NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
-        }
-      }
-#endif
     }
 
   //--//
@@ -607,10 +505,6 @@ HRESULT CLR_RT_Thread::Execute()
   {
   NATIVE_PROFILE_CLR_CORE();
   NANOCLR_HEADER();
-
-#if defined(NANOCLR_APPDOMAINS)
-  CLR_RT_AppDomain *appDomainSav = g_CLR_RT_ExecutionEngine.SetCurrentAppDomain(this->CurrentAppDomain());
-#endif
 
   CLR_RT_Thread *currentThreadSav = g_CLR_RT_ExecutionEngine.m_currentThread;
 
@@ -1046,22 +940,6 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
 #endif
 
     {
-    ////////////////////////
-    //
-    //
-#if defined(PLATFORM_WINDOWS_EMULATOR)
-    if (s_CLR_RT_fTrace_SimulateSpeed > c_CLR_RT_Trace_None)
-      {
-      CLR_PROF_Handler::SuspendTime();
-
-      HAL_Windows_FastSleep(g_HAL_Configuration_Windows.TicksPerOpcode);
-
-      CLR_PROF_Handler::ResumeTime();
-      }
-#endif
-    //
-    //
-    ////////////////////////
 
     //--//
 
@@ -2091,9 +1969,6 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
           NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
         CLR_RT_TypeDef_Index cls;
         CLR_RT_HeapBlock *pThis;
-#if defined(NANOCLR_APPDOMAINS)
-        bool fAppDomainTransition = false;
-#endif
 
         pThis = &evalPos[1 - calleeInst.m_target->numArgs]; // Point to the first arg, 'this' if an instance
                                                             // method
@@ -2110,10 +1985,6 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
             if ((calleeInst.m_target->flags & CLR_RECORD_METHODDEF::MD_Static) == 0)
               {
               pThis->Assign(dlg->m_object);
-
-#if defined(NANOCLR_APPDOMAINS)
-              fAppDomainTransition = pThis[0].IsTransparentProxy();
-#endif
               }
             else
               {
@@ -2162,25 +2033,9 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
 
                 calleeInst.InitializeFromIndex(calleeReal);
                 }
-
-#if defined(NANOCLR_APPDOMAINS)
-              fAppDomainTransition = pThis[0].IsTransparentProxy();
-#endif
               }
             }
           }
-
-#if defined(NANOCLR_APPDOMAINS)
-        if (fAppDomainTransition)
-          {
-          WRITEBACK(stack, evalPos, ip, fDirty);
-
-          _ASSERTE(FIMPLIES(pThis->DataType() == DATATYPE_OBJECT, pThis->Dereference() != NULL));
-          NANOCLR_CHECK_HRESULT(
-            CLR_RT_StackFrame::PushAppDomainTransition(th, calleeInst, &pThis[0], &pThis[1]));
-          }
-        else
-#endif // NANOCLR_APPDOMAINS
           {
 #ifndef CLR_NO_IL_INLINE
           if (stack->PushInline(ip, assm, evalPos, calleeInst, pThis))
@@ -2304,6 +2159,7 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
 
         UPDATESTACK(stack, evalPos);
 
+        // don't support embedded string
         NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_String::CreateInstance(evalPos[0], arg, assm));
         break;
         }
@@ -2511,24 +2367,6 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
           case DATATYPE_TIMESPAN:
             evalPos[0].SetInteger((CLR_INT64)obj->NumericByRefConst().s8);
             break;
-#if defined(NANOCLR_APPDOMAINS)
-          case DATATYPE_TRANSPARENT_PROXY:
-          {
-          CLR_RT_HeapBlock val;
-
-          NANOCLR_CHECK_HRESULT(obj->TransparentProxyValidate());
-
-          UPDATESTACK(stack, evalPos);
-
-          NANOCLR_CHECK_HRESULT(g_CLR_RT_ExecutionEngine.GetCurrentAppDomain()->MarshalObject(
-            obj->TransparentProxyDereference()[fieldInst.CrossReference().m_offset],
-            val,
-            obj->TransparentProxyAppDomain()));
-
-          evalPos[0].Assign(val);
-          }
-          goto Execute_LoadAndPromote;
-#endif
           default:
             NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
             break;
@@ -2550,10 +2388,6 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
         CLR_DataType dt = obj->DataType();
 
         NANOCLR_CHECK_HRESULT(CLR_RT_TypeDescriptor::ExtractObjectAndDataType(obj, dt));
-
-#if defined(NANOCLR_APPDOMAINS)
-        _ASSERTE(dt != DATATYPE_TRANSPARENT_PROXY);
-#endif
         if (dt == DATATYPE_CLASS || dt == DATATYPE_VALUETYPE)
           {
           evalPos[0].SetReference(obj[fieldInst.CrossReference().m_offset]);
@@ -2598,23 +2432,6 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
           case DATATYPE_TIMESPAN: // Special case.
             obj->NumericByRef().s8 = evalPos[2].NumericByRefConst().s8;
             break;
-
-#if defined(NANOCLR_APPDOMAINS)
-          case DATATYPE_TRANSPARENT_PROXY:
-          {
-          CLR_RT_HeapBlock val;
-
-          UPDATESTACK(stack, evalPos);
-
-          NANOCLR_CHECK_HRESULT(obj->TransparentProxyValidate());
-          NANOCLR_CHECK_HRESULT(obj->TransparentProxyAppDomain()->MarshalObject(evalPos[2], val));
-
-          obj->TransparentProxyDereference()[fieldInst.CrossReference().m_offset]
-            .AssignAndPreserveType(val);
-          }
-          break;
-#endif
-
           default:
             NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
             break;
@@ -3175,7 +2992,7 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
           {
           _ASSERTE(th->m_currentException.Dereference() == NULL);
 
-          (void)ExceptionCreateInstance(            th->m_currentException,
+          (void)ExceptionCreateInstance(th->m_currentException,
             g_CLR_RT_WellKnownTypes.m_ThreadAbortException,
             S_OK,
             stack);

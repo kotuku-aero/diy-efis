@@ -19,7 +19,7 @@ namespace CanFly
 
     public Pen(uint color, ushort width, PenStyle style)
     {
-      _handle = Syscall.CreatePen(color, width, (ushort) style);
+      ExceptionHelper.ThrowIfFailed(Syscall.CreatePen(color, width, (ushort) style, out _handle));
     }
 
     public void Dispose()
@@ -34,17 +34,32 @@ namespace CanFly
 
     public ushort Width
     {
-      get { return Syscall.GetPenWidth(Handle); }
+      get
+      {
+        ushort value;
+        ExceptionHelper.ThrowIfFailed(Syscall.GetPenWidth(Handle, out value));
+        return value;
+      }
     }
 
     public uint Color
     {
-      get { return Syscall.GetPenColor(Handle); }
+      get
+      {
+        uint color;
+        ExceptionHelper.ThrowIfFailed(Syscall.GetPenColor(Handle, out color));
+        return color;
+      }
     }
 
     public PenStyle Style
     {
-      get { return (PenStyle) Syscall.GetPenStyle(Handle); }
+      get 
+      {
+        ushort style;
+        ExceptionHelper.ThrowIfFailed(Syscall.GetPenStyle(Handle, out style));
+        return (PenStyle)style;
+      }
     }
   };
 }

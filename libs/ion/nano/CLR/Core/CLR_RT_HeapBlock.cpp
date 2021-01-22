@@ -168,14 +168,6 @@ HRESULT CLR_RT_HeapBlock::EnsureObjectReference(CLR_RT_HeapBlock *&obj)
     obj = Dereference();
     FAULT_ON_NULL(obj);
 
-#if defined(NANOCLR_APPDOMAINS)
-    if (obj->DataType() == DATATYPE_TRANSPARENT_PROXY)
-      {
-      NANOCLR_CHECK_HRESULT(obj->TransparentProxyValidate());
-      obj = obj->TransparentProxyDereference();
-      FAULT_ON_NULL(obj);
-      }
-#endif
     switch (obj->DataType())
       {
       case DATATYPE_CLASS:
@@ -187,7 +179,7 @@ HRESULT CLR_RT_HeapBlock::EnsureObjectReference(CLR_RT_HeapBlock *&obj)
       default:
         // the remaining data types aren't to be handled
         break;
-      }
+    }
     }
     break;
 
@@ -199,7 +191,7 @@ HRESULT CLR_RT_HeapBlock::EnsureObjectReference(CLR_RT_HeapBlock *&obj)
     default:
       // the remaining data types aren't to be handled
       break;
-    }
+  }
 
   NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
 
@@ -1163,24 +1155,20 @@ bool CLR_RT_HeapBlock::ObjectsEqual(
           return true;
           }
         break;
-
-#if defined(NANOCLR_APPDOMAINS)
-      case DATATYPE_TRANSPARENT_PROXY:
-#endif
       case DATATYPE_OBJECT:
-      {
-      CLR_RT_HeapBlock *objLeft = pArgLeft.Dereference();
-      CLR_RT_HeapBlock *objRight = pArgRight.Dereference();
-      if (objLeft == objRight)
-        return true;
-
-      if (objLeft && objRight)
         {
-        if (!fSameReference || (objLeft->DataType() == DATATYPE_REFLECTION))
-          return ObjectsEqual(*objLeft, *objRight, false);
+        CLR_RT_HeapBlock *objLeft = pArgLeft.Dereference();
+        CLR_RT_HeapBlock *objRight = pArgRight.Dereference();
+        if (objLeft == objRight)
+          return true;
+
+        if (objLeft && objRight)
+          {
+          if (!fSameReference || (objLeft->DataType() == DATATYPE_REFLECTION))
+            return ObjectsEqual(*objLeft, *objRight, false);
+          }
         }
-      }
-      break;
+        break;
 
       case DATATYPE_SZARRAY:
         if (fSameReference == false)
@@ -1374,9 +1362,6 @@ CLR_INT32 CLR_RT_HeapBlock::Compare_Values(const CLR_RT_HeapBlock &left, const C
     {
     switch (leftDataType)
       {
-#if defined(NANOCLR_APPDOMAINS)
-      case DATATYPE_TRANSPARENT_PROXY:
-#endif
       case DATATYPE_OBJECT:
       case DATATYPE_BYREF:
       {
@@ -1393,7 +1378,7 @@ CLR_INT32 CLR_RT_HeapBlock::Compare_Values(const CLR_RT_HeapBlock &left, const C
         }
 
       return Compare_Values(*leftObj, *rightObj, fSigned);
-      }
+        }
 
       case DATATYPE_STRING:
       {
@@ -1571,7 +1556,7 @@ CLR_INT32 CLR_RT_HeapBlock::Compare_Values(const CLR_RT_HeapBlock &left, const C
         // the remaining data types aren't to be handled
         break;
       }
-    }
+      }
   else
     {
     if (leftDataType == DATATYPE_STRING && rightDataType == DATATYPE_OBJECT)
@@ -1624,7 +1609,7 @@ CLR_INT32 CLR_RT_HeapBlock::Compare_Values(const CLR_RT_HeapBlock &left, const C
     }
 
   return -1; // Not comparable...
-  }
+    }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1702,12 +1687,12 @@ HRESULT CLR_RT_HeapBlock::NumericAdd(const CLR_RT_HeapBlock &right)
     // Advance current index. C# on pointer operations multiplies the offset by object size. We need to reverse
     // it.
     m_data.arrayReference.index += right.m_data.numeric.s4 / array->m_sizeOfElement;
-    }
+  }
     break;
 
     default:
       NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
-    }
+  }
 
   NANOCLR_NOCLEANUP();
   }
@@ -1789,7 +1774,7 @@ HRESULT CLR_RT_HeapBlock::NumericSub(const CLR_RT_HeapBlock &right)
     // Advance current index. C# on pointer operations multiplies the offset by object size. We need to reverse
     // it.
     m_data.arrayReference.index -= right.m_data.numeric.s4 / array->m_sizeOfElement;
-    }
+  }
     break;
     default:
       NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
@@ -1927,7 +1912,7 @@ HRESULT CLR_RT_HeapBlock::NumericDiv(const CLR_RT_HeapBlock &right)
     }
 
   NANOCLR_NOCLEANUP();
-  }
+      }
 
 HRESULT CLR_RT_HeapBlock::NumericDivUn(const CLR_RT_HeapBlock &right)
   {
@@ -2037,7 +2022,7 @@ HRESULT CLR_RT_HeapBlock::NumericRemUn(const CLR_RT_HeapBlock &right)
     }
 
   NANOCLR_NOCLEANUP();
-  }
+    }
 
 HRESULT CLR_RT_HeapBlock::NumericShl(const CLR_RT_HeapBlock &right)
   {
@@ -2191,45 +2176,6 @@ void CLR_RT_HeapBlock::WriteValue(const CLR_INT64 &val, int offset)
   }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-#if defined(NANOCLR_APPDOMAINS)
-
-void CLR_RT_HeapBlock::SetTransparentProxyReference(CLR_RT_AppDomain *appDomain, CLR_RT_HeapBlock *ptr)
-  {
-#if defined(_DEBUG)
-  if (ptr)
-    {
-    // Make sure the data points to a MBRO.
-    CLR_RT_TypeDef_Instance inst;
-
-    _ASSERTE(ptr->DataType() == DATATYPE_CLASS);
-
-    inst.InitializeFromIndex(ptr->ObjectCls());
-    _ASSERTE((inst.CrossReference().m_flags & CLR_RT_TypeDef_CrossReference::TD_CR_IsMarshalByRefObject) != 0);
-    }
-#endif
-
-  m_data.transparentProxy.appDomain = appDomain;
-  m_data.transparentProxy.ptr = ptr;
-  }
-
-HRESULT CLR_RT_HeapBlock::TransparentProxyValidate() const
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
-
-  CLR_RT_AppDomain *appDomain = TransparentProxyAppDomain();
-  CLR_RT_HeapBlock *obj = TransparentProxyDereference();
-
-  if (appDomain == NULL || !appDomain->IsLoaded())
-    NANOCLR_SET_AND_LEAVE(CLR_E_APPDOMAIN_EXITED);
-
-  FAULT_ON_NULL(obj);
-
-  NANOCLR_NOCLEANUP();
-  }
-
-#endif // NANOCLR_APPDOMAINS
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void CLR_RT_HeapBlock::Relocate__HeapBlock()
   {
@@ -2241,10 +2187,7 @@ void CLR_RT_HeapBlock::Relocate_String()
   {
   NATIVE_PROFILE_CLR_CORE();
   CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_data.string.m_text);
-#if !defined(NANOCLR_NO_ASSEMBLY_STRINGS)
-  CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_data.string.m_assm);
-#endif
-  }
+    }
 
 void CLR_RT_HeapBlock::Relocate_Obj()
   {
@@ -2272,14 +2215,6 @@ void CLR_RT_HeapBlock::Relocate_ArrayRef()
   CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_data.arrayReference.array);
   }
 
-#if defined(NANOCLR_APPDOMAINS)
-void CLR_RT_HeapBlock::Relocate_TransparentProxy()
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_data.transparentProxy.ptr);
-  }
-#endif
-
 //--//
 
 #if defined(NANOCLR_FILL_MEMORY_WITH_DIRTY_PATTERN)
@@ -2290,7 +2225,7 @@ void CLR_RT_HeapBlock::Debug_CheckPointer() const
   if (m_id.type.dataType == DATATYPE_OBJECT)
     {
     Debug_CheckPointer(Dereference());
-    }
+  }
   }
 
 void CLR_RT_HeapBlock::Debug_CheckPointer(void *ptr)

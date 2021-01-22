@@ -161,12 +161,16 @@ namespace CanFly
     /// <returns>Color value</returns>
     public uint GetPixel(Point pt)
     {
-      return Syscall.GetPixel(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, pt.X, pt.Y);
+      uint color;
+      ExceptionHelper.ThrowIfFailed(Syscall.GetPixel(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, pt.X, pt.Y, out color));
+      return color;
     }
 
     public uint SetPixel(Point pt, uint color)
     {
-      return Syscall.SetPixel(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, pt.X, pt.Y, color);
+      uint value;
+      ExceptionHelper.ThrowIfFailed(Syscall.SetPixel(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, pt.X, pt.Y, color, out value));
+      return value;
     }
     /// <summary>
     /// Draw an Arc

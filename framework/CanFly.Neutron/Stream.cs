@@ -40,7 +40,7 @@ namespace CanFly
     /// <returns></returns>
     public bool Eof()
     {
-      return Syscall.StreamEof(Handle);
+      return Syscall.StreamEof(Handle) == 0;
     }
     /// <summary>
     /// Read bytes from the stream
@@ -49,7 +49,10 @@ namespace CanFly
     /// <returns>Data read</returns>
     public byte[] Read(ushort size)
     {
-      return Syscall.StreamRead(Handle, size);
+      byte[] value;
+      ExceptionHelper.ThrowIfFailed(Syscall.StreamRead(Handle, size, out value));
+
+      return value;
     }
     /// <summary>
     /// Write bytes to the stream
@@ -64,7 +67,13 @@ namespace CanFly
     /// </summary>
     public uint Pos 
     {
-      get { return Syscall.StreamGetPos(Handle); }
+      get
+      {
+        uint pos;
+        ExceptionHelper.ThrowIfFailed(Syscall.StreamGetPos(Handle, out pos));
+
+        return pos;
+      }
       set { Syscall.StreamSetPos(Handle, value); }
     }
     /// <summary>
@@ -72,7 +81,12 @@ namespace CanFly
     /// </summary>
     public uint Length
     {
-      get { return Syscall.StreamLength(Handle); }
+      get 
+      {
+        uint length;
+        ExceptionHelper.ThrowIfFailed(Syscall.StreamLength(Handle, out length));
+        return length;
+      }
       set { Syscall.StreamTruncate(Handle, value); }
     }
     /// <summary>
@@ -90,7 +104,10 @@ namespace CanFly
     /// <returns>Filename of full path</returns>
     public string Path(bool full_path)
     {
-      return Syscall.StreamPath(Handle, full_path);
+      string path;
+      ExceptionHelper.ThrowIfFailed(Syscall.StreamPath(Handle, full_path, out path));
+
+      return path;
     }
 
   }
@@ -101,17 +118,26 @@ namespace CanFly
 
     public static FileStream Open(string path)
     {
-      return new FileStream(Syscall.FileStreamOpen(path));
+      uint handle;
+      ExceptionHelper.ThrowIfFailed(Syscall.FileStreamOpen(path, out handle));
+
+      return new FileStream(handle);
     }
 
     public static FileStream Create(string path)
     {
-      return new FileStream(Syscall.FileStreamCreate(path));
+      uint handle;
+      ExceptionHelper.ThrowIfFailed(Syscall.FileStreamCreate(path, out handle));
+
+      return new FileStream(handle);
     }
 
     public DirectoryEnumerator EnumerateDirectory(string path)
     {
-      return new DirectoryEnumerator(Syscall.GetDirectoryEnumerator(path));
+      uint handle;
+      ExceptionHelper.ThrowIfFailed(Syscall.GetDirectoryEnumerator(path, out handle));
+
+      return new DirectoryEnumerator(handle);
     }
   }
 
@@ -122,18 +148,18 @@ namespace CanFly
 
     public static RegistryStream Open(uint parent, string path)
     {
-      return new RegistryStream(RegStreamOpen(parent, path));
+      uint handle;
+      ExceptionHelper.ThrowIfFailed(Syscall.RegStreamOpen(parent, path, out handle));
+
+      return new RegistryStream(handle);
     }
 
     public static RegistryStream Create(uint parent, string path)
     {
-      return new RegistryStream(RegStreamCreate(parent, path));
+      uint handle;
+      ExceptionHelper.ThrowIfFailed(Syscall.RegStreamCreate(parent, path, out handle));
+
+      return new RegistryStream(handle);
     }
-
-
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    private static extern uint RegStreamOpen(uint parent, string path);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    private static extern uint RegStreamCreate(uint parent, string path);
   }
 }

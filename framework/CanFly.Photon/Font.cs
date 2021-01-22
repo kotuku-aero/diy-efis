@@ -16,6 +16,10 @@ namespace CanFly
       CanFly.Syscall.ReleaseFont(_hndl);
       _hndl = 0;
     }
+    internal Font(uint hndl)
+    {
+      _hndl = hndl;
+    }
     /// <summary>
     /// Load a font from the font cache
     /// </summary>
@@ -23,7 +27,8 @@ namespace CanFly
     /// <param name="pointSize">Size of the font requested</param>
     public Font(string fontName, uint pointSize)
     {
-      _hndl = CanFly.Syscall.GetFont(fontName, pointSize);
+      ExceptionHelper.ThrowIfFailed(CanFly.Syscall.GetFont(fontName, pointSize, out _hndl));
+
       if (_hndl == 0)
         throw new InvalidOperationException();
     }
