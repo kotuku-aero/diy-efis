@@ -1,15 +1,57 @@
-#include "../muon/cli/neutron.cli"
+#include "../muon/neutron.cli"
 
-ion
-#submode script
-	add <ENUM:can_ids:id> <STRING:name> <STRING:msg_handler>
-	del <ENUM:can_ids:id> <STRING:name>
-	cat <STRING:name>
-	edit <STRING:name>
-	create <STRING:name> { <STRING:content> }
-	rm <STRING:name>
-	ls { <STRING:name> }
-	debug { <STRING:name> }
-  exec { <STRING:name> }
-	exit
+debug
+#submode debug
+  info breakpoints
+  info watchpoints
+  info threads
+
+  break function <STRING:name>
+  break line <STRING:filename> <UINT16:line>
+
+  clear function <STRING:name>
+  clear line <STRING:filename> <UINT16:line>
+  clear <UINT16:index>
+  clear all
+
+  disable function <STRING:name>
+  disable line <STRING:filename> <UINT16:line>
+  disable <UINT16:index>
+  disable all
+
+  enable function <STRING:name>
+  enable line <STRING:filename> <UINT16:line>
+  enable <UINT16:index>
+  enable all
+
+  list
+  continue
+
+  step
+  step over
+  step into
+  step out
+
+  backtrace
+
+  source
+  source function <STRING:name>
+  source file <STRING:filename> { <UINT16:startIndex> } { <UINT16:endIndex> }
+
+  // print local variables
+  print	{ hex }
+  print member <STRING:name> { hex }
+  print local <STRING:name> { hex }
+
+  watchpoint add <STRING:name> { <STRING:expression> }
+  watchpoint remove <STRING:name>
+
+  symbols <STRING:path>
+
+  restart
+
+  load <STRING:path>
+
+  exit
+
 #endsubmode

@@ -858,9 +858,6 @@ struct CLR_DBG_Commands
 struct CLR_DBG_Debugger
   {
   CLR_Messaging* m_messaging;
-  static void Debugger_Discovery();
-  static void Debugger_WaitForCommands();
-
   static HRESULT CreateInstance();
 
   HRESULT Debugger_Initialize(COM_HANDLE port);
@@ -892,27 +889,21 @@ struct CLR_DBG_Debugger
 
     bool               GetValue(WP_Message* msg, CLR_RT_HeapBlock* ptr, CLR_RT_HeapBlock* reference, CLR_RT_TypeDef_Instance* pTD);
 
-    bool AllocateAndQueueMessage(CLR_UINT32 cmd, unsigned int length, unsigned char* data, CLR_RT_HeapBlock_EndPoint::Port port, CLR_RT_HeapBlock_EndPoint::Address addr, CLR_UINT32 found);
-
-    bool ProcessHeader(WP_Message* msg);
-    bool ProcessPayload(WP_Message* msg);
-
+    bool AllocateAndQueueMessage(CLR_UINT32 cmd, unsigned int length, unsigned char* data, 
+      CLR_RT_HeapBlock_EndPoint::Port port, CLR_RT_HeapBlock_EndPoint::Address addr, CLR_UINT32 found);
 
   public:
     static CLR_RT_Thread* GetThreadFromPid(CLR_INT32 pid);
 
     static bool Monitor_Ping(WP_Message* msg);
     static bool Monitor_Reboot(WP_Message* msg);
-    static bool Debugging_Execution_QueryCLRCapabilities(WP_Message* msg);
     static bool Monitor_ReadMemory(WP_Message* msg);
     static bool Monitor_WriteMemory(WP_Message* msg);
     static bool Monitor_Execute(WP_Message* msg);
-    static bool Monitor_MemoryMap(WP_Message* msg);
-    static bool Monitor_QueryConfiguration(WP_Message* msg);
     static bool Debugging_Execution_BasePtr(WP_Message* msg);
     static bool Debugging_Execution_ChangeConditions(WP_Message* msg);
     static bool Debugging_Execution_Allocate(WP_Message* msg);
-#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
+
     static bool Debugging_Execution_Breakpoints(WP_Message* msg);
     static bool Debugging_Execution_BreakpointStatus(WP_Message* msg);
     static bool Debugging_Execution_SetCurrentAppDomain(WP_Message* msg);
@@ -950,7 +941,6 @@ struct CLR_DBG_Debugger
     static bool Debugging_Resolve_Field(WP_Message* msg);
     static bool Debugging_Resolve_Method(WP_Message* msg);
     static bool Debugging_Resolve_VirtualMethod(WP_Message* msg);
-#endif //#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
 
     static bool Debugging_Deployment_Status(WP_Message* msg);
 

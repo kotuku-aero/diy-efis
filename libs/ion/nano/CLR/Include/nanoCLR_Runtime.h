@@ -3682,9 +3682,7 @@ struct CLR_RT_ExecutionEngine
 
   static HRESULT CastToType(CLR_RT_HeapBlock& ref, CLR_UINT32 tk, CLR_RT_Assembly* assm, bool isInstInstruction);
 
-  void DebuggerLoop();
 
-#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
   void SetDebuggingInfoBreakpoints(bool fSet);
   void InstallBreakpoints(CLR_DBG_Commands::Debugging_Execution_BreakpointDef* data, size_t num);
   void StopOnBreakpoint(CLR_DBG_Commands::Debugging_Execution_BreakpointDef& def, CLR_RT_Thread* th);
@@ -3715,7 +3713,6 @@ struct CLR_RT_ExecutionEngine
   void Breakpoint_Exception(CLR_RT_StackFrame* stack, CLR_UINT32 reason, CLR_PMETADATA ip);
   void Breakpoint_Exception_Intercepted(CLR_RT_StackFrame* stack);
   void Breakpoint_Exception_Uncaught(CLR_RT_Thread* th);
-#endif //#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
 
   //--//
 
@@ -3762,8 +3759,6 @@ struct CLR_RT_ExecutionEngine
 
     void CheckTimers(CLR_INT64& timeoutMin);
     void CheckThreads(CLR_INT64& timeoutMin, CLR_RT_DblLinkedList& threads);
-
-    void ProcessHardware();
 
     void ReleaseAllThreads(CLR_RT_DblLinkedList& threads);
     void AbortAllThreads(CLR_RT_DblLinkedList& threads);

@@ -23,6 +23,8 @@ extern result_t matrix_name_value_action(cli_t *context, const char * matrix_nam
 
 extern result_t string_name_value_action(cli_t *context, const char * string_name_, const char * string_name_value_);
 
+extern result_t script_name_value_action(cli_t *context, const char * script_name_, const char * script_name_value_);
+
 extern result_t bool_name_value_action(cli_t *context, const char * bool_name_, uint16_t bool_name_value_);
 
 extern const enum_t booleans[];
@@ -103,27 +105,79 @@ extern result_t send_can_id_type_session_val1_val2_val3_val4_action(cli_t *conte
 
 extern const enum_t can_types[];
 
-extern result_t ion_add_id_name_msg_handler_action(cli_t *context, uint16_t ion_add_id_, const char * ion_add_id_name_, const char * ion_add_id_name_msg_handler_);
+extern result_t debug_info_breakpoints_action(cli_t *context);
 
-extern result_t ion_del_id_name_action(cli_t *context, uint16_t ion_del_id_, const char * ion_del_id_name_);
+extern result_t debug_info_watchpoints_action(cli_t *context);
 
-extern result_t ion_cat_name_action(cli_t *context, const char * ion_cat_name_);
+extern result_t debug_info_threads_action(cli_t *context);
 
-extern result_t ion_edit_name_action(cli_t *context, const char * ion_edit_name_);
+extern result_t debug_break_function_name_action(cli_t *context, const char * debug_break_function_name_);
 
-extern result_t ion_create_name_content_action(cli_t *context, const char * ion_create_name_, const char * ion_create_name_content_);
+extern result_t debug_break_line_filename_line_action(cli_t *context, const char * debug_break_line_filename_, uint16_t debug_break_line_filename_line_);
 
-extern result_t ion_rm_name_action(cli_t *context, const char * ion_rm_name_);
+extern result_t debug_clear_function_name_action(cli_t *context, const char * debug_clear_function_name_);
 
-extern result_t ion_ls_name_action(cli_t *context, const char * ion_ls_name_);
+extern result_t debug_clear_line_filename_line_action(cli_t *context, const char * debug_clear_line_filename_, uint16_t debug_clear_line_filename_line_);
 
-extern result_t ion_debug_name_action(cli_t *context, const char * ion_debug_name_);
+extern result_t debug_clear_index_action(cli_t *context, uint16_t debug_clear_index_);
 
-extern result_t ion_exec_name_action(cli_t *context, const char * ion_exec_name_);
+extern result_t debug_clear_all_action(cli_t *context);
 
-extern result_t ion_exit_action(cli_t *context);
+extern result_t debug_disable_function_name_action(cli_t *context, const char * debug_disable_function_name_);
 
-extern result_t ion_action(cli_t *context);
+extern result_t debug_disable_line_filename_line_action(cli_t *context, const char * debug_disable_line_filename_, uint16_t debug_disable_line_filename_line_);
+
+extern result_t debug_disable_index_action(cli_t *context, uint16_t debug_disable_index_);
+
+extern result_t debug_disable_all_action(cli_t *context);
+
+extern result_t debug_enable_function_name_action(cli_t *context, const char * debug_enable_function_name_);
+
+extern result_t debug_enable_line_filename_line_action(cli_t *context, const char * debug_enable_line_filename_, uint16_t debug_enable_line_filename_line_);
+
+extern result_t debug_enable_index_action(cli_t *context, uint16_t debug_enable_index_);
+
+extern result_t debug_enable_all_action(cli_t *context);
+
+extern result_t debug_list_action(cli_t *context);
+
+extern result_t debug_continue_action(cli_t *context);
+
+extern result_t debug_step_action(cli_t *context);
+
+extern result_t debug_step_over_action(cli_t *context);
+
+extern result_t debug_step_into_action(cli_t *context);
+
+extern result_t debug_step_out_action(cli_t *context);
+
+extern result_t debug_backtrace_action(cli_t *context);
+
+extern result_t debug_source_action(cli_t *context);
+
+extern result_t debug_source_function_name_action(cli_t *context, const char * debug_source_function_name_);
+
+extern result_t debug_source_file_filename_startIndex_endIndex_action(cli_t *context, const char * debug_source_file_filename_, uint16_t *debug_source_file_filename_startIndex_, uint16_t *debug_source_file_filename_startIndex_endIndex_);
+
+extern result_t debug_print_hex_action(cli_t *context);
+
+extern result_t debug_print_member_name_hex_action(cli_t *context, const char * debug_print_member_name_);
+
+extern result_t debug_print_local_name_hex_action(cli_t *context, const char * debug_print_local_name_);
+
+extern result_t debug_watchpoint_add_name_expression_action(cli_t *context, const char * debug_watchpoint_add_name_, const char * debug_watchpoint_add_name_expression_);
+
+extern result_t debug_watchpoint_remove_name_action(cli_t *context, const char * debug_watchpoint_remove_name_);
+
+extern result_t debug_symbols_path_action(cli_t *context, const char * debug_symbols_path_);
+
+extern result_t debug_restart_action(cli_t *context);
+
+extern result_t debug_load_path_action(cli_t *context, const char * debug_load_path_);
+
+extern result_t debug_exit_action(cli_t *context);
+
+extern result_t debug_action(cli_t *context);
 
 #ifdef __cplusplus
 }

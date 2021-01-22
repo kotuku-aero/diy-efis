@@ -134,6 +134,25 @@ static result_t cli_string_name_value (cli_t *parser)
   }
 
 
+static result_t cli_script_name_value (cli_t *parser)
+  {
+  result_t result;
+  const char * script_name_ = 0;
+  const char * script_name_value_ = 0;
+
+  if(failed(result = cli_get_string(&parser->tokens[1], &script_name_)))
+    return result;
+
+  if(failed(result = cli_get_string(&parser->tokens[2], &script_name_value_)))
+    return result;
+
+  result = script_name_value_action(parser, script_name_, script_name_value_);
+
+
+  return result;
+  }
+
+
 static result_t cli_bool_name_value (cli_t *parser)
   {
   result_t result;
@@ -645,175 +664,496 @@ static result_t cli_send_can_id_type_session_val1_val2_val3_val4 (cli_t *parser)
   }
 
 
-static result_t cli_ion_add_id_name_msg_handler (cli_t *parser)
+static result_t cli_debug_info_breakpoints (cli_t *parser)
   {
   result_t result;
-  uint16_t ion_add_id_;
-  const char * ion_add_id_name_ = 0;
-  const char * ion_add_id_name_msg_handler_ = 0;
-
-  if(failed(result = cli_get_enum(&parser->tokens[1], can_ids, &ion_add_id_)))
-    return result;
-
-  if(failed(result = cli_get_string(&parser->tokens[2], &ion_add_id_name_)))
-    return result;
-
-  if(failed(result = cli_get_string(&parser->tokens[3], &ion_add_id_name_msg_handler_)))
-    return result;
-
-  result = ion_add_id_name_msg_handler_action(parser, ion_add_id_, ion_add_id_name_, ion_add_id_name_msg_handler_);
+  result = debug_info_breakpoints_action(parser);
 
 
   return result;
   }
 
 
-static result_t cli_ion_del_id_name (cli_t *parser)
+static result_t cli_debug_info_watchpoints (cli_t *parser)
   {
   result_t result;
-  uint16_t ion_del_id_;
-  const char * ion_del_id_name_ = 0;
-
-  if(failed(result = cli_get_enum(&parser->tokens[1], can_ids, &ion_del_id_)))
-    return result;
-
-  if(failed(result = cli_get_string(&parser->tokens[2], &ion_del_id_name_)))
-    return result;
-
-  result = ion_del_id_name_action(parser, ion_del_id_, ion_del_id_name_);
+  result = debug_info_watchpoints_action(parser);
 
 
   return result;
   }
 
 
-static result_t cli_ion_cat_name (cli_t *parser)
+static result_t cli_debug_info_threads (cli_t *parser)
   {
   result_t result;
-  const char * ion_cat_name_ = 0;
-
-  if(failed(result = cli_get_string(&parser->tokens[1], &ion_cat_name_)))
-    return result;
-
-  result = ion_cat_name_action(parser, ion_cat_name_);
+  result = debug_info_threads_action(parser);
 
 
   return result;
   }
 
 
-static result_t cli_ion_edit_name (cli_t *parser)
+static result_t cli_debug_break_function_name (cli_t *parser)
   {
   result_t result;
-  const char * ion_edit_name_ = 0;
+  const char * debug_break_function_name_ = 0;
 
-  if(failed(result = cli_get_string(&parser->tokens[1], &ion_edit_name_)))
+  if(failed(result = cli_get_string(&parser->tokens[2], &debug_break_function_name_)))
     return result;
 
-  result = ion_edit_name_action(parser, ion_edit_name_);
+  result = debug_break_function_name_action(parser, debug_break_function_name_);
 
 
   return result;
   }
 
 
-static result_t cli_ion_create_name_content (cli_t *parser)
+static result_t cli_debug_break_line_filename_line (cli_t *parser)
   {
   result_t result;
-  const char * ion_create_name_ = 0;
-  const char * ion_create_name_content_ = 0;
+  const char * debug_break_line_filename_ = 0;
+  uint16_t debug_break_line_filename_line_;
 
-  if(failed(result = cli_get_string(&parser->tokens[1], &ion_create_name_)))
+  if(failed(result = cli_get_string(&parser->tokens[2], &debug_break_line_filename_)))
     return result;
 
-  if((parser->tokens[2].token_length) > 0 &&
-    failed(result = cli_get_string(&parser->tokens[2], &ion_create_name_content_)))
+  if(failed(result = cli_get_uint16(&parser->tokens[3], &debug_break_line_filename_line_)))
     return result;
 
-  result = ion_create_name_content_action(parser, ion_create_name_, (((parser->tokens[2].token_length) > 0) ? ion_create_name_content_ : 0));
+  result = debug_break_line_filename_line_action(parser, debug_break_line_filename_, debug_break_line_filename_line_);
 
 
   return result;
   }
 
 
-static result_t cli_ion_rm_name (cli_t *parser)
+static result_t cli_debug_clear_function_name (cli_t *parser)
   {
   result_t result;
-  const char * ion_rm_name_ = 0;
+  const char * debug_clear_function_name_ = 0;
 
-  if(failed(result = cli_get_string(&parser->tokens[1], &ion_rm_name_)))
+  if(failed(result = cli_get_string(&parser->tokens[2], &debug_clear_function_name_)))
     return result;
 
-  result = ion_rm_name_action(parser, ion_rm_name_);
+  result = debug_clear_function_name_action(parser, debug_clear_function_name_);
 
 
   return result;
   }
 
 
-static result_t cli_ion_ls_name (cli_t *parser)
+static result_t cli_debug_clear_line_filename_line (cli_t *parser)
   {
   result_t result;
-  const char * ion_ls_name_ = 0;
+  const char * debug_clear_line_filename_ = 0;
+  uint16_t debug_clear_line_filename_line_;
 
-  if((parser->tokens[1].token_length) > 0 &&
-    failed(result = cli_get_string(&parser->tokens[1], &ion_ls_name_)))
+  if(failed(result = cli_get_string(&parser->tokens[2], &debug_clear_line_filename_)))
     return result;
 
-  result = ion_ls_name_action(parser, (((parser->tokens[1].token_length) > 0) ? ion_ls_name_ : 0));
-
-
-  return result;
-  }
-
-
-static result_t cli_ion_debug_name (cli_t *parser)
-  {
-  result_t result;
-  const char * ion_debug_name_ = 0;
-
-  if((parser->tokens[1].token_length) > 0 &&
-    failed(result = cli_get_string(&parser->tokens[1], &ion_debug_name_)))
+  if(failed(result = cli_get_uint16(&parser->tokens[3], &debug_clear_line_filename_line_)))
     return result;
 
-  result = ion_debug_name_action(parser, (((parser->tokens[1].token_length) > 0) ? ion_debug_name_ : 0));
+  result = debug_clear_line_filename_line_action(parser, debug_clear_line_filename_, debug_clear_line_filename_line_);
 
 
   return result;
   }
 
 
-static result_t cli_ion_exec_name (cli_t *parser)
+static result_t cli_debug_clear_index (cli_t *parser)
   {
   result_t result;
-  const char * ion_exec_name_ = 0;
+  uint16_t debug_clear_index_;
 
-  if((parser->tokens[1].token_length) > 0 &&
-    failed(result = cli_get_string(&parser->tokens[1], &ion_exec_name_)))
+  if(failed(result = cli_get_uint16(&parser->tokens[1], &debug_clear_index_)))
     return result;
 
-  result = ion_exec_name_action(parser, (((parser->tokens[1].token_length) > 0) ? ion_exec_name_ : 0));
+  result = debug_clear_index_action(parser, debug_clear_index_);
 
 
   return result;
   }
 
 
-static result_t cli_ion_exit (cli_t *parser)
+static result_t cli_debug_clear_all (cli_t *parser)
   {
   result_t result;
-  result = ion_exit_action(parser);
+  result = debug_clear_all_action(parser);
 
 
   return result;
   }
 
 
-static result_t cli_ion (cli_t *parser)
+static result_t cli_debug_disable_function_name (cli_t *parser)
   {
   result_t result;
-  result = ion_action(parser);
+  const char * debug_disable_function_name_ = 0;
+
+  if(failed(result = cli_get_string(&parser->tokens[2], &debug_disable_function_name_)))
+    return result;
+
+  result = debug_disable_function_name_action(parser, debug_disable_function_name_);
+
+
+  return result;
+  }
+
+
+static result_t cli_debug_disable_line_filename_line (cli_t *parser)
+  {
+  result_t result;
+  const char * debug_disable_line_filename_ = 0;
+  uint16_t debug_disable_line_filename_line_;
+
+  if(failed(result = cli_get_string(&parser->tokens[2], &debug_disable_line_filename_)))
+    return result;
+
+  if(failed(result = cli_get_uint16(&parser->tokens[3], &debug_disable_line_filename_line_)))
+    return result;
+
+  result = debug_disable_line_filename_line_action(parser, debug_disable_line_filename_, debug_disable_line_filename_line_);
+
+
+  return result;
+  }
+
+
+static result_t cli_debug_disable_index (cli_t *parser)
+  {
+  result_t result;
+  uint16_t debug_disable_index_;
+
+  if(failed(result = cli_get_uint16(&parser->tokens[1], &debug_disable_index_)))
+    return result;
+
+  result = debug_disable_index_action(parser, debug_disable_index_);
+
+
+  return result;
+  }
+
+
+static result_t cli_debug_disable_all (cli_t *parser)
+  {
+  result_t result;
+  result = debug_disable_all_action(parser);
+
+
+  return result;
+  }
+
+
+static result_t cli_debug_enable_function_name (cli_t *parser)
+  {
+  result_t result;
+  const char * debug_enable_function_name_ = 0;
+
+  if(failed(result = cli_get_string(&parser->tokens[2], &debug_enable_function_name_)))
+    return result;
+
+  result = debug_enable_function_name_action(parser, debug_enable_function_name_);
+
+
+  return result;
+  }
+
+
+static result_t cli_debug_enable_line_filename_line (cli_t *parser)
+  {
+  result_t result;
+  const char * debug_enable_line_filename_ = 0;
+  uint16_t debug_enable_line_filename_line_;
+
+  if(failed(result = cli_get_string(&parser->tokens[2], &debug_enable_line_filename_)))
+    return result;
+
+  if(failed(result = cli_get_uint16(&parser->tokens[3], &debug_enable_line_filename_line_)))
+    return result;
+
+  result = debug_enable_line_filename_line_action(parser, debug_enable_line_filename_, debug_enable_line_filename_line_);
+
+
+  return result;
+  }
+
+
+static result_t cli_debug_enable_index (cli_t *parser)
+  {
+  result_t result;
+  uint16_t debug_enable_index_;
+
+  if(failed(result = cli_get_uint16(&parser->tokens[1], &debug_enable_index_)))
+    return result;
+
+  result = debug_enable_index_action(parser, debug_enable_index_);
+
+
+  return result;
+  }
+
+
+static result_t cli_debug_enable_all (cli_t *parser)
+  {
+  result_t result;
+  result = debug_enable_all_action(parser);
+
+
+  return result;
+  }
+
+
+static result_t cli_debug_list (cli_t *parser)
+  {
+  result_t result;
+  result = debug_list_action(parser);
+
+
+  return result;
+  }
+
+
+static result_t cli_debug_continue (cli_t *parser)
+  {
+  result_t result;
+  result = debug_continue_action(parser);
+
+
+  return result;
+  }
+
+
+static result_t cli_debug_step (cli_t *parser)
+  {
+  result_t result;
+  result = debug_step_action(parser);
+
+
+  return result;
+  }
+
+
+static result_t cli_debug_step_over (cli_t *parser)
+  {
+  result_t result;
+  result = debug_step_over_action(parser);
+
+
+  return result;
+  }
+
+
+static result_t cli_debug_step_into (cli_t *parser)
+  {
+  result_t result;
+  result = debug_step_into_action(parser);
+
+
+  return result;
+  }
+
+
+static result_t cli_debug_step_out (cli_t *parser)
+  {
+  result_t result;
+  result = debug_step_out_action(parser);
+
+
+  return result;
+  }
+
+
+static result_t cli_debug_backtrace (cli_t *parser)
+  {
+  result_t result;
+  result = debug_backtrace_action(parser);
+
+
+  return result;
+  }
+
+
+static result_t cli_debug_source (cli_t *parser)
+  {
+  result_t result;
+  result = debug_source_action(parser);
+
+
+  return result;
+  }
+
+
+static result_t cli_debug_source_function_name (cli_t *parser)
+  {
+  result_t result;
+  const char * debug_source_function_name_ = 0;
+
+  if(failed(result = cli_get_string(&parser->tokens[2], &debug_source_function_name_)))
+    return result;
+
+  result = debug_source_function_name_action(parser, debug_source_function_name_);
+
+
+  return result;
+  }
+
+
+static result_t cli_debug_source_file_filename_startIndex_endIndex (cli_t *parser)
+  {
+  result_t result;
+  const char * debug_source_file_filename_ = 0;
+  uint16_t debug_source_file_filename_startIndex_;
+  uint16_t debug_source_file_filename_startIndex_endIndex_;
+
+  if(failed(result = cli_get_string(&parser->tokens[2], &debug_source_file_filename_)))
+    return result;
+
+  if(parser->tokens[3].token_length > 0 &&
+    failed(result = cli_get_uint16(&parser->tokens[3], &debug_source_file_filename_startIndex_)))
+    return result;
+
+  if(parser->tokens[4].token_length > 0 &&
+    failed(result = cli_get_uint16(&parser->tokens[4], &debug_source_file_filename_startIndex_endIndex_)))
+    return result;
+
+  result = debug_source_file_filename_startIndex_endIndex_action(parser, debug_source_file_filename_, ((parser->tokens[3].token_length > 0) ? &debug_source_file_filename_startIndex_ : 0), ((parser->tokens[4].token_length > 0) ? &debug_source_file_filename_startIndex_endIndex_ : 0));
+
+
+  return result;
+  }
+
+
+static result_t cli_debug_print_hex (cli_t *parser)
+  {
+  result_t result;
+  result = debug_print_hex_action(parser);
+
+
+  return result;
+  }
+
+
+static result_t cli_debug_print_member_name_hex (cli_t *parser)
+  {
+  result_t result;
+  const char * debug_print_member_name_ = 0;
+
+  if(failed(result = cli_get_string(&parser->tokens[2], &debug_print_member_name_)))
+    return result;
+
+  result = debug_print_member_name_hex_action(parser, debug_print_member_name_);
+
+
+  return result;
+  }
+
+
+static result_t cli_debug_print_local_name_hex (cli_t *parser)
+  {
+  result_t result;
+  const char * debug_print_local_name_ = 0;
+
+  if(failed(result = cli_get_string(&parser->tokens[2], &debug_print_local_name_)))
+    return result;
+
+  result = debug_print_local_name_hex_action(parser, debug_print_local_name_);
+
+
+  return result;
+  }
+
+
+static result_t cli_debug_watchpoint_add_name_expression (cli_t *parser)
+  {
+  result_t result;
+  const char * debug_watchpoint_add_name_ = 0;
+  const char * debug_watchpoint_add_name_expression_ = 0;
+
+  if(failed(result = cli_get_string(&parser->tokens[2], &debug_watchpoint_add_name_)))
+    return result;
+
+  if(parser->tokens[3].token_length > 0 &&
+    failed(result = cli_get_string(&parser->tokens[3], &debug_watchpoint_add_name_expression_)))
+    return result;
+
+  result = debug_watchpoint_add_name_expression_action(parser, debug_watchpoint_add_name_, ((parser->tokens[3].token_length > 0) ? debug_watchpoint_add_name_expression_ : 0));
+
+
+  return result;
+  }
+
+
+static result_t cli_debug_watchpoint_remove_name (cli_t *parser)
+  {
+  result_t result;
+  const char * debug_watchpoint_remove_name_ = 0;
+
+  if(failed(result = cli_get_string(&parser->tokens[2], &debug_watchpoint_remove_name_)))
+    return result;
+
+  result = debug_watchpoint_remove_name_action(parser, debug_watchpoint_remove_name_);
+
+
+  return result;
+  }
+
+
+static result_t cli_debug_symbols_path (cli_t *parser)
+  {
+  result_t result;
+  const char * debug_symbols_path_ = 0;
+
+  if(failed(result = cli_get_string(&parser->tokens[1], &debug_symbols_path_)))
+    return result;
+
+  result = debug_symbols_path_action(parser, debug_symbols_path_);
+
+
+  return result;
+  }
+
+
+static result_t cli_debug_restart (cli_t *parser)
+  {
+  result_t result;
+  result = debug_restart_action(parser);
+
+
+  return result;
+  }
+
+
+static result_t cli_debug_load_path (cli_t *parser)
+  {
+  result_t result;
+  const char * debug_load_path_ = 0;
+
+  if(failed(result = cli_get_string(&parser->tokens[1], &debug_load_path_)))
+    return result;
+
+  result = debug_load_path_action(parser, debug_load_path_);
+
+
+  return result;
+  }
+
+
+static result_t cli_debug_exit (cli_t *parser)
+  {
+  result_t result;
+  result = debug_exit_action(parser);
+
+
+  return result;
+  }
+
+
+static result_t cli_debug (cli_t *parser)
+  {
+  result_t result;
+  result = debug_action(parser);
 
 
   return result;
@@ -875,6 +1215,14 @@ static cli_node_t node_string_name_value;
 static cli_node_t node_string_name;
 
 static cli_node_t node_string;
+
+static cli_node_t node_script_name_value_end;
+
+static cli_node_t node_script_name_value;
+
+static cli_node_t node_script_name;
+
+static cli_node_t node_script;
 
 static cli_node_t node_bool_name_value_end;
 
@@ -1084,75 +1432,217 @@ static cli_node_t node_send_can_id;
 
 static cli_node_t node_send_can;
 
-static cli_node_t node_ion_add_id_name_msg_handler_end;
+static cli_node_t node_debug_info_breakpoints_end;
 
-static cli_node_t node_ion_add_id_name_msg_handler;
+static cli_node_t node_debug_info_breakpoints;
 
-static cli_node_t node_ion_add_id_name;
+static cli_node_t node_debug_info_watchpoints_end;
 
-static cli_node_t node_ion_add_id;
+static cli_node_t node_debug_info_watchpoints;
 
-static cli_node_t node_ion_add;
+static cli_node_t node_debug_info_threads_end;
 
-static cli_node_t node_ion_del_id_name_end;
+static cli_node_t node_debug_info_threads;
 
-static cli_node_t node_ion_del_id_name;
+static cli_node_t node_debug_info;
 
-static cli_node_t node_ion_del_id;
+static cli_node_t node_debug_break_function_name_end;
 
-static cli_node_t node_ion_del;
+static cli_node_t node_debug_break_function_name;
 
-static cli_node_t node_ion_cat_name_end;
+static cli_node_t node_debug_break_function;
 
-static cli_node_t node_ion_cat_name;
+static cli_node_t node_debug_break_line_filename_line_end;
 
-static cli_node_t node_ion_cat;
+static cli_node_t node_debug_break_line_filename_line;
 
-static cli_node_t node_ion_edit_name_end;
+static cli_node_t node_debug_break_line_filename;
 
-static cli_node_t node_ion_edit_name;
+static cli_node_t node_debug_break_line;
 
-static cli_node_t node_ion_edit;
+static cli_node_t node_debug_break;
 
-static cli_node_t node_ion_create_name_content_end;
+static cli_node_t node_debug_clear_function_name_end;
 
-static cli_node_t node_ion_create_name_content;
+static cli_node_t node_debug_clear_function_name;
 
-static cli_node_t node_ion_create_name;
+static cli_node_t node_debug_clear_function;
 
-static cli_node_t node_ion_create;
+static cli_node_t node_debug_clear_line_filename_line_end;
 
-static cli_node_t node_ion_rm_name_end;
+static cli_node_t node_debug_clear_line_filename_line;
 
-static cli_node_t node_ion_rm_name;
+static cli_node_t node_debug_clear_line_filename;
 
-static cli_node_t node_ion_rm;
+static cli_node_t node_debug_clear_line;
 
-static cli_node_t node_ion_ls_name_end;
+static cli_node_t node_debug_clear_index_end;
 
-static cli_node_t node_ion_ls_name;
+static cli_node_t node_debug_clear_index;
 
-static cli_node_t node_ion_ls;
+static cli_node_t node_debug_clear_all_end;
 
-static cli_node_t node_ion_debug_name_end;
+static cli_node_t node_debug_clear_all;
 
-static cli_node_t node_ion_debug_name;
+static cli_node_t node_debug_clear;
 
-static cli_node_t node_ion_debug;
+static cli_node_t node_debug_disable_function_name_end;
 
-static cli_node_t node_ion_exec_name_end;
+static cli_node_t node_debug_disable_function_name;
 
-static cli_node_t node_ion_exec_name;
+static cli_node_t node_debug_disable_function;
 
-static cli_node_t node_ion_exec;
+static cli_node_t node_debug_disable_line_filename_line_end;
 
-static cli_node_t node_ion_exit_end;
+static cli_node_t node_debug_disable_line_filename_line;
 
-static cli_node_t node_ion_exit;
+static cli_node_t node_debug_disable_line_filename;
 
-static cli_node_t node_ion_end;
+static cli_node_t node_debug_disable_line;
 
-static cli_node_t node_ion;
+static cli_node_t node_debug_disable_index_end;
+
+static cli_node_t node_debug_disable_index;
+
+static cli_node_t node_debug_disable_all_end;
+
+static cli_node_t node_debug_disable_all;
+
+static cli_node_t node_debug_disable;
+
+static cli_node_t node_debug_enable_function_name_end;
+
+static cli_node_t node_debug_enable_function_name;
+
+static cli_node_t node_debug_enable_function;
+
+static cli_node_t node_debug_enable_line_filename_line_end;
+
+static cli_node_t node_debug_enable_line_filename_line;
+
+static cli_node_t node_debug_enable_line_filename;
+
+static cli_node_t node_debug_enable_line;
+
+static cli_node_t node_debug_enable_index_end;
+
+static cli_node_t node_debug_enable_index;
+
+static cli_node_t node_debug_enable_all_end;
+
+static cli_node_t node_debug_enable_all;
+
+static cli_node_t node_debug_enable;
+
+static cli_node_t node_debug_list_end;
+
+static cli_node_t node_debug_list;
+
+static cli_node_t node_debug_continue_end;
+
+static cli_node_t node_debug_continue;
+
+static cli_node_t node_debug_step_end;
+
+static cli_node_t node_debug_step_over_end;
+
+static cli_node_t node_debug_step_over;
+
+static cli_node_t node_debug_step_into_end;
+
+static cli_node_t node_debug_step_into;
+
+static cli_node_t node_debug_step_out_end;
+
+static cli_node_t node_debug_step_out;
+
+static cli_node_t node_debug_step;
+
+static cli_node_t node_debug_backtrace_end;
+
+static cli_node_t node_debug_backtrace;
+
+static cli_node_t node_debug_source_end;
+
+static cli_node_t node_debug_source_function_name_end;
+
+static cli_node_t node_debug_source_function_name;
+
+static cli_node_t node_debug_source_function;
+
+static cli_node_t node_debug_source_file_filename_startIndex_endIndex_end;
+
+static cli_node_t node_debug_source_file_filename_startIndex_endIndex;
+
+static cli_node_t node_debug_source_file_filename_startIndex;
+
+static cli_node_t node_debug_source_file_filename;
+
+static cli_node_t node_debug_source_file;
+
+static cli_node_t node_debug_source;
+
+static cli_node_t node_debug_print_hex_end;
+
+static cli_node_t node_debug_print_hex;
+
+static cli_node_t node_debug_print_member_name_hex_end;
+
+static cli_node_t node_debug_print_member_name_hex;
+
+static cli_node_t node_debug_print_member_name;
+
+static cli_node_t node_debug_print_member;
+
+static cli_node_t node_debug_print_local_name_hex_end;
+
+static cli_node_t node_debug_print_local_name_hex;
+
+static cli_node_t node_debug_print_local_name;
+
+static cli_node_t node_debug_print_local;
+
+static cli_node_t node_debug_print;
+
+static cli_node_t node_debug_watchpoint_add_name_expression_end;
+
+static cli_node_t node_debug_watchpoint_add_name_expression;
+
+static cli_node_t node_debug_watchpoint_add_name;
+
+static cli_node_t node_debug_watchpoint_add;
+
+static cli_node_t node_debug_watchpoint_remove_name_end;
+
+static cli_node_t node_debug_watchpoint_remove_name;
+
+static cli_node_t node_debug_watchpoint_remove;
+
+static cli_node_t node_debug_watchpoint;
+
+static cli_node_t node_debug_symbols_path_end;
+
+static cli_node_t node_debug_symbols_path;
+
+static cli_node_t node_debug_symbols;
+
+static cli_node_t node_debug_restart_end;
+
+static cli_node_t node_debug_restart;
+
+static cli_node_t node_debug_load_path_end;
+
+static cli_node_t node_debug_load_path;
+
+static cli_node_t node_debug_load;
+
+static cli_node_t node_debug_exit_end;
+
+static cli_node_t node_debug_exit;
+
+static cli_node_t node_debug_end;
+
+static cli_node_t node_debug;
 
 static cli_node_t node_uint16_name_value_end = {
   CLI_NODE_END,
@@ -1429,8 +1919,48 @@ static cli_node_t node_string = {
   0,
   "string",
   0,
-  &node_bool,
+  &node_script,
   &node_string_name
+  };
+
+
+static cli_node_t node_script_name_value_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_script_name_value,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_script_name_value = {
+  CLI_NODE_STRING,
+  0,
+  "STRING:value",
+  0,
+  0,
+  &node_script_name_value_end
+  };
+
+
+static cli_node_t node_script_name = {
+  CLI_NODE_STRING,
+  0,
+  "STRING:name",
+  0,
+  0,
+  &node_script_name_value
+  };
+
+
+static cli_node_t node_script = {
+  CLI_NODE_KEYWORD,
+  0,
+  "script",
+  0,
+  &node_bool,
+  &node_script_name
   };
 
 
@@ -2469,358 +2999,1068 @@ static cli_node_t node_send_can = {
   0,
   "send_can",
   0,
-  &node_ion,
+  &node_debug,
   &node_send_can_id
   };
 
 
-static cli_node_t node_ion_add_id_name_msg_handler_end = {
+static cli_node_t node_debug_info_breakpoints_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_ion_add_id_name_msg_handler,
+  cli_debug_info_breakpoints,
   0,
   0,
   0
   };
 
 
-static cli_node_t node_ion_add_id_name_msg_handler = {
-  CLI_NODE_STRING,
+static cli_node_t node_debug_info_breakpoints = {
+  CLI_NODE_KEYWORD,
   0,
-  "STRING:msg_handler",
+  "breakpoints",
   0,
-  0,
-  &node_ion_add_id_name_msg_handler_end
+  &node_debug_info_watchpoints,
+  &node_debug_info_breakpoints_end
   };
 
 
-static cli_node_t node_ion_add_id_name = {
+static cli_node_t node_debug_info_watchpoints_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_info_watchpoints,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_info_watchpoints = {
+  CLI_NODE_KEYWORD,
+  0,
+  "watchpoints",
+  0,
+  &node_debug_info_threads,
+  &node_debug_info_watchpoints_end
+  };
+
+
+static cli_node_t node_debug_info_threads_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_info_threads,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_info_threads = {
+  CLI_NODE_KEYWORD,
+  0,
+  "threads",
+  0,
+  0,
+  &node_debug_info_threads_end
+  };
+
+
+static cli_node_t node_debug_info = {
+  CLI_NODE_KEYWORD,
+  0,
+  "info",
+  0,
+  &node_debug_break,
+  &node_debug_info_breakpoints
+  };
+
+
+static cli_node_t node_debug_break_function_name_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_break_function_name,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_break_function_name = {
   CLI_NODE_STRING,
   0,
   "STRING:name",
   0,
   0,
-  &node_ion_add_id_name_msg_handler
+  &node_debug_break_function_name_end
   };
 
 
-static cli_node_t node_ion_add_id = {
-  CLI_NODE_ENUM,
+static cli_node_t node_debug_break_function = {
+  CLI_NODE_KEYWORD,
   0,
-  &can_ids,
+  "function",
   0,
-  0,
-  &node_ion_add_id_name
+  &node_debug_break_line,
+  &node_debug_break_function_name
   };
 
 
-static cli_node_t node_ion_add = {
+static cli_node_t node_debug_break_line_filename_line_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_break_line_filename_line,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_break_line_filename_line = {
+  CLI_NODE_UINT16,
+  0,
+  "UINT16:line",
+  0,
+  0,
+  &node_debug_break_line_filename_line_end
+  };
+
+
+static cli_node_t node_debug_break_line_filename = {
+  CLI_NODE_STRING,
+  0,
+  "STRING:filename",
+  0,
+  0,
+  &node_debug_break_line_filename_line
+  };
+
+
+static cli_node_t node_debug_break_line = {
+  CLI_NODE_KEYWORD,
+  0,
+  "line",
+  0,
+  0,
+  &node_debug_break_line_filename
+  };
+
+
+static cli_node_t node_debug_break = {
+  CLI_NODE_KEYWORD,
+  0,
+  "break",
+  0,
+  &node_debug_clear,
+  &node_debug_break_function
+  };
+
+
+static cli_node_t node_debug_clear_function_name_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_clear_function_name,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_clear_function_name = {
+  CLI_NODE_STRING,
+  0,
+  "STRING:name",
+  0,
+  0,
+  &node_debug_clear_function_name_end
+  };
+
+
+static cli_node_t node_debug_clear_function = {
+  CLI_NODE_KEYWORD,
+  0,
+  "function",
+  0,
+  &node_debug_clear_line,
+  &node_debug_clear_function_name
+  };
+
+
+static cli_node_t node_debug_clear_line_filename_line_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_clear_line_filename_line,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_clear_line_filename_line = {
+  CLI_NODE_UINT16,
+  0,
+  "UINT16:line",
+  0,
+  0,
+  &node_debug_clear_line_filename_line_end
+  };
+
+
+static cli_node_t node_debug_clear_line_filename = {
+  CLI_NODE_STRING,
+  0,
+  "STRING:filename",
+  0,
+  0,
+  &node_debug_clear_line_filename_line
+  };
+
+
+static cli_node_t node_debug_clear_line = {
+  CLI_NODE_KEYWORD,
+  0,
+  "line",
+  0,
+  &node_debug_clear_index,
+  &node_debug_clear_line_filename
+  };
+
+
+static cli_node_t node_debug_clear_index_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_clear_index,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_clear_index = {
+  CLI_NODE_UINT16,
+  0,
+  "UINT16:index",
+  0,
+  &node_debug_clear_all,
+  &node_debug_clear_index_end
+  };
+
+
+static cli_node_t node_debug_clear_all_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_clear_all,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_clear_all = {
+  CLI_NODE_KEYWORD,
+  0,
+  "all",
+  0,
+  0,
+  &node_debug_clear_all_end
+  };
+
+
+static cli_node_t node_debug_clear = {
+  CLI_NODE_KEYWORD,
+  0,
+  "clear",
+  0,
+  &node_debug_disable,
+  &node_debug_clear_function
+  };
+
+
+static cli_node_t node_debug_disable_function_name_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_disable_function_name,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_disable_function_name = {
+  CLI_NODE_STRING,
+  0,
+  "STRING:name",
+  0,
+  0,
+  &node_debug_disable_function_name_end
+  };
+
+
+static cli_node_t node_debug_disable_function = {
+  CLI_NODE_KEYWORD,
+  0,
+  "function",
+  0,
+  &node_debug_disable_line,
+  &node_debug_disable_function_name
+  };
+
+
+static cli_node_t node_debug_disable_line_filename_line_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_disable_line_filename_line,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_disable_line_filename_line = {
+  CLI_NODE_UINT16,
+  0,
+  "UINT16:line",
+  0,
+  0,
+  &node_debug_disable_line_filename_line_end
+  };
+
+
+static cli_node_t node_debug_disable_line_filename = {
+  CLI_NODE_STRING,
+  0,
+  "STRING:filename",
+  0,
+  0,
+  &node_debug_disable_line_filename_line
+  };
+
+
+static cli_node_t node_debug_disable_line = {
+  CLI_NODE_KEYWORD,
+  0,
+  "line",
+  0,
+  &node_debug_disable_index,
+  &node_debug_disable_line_filename
+  };
+
+
+static cli_node_t node_debug_disable_index_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_disable_index,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_disable_index = {
+  CLI_NODE_UINT16,
+  0,
+  "UINT16:index",
+  0,
+  &node_debug_disable_all,
+  &node_debug_disable_index_end
+  };
+
+
+static cli_node_t node_debug_disable_all_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_disable_all,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_disable_all = {
+  CLI_NODE_KEYWORD,
+  0,
+  "all",
+  0,
+  0,
+  &node_debug_disable_all_end
+  };
+
+
+static cli_node_t node_debug_disable = {
+  CLI_NODE_KEYWORD,
+  0,
+  "disable",
+  0,
+  &node_debug_enable,
+  &node_debug_disable_function
+  };
+
+
+static cli_node_t node_debug_enable_function_name_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_enable_function_name,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_enable_function_name = {
+  CLI_NODE_STRING,
+  0,
+  "STRING:name",
+  0,
+  0,
+  &node_debug_enable_function_name_end
+  };
+
+
+static cli_node_t node_debug_enable_function = {
+  CLI_NODE_KEYWORD,
+  0,
+  "function",
+  0,
+  &node_debug_enable_line,
+  &node_debug_enable_function_name
+  };
+
+
+static cli_node_t node_debug_enable_line_filename_line_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_enable_line_filename_line,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_enable_line_filename_line = {
+  CLI_NODE_UINT16,
+  0,
+  "UINT16:line",
+  0,
+  0,
+  &node_debug_enable_line_filename_line_end
+  };
+
+
+static cli_node_t node_debug_enable_line_filename = {
+  CLI_NODE_STRING,
+  0,
+  "STRING:filename",
+  0,
+  0,
+  &node_debug_enable_line_filename_line
+  };
+
+
+static cli_node_t node_debug_enable_line = {
+  CLI_NODE_KEYWORD,
+  0,
+  "line",
+  0,
+  &node_debug_enable_index,
+  &node_debug_enable_line_filename
+  };
+
+
+static cli_node_t node_debug_enable_index_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_enable_index,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_enable_index = {
+  CLI_NODE_UINT16,
+  0,
+  "UINT16:index",
+  0,
+  &node_debug_enable_all,
+  &node_debug_enable_index_end
+  };
+
+
+static cli_node_t node_debug_enable_all_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_enable_all,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_enable_all = {
+  CLI_NODE_KEYWORD,
+  0,
+  "all",
+  0,
+  0,
+  &node_debug_enable_all_end
+  };
+
+
+static cli_node_t node_debug_enable = {
+  CLI_NODE_KEYWORD,
+  0,
+  "enable",
+  0,
+  &node_debug_list,
+  &node_debug_enable_function
+  };
+
+
+static cli_node_t node_debug_list_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_list,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_list = {
+  CLI_NODE_KEYWORD,
+  0,
+  "list",
+  0,
+  &node_debug_continue,
+  &node_debug_list_end
+  };
+
+
+static cli_node_t node_debug_continue_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_continue,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_continue = {
+  CLI_NODE_KEYWORD,
+  0,
+  "continue",
+  0,
+  &node_debug_step,
+  &node_debug_continue_end
+  };
+
+
+static cli_node_t node_debug_step_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_step,
+  0,
+  &node_debug_step_over,
+  0
+  };
+
+
+static cli_node_t node_debug_step_over_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_step_over,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_step_over = {
+  CLI_NODE_KEYWORD,
+  0,
+  "over",
+  0,
+  &node_debug_step_into,
+  &node_debug_step_over_end
+  };
+
+
+static cli_node_t node_debug_step_into_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_step_into,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_step_into = {
+  CLI_NODE_KEYWORD,
+  0,
+  "into",
+  0,
+  &node_debug_step_out,
+  &node_debug_step_into_end
+  };
+
+
+static cli_node_t node_debug_step_out_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_step_out,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_step_out = {
+  CLI_NODE_KEYWORD,
+  0,
+  "out",
+  0,
+  0,
+  &node_debug_step_out_end
+  };
+
+
+static cli_node_t node_debug_step = {
+  CLI_NODE_KEYWORD,
+  0,
+  "step",
+  0,
+  &node_debug_backtrace,
+  &node_debug_step_end
+  };
+
+
+static cli_node_t node_debug_backtrace_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_backtrace,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_backtrace = {
+  CLI_NODE_KEYWORD,
+  0,
+  "backtrace",
+  0,
+  &node_debug_source,
+  &node_debug_backtrace_end
+  };
+
+
+static cli_node_t node_debug_source_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_source,
+  0,
+  &node_debug_source_function,
+  0
+  };
+
+
+static cli_node_t node_debug_source_function_name_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_source_function_name,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_source_function_name = {
+  CLI_NODE_STRING,
+  0,
+  "STRING:name",
+  0,
+  0,
+  &node_debug_source_function_name_end
+  };
+
+
+static cli_node_t node_debug_source_function = {
+  CLI_NODE_KEYWORD,
+  0,
+  "function",
+  0,
+  &node_debug_source_file,
+  &node_debug_source_function_name
+  };
+
+
+static cli_node_t node_debug_source_file_filename_startIndex_endIndex_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_source_file_filename_startIndex_endIndex,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_source_file_filename_startIndex_endIndex = {
+  CLI_NODE_UINT16,
+  CLI_NODE_FLAGS_OPT_START | CLI_NODE_FLAGS_OPT_END | CLI_NODE_FLAGS_OPT_PARTIAL,
+  "UINT16:endIndex",
+  0,
+  0,
+  &node_debug_source_file_filename_startIndex_endIndex_end
+  };
+
+
+static cli_node_t node_debug_source_file_filename_startIndex = {
+  CLI_NODE_UINT16,
+  CLI_NODE_FLAGS_OPT_START | CLI_NODE_FLAGS_OPT_END | CLI_NODE_FLAGS_OPT_PARTIAL,
+  "UINT16:startIndex",
+  0,
+  0,
+  &node_debug_source_file_filename_startIndex_endIndex
+  };
+
+
+static cli_node_t node_debug_source_file_filename = {
+  CLI_NODE_STRING,
+  0,
+  "STRING:filename",
+  0,
+  0,
+  &node_debug_source_file_filename_startIndex
+  };
+
+
+static cli_node_t node_debug_source_file = {
+  CLI_NODE_KEYWORD,
+  0,
+  "file",
+  0,
+  0,
+  &node_debug_source_file_filename
+  };
+
+
+static cli_node_t node_debug_source = {
+  CLI_NODE_KEYWORD,
+  0,
+  "source",
+  0,
+  &node_debug_print,
+  &node_debug_source_end
+  };
+
+
+static cli_node_t node_debug_print_hex_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_print_hex,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_print_hex = {
+  CLI_NODE_KEYWORD,
+  CLI_NODE_FLAGS_OPT_START | CLI_NODE_FLAGS_OPT_END | CLI_NODE_FLAGS_OPT_PARTIAL,
+  "hex",
+  0,
+  &node_debug_print_member,
+  &node_debug_print_hex_end
+  };
+
+
+static cli_node_t node_debug_print_member_name_hex_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_print_member_name_hex,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_print_member_name_hex = {
+  CLI_NODE_KEYWORD,
+  CLI_NODE_FLAGS_OPT_START | CLI_NODE_FLAGS_OPT_END | CLI_NODE_FLAGS_OPT_PARTIAL,
+  "hex",
+  0,
+  0,
+  &node_debug_print_member_name_hex_end
+  };
+
+
+static cli_node_t node_debug_print_member_name = {
+  CLI_NODE_STRING,
+  0,
+  "STRING:name",
+  0,
+  0,
+  &node_debug_print_member_name_hex
+  };
+
+
+static cli_node_t node_debug_print_member = {
+  CLI_NODE_KEYWORD,
+  0,
+  "member",
+  0,
+  &node_debug_print_local,
+  &node_debug_print_member_name
+  };
+
+
+static cli_node_t node_debug_print_local_name_hex_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_print_local_name_hex,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_print_local_name_hex = {
+  CLI_NODE_KEYWORD,
+  CLI_NODE_FLAGS_OPT_START | CLI_NODE_FLAGS_OPT_END | CLI_NODE_FLAGS_OPT_PARTIAL,
+  "hex",
+  0,
+  0,
+  &node_debug_print_local_name_hex_end
+  };
+
+
+static cli_node_t node_debug_print_local_name = {
+  CLI_NODE_STRING,
+  0,
+  "STRING:name",
+  0,
+  0,
+  &node_debug_print_local_name_hex
+  };
+
+
+static cli_node_t node_debug_print_local = {
+  CLI_NODE_KEYWORD,
+  0,
+  "local",
+  0,
+  0,
+  &node_debug_print_local_name
+  };
+
+
+static cli_node_t node_debug_print = {
+  CLI_NODE_KEYWORD,
+  0,
+  "print",
+  0,
+  &node_debug_watchpoint,
+  &node_debug_print_hex
+  };
+
+
+static cli_node_t node_debug_watchpoint_add_name_expression_end = {
+  CLI_NODE_END,
+  CLI_NODE_FLAGS_OPT_END,
+  cli_debug_watchpoint_add_name_expression,
+  0,
+  0,
+  0
+  };
+
+
+static cli_node_t node_debug_watchpoint_add_name_expression = {
+  CLI_NODE_STRING,
+  CLI_NODE_FLAGS_OPT_START | CLI_NODE_FLAGS_OPT_END | CLI_NODE_FLAGS_OPT_PARTIAL,
+  "STRING:expression",
+  0,
+  0,
+  &node_debug_watchpoint_add_name_expression_end
+  };
+
+
+static cli_node_t node_debug_watchpoint_add_name = {
+  CLI_NODE_STRING,
+  0,
+  "STRING:name",
+  0,
+  0,
+  &node_debug_watchpoint_add_name_expression
+  };
+
+
+static cli_node_t node_debug_watchpoint_add = {
   CLI_NODE_KEYWORD,
   0,
   "add",
   0,
-  &node_ion_del,
-  &node_ion_add_id
+  &node_debug_watchpoint_remove,
+  &node_debug_watchpoint_add_name
   };
 
 
-static cli_node_t node_ion_del_id_name_end = {
+static cli_node_t node_debug_watchpoint_remove_name_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_ion_del_id_name,
+  cli_debug_watchpoint_remove_name,
   0,
   0,
   0
   };
 
 
-static cli_node_t node_ion_del_id_name = {
+static cli_node_t node_debug_watchpoint_remove_name = {
   CLI_NODE_STRING,
   0,
   "STRING:name",
   0,
   0,
-  &node_ion_del_id_name_end
+  &node_debug_watchpoint_remove_name_end
   };
 
 
-static cli_node_t node_ion_del_id = {
-  CLI_NODE_ENUM,
-  0,
-  &can_ids,
-  0,
-  0,
-  &node_ion_del_id_name
-  };
-
-
-static cli_node_t node_ion_del = {
+static cli_node_t node_debug_watchpoint_remove = {
   CLI_NODE_KEYWORD,
   0,
-  "del",
+  "remove",
   0,
-  &node_ion_cat,
-  &node_ion_del_id
+  0,
+  &node_debug_watchpoint_remove_name
   };
 
 
-static cli_node_t node_ion_cat_name_end = {
+static cli_node_t node_debug_watchpoint = {
+  CLI_NODE_KEYWORD,
+  0,
+  "watchpoint",
+  0,
+  &node_debug_symbols,
+  &node_debug_watchpoint_add
+  };
+
+
+static cli_node_t node_debug_symbols_path_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_ion_cat_name,
+  cli_debug_symbols_path,
   0,
   0,
   0
   };
 
 
-static cli_node_t node_ion_cat_name = {
+static cli_node_t node_debug_symbols_path = {
   CLI_NODE_STRING,
   0,
-  "STRING:name",
+  "STRING:path",
   0,
   0,
-  &node_ion_cat_name_end
+  &node_debug_symbols_path_end
   };
 
 
-static cli_node_t node_ion_cat = {
+static cli_node_t node_debug_symbols = {
   CLI_NODE_KEYWORD,
   0,
-  "cat",
+  "symbols",
   0,
-  &node_ion_edit,
-  &node_ion_cat_name
+  &node_debug_restart,
+  &node_debug_symbols_path
   };
 
 
-static cli_node_t node_ion_edit_name_end = {
+static cli_node_t node_debug_restart_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_ion_edit_name,
+  cli_debug_restart,
   0,
   0,
   0
   };
 
 
-static cli_node_t node_ion_edit_name = {
-  CLI_NODE_STRING,
-  0,
-  "STRING:name",
-  0,
-  0,
-  &node_ion_edit_name_end
-  };
-
-
-static cli_node_t node_ion_edit = {
+static cli_node_t node_debug_restart = {
   CLI_NODE_KEYWORD,
   0,
-  "edit",
+  "restart",
   0,
-  &node_ion_create,
-  &node_ion_edit_name
+  &node_debug_load,
+  &node_debug_restart_end
   };
 
 
-static cli_node_t node_ion_create_name_content_end = {
+static cli_node_t node_debug_load_path_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_ion_create_name_content,
+  cli_debug_load_path,
   0,
   0,
   0
   };
 
 
-static cli_node_t node_ion_create_name_content = {
+static cli_node_t node_debug_load_path = {
   CLI_NODE_STRING,
-  CLI_NODE_FLAGS_OPT_START | CLI_NODE_FLAGS_OPT_END | CLI_NODE_FLAGS_OPT_PARTIAL,
-  "STRING:content",
+  0,
+  "STRING:path",
   0,
   0,
-  &node_ion_create_name_content_end
+  &node_debug_load_path_end
   };
 
 
-static cli_node_t node_ion_create_name = {
-  CLI_NODE_STRING,
-  0,
-  "STRING:name",
-  0,
-  0,
-  &node_ion_create_name_content
-  };
-
-
-static cli_node_t node_ion_create = {
+static cli_node_t node_debug_load = {
   CLI_NODE_KEYWORD,
   0,
-  "create",
+  "load",
   0,
-  &node_ion_rm,
-  &node_ion_create_name
+  &node_debug_exit,
+  &node_debug_load_path
   };
 
 
-static cli_node_t node_ion_rm_name_end = {
+static cli_node_t node_debug_exit_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_ion_rm_name,
+  cli_debug_exit,
   0,
   0,
   0
   };
 
 
-static cli_node_t node_ion_rm_name = {
-  CLI_NODE_STRING,
-  0,
-  "STRING:name",
-  0,
-  0,
-  &node_ion_rm_name_end
-  };
-
-
-static cli_node_t node_ion_rm = {
-  CLI_NODE_KEYWORD,
-  0,
-  "rm",
-  0,
-  &node_ion_ls,
-  &node_ion_rm_name
-  };
-
-
-static cli_node_t node_ion_ls_name_end = {
-  CLI_NODE_END,
-  CLI_NODE_FLAGS_OPT_END,
-  cli_ion_ls_name,
-  0,
-  0,
-  0
-  };
-
-
-static cli_node_t node_ion_ls_name = {
-  CLI_NODE_STRING,
-  CLI_NODE_FLAGS_OPT_START | CLI_NODE_FLAGS_OPT_END | CLI_NODE_FLAGS_OPT_PARTIAL,
-  "STRING:name",
-  0,
-  0,
-  &node_ion_ls_name_end
-  };
-
-
-static cli_node_t node_ion_ls = {
-  CLI_NODE_KEYWORD,
-  0,
-  "ls",
-  0,
-  &node_ion_debug,
-  &node_ion_ls_name
-  };
-
-
-static cli_node_t node_ion_debug_name_end = {
-  CLI_NODE_END,
-  CLI_NODE_FLAGS_OPT_END,
-  cli_ion_debug_name,
-  0,
-  0,
-  0
-  };
-
-
-static cli_node_t node_ion_debug_name = {
-  CLI_NODE_STRING,
-  CLI_NODE_FLAGS_OPT_START | CLI_NODE_FLAGS_OPT_END | CLI_NODE_FLAGS_OPT_PARTIAL,
-  "STRING:name",
-  0,
-  0,
-  &node_ion_debug_name_end
-  };
-
-
-static cli_node_t node_ion_debug = {
-  CLI_NODE_KEYWORD,
-  0,
-  "debug",
-  0,
-  &node_ion_exec,
-  &node_ion_debug_name
-  };
-
-
-static cli_node_t node_ion_exec_name_end = {
-  CLI_NODE_END,
-  CLI_NODE_FLAGS_OPT_END,
-  cli_ion_exec_name,
-  0,
-  0,
-  0
-  };
-
-
-static cli_node_t node_ion_exec_name = {
-  CLI_NODE_STRING,
-  CLI_NODE_FLAGS_OPT_START | CLI_NODE_FLAGS_OPT_END | CLI_NODE_FLAGS_OPT_PARTIAL,
-  "STRING:name",
-  0,
-  0,
-  &node_ion_exec_name_end
-  };
-
-
-static cli_node_t node_ion_exec = {
-  CLI_NODE_KEYWORD,
-  0,
-  "exec",
-  0,
-  &node_ion_exit,
-  &node_ion_exec_name
-  };
-
-
-static cli_node_t node_ion_exit_end = {
-  CLI_NODE_END,
-  CLI_NODE_FLAGS_OPT_END,
-  cli_ion_exit,
-  0,
-  0,
-  0
-  };
-
-
-static cli_node_t node_ion_exit = {
+static cli_node_t node_debug_exit = {
   CLI_NODE_KEYWORD,
   0,
   "exit",
   0,
   0,
-  &node_ion_exit_end
+  &node_debug_exit_end
   };
 
 
-static cli_node_t node_ion_end = {
+static cli_node_t node_debug_end = {
   CLI_NODE_END,
   CLI_NODE_FLAGS_OPT_END,
-  cli_ion,
+  cli_debug,
   0,
   0,
-  &node_ion_add
+  &node_debug_info
   };
 
 
-static cli_node_t node_ion = {
+static cli_node_t node_debug = {
   CLI_NODE_KEYWORD,
   0,
-  "ion",
+  "debug",
   0,
   0,
-  &node_ion_end
+  &node_debug_end
   };
 
 

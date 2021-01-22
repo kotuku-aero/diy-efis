@@ -20,15 +20,11 @@
     }
 
 const CLR_Messaging_CommandHandlerLookup c_Debugger_Lookup_Request[] = {
-    DEFINE_CMD(Execution_QueryCLRCapabilities),
-    DEFINE_CMD2(Ping),
     DEFINE_CMD2(ReadMemory),
     DEFINE_CMD2(WriteMemory),
-    DEFINE_CMD2(QueryConfiguration),
-    //
     DEFINE_CMD2(Execute),
     DEFINE_CMD2(Reboot),
-    DEFINE_CMD2(MemoryMap),
+    { CLR_DBG_Debugger::Monitor_MemoryMap, CLR_DBG_Commands_c_Monitor_MemoryMap }
     //
     DEFINE_CMD(Execution_BasePtr),
     DEFINE_CMD(Execution_ChangeConditions),

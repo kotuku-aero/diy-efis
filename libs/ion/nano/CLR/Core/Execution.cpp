@@ -2766,23 +2766,6 @@ HRESULT CLR_RT_ExecutionEngine::InitTimeout(CLR_INT64 &timeExpire, CLR_INT32 tim
   NANOCLR_NOCLEANUP();
   }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void CLR_RT_ExecutionEngine::DebuggerLoop()
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  ProcessHardware();
-
-  // figure this out
-  // WaitSystemEvents(SLEEP_LEVEL__SLEEP, g_CLR_HW_Hardware.m_wakeupEvents, TIME_CONVERSION__TO_MILLISECONDS * 100);
-  }
-
-//--//
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
-
 void CLR_RT_ExecutionEngine::SetDebuggingInfoBreakpoints(bool fSet)
   {
   NATIVE_PROFILE_CLR_CORE();
@@ -3327,8 +3310,6 @@ void CLR_RT_ExecutionEngine::Breakpoint_Exception_Intercepted(CLR_RT_StackFrame 
 
   Breakpoint_System_Event(hit, event, NULL, stack, NULL);
   }
-
-#endif //#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

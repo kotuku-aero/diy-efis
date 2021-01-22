@@ -319,16 +319,6 @@ void CLR_Messaging::Cleanup()
   m_fInitialized = false;
   }
 
-//--//
-
-bool CLR_Messaging::ProcessHeader(WP_Message *msg)
-  {
-  (void)msg;
-
-  NATIVE_PROFILE_CLR_MESSAGING();
-  TRACE("MSG: 0x%08X\n", msg->m_header.m_cmd);
-  return true;
-  }
 
 bool CLR_Messaging::ProcessPayload(WP_Message *msg)
   {
