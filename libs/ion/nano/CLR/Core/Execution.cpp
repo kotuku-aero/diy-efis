@@ -405,7 +405,7 @@ HRESULT CLR_RT_ExecutionEngine::WaitForDebugger()
 #endif
     */
 
-    DebuggerLoop();
+    //DebuggerLoop();
     }
 
 #if defined(WIN32)
@@ -2136,23 +2136,12 @@ void CLR_RT_ExecutionEngine::DeleteLockRequests(
   NANOCLR_FOREACH_NODE_END();
   }
 
-//--//
-
-void CLR_RT_ExecutionEngine::ProcessHardware()
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  Watchdog_Reset();
-
-  // g_CLR_HW_Hardware.ProcessActivity();
-  }
 
 CLR_INT64 CLR_RT_ExecutionEngine::ProcessTimer()
   {
   NATIVE_PROFILE_CLR_CORE();
 
   CLR_INT64 timeoutMin;
-
-  ProcessHardware();
 
   timeoutMin = m_maximumTimeToActive; // max sleep.
 
