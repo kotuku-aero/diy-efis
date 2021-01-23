@@ -577,7 +577,7 @@ int main(int argc, const char **argv)
   process_cli_file(src_filename.c_str(), include_path.c_str(), root, pm_compile, root);
 
   // We work over the parser file now
-  std::string library_path = "<muon.h>";
+  std::string library_path = "\"../muon/muon.h\"";
   if(has_option(args, "l"))
     {
     library_path = "\"";
@@ -624,6 +624,9 @@ int main(int argc, const char **argv)
     impl_fname += ".c";
     }
 
+  std::string root_node = guard_fname;
+  root_node += "_root";
+
   std::ofstream hdr(hdr_fname);
 
   hdr << "#ifndef __" << guard_fname << "_h__" << std::endl;
@@ -634,7 +637,7 @@ int main(int argc, const char **argv)
   hdr << "#ifdef __cplusplus" << std::endl;
   hdr << "extern \"C\" {" << std::endl;
   hdr << "#endif" << std::endl << std::endl;
-  hdr << "extern cli_node_t " << filename << "_root;" << std::endl << std::endl;
+  hdr << "extern cli_node_t " << root_node << ";" << std::endl << std::endl;
   root->walk(print_action, &hdr);
   hdr << "#ifdef __cplusplus" << std::endl;
   hdr << "}" << std::endl;

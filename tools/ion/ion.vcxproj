@@ -116,7 +116,6 @@
     <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\corlib_native_System_WeakReference.cpp" />
     <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\mscorlib\corlib_native.cpp" />
     <ClCompile Include="..\..\libs\ion\nano\CLR\Debugger\Debugger.cpp" />
-    <ClCompile Include="..\..\libs\ion\nano\CLR\Debugger\Debugger_full.cpp" />
     <ClCompile Include="..\..\libs\ion\nano\CLR\Diagnostics\Info.cpp" />
     <ClCompile Include="..\..\libs\ion\nano\CLR\Diagnostics\Profile.cpp" />
     <ClCompile Include="..\..\libs\ion\nano\CLR\Diagnostics\Profiler.cpp" />
@@ -144,7 +143,6 @@
   <ItemGroup>
     <ClInclude Include="..\..\libs\ion\ion.h" />
     <ClInclude Include="..\..\libs\ion\ion_cli.h" />
-    <ClInclude Include="..\..\libs\ion\ion_cli_impl.h" />
     <ClInclude Include="..\..\libs\ion\targetHAL.h" />
     <ClInclude Include="..\..\libs\ion\target_os.h" />
     <ClInclude Include="..\..\libs\ion\nano\CLR\Core\Core.h" />

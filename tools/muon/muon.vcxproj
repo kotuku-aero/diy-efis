@@ -146,9 +146,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libs\muon\cli.h" />
-    <ClInclude Include="..\..\libs\muon\cli\neutron_cli.h" />
-    <ClInclude Include="..\..\libs\muon\cli\neutron_cli_impl.h" />
     <ClInclude Include="..\..\libs\muon\muon.h" />
+    <ClInclude Include="..\..\libs\muon\neutron_cli.h" />
+    <ClInclude Include="..\..\libs\muon\neutron_cli_impl.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\libs\muon\neutron.cli" />

@@ -390,9 +390,6 @@
     <ClCompile Include="..\..\libs\ion\nano\CLR\Debugger\Debugger.cpp">
       <Filter>nano\CLR\Debugger</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\ion\nano\CLR\Debugger\Debugger_full.cpp">
-      <Filter>nano\CLR\Debugger</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libs\ion\nano\CLR\Diagnostics\Info.cpp">
       <Filter>nano\CLR\Diagnostics</Filter>
     </ClCompile>
@@ -464,9 +461,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\libs\ion\ion_cli_impl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\libs\ion\ion.h">
       <Filter>Header Files</Filter>
     </ClInclude>

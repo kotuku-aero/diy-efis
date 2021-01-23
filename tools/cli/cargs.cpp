@@ -78,7 +78,7 @@ void cargs_t::parse(int argc, const char* argv[])
           val = to_insert.substr(pos + 1);
           to_insert.erase(pos);
           }
-        else if(i + 1 < argc)
+        else if(i + 2 < argc)
           {
           if(argv[i+1][0] != '-')
             val = argv[i + 1];
