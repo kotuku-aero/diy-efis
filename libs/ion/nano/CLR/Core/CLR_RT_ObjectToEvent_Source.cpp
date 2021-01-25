@@ -9,8 +9,8 @@
 
 HRESULT CLR_RT_ObjectToEvent_Source::CreateInstance(CLR_RT_ObjectToEvent_Destination *event, CLR_RT_HeapBlock &object, CLR_RT_HeapBlock &reference)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_ObjectToEvent_Source *oe = EVENTCACHE_EXTRACT_NODE(g_CLR_RT_EventCache, CLR_RT_ObjectToEvent_Source, DATATYPE_OBJECT_TO_EVENT); CHECK_ALLOCATION(oe);
 
@@ -28,7 +28,7 @@ HRESULT CLR_RT_ObjectToEvent_Source::CreateInstance(CLR_RT_ObjectToEvent_Destina
 
 CLR_RT_ObjectToEvent_Source *CLR_RT_ObjectToEvent_Source::ExtractInstance(CLR_RT_HeapBlock &reference)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   if (reference.IsAReferenceOfThisType(DATATYPE_OBJECT_TO_EVENT) == false) return NULL;
 
   return (CLR_RT_ObjectToEvent_Source *)reference.Dereference();
@@ -37,7 +37,7 @@ CLR_RT_ObjectToEvent_Source *CLR_RT_ObjectToEvent_Source::ExtractInstance(CLR_RT
 
 void CLR_RT_ObjectToEvent_Source::EnsureObjectIsAlive()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   if (m_objectPtr && m_objectPtr->IsAlive()) return;
 
   Detach();
@@ -45,7 +45,7 @@ void CLR_RT_ObjectToEvent_Source::EnsureObjectIsAlive()
 
 void CLR_RT_ObjectToEvent_Source::Detach()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   if (m_referencePtr)
     {
     m_referencePtr->SetObjectReference(NULL);
@@ -56,7 +56,7 @@ void CLR_RT_ObjectToEvent_Source::Detach()
 
 void CLR_RT_ObjectToEvent_Source::Relocate()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_objectPtr);
   CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_referencePtr);
   }

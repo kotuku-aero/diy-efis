@@ -13,6 +13,7 @@
 #include "nanoCLR_ErrorCodes.h"
 #include "nanoSupport.h"
 #include "nanoWeak.h"
+#include "../../../ion_debugger.h"
 
 struct CLR_RADIAN
   {
@@ -43,10 +44,10 @@ typedef CLR_RT_StringMap::iterator CLR_RT_StringMapIter;
 typedef std::vector<std::wstring> CLR_RT_StringVector;
 typedef CLR_RT_StringVector::iterator CLR_RT_StringVectorIter;
 
-typedef std::map<std::wstring, CLR_UINT32> CLR_RT_SymbolToAddressMap;
+typedef std::map<std::wstring, uint32_t> CLR_RT_SymbolToAddressMap;
 typedef CLR_RT_SymbolToAddressMap::iterator CLR_RT_SymbolToAddressMapIter;
 
-typedef std::map<CLR_UINT32, std::wstring> CLR_RT_AddressToSymbolMap;
+typedef std::map<uint32_t, std::wstring> CLR_RT_AddressToSymbolMap;
 typedef CLR_RT_AddressToSymbolMap::iterator CLR_RT_AddressToSymbolMapIter;
 
 #else
@@ -276,13 +277,13 @@ class CLR_XmlUtil
 
 //--//
 
-typedef std::vector<CLR_UINT8> CLR_RT_Buffer;
+typedef std::vector<uint8_t> CLR_RT_Buffer;
 
 struct CLR_RT_FileStore
   {
   static HRESULT LoadFile(const wchar_t* szFile, CLR_RT_Buffer& vec);
   static HRESULT SaveFile(const wchar_t* szFile, const CLR_RT_Buffer& vec);
-  static HRESULT SaveFile(const wchar_t* szFile, const CLR_UINT8* buf, size_t size);
+  static HRESULT SaveFile(const wchar_t* szFile, const uint8_t* buf, size_t size);
 
   static HRESULT ExtractTokensFromFile(
     const wchar_t* szFileName,
@@ -316,7 +317,7 @@ struct CLR_RT_FileStore
 #define MIN(a, b) (a < b ? a : b)
 #endif
 #define ABS(x)     (x > 0 ? x : (-x))
-#define FLOOR32(x) ((CLR_INT32)x)
+#define FLOOR32(x) ((int32_t)x)
 #define FRAC(x)    (x - FLOOR32(x))
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -372,129 +373,6 @@ typedef void (*CLR_RT_MarkingHandler)(CLR_RT_HeapBlock_BinaryBlob* ptr);
 typedef void (*CLR_RT_RelocationHandler)(CLR_RT_HeapBlock_BinaryBlob* ptr);
 typedef void (*CLR_RT_HardwareHandler)();
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#if defined(NANOCLR_PROFILE_HANDLER)
-
-struct CLR_PROF_CounterSimple;
-struct CLR_PROF_Counter;
-struct CLR_PROF_Counter_Value;
-struct CLR_PROF_Counter_Value2;
-struct CLR_PROF_Handler;
-
-#if defined(NANOCLR_PROFILE_NEW_CALLS)
-
-struct CLR_PROF_CounterCallChain
-  {
-  CLR_UINT64 m_time_exclusive;
-  CLR_RT_StackFrame* m_owningStackFrame;
-  CLR_PROF_Handler* m_owningHandler;
-
-  //--//
-
-  void* Prepare(CLR_PROF_Handler* handler);
-  void Complete(CLR_UINT64& t, CLR_PROF_Handler* handler);
-
-  void Enter(CLR_RT_StackFrame* stack);
-  void Leave();
-
-  //--//
-
-  PROHIBIT_COPY_CONSTRUCTORS(CLR_PROF_CounterCallChain);
-  };
-#endif
-
-//--//
-
-struct CLR_PROF_Handler
-  {
-  static const int c_Mode_Ignore = 0;
-  static const int c_Mode_Plain = 1;
-  static const int c_Mode_Simple = 2;
-#if defined(NANOCLR_PROFILE_NEW_CALLS)
-  static const int c_Mode_CallChain = 3;
-#endif
-
-  static bool s_initialized;
-  static CLR_PROF_Handler* s_current;
-  static volatile CLR_UINT64 s_time_overhead;
-  static volatile CLR_UINT64 s_time_freeze;
-  static volatile CLR_UINT64 s_time_adjusted;
-
-  int m_target_Mode;
-  void* m_target;
-
-  CLR_PROF_Handler* m_containing;
-  CLR_UINT64 m_time_correction;
-  CLR_UINT64 m_time_start;
-
-  //--//
-
-  CLR_PROF_Handler()
-    {
-    Constructor();
-    }
-
-#if defined(NANOCLR_PROFILE_NEW_CALLS)
-  CLR_PROF_Handler(CLR_PROF_CounterCallChain& target)
-    {
-    Constructor(target);
-    }
-#endif
-
-  ~CLR_PROF_Handler()
-    {
-    Destructor();
-    }
-
-  //--//
-
-  static void Calibrate();
-  static void SuspendTime();
-  static CLR_UINT64 GetFrozenTime();
-  static CLR_UINT64 ResumeTime();
-  static CLR_UINT64 ResumeTime(CLR_INT64 t);
-
-  //--//
-
-  private:
-    void Constructor();
-#if defined(NANOCLR_PROFILE_NEW_CALLS)
-    void Constructor(CLR_PROF_CounterCallChain& target);
-#endif
-
-    void Destructor();
-
-    void Init(void* target);
-
-    PROHIBIT_COPY_CONSTRUCTORS2(CLR_PROF_Handler);
-  };
-
-//--//
-
-#define CLR_PROF_HANDLER_SUSPEND_TIME() CLR_PROF_Handler::SuspendTime()
-#define CLR_PROF_HANDLER_RESUME_TIME()  CLR_PROF_Handler::ResumeTime()
-
-#else
-
-#define CLR_PROF_HANDLER_SUSPEND_TIME()
-#define CLR_PROF_HANDLER_RESUME_TIME()
-
-#endif
-
-#if defined(NANOCLR_PROFILE_NEW_CALLS)
-
-#define CLR_PROF_HANDLER_CALLCHAIN_VOID(v) CLR_PROF_Handler v
-#define CLR_PROF_HANDLER_CALLCHAIN(v, t)   CLR_PROF_Handler v(t)
-
-#else
-
-#define CLR_PROF_HANDLER_CALLCHAIN_VOID(v)
-#define CLR_PROF_HANDLER_CALLCHAIN(v, t)
-
-#endif
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
 struct CLR_RT_MemoryRange
   {
@@ -520,9 +398,9 @@ struct CLR_RT_Memory
   static void Reset();
   static void* SubtractFromSystem(size_t len);
   static void Release(void* ptr);
-  static void* Allocate(size_t len, CLR_UINT32 flags = 0);
+  static void* Allocate(size_t len, uint32_t flags = 0);
   static void* ReAllocate(void* ptr, size_t len);
-  static void* Allocate_And_Erase(size_t len, CLR_UINT32 flags = 0);
+  static void* Allocate_And_Erase(size_t len, uint32_t flags = 0);
   };
 
 //--//
@@ -535,11 +413,7 @@ struct CLR_RT_Random
 
     uint32_t Next();
 
-#if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
     double NextDouble();
-#else
-    CLR_INT64 NextDouble();
-#endif
     void NextBytes(unsigned char* buffer, unsigned int count);
   };
 
@@ -592,183 +466,47 @@ static const int MAXTYPENAMELEN = 256; // Including terminating null byte. Enfor
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define NANOCLR_INDEX_IS_VALID(idx)   ((idx).m_data != 0)
-#define NANOCLR_INDEX_IS_INVALID(idx) ((idx).m_data == 0)
+#define NANOCLR_INDEX_IS_VALID(idx)   ((idx) != 0)
+#define NANOCLR_INDEX_IS_INVALID(idx) ((idx) == 0)
 
 //
 // IMPORTANT: THE ASSEMBLY IDX IN ALL THE CLR_RT_*_Index STRUCTURES SHOULD ALWAYS BE ENCODED THE SAME WAY!!!
 //
 // For details, go to "bool CLR_RT_GarbageCollector::ComputeReachabilityGraphForMultipleBlocks( CLR_RT_HeapBlock*
-// lstExt, CLR_UINT32 numExt )"
+// lstExt, uint32_t numExt )"
 //
-
-struct CLR_RT_Assembly_Index
-  {
-  CLR_UINT32 m_data;
-
-  //--//
-
-  void Clear()
-    {
-    m_data = 0;
-    }
-
-  void Set(CLR_UINT32 idxAssm)
-    {
-    m_data = idxAssm << 16;
-    }
-
-  //--//
-
-  CLR_IDX Assembly() const
-    {
-    return (CLR_IDX)(m_data >> 16);
-    }
-  };
-
-struct CLR_RT_TypeSpec_Index
-  {
-  CLR_UINT32 m_data;
-
-  //--//
-
-  void Clear()
-    {
-    m_data = 0;
-    }
-
-  void Set(CLR_UINT32 idxAssm, CLR_UINT32 idxType)
-    {
-    m_data = idxAssm << 16 | idxType;
-    }
-
-  //--//
-
-  CLR_IDX Assembly() const
-    {
-    return (CLR_IDX)(m_data >> 16);
-    }
-  CLR_IDX TypeSpec() const
-    {
-    return (CLR_IDX)(m_data);
-    }
-  };
-
-struct CLR_RT_TypeDef_Index
-  {
-  CLR_UINT32 m_data;
-
-  //--//
-
-  void Clear()
-    {
-    m_data = 0;
-    }
-
-  void Set(CLR_UINT32 idxAssm, CLR_UINT32 idxType)
-    {
-    m_data = idxAssm << 16 | idxType;
-    }
-
-  //--//
-
-  CLR_IDX Assembly() const
-    {
-    return (CLR_IDX)(m_data >> 16);
-    }
-  CLR_IDX Type() const
-    {
-    return (CLR_IDX)(m_data);
-    }
-  };
-
-struct CLR_RT_FieldDef_Index
-  {
-  CLR_UINT32 m_data;
-
-  //--//
-
-  void Clear()
-    {
-    m_data = 0;
-    }
-
-  void Set(CLR_UINT32 idxAssm, CLR_UINT32 idxField)
-    {
-    m_data = idxAssm << 16 | idxField;
-    }
-
-  //--//
-
-  CLR_IDX Assembly() const
-    {
-    return (CLR_IDX)(m_data >> 16);
-    }
-  CLR_IDX Field() const
-    {
-    return (CLR_IDX)(m_data);
-    }
-  };
-
-struct CLR_RT_MethodDef_Index
-  {
-  CLR_UINT32 m_data;
-
-  //--//
-
-  void Clear()
-    {
-    m_data = 0;
-    }
-
-  void Set(CLR_UINT32 idxAssm, CLR_UINT32 idxMethod)
-    {
-    m_data = idxAssm << 16 | idxMethod;
-    }
-
-  //--//
-
-  CLR_IDX Assembly() const
-    {
-    return (CLR_IDX)(m_data >> 16);
-    }
-  CLR_IDX Method() const
-    {
-    return (CLR_IDX)(m_data);
-    }
-  };
 
 struct CLR_RT_ReflectionDef_Index
   {
-  CLR_UINT16 m_kind; // CLR_ReflectionType
-  CLR_UINT16 m_levels;
+  uint16_t m_kind; // CLR_ReflectionType
+  uint16_t m_levels;
 
   union {
-    CLR_RT_Assembly_Index m_assm;
-    CLR_RT_TypeDef_Index m_type;
-    CLR_RT_MethodDef_Index m_method;
-    CLR_RT_FieldDef_Index m_field;
-    CLR_UINT32 m_raw;
+    uint32_t m_assm;
+    uint32_t m_type;
+    uint32_t m_method;
+    uint32_t m_field;
+    uint32_t m_raw;
     } m_data;
 
   //--//
 
   void Clear();
 
-  CLR_UINT32 GetTypeHash() const;
+  uint32_t GetTypeHash() const;
 
-  void InitializeFromHash(CLR_UINT32 hash);
+  void InitializeFromHash(uint32_t hash);
 
-  CLR_UINT64 GetRawData() const;
-  void SetRawData(CLR_UINT64 data);
+  uint64_t GetRawData() const;
+  void SetRawData(uint64_t data);
 
   //--//
 
   static bool Convert(CLR_RT_HeapBlock& ref, CLR_RT_Assembly_Instance& inst);
-  static bool Convert(CLR_RT_HeapBlock& ref, CLR_RT_TypeDef_Instance& inst, CLR_UINT32* levels);
+  static bool Convert(CLR_RT_HeapBlock& ref, CLR_RT_TypeDef_Instance& inst, uint32_t* levels);
   static bool Convert(CLR_RT_HeapBlock& ref, CLR_RT_MethodDef_Instance& inst);
   static bool Convert(CLR_RT_HeapBlock& ref, CLR_RT_FieldDef_Instance& inst);
-  static bool Convert(CLR_RT_HeapBlock& ref, CLR_UINT32& hash);
+  static bool Convert(CLR_RT_HeapBlock& ref, uint32_t& hash);
   };
 
 //--//
@@ -780,62 +518,62 @@ struct CLR_RT_AssemblyRef_CrossReference
 
 struct CLR_RT_TypeRef_CrossReference
   {
-  CLR_RT_TypeDef_Index m_target;
+  uint32_t m_target;
   };
 
 struct CLR_RT_FieldRef_CrossReference
   {
-  CLR_RT_FieldDef_Index m_target;
+  uint32_t m_target;
   };
 
 struct CLR_RT_MethodRef_CrossReference
   {
-  CLR_RT_MethodDef_Index m_target;
+  uint32_t m_target;
   };
 
 struct CLR_RT_FieldDef_CrossReference
   {
-  CLR_IDX m_offset;
+  uint16_t m_offset;
   };
 
 struct CLR_RT_TypeDef_CrossReference
   {
-  static const CLR_UINT32 TD_CR_StaticConstructorCalled = 0x0001;
-  static const CLR_UINT32 TD_CR_HasFinalizer = 0x0002;
-  static const CLR_UINT32 TD_CR_IsMarshalByRefObject = 0x0004;
+  static const uint32_t TD_CR_StaticConstructorCalled = 0x0001;
+  static const uint32_t TD_CR_HasFinalizer = 0x0002;
+  static const uint32_t TD_CR_IsMarshalByRefObject = 0x0004;
 
-  CLR_UINT16 m_flags;
-  CLR_IDX m_totalFields;
-  CLR_UINT32 m_hash;
+  uint16_t m_flags;
+  uint16_t m_totalFields;
+  uint32_t m_hash;
   };
 
 struct CLR_RT_MethodDef_CrossReference
   {
-  static const CLR_UINT16 MD_CR_Patched = 0x8000;
-  static const CLR_UINT16 MD_CR_OwnerMask = 0x7FFF;
+  static const uint16_t MD_CR_Patched = 0x8000;
+  static const uint16_t MD_CR_OwnerMask = 0x7FFF;
 
-  CLR_UINT16 m_data;
+  uint16_t m_data;
 
-  CLR_IDX GetOwner() const
+  uint16_t GetOwner() const
     {
-    return (CLR_IDX)(m_data);
+    return (uint16_t)(m_data);
     }
   };
 
 struct CLR_RT_MethodDef_Patch
   {
-  CLR_IDX m_orig;
-  CLR_IDX m_patched;
+  uint16_t m_orig;
+  uint16_t m_patched;
   };
 
 #if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
 
 struct CLR_RT_MethodDef_DebuggingInfo
   {
-  static const CLR_UINT8 MD_DI_JustMyCode = 0x01;
-  static const CLR_UINT8 MD_DI_HasBreakpoint = 0x02;
+  static const uint8_t MD_DI_JustMyCode = 0x01;
+  static const uint8_t MD_DI_HasBreakpoint = 0x02;
 
-  CLR_UINT8 m_flags;
+  uint8_t m_flags;
 
   bool IsJMC() const
     {
@@ -856,19 +594,19 @@ struct CLR_RT_MethodDef_DebuggingInfo
     }
 
   private:
-    void SetFlags(CLR_UINT8 flags)
+    void SetFlags(uint8_t flags)
       {
       m_flags |= flags;
       }
-    void ResetFlags(CLR_UINT8 flags)
+    void ResetFlags(uint8_t flags)
       {
       m_flags &= ~flags;
       }
-    bool IsFlagSet(CLR_UINT8 flags) const
+    bool IsFlagSet(uint8_t flags) const
       {
       return (m_flags & flags) != 0;
       }
-    void SetResetFlags(bool b, CLR_UINT8 flags)
+    void SetResetFlags(bool b, uint8_t flags)
       {
       if (b)
         SetFlags(flags);
@@ -888,9 +626,9 @@ struct CLR_RT_MethodDef_DebuggingInfo
 
 struct CLR_RT_UnicodeHelper
   {
-  static const CLR_UINT32 SURROGATE_HALFSHIFT = 10;
-  static const CLR_UINT32 SURROGATE_HALFBASE = 0x00010000;
-  static const CLR_UINT32 SURROGATE_HALFMASK = 0x000003FF;
+  static const uint32_t SURROGATE_HALFSHIFT = 10;
+  static const uint32_t SURROGATE_HALFBASE = 0x00010000;
+  static const uint32_t SURROGATE_HALFMASK = 0x000003FF;
 
 #ifdef HIGH_SURROGATE_START
 #undef HIGH_SURROGATE_START
@@ -898,27 +636,27 @@ struct CLR_RT_UnicodeHelper
 #undef LOW_SURROGATE_START
 #undef LOW_SURROGATE_END
 #endif
-  static const CLR_UINT16 HIGH_SURROGATE_START = 0xD800;
-  static const CLR_UINT16 HIGH_SURROGATE_END = 0xDBFF;
-  static const CLR_UINT16 LOW_SURROGATE_START = 0xDC00;
-  static const CLR_UINT16 LOW_SURROGATE_END = 0xDFFF;
+  static const uint16_t HIGH_SURROGATE_START = 0xD800;
+  static const uint16_t HIGH_SURROGATE_END = 0xDBFF;
+  static const uint16_t LOW_SURROGATE_START = 0xDC00;
+  static const uint16_t LOW_SURROGATE_END = 0xDFFF;
 
-  const CLR_UINT8* m_inputUTF8;
-  const CLR_UINT16* m_inputUTF16;
+  const uint8_t* m_inputUTF8;
+  const uint16_t* m_inputUTF16;
 
-  CLR_UINT8* m_outputUTF8;
+  uint8_t* m_outputUTF8;
   int m_outputUTF8_size;
 
-  CLR_UINT16* m_outputUTF16;
+  uint16_t* m_outputUTF16;
   int m_outputUTF16_size;
 
   //--//
 
   void SetInputUTF8(const char* src)
     {
-    m_inputUTF8 = (const CLR_UINT8*)src;
+    m_inputUTF8 = (const uint8_t*)src;
     }
-  void SetInputUTF16(const CLR_UINT16* src)
+  void SetInputUTF16(const uint16_t* src)
     {
     m_inputUTF16 = src;
     }
@@ -944,7 +682,7 @@ class UnicodeString
   private:
     CLR_RT_UnicodeHelper m_unicodeHelper;
     CLR_RT_HeapBlock m_uHeapBlock;
-    CLR_UINT16* m_wCharArray;
+    uint16_t* m_wCharArray;
     int m_length; /// Length in wide characters (not bytes).
 
   public:
@@ -1020,7 +758,7 @@ struct CLR_RT_SignatureParser
     bool m_fByRef;
     int m_levels;
     CLR_DataType m_dt;
-    CLR_RT_TypeDef_Index m_cls;
+    uint32_t m_cls;
     };
 
   CLR_RT_HeapBlock* m_lst;
@@ -1028,7 +766,7 @@ struct CLR_RT_SignatureParser
   CLR_PMETADATA m_sig;
 
   int m_type;
-  CLR_UINT32 m_flags;
+  uint32_t m_flags;
   int m_count;
 
   //--//
@@ -1072,7 +810,7 @@ struct CLR_RT_SignatureParser
     {                                                                                                                  \
         CLR_RT_Assembly **ppASSM = (ts).m_assemblies;                                                                  \
         size_t iASSM = ARRAYSIZE((ts).m_assemblies);                                                                   \
-        CLR_IDX idx = 1;                                                                                               \
+        uint16_t idx = 1;                                                                                               \
         for (; iASSM--; ppASSM++, idx++)                                                                               \
         {                                                                                                              \
             if (*ppASSM == NULL)
@@ -1120,14 +858,8 @@ struct CLR_RT_Assembly : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOCAT
     size_t iTypeDef;
     size_t iFieldDef;
     size_t iMethodDef;
-
-#if !defined(NANOCLR_APPDOMAINS)
     size_t iStaticFields;
-#endif
-
-#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
     size_t iDebuggingInfoMethods;
-#endif //#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
     };
 
   //--//
@@ -1137,15 +869,15 @@ struct CLR_RT_Assembly : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOCAT
   // //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  static const CLR_UINT32 Resolved = 0x00000001;
-  static const CLR_UINT32 ResolutionCompleted = 0x00000002;
-  static const CLR_UINT32 PreparedForExecution = 0x00000004;
-  static const CLR_UINT32 Deployed = 0x00000008;
-  static const CLR_UINT32 PreparingForExecution = 0x00000010;
-  static const CLR_UINT32 StaticConstructorsExecuted = 0x00000020;
+  static const uint32_t Resolved = 0x00000001;
+  static const uint32_t ResolutionCompleted = 0x00000002;
+  static const uint32_t PreparedForExecution = 0x00000004;
+  static const uint32_t Deployed = 0x00000008;
+  static const uint32_t PreparingForExecution = 0x00000010;
+  static const uint32_t StaticConstructorsExecuted = 0x00000020;
 
-  CLR_UINT32 m_idx; // Relative to the type system (for static fields access).
-  CLR_UINT32 m_flags;
+  uint32_t m_idx; // Relative to the type system (for static fields access).
+  uint32_t m_flags;
 
   const CLR_RECORD_ASSEMBLY* m_header; // ANY HEAP - DO RELOCATION -
   const char* m_szName;                // ANY HEAP - DO RELOCATION -
@@ -1154,9 +886,7 @@ struct CLR_RT_Assembly : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOCAT
 
   int m_pTablesSize[TBL_Max];
 
-#if !defined(NANOCLR_APPDOMAINS)
   CLR_RT_HeapBlock* m_pStaticFields; // EVENT HEAP - NO RELOCATION - (but the data they point to has to be relocated)
-#endif
 
   int m_iStaticFields;
 
@@ -1177,10 +907,8 @@ struct CLR_RT_Assembly : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOCAT
   CLR_RT_MethodDef_CrossReference
     * m_pCrossReference_MethodDef; // EVENT HEAP - NO RELOCATION - (but the data they point to has to be relocated)
 
-#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
   CLR_RT_MethodDef_DebuggingInfo
     * m_pDebuggingInfo_MethodDef; // EVENT HEAP - NO RELOCATION - (but the data they point to has to be relocated)
-#endif                               //#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
 
 #if defined(NANOCLR_TRACE_STACK_HEAVY) && defined(_WIN32)
   int m_maxOpcodes;
@@ -1199,7 +927,7 @@ struct CLR_RT_Assembly : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOCAT
 
 #if defined(_WIN32)
 
-  static void InitString(std::map<std::string, CLR_OFFSET>& map);
+  static void InitString(std::map<std::string, uint16_t>& map);
   static HRESULT CreateInstance(const CLR_RECORD_ASSEMBLY* data, CLR_RT_Assembly*& assm, const wchar_t* szName);
 
 #endif
@@ -1223,29 +951,29 @@ struct CLR_RT_Assembly : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOCAT
 
   HRESULT PrepareForExecution();
 
-  CLR_UINT32 ComputeAssemblyHash();
-  CLR_UINT32 ComputeAssemblyHash(const CLR_RECORD_ASSEMBLYREF* ar);
+  uint32_t ComputeAssemblyHash();
+  uint32_t ComputeAssemblyHash(const CLR_RECORD_ASSEMBLYREF* ar);
 
-  bool FindTypeDef(const char* name, const char* nameSpace, CLR_RT_TypeDef_Index& idx);
-  bool FindTypeDef(const char* name, CLR_IDX scope, CLR_RT_TypeDef_Index& idx);
-  bool FindTypeDef(CLR_UINT32 hash, CLR_RT_TypeDef_Index& idx);
+  bool FindTypeDef(const char* name, const char* nameSpace, uint32_t& idx);
+  bool FindTypeDef(const char* name, uint16_t scope, uint32_t& idx);
+  bool FindTypeDef(uint32_t hash, uint32_t& idx);
 
   bool FindFieldDef(
     const CLR_RECORD_TYPEDEF* src,
     const char* name,
     CLR_RT_Assembly* base,
-    CLR_SIG sig,
-    CLR_RT_FieldDef_Index& idx);
+    uint16_t sig,
+    uint32_t& idx);
   bool FindMethodDef(
     const CLR_RECORD_TYPEDEF* src,
     const char* name,
     CLR_RT_Assembly* base,
-    CLR_SIG sig,
-    CLR_RT_MethodDef_Index& idx);
+    uint16_t sig,
+    uint32_t& idx);
 
-  bool FindNextStaticConstructor(CLR_RT_MethodDef_Index& idx);
+  bool FindNextStaticConstructor(uint32_t& idx);
 
-  bool FindMethodBoundaries(CLR_IDX i, CLR_OFFSET& start, CLR_OFFSET& end);
+  bool FindMethodBoundaries(uint16_t i, uint16_t& start, uint16_t& end);
 
   void Relocate();
 
@@ -1261,63 +989,63 @@ struct CLR_RT_Assembly : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOCAT
     }
 
 #define NANOCLR_ASSEMBLY_RESOLVE(cls, tbl, idx)                                                                        \
-    (const cls *)((CLR_UINT8 *)m_header + m_header->startOfTables[tbl] + (sizeof(cls) * idx))
-  const CLR_RECORD_ASSEMBLYREF* GetAssemblyRef(CLR_IDX i)
+    (const cls *)((uint8_t *)m_header + m_header->startOfTables[tbl] + (sizeof(cls) * idx))
+  const CLR_RECORD_ASSEMBLYREF* GetAssemblyRef(uint16_t i)
     {
     return NANOCLR_ASSEMBLY_RESOLVE(CLR_RECORD_ASSEMBLYREF, TBL_AssemblyRef, i);
     }
-  const CLR_RECORD_TYPEREF* GetTypeRef(CLR_IDX i)
+  const CLR_RECORD_TYPEREF* GetTypeRef(uint16_t i)
     {
     return NANOCLR_ASSEMBLY_RESOLVE(CLR_RECORD_TYPEREF, TBL_TypeRef, i);
     }
-  const CLR_RECORD_FIELDREF* GetFieldRef(CLR_IDX i)
+  const CLR_RECORD_FIELDREF* GetFieldRef(uint16_t i)
     {
     return NANOCLR_ASSEMBLY_RESOLVE(CLR_RECORD_FIELDREF, TBL_FieldRef, i);
     }
-  const CLR_RECORD_METHODREF* GetMethodRef(CLR_IDX i)
+  const CLR_RECORD_METHODREF* GetMethodRef(uint16_t i)
     {
     return NANOCLR_ASSEMBLY_RESOLVE(CLR_RECORD_METHODREF, TBL_MethodRef, i);
     }
-  const CLR_RECORD_TYPEDEF* GetTypeDef(CLR_IDX i)
+  const CLR_RECORD_TYPEDEF* GetTypeDef(uint16_t i)
     {
     return NANOCLR_ASSEMBLY_RESOLVE(CLR_RECORD_TYPEDEF, TBL_TypeDef, i);
     }
-  const CLR_RECORD_FIELDDEF* GetFieldDef(CLR_IDX i)
+  const CLR_RECORD_FIELDDEF* GetFieldDef(uint16_t i)
     {
     return NANOCLR_ASSEMBLY_RESOLVE(CLR_RECORD_FIELDDEF, TBL_FieldDef, i);
     }
-  const CLR_RECORD_METHODDEF* GetMethodDef(CLR_IDX i)
+  const CLR_RECORD_METHODDEF* GetMethodDef(uint16_t i)
     {
     return NANOCLR_ASSEMBLY_RESOLVE(CLR_RECORD_METHODDEF, TBL_MethodDef, i);
     }
-  const CLR_RECORD_ATTRIBUTE* GetAttribute(CLR_IDX i)
+  const CLR_RECORD_ATTRIBUTE* GetAttribute(uint16_t i)
     {
     return NANOCLR_ASSEMBLY_RESOLVE(CLR_RECORD_ATTRIBUTE, TBL_Attributes, i);
     }
-  const CLR_RECORD_TYPESPEC* GetTypeSpec(CLR_IDX i)
+  const CLR_RECORD_TYPESPEC* GetTypeSpec(uint16_t i)
     {
     return NANOCLR_ASSEMBLY_RESOLVE(CLR_RECORD_TYPESPEC, TBL_TypeSpec, i);
     }
-  const CLR_RECORD_RESOURCE_FILE* GetResourceFile(CLR_IDX i)
+  const CLR_RECORD_RESOURCE_FILE* GetResourceFile(uint16_t i)
     {
     return NANOCLR_ASSEMBLY_RESOLVE(CLR_RECORD_RESOURCE_FILE, TBL_ResourcesFiles, i);
     }
-  const CLR_RECORD_RESOURCE* GetResource(CLR_IDX i)
+  const CLR_RECORD_RESOURCE* GetResource(uint16_t i)
     {
     return NANOCLR_ASSEMBLY_RESOLVE(CLR_RECORD_RESOURCE, TBL_Resources, i);
     }
-  CLR_PMETADATA GetResourceData(CLR_UINT32 i)
+  CLR_PMETADATA GetResourceData(uint32_t i)
     {
-    return NANOCLR_ASSEMBLY_RESOLVE(CLR_UINT8, TBL_ResourcesData, i);
+    return NANOCLR_ASSEMBLY_RESOLVE(uint8_t, TBL_ResourcesData, i);
     }
-  const char* GetString(CLR_STRING i);
-  CLR_PMETADATA GetSignature(CLR_SIG i)
+  const char* GetString(uint16_t i);
+  CLR_PMETADATA GetSignature(uint16_t i)
     {
-    return NANOCLR_ASSEMBLY_RESOLVE(CLR_UINT8, TBL_Signatures, i);
+    return NANOCLR_ASSEMBLY_RESOLVE(uint8_t, TBL_Signatures, i);
     }
-  CLR_PMETADATA GetByteCode(CLR_OFFSET i)
+  CLR_PMETADATA GetByteCode(uint16_t i)
     {
-    return NANOCLR_ASSEMBLY_RESOLVE(CLR_UINT8, TBL_ByteCode, i);
+    return NANOCLR_ASSEMBLY_RESOLVE(uint8_t, TBL_ByteCode, i);
     }
 #undef NANOCLR_ASSEMBLY_RESOLVE
 
@@ -1338,8 +1066,8 @@ struct CLR_RT_Assembly : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOCAT
       DECL_POSTFIX;
 
   private:
-    void DumpToken(CLR_UINT32 tk) DECL_POSTFIX;
-    void DumpSignature(CLR_SIG sig) DECL_POSTFIX;
+    void DumpToken(uint32_t tk) DECL_POSTFIX;
+    void DumpSignature(uint16_t sig) DECL_POSTFIX;
     void DumpSignature(CLR_PMETADATA& p) DECL_POSTFIX;
     void DumpSignatureToken(CLR_PMETADATA& p) DECL_POSTFIX;
 
@@ -1388,10 +1116,10 @@ struct CLR_RT_Assembly : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOCAT
 #endif
   private:
 #if defined(_WIN32)
-    void Dump_Token(CLR_UINT32 tk);
-    void Dump_FieldOwner(CLR_UINT32 idx);
-    void Dump_MethodOwner(CLR_UINT32 idx);
-    void Dump_Signature(CLR_SIG sig);
+    void Dump_Token(uint32_t tk);
+    void Dump_FieldOwner(uint32_t idx);
+    void Dump_MethodOwner(uint32_t idx);
+    void Dump_Signature(uint16_t sig);
     void Dump_Signature(CLR_PMETADATA& p);
     void Dump_SignatureToken(CLR_PMETADATA& p);
 #endif
@@ -1403,9 +1131,9 @@ struct CLR_RT_Assembly : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOCAT
     //--//
 
   private:
-    CLR_UINT32 ComputeHashForName(const CLR_RT_TypeDef_Index& td, CLR_UINT32 hash);
+    uint32_t ComputeHashForName(uint32_t td, uint32_t hash);
 
-    static CLR_UINT32 ComputeHashForType(CLR_DataType dt, CLR_UINT32 hash);
+    static uint32_t ComputeHashForType(CLR_DataType dt, uint32_t hash);
   };
 
 #ifdef __GNUC__
@@ -1454,7 +1182,7 @@ struct CLR_RT_AppDomain : public CLR_RT_ObjectToEvent_Destination // EVENT HEAP 
     bool fOnReturn,
     CLR_RT_AppDomain* appDomainSrc = NULL);
 
-  HRESULT VerifyTypeIsLoaded(const CLR_RT_TypeDef_Index& idx);
+  HRESULT VerifyTypeIsLoaded(uint32_t idx);
   HRESULT GetAssemblies(CLR_RT_HeapBlock& ref);
   HRESULT LoadAssembly(CLR_RT_Assembly* assm);
   HRESULT GetManagedObject(CLR_RT_HeapBlock& obj);
@@ -1462,9 +1190,9 @@ struct CLR_RT_AppDomain : public CLR_RT_ObjectToEvent_Destination // EVENT HEAP 
 
 struct CLR_RT_AppDomainAssembly : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOCATION -
   {
-  static const CLR_UINT32 StaticConstructorsExecuted = 0x00000001;
+  static const uint32_t StaticConstructorsExecuted = 0x00000001;
 
-  CLR_UINT32 m_flags;
+  uint32_t m_flags;
   CLR_RT_AppDomain* m_appDomain;     // EVENT HEAP - NO RELOCATION -
   CLR_RT_Assembly* m_assembly;       // EVENT HEAP - NO RELOCATION -
   CLR_RT_HeapBlock* m_pStaticFields; // EVENT HEAP - NO RELOCATION - (but the data they point to has to be relocated)
@@ -1486,90 +1214,73 @@ struct CLR_RT_AppDomainAssembly : public CLR_RT_HeapBlock_Node // EVENT HEAP - N
 
 struct CLR_RT_WellKnownTypes
   {
-  CLR_RT_TypeDef_Index m_Boolean;
-  CLR_RT_TypeDef_Index m_Int8;
-  CLR_RT_TypeDef_Index m_UInt8;
+  uint32_t m_Boolean;
+  uint32_t m_Int8;
+  uint32_t m_UInt8;
 
-  CLR_RT_TypeDef_Index m_Char;
-  CLR_RT_TypeDef_Index m_Int16;
-  CLR_RT_TypeDef_Index m_UInt16;
+  uint32_t m_Char;
+  uint32_t m_Int16;
+  uint32_t m_UInt16;
 
-  CLR_RT_TypeDef_Index m_Int32;
-  CLR_RT_TypeDef_Index m_UInt32;
-  CLR_RT_TypeDef_Index m_Single;
+  uint32_t m_Int32;
+  uint32_t m_UInt32;
+  uint32_t m_Single;
 
-  CLR_RT_TypeDef_Index m_Int64;
-  CLR_RT_TypeDef_Index m_UInt64;
-  CLR_RT_TypeDef_Index m_Double;
-  CLR_RT_TypeDef_Index m_DateTime;
-  CLR_RT_TypeDef_Index m_TimeSpan;
-  CLR_RT_TypeDef_Index m_String;
+  uint32_t m_Int64;
+  uint32_t m_UInt64;
+  uint32_t m_Double;
+  uint32_t m_DateTime;
+  uint32_t m_TimeSpan;
+  uint32_t m_String;
 
-  CLR_RT_TypeDef_Index m_Void;
-  CLR_RT_TypeDef_Index m_Object;
-  CLR_RT_TypeDef_Index m_ValueType;
-  CLR_RT_TypeDef_Index m_Enum;
+  uint32_t m_Void;
+  uint32_t m_Object;
+  uint32_t m_ValueType;
+  uint32_t m_Enum;
 
-  CLR_RT_TypeDef_Index m_AppDomainUnloadedException;
-  CLR_RT_TypeDef_Index m_ArgumentNullException;
-  CLR_RT_TypeDef_Index m_ArgumentException;
-  CLR_RT_TypeDef_Index m_ArgumentOutOfRangeException;
-  CLR_RT_TypeDef_Index m_Exception;
-  CLR_RT_TypeDef_Index m_IndexOutOfRangeException;
-  CLR_RT_TypeDef_Index m_ThreadAbortException;
-  CLR_RT_TypeDef_Index m_InvalidOperationException;
-  CLR_RT_TypeDef_Index m_InvalidCastException;
-  CLR_RT_TypeDef_Index m_NotSupportedException;
-  CLR_RT_TypeDef_Index m_NotImplementedException;
-  CLR_RT_TypeDef_Index m_NullReferenceException;
-  CLR_RT_TypeDef_Index m_OutOfMemoryException;
-  CLR_RT_TypeDef_Index m_ObjectDisposedException;
-  CLR_RT_TypeDef_Index m_ConstraintException;
-  CLR_RT_TypeDef_Index m_WatchdogException;
+  uint32_t m_AppDomainUnloadedException;
+  uint32_t m_ArgumentNullException;
+  uint32_t m_ArgumentException;
+  uint32_t m_ArgumentOutOfRangeException;
+  uint32_t m_Exception;
+  uint32_t m_IndexOutOfRangeException;
+  uint32_t m_ThreadAbortException;
+  uint32_t m_InvalidOperationException;
+  uint32_t m_InvalidCastException;
+  uint32_t m_NotSupportedException;
+  uint32_t m_NotImplementedException;
+  uint32_t m_NullReferenceException;
+  uint32_t m_OutOfMemoryException;
+  uint32_t m_ObjectDisposedException;
+  uint32_t m_ConstraintException;
+  uint32_t m_WatchdogException;
 
-  CLR_RT_TypeDef_Index m_Delegate;
-  CLR_RT_TypeDef_Index m_MulticastDelegate;
+  uint32_t m_Delegate;
+  uint32_t m_MulticastDelegate;
 
-  CLR_RT_TypeDef_Index m_Array;
-  CLR_RT_TypeDef_Index m_ArrayList;
-  CLR_RT_TypeDef_Index m_ICloneable;
-  CLR_RT_TypeDef_Index m_IList;
+  uint32_t m_Array;
+  uint32_t m_ArrayList;
+  uint32_t m_ICloneable;
+  uint32_t m_IList;
 
-  CLR_RT_TypeDef_Index m_Assembly;
-  CLR_RT_TypeDef_Index m_TypeStatic;
-  CLR_RT_TypeDef_Index m_Type;
-  CLR_RT_TypeDef_Index m_ConstructorInfo;
-  CLR_RT_TypeDef_Index m_MethodInfo;
-  CLR_RT_TypeDef_Index m_FieldInfo;
+  uint32_t m_Assembly;
+  uint32_t m_TypeStatic;
+  uint32_t m_Type;
+  uint32_t m_ConstructorInfo;
+  uint32_t m_MethodInfo;
+  uint32_t m_FieldInfo;
 
-  CLR_RT_TypeDef_Index m_WeakReference;
+  uint32_t m_WeakReference;
 
-  CLR_RT_TypeDef_Index m_SerializationHintsAttribute;
-  CLR_RT_TypeDef_Index m_Bitmap;
-  CLR_RT_TypeDef_Index m_Font;
+  uint32_t m_SerializationHintsAttribute;
+  uint32_t m_Bitmap;
+  uint32_t m_Font;
 
-  CLR_RT_TypeDef_Index m_TouchEvent;
-  CLR_RT_TypeDef_Index m_TouchInput;
+  uint32_t m_TouchEvent;
+  uint32_t m_TouchInput;
 
-  CLR_RT_TypeDef_Index m_NetworkInterface;
-  CLR_RT_TypeDef_Index m_Wireless80211Configuration;
-  CLR_RT_TypeDef_Index m_WirelessAPConfiguration;
-  CLR_RT_TypeDef_Index m_WirelessAPStation;
-
-#if defined(NANOCLR_APPDOMAINS)
-  CLR_RT_TypeDef_Index m_AppDomain;
-  CLR_RT_TypeDef_Index m_MarshalByRefObject;
-#endif
-
-  CLR_RT_TypeDef_Index m_Thread;
-  CLR_RT_TypeDef_Index m_ResourceManager;
-
-  CLR_RT_TypeDef_Index m_SocketException;
-
-  CLR_RT_TypeDef_Index m_I2cTransferResult;
-  CLR_RT_TypeDef_Index m_I2cTransferResult_old;
-
-  CLR_RT_TypeDef_Index m_RmtCommand;
+  uint32_t m_Thread;
+  uint32_t m_ResourceManager;
 
   PROHIBIT_COPY_CONSTRUCTORS(CLR_RT_WellKnownTypes);
   };
@@ -1578,8 +1289,8 @@ extern CLR_RT_WellKnownTypes g_CLR_RT_WellKnownTypes;
 
 struct CLR_RT_WellKnownMethods
   {
-  CLR_RT_MethodDef_Index m_ResourceManager_GetObjectFromId;
-  CLR_RT_MethodDef_Index m_ResourceManager_GetObjectChunkFromId;
+  uint32_t m_ResourceManager_GetObjectFromId;
+  uint32_t m_ResourceManager_GetObjectChunkFromId;
 
   PROHIBIT_COPY_CONSTRUCTORS(CLR_RT_WellKnownMethods);
   };
@@ -1592,37 +1303,37 @@ typedef void (CLR_RT_HeapBlock::* CLR_RT_HeapBlockRelocate)();
 
 struct CLR_RT_DataTypeLookup
   {
-  static const CLR_UINT8 c_NA = 0x00;
-  static const CLR_UINT8 c_VariableSize = 0xFF;
+  static const uint8_t c_NA = 0x00;
+  static const uint8_t c_VariableSize = 0xFF;
 
-  static const CLR_UINT32 c_Primitive = 0x00000001;
-  static const CLR_UINT32 c_Interface = 0x00000002;
-  static const CLR_UINT32 c_Class = 0x00000004;
-  static const CLR_UINT32 c_ValueType = 0x00000008;
-  static const CLR_UINT32 c_Enum = 0x00000010;
-  static const CLR_UINT32 c_SemanticMask = 0x0000001F;
+  static const uint32_t c_Primitive = 0x00000001;
+  static const uint32_t c_Interface = 0x00000002;
+  static const uint32_t c_Class = 0x00000004;
+  static const uint32_t c_ValueType = 0x00000008;
+  static const uint32_t c_Enum = 0x00000010;
+  static const uint32_t c_SemanticMask = 0x0000001F;
 
-  static const CLR_UINT32 c_Array = 0x00000020;
-  static const CLR_UINT32 c_ArrayList = 0x00000040;
-  static const CLR_UINT32 c_SemanticMask2 = 0x0000007F;
+  static const uint32_t c_Array = 0x00000020;
+  static const uint32_t c_ArrayList = 0x00000040;
+  static const uint32_t c_SemanticMask2 = 0x0000007F;
 
-  static const CLR_UINT32 c_Reference = 0x00010000;
-  static const CLR_UINT32 c_Numeric = 0x00020000;
-  static const CLR_UINT32 c_Integer = 0x00040000;
-  static const CLR_UINT32 c_Signed = 0x00080000;
-  static const CLR_UINT32 c_Direct = 0x00100000;             // This isn't an indirect reference.
-  static const CLR_UINT32 c_OptimizedValueType = 0x00200000; // A value type that is kept in a single HeapBlock.
-  static const CLR_UINT32 c_ManagedType = 0x00400000; // this dt represents a managed type, or a pointer to a managed
+  static const uint32_t c_Reference = 0x00010000;
+  static const uint32_t c_Numeric = 0x00020000;
+  static const uint32_t c_Integer = 0x00040000;
+  static const uint32_t c_Signed = 0x00080000;
+  static const uint32_t c_Direct = 0x00100000;             // This isn't an indirect reference.
+  static const uint32_t c_OptimizedValueType = 0x00200000; // A value type that is kept in a single HeapBlock.
+  static const uint32_t c_ManagedType = 0x00400000; // this dt represents a managed type, or a pointer to a managed
                                                       // type More specificly, TypeDescriptor::InitializeFromObject
                                                       // will succeed when starting from an object of with this dt
 
-  CLR_UINT32 m_flags;
-  CLR_UINT8 m_sizeInBits;
-  CLR_UINT8 m_sizeInBytes;
-  CLR_UINT8 m_promoteTo;
-  CLR_UINT8 m_convertToElementType;
+  uint32_t m_flags;
+  uint8_t m_sizeInBits;
+  uint8_t m_sizeInBytes;
+  uint8_t m_promoteTo;
+  uint8_t m_convertToElementType;
 
-  CLR_RT_TypeDef_Index* m_cls;
+  uint32_t* m_cls;
   CLR_RT_HeapBlockRelocate m_relocate;
 
 #if defined(_WIN32) || defined(NANOCLR_TRACE_MEMORY_STATS)
@@ -1636,40 +1347,40 @@ extern const CLR_RT_DataTypeLookup c_CLR_RT_DataTypeLookup[];
 
 struct CLR_RT_OpcodeLookup
   {
-  static const CLR_UINT16 COND_BRANCH_NEVER = 0x0000;
-  static const CLR_UINT16 COND_BRANCH_ALWAYS = 0x0001;
-  static const CLR_UINT16 COND_BRANCH_IFTRUE = 0x0002;
-  static const CLR_UINT16 COND_BRANCH_IFFALSE = 0x0003;
-  static const CLR_UINT16 COND_BRANCH_IFEQUAL = 0x0004;
-  static const CLR_UINT16 COND_BRANCH_IFNOTEQUAL = 0x0005;
-  static const CLR_UINT16 COND_BRANCH_IFGREATER = 0x0006;
-  static const CLR_UINT16 COND_BRANCH_IFGREATEROREQUAL = 0x0007;
-  static const CLR_UINT16 COND_BRANCH_IFLESS = 0x0008;
-  static const CLR_UINT16 COND_BRANCH_IFLESSOREQUAL = 0x0009;
-  static const CLR_UINT16 COND_BRANCH_IFMATCH = 0x000A;
-  static const CLR_UINT16 COND_BRANCH_THROW = 0x000B;
-  static const CLR_UINT16 COND_BRANCH_MASK = 0x000F;
+  static const uint16_t COND_BRANCH_NEVER = 0x0000;
+  static const uint16_t COND_BRANCH_ALWAYS = 0x0001;
+  static const uint16_t COND_BRANCH_IFTRUE = 0x0002;
+  static const uint16_t COND_BRANCH_IFFALSE = 0x0003;
+  static const uint16_t COND_BRANCH_IFEQUAL = 0x0004;
+  static const uint16_t COND_BRANCH_IFNOTEQUAL = 0x0005;
+  static const uint16_t COND_BRANCH_IFGREATER = 0x0006;
+  static const uint16_t COND_BRANCH_IFGREATEROREQUAL = 0x0007;
+  static const uint16_t COND_BRANCH_IFLESS = 0x0008;
+  static const uint16_t COND_BRANCH_IFLESSOREQUAL = 0x0009;
+  static const uint16_t COND_BRANCH_IFMATCH = 0x000A;
+  static const uint16_t COND_BRANCH_THROW = 0x000B;
+  static const uint16_t COND_BRANCH_MASK = 0x000F;
 
-  static const CLR_UINT16 COND_OVERFLOW = 0x0010;
-  static const CLR_UINT16 COND_UNSIGNED = 0x0020;
+  static const uint16_t COND_OVERFLOW = 0x0010;
+  static const uint16_t COND_UNSIGNED = 0x0020;
 
-  static const CLR_UINT16 STACK_RESET = 0x0080;
+  static const uint16_t STACK_RESET = 0x0080;
 
-  static const CLR_UINT16 ATTRIB_HAS_TARGET = 0x0100;
-  static const CLR_UINT16 ATTRIB_HAS_DT = 0x0200;
-  static const CLR_UINT16 ATTRIB_HAS_INDEX = 0x0400;
-  static const CLR_UINT16 ATTRIB_HAS_TOKEN = 0x0800;
-  static const CLR_UINT16 ATTRIB_HAS_I4 = 0x1000;
-  static const CLR_UINT16 ATTRIB_HAS_R4 = 0x2000;
-  static const CLR_UINT16 ATTRIB_HAS_I8 = 0x4000;
-  static const CLR_UINT16 ATTRIB_HAS_R8 = 0x8000;
+  static const uint16_t ATTRIB_HAS_TARGET = 0x0100;
+  static const uint16_t ATTRIB_HAS_DT = 0x0200;
+  static const uint16_t ATTRIB_HAS_INDEX = 0x0400;
+  static const uint16_t ATTRIB_HAS_TOKEN = 0x0800;
+  static const uint16_t ATTRIB_HAS_I4 = 0x1000;
+  static const uint16_t ATTRIB_HAS_R4 = 0x2000;
+  static const uint16_t ATTRIB_HAS_I8 = 0x4000;
+  static const uint16_t ATTRIB_HAS_R8 = 0x8000;
 
 #if defined(NANOCLR_OPCODE_NAMES)
   const char* m_name;
 #endif
 
 #if defined(NANOCLR_OPCODE_STACKCHANGES)
-  CLR_UINT8 m_stackChanges;
+  uint8_t m_stackChanges;
 #endif
 
   CLR_OpcodeParam m_opParam;
@@ -1679,19 +1390,19 @@ struct CLR_RT_OpcodeLookup
 #if defined(NANOCLR_OPCODE_PARSER)
   CLR_LOGICAL_OPCODE m_logicalOpcode;
   CLR_DataType m_dt;
-  CLR_INT8 m_index;
-  CLR_UINT16 m_flags;
+  int8_t m_index;
+  uint16_t m_flags;
 #endif
 #if defined(NANOCLR_OPCODE_STACKCHANGES)
-  CLR_UINT32 StackPop() const
+  uint32_t StackPop() const
     {
     return m_stackChanges >> 4;
     }
-  CLR_UINT32 StackPush() const
+  uint32_t StackPush() const
     {
     return m_stackChanges & 0xF;
     }
-  CLR_INT32 StackChanges() const
+  int32_t StackChanges() const
     {
     return StackPush() - StackPop();
     }
@@ -1716,17 +1427,17 @@ extern const CLR_RT_OpcodeLookup c_CLR_RT_OpcodeLookup[];
 
 struct CLR_RT_LogicalOpcodeLookup
   {
-  static const CLR_UINT32 RESTARTPOINT_NEXT = 0x00000001;
-  static const CLR_UINT32 EXCEPTION = 0x00000002;
-  static const CLR_UINT32 EXCEPTION_IF_OVERFLOW = 0x00000010;
-  static const CLR_UINT32 EXCEPTION_IF_ZERO = 0x00000020;
-  static const CLR_UINT32 EXCEPTION_ON_CAST = 0x00000040;
+  static const uint32_t RESTARTPOINT_NEXT = 0x00000001;
+  static const uint32_t EXCEPTION = 0x00000002;
+  static const uint32_t EXCEPTION_IF_OVERFLOW = 0x00000010;
+  static const uint32_t EXCEPTION_IF_ZERO = 0x00000020;
+  static const uint32_t EXCEPTION_ON_CAST = 0x00000040;
 
 #if defined(NANOCLR_OPCODE_NAMES)
   const char* m_name;
 #endif
 
-  CLR_UINT32 m_flags;
+  uint32_t m_flags;
 
 #if defined(NANOCLR_OPCODE_NAMES)
   const char* Name() const
@@ -1759,17 +1470,16 @@ struct CLR_RT_TypeSystem // EVENT HEAP - NO RELOCATION -
 
   //--//
 
-  static const CLR_UINT32 TYPENAME_FLAGS_FULL = 0x1;
-  static const CLR_UINT32 TYPENAME_NESTED_SEPARATOR_DOT = 0x2;
+  static const uint32_t TYPENAME_FLAGS_FULL = 0x1;
+  static const uint32_t TYPENAME_NESTED_SEPARATOR_DOT = 0x2;
 
   //--//
 
   CLR_RT_Assembly* m_assemblies[c_MaxAssemblies]; // EVENT HEAP - NO RELOCATION - array of CLR_RT_Assembly
   size_t m_assembliesMax;
   CLR_RT_Assembly* m_assemblyMscorlib;
-  CLR_RT_Assembly* m_assemblyNative;
 
-  CLR_RT_MethodDef_Index m_entryPoint;
+  uint32_t m_entryPoint;
 
   //--//
 
@@ -1785,41 +1495,41 @@ struct CLR_RT_TypeSystem // EVENT HEAP - NO RELOCATION -
 
   CLR_RT_Assembly* FindAssembly(const char* name, const CLR_RECORD_VERSION* ver, bool fExact);
 
-  bool FindTypeDef(const char* name, const char* nameSpace, CLR_RT_Assembly* assm, CLR_RT_TypeDef_Index& res);
-  bool FindTypeDef(const char* name, CLR_RT_Assembly* assm, CLR_RT_TypeDef_Index& res);
-  bool FindTypeDef(const char* name, const char* nameSpace, CLR_RT_TypeDef_Index& res);
-  bool FindTypeDef(CLR_UINT32 hash, CLR_RT_TypeDef_Index& res);
-  bool FindTypeDef(const char* name, CLR_RT_TypeDef_Index& res);
+  bool FindTypeDef(const char* name, const char* nameSpace, CLR_RT_Assembly* assm, uint32_t& res);
+  bool FindTypeDef(const char* name, CLR_RT_Assembly* assm, uint32_t& res);
+  bool FindTypeDef(const char* name, const char* nameSpace, uint32_t& res);
+  bool FindTypeDef(uint32_t hash, uint32_t& res);
+  bool FindTypeDef(const char* name, uint32_t& res);
   bool FindTypeDef(const char* name, CLR_RT_Assembly* assm, CLR_RT_ReflectionDef_Index& reflex);
 
-  HRESULT LocateResourceFile(CLR_RT_Assembly_Instance assm, const char* name, CLR_INT32& idxResourceFile);
+  HRESULT LocateResourceFile(CLR_RT_Assembly_Instance assm, const char* name, int32_t& idxResourceFile);
   HRESULT LocateResource(
     CLR_RT_Assembly_Instance assm,
-    CLR_INT32 idxResourceFile,
-    CLR_INT16 id,
+    int32_t idxResourceFile,
+    int16_t id,
     const CLR_RECORD_RESOURCE*& res,
-    CLR_UINT32& size);
+    uint32_t& size);
 
   HRESULT BuildTypeName(
-    const CLR_RT_TypeDef_Index& cls,
-    char*& szBuffer,
-    size_t& size,
-    CLR_UINT32 flags,
-    CLR_UINT32 levels);
-  HRESULT BuildTypeName(const CLR_RT_TypeDef_Index& cls, char*& szBuffer, size_t& size);
-  HRESULT BuildMethodName(const CLR_RT_MethodDef_Index& md, char*& szBuffer, size_t& size);
-  HRESULT BuildFieldName(const CLR_RT_FieldDef_Index& fd, char*& szBuffer, size_t& size);
-  HRESULT QueueStringToBuffer(char*& szBuffer, size_t& size, const char* szText);
+    uint32_t cls,
+    char *szBuffer,
+    size_t size,
+    uint32_t flags,
+    uint32_t levels);
+  HRESULT BuildTypeName(uint32_t cls, char *szBuffer, size_t size);
+  HRESULT BuildMethodName(uint32_t md, char *szBuffer, size_t size);
+  HRESULT BuildFieldName(uint32_t fd, char *szBuffer, size_t size);
+  HRESULT QueueStringToBuffer(char *szBuffer, size_t  size, const char* szText);
 
   bool FindVirtualMethodDef(
-    const CLR_RT_TypeDef_Index& cls,
-    const CLR_RT_MethodDef_Index& calleeMD,
-    CLR_RT_MethodDef_Index& idx);
+    uint32_t cls,
+    uint32_t calleeMD,
+    uint32_t& idx);
   bool FindVirtualMethodDef(
-    const CLR_RT_TypeDef_Index& cls,
-    const CLR_RT_MethodDef_Index& calleeMD,
+    uint32_t cls,
+    uint32_t calleeMD,
     const char* calleeName,
-    CLR_RT_MethodDef_Index& idx);
+    uint32_t& idx);
 
   static bool MatchSignature(CLR_RT_SignatureParser& parserLeft, CLR_RT_SignatureParser& parserRight);
   static bool MatchSignatureDirect(
@@ -1831,8 +1541,8 @@ struct CLR_RT_TypeSystem // EVENT HEAP - NO RELOCATION -
     CLR_RT_SignatureParser::Element& resRight,
     bool fIsInstanceOfOK);
 
-  static CLR_DataType MapElementTypeToDataType(CLR_UINT32 et);
-  static CLR_UINT32 MapDataTypeToElementType(CLR_DataType dt);
+  static CLR_DataType MapElementTypeToDataType(uint32_t et);
+  static uint32_t MapDataTypeToElementType(CLR_DataType dt);
 
 #if defined(_WIN32)
   void Dump(const wchar_t* szFileName, bool fNoByteCode);
@@ -1847,52 +1557,55 @@ extern CLR_RT_TypeSystem g_CLR_RT_TypeSystem;
 
 //--//
 
-struct CLR_RT_Assembly_Instance : public CLR_RT_Assembly_Index
+struct CLR_RT_Assembly_Instance
   {
+  uint32_t m_index;
   CLR_RT_Assembly* m_assm;
 
   //--//
 
-  bool InitializeFromIndex(const CLR_RT_Assembly_Index& idx);
+  bool InitializeFromIndex(uint32_t idx);
   void Clear();
   };
 
-struct CLR_RT_TypeSpec_Instance : public CLR_RT_TypeSpec_Index
+struct CLR_RT_TypeSpec_Instance
   {
+  uint32_t m_index;
   CLR_RT_Assembly* m_assm;
   CLR_PMETADATA m_target;
 
   //--//
 
-  bool InitializeFromIndex(const CLR_RT_TypeSpec_Index& idx);
+  bool InitializeFromIndex(uint32_t idx);
   void Clear();
 
-  bool ResolveToken(CLR_UINT32 tk, CLR_RT_Assembly* assm);
+  bool ResolveToken(uint32_t tk, CLR_RT_Assembly* assm);
   };
 
 //--//
 
-struct CLR_RT_TypeDef_Instance : public CLR_RT_TypeDef_Index
+struct CLR_RT_TypeDef_Instance
   {
+  uint32_t m_index;
   CLR_RT_Assembly* m_assm;
   const CLR_RECORD_TYPEDEF* m_target;
 
   //--//
 
-  bool InitializeFromReflection(const CLR_RT_ReflectionDef_Index& reflex, CLR_UINT32* levels);
-  bool InitializeFromIndex(const CLR_RT_TypeDef_Index& idx);
+  bool InitializeFromReflection(const CLR_RT_ReflectionDef_Index& reflex, uint32_t* levels);
+  bool InitializeFromIndex(uint32_t idx);
   bool InitializeFromMethod(const CLR_RT_MethodDef_Instance& md);
   bool InitializeFromField(const CLR_RT_FieldDef_Instance& fd);
 
   void Clear();
 
-  bool ResolveToken(CLR_UINT32 tk, CLR_RT_Assembly* assm);
+  bool ResolveToken(uint32_t tk, CLR_RT_Assembly* assm);
 
   //--//
 
   CLR_RT_TypeDef_CrossReference& CrossReference() const
     {
-    return m_assm->m_pCrossReference_TypeDef[Type()];
+    return m_assm->m_pCrossReference_TypeDef[ get_type_index(m_index) ];
     }
 
   bool SwitchToParent();
@@ -1903,47 +1616,49 @@ struct CLR_RT_TypeDef_Instance : public CLR_RT_TypeDef_Index
 
 //--//
 
-struct CLR_RT_FieldDef_Instance : public CLR_RT_FieldDef_Index
+struct CLR_RT_FieldDef_Instance
   {
+  uint32_t m_index;
   CLR_RT_Assembly* m_assm;
   const CLR_RECORD_FIELDDEF* m_target;
 
   //--//
 
-  bool InitializeFromIndex(const CLR_RT_FieldDef_Index& idx);
+  bool InitializeFromIndex(uint32_t idx);
   void Clear();
 
-  bool ResolveToken(CLR_UINT32 tk, CLR_RT_Assembly* assm);
+  bool ResolveToken(uint32_t tk, CLR_RT_Assembly* assm);
 
   //--//
 
   CLR_RT_FieldDef_CrossReference& CrossReference() const
     {
-    return m_assm->m_pCrossReference_FieldDef[Field()];
+    return m_assm->m_pCrossReference_FieldDef[ get_field_index(m_index) ];
     }
   };
 
 //--//
 
-struct CLR_RT_MethodDef_Instance : public CLR_RT_MethodDef_Index
+struct CLR_RT_MethodDef_Instance
   {
+  uint32_t m_index;
   CLR_RT_Assembly* m_assm;
   const CLR_RECORD_METHODDEF* m_target;
 
   //--//
 
-  bool InitializeFromIndex(const CLR_RT_MethodDef_Index& idx);
+  bool InitializeFromIndex(uint32_t idx);
   void Clear();
 
-  bool ResolveToken(CLR_UINT32 tk, CLR_RT_Assembly* assm);
+  bool ResolveToken(uint32_t tk, CLR_RT_Assembly* assm);
 
   //--//
 
   CLR_RT_MethodDef_CrossReference& CrossReference() const
     {
-    return m_assm->m_pCrossReference_MethodDef[Method()];
+    return m_assm->m_pCrossReference_MethodDef[ get_method_index(m_index) ];
     }
-  CLR_UINT32 Hits() const
+  uint32_t Hits() const
     {
     return 0;
     }
@@ -1951,7 +1666,7 @@ struct CLR_RT_MethodDef_Instance : public CLR_RT_MethodDef_Index
 #if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
   CLR_RT_MethodDef_DebuggingInfo& DebuggingInfo() const
     {
-    return m_assm->m_pDebuggingInfo_MethodDef[Method()];
+    return m_assm->m_pDebuggingInfo_MethodDef[ get_method_index(m_index) ];
     }
 #endif //#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
   };
@@ -1965,7 +1680,7 @@ struct CLR_RT_AttributeEnumerator
   int m_num;
   CLR_RECORD_ATTRIBUTE m_data;
 
-  CLR_RT_MethodDef_Index m_match;
+  uint32_t m_match;
   CLR_PMETADATA m_blob;
 
   void Initialize(const CLR_RT_TypeDef_Instance& inst);
@@ -2003,9 +1718,9 @@ struct CLR_RT_AttributeParser
   CLR_RT_Assembly* m_assm;
   CLR_PMETADATA m_blob;
 
-  CLR_RT_MethodDef_Instance m_md;
-  CLR_RT_MethodDef_Index m_mdIdx;
-  CLR_RT_TypeDef_Instance m_td;
+  CLR_RT_MethodDef_Instance m_methodDefInstance;
+  uint32_t m_methodIndex;
+  CLR_RT_TypeDef_Instance m_typeDefInstance;
   CLR_RT_SignatureParser m_parser;
   CLR_RT_SignatureParser::Element m_res;
 
@@ -2029,7 +1744,7 @@ struct CLR_RT_AttributeParser
 
 struct CLR_RT_TypeDescriptor
   {
-  CLR_UINT32 m_flags;
+  uint32_t m_flags;
   CLR_RT_TypeDef_Instance m_handlerCls;
 
   CLR_RT_ReflectionDef_Index m_reflex;
@@ -2045,8 +1760,8 @@ struct CLR_RT_TypeDescriptor
 
   HRESULT InitializeFromDataType(CLR_DataType dt);
   HRESULT InitializeFromReflection(const CLR_RT_ReflectionDef_Index& reflex);
-  HRESULT InitializeFromTypeSpec(const CLR_RT_TypeSpec_Index& sig);
-  HRESULT InitializeFromType(const CLR_RT_TypeDef_Index& cls);
+  HRESULT InitializeFromTypeSpec(uint32_t sig);
+  HRESULT InitializeFromType(uint32_t cls);
   HRESULT InitializeFromFieldDefinition(const CLR_RT_FieldDef_Instance& fd);
   HRESULT InitializeFromSignatureParser(CLR_RT_SignatureParser& parser);
   HRESULT InitializeFromObject(const CLR_RT_HeapBlock& ref);
@@ -2056,7 +1771,7 @@ struct CLR_RT_TypeDescriptor
 
   bool GetElementType(CLR_RT_TypeDescriptor& sub);
 
-  static HRESULT ExtractTypeIndexFromObject(const CLR_RT_HeapBlock& ref, CLR_RT_TypeDef_Index& res);
+  static HRESULT ExtractTypeIndexFromObject(const CLR_RT_HeapBlock& ref, uint32_t& res);
   static HRESULT ExtractObjectAndDataType(CLR_RT_HeapBlock*& ref, CLR_DataType& dt);
   };
 
@@ -2077,13 +1792,13 @@ struct CLR_RT_HeapCluster : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELO
 
   //--//
 
-  void HeapCluster_Initialize(CLR_UINT32 size, CLR_UINT32 blockSize); // Memory is not erased by the caller.
+  void HeapCluster_Initialize(uint32_t size, uint32_t blockSize); // Memory is not erased by the caller.
 
-  CLR_RT_HeapBlock* ExtractBlocks(CLR_UINT32 dataType, CLR_UINT32 flags, CLR_UINT32 length);
+  CLR_RT_HeapBlock* ExtractBlocks(uint32_t dataType, uint32_t flags, uint32_t length);
 
   void RecoverFromGC();
 
-  CLR_RT_HeapBlock_Node* InsertInOrder(CLR_RT_HeapBlock_Node* node, CLR_UINT32 size);
+  CLR_RT_HeapBlock_Node* InsertInOrder(CLR_RT_HeapBlock_Node* node, uint32_t size);
 
   //--//
 
@@ -2141,50 +1856,50 @@ struct CLR_RT_StackFrame : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOC
     2; // We need to have more slots in the stack to process a 'newobj' opcode.
   static const int c_MinimumStack = 10;
 
-  static const CLR_UINT32 c_MethodKind_Native = 0x00000000;
-  static const CLR_UINT32 c_MethodKind_Interpreted = 0x00000001;
-  static const CLR_UINT32 c_UNUSED_00000002 = 0x00000002; // c_MethodKind_Jitted
-  static const CLR_UINT32 c_MethodKind_Mask = 0x00000003;
+  static const uint32_t c_MethodKind_Native = 0x00000000;
+  static const uint32_t c_MethodKind_Interpreted = 0x00000001;
+  static const uint32_t c_UNUSED_00000002 = 0x00000002; // c_MethodKind_Jitted
+  static const uint32_t c_MethodKind_Mask = 0x00000003;
 
-  static const CLR_UINT32 c_NativeProfiled = 0x00000004;
-  static const CLR_UINT32 c_MethodKind_Inlined = 0x00000008;
+  static const uint32_t c_NativeProfiled = 0x00000004;
+  static const uint32_t c_MethodKind_Inlined = 0x00000008;
 
-  static const CLR_UINT32 c_ExecutingConstructor = 0x00000010;
-  static const CLR_UINT32 c_CompactAndRestartOnOutOfMemory = 0x00000020;
-  static const CLR_UINT32 c_CallOnPop = 0x00000040;
-  static const CLR_UINT32 c_CalledOnPop = 0x00000080;
+  static const uint32_t c_ExecutingConstructor = 0x00000010;
+  static const uint32_t c_CompactAndRestartOnOutOfMemory = 0x00000020;
+  static const uint32_t c_CallOnPop = 0x00000040;
+  static const uint32_t c_CalledOnPop = 0x00000080;
 
-  static const CLR_UINT32 c_NeedToSynchronize = 0x00000100;
-  static const CLR_UINT32 c_PendingSynchronize = 0x00000200;
-  static const CLR_UINT32 c_Synchronized = 0x00000400;
-  static const CLR_UINT32 c_UNUSED_00000800 = 0x00000800;
+  static const uint32_t c_NeedToSynchronize = 0x00000100;
+  static const uint32_t c_PendingSynchronize = 0x00000200;
+  static const uint32_t c_Synchronized = 0x00000400;
+  static const uint32_t c_UNUSED_00000800 = 0x00000800;
 
-  static const CLR_UINT32 c_NeedToSynchronizeGlobally = 0x00001000;
-  static const CLR_UINT32 c_PendingSynchronizeGlobally = 0x00002000;
-  static const CLR_UINT32 c_SynchronizedGlobally = 0x00004000;
-  static const CLR_UINT32 c_UNUSED_00008000 = 0x00008000;
+  static const uint32_t c_NeedToSynchronizeGlobally = 0x00001000;
+  static const uint32_t c_PendingSynchronizeGlobally = 0x00002000;
+  static const uint32_t c_SynchronizedGlobally = 0x00004000;
+  static const uint32_t c_UNUSED_00008000 = 0x00008000;
 
-  static const CLR_UINT32 c_ExecutingIL = 0x00010000;
-  static const CLR_UINT32 c_CallerIsCompatibleForCall = 0x00020000;
-  static const CLR_UINT32 c_CallerIsCompatibleForRet = 0x00040000;
-  static const CLR_UINT32 c_PseudoStackFrameForFilter = 0x00080000;
+  static const uint32_t c_ExecutingIL = 0x00010000;
+  static const uint32_t c_CallerIsCompatibleForCall = 0x00020000;
+  static const uint32_t c_CallerIsCompatibleForRet = 0x00040000;
+  static const uint32_t c_PseudoStackFrameForFilter = 0x00080000;
 
-  static const CLR_UINT32 c_InlineMethodHasReturnValue = 0x00100000;
-  static const CLR_UINT32 c_UNUSED_00200000 = 0x00200000;
-  static const CLR_UINT32 c_UNUSED_00400000 = 0x00400000;
-  static const CLR_UINT32 c_UNUSED_00800000 = 0x00800000;
+  static const uint32_t c_InlineMethodHasReturnValue = 0x00100000;
+  static const uint32_t c_UNUSED_00200000 = 0x00200000;
+  static const uint32_t c_UNUSED_00400000 = 0x00400000;
+  static const uint32_t c_UNUSED_00800000 = 0x00800000;
 
-  static const CLR_UINT32 c_UNUSED_01000000 = 0x01000000;
-  static const CLR_UINT32 c_UNUSED_02000000 = 0x02000000;
+  static const uint32_t c_UNUSED_01000000 = 0x01000000;
+  static const uint32_t c_UNUSED_02000000 = 0x02000000;
 
-  static const CLR_UINT32 c_AppDomainMethodInvoke = 0x04000000;
-  static const CLR_UINT32 c_AppDomainInjectException = 0x08000000;
-  static const CLR_UINT32 c_AppDomainTransition = 0x10000000;
-  static const CLR_UINT32 c_InvalidIP = 0x20000000;
-  static const CLR_UINT32 c_UNUSED_40000000 = 0x40000000;
-  static const CLR_UINT32 c_HasBreakpoint = 0x80000000;
+  static const uint32_t c_AppDomainMethodInvoke = 0x04000000;
+  static const uint32_t c_AppDomainInjectException = 0x08000000;
+  static const uint32_t c_AppDomainTransition = 0x10000000;
+  static const uint32_t c_InvalidIP = 0x20000000;
+  static const uint32_t c_UNUSED_40000000 = 0x40000000;
+  static const uint32_t c_HasBreakpoint = 0x80000000;
 
-  static const CLR_UINT32 c_ProcessSynchronize =
+  static const uint32_t c_ProcessSynchronize =
     c_NeedToSynchronize | c_PendingSynchronize | c_NeedToSynchronizeGlobally | c_PendingSynchronizeGlobally;
 
   //--//
@@ -2202,7 +1917,7 @@ struct CLR_RT_StackFrame : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOC
   ///////////////////////////////////////////////////////////////////////////////////////////
 
   CLR_RT_SubThread* m_owningSubThread; // EVENT HEAP - NO RELOCATION -
-  CLR_UINT32 m_flags;
+  uint32_t m_flags;
 
   CLR_RT_MethodDef_Instance m_call;
 
@@ -2213,7 +1928,7 @@ struct CLR_RT_StackFrame : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOC
   CLR_RT_HeapBlock* m_evalStackEnd; // EVENT HEAP - NO RELOCATION -
 
   union {
-    CLR_UINT32 m_customState;
+    uint32_t m_customState;
     void* m_customPointer;
     };
 
@@ -2222,7 +1937,7 @@ struct CLR_RT_StackFrame : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOC
 #endif
 
 #if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
-  CLR_UINT32 m_depth;
+  uint32_t m_depth;
 #endif //#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
 
 #if defined(NANOCLR_PROFILE_NEW_CALLS)
@@ -2241,7 +1956,7 @@ struct CLR_RT_StackFrame : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOC
 
   ////////////////////////////////////////
 
-  static HRESULT Push(CLR_RT_Thread* th, const CLR_RT_MethodDef_Instance& callInst, CLR_INT32 extraBlocks);
+  static HRESULT Push(CLR_RT_Thread* th, const CLR_RT_MethodDef_Instance& callInst, int32_t extraBlocks);
 
   void Pop();
 
@@ -2273,29 +1988,29 @@ struct CLR_RT_StackFrame : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOC
 
   HRESULT HandleSynchronized(bool fAcquire, bool fGlobal);
 
-  void SetResult(CLR_INT32 val, CLR_DataType dataType);
-  void SetResult_I1(CLR_UINT8 val);
-  void SetResult_I2(CLR_INT16 val);
-  void SetResult_I4(CLR_INT32 val);
-  void SetResult_I8(CLR_INT64& val);
-  void SetResult_U1(CLR_INT8 val);
-  void SetResult_U2(CLR_UINT16 val);
-  void SetResult_U4(CLR_UINT32 val);
-  void SetResult_U8(CLR_UINT64& val);
+  void SetResult(int32_t val, CLR_DataType dataType);
+  void SetResult_I1(uint8_t val);
+  void SetResult_I2(int16_t val);
+  void SetResult_I4(int32_t val);
+  void SetResult_I8(int64_t& val);
+  void SetResult_U1(int8_t val);
+  void SetResult_U2(uint16_t val);
+  void SetResult_U4(uint32_t val);
+  void SetResult_U8(uint64_t& val);
 
 #if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
   void SetResult_R4(float val);
   void SetResult_R8(double val);
 #else
-  void SetResult_R4(CLR_INT32 val);
-  void SetResult_R8(CLR_INT64 val);
+  void SetResult_R4(int32_t val);
+  void SetResult_R8(int64_t val);
 #endif
 
   void SetResult_Boolean(bool val);
   void SetResult_Object(CLR_RT_HeapBlock* val);
   HRESULT SetResult_String(const char* val);
 
-  HRESULT SetupTimeoutFromTicks(CLR_RT_HeapBlock& input, CLR_INT64*& output);
+  HRESULT SetupTimeoutFromTicks(CLR_RT_HeapBlock& input, int64_t*& output);
 
   void ConvertResultToBoolean();
   void NegateResult();
@@ -2348,7 +2063,7 @@ struct CLR_RT_StackFrame : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOC
     return m_arguments[7];
     }
 
-  CLR_RT_HeapBlock& ArgN(CLR_INT32 n) const
+  CLR_RT_HeapBlock& ArgN(int32_t n) const
     {
     return m_arguments[n];
     }
@@ -2399,7 +2114,7 @@ struct CLR_RT_StackFrame : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOC
     return top;
     }
 
-  inline void PushValueI4(CLR_INT32 val)
+  inline void PushValueI4(int32_t val)
     {
     SetResult_I4(val);
     }
@@ -2433,10 +2148,10 @@ struct CLR_RT_StackFrame : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOC
 #pragma GCC diagnostic ignored "-Winvalid-offsetof"
 #endif
 
-CT_ASSERT(offsetof(CLR_RT_StackFrame, m_owningThread) + sizeof(CLR_UINT32) == offsetof(CLR_RT_StackFrame, m_evalStack))
-CT_ASSERT(offsetof(CLR_RT_StackFrame, m_evalStack) + sizeof(CLR_UINT32) == offsetof(CLR_RT_StackFrame, m_arguments))
-CT_ASSERT(offsetof(CLR_RT_StackFrame, m_arguments) + sizeof(CLR_UINT32) == offsetof(CLR_RT_StackFrame, m_locals))
-CT_ASSERT(offsetof(CLR_RT_StackFrame, m_locals) + sizeof(CLR_UINT32) == offsetof(CLR_RT_StackFrame, m_IP))
+CT_ASSERT(offsetof(CLR_RT_StackFrame, m_owningThread) + sizeof(uint32_t) == offsetof(CLR_RT_StackFrame, m_evalStack))
+CT_ASSERT(offsetof(CLR_RT_StackFrame, m_evalStack) + sizeof(uint32_t) == offsetof(CLR_RT_StackFrame, m_arguments))
+CT_ASSERT(offsetof(CLR_RT_StackFrame, m_arguments) + sizeof(uint32_t) == offsetof(CLR_RT_StackFrame, m_locals))
+CT_ASSERT(offsetof(CLR_RT_StackFrame, m_locals) + sizeof(uint32_t) == offsetof(CLR_RT_StackFrame, m_IP))
 
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
@@ -2446,9 +2161,9 @@ CT_ASSERT(offsetof(CLR_RT_StackFrame, m_locals) + sizeof(CLR_UINT32) == offsetof
 
 struct CLR_RT_ProtectFromGC
   {
-  static const CLR_UINT32 c_Generic = 0x00000001;
-  static const CLR_UINT32 c_HeapBlock = 0x00000002;
-  static const CLR_UINT32 c_ResetKeepAlive = 0x00000004;
+  static const uint32_t c_Generic = 0x00000001;
+  static const uint32_t c_HeapBlock = 0x00000002;
+  static const uint32_t c_ResetKeepAlive = 0x00000004;
 
   typedef void (*Callback)(void* state);
 
@@ -2457,7 +2172,7 @@ struct CLR_RT_ProtectFromGC
   CLR_RT_ProtectFromGC* m_next;
   void** m_data;
   Callback m_fpn;
-  CLR_UINT32 m_flags;
+  uint32_t m_flags;
 
   CLR_RT_ProtectFromGC(CLR_RT_HeapBlock& ref)
     {
@@ -2523,13 +2238,13 @@ struct CLR_RT_AssertEarlyCollection
 struct CLR_RT_GarbageCollector
   {
   typedef bool (*MarkSingleFtn)(CLR_RT_HeapBlock** ptr);
-  typedef bool (*MarkMultipleFtn)(CLR_RT_HeapBlock* lstExt, CLR_UINT32 numExt);
+  typedef bool (*MarkMultipleFtn)(CLR_RT_HeapBlock* lstExt, uint32_t numExt);
   typedef bool (*RelocateFtn)(void** ref);
 
   struct MarkStackElement
     {
     CLR_RT_HeapBlock* ptr;
-    CLR_UINT32 num;
+    uint32_t num;
 #if defined(NANOCLR_VALIDATE_APPDOMAIN_ISOLATION)
     CLR_RT_AppDomain* appDomain;
 #endif
@@ -2545,33 +2260,33 @@ struct CLR_RT_GarbageCollector
 
   struct RelocationRegion
     {
-    CLR_UINT8* m_start;
-    CLR_UINT8* m_end;
-    CLR_UINT8* m_destination;
-    CLR_UINT32 m_offset;
+    uint8_t* m_start;
+    uint8_t* m_end;
+    uint8_t* m_destination;
+    uint32_t m_offset;
     };
 
   //--//
 
   static const int c_minimumSpaceForGC = 128;
   static const int c_minimumSpaceForCompact = 128;
-  static const CLR_UINT32 c_pressureThreshold = 10;
-  static const CLR_UINT32 c_memoryThreshold = HEAP_SIZE_THRESHOLD;
-  static const CLR_UINT32 c_memoryThreshold2 = HEAP_SIZE_THRESHOLD_UPPER;
+  static const uint32_t c_pressureThreshold = 10;
+  static const uint32_t c_memoryThreshold = HEAP_SIZE_THRESHOLD;
+  static const uint32_t c_memoryThreshold2 = HEAP_SIZE_THRESHOLD_UPPER;
 
-  static const CLR_UINT32 c_StartGraphEvent = 0x00000001;
-  static const CLR_UINT32 c_StopGraphEvent = 0x00000002;
-  static const CLR_UINT32 c_DumpGraphHeapEvent = 0x00000004;
-  static const CLR_UINT32 c_DumpPerfCountersEvent = 0x00000008;
+  static const uint32_t c_StartGraphEvent = 0x00000001;
+  static const uint32_t c_StopGraphEvent = 0x00000002;
+  static const uint32_t c_DumpGraphHeapEvent = 0x00000004;
+  static const uint32_t c_DumpPerfCountersEvent = 0x00000008;
 
-  CLR_UINT32 m_numberOfGarbageCollections;
-  CLR_UINT32 m_numberOfCompactions;
+  uint32_t m_numberOfGarbageCollections;
+  uint32_t m_numberOfCompactions;
 
   CLR_RT_DblLinkedList m_weakDelegates_Reachable; // list of CLR_RT_HeapBlock_Delegate_List
 
-  CLR_UINT32 m_totalBytes;
-  CLR_UINT32 m_freeBytes;
-  CLR_UINT32 m_pressureCounter;
+  uint32_t m_totalBytes;
+  uint32_t m_freeBytes;
+  uint32_t m_pressureCounter;
 
   CLR_RT_DblLinkedList* m_markStackList;
   MarkStack* m_markStack;
@@ -2579,8 +2294,8 @@ struct CLR_RT_GarbageCollector
   RelocationRegion* m_relocBlocks;
   size_t m_relocTotal;
   size_t m_relocCount;
-  CLR_UINT8* m_relocMinimum;
-  CLR_UINT8* m_relocMaximum;
+  uint8_t* m_relocMinimum;
+  uint8_t* m_relocMaximum;
 #if NANOCLR_VALIDATE_HEAP > NANOCLR_VALIDATE_HEAP_0_None
   RelocateFtn m_relocWorker;
 #endif
@@ -2591,13 +2306,13 @@ struct CLR_RT_GarbageCollector
   bool m_fOutOfStackSpaceForGC;
 
 #if defined(_WIN32)
-  CLR_UINT32 m_events;
+  uint32_t m_events;
 #endif
 
   //--//
 
-  CLR_UINT32 ExecuteGarbageCollection();
-  CLR_UINT32 ExecuteCompaction();
+  uint32_t ExecuteGarbageCollection();
+  uint32_t ExecuteCompaction();
 
   void Mark();
   void MarkWeak();
@@ -2614,17 +2329,17 @@ struct CLR_RT_GarbageCollector
   void Thread_Mark(CLR_RT_Thread* thread);
 
   void Heap_Compact();
-  CLR_UINT32 Heap_ComputeAliveVsDeadRatio();
+  uint32_t Heap_ComputeAliveVsDeadRatio();
 
   void RecoverEventsFromGC();
 
   void Heap_Relocate_Prepare(RelocationRegion* blocks, size_t total);
-  void Heap_Relocate_AddBlock(CLR_UINT8* dst, CLR_UINT8* src, CLR_UINT32 length);
+  void Heap_Relocate_AddBlock(uint8_t* dst, uint8_t* src, uint32_t length);
   void Heap_Relocate();
 
   //--//
 
-  static void Heap_Relocate(CLR_RT_HeapBlock* lst, CLR_UINT32 len);
+  static void Heap_Relocate(CLR_RT_HeapBlock* lst, uint32_t len);
   static void Heap_Relocate(void** ref);
 
   //--//
@@ -2667,12 +2382,12 @@ struct CLR_RT_GarbageCollector
   struct RelocationRecord
     {
     void** oldRef;
-    CLR_UINT32* oldPtr;
+    uint32_t* oldPtr;
 
     void** newRef;
-    CLR_UINT32* newPtr;
+    uint32_t* newPtr;
 
-    CLR_UINT32 data;
+    uint32_t data;
     };
 
   typedef std::list<RelocationRecord*> Rel_List;
@@ -2751,7 +2466,7 @@ struct CLR_RT_GarbageCollector
     {
     return ptr ? m_funcMultipleBlocks(ptr, 1) : true;
     }
-  bool CheckMultipleBlocks(CLR_RT_HeapBlock* lst, CLR_UINT32 num)
+  bool CheckMultipleBlocks(CLR_RT_HeapBlock* lst, uint32_t num)
     {
     return lst ? m_funcMultipleBlocks(lst, num) : true;
     }
@@ -2759,7 +2474,7 @@ struct CLR_RT_GarbageCollector
   //--//
 
   static bool ComputeReachabilityGraphForSingleBlock(CLR_RT_HeapBlock** ptr);
-  static bool ComputeReachabilityGraphForMultipleBlocks(CLR_RT_HeapBlock* lst, CLR_UINT32 num);
+  static bool ComputeReachabilityGraphForMultipleBlocks(CLR_RT_HeapBlock* lst, uint32_t num);
 
   //--//
 
@@ -2790,11 +2505,11 @@ struct CLR_RT_SubThread : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOCA
 
   CLR_RT_Thread* m_owningThread; // EVENT HEAP - NO RELOCATION -
   CLR_RT_StackFrame* m_owningStackFrame;
-  CLR_UINT32 m_lockRequestsCount;
+  uint32_t m_lockRequestsCount;
 
   int m_priority;
-  CLR_INT64 m_timeConstraint;
-  CLR_UINT32 m_status;
+  int64_t m_timeConstraint;
+  uint32_t m_status;
 
   //--//
 
@@ -2813,7 +2528,7 @@ struct CLR_RT_SubThread : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOCA
 struct CLR_RT_ExceptionHandler
   {
   union {
-    CLR_RT_TypeDef_Index m_typeFilter;
+    uint32_t m_typeFilter;
     CLR_PMETADATA m_userFilterStart;
     };
   CLR_PMETADATA m_tryStart;
@@ -2821,7 +2536,7 @@ struct CLR_RT_ExceptionHandler
   CLR_PMETADATA m_handlerStart;
   CLR_PMETADATA m_handlerEnd;
 
-  CLR_UINT16 m_ehType;
+  uint16_t m_ehType;
   //--//
 
   bool ConvertFromEH(const CLR_RT_MethodDef_Instance& owner, CLR_PMETADATA ipStart, const CLR_RECORD_EH* ehPtr);
@@ -2860,53 +2575,53 @@ struct CLR_RT_Thread : public CLR_RT_ObjectToEvent_Destination // EVENT HEAP - N
     CLR_PMETADATA m_handlerBlockEnd;
 
     CLR_RT_StackFrame* m_handlerStack;
-    CLR_UINT8 m_flags;
+    uint8_t m_flags;
 
-    static const CLR_UINT8 p_Phase_Mask = 0x07;
-    static const CLR_UINT8 p_1_SearchingForHandler_0 = 0x01;
-    static const CLR_UINT8 p_1_SearchingForHandler_1_SentFirstChance = 0x02;
-    static const CLR_UINT8 p_1_SearchingForHandler_2_SentUsersChance = 0x03;
-    static const CLR_UINT8 p_2_RunningFinallys_0 = 0x04;
-    static const CLR_UINT8 p_2_RunningFinallys_1_SentUnwindBegin = 0x05;
-    static const CLR_UINT8 p_3_RunningHandler = 0x06;
-    static const CLR_UINT8 p_4_NormalCleanup = 0x07;
+    static const uint8_t p_Phase_Mask = 0x07;
+    static const uint8_t p_1_SearchingForHandler_0 = 0x01;
+    static const uint8_t p_1_SearchingForHandler_1_SentFirstChance = 0x02;
+    static const uint8_t p_1_SearchingForHandler_2_SentUsersChance = 0x03;
+    static const uint8_t p_2_RunningFinallys_0 = 0x04;
+    static const uint8_t p_2_RunningFinallys_1_SentUnwindBegin = 0x05;
+    static const uint8_t p_3_RunningHandler = 0x06;
+    static const uint8_t p_4_NormalCleanup = 0x07;
 
-    static const CLR_UINT8 c_MagicCatchForInline = 0x20;
-    static const CLR_UINT8 c_MagicCatchForInteceptedException = 0x40;
-    static const CLR_UINT8 c_ContinueExceptionHandler = 0x80;
+    static const uint8_t c_MagicCatchForInline = 0x20;
+    static const uint8_t c_MagicCatchForInteceptedException = 0x40;
+    static const uint8_t c_ContinueExceptionHandler = 0x80;
 
-    CLR_UINT8 inline GetPhase()
+    uint8_t inline GetPhase()
       {
       return m_flags & p_Phase_Mask;
       }
-    void inline SetPhase(CLR_UINT8 phase)
+    void inline SetPhase(uint8_t phase)
       {
       _ASSERTE((phase & ~p_Phase_Mask) == 0);
       m_flags = (m_flags & ~p_Phase_Mask) | phase;
       }
     };
 
-  static const CLR_UINT32 TH_S_Ready = 0x00000000;
-  static const CLR_UINT32 TH_S_Waiting = 0x00000001;
-  static const CLR_UINT32 TH_S_Terminated = 0x00000002;
-  static const CLR_UINT32 TH_S_Unstarted = 0x00000003;
+  static const uint32_t TH_S_Ready = 0x00000000;
+  static const uint32_t TH_S_Waiting = 0x00000001;
+  static const uint32_t TH_S_Terminated = 0x00000002;
+  static const uint32_t TH_S_Unstarted = 0x00000003;
 
-  static const CLR_UINT32 TH_F_Suspended = 0x00000001;
-  static const CLR_UINT32 TH_F_Aborted = 0x00000002;
-  static const CLR_UINT32 TH_F_System = 0x00000004;
-  static const CLR_UINT32 TH_F_ContainsDoomedAppDomain = 0x00000008;
+  static const uint32_t TH_F_Suspended = 0x00000001;
+  static const uint32_t TH_F_Aborted = 0x00000002;
+  static const uint32_t TH_F_System = 0x00000004;
+  static const uint32_t TH_F_ContainsDoomedAppDomain = 0x00000008;
 
-  static const CLR_INT32 TH_WAIT_RESULT_INIT = -1;
-  static const CLR_INT32 TH_WAIT_RESULT_HANDLE_0 = 0;
-  static const CLR_INT32 TH_WAIT_RESULT_TIMEOUT = 0x102; // WaitHandle.WaitTimeout
-  static const CLR_INT32 TH_WAIT_RESULT_HANDLE_ALL = 0x103;
+  static const int32_t TH_WAIT_RESULT_INIT = -1;
+  static const int32_t TH_WAIT_RESULT_HANDLE_0 = 0;
+  static const int32_t TH_WAIT_RESULT_TIMEOUT = 0x102; // WaitHandle.WaitTimeout
+  static const int32_t TH_WAIT_RESULT_HANDLE_ALL = 0x103;
 
-  static const CLR_UINT32 c_TimeQuantum_Milliseconds = 20;
+  static const uint32_t c_TimeQuantum_Milliseconds = 20;
   static const int c_MaxStackUnwindDepth = 6;
 
   int m_pid;
-  CLR_UINT32 m_status;
-  CLR_UINT32 m_flags;
+  uint32_t m_status;
+  uint32_t m_flags;
   int m_executionCounter;
   volatile bool m_timeQuantumExpired;
 
@@ -2923,15 +2638,15 @@ struct CLR_RT_Thread : public CLR_RT_ObjectToEvent_Destination // EVENT HEAP - N
   ThreadTerminationCallback m_terminationCallback;
   void* m_terminationParameter; // EVENT HEAP - NO RELOCATION -
 
-  CLR_UINT32 m_waitForEvents;
-  CLR_INT64 m_waitForEvents_Timeout;
-  CLR_INT64 m_waitForEvents_IdleTimeWorkItem;
+  uint32_t m_waitForEvents;
+  int64_t m_waitForEvents_Timeout;
+  int64_t m_waitForEvents_IdleTimeWorkItem;
 
   CLR_RT_DblLinkedList m_locks; // EVENT HEAP - NO RELOCATION - list of CLR_RT_HeapBlock_Lock
-  CLR_UINT32 m_lockRequestsCount;
+  uint32_t m_lockRequestsCount;
 
   CLR_RT_HeapBlock_WaitForObject* m_waitForObject; // EVENT HEAP - NO RELOCATION, but the objects they point to do
-  CLR_INT32 m_waitForObject_Result;
+  int32_t m_waitForObject_Result;
 
   CLR_RT_DblLinkedList m_stackFrames; // EVENT HEAP - NO RELOCATION - list of CLR_RT_StackFrame
 
@@ -2958,8 +2673,8 @@ struct CLR_RT_Thread : public CLR_RT_ObjectToEvent_Destination // EVENT HEAP - N
     CLR_RT_HeapBlock_Delegate* pDelegate,
     int priority,
     CLR_RT_Thread*& th,
-    CLR_UINT32 flags);
-  static HRESULT CreateInstance(int pid, int priority, CLR_RT_Thread*& th, CLR_UINT32 flags);
+    uint32_t flags);
+  static HRESULT CreateInstance(int pid, int priority, CLR_RT_Thread*& th, uint32_t flags);
   HRESULT PushThreadProcDelegate(CLR_RT_HeapBlock_Delegate* pDelegate);
 
   void DestroyInstance();
@@ -3096,12 +2811,12 @@ extern size_t PayloadArraySize();
 extern size_t InlineBufferCount();
 #endif
 
-extern CLR_UINT32 g_scratchVirtualMethodTableLink[];
-extern CLR_UINT32 g_scratchVirtualMethodTableLinkMRU[];
-extern CLR_UINT32 g_scratchVirtualMethodPayload[];
-extern CLR_UINT32 g_scratchInterruptDispatchingStorage[];
+extern uint32_t g_scratchVirtualMethodTableLink[];
+extern uint32_t g_scratchVirtualMethodTableLinkMRU[];
+extern uint32_t g_scratchVirtualMethodPayload[];
+extern uint32_t g_scratchInterruptDispatchingStorage[];
 #ifndef CLR_NO_IL_INLINE
-extern CLR_UINT32 g_scratchInlineBuffer[];
+extern uint32_t g_scratchInlineBuffer[];
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -3120,9 +2835,9 @@ struct CLR_RT_EventCache
     //
     // The first two fields compose the key, the last field is the value.
     //
-    CLR_RT_MethodDef_Index m_mdVirtual; // The definition of the virtual method.
-    CLR_RT_TypeDef_Index m_cls;         // The class of the instance we need to resolve.
-    CLR_RT_MethodDef_Index m_md;        // The actual implementation of the virtual method.
+    uint32_t m_mdVirtual; // The definition of the virtual method.
+    uint32_t m_cls;         // The class of the instance we need to resolve.
+    uint32_t m_md;        // The actual implementation of the virtual method.
 
     //--//
 
@@ -3162,9 +2877,9 @@ struct CLR_RT_EventCache
     void Initialize();
 
     bool FindVirtualMethod(
-      const CLR_RT_TypeDef_Index& cls,
-      const CLR_RT_MethodDef_Index& mdVirtual,
-      CLR_RT_MethodDef_Index& md);
+      uint32_t cls,
+      uint32_t mdVirtual,
+      uint32_t& md);
 
     //--//
 
@@ -3193,20 +2908,20 @@ struct CLR_RT_EventCache
 
   struct Link
     {
-    CLR_UINT16 m_next;
-    CLR_UINT16 m_prev;
+    uint16_t m_next;
+    uint16_t m_prev;
     };
 
   struct Payload
     {
     struct Key
       {
-      CLR_RT_MethodDef_Index m_mdVirtual; // The definition of the virtual method.
-      CLR_RT_TypeDef_Index m_cls;         // The class of the instance we need to resolve.
+      uint32_t m_mdVirtual; // The definition of the virtual method.
+      uint32_t m_cls;         // The class of the instance we need to resolve.
       };
 
     Key m_key;
-    CLR_RT_MethodDef_Index m_md; // The actual implementation of the virtual method.
+    uint32_t m_md; // The actual implementation of the virtual method.
     };
 
   struct VirtualMethodTable
@@ -3220,23 +2935,23 @@ struct CLR_RT_EventCache
     void Initialize();
 
     bool FindVirtualMethod(
-      const CLR_RT_TypeDef_Index& cls,
-      const CLR_RT_MethodDef_Index& mdVirtual,
-      CLR_RT_MethodDef_Index& md);
+      uint32_t cls,
+      uint32_t mdVirtual,
+      uint32_t& md);
 
     private:
-      CLR_UINT32 GetNewEntry()
+      uint32_t GetNewEntry()
         {
         return m_entriesMRU[LinkMRUArraySize() - 1].m_prev;
         }
 
-      static void MoveEntryToTop(Link* entries, CLR_UINT32 slot, CLR_UINT32 idx);
+      static void MoveEntryToTop(Link* entries, uint32_t slot, uint32_t idx);
     };
 #endif
 
   //--//
 
-  static const CLR_UINT16 c_maxFastLists = 40;
+  static const uint16_t c_maxFastLists = 40;
 
   // the scratch array is used to avoid bringing in arm ABI methods (for semihosting)
   // struct arrays require initialization with the v3.0 compiler and this is done with ABI methods,
@@ -3252,18 +2967,18 @@ struct CLR_RT_EventCache
   //--//
 
   void EventCache_Initialize();
-  CLR_UINT32 EventCache_Cleanup();
+  uint32_t EventCache_Cleanup();
 
   void Append_Node(CLR_RT_HeapBlock* node);
-  CLR_RT_HeapBlock* Extract_Node_Slow(CLR_UINT32 dataType, CLR_UINT32 flags, CLR_UINT32 blocks);
-  CLR_RT_HeapBlock* Extract_Node_Fast(CLR_UINT32 dataType, CLR_UINT32 flags, CLR_UINT32 blocks);
-  CLR_RT_HeapBlock* Extract_Node_Bytes(CLR_UINT32 dataType, CLR_UINT32 flags, CLR_UINT32 bytes);
-  CLR_RT_HeapBlock* Extract_Node(CLR_UINT32 dataType, CLR_UINT32 flags, CLR_UINT32 blocks);
+  CLR_RT_HeapBlock* Extract_Node_Slow(uint32_t dataType, uint32_t flags, uint32_t blocks);
+  CLR_RT_HeapBlock* Extract_Node_Fast(uint32_t dataType, uint32_t flags, uint32_t blocks);
+  CLR_RT_HeapBlock* Extract_Node_Bytes(uint32_t dataType, uint32_t flags, uint32_t bytes);
+  CLR_RT_HeapBlock* Extract_Node(uint32_t dataType, uint32_t flags, uint32_t blocks);
 
   bool FindVirtualMethod(
-    const CLR_RT_TypeDef_Index& cls,
-    const CLR_RT_MethodDef_Index& mdVirtual,
-    CLR_RT_MethodDef_Index& md);
+    uint32_t cls,
+    uint32_t mdVirtual,
+    uint32_t *md);
 
 #ifndef CLR_NO_IL_INLINE
   bool GetInlineFrameBuffer(CLR_RT_InlineBuffer** ppBuffer);
@@ -3309,16 +3024,6 @@ CT_ASSERT(sizeof(CLR_RT_EventCache::Link) == 4)
 CT_ASSERT(sizeof(CLR_RT_EventCache::Payload) == 12)
 #endif
 
-//////////////////////////////////////////////////////////////////////////////////////
-
-//--//
-
-//#include <nanoCLR_Messaging.h>
-#include "../../CLR/Include/nanoCLR_Debugging.h"
-#include "../../CLR/Include/nanoCLR_Profiling.h"
-
-//--//
-
 #if defined(NANOCLR_TRACE_STACK)
 
 //
@@ -3349,38 +3054,13 @@ struct CLR_RT_ExecutionEngine
   {
   ////////////////////////////////////////////////////////////////////////////////////////////////
 
-  static const CLR_UINT32 c_Compile_CPP = 0x00000001;
-  static const CLR_UINT32 c_Compile_ARM = 0x00000002;
+  static const uint32_t c_Compile_CPP = 0x00000001;
+  static const uint32_t c_Compile_ARM = 0x00000002;
 
   ////////////////////////////////////////////////////////////////////////////////////////////////
 
   static const int c_HeapState_Normal = 0x00000000;
   static const int c_HeapState_UnderGC = 0x00000001;
-
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // NEED TO KEEP THESE IN SYNC WITH Enum 'Commands.Debugging_Execution_ChangeConditions...' on debugger library code
-  // //
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  static const int c_fDebugger_StateInitialize = 0x00000000;
-  static const int c_fDebugger_StateResolutionFailed = 0x00000001;
-  static const int c_fDebugger_StateProgramRunning = 0x00000400;
-  static const int c_fDebugger_StateProgramExited = 0x00000800;
-  static const int c_fDebugger_StateMask = c_fDebugger_StateProgramRunning + c_fDebugger_StateProgramExited;
-  //
-  static const int c_fDebugger_BreakpointsDisabled = 0x00001000;
-  //
-  static const int c_fDebugger_Quiet = 0x00010000; // Do not spew debug text to the debugger
-  static const int c_fDebugger_ExitPending = 0x00020000;
-  //
-  static const int c_fDebugger_PauseTimers =
-    0x04000000; // Threads associated with timers are created in "suspended" mode.
-  static const int c_fDebugger_NoCompaction = 0x08000000; // Don't perform compaction during execution.
-  //
-  static const int c_fDebugger_SourceLevelDebugging = 0x10000000;
-  static const int c_fDebugger_RebootPending = 0x20000000;
-  static const int c_fDebugger_Enabled = 0x40000000;
-  static const int c_fDebugger_Stopped = 0x80000000;
 
   volatile int m_iDebugger_Conditions;
 
@@ -3388,92 +3068,48 @@ struct CLR_RT_ExecutionEngine
 
   static const int c_fExecution_GC_Pending = 0x00000001; // Not currently used
   static const int c_fExecution_Compaction_Pending = 0x00000002;
-#if defined(NANOCLR_APPDOMAINS)
-  static const int c_fExecution_UnloadingAppDomain = 0x00000004;
-#endif
 
   int m_iExecution_Conditions;
 
   int m_iReboot_Options;
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////
-
-  static const int c_fProfiling_Enabled = 0x00000001;
-  static const int c_fProfiling_Allocations = 0x00000002;
-  static const int c_fProfiling_Calls = 0x00000004;
-  static const int c_fProfiling_CLRTypes =
-    0x00000008; // Don't dump out certain types, like ASSEMBLY, or THREAD, or BINARY_BLOB, etc.
   int m_iProfiling_Conditions;
 
-  enum
-    {
-    EXECUTION_COUNTER_MAXIMUM =
-    0x70000000, // Threshold value when we increase all execution counters to avoid overflow
-    EXECUTION_COUNTER_ADJUSTMENT =
-    0x60000000 // The update ( increase ) value for all executioin counters after threshold is reached.
-    };
-  ////////////////////////////////////////////////////////////////////////////////////////////////
-
-#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
   static const int c_MaxBreakpointsActive = 5;
 
   size_t m_breakpointsNum;
-  CLR_DBG_Commands::Debugging_Execution_BreakpointDef* m_breakpoints;
-  CLR_DBG_Commands::Debugging_Execution_BreakpointDef m_breakpointsActive[c_MaxBreakpointsActive];
-  size_t m_breakpointsActiveNum;
-#endif //#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
-
-#if !defined(BUILD_RTM) || defined(_WIN32)
-  bool m_fPerformGarbageCollection; // Should the EE do a GC every context switch
-  bool m_fPerformHeapCompaction;    // Should the EE do a Compaction following every GC
-#endif
-
-#if defined(NANOCLR_APPDOMAINS)
-  static const int c_AppDomainId_Invalid = 0;
-
-  CLR_RT_DblLinkedList m_appDomains;
-  CLR_RT_AppDomain* m_appDomainCurrent;
-  int m_appDomainIdNext;
-
-  CLR_RT_AppDomain* SetCurrentAppDomain(CLR_RT_AppDomain* appDomain);
-  CLR_RT_AppDomain* GetCurrentAppDomain();
-
-  HRESULT UnloadAppDomain(CLR_RT_AppDomain* appDomain, CLR_RT_Thread* th);
-  void PrepareThreadsForAppDomainUnload(CLR_RT_AppDomain* appDomain, CLR_RT_DblLinkedList& threads);
-
-  void TryToUnloadAppDomains_Helper_Threads(CLR_RT_DblLinkedList& threads);
-  void TryToUnloadAppDomains_Helper_Finalizers(CLR_RT_DblLinkedList& finalizers, bool fAlive);
-  bool TryToUnloadAppDomains();
-#endif // NANOCLR_APPDOMAINS
+  execution_breakpoint_t *m_breakpoints;
+ 
+  void StopOnBreakpoint(execution_breakpoint_t *def, CLR_RT_Thread *th);
 
 #define CLR_EE_DBG_IS(Cond)                                                                                            \
-    ((g_CLR_RT_ExecutionEngine.m_iDebugger_Conditions & CLR_RT_ExecutionEngine::c_fDebugger_##Cond) != 0)
+    ((g_CLR_RT_ExecutionEngine.m_iDebugger_Conditions & c_fDebugger_##Cond) != 0)
 #define CLR_EE_DBG_IS_NOT(Cond)                                                                                        \
-    ((g_CLR_RT_ExecutionEngine.m_iDebugger_Conditions & CLR_RT_ExecutionEngine::c_fDebugger_##Cond) == 0)
+    ((g_CLR_RT_ExecutionEngine.m_iDebugger_Conditions & c_fDebugger_##Cond) == 0)
 #define CLR_EE_DBG_SET(Cond)                                                                                           \
-    g_CLR_RT_ExecutionEngine.m_iDebugger_Conditions |= CLR_RT_ExecutionEngine::c_fDebugger_##Cond
+    g_CLR_RT_ExecutionEngine.m_iDebugger_Conditions |= c_fDebugger_##Cond
 #define CLR_EE_DBG_CLR(Cond)                                                                                           \
-    g_CLR_RT_ExecutionEngine.m_iDebugger_Conditions &= ~CLR_RT_ExecutionEngine::c_fDebugger_##Cond
+    g_CLR_RT_ExecutionEngine.m_iDebugger_Conditions &= ~c_fDebugger_##Cond
 #define CLR_EE_DBG_SET_MASK(Cond, Mask)                                                                                \
     CLR_EE_DBG_CLR(Mask);                                                                                              \
     CLR_EE_DBG_SET(Cond);
 #define CLR_EE_DBG_RESTORE(Cond, f) ((f) ? CLR_EE_DBG_SET(Cond) : CLR_EE_DBG_CLR(Cond))
 #define CLR_EE_DBG_IS_MASK(Cond, Mask)                                                                                 \
-    ((g_CLR_RT_ExecutionEngine.m_iDebugger_Conditions & CLR_RT_ExecutionEngine::c_fDebugger_##Mask) ==                 \
-     CLR_RT_ExecutionEngine::c_fDebugger_##Cond)
+    ((g_CLR_RT_ExecutionEngine.m_iDebugger_Conditions & c_fDebugger_##Mask) ==                 \
+     c_fDebugger_##Cond)
 
 #define CLR_EE_PRF_IS(Cond)                                                                                            \
-    ((g_CLR_RT_ExecutionEngine.m_iProfiling_Conditions & CLR_RT_ExecutionEngine::c_fProfiling_##Cond) != 0)
+    ((g_CLR_RT_ExecutionEngine.m_iProfiling_Conditions & c_fProfiling_##Cond) != 0)
 #define CLR_EE_PRF_IS_NOT(Cond)                                                                                        \
-    ((g_CLR_RT_ExecutionEngine.m_iProfiling_Conditions & CLR_RT_ExecutionEngine::c_fProfiling_##Cond) == 0)
+    ((g_CLR_RT_ExecutionEngine.m_iProfiling_Conditions & c_fProfiling_##Cond) == 0)
 
 #define CLR_EE_IS(Cond)                                                                                                \
-    ((g_CLR_RT_ExecutionEngine.m_iExecution_Conditions & CLR_RT_ExecutionEngine::c_fExecution_##Cond) != 0)
+    ((g_CLR_RT_ExecutionEngine.m_iExecution_Conditions & c_fExecution_##Cond) != 0)
 #define CLR_EE_IS_NOT(Cond)                                                                                            \
-    ((g_CLR_RT_ExecutionEngine.m_iExecution_Conditions & CLR_RT_ExecutionEngine::c_fExecution_##Cond) == 0)
-#define CLR_EE_SET(Cond) g_CLR_RT_ExecutionEngine.m_iExecution_Conditions |= CLR_RT_ExecutionEngine::c_fExecution_##Cond
+    ((g_CLR_RT_ExecutionEngine.m_iExecution_Conditions & c_fExecution_##Cond) == 0)
+#define CLR_EE_SET(Cond) g_CLR_RT_ExecutionEngine.m_iExecution_Conditions |= c_fExecution_##Cond
 #define CLR_EE_CLR(Cond)                                                                                               \
-    g_CLR_RT_ExecutionEngine.m_iExecution_Conditions &= ~CLR_RT_ExecutionEngine::c_fExecution_##Cond
+    g_CLR_RT_ExecutionEngine.m_iExecution_Conditions &= ~c_fExecution_##Cond
 
 #define CLR_EE_REBOOT_IS(Cond)                                                                                         \
     ((g_CLR_RT_ExecutionEngine.m_iReboot_Options & CLR_DBG_Commands::Monitor_Reboot::c_##Cond) ==                      \
@@ -3494,9 +3130,9 @@ struct CLR_RT_ExecutionEngine
   //
   struct ExecutionConstraintCompensation
     {
-    CLR_INT32 m_recursion;
-    CLR_INT32 m_start;
-    CLR_INT32 m_cumulative;
+    int32_t m_recursion;
+    int32_t m_start;
+    int32_t m_cumulative;
 
     void Suspend()
       {
@@ -3517,7 +3153,7 @@ struct CLR_RT_ExecutionEngine
         }
       }
 
-    CLR_INT64 Adjust(CLR_INT64 time) const
+    int64_t Adjust(int64_t time) const
       {
       // FIXME: evaluate if the caller code can be adjusted to use SysTicks instead of 100ns ticks
       return time + ::HAL_Time_SysTicksToTime(m_cumulative);
@@ -3528,14 +3164,14 @@ struct CLR_RT_ExecutionEngine
 
   //--//
 
-  CLR_INT64 m_maximumTimeToActive;
+  int64_t m_maximumTimeToActive;
 
   //--//
 
-  CLR_INT64 m_startTime;
-  CLR_INT64 m_currentNextActivityTime;
+  int64_t m_startTime;
+  int64_t m_currentNextActivityTime;
   bool m_timerCache;
-  CLR_UINT64 m_timerCacheNextTimeout;
+  uint64_t m_timerCacheNextTimeout;
 
   CLR_RT_DblLinkedList m_heap; // list of CLR_RT_HeapCluster
   CLR_RT_HeapCluster* m_lastHcUsed;
@@ -3544,7 +3180,7 @@ struct CLR_RT_ExecutionEngine
   CLR_RT_DblLinkedList m_weakReferences; // OBJECT HEAP - DO RELOCATION - list of CLR_RT_HeapBlock_WeakReference
 
   CLR_RT_DblLinkedList m_timers; // EVENT HEAP - NO RELOCATION - list of CLR_RT_HeapBlock_Timer
-  CLR_UINT32 m_raisedEvents;
+  uint32_t m_raisedEvents;
 
   CLR_RT_DblLinkedList m_threadsReady;   // EVENT HEAP - NO RELOCATION - list of CLR_RT_Thread
   CLR_RT_DblLinkedList m_threadsWaiting; // EVENT HEAP - NO RELOCATION - list of CLR_RT_Thread
@@ -3587,8 +3223,6 @@ struct CLR_RT_ExecutionEngine
 
   void ExecutionEngine_Cleanup();
 
-  HRESULT StartHardware();
-
   static void Reboot(bool fHard);
 
   void JoinAllThreadsAndExecuteFinalizer();
@@ -3598,105 +3232,105 @@ struct CLR_RT_ExecutionEngine
   static void ExecutionConstraint_Suspend();
   static void ExecutionConstraint_Resume();
 
-  CLR_UINT32 PerformGarbageCollection();
+  uint32_t PerformGarbageCollection();
   void PerformHeapCompaction();
 
   void Relocate();
 
   HRESULT ScheduleThreads(int maxContextSwitch);
 
-  CLR_UINT32 WaitForActivity(CLR_UINT32 powerLevel, CLR_UINT32 events, CLR_INT64 timeout_ms);
-  CLR_UINT32 WaitForActivity();
+  uint32_t WaitForActivity(uint32_t powerLevel, uint32_t events, int64_t timeout_ms);
+  uint32_t WaitForActivity();
 
   HRESULT Execute(wchar_t* entryPointArgs, int maxContextSwitch);
 
   HRESULT WaitForDebugger();
 
-  static CLR_RT_HeapBlock* AccessStaticField(const CLR_RT_FieldDef_Index& fd);
+  static CLR_RT_HeapBlock* AccessStaticField(uint32_t fd);
 
-  void ProcessTimeEvent(CLR_UINT32 event);
+  void ProcessTimeEvent(uint32_t event);
 
   static void InvalidateTimerCache();
 
-  static CLR_INT64 GetUptime();
+  static int64_t GetUptime();
 
   CLR_RT_HeapBlock* ExtractHeapBlocksForArray(
     CLR_RT_TypeDef_Instance& inst,
-    CLR_UINT32 length,
+    uint32_t length,
     const CLR_RT_ReflectionDef_Index& reflex);
   CLR_RT_HeapBlock* ExtractHeapBlocksForClassOrValueTypes(
-    CLR_UINT32 dataType,
-    CLR_UINT32 flags,
-    const CLR_RT_TypeDef_Index& cls,
-    CLR_UINT32 length);
-  CLR_RT_HeapBlock* ExtractHeapBytesForObjects(CLR_UINT32 dataType, CLR_UINT32 flags, CLR_UINT32 length);
-  CLR_RT_HeapBlock* ExtractHeapBlocksForObjects(CLR_UINT32 dataType, CLR_UINT32 flags, CLR_UINT32 length);
-  CLR_RT_HeapBlock_Node* ExtractHeapBlocksForEvents(CLR_UINT32 dataType, CLR_UINT32 flags, CLR_UINT32 length);
+    uint32_t dataType,
+    uint32_t flags,
+    uint32_t cls,
+    uint32_t length);
+  CLR_RT_HeapBlock* ExtractHeapBytesForObjects(uint32_t dataType, uint32_t flags, uint32_t length);
+  CLR_RT_HeapBlock* ExtractHeapBlocksForObjects(uint32_t dataType, uint32_t flags, uint32_t length);
+  CLR_RT_HeapBlock_Node* ExtractHeapBlocksForEvents(uint32_t dataType, uint32_t flags, uint32_t length);
 
   HRESULT NewThread(
     CLR_RT_Thread*& th,
     CLR_RT_HeapBlock_Delegate* pDelegate,
     int priority,
-    CLR_INT32 id,
-    CLR_UINT32 flags = 0);
+    int32_t id,
+    uint32_t flags = 0);
   void PutInProperList(CLR_RT_Thread* th);
-  CLR_INT32 GetNextThreadId();
+  int32_t GetNextThreadId();
 
   HRESULT InitializeReference(CLR_RT_HeapBlock& ref, CLR_RT_SignatureParser& parser);
   HRESULT InitializeReference(CLR_RT_HeapBlock& ref, const CLR_RECORD_FIELDDEF* target, CLR_RT_Assembly* assm);
 
   HRESULT InitializeLocals(CLR_RT_HeapBlock* locals, CLR_RT_Assembly* assm, const CLR_RECORD_METHODDEF* md);
 
-  HRESULT NewObjectFromIndex(CLR_RT_HeapBlock& reference, const CLR_RT_TypeDef_Index& cls);
+  HRESULT NewObjectFromIndex(CLR_RT_HeapBlock& reference, uint32_t cls);
   HRESULT NewObject(CLR_RT_HeapBlock& reference, const CLR_RT_TypeDef_Instance& inst);
-  HRESULT NewObject(CLR_RT_HeapBlock& reference, CLR_UINT32 token, CLR_RT_Assembly* assm);
+  HRESULT NewObject(CLR_RT_HeapBlock& reference, uint32_t token, CLR_RT_Assembly* assm);
 
   HRESULT CloneObject(CLR_RT_HeapBlock& reference, const CLR_RT_HeapBlock& source);
   HRESULT CopyValueType(CLR_RT_HeapBlock* destination, const CLR_RT_HeapBlock* source);
 
   HRESULT NewArrayList(CLR_RT_HeapBlock& ref, int size, CLR_RT_HeapBlock_Array*& array);
 
-  HRESULT FindFieldDef(CLR_RT_TypeDef_Instance& inst, const char* szText, CLR_RT_FieldDef_Index& res);
-  HRESULT FindFieldDef(CLR_RT_HeapBlock& reference, const char* szText, CLR_RT_FieldDef_Index& res);
+  HRESULT FindFieldDef(CLR_RT_TypeDef_Instance& inst, const char* szText, uint32_t& res);
+  HRESULT FindFieldDef(CLR_RT_HeapBlock& reference, const char* szText, uint32_t& res);
   HRESULT FindField(CLR_RT_HeapBlock& reference, const char* szText, CLR_RT_HeapBlock*& field);
   HRESULT SetField(CLR_RT_HeapBlock& reference, const char* szText, CLR_RT_HeapBlock& value);
   HRESULT GetField(CLR_RT_HeapBlock& reference, const char* szText, CLR_RT_HeapBlock& value);
 
-  HRESULT LockObject(CLR_RT_HeapBlock& reference, CLR_RT_SubThread* sth, const CLR_INT64& timeExpire, bool fForce);
+  HRESULT LockObject(CLR_RT_HeapBlock& reference, CLR_RT_SubThread* sth, const int64_t& timeExpire, bool fForce);
   HRESULT UnlockObject(CLR_RT_HeapBlock& reference, CLR_RT_SubThread* sth);
   void DeleteLockRequests(CLR_RT_Thread* thTarget, CLR_RT_SubThread* sthTarget);
 
-  HRESULT Sleep(CLR_RT_Thread* caller, const CLR_INT64& timeExpire);
+  HRESULT Sleep(CLR_RT_Thread* caller, const int64_t& timeExpire);
 
-  HRESULT WaitEvents(CLR_RT_Thread* caller, const CLR_INT64& timeExpire, CLR_UINT32 events, bool& fSuccess);
-  void SignalEvents(CLR_RT_DblLinkedList& threads, CLR_UINT32 events);
-  void SignalEvents(CLR_UINT32 events);
+  HRESULT WaitEvents(CLR_RT_Thread* caller, const int64_t& timeExpire, uint32_t events, bool& fSuccess);
+  void SignalEvents(CLR_RT_DblLinkedList& threads, uint32_t events);
+  void SignalEvents(uint32_t events);
 
-  HRESULT InitTimeout(CLR_INT64& timeExpire, const CLR_INT64& timeout);
-  HRESULT InitTimeout(CLR_INT64& timeExpire, CLR_INT32 timeout);
+  HRESULT InitTimeout(int64_t& timeExpire, const int64_t& timeout);
+  HRESULT InitTimeout(int64_t& timeExpire, int32_t timeout);
 
   static bool IsInstanceOf(CLR_RT_TypeDescriptor& desc, CLR_RT_TypeDescriptor& descTarget, bool isInstInstruction);
-  static bool IsInstanceOf(const CLR_RT_TypeDef_Index& cls, const CLR_RT_TypeDef_Index& clsTarget);
-  static bool IsInstanceOf(CLR_RT_HeapBlock& obj, const CLR_RT_TypeDef_Index& clsTarget);
-  static bool IsInstanceOf(CLR_RT_HeapBlock& obj, CLR_RT_Assembly* assm, CLR_UINT32 token, bool isInstInstruction);
+  static bool IsInstanceOf(uint32_t cls, uint32_t clsTarget);
+  static bool IsInstanceOf(CLR_RT_HeapBlock& obj, uint32_t clsTarget);
+  static bool IsInstanceOf(CLR_RT_HeapBlock& obj, CLR_RT_Assembly* assm, uint32_t token, bool isInstInstruction);
 
-  static HRESULT CastToType(CLR_RT_HeapBlock& ref, CLR_UINT32 tk, CLR_RT_Assembly* assm, bool isInstInstruction);
+  static HRESULT CastToType(CLR_RT_HeapBlock& ref, uint32_t tk, CLR_RT_Assembly* assm, bool isInstInstruction);
 
 
   void SetDebuggingInfoBreakpoints(bool fSet);
-  void InstallBreakpoints(CLR_DBG_Commands::Debugging_Execution_BreakpointDef* data, size_t num);
-  void StopOnBreakpoint(CLR_DBG_Commands::Debugging_Execution_BreakpointDef& def, CLR_RT_Thread* th);
+  void InstallBreakpoints(const execution_breakpoint_t *data, size_t num);
+  void StopOnBreakpoint(const execution_breakpoint_t *def, CLR_RT_Thread* th);
   void StopOnBreakpoint(
-    CLR_DBG_Commands::Debugging_Execution_BreakpointDef& def,
+    const execution_breakpoint_t *def,
     CLR_RT_StackFrame* stack,
     CLR_PMETADATA ip);
   void Breakpoint_System_Event(
-    CLR_DBG_Commands::Debugging_Execution_BreakpointDef& def,
-    CLR_UINT16 event,
+    const execution_breakpoint_t *def,
+    uint16_t event,
     CLR_RT_Thread* th,
     CLR_RT_StackFrame* stack,
     CLR_PMETADATA ip);
-  bool DequeueActiveBreakpoint(CLR_DBG_Commands::Debugging_Execution_BreakpointDef& def);
+  bool DequeueActiveBreakpoint(const execution_breakpoint_t *def);
 
   void Breakpoint_Assemblies_Loaded();
 
@@ -3704,21 +3338,20 @@ struct CLR_RT_ExecutionEngine
   void Breakpoint_Thread_Terminated(CLR_RT_Thread* th);
   void Breakpoint_Thread_Created(CLR_RT_Thread* th);
 
-  void Breakpoint_StackFrame_Break(CLR_RT_StackFrame* stack);
-  void Breakpoint_StackFrame_Push(CLR_RT_StackFrame* stack, CLR_UINT32 reason);
+  void Breakpoint_StackFrame_Push(CLR_RT_StackFrame* stack, uint32_t reason);
   void Breakpoint_StackFrame_Pop(CLR_RT_StackFrame* stack, bool stepEH);
   void Breakpoint_StackFrame_Step(CLR_RT_StackFrame* stack, CLR_PMETADATA ip);
   void Breakpoint_StackFrame_Hard(CLR_RT_StackFrame* stack, CLR_PMETADATA ip);
 
-  void Breakpoint_Exception(CLR_RT_StackFrame* stack, CLR_UINT32 reason, CLR_PMETADATA ip);
+  void Breakpoint_Exception(CLR_RT_StackFrame* stack, uint32_t reason, CLR_PMETADATA ip);
   void Breakpoint_Exception_Intercepted(CLR_RT_StackFrame* stack);
   void Breakpoint_Exception_Uncaught(CLR_RT_Thread* th);
 
   //--//
 
-  bool IsTimeExpired(const CLR_INT64& timeExpire, CLR_INT64& timeoutMin);
+  bool IsTimeExpired(const int64_t& timeExpire, int64_t& timeoutMin);
 
-  bool IsThereEnoughIdleTime(CLR_UINT32 expectedMsec);
+  bool IsThereEnoughIdleTime(uint32_t expectedMsec);
 
   void SpawnTimer();
   void SpawnFinalizer();
@@ -3727,15 +3360,15 @@ struct CLR_RT_ExecutionEngine
   bool SpawnStaticConstructorHelper(
     CLR_RT_AppDomain* appDomain,
     CLR_RT_AppDomainAssembly* appDomainAssembly,
-    const CLR_RT_MethodDef_Index& idx);
+    uint32_t idx);
 #else
-  bool SpawnStaticConstructorHelper(CLR_RT_Assembly* assembly, const CLR_RT_MethodDef_Index& idx);
+  bool SpawnStaticConstructorHelper(CLR_RT_Assembly* assembly, uint32_t idx);
 #endif
   static void FinalizerTerminationCallback(void* arg);
   static void StaticConstructorTerminationCallback(void* arg);
   bool EnsureSystemThread(CLR_RT_Thread*& thread, int priority);
 
-  CLR_INT64 ProcessTimer();
+  int64_t ProcessTimer();
 
   //--//
 
@@ -3750,22 +3383,22 @@ struct CLR_RT_ExecutionEngine
 
     CLR_RT_HeapBlock* ExtractHeapBlocks(
       CLR_RT_DblLinkedList& heap,
-      CLR_UINT32 dataType,
-      CLR_UINT32 flags,
-      CLR_UINT32 length);
+      uint32_t dataType,
+      uint32_t flags,
+      uint32_t length);
 
     CLR_RT_HeapBlock_Lock* FindLockObject(CLR_RT_DblLinkedList& threads, CLR_RT_HeapBlock& object);
     CLR_RT_HeapBlock_Lock* FindLockObject(CLR_RT_HeapBlock& object);
 
-    void CheckTimers(CLR_INT64& timeoutMin);
-    void CheckThreads(CLR_INT64& timeoutMin, CLR_RT_DblLinkedList& threads);
+    void CheckTimers(int64_t& timeoutMin);
+    void CheckThreads(int64_t& timeoutMin, CLR_RT_DblLinkedList& threads);
 
     void ReleaseAllThreads(CLR_RT_DblLinkedList& threads);
     void AbortAllThreads(CLR_RT_DblLinkedList& threads);
 
     void InsertThreadRoundRobin(CLR_RT_DblLinkedList& threads, CLR_RT_Thread* th);
 
-    CLR_UINT32 WaitSystemEvents(CLR_UINT32 powerLevel, CLR_UINT32 events, CLR_INT64 timeExpire);
+    uint32_t WaitSystemEvents(uint32_t powerLevel, uint32_t events, int64_t timeExpire);
 
 #if defined(_WIN32)
     HRESULT CreateEntryPointArgs(CLR_RT_HeapBlock& args, wchar_t* szCommandLineArgs);
@@ -3783,11 +3416,11 @@ struct CLR_RT_ExecutionEngine
     // It is used to Thread.Sleep(0) imlementation. The thread is still ready, but is last to execute.
     void UpdateToLowestExecutionCounter(CLR_RT_Thread* pThread) const;
 
-    void RetrieveCurrentMethod(CLR_UINT32& assmIdx, CLR_UINT32& methodIdx);
+    void RetrieveCurrentMethod(uint32_t& assmIdx, uint32_t& methodIdx);
   };
 
 extern CLR_RT_ExecutionEngine g_CLR_RT_ExecutionEngine;
-extern CLR_UINT32 g_buildCRC;
+extern uint32_t g_buildCRC;
 
 //--//
 

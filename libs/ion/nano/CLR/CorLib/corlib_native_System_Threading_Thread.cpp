@@ -8,7 +8,7 @@
 
 static CLR_RT_ObjectToEvent_Source *GetThreadReference(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock *pThis = stack.This();
 
   return CLR_RT_ObjectToEvent_Source::ExtractInstance(pThis[Library_corlib_native_System_Threading_Thread::FIELD___thread]);
@@ -16,7 +16,7 @@ static CLR_RT_ObjectToEvent_Source *GetThreadReference(CLR_RT_StackFrame &stack)
 
 static void ResetThreadReference(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_ObjectToEvent_Source *src = GetThreadReference(stack);
   if (src)
     {
@@ -26,8 +26,8 @@ static void ResetThreadReference(CLR_RT_StackFrame &stack)
 
 static HRESULT SetThread(CLR_RT_StackFrame &stack, CLR_RT_Thread *th)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock *pThis = stack.This();
 
@@ -40,8 +40,8 @@ static HRESULT SetThread(CLR_RT_StackFrame &stack, CLR_RT_Thread *th)
 
 static HRESULT GetThread(CLR_RT_StackFrame &stack, CLR_RT_Thread *&th, bool mustBeStarted, bool noSystemThreads)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
   CLR_RT_ObjectToEvent_Source *src = GetThreadReference(stack);
 
   th = (src == NULL) ? NULL : (CLR_RT_Thread *)src->m_eventPtr;
@@ -60,10 +60,10 @@ static HRESULT GetThread(CLR_RT_StackFrame &stack, CLR_RT_Thread *&th, bool must
   NANOCLR_NOCLEANUP();
   }
 
-static HRESULT Join(CLR_RT_StackFrame &stack, const CLR_INT64 &timeExpire)
+static HRESULT Join(CLR_RT_StackFrame &stack, const int64_t &timeExpire)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_Thread *th;
   bool fRes = true;
@@ -101,8 +101,8 @@ static HRESULT Join(CLR_RT_StackFrame &stack, const CLR_INT64 &timeExpire)
 
 HRESULT Library_corlib_native_CanFly_Runtime::ThreadCtor___STATIC__VOID__SystemThreadingThread__SystemThreadingThreadStart(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock* pThis = stack.This();
 
@@ -120,8 +120,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::ThreadCtor___STATIC__VOID__SystemT
 
 HRESULT Library_corlib_native_CanFly_Runtime::ThreadStart___STATIC__VOID__SystemThreadingThread(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_Thread* th;
   CLR_RT_HeapBlock* pThis;
@@ -156,8 +156,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::ThreadStart___STATIC__VOID__System
 
 HRESULT Library_corlib_native_CanFly_Runtime::ThreadAbort___STATIC__VOID__SystemThreadingThread(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_Thread* th;
 
@@ -175,8 +175,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::ThreadAbort___STATIC__VOID__System
 
 HRESULT Library_corlib_native_CanFly_Runtime::ThreadSuspend___STATIC__VOID__SystemThreadingThread(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   // Test if this the call from managed Thread.Suspend() or second call on resume.
   switch (stack.m_customState)
@@ -221,8 +221,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::ThreadSuspend___STATIC__VOID__Syst
 
 HRESULT Library_corlib_native_CanFly_Runtime::ThreadResume___STATIC__VOID__SystemThreadingThread(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_Thread* th;
 
@@ -235,8 +235,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::ThreadResume___STATIC__VOID__Syste
 
 HRESULT Library_corlib_native_CanFly_Runtime::GetThreadPriority___STATIC__SystemThreadingThreadPriority__SystemThreadingThread(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_Thread* th;
   int pri;
@@ -279,8 +279,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::GetThreadPriority___STATIC__System
 
 HRESULT Library_corlib_native_CanFly_Runtime::SetThreadPriority___STATIC__VOID__SystemThreadingThread__SystemThreadingThreadPriority(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   if (stack.m_customState == 0)
     {
@@ -322,8 +322,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::SetThreadPriority___STATIC__VOID__
 
 HRESULT Library_corlib_native_CanFly_Runtime::GetManagedThreadId___STATIC__I4__SystemThreadingThread(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   int id;
 
@@ -341,8 +341,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::GetManagedThreadId___STATIC__I4__S
 
 HRESULT Library_corlib_native_CanFly_Runtime::ThreadIsAlive___STATIC__BOOLEAN__SystemThreadingThread(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_Thread* th;
 
@@ -355,8 +355,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::ThreadIsAlive___STATIC__BOOLEAN__S
 
 HRESULT Library_corlib_native_CanFly_Runtime::ThreadJoin___STATIC__VOID__SystemThreadingThread(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(Join(stack, TIMEOUT_INFINITE));
 
@@ -365,10 +365,10 @@ HRESULT Library_corlib_native_CanFly_Runtime::ThreadJoin___STATIC__VOID__SystemT
 
 HRESULT Library_corlib_native_CanFly_Runtime::ThreadJoin___STATIC__BOOLEAN__SystemThreadingThread__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
-  CLR_INT64 timeExpire;
+  int64_t timeExpire;
 
   NANOCLR_CHECK_HRESULT(g_CLR_RT_ExecutionEngine.InitTimeout(timeExpire, stack.Arg1().NumericByRef().s4));
 
@@ -379,9 +379,9 @@ HRESULT Library_corlib_native_CanFly_Runtime::ThreadJoin___STATIC__BOOLEAN__Syst
 
 HRESULT Library_corlib_native_CanFly_Runtime::GetThreadState___STATIC__SystemThreadingThreadState__SystemThreadingThread(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
 
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   CLR_RT_Thread* th;
   int            val = 0;
@@ -422,11 +422,11 @@ HRESULT Library_corlib_native_CanFly_Runtime::GetThreadState___STATIC__SystemThr
 
 HRESULT Library_corlib_native_CanFly_Runtime::ThreadSleep___STATIC__VOID__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
-  CLR_INT64 timeExpire;
-  CLR_INT32 timeSleep;
+  int64_t timeExpire;
+  int32_t timeSleep;
 
   switch (stack.m_customState)
     {
@@ -469,8 +469,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::ThreadSleep___STATIC__VOID__I4(CLR
 
 HRESULT Library_corlib_native_CanFly_Runtime::GetCurrentThread___STATIC__SystemThreadingThread(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_Thread* thread = stack.m_owningThread;
   CLR_RT_HeapBlock& top = stack.PushValueAndClear();

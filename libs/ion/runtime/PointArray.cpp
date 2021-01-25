@@ -27,7 +27,7 @@ HRESULT Library_corlib_native_CanFly_Syscall::PointArrayCreate___STATIC__I4__U4_
     return S_OK;
     }
 
-  stack.Arg1().Dereference()->SetInteger((CLR_UINT32)hndl);
+  stack.Arg1().Dereference()->SetInteger((uint32_t)hndl);
 
   SetResult_INT32(stack, s_ok);
 

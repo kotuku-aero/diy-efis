@@ -9,7 +9,7 @@
 
 void CLR_RT_HeapBlock_Node::Relocate()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_data.nodeLink.prevBlock);
   CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_data.nodeLink.nextBlock);
   }

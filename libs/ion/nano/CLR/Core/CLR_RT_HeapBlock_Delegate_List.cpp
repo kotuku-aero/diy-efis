@@ -7,12 +7,12 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HRESULT CLR_RT_HeapBlock_Delegate_List::CreateInstance(CLR_RT_HeapBlock_Delegate_List *&list, CLR_UINT32 length)
+HRESULT CLR_RT_HeapBlock_Delegate_List::CreateInstance(CLR_RT_HeapBlock_Delegate_List *&list, uint32_t length)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
-  CLR_UINT32 totLength = (CLR_UINT32)(sizeof(CLR_RT_HeapBlock_Delegate_List) + length * sizeof(CLR_RT_HeapBlock));
+  uint32_t totLength = (uint32_t)(sizeof(CLR_RT_HeapBlock_Delegate_List) + length * sizeof(CLR_RT_HeapBlock));
 
   list = (CLR_RT_HeapBlock_Delegate_List *)g_CLR_RT_ExecutionEngine.ExtractHeapBytesForObjects(DATATYPE_DELEGATELIST_HEAD, 0, totLength); CHECK_ALLOCATION(list);
 
@@ -24,9 +24,9 @@ HRESULT CLR_RT_HeapBlock_Delegate_List::CreateInstance(CLR_RT_HeapBlock_Delegate
   NANOCLR_NOCLEANUP();
   }
 
-CLR_RT_HeapBlock *CLR_RT_HeapBlock_Delegate_List::CopyAndCompress(CLR_RT_HeapBlock *src, CLR_RT_HeapBlock *dst, CLR_UINT32 num)
+CLR_RT_HeapBlock *CLR_RT_HeapBlock_Delegate_List::CopyAndCompress(CLR_RT_HeapBlock *src, CLR_RT_HeapBlock *dst, uint32_t num)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   while (num--)
     {
     CLR_RT_HeapBlock_Delegate *dlg = src->DereferenceDelegate();
@@ -49,18 +49,18 @@ CLR_RT_HeapBlock *CLR_RT_HeapBlock_Delegate_List::CopyAndCompress(CLR_RT_HeapBlo
 
 HRESULT CLR_RT_HeapBlock_Delegate_List::Change(CLR_RT_HeapBlock &reference, CLR_RT_HeapBlock &delegateSrc, CLR_RT_HeapBlock &delegateTarget, bool fCombine, bool fWeak)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Delegate_List *dlgListSrc;
   CLR_RT_HeapBlock_Delegate_List *dlgListDst;
   CLR_RT_HeapBlock_Delegate *dlg;
   CLR_RT_HeapBlock *newDlgs;
   CLR_RT_HeapBlock *oldDlgs;
-  CLR_UINT32                      oldNum;
-  CLR_UINT32                      newNum;
+  uint32_t                      oldNum;
+  uint32_t                      newNum;
 
-  CLR_UINT32 num = 0;
+  uint32_t num = 0;
 
   reference.SetObjectReference(NULL);
 
@@ -206,8 +206,8 @@ HRESULT CLR_RT_HeapBlock_Delegate_List::Change(CLR_RT_HeapBlock &reference, CLR_
 
 HRESULT CLR_RT_HeapBlock_Delegate_List::Combine(CLR_RT_HeapBlock &reference, CLR_RT_HeapBlock &delegateSrc, CLR_RT_HeapBlock &delegateNew, bool fWeak)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(Change(reference, delegateSrc, delegateNew, true, fWeak));
 
@@ -216,8 +216,8 @@ HRESULT CLR_RT_HeapBlock_Delegate_List::Combine(CLR_RT_HeapBlock &reference, CLR
 
 HRESULT CLR_RT_HeapBlock_Delegate_List::Remove(CLR_RT_HeapBlock &reference, CLR_RT_HeapBlock &delegateSrc, CLR_RT_HeapBlock &delegateOld)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(Change(reference, delegateSrc, delegateOld, false, false));
 
@@ -226,7 +226,7 @@ HRESULT CLR_RT_HeapBlock_Delegate_List::Remove(CLR_RT_HeapBlock &reference, CLR_
 
 void CLR_RT_HeapBlock_Delegate_List::Relocate()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_GarbageCollector::Heap_Relocate(GetDelegates(), m_length);
   }
 

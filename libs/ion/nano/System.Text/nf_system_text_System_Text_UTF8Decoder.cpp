@@ -10,20 +10,20 @@
 HRESULT Library_nf_system_text_System_Text_UTF8Decoder::Convert___VOID__SZARRAY_U1__I4__I4__SZARRAY_CHAR__I4__I4__BOOLEAN__BYREF_I4__BYREF_I4__BYREF_BOOLEAN( CLR_RT_StackFrame& stack )
 {
     NATIVE_PROFILE_CLR_UTF8_DECODER();
-    NANOCLR_HEADER();
+    HRESULT hr;
 
     CLR_RT_HeapBlock_Array* pArrayBytes;
-    CLR_INT32               byteIndex;
-    CLR_INT32               byteCount;
+    int32_t               byteIndex;
+    int32_t               byteCount;
     CLR_RT_HeapBlock_Array* pArrayChars;
-    CLR_INT32               charIndex;
-    CLR_INT32               charCount;
-    CLR_INT32               byteUsed;
-    CLR_INT32               charUsed;
+    int32_t               charIndex;
+    int32_t               charCount;
+    int32_t               byteUsed;
+    int32_t               charUsed;
     bool                    completed;
 
     CLR_RT_UnicodeHelper uh;
-    CLR_UINT8* byteStart;
+    uint8_t* byteStart;
 
     // Get all the parameters
     pArrayBytes = stack.Arg1().DereferenceArray(); FAULT_ON_NULL(pArrayBytes);
@@ -39,8 +39,8 @@ HRESULT Library_nf_system_text_System_Text_UTF8Decoder::Convert___VOID__SZARRAY_
         byteCount < 0 || 
         charIndex < 0 || 
         charCount < 0 ||
-        (CLR_INT32)pArrayBytes->m_numOfElements - byteIndex < byteCount ||
-        (CLR_INT32)pArrayChars->m_numOfElements - charIndex < charCount )
+        (int32_t)pArrayBytes->m_numOfElements - byteIndex < byteCount ||
+        (int32_t)pArrayChars->m_numOfElements - charIndex < charCount )
     {
         NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
     }
@@ -57,13 +57,13 @@ HRESULT Library_nf_system_text_System_Text_UTF8Decoder::Convert___VOID__SZARRAY_
     byteStart = pArrayBytes->GetElement( byteIndex );
     uh.SetInputUTF8( (const char*)byteStart );
 
-    uh.m_outputUTF16      = (CLR_UINT16*)pArrayChars->GetElement( charIndex );
+    uh.m_outputUTF16      = (uint16_t*)pArrayChars->GetElement( charIndex );
     uh.m_outputUTF16_size = charCount;
 
     uh.ConvertFromUTF8( charCount, false, byteCount );
 
     // Calculate return values
-    byteUsed  = (CLR_INT32)(uh.m_inputUTF8 - byteStart);
+    byteUsed  = (int32_t)(uh.m_inputUTF8 - byteStart);
     charUsed  = charCount - uh.m_outputUTF16_size;
     completed = (byteUsed == byteCount);
 

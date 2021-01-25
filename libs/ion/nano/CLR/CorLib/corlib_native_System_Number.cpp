@@ -98,8 +98,8 @@ void nf_RemovePrependedZeros(char* floatStr)
 
 HRESULT Library_corlib_native_CanFly_Runtime::FormatNative___STATIC__STRING__OBJECT__CHAR__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock* pArgs = &(stack.Arg0());
   CLR_RT_HeapBlock* value = pArgs;
@@ -201,7 +201,6 @@ HRESULT Library_corlib_native_CanFly_Runtime::FormatNative___STATIC__STRING__OBJ
     hal_snprintf(result, ARRAYSIZE(result), "%.9g", value->NumericByRef().r4);
 #else
 
-#if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
   // use default precision is none is specfied AND if format in not generic
     precision = (formatCh == 'G' && precision == 1) ? 9 : precision;
 
@@ -213,10 +212,7 @@ HRESULT Library_corlib_native_CanFly_Runtime::FormatNative___STATIC__STRING__OBJ
       {
       nf_RemovePrependedZeros(result);
       }
-#else
-    CLR_INT32 f = value->NumericByRef().r4;
-    NANOCLR_SET_AND_LEAVE(CLR_E_FAIL);
-#endif // !defined(NANOCLR_EMULATED_FLOATINGPOINT)
+
 #endif // defined(_WIN32)
     }
     break;
@@ -236,7 +232,6 @@ HRESULT Library_corlib_native_CanFly_Runtime::FormatNative___STATIC__STRING__OBJ
 #if defined(_WIN32) || defined(WIN32) || defined(_WIN32_WCE)
     hal_snprintf(result, ARRAYSIZE(result), "%.15g", (CLR_DOUBLE_TEMP_CAST)value->NumericByRef().r8);
 #else
-#if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
   // use default precision is none is specfied AND format is not generic
     precision = (formatCh == 'G' && precision == 1) ? 15 : precision;
 
@@ -248,10 +243,6 @@ HRESULT Library_corlib_native_CanFly_Runtime::FormatNative___STATIC__STRING__OBJ
       {
       nf_RemovePrependedZeros(result);
       }
-#else
-    CLR_INT64 d = (CLR_DOUBLE_TEMP_CAST)value->NumericByRef().r8;
-    NANOCLR_SET_AND_LEAVE(CLR_E_FAIL);
-#endif // !defined(NANOCLR_EMULATED_FLOATINGPOINT)
 #endif // defined(_WIN32)
     }
     break;

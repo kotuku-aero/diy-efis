@@ -7,7 +7,7 @@
 
 void EventSet(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock *pThis = stack.Arg0().Dereference();
 
   CLR_RT_HeapBlock_WaitForObject::SignalObject(*pThis);
@@ -17,7 +17,7 @@ void EventSet(CLR_RT_StackFrame &stack)
 
 void EventReset(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock *pThis = stack.Arg0().Dereference();
 
   pThis->ResetFlags(CLR_RT_HeapBlock::HB_Signaled);
@@ -34,10 +34,10 @@ HRESULT EventWait(CLR_RT_StackFrame &stack,
   {
   (void)blkExitContext;
 
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
-  CLR_INT64 timeExpire;
+  int64_t timeExpire;
 
   NANOCLR_CHECK_HRESULT(g_CLR_RT_ExecutionEngine.InitTimeout(timeExpire, blkTimeout.NumericByRef().s4));
 
@@ -48,8 +48,8 @@ HRESULT EventWait(CLR_RT_StackFrame &stack,
 
 HRESULT Library_corlib_native_CanFly_Runtime::WaitHandleWaitOne___STATIC__BOOLEAN__SystemThreadingWaitHandle__I4__BOOLEAN(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_CHECK_HRESULT(EventWait(stack, stack.Arg1(), stack.Arg2(), &stack.ThisRef(), 1, false));
 
@@ -60,8 +60,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::WaitHandleWaitOne___STATIC__BOOLEA
 
 HRESULT Library_corlib_native_CanFly_Runtime::WaitMultiple___STATIC__I4__SZARRAY_SystemThreadingWaitHandle__I4__BOOLEAN__BOOLEAN(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Array* arr = stack.Arg0().DereferenceArray();  FAULT_ON_NULL(arr);
 

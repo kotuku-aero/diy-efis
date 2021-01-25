@@ -8,8 +8,8 @@
 
 HRESULT Library_corlib_native_CanFly_Runtime::InitializeArray___STATIC__VOID__SystemArray__SystemRuntimeFieldHandle(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_FieldDef_Instance inst;
   CLR_RT_HeapBlock_Array* array = stack.Arg0().DereferenceArray(); FAULT_ON_NULL(array);
@@ -31,11 +31,11 @@ HRESULT Library_corlib_native_CanFly_Runtime::InitializeArray___STATIC__VOID__Sy
 
   {
   CLR_PMETADATA ptrSrc = inst.m_assm->GetSignature(inst.m_target->defaultValue);
-  CLR_UINT32    lenSrc; NANOCLR_READ_UNALIGNED_UINT16(lenSrc, ptrSrc);
+  uint32_t    lenSrc; NANOCLR_READ_UNALIGNED_UINT16(lenSrc, ptrSrc);
 
-  CLR_UINT8* ptrDst = array->GetFirstElement();
-  CLR_UINT32    lenDst = array->m_numOfElements;
-  CLR_UINT32    sizeDst = array->m_sizeOfElement;
+  uint8_t* ptrDst = array->GetFirstElement();
+  uint32_t    lenDst = array->m_numOfElements;
+  uint32_t    sizeDst = array->m_sizeOfElement;
 
   lenSrc /= sizeDst; if (lenSrc > lenDst) lenSrc = lenDst;
 #if !defined(NETMF_TARGET_BIG_ENDIAN)
@@ -51,9 +51,9 @@ HRESULT Library_corlib_native_CanFly_Runtime::InitializeArray___STATIC__VOID__Sy
     case DATATYPE_I2:
     case DATATYPE_U2:
     {
-    CLR_UINT32  count = 0;
-    CLR_UINT16  d;
-    CLR_UINT16* p16 = (CLR_UINT16*)ptrDst;
+    uint32_t  count = 0;
+    uint16_t  d;
+    uint16_t* p16 = (uint16_t*)ptrDst;
     while (count < lenDst)
       {
       NANOCLR_READ_UNALIGNED_UINT16(d, ptrSrc);
@@ -67,9 +67,9 @@ HRESULT Library_corlib_native_CanFly_Runtime::InitializeArray___STATIC__VOID__Sy
     case DATATYPE_U4:
     case DATATYPE_R4:
     {
-    CLR_UINT32  count = 0;
-    CLR_UINT32  d;
-    CLR_UINT32* p32 = (CLR_UINT32*)ptrDst;
+    uint32_t  count = 0;
+    uint32_t  d;
+    uint32_t* p32 = (uint32_t*)ptrDst;
     while (count < lenDst)
       {
       NANOCLR_READ_UNALIGNED_UINT32(d, ptrSrc);
@@ -82,9 +82,9 @@ HRESULT Library_corlib_native_CanFly_Runtime::InitializeArray___STATIC__VOID__Sy
     case DATATYPE_U8:
     case DATATYPE_R8:
     {
-    CLR_UINT32  count = 0;
-    CLR_UINT64  d;
-    CLR_UINT64* p64 = (CLR_UINT64*)ptrDst;
+    uint32_t  count = 0;
+    uint64_t  d;
+    uint64_t* p64 = (uint64_t*)ptrDst;
 
     while (count < lenDst)
       {
@@ -107,7 +107,7 @@ HRESULT Library_corlib_native_CanFly_Runtime::InitializeArray___STATIC__VOID__Sy
     case DATATYPE_R4:
     {
     CLR_RT_HeapBlock tmp;
-    CLR_UINT32* ptr = (CLR_UINT32*)ptrDst;
+    uint32_t* ptr = (uint32_t*)ptrDst;
 
     for (; lenSrc; lenSrc--, ptr++)
       {
@@ -121,7 +121,7 @@ HRESULT Library_corlib_native_CanFly_Runtime::InitializeArray___STATIC__VOID__Sy
     case DATATYPE_R8:
     {
     CLR_RT_HeapBlock tmp;
-    CLR_UINT64* ptr = (CLR_UINT64*)ptrDst;
+    uint64_t* ptr = (uint64_t*)ptrDst;
 
     for (; lenSrc; lenSrc--, ptr++)
       {
@@ -141,8 +141,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::InitializeArray___STATIC__VOID__Sy
 
 HRESULT Library_corlib_native_CanFly_Runtime::GetObjectValue___STATIC__OBJECT__OBJECT(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock& top = stack.PushValueAndClear();
   CLR_RT_HeapBlock* src = stack.Arg0().Dereference();
@@ -163,8 +163,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::RunClassConstructor___STATIC__VOID
   {
   (void)stack;
 
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(CLR_E_NOT_SUPPORTED);
 
@@ -175,8 +175,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::OffsetToStringData___STATIC__I4(CL
   {
   (void)stack;
 
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(CLR_E_NOT_SUPPORTED);
 

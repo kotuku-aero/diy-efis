@@ -9,8 +9,8 @@
 
 HRESULT CLR_Checks::VerifyObject(CLR_RT_HeapBlock &top)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   switch (top.DataType())
     {
@@ -34,8 +34,8 @@ HRESULT CLR_Checks::VerifyObject(CLR_RT_HeapBlock &top)
 
 HRESULT CLR_Checks::VerifyArrayReference(CLR_RT_HeapBlock &ref)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Array *array;
 
@@ -62,8 +62,8 @@ HRESULT CLR_Checks::VerifyUnknownInstruction(CLR_OPCODE op)
   {
   (void)op;
 
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(CLR_E_UNKNOWN_INSTRUCTION);
 
@@ -74,8 +74,8 @@ HRESULT CLR_Checks::VerifyUnsupportedInstruction(CLR_OPCODE op)
   {
   (void)op;
 
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(CLR_E_UNSUPPORTED_INSTRUCTION);
 

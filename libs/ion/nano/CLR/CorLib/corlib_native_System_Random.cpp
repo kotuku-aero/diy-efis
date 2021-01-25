@@ -7,7 +7,7 @@
 
 static HRESULT GetRandom(CLR_RT_StackFrame &stack, CLR_RT_Random *&rand, bool create)
   {
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   CLR_RT_HeapBlock *pThis = stack.Arg0().Dereference();
   FAULT_ON_NULL(pThis);
@@ -25,7 +25,7 @@ static HRESULT GetRandom(CLR_RT_StackFrame &stack, CLR_RT_Random *&rand, bool cr
 
 HRESULT Library_corlib_native_CanFly_Runtime::RandomNext___STATIC__I4__SystemRandom(CLR_RT_StackFrame& stack)
   {
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   CLR_RT_Random* rand;
 
@@ -38,10 +38,10 @@ HRESULT Library_corlib_native_CanFly_Runtime::RandomNext___STATIC__I4__SystemRan
 
 HRESULT Library_corlib_native_CanFly_Runtime::RandomNext___STATIC__I4__SystemRandom__I4(CLR_RT_StackFrame& stack)
   {
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   CLR_RT_Random* rand;
-  CLR_INT32      maxValue;
+  int32_t      maxValue;
 
   NANOCLR_CHECK_HRESULT(GetRandom(stack, rand, false));
 
@@ -58,7 +58,7 @@ HRESULT Library_corlib_native_CanFly_Runtime::RandomNextDouble___STATIC__R8__Sys
   {
 
 
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   CLR_RT_Random* rand;
 
@@ -66,7 +66,7 @@ HRESULT Library_corlib_native_CanFly_Runtime::RandomNextDouble___STATIC__R8__Sys
 
   double     nextDouble;
 #else
-  CLR_INT64  nextDouble;
+  int64_t  nextDouble;
 
 #endif
 
@@ -83,7 +83,7 @@ HRESULT Library_corlib_native_CanFly_Runtime::RandomNextDouble___STATIC__R8__Sys
 
 HRESULT Library_corlib_native_CanFly_Runtime::RandomNextBytes___STATIC__VOID__SystemRandom__SZARRAY_U1(CLR_RT_StackFrame& stack)
   {
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   CLR_RT_Random* rand;
   CLR_RT_HeapBlock_Array* buffer;
@@ -99,7 +99,7 @@ HRESULT Library_corlib_native_CanFly_Runtime::RandomNextBytes___STATIC__VOID__Sy
 
 HRESULT Library_corlib_native_CanFly_Runtime::RandomCtor___STATIC__VOID__SystemRandom(CLR_RT_StackFrame& stack)
   {
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   CLR_RT_Random* rand;
 
@@ -112,7 +112,7 @@ HRESULT Library_corlib_native_CanFly_Runtime::RandomCtor___STATIC__VOID__SystemR
 
 HRESULT Library_corlib_native_CanFly_Runtime::RandomCtor___STATIC__VOID__SystemRandom__I4(CLR_RT_StackFrame& stack)
   {
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   CLR_RT_Random* rand;
 

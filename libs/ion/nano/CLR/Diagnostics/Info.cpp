@@ -81,7 +81,7 @@ HRESULT NANOCLR_DEBUG_PROCESS_EXCEPTION(HRESULT hr, const char* szFunc, const ch
       return hr;
     }
 
-  CLR_Debug::Printf("HRESULT %08x: %s %s:%d\r\n", hr, szFunc, szFile, line);
+  trace_debug("HRESULT %08x: %s %s:%d\r\n", hr, szFunc, szFile, line);
   return hr;
   }
 #endif
@@ -249,7 +249,7 @@ void CLR_Debug::Emit(const char* text, int len)
     }
   }
 
-int CLR_Debug::PrintfV(const char* format, va_list arg)
+int trace_debugV(const char* format, va_list arg)
   {
   NATIVE_PROFILE_CLR_DIAGNOSTICS();
 
@@ -291,7 +291,7 @@ int CLR_Debug::PrintfV(const char* format, va_list arg)
   return (int)iBuffer;
   }
 
-int CLR_Debug::Printf(const char* format, ...)
+int trace_debug(const char* format, ...)
   {
   NATIVE_PROFILE_CLR_DIAGNOSTICS();
   va_list arg;
@@ -299,7 +299,7 @@ int CLR_Debug::Printf(const char* format, ...)
 
   va_start(arg, format);
 
-  chars = CLR_Debug::PrintfV(format, arg);
+  chars = trace_debugV(format, arg);
 
   va_end(arg);
 
@@ -310,7 +310,7 @@ int CLR_Debug::Printf(const char* format, ...)
 
 #if defined(_WIN32)
 
-const CLR_UINT8 c_CLR_opParamSize[] = {
+const uint8_t c_CLR_opParamSize[] = {
     4, // CLR_OpcodeParam_Field
     4, // CLR_OpcodeParam_Method
     4, // CLR_OpcodeParam_Type
@@ -330,7 +330,7 @@ const CLR_UINT8 c_CLR_opParamSize[] = {
     1, // CLR_OpcodeParam_ShortVar
   };
 
-const CLR_UINT8 c_CLR_opParamSizeCompressed[] = {
+const uint8_t c_CLR_opParamSizeCompressed[] = {
     2, // CLR_OpcodeParam_Field
     2, // CLR_OpcodeParam_Method
     2, // CLR_OpcodeParam_Type
@@ -350,11 +350,11 @@ const CLR_UINT8 c_CLR_opParamSizeCompressed[] = {
     1, // CLR_OpcodeParam_ShortVar
   };
 
-CLR_UINT32 CLR_ReadTokenCompressed(const CLR_UINT8*& ip, CLR_OPCODE opcode)
+uint32_t CLR_ReadTokenCompressed(const uint8_t*& ip, CLR_OPCODE opcode)
   {
   NATIVE_PROFILE_CLR_DIAGNOSTICS();
-  CLR_UINT32 arg;
-  const CLR_UINT8* ptr = ip;
+  uint32_t arg;
+  const uint8_t* ptr = ip;
 
   switch (c_CLR_RT_OpcodeLookup[opcode].m_opParam)
     {
@@ -393,17 +393,17 @@ CLR_UINT32 CLR_ReadTokenCompressed(const CLR_UINT8*& ip, CLR_OPCODE opcode)
 //          the instruction stream.  Note that this is not an
 //          instruction boundary, it is past the opcode.
 //
-const CLR_UINT8* CLR_SkipBodyOfOpcode(const CLR_UINT8* ip, CLR_OPCODE opcode)
+const uint8_t* CLR_SkipBodyOfOpcode(const uint8_t* ip, CLR_OPCODE opcode)
   {
   NATIVE_PROFILE_CLR_DIAGNOSTICS();
   CLR_OpcodeParam opParam = c_CLR_RT_OpcodeLookup[opcode].m_opParam;
 
   if (opParam == CLR_OpcodeParam_Switch)
     {
-    CLR_UINT32 numcases;
+    uint32_t numcases;
     NANOCLR_READ_UNALIGNED_UINT32(numcases, ip);
 
-    ip += numcases * sizeof(CLR_UINT32);
+    ip += numcases * sizeof(uint32_t);
     }
   else
     {
@@ -413,17 +413,17 @@ const CLR_UINT8* CLR_SkipBodyOfOpcode(const CLR_UINT8* ip, CLR_OPCODE opcode)
   return ip;
   }
 
-const CLR_UINT8* CLR_SkipBodyOfOpcodeCompressed(const CLR_UINT8* ip, CLR_OPCODE opcode)
+const uint8_t* CLR_SkipBodyOfOpcodeCompressed(const uint8_t* ip, CLR_OPCODE opcode)
   {
   NATIVE_PROFILE_CLR_DIAGNOSTICS();
   CLR_OpcodeParam opParam = c_CLR_RT_OpcodeLookup[opcode].m_opParam;
 
   if (opParam == CLR_OpcodeParam_Switch)
     {
-    CLR_UINT32 numcases;
+    uint32_t numcases;
     NANOCLR_READ_UNALIGNED_UINT8(numcases, ip);
 
-    ip += numcases * sizeof(CLR_UINT16);
+    ip += numcases * sizeof(uint16_t);
     }
   else
     {
@@ -451,10 +451,10 @@ const CLR_UINT8* CLR_SkipBodyOfOpcodeCompressed(const CLR_UINT8* ip, CLR_OPCODE 
 
 #if defined(NANOCLR_TRACE_INSTRUCTIONS)
 
-void CLR_RT_Assembly::DumpToken(CLR_UINT32 tk)
+void CLR_RT_Assembly::DumpToken(uint32_t tk)
   {
   NATIVE_PROFILE_CLR_DIAGNOSTICS();
-  CLR_UINT32 idx = CLR_DataFromTk(tk);
+  uint32_t idx = CLR_DataFromTk(tk);
 
   switch (CLR_TypeFromTk(tk))
     {
@@ -462,7 +462,7 @@ void CLR_RT_Assembly::DumpToken(CLR_UINT32 tk)
     {
     LOOKUP_ELEMENT(idx, AssemblyRef, ASSEMBLYREF);
     {
-    CLR_Debug::Printf("[%s]", GetString(p->name));
+    trace_debug("[%s]", GetString(p->name));
     }
     break;
     }
@@ -475,7 +475,7 @@ void CLR_RT_Assembly::DumpToken(CLR_UINT32 tk)
       }
     else
       {
-      CLR_Debug::Printf("%s.%s", GetString(p->nameSpace), GetString(p->name));
+      trace_debug("%s.%s", GetString(p->nameSpace), GetString(p->name));
       }
     break;
     }
@@ -488,7 +488,7 @@ void CLR_RT_Assembly::DumpToken(CLR_UINT32 tk)
       }
     else
       {
-      CLR_Debug::Printf("%s", GetString(p->name));
+      trace_debug("%s", GetString(p->name));
       }
     break;
     }
@@ -501,7 +501,7 @@ void CLR_RT_Assembly::DumpToken(CLR_UINT32 tk)
       }
     else
       {
-      CLR_Debug::Printf("%s", GetString(p->name));
+      trace_debug("%s", GetString(p->name));
       }
     break;
     }
@@ -526,27 +526,27 @@ void CLR_RT_Assembly::DumpToken(CLR_UINT32 tk)
     case TBL_Strings:
     {
     const char* p = GetString(idx);
-    CLR_Debug::Printf("'%s'", p);
+    trace_debug("'%s'", p);
     break;
     }
 
     default:
-      CLR_Debug::Printf("[%08x]", tk);
+      trace_debug("[%08x]", tk);
     }
   }
 
-void CLR_RT_Assembly::DumpSignature(CLR_SIG sig)
+void CLR_RT_Assembly::DumpSignature(uint16_t sig)
   {
   NATIVE_PROFILE_CLR_DIAGNOSTICS();
-  const CLR_UINT8* p = GetSignature(sig);
-  CLR_UINT32 len;
+  const uint8_t* p = GetSignature(sig);
+  uint32_t len;
 
   CLR_CorCallingConvention cc = (CLR_CorCallingConvention)*p++;
 
   switch (cc & PIMAGE_CEE_CS_CALLCONV_MASK)
     {
     case PIMAGE_CEE_CS_CALLCONV_FIELD:
-      CLR_Debug::Printf("FIELD ");
+      trace_debug("FIELD ");
       DumpSignature(p);
       break;
 
@@ -556,25 +556,25 @@ void CLR_RT_Assembly::DumpSignature(CLR_SIG sig)
     case PIMAGE_CEE_CS_CALLCONV_DEFAULT:
       len = *p++;
 
-      CLR_Debug::Printf("METHOD ");
+      trace_debug("METHOD ");
       DumpSignature(p);
-      CLR_Debug::Printf("(");
+      trace_debug("(");
 
       while (len-- > 0)
         {
-        CLR_Debug::Printf(" ");
+        trace_debug(" ");
         DumpSignature(p);
         if (len)
-          CLR_Debug::Printf(",");
+          trace_debug(",");
         else
-          CLR_Debug::Printf(" ");
+          trace_debug(" ");
         }
-      CLR_Debug::Printf(")");
+      trace_debug(")");
       break;
     }
   }
 
-void CLR_RT_Assembly::DumpSignature(const CLR_UINT8*& p)
+void CLR_RT_Assembly::DumpSignature(const uint8_t*& p)
   {
   NATIVE_PROFILE_CLR_DIAGNOSTICS();
   CLR_DataType opt = CLR_UncompressElementType(p);
@@ -582,79 +582,79 @@ void CLR_RT_Assembly::DumpSignature(const CLR_UINT8*& p)
   switch (opt)
     {
     case DATATYPE_VOID:
-      CLR_Debug::Printf("VOID");
+      trace_debug("VOID");
       break;
     case DATATYPE_BOOLEAN:
-      CLR_Debug::Printf("BOOLEAN");
+      trace_debug("BOOLEAN");
       break;
     case DATATYPE_CHAR:
-      CLR_Debug::Printf("char");
+      trace_debug("char");
       break;
     case DATATYPE_I1:
-      CLR_Debug::Printf("I1");
+      trace_debug("I1");
       break;
     case DATATYPE_U1:
-      CLR_Debug::Printf("U1");
+      trace_debug("U1");
       break;
     case DATATYPE_I2:
-      CLR_Debug::Printf("I2");
+      trace_debug("I2");
       break;
     case DATATYPE_U2:
-      CLR_Debug::Printf("U2");
+      trace_debug("U2");
       break;
     case DATATYPE_I4:
-      CLR_Debug::Printf("I4");
+      trace_debug("I4");
       break;
     case DATATYPE_U4:
-      CLR_Debug::Printf("U4");
+      trace_debug("U4");
       break;
     case DATATYPE_I8:
-      CLR_Debug::Printf("I8");
+      trace_debug("I8");
       break;
     case DATATYPE_U8:
-      CLR_Debug::Printf("U8");
+      trace_debug("U8");
       break;
     case DATATYPE_R4:
-      CLR_Debug::Printf("R4");
+      trace_debug("R4");
       break;
     case DATATYPE_R8:
-      CLR_Debug::Printf("R8");
+      trace_debug("R8");
       break;
     case DATATYPE_STRING:
-      CLR_Debug::Printf("STRING");
+      trace_debug("STRING");
       break;
     case DATATYPE_BYREF:
-      CLR_Debug::Printf("BYREF ");
+      trace_debug("BYREF ");
       DumpSignature(p);
       break;
     case DATATYPE_VALUETYPE:
-      CLR_Debug::Printf("VALUETYPE ");
+      trace_debug("VALUETYPE ");
       DumpSignatureToken(p);
       break;
     case DATATYPE_CLASS:
-      CLR_Debug::Printf("CLASS ");
+      trace_debug("CLASS ");
       DumpSignatureToken(p);
       break;
     case DATATYPE_OBJECT:
-      CLR_Debug::Printf("OBJECT");
+      trace_debug("OBJECT");
       break;
     case DATATYPE_SZARRAY:
-      CLR_Debug::Printf("SZARRAY ");
+      trace_debug("SZARRAY ");
       DumpSignature(p);
       break;
 
     default:
-      CLR_Debug::Printf("[UNKNOWN: %08x]", opt);
+      trace_debug("[UNKNOWN: %08x]", opt);
       break;
     }
   }
 
-void CLR_RT_Assembly::DumpSignatureToken(const CLR_UINT8*& p)
+void CLR_RT_Assembly::DumpSignatureToken(const uint8_t*& p)
   {
   NATIVE_PROFILE_CLR_DIAGNOSTICS();
-  CLR_UINT32 tk = CLR_TkFromStream(p);
+  uint32_t tk = CLR_TkFromStream(p);
 
-  CLR_Debug::Printf("[%08x]", tk);
+  trace_debug("[%08x]", tk);
   }
 
 //--//
@@ -686,18 +686,18 @@ void CLR_RT_Assembly::DumpOpcodeDirect(
   int pid)
   {
   NATIVE_PROFILE_CLR_DIAGNOSTICS();
-  CLR_Debug::Printf("    [%04x:%04x:%08x", pid, (int)(ip - ipStart), (size_t)ip);
+  trace_debug("    [%04x:%04x:%08x", pid, (int)(ip - ipStart), (size_t)ip);
 
   if (NANOCLR_INDEX_IS_VALID(call))
     {
-    CLR_Debug::Printf(":");
+    trace_debug(":");
     CLR_RT_DUMP::METHOD(call);
     }
 
   CLR_OPCODE op = CLR_ReadNextOpcodeCompressed(ip);
   CLR_OpcodeParam opParam = c_CLR_RT_OpcodeLookup[op].m_opParam;
 
-  CLR_Debug::Printf("] %-12s", c_CLR_RT_OpcodeLookup[op].m_name);
+  trace_debug("] %-12s", c_CLR_RT_OpcodeLookup[op].m_name);
 
   if (IsOpParamToken(opParam))
     {
@@ -705,32 +705,32 @@ void CLR_RT_Assembly::DumpOpcodeDirect(
     }
   else
     {
-    CLR_UINT32 argLo;
-    CLR_UINT32 argHi;
+    uint32_t argLo;
+    uint32_t argHi;
 
     switch (c_CLR_opParamSizeCompressed[opParam])
       {
       case 8:
         NANOCLR_READ_UNALIGNED_UINT32(argLo, ip);
         NANOCLR_READ_UNALIGNED_UINT32(argHi, ip);
-        CLR_Debug::Printf("%08X,%08X", argHi, argLo);
+        trace_debug("%08X,%08X", argHi, argLo);
         break;
       case 4:
         NANOCLR_READ_UNALIGNED_UINT32(argLo, ip);
-        CLR_Debug::Printf("%08X", argLo);
+        trace_debug("%08X", argLo);
         break;
       case 2:
         NANOCLR_READ_UNALIGNED_UINT16(argLo, ip);
-        CLR_Debug::Printf("%04X", argLo);
+        trace_debug("%04X", argLo);
         break;
       case 1:
         NANOCLR_READ_UNALIGNED_UINT8(argLo, ip);
-        CLR_Debug::Printf("%02X", argLo);
+        trace_debug("%02X", argLo);
         break;
       }
     }
 
-  CLR_Debug::Printf("\r\n");
+  trace_debug("\r\n");
   }
 
 #endif // defined(NANOCLR_TRACE_INSTRUCTIONS)
@@ -739,7 +739,7 @@ void CLR_RT_Assembly::DumpOpcodeDirect(
 
 #if defined(NANOCLR_TRACE_ERRORS)
 
-void CLR_RT_DUMP::TYPE(const CLR_RT_TypeDef_Index& cls)
+void CLR_RT_DUMP::TYPE(uint32_t cls)
   {
   NATIVE_PROFILE_CLR_DIAGNOSTICS();
   char rgBuffer[512];
@@ -749,14 +749,14 @@ void CLR_RT_DUMP::TYPE(const CLR_RT_TypeDef_Index& cls)
   g_CLR_RT_TypeSystem.BuildTypeName(cls, szBuffer, iBuffer);
   rgBuffer[MAXSTRLEN(rgBuffer)] = 0;
 
-  CLR_Debug::Printf("%s", rgBuffer);
+  trace_debug("%s", rgBuffer);
   }
 
 void CLR_RT_DUMP::TYPE(const CLR_RT_ReflectionDef_Index& reflex)
   {
   NATIVE_PROFILE_CLR_DIAGNOSTICS();
   CLR_RT_TypeDef_Instance inst;
-  CLR_UINT32 levels;
+  uint32_t levels;
 
   if (inst.InitializeFromReflection(reflex, &levels))
     {
@@ -764,12 +764,12 @@ void CLR_RT_DUMP::TYPE(const CLR_RT_ReflectionDef_Index& reflex)
 
     while (levels-- > 0)
       {
-      CLR_Debug::Printf("[]");
+      trace_debug("[]");
       }
     }
   }
 
-void CLR_RT_DUMP::METHOD(const CLR_RT_MethodDef_Index& method)
+void CLR_RT_DUMP::METHOD(uint32_t method)
   {
   NATIVE_PROFILE_CLR_DIAGNOSTICS();
   char rgBuffer[512];
@@ -778,10 +778,10 @@ void CLR_RT_DUMP::METHOD(const CLR_RT_MethodDef_Index& method)
 
   g_CLR_RT_TypeSystem.BuildMethodName(method, szBuffer, iBuffer);
 
-  CLR_Debug::Printf("%s", rgBuffer);
+  trace_debug("%s", rgBuffer);
   }
 
-void CLR_RT_DUMP::FIELD(const CLR_RT_FieldDef_Index& field)
+void CLR_RT_DUMP::FIELD(uint32_t field)
   {
   NATIVE_PROFILE_CLR_DIAGNOSTICS();
   char rgBuffer[512];
@@ -790,7 +790,7 @@ void CLR_RT_DUMP::FIELD(const CLR_RT_FieldDef_Index& field)
 
   g_CLR_RT_TypeSystem.BuildFieldName(field, szBuffer, iBuffer);
 
-  CLR_Debug::Printf("%s", rgBuffer);
+  trace_debug("%s", rgBuffer);
   }
 
 void CLR_RT_DUMP::OBJECT(CLR_RT_HeapBlock* ptr, const char* text)
@@ -798,19 +798,19 @@ void CLR_RT_DUMP::OBJECT(CLR_RT_HeapBlock* ptr, const char* text)
   NATIVE_PROFILE_CLR_DIAGNOSTICS();
 #define PELEMENT_TO_STRING(elem)                                                                                       \
     case DATATYPE_##elem:                                                                                              \
-        CLR_Debug::Printf("%s", #elem);                                                                                \
+        trace_debug("%s", #elem);                                                                                \
         break
 
-  CLR_Debug::Printf("%s - ", text);
+  trace_debug("%s - ", text);
 
   while (ptr->DataType() == DATATYPE_OBJECT && ptr->Dereference())
     {
     ptr = ptr->Dereference();
 
-    CLR_Debug::Printf("PTR ");
+    trace_debug("PTR ");
     }
 
-  CLR_Debug::Printf("%04x blocks at %08x [%02x] ", ptr->DataSize(), (int)(size_t)ptr, ptr->DataType());
+  trace_debug("%04x blocks at %08x [%02x] ", ptr->DataSize(), (int)(size_t)ptr, ptr->DataType());
 
   switch (ptr->DataType())
     {
@@ -823,7 +823,7 @@ void CLR_RT_DUMP::OBJECT(CLR_RT_HeapBlock* ptr, const char* text)
 
     case DATATYPE_STRING:
     {
-    CLR_Debug::Printf("'%s'", ptr->StringText());
+    trace_debug("'%s'", ptr->StringText());
     }
     break;
 
@@ -883,7 +883,7 @@ void CLR_RT_DUMP::OBJECT(CLR_RT_HeapBlock* ptr, const char* text)
       break;
     }
 
-  CLR_Debug::Printf("\r\n");
+  trace_debug("\r\n");
 
 #undef PELEMENT_TO_STRING
   }
@@ -901,7 +901,7 @@ static const char *GetMessage(CLR_RT_HeapBlock *obj)
   return obj[Library_corlib_native_System_Exception::FIELD___message].RecoverString();
   }
 
-static CLR_UINT32 GetHResult(CLR_RT_HeapBlock *obj)
+static uint32_t GetHResult(CLR_RT_HeapBlock *obj)
   {
   return obj[Library_corlib_native_System_Exception::FIELD__HResult].NumericByRef().u4;
   }
@@ -916,25 +916,25 @@ void CLR_RT_DUMP::EXCEPTION(CLR_RT_StackFrame& stack, CLR_RT_HeapBlock& ref)
   if (!obj)
     return;
 
-  CLR_Debug::Printf("    ++++ Exception ");
+  trace_debug("    ++++ Exception ");
   CLR_RT_DUMP::TYPE(obj->ObjectCls());
-  CLR_Debug::Printf(" - %s (%d) ++++\r\n", CLR_RT_DUMP::GETERRORMESSAGE(GetHResult(obj)),
+  trace_debug(" - %s (%d) ++++\r\n", CLR_RT_DUMP::GETERRORMESSAGE(GetHResult(obj)),
     stack.m_owningThread->m_pid);
 
   msg = GetMessage(obj);
 
-  CLR_Debug::Printf("    ++++ Message: %s\r\n", msg == NULL ? "" : msg);
+  trace_debug("    ++++ Message: %s\r\n", msg == NULL ? "" : msg);
 
-  CLR_UINT32 depth;
+  uint32_t depth;
   StackTrace *stackTrace = GetStackTrace(obj, depth);
   if (!stackTrace)
     return;
 
   while (depth-- > 0)
     {
-    CLR_Debug::Printf("    ++++ ");
+    trace_debug("    ++++ ");
     CLR_RT_DUMP::METHOD(stackTrace->m_md);
-    CLR_Debug::Printf(" [IP: %04x] ++++\r\n", stackTrace->m_IP);
+    trace_debug(" [IP: %04x] ++++\r\n", stackTrace->m_IP);
 
     stackTrace++;
     }

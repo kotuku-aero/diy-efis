@@ -9,8 +9,8 @@
 
 HRESULT CLR_RT_HeapBlock_Finalizer::CreateInstance(CLR_RT_HeapBlock *object, const CLR_RT_TypeDef_Instance &inst)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_TypeDef_Instance inst2 = inst;
 
@@ -47,20 +47,20 @@ HRESULT CLR_RT_HeapBlock_Finalizer::CreateInstance(CLR_RT_HeapBlock *object, con
 
 void CLR_RT_HeapBlock_Finalizer::Relocate()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_object);
   }
 
 void CLR_RT_HeapBlock_Finalizer::SuppressFinalize(CLR_RT_HeapBlock *object)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   RemoveInstance(object, g_CLR_RT_ExecutionEngine.m_finalizersAlive);
   RemoveInstance(object, g_CLR_RT_ExecutionEngine.m_finalizersPending);
   }
 
 void CLR_RT_HeapBlock_Finalizer::RemoveInstance(CLR_RT_HeapBlock *object, CLR_RT_DblLinkedList &lst)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   NANOCLR_FOREACH_NODE(CLR_RT_HeapBlock_Finalizer, fin, lst)
     {
     if (fin->m_object == object)

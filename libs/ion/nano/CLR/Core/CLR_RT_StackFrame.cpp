@@ -7,18 +7,18 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HRESULT CLR_RT_StackFrame::Push(CLR_RT_Thread *th, const CLR_RT_MethodDef_Instance &callInst, CLR_INT32 extraBlocks)
+HRESULT CLR_RT_StackFrame::Push(CLR_RT_Thread *th, const CLR_RT_MethodDef_Instance &callInst, int32_t extraBlocks)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_StackFrame *stack;
   CLR_RT_StackFrame *caller;
   CLR_RT_Assembly *assm;
   const CLR_RECORD_METHODDEF *md;
   const CLR_RT_MethodDef_Instance *callInstPtr = &callInst;
-  CLR_UINT32 sizeLocals;
-  CLR_UINT32 sizeEvalStack;
+  uint32_t sizeLocals;
+  uint32_t sizeEvalStack;
 
   assm = callInstPtr->m_assm;
   md = callInstPtr->m_target;
@@ -40,7 +40,7 @@ HRESULT CLR_RT_StackFrame::Push(CLR_RT_Thread *th, const CLR_RT_MethodDef_Instan
   // Allocate memory for the runtime state.
   //
   {
-  CLR_UINT32 memorySize = sizeLocals + sizeEvalStack;
+  uint32_t memorySize = sizeLocals + sizeEvalStack;
 
   if (extraBlocks > 0)
     memorySize += extraBlocks;
@@ -81,7 +81,7 @@ HRESULT CLR_RT_StackFrame::Push(CLR_RT_Thread *th, const CLR_RT_MethodDef_Instan
   stack->m_owningSubThread =
     th->CurrentSubThread();   // CLR_RT_SubThread*         m_owningSubThread;  // EVENT HEAP - NO RELOCATION -
   stack->m_owningThread = th;   // CLR_RT_Thread*            m_owningThread;     // EVENT HEAP - NO RELOCATION -
-                                // CLR_UINT32                m_flags;
+                                // uint32_t                m_flags;
                                 //
   stack->m_call = *callInstPtr; // CLR_RT_MethodDef_Instance m_call;
                                 //
@@ -103,15 +103,12 @@ HRESULT CLR_RT_StackFrame::Push(CLR_RT_Thread *th, const CLR_RT_MethodDef_Instan
                              //
                              // union
                              // {
-  stack->m_customState = 0;  //    CLR_UINT32             m_customState;
+  stack->m_customState = 0;  //    uint32_t             m_customState;
                              //    void*                  m_customPointer;
                              // };
                              //
 #ifndef CLR_NO_IL_INLINE
   stack->m_inlineFrame = NULL;
-#endif
-#if defined(NANOCLR_PROFILE_NEW_CALLS)
-  stack->m_callchain.Enter(stack); // CLR_PROF_CounterCallChain m_callchain;
 #endif
                                          //
                                          // CLR_RT_HeapBlock          m_extension[1];
@@ -128,7 +125,7 @@ HRESULT CLR_RT_StackFrame::Push(CLR_RT_Thread *th, const CLR_RT_MethodDef_Instan
     stack->m_flags = CLR_RT_StackFrame::c_MethodKind_Native;
     stack->m_IPstart = NULL;
     }
-  else if (assm->m_nativeCode && (impl = assm->m_nativeCode[stack->m_call.Method()]) != NULL)
+  else if (assm->m_nativeCode && (impl = assm->m_nativeCode[get_method_index(stack->m_call.m_index)]) != NULL)
     {
     stack->m_nativeMethod = impl;
 
@@ -159,10 +156,6 @@ HRESULT CLR_RT_StackFrame::Push(CLR_RT_Thread *th, const CLR_RT_MethodDef_Instan
   //--//
 
   th->m_stackFrames.LinkAtBack(stack);
-
-#if defined(NANOCLR_PROFILE_NEW_CALLS)
-  g_CLR_PRF_Profiler.RecordFunctionCall(th, callInst);
-#endif
   }
 
   if (md->numLocals)
@@ -171,7 +164,7 @@ HRESULT CLR_RT_StackFrame::Push(CLR_RT_Thread *th, const CLR_RT_MethodDef_Instan
     }
 
   {
-  CLR_UINT32 flags = md->flags & (md->MD_Synchronized | md->MD_GloballySynchronized);
+  uint32_t flags = md->flags & (md->MD_Synchronized | md->MD_GloballySynchronized);
 
   if (flags)
     {
@@ -197,7 +190,7 @@ HRESULT CLR_RT_StackFrame::Push(CLR_RT_Thread *th, const CLR_RT_MethodDef_Instan
       {
       g_CLR_RT_ExecutionEngine.Breakpoint_StackFrame_Push(
         stack,
-        CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_DEPTH_STEP_CALL);
+        c_DEPTH_STEP_CALL);
       }
     }
 #endif
@@ -331,7 +324,7 @@ bool CLR_RT_StackFrame::PushInline(
       {
       g_CLR_RT_ExecutionEngine.Breakpoint_StackFrame_Push(
         this,
-        CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_DEPTH_STEP_CALL);
+        c_DEPTH_STEP_CALL);
       }
     }
 #endif
@@ -411,8 +404,8 @@ HRESULT CLR_RT_StackFrame::MakeCall(
   CLR_RT_HeapBlock *args,
   int nArgs)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   const CLR_RECORD_METHODDEF *mdR = md.m_target;
   bool fStatic = (mdR->flags & CLR_RECORD_METHODDEF::MD_Static) != 0;
@@ -457,8 +450,8 @@ HRESULT CLR_RT_StackFrame::MakeCall(
   //
   if (mdR->flags & (CLR_RECORD_METHODDEF::MD_Abstract | CLR_RECORD_METHODDEF::MD_Virtual))
     {
-    CLR_RT_TypeDef_Index cls;
-    CLR_RT_MethodDef_Index mdReal;
+    uint32_t cls;
+    uint32_t mdReal;
 
     _ASSERTE(obj);
     _ASSERTE(!fStatic);
@@ -500,11 +493,11 @@ HRESULT CLR_RT_StackFrame::MakeCall(
 
 HRESULT CLR_RT_StackFrame::FixCall()
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   const CLR_RECORD_METHODDEF *target = m_call.m_target;
-  CLR_UINT8 numArgs = target->numArgs;
+  uint8_t numArgs = target->numArgs;
 
   //
   // The copy of ValueTypes is delayed as much as possible.
@@ -578,8 +571,8 @@ HRESULT CLR_RT_StackFrame::FixCall()
 
 HRESULT CLR_RT_StackFrame::HandleSynchronized(bool fAcquire, bool fGlobal)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock refType;
   CLR_RT_HeapBlock *obj;
@@ -611,9 +604,7 @@ HRESULT CLR_RT_StackFrame::HandleSynchronized(bool fAcquire, bool fGlobal)
     }
   else if (m_call.m_target->flags & CLR_RECORD_METHODDEF::MD_Static)
     {
-    CLR_RT_TypeDef_Index idx;
-
-    idx.Set(m_call.Assembly(), m_call.CrossReference().GetOwner());
+    uint32_t idx = create_index(get_assembly_index(m_call.m_index), m_call.CrossReference().GetOwner());
 
     refType.SetReflection(idx);
 
@@ -638,31 +629,14 @@ HRESULT CLR_RT_StackFrame::HandleSynchronized(bool fAcquire, bool fGlobal)
 
 void CLR_RT_StackFrame::Pop()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
 
-#if defined(NANOCLR_PROFILE_NEW_CALLS)
-  {
-  //
-  // This passivates any outstanding handler.
-  //
-  CLR_PROF_HANDLER_CALLCHAIN(pm2, m_callchain);
-
-  m_callchain.Leave();
-  }
-#endif
-
-#if defined(NANOCLR_PROFILE_NEW_CALLS)
-  g_CLR_PRF_Profiler.RecordFunctionReturn(m_owningThread, m_callchain);
-#endif
-
-#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
   if (m_owningThread->m_fHasJMCStepper || (m_flags & c_HasBreakpoint))
     {
     g_CLR_RT_ExecutionEngine.Breakpoint_StackFrame_Pop(this, false);
     }
-#endif
 
-  const CLR_UINT32 c_flagsToCheck = CLR_RT_StackFrame::c_CallOnPop | CLR_RT_StackFrame::c_Synchronized |
+  const uint32_t c_flagsToCheck = CLR_RT_StackFrame::c_CallOnPop | CLR_RT_StackFrame::c_Synchronized |
     CLR_RT_StackFrame::c_SynchronizedGlobally | CLR_RT_StackFrame::c_NativeProfiled;
 
   if (m_flags & c_flagsToCheck)
@@ -738,7 +712,7 @@ void CLR_RT_StackFrame::Pop()
       }
     else
       { // Note that ExecutingConstructor is checked on 'caller', whereas the other two flags are checked on 'this'
-      const CLR_UINT32 c_moreFlagsToCheck =
+      const uint32_t c_moreFlagsToCheck =
         CLR_RT_StackFrame::c_PseudoStackFrameForFilter | CLR_RT_StackFrame::c_AppDomainTransition;
 
       if (m_flags & c_moreFlagsToCheck)
@@ -775,9 +749,9 @@ void CLR_RT_StackFrame::Pop()
       {
       CLR_RT_HeapBlock_Array *array = g_CLR_RT_ExecutionEngine.m_scratchPadArray;
 
-      if (array && array->m_numOfElements > (CLR_UINT32)idx)
+      if (array && array->m_numOfElements > (uint32_t)idx)
         {
-        CLR_RT_HeapBlock *dst = (CLR_RT_HeapBlock *)array->GetElement((CLR_UINT32)idx);
+        CLR_RT_HeapBlock *dst = (CLR_RT_HeapBlock *)array->GetElement((uint32_t)idx);
         CLR_RT_HeapBlock *exception = m_owningThread->m_currentException.Dereference();
 
         dst->SetObjectReference(NULL);
@@ -839,19 +813,17 @@ void CLR_RT_StackFrame::Pop()
 
 //--//
 
-void CLR_RT_StackFrame::SetResult(CLR_INT32 val, CLR_DataType dataType)
+void CLR_RT_StackFrame::SetResult(int32_t val, CLR_DataType dataType)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock &top = PushValue();
 
   top.SetInteger(val, dataType);
   }
 
-#if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
-
 void CLR_RT_StackFrame::SetResult_R4(float val)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock &top = PushValue();
 
   top.SetFloat(val);
@@ -859,89 +831,69 @@ void CLR_RT_StackFrame::SetResult_R4(float val)
 
 void CLR_RT_StackFrame::SetResult_R8(double val)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock &top = PushValue();
 
   top.SetDouble(val);
   }
 
-#else
-
-void CLR_RT_StackFrame::SetResult_R4(CLR_INT32 val)
+void CLR_RT_StackFrame::SetResult_I1(uint8_t val)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_HeapBlock &top = PushValue();
-
-  top.SetFloat(val);
-  }
-
-void CLR_RT_StackFrame::SetResult_R8(CLR_INT64 val)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_HeapBlock &top = PushValue();
-
-  top.SetDouble(val);
-  }
-
-#endif
-
-void CLR_RT_StackFrame::SetResult_I1(CLR_UINT8 val)
-  {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock &top = PushValue();
 
   top.SetInteger(val);
   }
 
-void CLR_RT_StackFrame::SetResult_I2(CLR_INT16 val)
+void CLR_RT_StackFrame::SetResult_I2(int16_t val)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock &top = PushValue();
 
   top.SetInteger(val);
   }
 
-void CLR_RT_StackFrame::SetResult_I4(CLR_INT32 val)
+void CLR_RT_StackFrame::SetResult_I4(int32_t val)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock &top = PushValue();
 
   top.SetInteger(val);
   }
 
-void CLR_RT_StackFrame::SetResult_I8(CLR_INT64 &val)
+void CLR_RT_StackFrame::SetResult_I8(int64_t &val)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock &top = PushValue();
 
   top.SetInteger(val);
   }
 
-void CLR_RT_StackFrame::SetResult_U1(CLR_INT8 val)
+void CLR_RT_StackFrame::SetResult_U1(int8_t val)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock &top = PushValue();
 
   top.SetInteger(val);
   }
 
-void CLR_RT_StackFrame::SetResult_U2(CLR_UINT16 val)
+void CLR_RT_StackFrame::SetResult_U2(uint16_t val)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock &top = PushValue();
 
   top.SetInteger(val);
   }
 
-void CLR_RT_StackFrame::SetResult_U4(CLR_UINT32 val)
+void CLR_RT_StackFrame::SetResult_U4(uint32_t val)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock &top = PushValue();
 
   top.SetInteger(val);
   }
 
-void CLR_RT_StackFrame::SetResult_U8(CLR_UINT64 &val)
+void CLR_RT_StackFrame::SetResult_U8(uint64_t &val)
 
   {
   CLR_RT_HeapBlock &top = PushValue();
@@ -951,7 +903,7 @@ void CLR_RT_StackFrame::SetResult_U8(CLR_UINT64 &val)
 
 void CLR_RT_StackFrame::SetResult_Boolean(bool val)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock &top = PushValue();
 
   top.SetBoolean(val);
@@ -959,7 +911,7 @@ void CLR_RT_StackFrame::SetResult_Boolean(bool val)
 
 void CLR_RT_StackFrame::SetResult_Object(CLR_RT_HeapBlock *val)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock &top = PushValue();
 
   top.SetObjectReference(val);
@@ -967,8 +919,8 @@ void CLR_RT_StackFrame::SetResult_Object(CLR_RT_HeapBlock *val)
 
 HRESULT CLR_RT_StackFrame::SetResult_String(const char *val)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock &top = PushValue();
 
@@ -979,7 +931,7 @@ HRESULT CLR_RT_StackFrame::SetResult_String(const char *val)
 
 void CLR_RT_StackFrame::ConvertResultToBoolean()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock &top = TopValue();
 
   top.SetBoolean(top.NumericByRef().s4 == 0);
@@ -987,7 +939,7 @@ void CLR_RT_StackFrame::ConvertResultToBoolean()
 
 void CLR_RT_StackFrame::NegateResult()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock &top = TopValue();
 
   top.NumericByRef().s4 = top.NumericByRef().s4 ? 0 : 1;
@@ -996,17 +948,17 @@ void CLR_RT_StackFrame::NegateResult()
 //--//
 
 // input HeapBlock has timeout value **IN TICKS**
-// sometimes you have to force a cast to (CLR_INT64) otherwise the set operations will fail because of the var size
+// sometimes you have to force a cast to (int64_t) otherwise the set operations will fail because of the var size
 // mismatch
-HRESULT CLR_RT_StackFrame::SetupTimeoutFromTicks(CLR_RT_HeapBlock &input, CLR_INT64 *&output)
+HRESULT CLR_RT_StackFrame::SetupTimeoutFromTicks(CLR_RT_HeapBlock &input, int64_t *&output)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   if (m_customState == 0)
     {
     CLR_RT_HeapBlock &ref = PushValueAndClear();
-    CLR_INT64 timeExpire;
+    int64_t timeExpire;
 
     //
     // Initialize timeout and save it on the stack.
@@ -1018,7 +970,7 @@ HRESULT CLR_RT_StackFrame::SetupTimeoutFromTicks(CLR_RT_HeapBlock &input, CLR_IN
     m_customState = 1;
     }
 
-  output = (CLR_INT64 *)&m_evalStack[0].NumericByRef().s8;
+  output = (int64_t *)&m_evalStack[0].NumericByRef().s8;
 
   NANOCLR_NOCLEANUP();
   }
@@ -1027,7 +979,7 @@ HRESULT CLR_RT_StackFrame::SetupTimeoutFromTicks(CLR_RT_HeapBlock &input, CLR_IN
 
 void CLR_RT_StackFrame::Relocate()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
 
 #ifndef CLR_NO_IL_INLINE
   if (m_inlineFrame)
@@ -1073,8 +1025,8 @@ void CLR_RT_StackFrame::Relocate()
 
 HRESULT CLR_RT_StackFrame::NotImplementedStub()
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   if (m_call.m_target->retVal != DATATYPE_VOID)
     {

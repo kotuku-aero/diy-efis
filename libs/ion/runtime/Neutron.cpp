@@ -24,7 +24,7 @@ HRESULT Library_corlib_native_CanFly_Syscall::RegCreateKey___STATIC__I4__U4__STR
   SetResult_INT32(stack, hr);
 
   if (succeeded(hr))
-    stack.Arg2().Dereference()->SetInteger((CLR_UINT32)key);
+    stack.Arg2().Dereference()->SetInteger((uint32_t)key);
 
   return S_OK;
   }
@@ -51,7 +51,7 @@ HRESULT Library_corlib_native_CanFly_Syscall::RegOpenKey___STATIC__I4__U4__STRIN
   SetResult_INT32(stack, hr);
 
   if (succeeded(hr))
-    stack.Arg2().Dereference()->SetInteger((CLR_UINT32)key);
+    stack.Arg2().Dereference()->SetInteger((uint32_t)key);
   
   return S_OK;
   }

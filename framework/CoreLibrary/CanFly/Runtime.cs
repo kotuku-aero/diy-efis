@@ -347,34 +347,32 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void MonitorExit(Object obj);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void ThreadCtor(System.Threading.Thread obj, System.Threading.ThreadStart start);
+    internal static extern uint ThreadCtor(byte priority, string name, System.Threading.ThreadStart start, object arg, out uint id);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void ThreadStart(System.Threading.Thread obj);
+    internal static extern uint ThreadGetArg(uint id, out object arg);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void ThreadAbort(System.Threading.Thread obj);
+    internal static extern uint ThreadGetCurrentId(out uint id);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void ThreadSuspend(System.Threading.Thread obj);
+    internal static extern uint ThreadStart(uint id);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void ThreadResume(System.Threading.Thread obj);
+    internal static extern uint ThreadAbort(uint id);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern System.Threading.ThreadPriority GetThreadPriority(System.Threading.Thread obj);
+    internal static extern uint ThreadSuspend(uint id);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetThreadPriority(System.Threading.Thread obj, System.Threading.ThreadPriority value);
+    internal static extern uint ThreadResume(uint id);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int GetManagedThreadId(System.Threading.Thread obj);
+    internal static extern uint GetThreadPriority(uint id, out byte priority);
     [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern uint SetThreadPriority(uint id, byte priority);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern uint ThreadIsAlive(uint id);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern uint ThreadSleep(int millisecondsTimeout);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern uint GetThreadState(uint id, out uint state);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern uint ThreadWaitTillFinished(uint id, int waitWilliseconds);
 
-    internal static extern bool ThreadIsAlive(System.Threading.Thread obj);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void ThreadJoin(System.Threading.Thread obj);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern bool ThreadJoin(System.Threading.Thread obj, int millisecondsTimeout);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void ThreadSleep(int millisecondsTimeout);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern System.Threading.Thread GetCurrentThread();
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern System.Threading.ThreadState GetThreadState(System.Threading.Thread obj);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void TimerCtor(System.Threading.Timer obj, System.Threading.TimerCallback callback, Object state, int dueTime, int period);
     [MethodImpl(MethodImplOptions.InternalCall)]

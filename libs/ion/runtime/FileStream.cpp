@@ -23,7 +23,7 @@ HRESULT Library_corlib_native_CanFly_Syscall::FileStreamOpen___STATIC__I4__STRIN
   hr = stream_open(param0, &retValue);
   SetResult_INT32(stack, hr);
   if (succeeded(hr))
-    stack.Arg1().Dereference()->SetInteger((CLR_UINT32)retValue);
+    stack.Arg1().Dereference()->SetInteger((uint32_t)retValue);
 
   return S_OK;
   }
@@ -50,7 +50,7 @@ HRESULT Library_corlib_native_CanFly_Syscall::FileStreamCreate___STATIC__I4__STR
 
   SetResult_INT32(stack, hr);
   if (succeeded(hr))
-    stack.Arg1().Dereference()->SetInteger((CLR_UINT32)retValue);
+    stack.Arg1().Dereference()->SetInteger((uint32_t)retValue);
 
   return S_OK;
   }
@@ -110,7 +110,7 @@ HRESULT Library_corlib_native_CanFly_Syscall::GetDirectoryEnumerator___STATIC__I
   SetResult_INT32(stack, hr);
 
   if (succeeded(hr))
-    stack.Arg1().Dereference()->SetInteger((CLR_UINT32)dirp);
+    stack.Arg1().Dereference()->SetInteger((uint32_t)dirp);
 
   return S_OK;
   }

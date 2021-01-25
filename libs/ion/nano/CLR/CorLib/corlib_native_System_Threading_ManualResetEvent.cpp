@@ -8,8 +8,8 @@
 
 HRESULT Library_corlib_native_CanFly_Runtime::ManualResetEventCtor___STATIC__VOID__SystemThreadingManualResetEvent__BOOLEAN(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock* pThis = stack.Arg0().Dereference();
 
@@ -23,8 +23,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::ManualResetEventCtor___STATIC__VOI
 
 HRESULT Library_corlib_native_CanFly_Runtime::ManualResetEventReset___STATIC__BOOLEAN__SystemThreadingManualResetEvent(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   EventReset(stack);
 
@@ -33,8 +33,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::ManualResetEventReset___STATIC__BO
 
 HRESULT Library_corlib_native_CanFly_Runtime::ManualResetEventSet___STATIC__BOOLEAN__SystemThreadingManualResetEvent(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   EventSet(stack);
 

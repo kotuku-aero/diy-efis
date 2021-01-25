@@ -8,8 +8,8 @@
 
 HRESULT Library_corlib_native_CanFly_Runtime::FormatDigits___STATIC__STRING__I4__I4(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock *pArgs = &(stack.Arg0());
 

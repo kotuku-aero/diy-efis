@@ -78,7 +78,7 @@ static int64_t GetIntegerFromHexString(char *str)
 
 HRESULT Library_corlib_native_CanFly_Runtime::NativeToInt64___STATIC__I8__STRING__BOOLEAN__I8__I8__I4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER();
+  HRESULT hr;
   {
   int64_t result = 0;
 
@@ -203,7 +203,7 @@ HRESULT Library_corlib_native_CanFly_Runtime::NativeToInt64___STATIC__I8__STRING
 
 HRESULT Library_corlib_native_CanFly_Runtime::NativeToDouble___STATIC__R8__STRING(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER();
+  HRESULT hr;
   {
   char *str = (char *)stack.Arg0().RecoverString();
 
@@ -394,7 +394,7 @@ HRESULT Library_corlib_native_CanFly_Runtime::NativeToDouble___STATIC__R8__STRIN
 
 HRESULT Library_corlib_native_CanFly_Runtime::ToBase64String___STATIC__STRING__SZARRAY_U1__I4__I4__BOOLEAN(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   size_t outputLength;
   char *outArray = NULL;
@@ -510,14 +510,14 @@ HRESULT Library_corlib_native_CanFly_Runtime::ToBase64String___STATIC__STRING__S
 
 HRESULT Library_corlib_native_CanFly_Runtime::FromBase64CharArray___STATIC__SZARRAY_U1__SZARRAY_CHAR__I4(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   size_t outputLength;
   char *outArray = NULL;
   uint16_t *inArrayPointerTmp = NULL;
   uint8_t *inArrayPointer = NULL;
   uint8_t charValue;
-  CLR_UINT8 *returnArray;
+  uint8_t *returnArray;
   int16_t i = 0;
   uint16_t result;
 

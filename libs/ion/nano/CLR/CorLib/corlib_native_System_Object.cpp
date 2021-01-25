@@ -10,8 +10,8 @@
 
 HRESULT Library_corlib_native_CanFly_Runtime::ObjectEquals___STATIC__BOOLEAN__OBJECT__OBJECT(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   stack.SetResult_Boolean(CLR_RT_HeapBlock::ObjectsEqual(stack.Arg0(), stack.Arg1(), true));
 
@@ -20,8 +20,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::ObjectEquals___STATIC__BOOLEAN__OB
 
 HRESULT Library_corlib_native_CanFly_Runtime::ObjectGetHashCode___STATIC__I4__OBJECT(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   stack.SetResult_I4(CLR_RT_HeapBlock::GetHashCode(stack.This(), true, 0));
 
@@ -30,8 +30,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::ObjectGetHashCode___STATIC__I4__OB
 
 HRESULT Library_corlib_native_CanFly_Runtime::ObjectMemberwiseClone___STATIC__OBJECT__OBJECT(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(g_CLR_RT_ExecutionEngine.CloneObject(stack.PushValueAndClear(), stack.Arg0()));
 
@@ -40,8 +40,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::ObjectMemberwiseClone___STATIC__OB
 
 HRESULT Library_corlib_native_CanFly_Runtime::ObjectReferenceEquals___STATIC__BOOLEAN__OBJECT__OBJECT(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   stack.SetResult_Boolean(CLR_RT_HeapBlock::ObjectsEqual(stack.Arg0(), stack.Arg1(), true));
 

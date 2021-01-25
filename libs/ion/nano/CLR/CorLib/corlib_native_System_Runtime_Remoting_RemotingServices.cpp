@@ -8,8 +8,8 @@
 
 HRESULT Library_corlib_native_CanFly_Runtime::IsTransparentProxy___STATIC__BOOLEAN__OBJECT(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   bool              fProxy = false;
 

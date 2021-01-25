@@ -15,7 +15,7 @@ namespace System.Threading.Internal
         WaitCallback callback;
         object state;
         internal bool IsFree => thread == null || callback == null || thread.ThreadState == ThreadState.Suspended;
-        internal int Id => thread != null ? thread.ManagedThreadId : -1;
+        internal int Id => thread != null ? (int) thread.ManagedThreadId : -1;
         internal SynchronizationContext SynchronizationContext { get; private set; }
         AutoResetEvent run = new AutoResetEvent(false);
 
@@ -41,7 +41,7 @@ namespace System.Threading.Internal
                     run.WaitOne();
                 }
             });
-            SynchronizationContext = new NanoFrameworkSynchronizationContext(thread.ManagedThreadId);
+            SynchronizationContext = new NanoFrameworkSynchronizationContext((int) thread.ManagedThreadId);
             thread.Start();
         }
 

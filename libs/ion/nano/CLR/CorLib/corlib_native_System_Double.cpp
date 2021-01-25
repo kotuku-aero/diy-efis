@@ -8,12 +8,12 @@
 
 HRESULT Library_corlib_native_CanFly_Runtime::CompareTo___STATIC__I4__R8__R8(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   double d = stack.Arg0().NumericByRefConst().r8;
   double val = stack.Arg1().NumericByRefConst().r8;
-  CLR_INT32 res = System::Double::CompareTo(d, val);
+  int32_t res = System::Double::CompareTo(d, val);
 
   stack.PushValue().SetInteger(res);
 
@@ -22,8 +22,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::CompareTo___STATIC__I4__R8__R8(CLR
 
 HRESULT Library_corlib_native_CanFly_Runtime::IsInfinity___STATIC__BOOLEAN__R8(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   double d = stack.Arg0().NumericByRefConst().r8;
   bool res = System::Double::IsInfinity(d);
@@ -35,8 +35,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::IsInfinity___STATIC__BOOLEAN__R8(C
 
 HRESULT Library_corlib_native_CanFly_Runtime::IsNaN___STATIC__BOOLEAN__R8(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   double d = stack.Arg0().NumericByRefConst().r8;
   bool res = System::Double::IsNaN(d);
@@ -48,8 +48,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::IsNaN___STATIC__BOOLEAN__R8(CLR_RT
 
 HRESULT Library_corlib_native_CanFly_Runtime::IsNegativeInfinity___STATIC__BOOLEAN__R8(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   double d = stack.Arg0().NumericByRefConst().r8;
   bool res = System::Double::IsNegativeInfinity(d);
@@ -61,8 +61,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::IsNegativeInfinity___STATIC__BOOLE
 
 HRESULT Library_corlib_native_CanFly_Runtime::IsPositiveInfinity___STATIC__BOOLEAN__R8(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   double d = stack.Arg0().NumericByRefConst().r8;
   bool res = System::Double::IsPositiveInfinity(d);

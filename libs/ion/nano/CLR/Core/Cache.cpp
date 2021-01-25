@@ -11,7 +11,7 @@
 
 int CLR_RT_EventCache::LookupEntry::Callback_Compare(void *state, CLR_RT_AVLTree::Entry *left, CLR_RT_AVLTree::Entry *right)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
 
   LookupEntry *leftDirect = (LookupEntry *)left;
   LookupEntry *rightDirect = (LookupEntry *)right;
@@ -23,7 +23,7 @@ int CLR_RT_EventCache::LookupEntry::Callback_Compare(void *state, CLR_RT_AVLTree
 
 void CLR_RT_EventCache::VirtualMethodTable::Initialize()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
 
   m_entries = (Payload *)&g_scratchVirtualMethodPayload[0];
 
@@ -51,9 +51,9 @@ void CLR_RT_EventCache::VirtualMethodTable::Initialize()
     }
   }
 
-bool CLR_RT_EventCache::VirtualMethodTable::FindVirtualMethod(const CLR_RT_TypeDef_Index &cls, const CLR_RT_MethodDef_Index &mdVirtual, CLR_RT_MethodDef_Index &md)
+bool CLR_RT_EventCache::VirtualMethodTable::FindVirtualMethod(uint32_t cls, const uint32_t &mdVirtual, uint32_t &md)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   LookupEntry *en;
   LookupEntry               key;
   CLR_RT_MethodDef_Instance instMD;
@@ -139,7 +139,7 @@ bool CLR_RT_EventCache::VirtualMethodTable::FindVirtualMethod(const CLR_RT_TypeD
 
 CLR_RT_AVLTree::Entry *CLR_RT_EventCache::VirtualMethodTable::Callback_NewNode(void *state, CLR_RT_AVLTree::Entry *payload)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_EventCache::VirtualMethodTable *pThis = (CLR_RT_EventCache::VirtualMethodTable *)state;
   LookupEntry *payloadDirect = (LookupEntry *)payload;
   LookupEntry *en;
@@ -157,7 +157,7 @@ CLR_RT_AVLTree::Entry *CLR_RT_EventCache::VirtualMethodTable::Callback_NewNode(v
 
 void CLR_RT_EventCache::VirtualMethodTable::Callback_FreeNode(void *state, CLR_RT_AVLTree::Entry *node)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_EventCache::VirtualMethodTable *pThis = (CLR_RT_EventCache::VirtualMethodTable *)state;
   LookupEntry *nodeDirect = (LookupEntry *)node;
 
@@ -166,7 +166,7 @@ void CLR_RT_EventCache::VirtualMethodTable::Callback_FreeNode(void *state, CLR_R
 
 void CLR_RT_EventCache::VirtualMethodTable::Callback_Reassign(void *state, CLR_RT_AVLTree::Entry *from, CLR_RT_AVLTree::Entry *to)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_EventCache::VirtualMethodTable *pThis = (CLR_RT_EventCache::VirtualMethodTable *)state;
   LookupEntry *fromDirect = (LookupEntry *)from;
   LookupEntry *toDirect = (LookupEntry *)to;
@@ -180,8 +180,8 @@ void CLR_RT_EventCache::VirtualMethodTable::Callback_Reassign(void *state, CLR_R
 
 void CLR_RT_EventCache::VirtualMethodTable::Initialize()
   {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_UINT32 idx;
+ 
+  uint32_t idx;
 
   m_entries = (Link *)&g_scratchVirtualMethodTableLink[0];
   m_entriesMRU = (Link *)&g_scratchVirtualMethodTableLinkMRU[0];
@@ -207,18 +207,18 @@ void CLR_RT_EventCache::VirtualMethodTable::Initialize()
     Link &lnk = m_entriesMRU[idx];
 
     lnk.m_next = idx == LinkMRUArraySize() - 1 ? 0 : idx + 1;
-    lnk.m_prev = idx == 0 ? (CLR_UINT16)LinkMRUArraySize() - 1 : idx - 1;
+    lnk.m_prev = idx == 0 ? (uint16_t)LinkMRUArraySize() - 1 : idx - 1;
     }
   }
 
-bool CLR_RT_EventCache::VirtualMethodTable::FindVirtualMethod(const CLR_RT_TypeDef_Index &cls, const CLR_RT_MethodDef_Index &mdVirtual, CLR_RT_MethodDef_Index &md)
+bool CLR_RT_EventCache::VirtualMethodTable::FindVirtualMethod(uint32_t cls, uint32_t mdVirtual, uint32_t &md)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   Payload::Key key;
-  CLR_UINT32   idx;
-  CLR_UINT32   idxHead;
-  CLR_UINT32   clsData = cls.m_data;
-  CLR_UINT32   mdVirtualData = mdVirtual.m_data;
+  uint32_t   idx;
+  uint32_t   idxHead;
+  uint32_t   clsData = cls;
+  uint32_t   mdVirtualData = mdVirtual;
 
 #if defined(_WIN32)
   bool fVerify = false;
@@ -233,7 +233,7 @@ bool CLR_RT_EventCache::VirtualMethodTable::FindVirtualMethod(const CLR_RT_TypeD
   //
   // Shortcut for terminal virtual methods.
   //
-  if (clsData == instCLS.m_data)
+  if (clsData == instCLS.m_index)
     {
     if ((instMD.m_target->flags & CLR_RECORD_METHODDEF::MD_Abstract) == 0)
       {
@@ -245,18 +245,18 @@ bool CLR_RT_EventCache::VirtualMethodTable::FindVirtualMethod(const CLR_RT_TypeD
   }
 #endif
 
-  if (cls.Assembly() == mdVirtual.Assembly())
+  if (get_assembly_index(cls) == get_assembly_index(mdVirtual))
     {
-    CLR_RT_Assembly *assm = g_CLR_RT_TypeSystem.m_assemblies[mdVirtual.Assembly() - 1];
-    CLR_IDX          owner = assm->m_pCrossReference_MethodDef[mdVirtual.Method()].GetOwner();
+    CLR_RT_Assembly *assm = g_CLR_RT_TypeSystem.m_assemblies[get_assembly_index(mdVirtual) - 1];
+    uint16_t          owner = assm->m_pCrossReference_MethodDef[get_method_index(mdVirtual)].GetOwner();
 
-    if (cls.Type() == owner)
+    if (get_type_index(cls) == owner)
       {
 #if defined(_WIN32)
       if (fVerify != true)
         {
-        CLR_Debug::Printf("INTERNAL ERROR: Shortcut for terminal virtual methods failed: CLS:%08x:%08x => %08x\r\n", cls.m_data, mdVirtual.m_data, md.m_data);
-        ::DebugBreak();
+        trace_debug("INTERNAL ERROR: Shortcut for terminal virtual methods failed: CLS:%08x:%08x => %08x\r\n", cls, mdVirtual, md);
+        debug_break();
         }
 #endif
 
@@ -269,14 +269,14 @@ bool CLR_RT_EventCache::VirtualMethodTable::FindVirtualMethod(const CLR_RT_TypeD
 #if defined(_WIN32)
   if (fVerify != false)
     {
-    CLR_Debug::Printf("INTERNAL ERROR: Shortcut for terminal virtual methods failed: CLS:%08x:%08x\r\n", cls.m_data, mdVirtual.m_data);
-    ::DebugBreak();
+    trace_debug("INTERNAL ERROR: Shortcut for terminal virtual methods failed: CLS:%08x:%08x\r\n", cls, mdVirtual);
+    debug_break();
     }
 #endif
 
 
-  key.m_mdVirtual.m_data = mdVirtualData;
-  key.m_cls.m_data = clsData;
+  key.m_mdVirtual = mdVirtualData;
+  key.m_cls = clsData;
 
   idxHead = (SUPPORT_ComputeCRC(&key, sizeof(key), 0) % (LinkArraySize() - PayloadArraySize())) + PayloadArraySize();
 
@@ -286,8 +286,10 @@ bool CLR_RT_EventCache::VirtualMethodTable::FindVirtualMethod(const CLR_RT_TypeD
       {
       Payload &res = m_payloads[idx];
 
-      if (res.m_key.m_mdVirtual.m_data != mdVirtualData) continue;
-      if (res.m_key.m_cls.m_data != clsData) continue;
+      if (res.m_key.m_mdVirtual != mdVirtualData)
+        continue;
+      if (res.m_key.m_cls != clsData)
+        continue;
 
       md = res.m_md;
 
@@ -295,7 +297,8 @@ bool CLR_RT_EventCache::VirtualMethodTable::FindVirtualMethod(const CLR_RT_TypeD
       }
     else
       {
-      if (g_CLR_RT_TypeSystem.FindVirtualMethodDef(cls, mdVirtual, md) == false) return false;
+      if (g_CLR_RT_TypeSystem.FindVirtualMethodDef(cls, mdVirtual, md) == false)
+        return false;
 
       idx = GetNewEntry();
 
@@ -314,16 +317,16 @@ bool CLR_RT_EventCache::VirtualMethodTable::FindVirtualMethod(const CLR_RT_TypeD
   return true;
   }
 
-void CLR_RT_EventCache::VirtualMethodTable::MoveEntryToTop(Link *entries, CLR_UINT32 slot, CLR_UINT32 idx)
+void CLR_RT_EventCache::VirtualMethodTable::MoveEntryToTop(Link *entries, uint32_t slot, uint32_t idx)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   Link &list = entries[slot];
 
   if (list.m_next != idx)
     {
     Link &node = entries[idx];
-    CLR_UINT32 next;
-    CLR_UINT32 prev;
+    uint32_t next;
+    uint32_t prev;
 
     //
     // Unlink.
@@ -353,7 +356,6 @@ void CLR_RT_EventCache::VirtualMethodTable::MoveEntryToTop(Link *entries, CLR_UI
 
 void CLR_RT_EventCache::EventCache_Initialize()
   {
-  NATIVE_PROFILE_CLR_CORE();
   NANOCLR_CLEAR(*this);
 
   m_events = (BoundedList *)&m_scratch[0];
@@ -383,12 +385,12 @@ void CLR_RT_EventCache::EventCache_Initialize()
 #endif    
   }
 
-CLR_UINT32 CLR_RT_EventCache::EventCache_Cleanup()
+uint32_t CLR_RT_EventCache::EventCache_Cleanup()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   BoundedList *lst = m_events;
   size_t       num = c_maxFastLists;
-  CLR_UINT32   tot = 0;
+  uint32_t   tot = 0;
 
   while (num--)
     {
@@ -413,9 +415,9 @@ CLR_UINT32 CLR_RT_EventCache::EventCache_Cleanup()
 
 void CLR_RT_EventCache::Append_Node(CLR_RT_HeapBlock *node)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock_Node *ptr = (CLR_RT_HeapBlock_Node *)node;
-  CLR_UINT32             blocks = ptr->DataSize();
+  uint32_t blocks = ptr->DataSize();
   BoundedList &lst = m_events[blocks < c_maxFastLists ? blocks : 0];
 
   ptr->ChangeDataType(DATATYPE_CACHEDBLOCK);
@@ -426,22 +428,17 @@ void CLR_RT_EventCache::Append_Node(CLR_RT_HeapBlock *node)
   ptr->Debug_ClearBlock(0xAB);
 
   lst.m_blocks.LinkAtBack(ptr);
-
-#if defined(NANOCLR_PROFILE_NEW_ALLOCATIONS)
-  g_CLR_PRF_Profiler.TrackObjectDeletion(node);
-#endif
   }
 
-CLR_RT_HeapBlock *CLR_RT_EventCache::Extract_Node_Slow(CLR_UINT32 dataType, CLR_UINT32 flags, CLR_UINT32 blocks)
+CLR_RT_HeapBlock *CLR_RT_EventCache::Extract_Node_Slow(uint32_t dataType, uint32_t flags, uint32_t blocks)
   {
-  NATIVE_PROFILE_CLR_CORE();
   CLR_RT_HeapBlock_Node *ptr;
   CLR_RT_HeapBlock_Node *best = NULL;
-  CLR_UINT32             bestSize = 0;
+  uint32_t             bestSize = 0;
 
   NANOCLR_FOREACH_NODE(CLR_RT_HeapBlock_Node, ptr, m_events[0].m_blocks)
     {
-    CLR_UINT32 size = ptr->DataSize();
+    uint32_t size = ptr->DataSize();
 
     if (size == blocks)
       {
@@ -494,19 +491,15 @@ CLR_RT_HeapBlock *CLR_RT_EventCache::Extract_Node_Slow(CLR_UINT32 dataType, CLR_
       ptr->Debug_ClearBlock(0xAD);
       }
 
-#if defined(NANOCLR_PROFILE_NEW_ALLOCATIONS)
-    g_CLR_PRF_Profiler.TrackObjectCreation(ptr);
-#endif
-
     return ptr;
     }
 
   return g_CLR_RT_ExecutionEngine.ExtractHeapBlocksForEvents(dataType, flags, blocks);
   }
 
-CLR_RT_HeapBlock *CLR_RT_EventCache::Extract_Node_Fast(CLR_UINT32 dataType, CLR_UINT32 flags, CLR_UINT32 blocks)
+CLR_RT_HeapBlock *CLR_RT_EventCache::Extract_Node_Fast(uint32_t dataType, uint32_t flags, uint32_t blocks)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock_Node *ptr = m_events[blocks].m_blocks.FirstNode();
 
   if (ptr->Next())
@@ -525,25 +518,21 @@ CLR_RT_HeapBlock *CLR_RT_EventCache::Extract_Node_Fast(CLR_UINT32 dataType, CLR_
       ptr->Debug_ClearBlock(0xAD);
       }
 
-#if defined(NANOCLR_PROFILE_NEW_ALLOCATIONS)
-    g_CLR_PRF_Profiler.TrackObjectCreation(ptr);
-#endif
-
     return ptr;
     }
 
   return g_CLR_RT_ExecutionEngine.ExtractHeapBlocksForEvents(dataType, flags, blocks);
   }
 
-CLR_RT_HeapBlock *CLR_RT_EventCache::Extract_Node_Bytes(CLR_UINT32 dataType, CLR_UINT32 flags, CLR_UINT32 bytes)
+CLR_RT_HeapBlock *CLR_RT_EventCache::Extract_Node_Bytes(uint32_t dataType, uint32_t flags, uint32_t bytes)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   return Extract_Node(dataType, flags, CONVERTFROMSIZETOHEAPBLOCKS(bytes));
   }
 
-CLR_RT_HeapBlock *CLR_RT_EventCache::Extract_Node(CLR_UINT32 dataType, CLR_UINT32 flags, CLR_UINT32 blocks)
+CLR_RT_HeapBlock *CLR_RT_EventCache::Extract_Node(uint32_t dataType, uint32_t flags, uint32_t blocks)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
 #if defined(NANOCLR_FORCE_GC_BEFORE_EVERY_ALLOCATION)        
   return g_CLR_RT_ExecutionEngine.ExtractHeapBlocksForEvents(dataType, flags, blocks);
 #else
@@ -554,9 +543,8 @@ CLR_RT_HeapBlock *CLR_RT_EventCache::Extract_Node(CLR_UINT32 dataType, CLR_UINT3
 
 //--//
 
-bool CLR_RT_EventCache::FindVirtualMethod(const CLR_RT_TypeDef_Index &cls, const CLR_RT_MethodDef_Index &mdVirtual, CLR_RT_MethodDef_Index &md)
+bool CLR_RT_EventCache::FindVirtualMethod(uint32_t cls, uint32_t mdVirtual, uint32_t &md)
   {
-  NATIVE_PROFILE_CLR_CORE();
   return m_lookup_VirtualMethod.FindVirtualMethod(cls, mdVirtual, md);
   }
 
@@ -586,6 +574,3 @@ bool CLR_RT_EventCache::FreeInlineBuffer(CLR_RT_InlineBuffer *pBuffer)
   return true;
   }
 #endif
-
-////////////////////////////////////////////////////////////////////////////////
-

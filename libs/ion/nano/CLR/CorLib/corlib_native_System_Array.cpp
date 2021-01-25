@@ -9,8 +9,8 @@ static HRESULT Clear(CLR_RT_StackFrame &stack, CLR_RT_HeapBlock &arg, int index,
   {
   (void)stack;
 
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Array *array;
   int                     numElem;
@@ -38,8 +38,8 @@ static HRESULT Copy(CLR_RT_StackFrame &stack, CLR_RT_HeapBlock &argSrc, int inde
   {
   (void)stack;
 
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   if (length)
     {
@@ -54,8 +54,8 @@ static HRESULT Copy(CLR_RT_StackFrame &stack, CLR_RT_HeapBlock &argSrc, int inde
 
 static HRESULT TrySzIndexOf(CLR_RT_StackFrame &stack, CLR_RT_HeapBlock &argSrc, CLR_RT_HeapBlock &match, int start, int stop, bool fForward, CLR_RT_HeapBlock &retValue)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   int index;
   bool fRet;
@@ -88,8 +88,8 @@ static HRESULT TrySzIndexOf(CLR_RT_StackFrame &stack, CLR_RT_HeapBlock &argSrc, 
 
 HRESULT Library_corlib_native_CanFly_Runtime::GetArrayAt___STATIC__OBJECT__SystemArray__I4(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock &thisRef = stack.ThisRef();
   int               index = stack.Arg1().NumericByRef().s4;
@@ -108,8 +108,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::GetArrayAt___STATIC__OBJECT__Syste
 
 HRESULT Library_corlib_native_CanFly_Runtime::SetArrayAt___STATIC__VOID__SystemArray__I4__OBJECT(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock &thisRef = stack.ThisRef();
   int               index = stack.Arg1().NumericByRef().s4;
@@ -123,8 +123,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::SetArrayAt___STATIC__VOID__SystemA
 
 HRESULT Library_corlib_native_CanFly_Runtime::GetArrayLength___STATIC__I4__SystemArray(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_CHECK_HRESULT(CLR_Checks::VerifyArrayReference(stack.Arg0()));
 
@@ -135,8 +135,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::GetArrayLength___STATIC__I4__Syste
 
 HRESULT Library_corlib_native_CanFly_Runtime::Copy___STATIC__VOID__SystemArray__I4__SystemArray__I4__I4(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(Copy(stack, stack.Arg0(), stack.Arg1().NumericByRef().s4, stack.Arg2(), stack.Arg3().NumericByRef().s4, stack.Arg4().NumericByRef().s4));
 
@@ -145,8 +145,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::Copy___STATIC__VOID__SystemArray__
 
 HRESULT Library_corlib_native_CanFly_Runtime::Clear___STATIC__VOID__SystemArray__I4__I4(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(Clear(stack, stack.Arg0(), stack.Arg1().NumericByRef().s4, stack.Arg2().NumericByRef().s4));
 
@@ -155,12 +155,12 @@ HRESULT Library_corlib_native_CanFly_Runtime::Clear___STATIC__VOID__SystemArray_
 
 HRESULT Library_corlib_native_CanFly_Runtime::TrySzIndexOf___STATIC__BOOLEAN__SystemArray__I4__I4__OBJECT__BYREF_I4(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
-  CLR_INT32 start = stack.Arg1().NumericByRefConst().s4;
-  CLR_INT32 count = stack.Arg2().NumericByRefConst().s4;
-  CLR_INT32 stop = start + count;
+  int32_t start = stack.Arg1().NumericByRefConst().s4;
+  int32_t count = stack.Arg2().NumericByRefConst().s4;
+  int32_t stop = start + count;
 
   NANOCLR_SET_AND_LEAVE(TrySzIndexOf(stack, stack.Arg0(), stack.Arg3(), start, stop, true, stack.Arg4()));
 

@@ -9,8 +9,8 @@
 
 HRESULT Library_nf_system_collections_System_Collections_Stack::Clear___VOID( CLR_RT_StackFrame& stack )
 {
-    NATIVE_PROFILE_CLR_CORE();
-    NANOCLR_HEADER();
+   
+    HRESULT hr;
 
     CLR_RT_HeapBlock_Stack* pThis = (CLR_RT_HeapBlock_Stack*)stack.This(); FAULT_ON_NULL(pThis);
 
@@ -21,8 +21,8 @@ HRESULT Library_nf_system_collections_System_Collections_Stack::Clear___VOID( CL
 
 HRESULT Library_nf_system_collections_System_Collections_Stack::Peek___OBJECT( CLR_RT_StackFrame& stack )
 {
-    NATIVE_PROFILE_CLR_CORE();
-    NANOCLR_HEADER();
+   
+    HRESULT hr;
 
     CLR_RT_HeapBlock_Stack* pThis = (CLR_RT_HeapBlock_Stack*)stack.This(); FAULT_ON_NULL(pThis);
     CLR_RT_HeapBlock*       value;
@@ -37,8 +37,8 @@ HRESULT Library_nf_system_collections_System_Collections_Stack::Peek___OBJECT( C
 
 HRESULT Library_nf_system_collections_System_Collections_Stack::Pop___OBJECT( CLR_RT_StackFrame& stack )
 {
-    NATIVE_PROFILE_CLR_CORE();
-    NANOCLR_HEADER();
+   
+    HRESULT hr;
 
     CLR_RT_HeapBlock_Stack* pThis = (CLR_RT_HeapBlock_Stack*)stack.This(); FAULT_ON_NULL(pThis);
     CLR_RT_HeapBlock*       value;
@@ -52,8 +52,8 @@ HRESULT Library_nf_system_collections_System_Collections_Stack::Pop___OBJECT( CL
 
 HRESULT Library_nf_system_collections_System_Collections_Stack::Push___VOID__OBJECT( CLR_RT_StackFrame& stack )
 {
-    NATIVE_PROFILE_CLR_CORE();
-    NANOCLR_HEADER();
+   
+    HRESULT hr;
 
     CLR_RT_HeapBlock_Stack* pThis = (CLR_RT_HeapBlock_Stack*)stack.This(); FAULT_ON_NULL(pThis);
 

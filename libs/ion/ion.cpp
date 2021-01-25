@@ -45,7 +45,6 @@ extern "C" {
 
 // include the runtime interface
 #include "nano/CLR/Include/nanoCLR_Runtime.h"
-#include "nano/CLR/Include/WireProtocol_Message.h"
 
 static semaphore_p ion_mutex;
 
@@ -58,7 +57,7 @@ CLR_RT_TypeSystem          g_CLR_RT_TypeSystem;
 CLR_RT_EventCache          g_CLR_RT_EventCache;
 CLR_RT_GarbageCollector    g_CLR_RT_GarbageCollector;
 
-CLR_UINT32 g_buildCRC = 0xBAADF00D;
+uint32_t g_buildCRC = 0xBAADF00D;
 
 static uint8_t *heap_base = 0;
 // 8mb
@@ -79,11 +78,6 @@ void HeapLocation(unsigned char *&base_address, unsigned int &size_in_bytes)
 
 // these interface from the nano debugger
 int WP_ReceiveBytes(uint8_t *ptr, unsigned short *size)
-  {
-  return 0;
-  }
-
-int WP_TransmitMessage(WP_Message *message)
   {
   return 0;
   }
@@ -350,7 +344,7 @@ result_t ion_create(ion_context_t *ion_context)
     }
 
   // start the debugger handlers.
-  CLR_DBG_Debugger::Debugger_Discovery();
+  // CLR_DBG_Debugger::Debugger_Discovery();
 
   // load all of the assemblies defined in the startup registry key
   char startup_assembly[REG_STRING_MAX];
@@ -393,10 +387,6 @@ result_t ion_create(ion_context_t *ion_context)
     return result;
     }
 
-#if defined(NANOCLR_PROFILE_HANDLER)
-  CLR_PROF_Handler::Calibrate();
-#endif
-
 #if !defined(BUILD_RTM)
   if (result == CLR_E_TYPE_UNAVAILABLE)
     {
@@ -416,9 +406,9 @@ result_t ion_create(ion_context_t *ion_context)
   return result;
   }
 
-  extern "C" {
-    extern result_t pen_init();
-    }
+extern "C" {
+  extern result_t pen_init();
+  }
 
 void ion_run(void *arg)
   {
@@ -434,12 +424,10 @@ void ion_run(void *arg)
   if (failed(result = reg_get_bool(ion_context->home, "debug-after-exit", &enter_debugger_after_exit)))
     enter_debugger_after_exit = false;
 
-  bool softReboot;
+  bool softReboot = false;
 
   do
     {
-    softReboot = false;
-
     pen_init();
 
     CLR_RT_Assembly::InitString();
@@ -449,34 +437,19 @@ void ion_run(void *arg)
 
     result_t result = g_CLR_RT_ExecutionEngine.Execute(NULL, max_context_switches);
 
+    // notify debugger the program has exited
+    debug_program_exit(0);
+
     // this could be a reboot
-    if (CLR_EE_DBG_IS_NOT(RebootPending))
+    if ((g_CLR_RT_ExecutionEngine.m_iDebugger_Conditions & c_fDebugger_RebootPending) == 0)
       {
       CLR_EE_DBG_SET_MASK(StateProgramExited, StateMask);
-      CLR_EE_DBG_EVENT_BROADCAST(CLR_DBG_Commands::c_Monitor_ProgramExit, 0, NULL, WP_Flags_c_NonCritical);
 
+      // break into the debugger, return s_ok to restart
+      if (failed(debug_break()))
+        break;    // exit the interpreter
 
-      if (enter_debugger_after_exit)
-        CLR_DBG_Debugger::Debugger_WaitForCommands();
-      }
-
-    // DO NOT USE 'ELSE IF' here because the state can change in Debugger_WaitForCommands() call
-
-    if (CLR_EE_DBG_IS(RebootPending))
-      {
-      if (CLR_EE_REBOOT_IS(ClrOnly))
-        {
-        softReboot = true;
-
-        enter_debugger_after_exit = CLR_EE_REBOOT_IS(WaitForDebugger);
-
-        //nanoHAL_Uninitialize();
-
-        //re-init the hal for the reboot (initially it is called in bootentry)
-        //nanoHAL_Initialize();
-        }
-      else
-        break;        // TODO: reset the device....
+      softReboot = true;
       }
     } while (softReboot);
 

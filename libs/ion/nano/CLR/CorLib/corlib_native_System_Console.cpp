@@ -12,7 +12,7 @@
 
 HRESULT Library_corlib_native_CanFly_Runtime::OutNative___STATIC__VOID__STRING__BOOLEAN(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER();
+  HRESULT hr;
 
 #if defined(_WIN32)
   return stack.NotImplementedStub();

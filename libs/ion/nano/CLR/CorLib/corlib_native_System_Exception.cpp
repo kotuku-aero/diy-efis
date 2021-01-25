@@ -9,7 +9,7 @@
 struct ExceptionLookup
   {
   HRESULT hr;
-  CLR_RT_TypeDef_Index *ptr;
+  uint32_t *ptr;
   };
 
 
@@ -35,15 +35,15 @@ static const ExceptionLookup c_ExceptionLookup[] =
 
 HRESULT SetStackTrace(CLR_RT_HeapBlock &ref, CLR_RT_StackFrame *stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   if (stack)
     {
     CLR_RT_HeapBlock *obj;
     CLR_RT_HeapBlock_Array *the_array;
     StackTrace *dst;
-    CLR_UINT32              depth;
+    uint32_t              depth;
 
     if (CLR_RT_ExecutionEngine::IsInstanceOf(ref, g_CLR_RT_WellKnownTypes.m_Exception) == false)
       NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
@@ -70,8 +70,8 @@ HRESULT SetStackTrace(CLR_RT_HeapBlock &ref, CLR_RT_StackFrame *stack)
 
     NANOCLR_FOREACH_NODE_BACKWARD__DIRECT(CLR_RT_StackFrame, stackSub, stack)
       {
-      dst->m_md = stackSub->m_call;
-      dst->m_IP = (CLR_UINT32)(stackSub->m_IP - stackSub->m_IPstart);
+      dst->m_md = stackSub->m_call.m_index;
+      dst->m_IP = (uint32_t)(stackSub->m_IP - stackSub->m_IPstart);
 
       dst++;
       }
@@ -96,10 +96,10 @@ HRESULT SetStackTrace(CLR_RT_HeapBlock &ref, CLR_RT_StackFrame *stack)
         - S_OK.
         - S_FALSE.  ref points to the pre-allocated OutOfMemory exception
 */
-HRESULT ExceptionCreateInstance(CLR_RT_HeapBlock &ref, const CLR_RT_TypeDef_Index &cls, HRESULT hrIn, CLR_RT_StackFrame *stack)
+HRESULT ExceptionCreateInstance(CLR_RT_HeapBlock &ref, uint32_t cls, HRESULT hrIn, CLR_RT_StackFrame *stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock *obj;
 
@@ -119,7 +119,7 @@ HRESULT ExceptionCreateInstance(CLR_RT_HeapBlock &ref, const CLR_RT_TypeDef_Inde
 
   obj = ref.Dereference();
 
-  obj[Library_corlib_native_System_Exception::FIELD__HResult].SetInteger((CLR_UINT32)hrIn);
+  obj[Library_corlib_native_System_Exception::FIELD__HResult].SetInteger((uint32_t)hrIn);
 
   if (hr == S_OK)
     {
@@ -135,8 +135,8 @@ HRESULT ExceptionCreateInstance(CLR_RT_HeapBlock &ref, const CLR_RT_TypeDef_Inde
 
 HRESULT ExceptionCreateInstance(CLR_RT_HeapBlock &ref, HRESULT hrIn, CLR_RT_StackFrame *stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_TypeDef_Index *cls = &g_CLR_RT_WellKnownTypes.m_Exception;
+ 
+  uint32_t *cls = &g_CLR_RT_WellKnownTypes.m_Exception;
 
   _ASSERTE(FAILED(hrIn));
 
@@ -154,13 +154,13 @@ HRESULT ExceptionCreateInstance(CLR_RT_HeapBlock &ref, HRESULT hrIn, CLR_RT_Stac
 
 CLR_RT_HeapBlock *ExceptionGetTarget(CLR_RT_HeapBlock &ref)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   return CLR_RT_ExecutionEngine::IsInstanceOf(ref, g_CLR_RT_WellKnownTypes.m_Exception) ? ref.Dereference() : NULL;
   }
 
-StackTrace *GetStackTrace(CLR_RT_HeapBlock *obj, CLR_UINT32 &depth)
+StackTrace *GetStackTrace(CLR_RT_HeapBlock *obj, uint32_t &depth)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   if (obj)
     {
     CLR_RT_HeapBlock_Array *array = obj[Library_corlib_native_System_Exception::FIELD___stackTrace].DereferenceArray();
@@ -182,8 +182,8 @@ StackTrace *GetStackTrace(CLR_RT_HeapBlock *obj, CLR_UINT32 &depth)
 
 HRESULT Library_corlib_native_CanFly_Runtime::GetStackTrace___STATIC__STRING__SystemException(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Array *pArray;
   StackTrace *pStackTrace;

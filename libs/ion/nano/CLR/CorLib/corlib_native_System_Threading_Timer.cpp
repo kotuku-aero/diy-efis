@@ -8,15 +8,15 @@
 
 static bool CheckDisposed(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
 
   return CLR_RT_HeapBlock_Timer::CheckDisposed(stack);
   }
 
-static HRESULT SetValues(CLR_RT_StackFrame &stack, CLR_UINT32 flags)
+static HRESULT SetValues(CLR_RT_StackFrame &stack, uint32_t flags)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(CLR_RT_HeapBlock_Timer::ConfigureObject(stack, flags));
 
@@ -25,8 +25,8 @@ static HRESULT SetValues(CLR_RT_StackFrame &stack, CLR_UINT32 flags)
 
 HRESULT Library_corlib_native_CanFly_Runtime::TimerDispose___STATIC__VOID__SystemThreadingTimer(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   (void)SetValues(stack, CLR_RT_HeapBlock_Timer::c_ACTION_Destroy);
 
@@ -35,8 +35,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::TimerDispose___STATIC__VOID__Syste
 
 HRESULT Library_corlib_native_CanFly_Runtime::TimerCtor___STATIC__VOID__SystemThreadingTimer__SystemThreadingTimerCallback__OBJECT__I4__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(SetValues(stack, CLR_RT_HeapBlock_Timer::c_ACTION_Create | CLR_RT_HeapBlock_Timer::c_INPUT_Int32));
 
@@ -46,8 +46,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::TimerCtor___STATIC__VOID__SystemTh
 /*
 HRESULT Library_corlib_native_CanFly_Runtime::_ctor___VOID__SystemThreadingTimerCallback__OBJECT__SystemTimeSpan__SystemTimeSpan(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(SetValues(stack, CLR_RT_HeapBlock_Timer::c_ACTION_Create | CLR_RT_HeapBlock_Timer::c_INPUT_TimeSpan));
 
@@ -57,8 +57,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::_ctor___VOID__SystemThreadingTimer
 
 HRESULT Library_corlib_native_CanFly_Runtime::TimerChange___STATIC__BOOLEAN__SystemThreadingTimer__I4__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   if (CheckDisposed(stack))
     {
@@ -75,8 +75,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::TimerChange___STATIC__BOOLEAN__Sys
 /*
 HRESULT Library_corlib_native_CanFly_Runtime::Change___BOOLEAN__SystemTimeSpan__SystemTimeSpan(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   if (CheckDisposed(stack))
     {

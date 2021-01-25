@@ -7,17 +7,14 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-CLR_UINT32 CLR_RT_GarbageCollector::ExecuteCompaction()
+uint32_t CLR_RT_GarbageCollector::ExecuteCompaction()
   {
-  NATIVE_PROFILE_CLR_CORE();
-#if defined(NANOCLR_PROFILE_NEW_ALLOCATIONS)
-  g_CLR_PRF_Profiler.RecordHeapCompactionBegin();
-#endif
+ 
 
 #if defined(NANOCLR_TRACE_MEMORY_STATS)
   if (s_CLR_RT_fTrace_MemoryStats >= c_CLR_RT_Trace_Info)
     {
-    CLR_Debug::Printf("GC: performing heap compaction\r\n");
+    trace_debug("GC: performing heap compaction\r\n");
     }
 #endif
 
@@ -31,15 +28,10 @@ CLR_UINT32 CLR_RT_GarbageCollector::ExecuteCompaction()
 
   m_numberOfCompactions++;
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////
-#if defined(NANOCLR_PROFILE_NEW_ALLOCATIONS)
-  g_CLR_PRF_Profiler.RecordHeapCompactionEnd();
-#endif
-
 #if defined(NANOCLR_TRACE_MEMORY_STATS)
   if (s_CLR_RT_fTrace_MemoryStats >= c_CLR_RT_Trace_Info)
     {
-    CLR_Debug::Printf("GC: heap compaction completed\r\n");
+    trace_debug("GC: heap compaction completed\r\n");
     }
 #endif
 
@@ -50,7 +42,7 @@ CLR_UINT32 CLR_RT_GarbageCollector::ExecuteCompaction()
 
 void CLR_RT_GarbageCollector::Heap_Compact()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
 
   ValidatePointers();
 
@@ -124,14 +116,14 @@ void CLR_RT_GarbageCollector::Heap_Compact()
 #if NANOCLR_VALIDATE_HEAP >= NANOCLR_VALIDATE_HEAP_4_CompactionPlus
       if (IsBlockInFreeList(g_CLR_RT_ExecutionEngine.m_heap, freeRegion, true) == false)
         {
-        CLR_Debug::Printf("'freeRegion' is not in a free list!! %08x\r\n", freeRegion);
+        trace_debug("'freeRegion' is not in a free list!! %08x\r\n", freeRegion);
 
         NANOCLR_DEBUG_STOP();
         }
 
       if (IsBlockInFreeList(g_CLR_RT_ExecutionEngine.m_heap, currentSource, false))
         {
-        CLR_Debug::Printf("'currentSource' is in a free list!! %08x\r\n", currentSource);
+        trace_debug("'currentSource' is in a free list!! %08x\r\n", currentSource);
 
         NANOCLR_DEBUG_STOP();
         }
@@ -152,13 +144,13 @@ void CLR_RT_GarbageCollector::Heap_Compact()
         }
 
       {
-      CLR_UINT32 move = 0;
-      CLR_UINT32 freeRegion_Size = freeRegion->DataSize();
+      uint32_t move = 0;
+      uint32_t freeRegion_Size = freeRegion->DataSize();
       bool       fSlide;
 
-      relocCurrent->m_destination = (CLR_UINT8 *)freeRegion;
-      relocCurrent->m_start = (CLR_UINT8 *)currentSource;
-      relocCurrent->m_offset = (CLR_UINT32)(relocCurrent->m_destination - relocCurrent->m_start);
+      relocCurrent->m_destination = (uint8_t *)freeRegion;
+      relocCurrent->m_start = (uint8_t *)currentSource;
+      relocCurrent->m_offset = (uint32_t)(relocCurrent->m_destination - relocCurrent->m_start);
 
 
       //
@@ -168,7 +160,7 @@ void CLR_RT_GarbageCollector::Heap_Compact()
         {
         while (currentSource < currentSource_end && currentSource->IsFlagSet(CLR_RT_HeapBlock::HB_Unmovable) == false)
           {
-          CLR_UINT32 len = currentSource->DataSize();
+          uint32_t len = currentSource->DataSize();
 
           currentSource += len;
           move += len;
@@ -180,7 +172,7 @@ void CLR_RT_GarbageCollector::Heap_Compact()
         {
         while (freeRegion_Size && currentSource < currentSource_end && currentSource->IsFlagSet(CLR_RT_HeapBlock::HB_Unmovable) == false)
           {
-          CLR_UINT32 len = currentSource->DataSize();
+          uint32_t len = currentSource->DataSize();
 
           if (freeRegion_Size < len)
             {
@@ -205,7 +197,7 @@ void CLR_RT_GarbageCollector::Heap_Compact()
           currentSource += currentSource->DataSize();
           }
 
-        CLR_UINT32 moveBytes = move * sizeof(*currentSource);
+        uint32_t moveBytes = move * sizeof(*currentSource);
 
         relocCurrent->m_end = relocCurrent->m_start + moveBytes;
 
@@ -291,15 +283,15 @@ void CLR_RT_GarbageCollector::Heap_Compact()
 
 void CLR_RT_GarbageCollector::Heap_Relocate_Prepare(RelocationRegion *blocks, size_t total)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   m_relocBlocks = blocks;
   m_relocTotal = total;
   m_relocCount = 0;
   }
 
-void CLR_RT_GarbageCollector::Heap_Relocate_AddBlock(CLR_UINT8 *dst, CLR_UINT8 *src, CLR_UINT32 length)
+void CLR_RT_GarbageCollector::Heap_Relocate_AddBlock(uint8_t *dst, uint8_t *src, uint32_t length)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   RelocationRegion *reloc = m_relocBlocks;
   size_t            count = m_relocCount;
 
@@ -321,7 +313,7 @@ void CLR_RT_GarbageCollector::Heap_Relocate_AddBlock(CLR_UINT8 *dst, CLR_UINT8 *
   reloc->m_start = src;
   reloc->m_end = &src[length];
   reloc->m_destination = dst;
-  reloc->m_offset = (CLR_UINT32)(dst - src);
+  reloc->m_offset = (uint32_t)(dst - src);
 
   if (++m_relocCount == m_relocTotal)
     {
@@ -331,13 +323,13 @@ void CLR_RT_GarbageCollector::Heap_Relocate_AddBlock(CLR_UINT8 *dst, CLR_UINT8 *
 
 void CLR_RT_GarbageCollector::Heap_Relocate()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   if (m_relocCount)
     {
     RelocationRegion *relocBlocks = m_relocBlocks;
 
-    CLR_UINT8 *relocMinimum = relocBlocks->m_start;
-    CLR_UINT8 *relocMaximum = relocBlocks->m_end;
+    uint8_t *relocMinimum = relocBlocks->m_start;
+    uint8_t *relocMaximum = relocBlocks->m_end;
 
     for (size_t i = 0; i < m_relocCount; i++, relocBlocks++)
       {
@@ -352,10 +344,6 @@ void CLR_RT_GarbageCollector::Heap_Relocate()
 
     Heap_Relocate_Pass(NULL);
 
-#if defined(NANOCLR_PROFILE_NEW_ALLOCATIONS)
-    g_CLR_PRF_Profiler.TrackObjectRelocation();
-#endif
-
     ValidatePointers();
 
     TestPointers_PopulateNew();
@@ -366,7 +354,7 @@ void CLR_RT_GarbageCollector::Heap_Relocate()
 
 void CLR_RT_GarbageCollector::Heap_Relocate_Pass(RelocateFtn ftn)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
 
 #if NANOCLR_VALIDATE_HEAP > NANOCLR_VALIDATE_HEAP_0_None
   m_relocWorker = ftn;
@@ -394,9 +382,9 @@ void CLR_RT_GarbageCollector::Heap_Relocate_Pass(RelocateFtn ftn)
 
 //--//
 
-void CLR_RT_GarbageCollector::Heap_Relocate(CLR_RT_HeapBlock *lst, CLR_UINT32 len)
+void CLR_RT_GarbageCollector::Heap_Relocate(CLR_RT_HeapBlock *lst, uint32_t len)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   while (len--)
     {
     CLR_RT_HEAPBLOCK_RELOCATE(lst);
@@ -407,8 +395,8 @@ void CLR_RT_GarbageCollector::Heap_Relocate(CLR_RT_HeapBlock *lst, CLR_UINT32 le
 
 void CLR_RT_GarbageCollector::Heap_Relocate(void **ref)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_UINT8 *dst = (CLR_UINT8 *)*ref;
+ 
+  uint8_t *dst = (uint8_t *)*ref;
 
 #if NANOCLR_VALIDATE_HEAP > NANOCLR_VALIDATE_HEAP_0_None
   if (g_CLR_RT_GarbageCollector.m_relocWorker)
@@ -452,8 +440,8 @@ void CLR_RT_GarbageCollector::Heap_Relocate(void **ref)
 
 bool CLR_RT_GarbageCollector::Relocation_JustCheck(void **ref)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_UINT8 *dst = (CLR_UINT8 *)*ref;
+ 
+  uint8_t *dst = (uint8_t *)*ref;
 
   if (dst)
     {

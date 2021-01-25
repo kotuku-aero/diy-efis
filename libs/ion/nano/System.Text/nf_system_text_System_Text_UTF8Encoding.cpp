@@ -9,8 +9,8 @@
 
 HRESULT Library_nf_system_text_System_Text_UTF8Encoding::GetBytes___SZARRAY_U1__STRING( CLR_RT_StackFrame& stack )
 {
-    NATIVE_PROFILE_CLR_CORE();
-    NANOCLR_HEADER();
+   
+    HRESULT hr;
 
     size_t                  cBytes;
     CLR_RT_HeapBlock_Array* arr;
@@ -20,7 +20,7 @@ HRESULT Library_nf_system_text_System_Text_UTF8Encoding::GetBytes___SZARRAY_U1__
     str    = stack.Arg1().RecoverString(); FAULT_ON_NULL(str);
     cBytes = hal_strlen_s(str);    
 
-    NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_Array::CreateInstance( ret, (CLR_UINT32)cBytes, g_CLR_RT_WellKnownTypes.m_UInt8 ));
+    NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_Array::CreateInstance( ret, (uint32_t)cBytes, g_CLR_RT_WellKnownTypes.m_UInt8 ));
 
     arr = ret.DereferenceArray();
 
@@ -31,17 +31,17 @@ HRESULT Library_nf_system_text_System_Text_UTF8Encoding::GetBytes___SZARRAY_U1__
 
 HRESULT Library_nf_system_text_System_Text_UTF8Encoding::GetBytes___I4__STRING__I4__I4__SZARRAY_U1__I4( CLR_RT_StackFrame& stack )
 {
-    NATIVE_PROFILE_CLR_CORE();
-    NANOCLR_HEADER();
+   
+    HRESULT hr;
 
     const char*             str         = stack.Arg1().RecoverString();
-    CLR_INT32               strIdx      = stack.Arg2().NumericByRef().s4;
-    CLR_INT32               strCnt      = stack.Arg3().NumericByRef().s4;
+    int32_t               strIdx      = stack.Arg2().NumericByRef().s4;
+    int32_t               strCnt      = stack.Arg3().NumericByRef().s4;
     CLR_RT_HeapBlock_Array* pArrayBytes = stack.Arg4().DereferenceArray();
-    CLR_INT32               byteIdx     = stack.Arg5().NumericByRef().s4;
+    int32_t               byteIdx     = stack.Arg5().NumericByRef().s4;
 
-    const CLR_UINT8*        i;
-    const CLR_UINT8*        j;
+    const uint8_t*        i;
+    const uint8_t*        j;
     CLR_RT_UnicodeHelper    uh;
     int                     strLength;
 
@@ -53,7 +53,7 @@ HRESULT Library_nf_system_text_System_Text_UTF8Encoding::GetBytes___I4__STRING__
     if (strLength < 0) 
         NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);   
 
-    if ((strIdx + strCnt) > (CLR_INT32)strLength) 
+    if ((strIdx + strCnt) > (int32_t)strLength) 
         NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
 
     uh.ConvertFromUTF8(strIdx, true);
@@ -61,7 +61,7 @@ HRESULT Library_nf_system_text_System_Text_UTF8Encoding::GetBytes___I4__STRING__
     uh.ConvertFromUTF8(strCnt, true);
     j = uh.m_inputUTF8;
 
-    if ((byteIdx + j - i) > (CLR_INT32)pArrayBytes->m_numOfElements) 
+    if ((byteIdx + j - i) > (int32_t)pArrayBytes->m_numOfElements) 
         NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
 
     memcpy(pArrayBytes->GetElement(byteIdx), i, j - i);
@@ -73,8 +73,8 @@ HRESULT Library_nf_system_text_System_Text_UTF8Encoding::GetBytes___I4__STRING__
 
 HRESULT Library_nf_system_text_System_Text_UTF8Encoding::GetChars___SZARRAY_CHAR__SZARRAY_U1( CLR_RT_StackFrame& stack )
 {
-    NATIVE_PROFILE_CLR_CORE();
-    NANOCLR_HEADER();
+   
+    HRESULT hr;
 
     NANOCLR_CHECK_HRESULT(Helper__GetChars( stack, false ));
 
@@ -83,8 +83,8 @@ HRESULT Library_nf_system_text_System_Text_UTF8Encoding::GetChars___SZARRAY_CHAR
 
 HRESULT Library_nf_system_text_System_Text_UTF8Encoding::GetChars___SZARRAY_CHAR__SZARRAY_U1__I4__I4( CLR_RT_StackFrame& stack )
 {
-    NATIVE_PROFILE_CLR_CORE();
-    NANOCLR_HEADER();
+   
+    HRESULT hr;
 
     NANOCLR_CHECK_HRESULT(Helper__GetChars( stack, true ));
 
@@ -93,15 +93,15 @@ HRESULT Library_nf_system_text_System_Text_UTF8Encoding::GetChars___SZARRAY_CHAR
 
 HRESULT Library_nf_system_text_System_Text_UTF8Encoding::Helper__GetChars(CLR_RT_StackFrame& stack, bool fIndexed)
 {
-    NATIVE_PROFILE_CLR_CORE();
-    NANOCLR_HEADER();
+   
+    HRESULT hr;
 
     const char* szText;
     CLR_RT_HeapBlock ref; ref.SetObjectReference( NULL );
     CLR_RT_ProtectFromGC gc( ref );
     CLR_RT_HeapBlock_Array* pArrayBytes = stack.Arg1().DereferenceArray();
-    CLR_INT32               byteIdx     = fIndexed ? stack.Arg2().NumericByRef().s4 : 0;
-    CLR_INT32               byteCnt     = fIndexed ? stack.Arg3().NumericByRef().s4 : pArrayBytes->m_numOfElements;
+    int32_t               byteIdx     = fIndexed ? stack.Arg2().NumericByRef().s4 : 0;
+    int32_t               byteCnt     = fIndexed ? stack.Arg3().NumericByRef().s4 : pArrayBytes->m_numOfElements;
     CLR_RT_HeapBlock_Array* pArrayBytesCopy;
     CLR_RT_HeapBlock_Array* arrTmp;
     int cBytesCopy;
@@ -110,7 +110,7 @@ HRESULT Library_nf_system_text_System_Text_UTF8Encoding::Helper__GetChars(CLR_RT
 
     _ASSERTE(pArrayBytes->m_typeOfElement == DATATYPE_U1);
 
-    if((byteIdx + byteCnt) > (CLR_INT32)pArrayBytes->m_numOfElements)
+    if((byteIdx + byteCnt) > (int32_t)pArrayBytes->m_numOfElements)
       NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
 
     cBytesCopy = byteCnt+1;

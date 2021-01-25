@@ -8,8 +8,8 @@
 
 HRESULT Library_corlib_native_CanFly_Runtime::AnyPendingFinalizers___STATIC__BOOLEAN(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   stack.SetResult_Boolean(g_CLR_RT_ExecutionEngine.m_finalizersPending.IsEmpty() == false
     || (g_CLR_RT_ExecutionEngine.m_finalizerThread != NULL && !g_CLR_RT_ExecutionEngine.m_finalizerThread->CanThreadBeReused()));
@@ -19,8 +19,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::AnyPendingFinalizers___STATIC__BOO
 
 HRESULT Library_corlib_native_CanFly_Runtime::SuppressFinalize___STATIC__VOID__OBJECT(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock *pObj = stack.Arg0().Dereference(); FAULT_ON_NULL(pObj);
 
@@ -31,8 +31,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::SuppressFinalize___STATIC__VOID__O
 
 HRESULT Library_corlib_native_CanFly_Runtime::ReRegisterForFinalize___STATIC__VOID__OBJECT(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_TypeDescriptor desc;
   CLR_RT_HeapBlock *pObj = stack.Arg0().Dereference(); FAULT_ON_NULL(pObj);

@@ -8,8 +8,8 @@
 
 HRESULT Library_corlib_native_CanFly_Runtime::Increment___STATIC__I4__BYREF_I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
   {
   CLR_RT_HeapBlock heapLocation;
   NANOCLR_CHECK_HRESULT(heapLocation.LoadFromReference(stack.Arg0()));
@@ -27,8 +27,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::Increment___STATIC__I4__BYREF_I4(C
 
 HRESULT Library_corlib_native_CanFly_Runtime::Decrement___STATIC__I4__BYREF_I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
   {
   CLR_RT_HeapBlock heapLocation;
   NANOCLR_CHECK_HRESULT(heapLocation.LoadFromReference(stack.Arg0()));
@@ -47,8 +47,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::Decrement___STATIC__I4__BYREF_I4(C
 
 HRESULT Library_corlib_native_CanFly_Runtime::Exchange___STATIC__I4__BYREF_I4__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
   {
   CLR_RT_HeapBlock heapLocation;
   NANOCLR_CHECK_HRESULT(heapLocation.LoadFromReference(stack.Arg0()));
@@ -69,8 +69,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::Exchange___STATIC__I4__BYREF_I4__I
 
 HRESULT Library_corlib_native_CanFly_Runtime::CompareExchange___STATIC__I4__BYREF_I4__I4__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
   {
   CLR_RT_HeapBlock heapLocation;
   NANOCLR_CHECK_HRESULT(heapLocation.LoadFromReference(stack.Arg0()));

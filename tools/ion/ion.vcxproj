@@ -19,12 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\libs\ion\builtin\mscorlib.c" />
-    <ClCompile Include="..\..\libs\ion\comm_service.c" />
-    <ClCompile Include="..\..\libs\ion\debug_service.c" />
     <ClCompile Include="..\..\libs\ion\ion_cli.c" />
     <ClCompile Include="..\..\libs\ion\ion_cli_impl.c" />
     <ClCompile Include="..\..\libs\ion\ion.cpp" />
+    <ClCompile Include="..\..\libs\ion\ion_debugger.c" />
     <ClCompile Include="..\..\libs\ion\nanoCRT.cpp" />
     <ClCompile Include="..\..\libs\ion\neo.c" />
     <ClCompile Include="..\..\libs\ion\runtime\CanFlyMsg.cpp" />
@@ -117,16 +115,10 @@
     <ClCompile Include="..\..\libs\ion\nano\CLR\CorLib\mscorlib\corlib_native.cpp" />
     <ClCompile Include="..\..\libs\ion\nano\CLR\Debugger\Debugger.cpp" />
     <ClCompile Include="..\..\libs\ion\nano\CLR\Diagnostics\Info.cpp" />
-    <ClCompile Include="..\..\libs\ion\nano\CLR\Diagnostics\Profile.cpp" />
-    <ClCompile Include="..\..\libs\ion\nano\CLR\Diagnostics\Profiler.cpp" />
     <ClCompile Include="..\..\libs\ion\nano\CLR\Helpers\Base64\base64.c" />
     <ClCompile Include="..\..\libs\ion\nano\CLR\Helpers\TinyPrintf\printf.c" />
-    <ClCompile Include="..\..\libs\ion\nano\CLR\Messaging\Messaging.cpp" />
-    <ClCompile Include="..\..\libs\ion\nano\CLR\Startup\CLRStartup.cpp" />
     <ClCompile Include="..\..\libs\ion\nano\CLR\System.Math\nf_native_system_math.cpp" />
     <ClCompile Include="..\..\libs\ion\nano\CLR\System.Math\nf_native_system_math_System_Math.cpp" />
-    <ClCompile Include="..\..\libs\ion\nano\CLR\WireProtocol\WireProtocol_App_Interface.c" />
-    <ClCompile Include="..\..\libs\ion\nano\CLR\WireProtocol\WireProtocol_Message.c" />
     <ClCompile Include="..\..\libs\ion\nano\HAL\nanoHAL_SystemInformation.cpp" />
     <ClCompile Include="..\..\libs\ion\nano\HAL\nanoHAL_Time.cpp" />
     <ClCompile Include="..\..\libs\ion\nano\PAL\AsyncProcCall\AsyncCompletions.cpp" />
@@ -143,6 +135,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\libs\ion\ion.h" />
     <ClInclude Include="..\..\libs\ion\ion_cli.h" />
+    <ClInclude Include="..\..\libs\ion\ion_debugger.h" />
     <ClInclude Include="..\..\libs\ion\targetHAL.h" />
     <ClInclude Include="..\..\libs\ion\target_os.h" />
     <ClInclude Include="..\..\libs\ion\nano\CLR\Core\Core.h" />
@@ -160,10 +153,8 @@
     <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_Hardware.h" />
     <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_Headers.h" />
     <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_Interop.h" />
-    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_Messaging.h" />
     <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_ParseOptions.h" />
     <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_PlatformDef.h" />
-    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_Profiling.h" />
     <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_Runtime.h" />
     <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_Runtime__HeapBlock.h" />
     <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_Runtime__Serialization.h" />
@@ -174,12 +165,6 @@
     <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoVersion.h" />
     <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoWeak.h" />
     <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nf_errors_exceptions.h" />
-    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\WireProtocol.h" />
-    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\WireProtocol_App_Interface.h" />
-    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\WireProtocol_HAL_Interface.h" />
-    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\WireProtocol_Message.h" />
-    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\WireProtocol_MonitorCommands.h" />
-    <ClInclude Include="..\..\libs\ion\nano\CLR\Startup\CLRStartup.h" />
     <ClInclude Include="..\..\libs\ion\nano\CLR\System.Math\nf_native_system_math.h" />
     <ClInclude Include="..\..\libs\ion\nano\HAL\Include\nanoHAL.h" />
     <ClInclude Include="..\..\libs\ion\nano\HAL\Include\nanoHAL_ReleaseInfo.h" />
@@ -264,6 +249,7 @@
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <TreatSpecificWarningsAsErrors>4013;%(TreatSpecificWarningsAsErrors)</TreatSpecificWarningsAsErrors>
+      <AdditionalIncludeDirectories>$(SolutionDir)libs\ion\nano\CLR\Include;$(SolutionDir)libs\ion\nano\HAL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -308,6 +294,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)libs\ion\nano\CLR\Include;$(SolutionDir)libs\ion\nano\HAL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

@@ -24,10 +24,10 @@ void CLR_RT_HeapBlock_WeakReference::Relocate()
   CLR_RT_GarbageCollector::Heap_Relocate((void**)&m_targetSerialized);
   }
 
-CLR_UINT32 CLR_RT_HeapBlock_WeakReference_Identity::ComputeCRC(const CLR_UINT8* ptr, CLR_UINT32 len) const
+uint32_t CLR_RT_HeapBlock_WeakReference_Identity::ComputeCRC(const uint8_t* ptr, uint32_t len) const
   {
   NATIVE_PROFILE_CLR_HEAP_PERSISTENCE();
-  CLR_UINT32 hash;
+  uint32_t hash;
 
   hash = SUPPORT_ComputeCRC(ptr, len, g_buildCRC);
   hash = SUPPORT_ComputeCRC(&m_selectorHash, sizeof(m_selectorHash), hash);
@@ -107,7 +107,7 @@ void CLR_RT_HeapBlock_WeakReference::RecoverObjects(CLR_RT_DblLinkedList& lstHea
 HRESULT CLR_RT_HeapBlock_WeakReference::GetTarget(CLR_RT_HeapBlock& targetReference)
   {
   NATIVE_PROFILE_CLR_HEAP_PERSISTENCE();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   if (CLR_RT_BinaryFormatter::SerializationEnabled())
     {
@@ -150,7 +150,7 @@ HRESULT CLR_RT_HeapBlock_WeakReference::GetTarget(CLR_RT_HeapBlock& targetRefere
 HRESULT CLR_RT_HeapBlock_WeakReference::SetTarget(CLR_RT_HeapBlock& targetReference)
   {
   NATIVE_PROFILE_CLR_HEAP_PERSISTENCE();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   // Only classes and value types can be associated with a weak reference!
   if (targetReference.DataType() != DATATYPE_OBJECT)
@@ -167,8 +167,8 @@ HRESULT CLR_RT_HeapBlock_WeakReference::SetTarget(CLR_RT_HeapBlock& targetRefere
 
 HRESULT Library_corlib_native_CanFly_Runtime::WeakReferenceIsAlive___STATIC__BOOLEAN__WEAKCLASS(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_WeakReference* weak;
 
@@ -182,8 +182,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::WeakReferenceIsAlive___STATIC__BOO
 
 HRESULT Library_corlib_native_CanFly_Runtime::GetWeakReferenceTarget___STATIC__OBJECT__WEAKCLASS(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_WeakReference* weak;
 
@@ -197,8 +197,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::GetWeakReferenceTarget___STATIC__O
 
 HRESULT Library_corlib_native_CanFly_Runtime::SetWeakReferenceTarget___STATIC__VOID__WEAKCLASS__OBJECT(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_WeakReference* weak;
 
@@ -212,8 +212,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::SetWeakReferenceTarget___STATIC__V
 
 HRESULT Library_corlib_native_CanFly_Runtime::WeakReferenceCtor___STATIC__VOID__WEAKCLASS__OBJECT(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_WeakReference* weak = (CLR_RT_HeapBlock_WeakReference*)stack.This();
   FAULT_ON_NULL(weak);

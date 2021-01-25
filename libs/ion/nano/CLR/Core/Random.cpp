@@ -7,7 +7,7 @@
 
 void CLR_RT_Random::Initialize()
   {
-  CLR_INT64  st = HAL_Time_CurrentTime();
+  int64_t  st = HAL_Time_CurrentTime();
 
   srand((unsigned int)st);
   }
@@ -22,23 +22,11 @@ uint32_t CLR_RT_Random::Next()
   return rand();
   }
 
-#if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
-
 double CLR_RT_Random::NextDouble()
   {
   // Next() will return value between 0 - 0x7FFFFFFF (inclusive)
   return ((double)rand()) / ((double)0x7FFFFFFF);
   }
-#else
-
-CLR_INT64 CLR_RT_Random::NextDouble()
-  {
-  // Next() will return value between 0 - 0x7FFFFFFF (inclusive)
-
-  return  ((CLR_INT64)rand()) / ((CLR_INT64)0x7FFFFFFF >> CLR_RT_HeapBlock::HB_DoubleShift);
-  }
-
-#endif
 
 void CLR_RT_Random::NextBytes(unsigned char *buffer, unsigned int count)
   {

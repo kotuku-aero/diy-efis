@@ -32,15 +32,15 @@
 // used for tracking exceptions
 struct StackTrace
   {
-  CLR_RT_MethodDef_Index m_md;
-  CLR_UINT32 m_IP;
+  uint32_t m_md;
+  uint32_t m_IP;
   };
 
 extern HRESULT ExceptionCreateInstance(CLR_RT_HeapBlock &ref, HRESULT hrIn, CLR_RT_StackFrame *stack);
-extern HRESULT ExceptionCreateInstance(CLR_RT_HeapBlock &ref, const CLR_RT_TypeDef_Index &cls, HRESULT hr, CLR_RT_StackFrame *stack);
+extern HRESULT ExceptionCreateInstance(CLR_RT_HeapBlock &ref, uint32_t cls, HRESULT hr, CLR_RT_StackFrame *stack);
 extern HRESULT SetStackTrace(CLR_RT_HeapBlock &ref, CLR_RT_StackFrame *stack);
-extern StackTrace *GetStackTrace(CLR_RT_HeapBlock *obj, CLR_UINT32 &depth);
-extern CLR_INT64 *GetValuePtr(CLR_RT_HeapBlock &ref);
+extern StackTrace *GetStackTrace(CLR_RT_HeapBlock *obj, uint32_t &depth);
+extern int64_t *GetValuePtr(CLR_RT_HeapBlock &ref);
 extern CLR_RT_HeapBlock *ExceptionGetTarget(CLR_RT_HeapBlock &ref);
 extern HRESULT ConvertToCharArray(const char *szText, CLR_RT_HeapBlock &ref, CLR_RT_HeapBlock_Array *&array, int startIndex, int length);
 

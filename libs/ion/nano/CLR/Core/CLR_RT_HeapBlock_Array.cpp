@@ -9,19 +9,19 @@
 
 HRESULT CLR_RT_HeapBlock_Array::CreateInstance(
   CLR_RT_HeapBlock &reference,
-  CLR_UINT32 length,
+  uint32_t length,
   const CLR_RT_ReflectionDef_Index &reflex)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Array *pArray;
-  CLR_RT_TypeDef_Index cls;
+  uint32_t cls;
   CLR_RT_TypeDef_Instance inst;
 
   reference.SetObjectReference(NULL);
 
-  if ((CLR_INT32)length < 0)
+  if ((int32_t)length < 0)
     NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
 
   if (reflex.m_kind != REFLECTION_TYPE)
@@ -65,11 +65,11 @@ HRESULT CLR_RT_HeapBlock_Array::CreateInstance(
 
 HRESULT CLR_RT_HeapBlock_Array::CreateInstance(
   CLR_RT_HeapBlock &reference,
-  CLR_UINT32 length,
-  const CLR_RT_TypeDef_Index &cls)
+  uint32_t length,
+  uint32_t cls)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_ReflectionDef_Index reflex;
 
@@ -84,12 +84,12 @@ HRESULT CLR_RT_HeapBlock_Array::CreateInstance(
 
 HRESULT CLR_RT_HeapBlock_Array::CreateInstance(
   CLR_RT_HeapBlock &reference,
-  CLR_UINT32 length,
+  uint32_t length,
   CLR_RT_Assembly *assm,
-  CLR_UINT32 tk)
+  uint32_t tk)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock ref;
   CLR_RT_TypeDef_Instance cls;
@@ -117,11 +117,11 @@ HRESULT CLR_RT_HeapBlock_Array::CreateInstance(
 
 HRESULT CLR_RT_HeapBlock_Array::ClearElements(int index, int length)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   const CLR_RT_ReflectionDef_Index &reflex = ReflectionDataConst();
-  CLR_UINT8 *data = GetElement(index);
+  uint8_t *data = GetElement(index);
 
   CLR_RT_Memory::ZeroFill(data, length * m_sizeOfElement);
 
@@ -163,7 +163,7 @@ HRESULT CLR_RT_HeapBlock_Array::ClearElements(int index, int length)
 
 void CLR_RT_HeapBlock_Array::Relocate()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   //
   // If the array is full of reference types, relocate each of them.
   //
@@ -175,7 +175,7 @@ void CLR_RT_HeapBlock_Array::Relocate()
 
 bool CLR_RT_HeapBlock_Array::CheckRange(int index, int length, int numOfElements)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   if (length < 0)
     return false;
   if (index < 0 || index > numOfElements)
@@ -199,8 +199,8 @@ HRESULT CLR_RT_HeapBlock_Array::IndexOf(
   bool fForward,
   int &index)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   int numElem = array->m_numOfElements;
   int count;
@@ -215,8 +215,8 @@ HRESULT CLR_RT_HeapBlock_Array::IndexOf(
 
   if (count > 0)
     {
-    CLR_UINT8 *data = array->GetFirstElement();
-    CLR_UINT8 sizeElem = array->m_sizeOfElement;
+    uint8_t *data = array->GetFirstElement();
+    uint8_t sizeElem = array->m_sizeOfElement;
     int pos;
     int incr;
 
@@ -291,8 +291,8 @@ HRESULT CLR_RT_HeapBlock_Array::Copy(
   int indexDst,
   int length)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   if (length)
     {
@@ -313,9 +313,9 @@ HRESULT CLR_RT_HeapBlock_Array::Copy(
 
     if (arraySrc->SameHeader(*arrayDst))
       {
-      CLR_UINT8 *dataSrc = arraySrc->GetFirstElement();
-      CLR_UINT8 *dataDst = arrayDst->GetFirstElement();
-      CLR_UINT8 sizeElem = arraySrc->m_sizeOfElement;
+      uint8_t *dataSrc = arraySrc->GetFirstElement();
+      uint8_t *dataDst = arrayDst->GetFirstElement();
+      uint8_t sizeElem = arraySrc->m_sizeOfElement;
 
       dataSrc += indexSrc * sizeElem;
       dataDst += indexDst * sizeElem;

@@ -21,20 +21,11 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // FEATURES
 
-#if defined(PLATFORM_EMULATED_FLOATINGPOINT)
-#define NANOCLR_EMULATED_FLOATINGPOINT // use the fixed point floating point notation in the clr codes
-#endif
-
-#if defined(NANOCLR_USE_APPDOMAINS)
-#define NANOCLR_APPDOMAINS // enables application doman support
-#endif
 #define NANOCLR_TRACE_EXCEPTIONS // enables exception dump support
 #define NANOCLR_TRACE_ERRORS     // enables rich exception dump support
 #if defined(DEBUG) || defined(_DEBUG)
 #define NANOCLR_TRACE_STACK // enables rich eval stack tracing
 #endif
-//#define TINYCLR_TRACE_INSTRUCTIONS 1    // enables tracing of instructions execution
-//#define NANOCLR_TRACE_HRESULT        // enable tracing of HRESULTS from interop libraries
 
 //-o-//-o-//-o-//-o-//-o-//-o-//
 // PLATFORMS
@@ -65,9 +56,6 @@
 
 #define NANOCLR_GC_VERBOSE
 #define NANOCLR_TRACE_MEMORY_STATS
-#define NANOCLR_PROFILE_NEW
-#define NANOCLR_PROFILE_NEW_CALLS
-#define NANOCLR_PROFILE_NEW_ALLOCATIONS
 #if defined(DEBUG) || defined(_DEBUG)
 #define NANOCLR_VALIDATE_HEAP NANOCLR_VALIDATE_HEAP_2_DblLinkedList
 //#define NANOCLR_TRACE_MALLOC
@@ -87,9 +75,6 @@
 #if defined(PLATFORM_ARM) || defined(PLATFORM_ESP32)
 // #define NANOCLR_STRESS_GC
 // #define NANOCLR_GC_VERBOSE
-// #define NANOCLR_PROFILE_NEW
-// #define NANOCLR_PROFILE_NEW_CALLS
-// #define NANOCLR_PROFILE_NEW_ALLOCATIONS
 // #define NANOCLR_TRACE_MEMORY_STATS
 // #define NANOCLR_FORCE_GC_BEFORE_EVERY_ALLOCATION
 #define NANOCLR_VALIDATE_HEAP NANOCLR_VALIDATE_HEAP_0_None
@@ -122,18 +107,6 @@
 
 #if !defined(NANOCLR_VALIDATE_HEAP)
 #define NANOCLR_VALIDATE_HEAP NANOCLR_VALIDATE_HEAP_0_None
-#endif
-
-#if defined(NANOCLR_PROFILE_NEW_CALLS) && !defined(NANOCLR_PROFILE_HANDLER)
-#define NANOCLR_PROFILE_HANDLER
-#endif
-
-#if defined(NANOCLR_PROFILE_NEW_CALLS) && !defined(NANOCLR_PROFILE_NEW)
-#define NANOCLR_PROFILE_NEW
-#endif
-
-#if defined(NANOCLR_PROFILE_NEW_ALLOCATIONS) && !defined(NANOCLR_PROFILE_NEW)
-#define NANOCLR_PROFILE_NEW
 #endif
 
 //-o-//-o-//-o-//-o-//-o-//-o-//

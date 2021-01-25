@@ -10,12 +10,12 @@
 
 HRESULT CLR_RT_HeapBlock_Queue::Dequeue(CLR_RT_HeapBlock *&value)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Array *array = GetArray();
-  CLR_INT32               size = GetSize();
-  CLR_INT32               head = Head();
+  int32_t               size = GetSize();
+  int32_t               head = Head();
   CLR_RT_HeapBlock *removed;
 
   if (size == 0) NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_OPERATION);
@@ -36,13 +36,13 @@ HRESULT CLR_RT_HeapBlock_Queue::Dequeue(CLR_RT_HeapBlock *&value)
 // May Trigger GC, but parameter value will be protected
 HRESULT CLR_RT_HeapBlock_Queue::Enqueue(CLR_RT_HeapBlock *value)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Array *array = GetArray();
-  CLR_INT32               size = GetSize();
-  CLR_INT32               tail = GetTail();
-  CLR_INT32               capacity = array->m_numOfElements;
+  int32_t               size = GetSize();
+  int32_t               tail = GetTail();
+  int32_t               capacity = array->m_numOfElements;
 
   if (size == capacity)
     {
@@ -79,8 +79,8 @@ HRESULT CLR_RT_HeapBlock_Queue::Enqueue(CLR_RT_HeapBlock *value)
 
 HRESULT CLR_RT_HeapBlock_Queue::Peek(CLR_RT_HeapBlock *&value)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   if (GetSize() == 0) NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_OPERATION);
 
@@ -91,13 +91,13 @@ HRESULT CLR_RT_HeapBlock_Queue::Peek(CLR_RT_HeapBlock *&value)
 
 HRESULT CLR_RT_HeapBlock_Queue::Clear()
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Array *array = GetArray();
-  CLR_INT32               size = GetSize();
-  CLR_INT32               head = Head();
-  CLR_INT32               tail = GetTail();
+  int32_t               size = GetSize();
+  int32_t               head = Head();
+  int32_t               tail = GetTail();
 
   if (size > 0)
     {
@@ -122,28 +122,28 @@ HRESULT CLR_RT_HeapBlock_Queue::Clear()
 
 HRESULT CLR_RT_HeapBlock_Queue::ObjArrayMemcpy(CLR_RT_HeapBlock_Array *arraySrc, int indexSrc, CLR_RT_HeapBlock_Array *arrayDst, int indexDst, int length)
   {
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   memcpy(arraySrc->GetElement(indexSrc), arrayDst->GetElement(indexDst), length * sizeof(CLR_RT_HeapBlock));
 
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT CLR_RT_HeapBlock_Queue::CopyTo(CLR_RT_HeapBlock_Array *toArray, CLR_INT32 index)
+HRESULT CLR_RT_HeapBlock_Queue::CopyTo(CLR_RT_HeapBlock_Array *toArray, int32_t index)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Array *array = GetArray();
-  CLR_INT32               size = GetSize();
-  CLR_INT32               head = Head();
-  CLR_INT32               tail = GetTail();
+  int32_t               size = GetSize();
+  int32_t               head = Head();
+  int32_t               tail = GetTail();
 
   // if the target array is of type Object, we don't need to call the complex Array::Copy() since there will be no casting involved
   HRESULT(*arrayCopy)(CLR_RT_HeapBlock_Array *, int, CLR_RT_HeapBlock_Array *, int, int) =
     (toArray->m_typeOfElement == DATATYPE_OBJECT) ? ObjArrayMemcpy : CLR_RT_HeapBlock_Array::Copy;
 
-  if (((CLR_INT32)toArray->m_numOfElements) - index < size) NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
+  if (((int32_t)toArray->m_numOfElements) - index < size) NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
 
   if (size > 0)
     {
@@ -153,7 +153,7 @@ HRESULT CLR_RT_HeapBlock_Queue::CopyTo(CLR_RT_HeapBlock_Array *toArray, CLR_INT3
       }
     else
       {
-      CLR_INT32 firstPart = array->m_numOfElements - head;
+      int32_t firstPart = array->m_numOfElements - head;
 
       NANOCLR_CHECK_HRESULT(arrayCopy(array, head, toArray, index, firstPart));
       NANOCLR_SET_AND_LEAVE(arrayCopy(array, 0, toArray, index + firstPart, tail));

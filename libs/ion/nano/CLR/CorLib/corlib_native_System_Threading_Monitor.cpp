@@ -8,8 +8,8 @@
 
 HRESULT Library_corlib_native_CanFly_Runtime::MonitorEnter___STATIC__VOID__OBJECT(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_StackFrame *caller = NULL;
 
@@ -48,8 +48,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::MonitorEnter___STATIC__VOID__OBJEC
 
 HRESULT Library_corlib_native_CanFly_Runtime::MonitorExit___STATIC__VOID__OBJECT(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_StackFrame *caller = NULL;
 

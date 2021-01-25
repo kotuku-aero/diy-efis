@@ -9,13 +9,13 @@
 
 void CLR_RT_ObjectToEvent_Destination::Initialize()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   m_references.DblLinkedList_Initialize();
   }
 
 void CLR_RT_ObjectToEvent_Destination::CheckAll()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   NANOCLR_FOREACH_NODE(CLR_RT_ObjectToEvent_Source, ref, m_references)
     {
     ref->EnsureObjectIsAlive();
@@ -25,7 +25,7 @@ void CLR_RT_ObjectToEvent_Destination::CheckAll()
 
 void CLR_RT_ObjectToEvent_Destination::SignalAll()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   NANOCLR_FOREACH_NODE(CLR_RT_ObjectToEvent_Source, ref, m_references)
     {
     if (ref->m_objectPtr)
@@ -38,7 +38,7 @@ void CLR_RT_ObjectToEvent_Destination::SignalAll()
 
 void CLR_RT_ObjectToEvent_Destination::DetachAll()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   while (true)
     {
     CLR_RT_ObjectToEvent_Source *ref = (CLR_RT_ObjectToEvent_Source *)m_references.ExtractFirstNode(); if (!ref) break;
@@ -49,7 +49,7 @@ void CLR_RT_ObjectToEvent_Destination::DetachAll()
 
 bool CLR_RT_ObjectToEvent_Destination::IsReadyForRelease()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   if (m_references.IsEmpty())
     {
     if (IsForcedAlive() == false)
@@ -63,7 +63,7 @@ bool CLR_RT_ObjectToEvent_Destination::IsReadyForRelease()
 
 bool CLR_RT_ObjectToEvent_Destination::ReleaseWhenDead()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   bool res = IsReadyForRelease();
 
   if (res) g_CLR_RT_EventCache.Append_Node(this);

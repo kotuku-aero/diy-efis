@@ -25,7 +25,7 @@ HRESULT Library_corlib_native_CanFly_Syscall::GetFont___STATIC__I4__STRING__U4__
   SetResult_INT32(stack, hr);
 
   if (succeeded(hr))
-    stack.Arg2().Dereference()->SetInteger((CLR_INT32)font);
+    stack.Arg2().Dereference()->SetInteger((int32_t)font);
   
   return S_OK;
   }

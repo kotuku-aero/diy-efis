@@ -12,11 +12,11 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 HRESULT CLR_RT_HeapBlock_Stack::Pop(CLR_RT_HeapBlock *&value)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Array *array = GetArray();
-  CLR_INT32               size = GetSize();
+  int32_t               size = GetSize();
   CLR_RT_HeapBlock *removed;
 
   if (size == 0) NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_OPERATION);
@@ -35,12 +35,12 @@ HRESULT CLR_RT_HeapBlock_Stack::Pop(CLR_RT_HeapBlock *&value)
 // May Trigger GC, but parameter value will be protected
 HRESULT CLR_RT_HeapBlock_Stack::Push(CLR_RT_HeapBlock *value)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Array *array = GetArray();
-  CLR_INT32               size = GetSize();
-  CLR_INT32               capacity = array->m_numOfElements;
+  int32_t               size = GetSize();
+  int32_t               capacity = array->m_numOfElements;
 
   if (size == capacity)
     {
@@ -75,11 +75,11 @@ HRESULT CLR_RT_HeapBlock_Stack::Push(CLR_RT_HeapBlock *value)
 
 HRESULT CLR_RT_HeapBlock_Stack::Peek(CLR_RT_HeapBlock *&value)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Array *array = GetArray();
-  CLR_INT32               size = GetSize();
+  int32_t               size = GetSize();
 
   if (size == 0) NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_OPERATION);
 
@@ -90,11 +90,11 @@ HRESULT CLR_RT_HeapBlock_Stack::Peek(CLR_RT_HeapBlock *&value)
 
 HRESULT CLR_RT_HeapBlock_Stack::Clear()
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Array *array = GetArray();
-  CLR_INT32               size = GetSize();
+  int32_t               size = GetSize();
 
   NANOCLR_CHECK_HRESULT(array->ClearElements(array->m_numOfElements - size, size));
 

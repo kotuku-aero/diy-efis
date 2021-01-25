@@ -288,20 +288,19 @@ struct Library_corlib_native_CanFly_Runtime
     NANOCLR_NATIVE_DECLARE(ManualResetEventSet___STATIC__BOOLEAN__SystemThreadingManualResetEvent);
     NANOCLR_NATIVE_DECLARE(MonitorEnter___STATIC__VOID__OBJECT);
     NANOCLR_NATIVE_DECLARE(MonitorExit___STATIC__VOID__OBJECT);
-    NANOCLR_NATIVE_DECLARE(ThreadCtor___STATIC__VOID__SystemThreadingThread__SystemThreadingThreadStart);
-    NANOCLR_NATIVE_DECLARE(ThreadStart___STATIC__VOID__SystemThreadingThread);
-    NANOCLR_NATIVE_DECLARE(ThreadAbort___STATIC__VOID__SystemThreadingThread);
-    NANOCLR_NATIVE_DECLARE(ThreadSuspend___STATIC__VOID__SystemThreadingThread);
-    NANOCLR_NATIVE_DECLARE(ThreadResume___STATIC__VOID__SystemThreadingThread);
-    NANOCLR_NATIVE_DECLARE(GetThreadPriority___STATIC__SystemThreadingThreadPriority__SystemThreadingThread);
-    NANOCLR_NATIVE_DECLARE(SetThreadPriority___STATIC__VOID__SystemThreadingThread__SystemThreadingThreadPriority);
-    NANOCLR_NATIVE_DECLARE(GetManagedThreadId___STATIC__I4__SystemThreadingThread);
-    NANOCLR_NATIVE_DECLARE(ThreadIsAlive___STATIC__BOOLEAN__SystemThreadingThread);
-    NANOCLR_NATIVE_DECLARE(ThreadJoin___STATIC__VOID__SystemThreadingThread);
-    NANOCLR_NATIVE_DECLARE(ThreadJoin___STATIC__BOOLEAN__SystemThreadingThread__I4);
-    NANOCLR_NATIVE_DECLARE(ThreadSleep___STATIC__VOID__I4);
-    NANOCLR_NATIVE_DECLARE(GetCurrentThread___STATIC__SystemThreadingThread);
-    NANOCLR_NATIVE_DECLARE(GetThreadState___STATIC__SystemThreadingThreadState__SystemThreadingThread);
+    NANOCLR_NATIVE_DECLARE(ThreadCtor___STATIC__U4__U1__STRING__SystemThreadingThreadStart__OBJECT__BYREF_U4);
+    NANOCLR_NATIVE_DECLARE(ThreadGetArg___STATIC__U4__U4__BYREF_OBJECT);
+    NANOCLR_NATIVE_DECLARE(ThreadGetCurrentId___STATIC__U4__BYREF_U4);
+    NANOCLR_NATIVE_DECLARE(ThreadStart___STATIC__U4__U4);
+    NANOCLR_NATIVE_DECLARE(ThreadAbort___STATIC__U4__U4);
+    NANOCLR_NATIVE_DECLARE(ThreadSuspend___STATIC__U4__U4);
+    NANOCLR_NATIVE_DECLARE(ThreadResume___STATIC__U4__U4);
+    NANOCLR_NATIVE_DECLARE(GetThreadPriority___STATIC__U4__U4__BYREF_U1);
+    NANOCLR_NATIVE_DECLARE(SetThreadPriority___STATIC__U4__U4__U1);
+    NANOCLR_NATIVE_DECLARE(ThreadIsAlive___STATIC__U4__U4);
+    NANOCLR_NATIVE_DECLARE(ThreadSleep___STATIC__U4__I4);
+    NANOCLR_NATIVE_DECLARE(GetThreadState___STATIC__U4__U4__BYREF_U4);
+    NANOCLR_NATIVE_DECLARE(ThreadWaitTillFinished___STATIC__U4__U4__I4);
     NANOCLR_NATIVE_DECLARE(TimerCtor___STATIC__VOID__SystemThreadingTimer__SystemThreadingTimerCallback__OBJECT__I4__I4);
     NANOCLR_NATIVE_DECLARE(TimerChange___STATIC__BOOLEAN__SystemThreadingTimer__I4__I4);
     NANOCLR_NATIVE_DECLARE(TimerDispose___STATIC__VOID__SystemThreadingTimer);
@@ -724,10 +723,7 @@ struct Library_corlib_native_System_SpanByte
 struct Library_corlib_native_System_Threading_Thread
 {
     static const int FIELD___delegate = 1;
-    static const int FIELD___priority = 2;
-    static const int FIELD___thread = 3;
-    static const int FIELD___appDomain = 4;
-    static const int FIELD___id = 5;
+    static const int FIELD___thread = 2;
 
     //--//
 

@@ -26,6 +26,8 @@ debug
 
   list
   continue
+  pause
+  stop
 
   step
   step over

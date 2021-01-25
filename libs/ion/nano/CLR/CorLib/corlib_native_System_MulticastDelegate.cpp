@@ -8,8 +8,8 @@
 
 HRESULT Library_corlib_native_CanFly_Runtime::Equals___STATIC__BOOLEAN__SystemMulticastDelegate__SystemMulticastDelegate(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(DelegateEquals___STATIC__BOOLEAN__SystemDelegate__OBJECT(stack));
 
@@ -18,8 +18,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::Equals___STATIC__BOOLEAN__SystemMu
 
 HRESULT Library_corlib_native_CanFly_Runtime::NotEquals___STATIC__BOOLEAN__SystemMulticastDelegate__SystemMulticastDelegate(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(DelegateEquals___STATIC__BOOLEAN__SystemDelegate__OBJECT(stack));
 

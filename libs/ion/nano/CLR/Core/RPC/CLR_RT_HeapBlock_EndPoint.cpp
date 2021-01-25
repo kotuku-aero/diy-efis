@@ -48,7 +48,7 @@ bool CLR_RT_HeapBlock_EndPoint::Port::Compare(const CLR_RT_HeapBlock_EndPoint::P
 
 HRESULT CLR_RT_HeapBlock_EndPoint::CreateInstance(const CLR_RT_HeapBlock_EndPoint::Port &port, CLR_RT_HeapBlock &owner, CLR_RT_HeapBlock &epRef)
   {
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   CLR_RT_HeapBlock_EndPoint *endPoint = NULL;
 
@@ -84,7 +84,7 @@ HRESULT CLR_RT_HeapBlock_EndPoint::CreateInstance(const CLR_RT_HeapBlock_EndPoin
 
 HRESULT CLR_RT_HeapBlock_EndPoint::ExtractInstance(CLR_RT_HeapBlock &ref, CLR_RT_HeapBlock_EndPoint *&endPoint)
   {
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   CLR_RT_ObjectToEvent_Source *src = CLR_RT_ObjectToEvent_Source::ExtractInstance(ref); FAULT_ON_NULL(src);
 
@@ -113,7 +113,7 @@ void CLR_RT_HeapBlock_EndPoint::RecoverFromGC()
 
 //--//
 
-CLR_RT_HeapBlock_EndPoint::Message *CLR_RT_HeapBlock_EndPoint::FindMessage(CLR_UINT32 cmd, const CLR_UINT32 *seq)
+CLR_RT_HeapBlock_EndPoint::Message *CLR_RT_HeapBlock_EndPoint::FindMessage(uint32_t cmd, const uint32_t *seq)
   {
   NANOCLR_FOREACH_NODE(Message, msg, m_messages)
     {

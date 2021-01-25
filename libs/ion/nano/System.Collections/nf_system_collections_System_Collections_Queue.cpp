@@ -9,12 +9,12 @@
 
 HRESULT Library_nf_system_collections_System_Collections_Queue::CopyTo___VOID__SystemArray__I4( CLR_RT_StackFrame& stack )
 {
-    NATIVE_PROFILE_CLR_CORE();
-    NANOCLR_HEADER();
+   
+    HRESULT hr;
 
     CLR_RT_HeapBlock_Queue* pThis;
     CLR_RT_HeapBlock_Array* array;
-    CLR_INT32               index;
+    int32_t               index;
 
     pThis = (CLR_RT_HeapBlock_Queue*)stack.This(); FAULT_ON_NULL(pThis);
     array = stack.Arg1().DereferenceArray(); FAULT_ON_NULL_ARG(array);
@@ -27,8 +27,8 @@ HRESULT Library_nf_system_collections_System_Collections_Queue::CopyTo___VOID__S
 
 HRESULT Library_nf_system_collections_System_Collections_Queue::Clear___VOID( CLR_RT_StackFrame& stack )
 {
-    NATIVE_PROFILE_CLR_CORE();
-    NANOCLR_HEADER();
+   
+    HRESULT hr;
 
     CLR_RT_HeapBlock_Queue* pThis = (CLR_RT_HeapBlock_Queue*)stack.This(); FAULT_ON_NULL(pThis);
 
@@ -39,8 +39,8 @@ HRESULT Library_nf_system_collections_System_Collections_Queue::Clear___VOID( CL
 
 HRESULT Library_nf_system_collections_System_Collections_Queue::Enqueue___VOID__OBJECT( CLR_RT_StackFrame& stack )
 {
-    NATIVE_PROFILE_CLR_CORE();
-    NANOCLR_HEADER();
+   
+    HRESULT hr;
 
     CLR_RT_HeapBlock_Queue* pThis = (CLR_RT_HeapBlock_Queue*)stack.This(); FAULT_ON_NULL(pThis);
 
@@ -51,8 +51,8 @@ HRESULT Library_nf_system_collections_System_Collections_Queue::Enqueue___VOID__
 
 HRESULT Library_nf_system_collections_System_Collections_Queue::Dequeue___OBJECT( CLR_RT_StackFrame& stack )
 {
-    NATIVE_PROFILE_CLR_CORE();
-    NANOCLR_HEADER();
+   
+    HRESULT hr;
 
     CLR_RT_HeapBlock_Queue* pThis = (CLR_RT_HeapBlock_Queue*)stack.This(); FAULT_ON_NULL(pThis);
     CLR_RT_HeapBlock*       value;
@@ -66,8 +66,8 @@ HRESULT Library_nf_system_collections_System_Collections_Queue::Dequeue___OBJECT
 
 HRESULT Library_nf_system_collections_System_Collections_Queue::Peek___OBJECT( CLR_RT_StackFrame& stack )
 {
-    NATIVE_PROFILE_CLR_CORE();
-    NANOCLR_HEADER();
+   
+    HRESULT hr;
 
     CLR_RT_HeapBlock_Queue* pThis = (CLR_RT_HeapBlock_Queue*)stack.This(); FAULT_ON_NULL(pThis);
     CLR_RT_HeapBlock*       value;

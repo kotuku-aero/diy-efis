@@ -9,7 +9,7 @@
 
 void CLR_RT_GarbageCollector::MarkStack::Initialize(MarkStackElement *ptr, size_t num)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   GenericNode_Initialize();
 
   m_last = &ptr[num - 1];
@@ -29,16 +29,16 @@ void CLR_RT_GarbageCollector::MarkStack::Initialize(MarkStackElement *ptr, size_
 
 bool CLR_RT_GarbageCollector::ComputeReachabilityGraphForSingleBlock(CLR_RT_HeapBlock **ptr)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock *obj = *ptr; if (obj == NULL || obj->IsAlive()) return true;
 
   return ComputeReachabilityGraphForMultipleBlocks(obj, 1);
   }
 
 
-bool CLR_RT_GarbageCollector::ComputeReachabilityGraphForMultipleBlocks(CLR_RT_HeapBlock *lst, CLR_UINT32 num)
+bool CLR_RT_GarbageCollector::ComputeReachabilityGraphForMultipleBlocks(CLR_RT_HeapBlock *lst, uint32_t num)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
 
   MarkStack *stackList;
   MarkStackElement *stack;
@@ -112,7 +112,7 @@ bool CLR_RT_GarbageCollector::ComputeReachabilityGraphForMultipleBlocks(CLR_RT_H
             {
             for (int cElement = g_CLR_RT_GarbageCollector.c_minimumSpaceForGC; cElement >= 1; cElement /= 2)
               {
-              CLR_UINT32 size = sizeof(MarkStack) + sizeof(MarkStackElement) * cElement;
+              uint32_t size = sizeof(MarkStack) + sizeof(MarkStackElement) * cElement;
 
               stackNext = (MarkStack *)CLR_RT_Memory::Allocate(size, CLR_RT_HeapBlock::HB_SpecialGCAllocation);
 

@@ -9,7 +9,7 @@
 
 void CLR_RT_GetVersion(unsigned short int *pMajor, unsigned short int *pMinor, unsigned short int *pBuild, unsigned short int *pRevision)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   if (pMajor) *pMajor = VERSION_MAJOR;
   if (pMinor) *pMinor = VERSION_MINOR;
   if (pBuild) *pBuild = VERSION_BUILD;
@@ -20,8 +20,8 @@ void CLR_RT_GetVersion(unsigned short int *pMajor, unsigned short int *pMinor, u
 
 HRESULT CLR_RT_ArrayListHelper::PrepareArrayList(CLR_RT_HeapBlock &thisRef, int count, int capacity)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock *pThis = thisRef.Dereference(); FAULT_ON_NULL(pThis);
 
@@ -39,8 +39,8 @@ HRESULT CLR_RT_ArrayListHelper::PrepareArrayList(CLR_RT_HeapBlock &thisRef, int 
 
 HRESULT CLR_RT_ArrayListHelper::ExtractArrayFromArrayList(CLR_RT_HeapBlock &thisRef, CLR_RT_HeapBlock_Array *&array, int &count, int &capacity)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock *pThis;
   CLR_RT_HeapBlock *items;
@@ -70,8 +70,8 @@ HRESULT CLR_RT_ArrayListHelper::ExtractArrayFromArrayList(CLR_RT_HeapBlock &this
 
 HRESULT CLR_RT_ByteArrayReader::Init(const unsigned char *src, unsigned int srcSize)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   if (src == NULL || srcSize == 0) NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
 
@@ -83,8 +83,8 @@ HRESULT CLR_RT_ByteArrayReader::Init(const unsigned char *src, unsigned int srcS
 
 HRESULT CLR_RT_ByteArrayReader::Read(void *dst, unsigned int size)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   if (size > sourceSize) NANOCLR_SET_AND_LEAVE(CLR_E_FAIL);
 
@@ -98,8 +98,8 @@ HRESULT CLR_RT_ByteArrayReader::Read(void *dst, unsigned int size)
 
 HRESULT CLR_RT_ByteArrayReader::Read1Byte(void *dst)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   if (1 > sourceSize) NANOCLR_SET_AND_LEAVE(CLR_E_FAIL);
 
@@ -113,8 +113,8 @@ HRESULT CLR_RT_ByteArrayReader::Read1Byte(void *dst)
 
 HRESULT CLR_RT_ByteArrayReader::Skip(unsigned int size)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   if (size > sourceSize) NANOCLR_SET_AND_LEAVE(CLR_E_FAIL);
 
@@ -124,9 +124,9 @@ HRESULT CLR_RT_ByteArrayReader::Skip(unsigned int size)
   NANOCLR_NOCLEANUP();
   }
 
-CLR_INT64 *GetValuePtr(CLR_RT_HeapBlock &ref)
+int64_t *GetValuePtr(CLR_RT_HeapBlock &ref)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock *obj = &ref;
   CLR_DataType dt = obj->DataType();
 
@@ -141,17 +141,17 @@ CLR_INT64 *GetValuePtr(CLR_RT_HeapBlock &ref)
 
   if (dt == DATATYPE_TIMESPAN)
     {
-    return (CLR_INT64 *)&obj->NumericByRef().s8;
+    return (int64_t *)&obj->NumericByRef().s8;
     }
 
   if (dt == DATATYPE_I8)
     {
-    return (CLR_INT64 *)&obj->NumericByRef().s8;
+    return (int64_t *)&obj->NumericByRef().s8;
     }
 
   if (dt == DATATYPE_VALUETYPE && obj->ObjectCls().m_data == g_CLR_RT_WellKnownTypes.m_TimeSpan.m_data)
     {
-    return (CLR_INT64 *)&obj[Library_corlib_native_System_TimeSpan::FIELD___ticks].NumericByRef().s8;
+    return (int64_t *)&obj[Library_corlib_native_System_TimeSpan::FIELD___ticks].NumericByRef().s8;
     }
 
   return NULL;

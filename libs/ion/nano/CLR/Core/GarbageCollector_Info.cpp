@@ -11,7 +11,7 @@
 
 void CLR_RT_GarbageCollector::GC_Stats(int &resNumberObjects, int &resSizeObjects, int &resNumberEvents, int &resSizeEvents)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   resNumberObjects = 0;
   resSizeObjects = 0;
 
@@ -25,7 +25,7 @@ void CLR_RT_GarbageCollector::GC_Stats(int &resNumberObjects, int &resSizeObject
 
     while (ptr < end)
       {
-      CLR_UINT16 size = ptr->DataSize();
+      uint16_t size = ptr->DataSize();
 
       hc->ValidateBlock(ptr);
 
@@ -50,26 +50,26 @@ void CLR_RT_GarbageCollector::GC_Stats(int &resNumberObjects, int &resSizeObject
   }
 
 
-static void DumpTimeout(CLR_RT_Thread *th, CLR_INT64 &t)
+static void DumpTimeout(CLR_RT_Thread *th, int64_t &t)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_Debug::Printf(": %d", th ? th->m_pid : -1);
+ 
+  trace_debug(": %d", th ? th->m_pid : -1);
 
   if (t < TIMEOUT_INFINITE)
     {
     t -= HAL_Time_CurrentTime();
 
-    CLR_Debug::Printf(" %d", (int)t);
+    trace_debug(" %d", (int)t);
     }
   else
     {
-    CLR_Debug::Printf(" INFINITE");
+    trace_debug(" INFINITE");
     }
   }
 
 void CLR_RT_GarbageCollector::DumpThreads()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   NANOCLR_FOREACH_NODE(CLR_RT_Thread, th, g_CLR_RT_ExecutionEngine.m_threadsReady)
     {
     th->DumpStack();
@@ -82,7 +82,7 @@ void CLR_RT_GarbageCollector::DumpThreads()
     }
   NANOCLR_FOREACH_NODE_END();
 
-  CLR_Debug::Printf("\r\n");
+  trace_debug("\r\n");
   }
 #endif
 
@@ -92,7 +92,7 @@ void CLR_RT_GarbageCollector::DumpThreads()
 
 void CLR_RT_GarbageCollector::ValidateCluster(CLR_RT_HeapCluster *hc)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock_Node *ptr = hc->m_payloadStart;
   CLR_RT_HeapBlock_Node *end = hc->m_payloadEnd;
 
@@ -106,7 +106,7 @@ void CLR_RT_GarbageCollector::ValidateCluster(CLR_RT_HeapCluster *hc)
 
 void CLR_RT_GarbageCollector::ValidateHeap(CLR_RT_DblLinkedList &lst)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   NANOCLR_FOREACH_NODE(CLR_RT_HeapCluster, hc, lst)
     {
     ValidateCluster(hc);
@@ -116,7 +116,7 @@ void CLR_RT_GarbageCollector::ValidateHeap(CLR_RT_DblLinkedList &lst)
 
 void CLR_RT_GarbageCollector::ValidateBlockNotInFreeList(CLR_RT_DblLinkedList &lst, CLR_RT_HeapBlock_Node *dst)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   NANOCLR_FOREACH_NODE(CLR_RT_HeapCluster, hc, lst)
     {
     NANOCLR_FOREACH_NODE(CLR_RT_HeapBlock_Node, ptr, hc->m_freeList)
@@ -125,7 +125,7 @@ void CLR_RT_GarbageCollector::ValidateBlockNotInFreeList(CLR_RT_DblLinkedList &l
 
       if (ptr <= dst && dst < ptrEnd)
         {
-        CLR_Debug::Printf("Pointer into free list!! %08x %08x %08x\r\n", dst, ptr, ptrEnd);
+        trace_debug("Pointer into free list!! %08x %08x %08x\r\n", dst, ptr, ptrEnd);
 
         NANOCLR_DEBUG_STOP();
         }
@@ -137,7 +137,7 @@ void CLR_RT_GarbageCollector::ValidateBlockNotInFreeList(CLR_RT_DblLinkedList &l
 
 bool CLR_RT_GarbageCollector::IsBlockInFreeList(CLR_RT_DblLinkedList &lst, CLR_RT_HeapBlock_Node *dst, bool fExact)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   NANOCLR_FOREACH_NODE(CLR_RT_HeapCluster, hc, lst)
     {
     NANOCLR_FOREACH_NODE(CLR_RT_HeapBlock_Node, ptr, hc->m_freeList)
@@ -162,7 +162,7 @@ bool CLR_RT_GarbageCollector::IsBlockInFreeList(CLR_RT_DblLinkedList &lst, CLR_R
 
 bool CLR_RT_GarbageCollector::IsBlockInHeap(CLR_RT_DblLinkedList &lst, CLR_RT_HeapBlock_Node *dst)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   NANOCLR_FOREACH_NODE(CLR_RT_HeapCluster, hc, lst)
     {
     if (hc->m_payloadStart <= dst && dst < hc->m_payloadEnd) return true;
@@ -186,8 +186,8 @@ CLR_RT_GarbageCollector::Rel_Map  CLR_RT_GarbageCollector::s_mapNewToRecord;
 
 bool CLR_RT_GarbageCollector::TestPointers_PopulateOld_Worker(void **ref)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_UINT32 *dst = (CLR_UINT32 *)*ref;
+ 
+  uint32_t *dst = (uint32_t *)*ref;
 
   if (dst)
     {
@@ -205,14 +205,14 @@ bool CLR_RT_GarbageCollector::TestPointers_PopulateOld_Worker(void **ref)
 
     if (s_mapOldToRecord.find(ref) != s_mapOldToRecord.end())
       {
-      CLR_Debug::Printf("Duplicate base OLD: %08x\r\n", ref);
+      trace_debug("Duplicate base OLD: %08x\r\n", ref);
       }
 
     s_mapOldToRecord[ref] = ptr;
 
     if (IsBlockInFreeList(g_CLR_RT_ExecutionEngine.m_heap, (CLR_RT_HeapBlock_Node *)dst, false))
       {
-      CLR_Debug::Printf("Some data points into a free list: %08x\r\n", dst);
+      trace_debug("Some data points into a free list: %08x\r\n", dst);
 
       NANOCLR_DEBUG_STOP();
       }
@@ -223,7 +223,7 @@ bool CLR_RT_GarbageCollector::TestPointers_PopulateOld_Worker(void **ref)
 
 void CLR_RT_GarbageCollector::TestPointers_PopulateOld()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   Rel_List_Iter itLst;
 
   for (itLst = s_lstRecords.begin(); itLst != s_lstRecords.end(); itLst++)
@@ -244,7 +244,7 @@ void CLR_RT_GarbageCollector::TestPointers_PopulateOld()
 
 void CLR_RT_GarbageCollector::Relocation_UpdatePointer(void **ref)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
 
   }
 
@@ -252,18 +252,18 @@ void CLR_RT_GarbageCollector::Relocation_UpdatePointer(void **ref)
 
 void CLR_RT_GarbageCollector::TestPointers_Remap()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   Rel_Map_Iter it;
 
   for (it = s_mapOldToRecord.begin(); it != s_mapOldToRecord.end(); it++)
     {
     RelocationRecord *ptr = it->second;
     void **ref = it->first; CLR_RT_GarbageCollector::Relocation_UpdatePointer((void **)&ref);
-    CLR_UINT32 *dst = ptr->oldPtr; CLR_RT_GarbageCollector::Relocation_UpdatePointer((void **)&dst);
+    uint32_t *dst = ptr->oldPtr; CLR_RT_GarbageCollector::Relocation_UpdatePointer((void **)&dst);
 
     if (s_mapNewToRecord.find(ref) != s_mapNewToRecord.end())
       {
-      CLR_Debug::Printf("Duplicate base NEW: %08x\r\n", ref);
+      trace_debug("Duplicate base NEW: %08x\r\n", ref);
       }
 
     s_mapNewToRecord[ref] = ptr;
@@ -277,8 +277,8 @@ void CLR_RT_GarbageCollector::TestPointers_Remap()
 
 bool CLR_RT_GarbageCollector::TestPointers_PopulateNew_Worker(void **ref)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_UINT32 *dst = (CLR_UINT32 *)*ref;
+ 
+  uint32_t *dst = (uint32_t *)*ref;
 
   if (dst)
     {
@@ -290,23 +290,23 @@ bool CLR_RT_GarbageCollector::TestPointers_PopulateNew_Worker(void **ref)
 
       if (ptr->newPtr != dst)
         {
-        CLR_Debug::Printf("Bad pointer: %08x %08x\r\n", ptr->newPtr, dst);
+        trace_debug("Bad pointer: %08x %08x\r\n", ptr->newPtr, dst);
         }
       else if (ptr->data != *dst)
         {
-        CLR_Debug::Printf("Bad data: %08x %08x\r\n", ptr->data, *dst);
+        trace_debug("Bad data: %08x %08x\r\n", ptr->data, *dst);
         }
 
       if (IsBlockInFreeList(g_CLR_RT_ExecutionEngine.m_heap, (CLR_RT_HeapBlock_Node *)dst, false))
         {
-        CLR_Debug::Printf("Some data points into a free list: %08x\r\n", dst);
+        trace_debug("Some data points into a free list: %08x\r\n", dst);
 
         NANOCLR_DEBUG_STOP();
         }
       }
     else
       {
-      CLR_Debug::Printf("Bad base: %08x\r\n", ref);
+      trace_debug("Bad base: %08x\r\n", ref);
       }
     }
 
@@ -315,7 +315,7 @@ bool CLR_RT_GarbageCollector::TestPointers_PopulateNew_Worker(void **ref)
 
 void CLR_RT_GarbageCollector::TestPointers_PopulateNew()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   Heap_Relocate_Pass(TestPointers_PopulateNew_Worker);
   }
 

@@ -9,21 +9,21 @@
 
 #define UTF8_BAD_LOWPART(ch) (ch < 0x80 || ch > 0xBF)
 
-#define UTF8_CHECK_LOWPART(ch,src) ch = (CLR_UINT32)*src++; if(UTF8_BAD_LOWPART(ch)) return -1
+#define UTF8_CHECK_LOWPART(ch,src) ch = (uint32_t)*src++; if(UTF8_BAD_LOWPART(ch)) return -1
 
-#define UTF8_LOAD_LOWPART(ch,ch2,src) ch = (CLR_UINT32)*src++; ch2 <<= 6; ch2 |=  (ch & 0x3F)
+#define UTF8_LOAD_LOWPART(ch,ch2,src) ch = (uint32_t)*src++; ch2 <<= 6; ch2 |=  (ch & 0x3F)
 
 //--//
 
 int CLR_RT_UnicodeHelper::CountNumberOfCharacters(int max)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  const CLR_UINT8 *pSrc = m_inputUTF8;
+ 
+  const uint8_t *pSrc = m_inputUTF8;
   int              num = 0;
 
   while (true)
     {
-    CLR_UINT32 ch = (CLR_UINT32)*pSrc++; if (!ch) break;
+    uint32_t ch = (uint32_t)*pSrc++; if (!ch) break;
 
     if (max-- == 0) break; // This works even if you pass -1 as argument (it will walk through the whole string).
 
@@ -75,13 +75,13 @@ int CLR_RT_UnicodeHelper::CountNumberOfCharacters(int max)
 
 int CLR_RT_UnicodeHelper::CountNumberOfBytes(int max)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  const CLR_UINT16 *pSrc = m_inputUTF16;
+ 
+  const uint16_t *pSrc = m_inputUTF16;
   int               num = 0;
 
   while (true)
     {
-    CLR_UINT16 ch = *pSrc++; if (!ch) break;
+    uint16_t ch = *pSrc++; if (!ch) break;
 
     if (max-- == 0) break; // This works even if you pass -1 as argument (it will walk through the whole string).
 
@@ -134,12 +134,12 @@ int CLR_RT_UnicodeHelper::CountNumberOfBytes(int max)
 
 bool CLR_RT_UnicodeHelper::ConvertFromUTF8(int iMaxChars, bool fJustMove, int iMaxBytes)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  const CLR_UINT8 *inputUTF8 = m_inputUTF8;
-  CLR_UINT16 *outputUTF16 = m_outputUTF16;
+ 
+  const uint8_t *inputUTF8 = m_inputUTF8;
+  uint16_t *outputUTF16 = m_outputUTF16;
   int              outputUTF16_size = m_outputUTF16_size;
-  CLR_UINT32       ch;
-  CLR_UINT32       ch2;
+  uint32_t       ch;
+  uint32_t       ch2;
   bool             res;
 
   if (iMaxBytes == -1)
@@ -149,7 +149,7 @@ bool CLR_RT_UnicodeHelper::ConvertFromUTF8(int iMaxChars, bool fJustMove, int iM
 
   while (iMaxChars > 0 && iMaxBytes > 0)
     {
-    ch = (CLR_UINT32)*inputUTF8++;
+    ch = (uint32_t)*inputUTF8++;
 
     switch (ch & 0xF0)
       {
@@ -332,7 +332,7 @@ Exit:
 bool CLR_RT_UnicodeHelper::MoveBackwardInUTF8(const char *utf8StringStart, int iMaxChars)
   {
   // already at the beginning or iMaxChars < 1?
-  if (m_inputUTF8 <= (const CLR_UINT8 *)utf8StringStart || iMaxChars < 1)
+  if (m_inputUTF8 <= (const uint8_t *)utf8StringStart || iMaxChars < 1)
     {
     return false;
     }
@@ -354,7 +354,7 @@ bool CLR_RT_UnicodeHelper::MoveBackwardInUTF8(const char *utf8StringStart, int i
       }
 
     // reached the beginning?
-    if (m_inputUTF8 == (const CLR_UINT8 *)utf8StringStart)
+    if (m_inputUTF8 == (const uint8_t *)utf8StringStart)
       {
       return false;
       }
@@ -363,16 +363,16 @@ bool CLR_RT_UnicodeHelper::MoveBackwardInUTF8(const char *utf8StringStart, int i
 
 bool CLR_RT_UnicodeHelper::ConvertToUTF8(int iMaxChars, bool fJustMove)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  const CLR_UINT16 *inputUTF16 = m_inputUTF16;
-  CLR_UINT8 *outputUTF8 = m_outputUTF8;
+ 
+  const uint16_t *inputUTF16 = m_inputUTF16;
+  uint8_t *outputUTF8 = m_outputUTF8;
   int               outputUTF8_size = m_outputUTF8_size;
-  CLR_UINT32        ch;
+  uint32_t        ch;
   bool              res;
 
   while (iMaxChars > 0)
     {
-    ch = (CLR_UINT32)*inputUTF16++;
+    ch = (uint32_t)*inputUTF16++;
 
     if (ch < 0x0080)
       {
@@ -545,7 +545,7 @@ UnicodeString::~UnicodeString()
 HRESULT UnicodeString::Assign(const char *string)
   {
   NATIVE_PROFILE_CLR_IO();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   int byteLength = 0;
 
@@ -559,9 +559,9 @@ HRESULT UnicodeString::Assign(const char *string)
   if (m_length < 0) NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
   /// We have m_length >=0 now.
 
-  byteLength = (m_length + 1) * sizeof(CLR_UINT16);
+  byteLength = (m_length + 1) * sizeof(uint16_t);
 
-  m_wCharArray = (CLR_UINT16 *)CLR_RT_Memory::Allocate(byteLength);  CHECK_ALLOCATION(m_wCharArray);
+  m_wCharArray = (uint16_t *)CLR_RT_Memory::Allocate(byteLength);  CHECK_ALLOCATION(m_wCharArray);
 
   m_unicodeHelper.m_outputUTF16 = m_wCharArray;
   m_unicodeHelper.m_outputUTF16_size = m_length + 1;

@@ -14,7 +14,7 @@
 
 const size_t c_CLR_StringTable_Size = 860;
 
-const CLR_STRING c_CLR_StringTable_Lookup[] =
+const uint16_t c_CLR_StringTable_Lookup[] =
   {
   /* 0000 */ 0,
   /* 0001 */ 7,

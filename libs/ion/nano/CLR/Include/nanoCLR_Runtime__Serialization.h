@@ -15,27 +15,27 @@ struct CLR_RT_BinaryFormatter : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO 
   // Keep in sync with definitions in Reflection.cs!!!!
   //
   static const int        TE_L1 = 2;
-  static const CLR_UINT32 TE_L1_Null = 0x00000000;
-  static const CLR_UINT32 TE_L1_Duplicate = 0x00000001; // N bits for the duplicate id.
-  static const CLR_UINT32 TE_L1_Reference = 0x00000002; // 32 bits for the type.
-  static const CLR_UINT32 TE_L1_Other = 0x00000003;
+  static const uint32_t TE_L1_Null = 0x00000000;
+  static const uint32_t TE_L1_Duplicate = 0x00000001; // N bits for the duplicate id.
+  static const uint32_t TE_L1_Reference = 0x00000002; // 32 bits for the type.
+  static const uint32_t TE_L1_Other = 0x00000003;
 
   static const int        TE_L2 = 2;
-  static const CLR_UINT32 TE_L2_Primitive = 0x00000000; // 4 bits for the type.
-  static const CLR_UINT32 TE_L2_Array = 0x00000001;
-  static const CLR_UINT32 TE_L2_ArrayList = 0x00000002;
-  static const CLR_UINT32 TE_L2_Other = 0x00000003;
+  static const uint32_t TE_L2_Primitive = 0x00000000; // 4 bits for the type.
+  static const uint32_t TE_L2_Array = 0x00000001;
+  static const uint32_t TE_L2_ArrayList = 0x00000002;
+  static const uint32_t TE_L2_Other = 0x00000003;
 
   static const int        TE_L3 = 4;
-  static const CLR_UINT32 TE_L3_Type = 0x00000000; // 32 bits for the type.
-  static const CLR_UINT32 TE_L3_Reflection = 0x00000001; // CLR_RT_ReflectionDef_Index.  Valid in marshaling only.
-  static const CLR_UINT32 TE_L3_MBRO = 0x00000002; // 32 bits for the pointer to the MBRO class, 32 bits for the pointer to the AppDomain    
+  static const uint32_t TE_L3_Type = 0x00000000; // 32 bits for the type.
+  static const uint32_t TE_L3_Reflection = 0x00000001; // CLR_RT_ReflectionDef_Index.  Valid in marshaling only.
+  static const uint32_t TE_L3_MBRO = 0x00000002; // 32 bits for the pointer to the MBRO class, 32 bits for the pointer to the AppDomain    
 
   static const int        TE_ElementType = 4;
   static const int        TE_ArrayDepth = 4;
 
-  static const CLR_UINT32 c_Flags_None = 0x00000000;
-  static const CLR_UINT32 c_Flags_Marshal = 0x00000001;
+  static const uint32_t c_Flags_None = 0x00000000;
+  static const uint32_t c_Flags_Marshal = 0x00000001;
 
   //
   //--//
@@ -59,8 +59,8 @@ struct CLR_RT_BinaryFormatter : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO 
     int                m_arraySize;     // -1 == extend to the end of the stream.
 
     int                m_bitPacked;     // In bits.
-    CLR_INT64          m_rangeBias;
-    CLR_UINT64         m_scale;         // For time, it's in ticks.
+    int64_t          m_rangeBias;
+    uint64_t         m_scale;         // For time, it's in ticks.
     };
   //
   //////////////////////////////////////////////////////////////////
@@ -156,7 +156,7 @@ struct CLR_RT_BinaryFormatter : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO 
     bool CompareTypes(CLR_RT_TypeDescriptor* left, CLR_RT_TypeDescriptor* right);
 
     static CLR_DataType GetDataType(CLR_RT_TypeDescriptor* type);
-    static CLR_UINT32   GetSizeOfType(CLR_RT_TypeDescriptor* type);
+    static uint32_t   GetSizeOfType(CLR_RT_TypeDescriptor* type);
     static bool         GetSignOfType(CLR_RT_TypeDescriptor* type);
 
     static CLR_RT_HeapBlock* FixDereference(CLR_RT_HeapBlock* v);
@@ -220,14 +220,14 @@ struct CLR_RT_BinaryFormatter : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO 
   struct DuplicateTracker : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOCATION -
     {
     CLR_RT_HeapBlock* m_ptr;
-    CLR_UINT32        m_idx;
+    uint32_t        m_idx;
     };
 
   //--//
 
   CLR_RT_HeapBlock_MemoryStream* m_stream;
-  CLR_UINT32                     m_idx;
-  CLR_UINT32                     m_lastTypeRead;
+  uint32_t                     m_idx;
+  uint32_t                     m_lastTypeRead;
   CLR_RT_DblLinkedList           m_duplicates;            // EVENT HEAP - NO RELOCATION - list of CLR_RT_BinaryFormatter::DuplicateTracker
   CLR_RT_DblLinkedList           m_states;                // EVENT HEAP - NO RELOCATION - list of CLR_RT_BinaryFormatter::State
 
@@ -235,44 +235,44 @@ struct CLR_RT_BinaryFormatter : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO 
   CLR_RT_HeapBlock               m_value;
   CLR_RT_TypeDescriptor          m_value_desc;
 
-  CLR_UINT32                     m_flags;
+  uint32_t                     m_flags;
 
   //--//
 
   static bool SerializationEnabled();
 
-  static HRESULT CreateInstance(CLR_UINT8* buf, int len, CLR_RT_BinaryFormatter*& res);
+  static HRESULT CreateInstance(uint8_t* buf, int len, CLR_RT_BinaryFormatter*& res);
 
   void    DestroyInstance();
   HRESULT Advance();
 
-  static HRESULT Serialize(CLR_RT_HeapBlock& refData, CLR_RT_HeapBlock& object, CLR_RT_HeapBlock* cls, CLR_UINT32 flags);
-  static HRESULT Deserialize(CLR_RT_HeapBlock& refData, CLR_RT_HeapBlock& object, CLR_RT_HeapBlock* cls, CLR_UINT32* unknownType, CLR_UINT32 flags);
-  static HRESULT Deserialize(CLR_RT_HeapBlock& refData, CLR_UINT8* data, CLR_UINT32 size, CLR_RT_HeapBlock* cls, CLR_UINT32* unknownType, CLR_UINT32 flags);
+  static HRESULT Serialize(CLR_RT_HeapBlock& refData, CLR_RT_HeapBlock& object, CLR_RT_HeapBlock* cls, uint32_t flags);
+  static HRESULT Deserialize(CLR_RT_HeapBlock& refData, CLR_RT_HeapBlock& object, CLR_RT_HeapBlock* cls, uint32_t* unknownType, uint32_t flags);
+  static HRESULT Deserialize(CLR_RT_HeapBlock& refData, uint8_t* data, uint32_t size, CLR_RT_HeapBlock* cls, uint32_t* unknownType, uint32_t flags);
 
   HRESULT           TrackDuplicate(CLR_RT_HeapBlock* object);
-  CLR_UINT32        SearchDuplicate(CLR_RT_HeapBlock* object);
-  CLR_RT_HeapBlock* GetDuplicate(CLR_UINT32        idx);
+  uint32_t        SearchDuplicate(CLR_RT_HeapBlock* object);
+  CLR_RT_HeapBlock* GetDuplicate(uint32_t        idx);
 
   //--//
 
   int     BitsAvailable();
 
-  HRESULT ReadBits(CLR_UINT32& val, int bits);
-  HRESULT WriteBits(CLR_UINT32                  val, int bits);
+  HRESULT ReadBits(uint32_t& val, int bits);
+  HRESULT WriteBits(uint32_t                  val, int bits);
 
-  HRESULT ReadBits(CLR_UINT64& val, int bits);
-  HRESULT WriteBits(CLR_UINT64                  val, int bits);
+  HRESULT ReadBits(uint64_t& val, int bits);
+  HRESULT WriteBits(uint64_t                  val, int bits);
 
-  HRESULT ReadArray(CLR_UINT8* buf, int bytes);
-  HRESULT WriteArray(const CLR_UINT8* buf, int bytes);
+  HRESULT ReadArray(uint8_t* buf, int bytes);
+  HRESULT WriteArray(const uint8_t* buf, int bytes);
 
-  HRESULT ReadCompressedUnsigned(CLR_UINT32& val);
-  HRESULT WriteCompressedUnsigned(CLR_UINT32                  val);
+  HRESULT ReadCompressedUnsigned(uint32_t& val);
+  HRESULT WriteCompressedUnsigned(uint32_t                  val);
 
   HRESULT ReadType(CLR_RT_ReflectionDef_Index& val);
   HRESULT WriteType(const CLR_RT_ReflectionDef_Index& val);
-  HRESULT WriteType(CLR_UINT32                  val);
+  HRESULT WriteType(uint32_t                  val);
 
   //--//
 

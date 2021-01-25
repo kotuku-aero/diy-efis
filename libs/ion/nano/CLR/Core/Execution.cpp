@@ -5,8 +5,10 @@
 //
 #include "Core.h"
 
-static const CLR_INT64 c_MaximumTimeToActive = (TIME_CONVERSION__ONEMINUTE * TIME_CONVERSION__TO_SECONDS);
-extern HRESULT ExceptionCreateInstance(CLR_RT_HeapBlock &ref, const CLR_RT_TypeDef_Index &cls, HRESULT hr, CLR_RT_StackFrame *stack);
+#include "../../../ion_debugger.h"
+
+static const int64_t c_MaximumTimeToActive = (TIME_CONVERSION__ONEMINUTE * TIME_CONVERSION__TO_SECONDS);
+extern HRESULT ExceptionCreateInstance(CLR_RT_HeapBlock &ref, uint32_t cls, HRESULT hr, CLR_RT_StackFrame *stack);
 //--//
 
 CLR_RT_ExecutionEngine::ExecutionConstraintCompensation CLR_RT_ExecutionEngine::s_compensation = { 0, 0, 0 };
@@ -15,8 +17,8 @@ CLR_RT_ExecutionEngine::ExecutionConstraintCompensation CLR_RT_ExecutionEngine::
 
 HRESULT CLR_RT_ExecutionEngine::CreateInstance()
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_CLEAR(g_CLR_RT_ExecutionEngine);
 
@@ -29,16 +31,16 @@ HRESULT CLR_RT_ExecutionEngine::CreateInstance()
 
 HRESULT CLR_RT_ExecutionEngine::ExecutionEngine_Initialize()
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
-  m_maximumTimeToActive = c_MaximumTimeToActive; // CLR_INT64                           m_maximumTimeToActive
+  m_maximumTimeToActive = c_MaximumTimeToActive; // int64_t                           m_maximumTimeToActive
                                                  // int                                 m_iDebugger_Conditions;
                                                  //
 
-  // CLR_INT64                           m_currentNextActivityTime;
+  // int64_t                           m_currentNextActivityTime;
   m_timerCache = false;                           // bool                                m_timerCache;
-                                                  // CLR_INT64                           m_timerCacheNextTimeout;
+                                                  // int64_t                           m_timerCacheNextTimeout;
                                                   //
   m_heap.DblLinkedList_Initialize();              // CLR_RT_DblLinkedList                m_heap;
                                                   // CLR_RT_HeapCluster*                 m_lastHcUsed;
@@ -47,7 +49,7 @@ HRESULT CLR_RT_ExecutionEngine::ExecutionEngine_Initialize()
   m_weakReferences.DblLinkedList_Initialize();    // CLR_RT_DblLinkedList                m_weakReferences;
                                                   //
   m_timers.DblLinkedList_Initialize();            // CLR_RT_DblLinkedList                m_timers;
-  m_raisedEvents = 0;                             // CLR_UINT32                          m_raisedEvents;
+  m_raisedEvents = 0;                             // uint32_t                          m_raisedEvents;
                                                   //
   m_threadsReady.DblLinkedList_Initialize();      // CLR_RT_DblLinkedList                m_threadsReady;
   m_threadsWaiting.DblLinkedList_Initialize();    // CLR_RT_DblLinkedList                m_threadsWaiting;
@@ -69,9 +71,7 @@ HRESULT CLR_RT_ExecutionEngine::ExecutionEngine_Initialize()
 
   m_canFlyEventThread = NULL; // CLR_RT_Thread                       m_interruptThread;
 
-#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
   m_scratchPadArray = NULL; // CLR_RT_HeapBlock_Array*             m_scratchPadArray;
-#endif                        //#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
 
   m_currentThread = NULL;
 
@@ -81,47 +81,29 @@ HRESULT CLR_RT_ExecutionEngine::ExecutionEngine_Initialize()
   m_fShuttingDown = false; // bool                                m_fShuttingDown;
 #endif
 
-    //--//
-
   NANOCLR_CHECK_HRESULT(AllocateHeaps());
 
   g_CLR_RT_TypeSystem.TypeSystem_Initialize();
   g_CLR_RT_EventCache.EventCache_Initialize();
 
-  //--//
-
-  // NANOCLR_CHECK_HRESULT(CLR_HW_Hardware::CreateInstance());
-
-  //--//
-
-  NANOCLR_CHECK_HRESULT(CLR_Messaging::CreateInstance());
-
-  NANOCLR_CHECK_HRESULT(CLR_DBG_Debugger::CreateInstance());
-
-#if defined(NANOCLR_PROFILE_NEW)
-  NANOCLR_CHECK_HRESULT(CLR_PRF_Profiler::CreateInstance());
-#endif
-
   m_startTime = HAL_Time_CurrentTime();
 
   CLR_RT_HeapBlock_WeakReference::RecoverObjects(m_heap);
-
-  //--//
 
   NANOCLR_NOCLEANUP();
   }
 
 HRESULT CLR_RT_ExecutionEngine::AllocateHeaps()
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
-  const CLR_UINT32 c_HeapClusterSize = sizeof(CLR_RT_HeapBlock) * CLR_RT_HeapBlock::HB_MaxSize;
+  const uint32_t c_HeapClusterSize = sizeof(CLR_RT_HeapBlock) * CLR_RT_HeapBlock::HB_MaxSize;
 
-  CLR_UINT8 *heapFirstFree = s_CLR_RT_Heap.m_location;
-  CLR_UINT32 heapFree = s_CLR_RT_Heap.m_size;
-  CLR_INT32 i = 0;
-  CLR_UINT32 blockSize = 1;
+  uint8_t *heapFirstFree = s_CLR_RT_Heap.m_location;
+  uint32_t heapFree = s_CLR_RT_Heap.m_size;
+  int32_t i = 0;
+  uint32_t blockSize = 1;
 
   if (heapFree <= sizeof(CLR_RT_HeapCluster))
     {
@@ -131,14 +113,14 @@ HRESULT CLR_RT_ExecutionEngine::AllocateHeaps()
   while (heapFree > sizeof(CLR_RT_HeapCluster))
     {
     CLR_RT_HeapCluster *hc = (CLR_RT_HeapCluster *)heapFirstFree;
-    CLR_UINT32 size = (heapFree < c_HeapClusterSize) ? heapFree : c_HeapClusterSize;
+    uint32_t size = (heapFree < c_HeapClusterSize) ? heapFree : c_HeapClusterSize;
 
 #if NANOCLR_VALIDATE_HEAP >= NANOCLR_VALIDATE_HEAP_1_HeapBlocksAndUnlink
 
-    CLR_Debug::Printf("Heap Cluster information\r\n");
-    CLR_Debug::Printf("Start:       %08x\r\n", (size_t)heapFirstFree);
-    CLR_Debug::Printf("Free:        %08x\r\n", (size_t)heapFree);
-    CLR_Debug::Printf("Block size:  %d\r\n", sizeof(CLR_RT_HeapBlock));
+    trace_debug("Heap Cluster information\r\n");
+    trace_debug("Start:       %08x\r\n", (size_t)heapFirstFree);
+    trace_debug("Free:        %08x\r\n", (size_t)heapFree);
+    trace_debug("Block size:  %d\r\n", sizeof(CLR_RT_HeapBlock));
 
 #endif
     ///
@@ -174,8 +156,8 @@ HRESULT CLR_RT_ExecutionEngine::AllocateHeaps()
 
 HRESULT CLR_RT_ExecutionEngine::DeleteInstance()
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   g_CLR_RT_ExecutionEngine.ExecutionEngine_Cleanup();
 
@@ -193,23 +175,11 @@ void CLR_RT_ExecutionEngine::ExecutionEngine_Cleanup()
   // there to be executed wouldn't never be executed anyways.
   /////////////////////////////////////////////////////////////////////////////////////////////////
 
-  NATIVE_PROFILE_CLR_CORE();
+ 
   m_fShuttingDown = true;
 
-#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
   m_scratchPadArray = NULL;
   m_breakpointsNum = 0;
-
-  CLR_DBG_Debugger::DeleteInstance();
-#endif //#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
-
-#if defined(NANOCLR_PROFILE_NEW)
-  CLR_PRF_Profiler::DeleteInstance();
-#endif
-
-  CLR_Messaging::DeleteInstance();
-
-  // CLR_HW_Hardware::DeleteInstance();
 
   m_finalizersAlive.DblLinkedList_PushToCache();
   m_finalizersPending.DblLinkedList_PushToCache();
@@ -230,34 +200,19 @@ void CLR_RT_ExecutionEngine::ExecutionEngine_Cleanup()
   m_heap.DblLinkedList_Initialize();
   }
 
-//--//
-
-HRESULT CLR_RT_ExecutionEngine::StartHardware()
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
-
-  // NANOCLR_SET_AND_LEAVE(g_CLR_HW_Hardware.Hardware_Initialize());
-
-  NANOCLR_NOCLEANUP();
-  }
-
 void CLR_RT_ExecutionEngine::Reboot(bool fHard)
   {
-  NATIVE_PROFILE_CLR_CORE();
-
   if (fHard)
     {
-    ::CPU_Reset();
+    debug_break();
     }
   else
     {
-    CLR_EE_REBOOT_CLR;
     CLR_EE_DBG_SET(RebootPending);
     }
   }
 
-CLR_INT64 CLR_RT_ExecutionEngine::GetUptime()
+int64_t CLR_RT_ExecutionEngine::GetUptime()
   {
   return HAL_Time_CurrentTime() - g_CLR_RT_ExecutionEngine.m_startTime;
   }
@@ -268,7 +223,7 @@ void CLR_RT_ExecutionEngine::JoinAllThreadsAndExecuteFinalizer()
 
 void CLR_RT_ExecutionEngine::LoadDownloadedAssemblies()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   PerformGarbageCollection();
   PerformHeapCompaction();
 
@@ -325,24 +280,24 @@ void CLR_RT_ExecutionEngine::LoadDownloadedAssemblies()
 
 void CLR_RT_ExecutionEngine::ExecutionConstraint_Suspend()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   s_compensation.Suspend();
   }
 
 void CLR_RT_ExecutionEngine::ExecutionConstraint_Resume()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   s_compensation.Resume();
   }
 
 //--//
 
-CLR_UINT32 CLR_RT_ExecutionEngine::PerformGarbageCollection()
+uint32_t CLR_RT_ExecutionEngine::PerformGarbageCollection()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   m_heapState = c_HeapState_UnderGC;
 
-  CLR_UINT32 freeMem = g_CLR_RT_GarbageCollector.ExecuteGarbageCollection();
+  uint32_t freeMem = g_CLR_RT_GarbageCollector.ExecuteGarbageCollection();
 
   m_heapState = c_HeapState_Normal;
 
@@ -360,7 +315,7 @@ CLR_UINT32 CLR_RT_ExecutionEngine::PerformGarbageCollection()
 
 void CLR_RT_ExecutionEngine::PerformHeapCompaction()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   if (CLR_EE_DBG_IS(NoCompaction))
     return;
 
@@ -373,7 +328,7 @@ void CLR_RT_ExecutionEngine::PerformHeapCompaction()
 
 void CLR_RT_ExecutionEngine::Relocate()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
 #if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
   CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_scratchPadArray);
 #endif //#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
@@ -389,23 +344,13 @@ void CLR_RT_ExecutionEngine::Relocate()
 //--//
 HRESULT CLR_RT_ExecutionEngine::WaitForDebugger()
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   while (CLR_EE_DBG_IS(Stopped) && !CLR_EE_DBG_IS(RebootPending) && !CLR_EE_DBG_IS(ExitPending))
     {
-    /*
-    // TODO: Generalize this as a standard HAL API
-
-#if defined(WIN32)
-    if (HAL_Windows_IsShutdownPending())
-      {
-      NANOCLR_SET_AND_LEAVE(CLR_E_SHUTTING_DOWN);
-      }
-#endif
-    */
-
-    //DebuggerLoop();
+    // this will fail if there is no debugger attached
+    hr = debug_break();
     }
 
 #if defined(WIN32)
@@ -418,8 +363,8 @@ HRESULT CLR_RT_ExecutionEngine::WaitForDebugger()
 #if defined(WIN32)
 HRESULT CLR_RT_ExecutionEngine::CreateEntryPointArgs(CLR_RT_HeapBlock &argsBlk, wchar_t *szCommandLineArgs)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   std::list<std::wstring> args;
 
@@ -438,11 +383,11 @@ HRESULT CLR_RT_ExecutionEngine::CreateEntryPointArgs(CLR_RT_HeapBlock &argsBlk, 
     szArg = wcstok_s(NULL, sep, &context);
     }
 
-  if (FAILED(hr = CLR_RT_HeapBlock_Array::CreateInstance(argsBlk, (CLR_UINT32)args.size(), g_CLR_RT_WellKnownTypes.m_String)))
+  if (FAILED(hr = CLR_RT_HeapBlock_Array::CreateInstance(argsBlk, (uint32_t)args.size(), g_CLR_RT_WellKnownTypes.m_String)))
     return hr;
 
   CLR_RT_HeapBlock_Array *array = argsBlk.Array();
-  CLR_UINT32 iArg = 0;
+  uint32_t iArg = 0;
 
   for (std::list<std::wstring>::iterator it = args.begin(); it != args.end(); it++, iArg++)
     {
@@ -462,8 +407,8 @@ HRESULT CLR_RT_ExecutionEngine::CreateEntryPointArgs(CLR_RT_HeapBlock &argsBlk, 
 
 HRESULT CLR_RT_ExecutionEngine::Execute(wchar_t *entryPointArgs, int maxContextSwitch)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock ref;
   CLR_RT_Thread *thMain = NULL;
@@ -471,7 +416,7 @@ HRESULT CLR_RT_ExecutionEngine::Execute(wchar_t *entryPointArgs, int maxContextS
   if (NANOCLR_INDEX_IS_INVALID(g_CLR_RT_TypeSystem.m_entryPoint))
     {
 #if !defined(BUILD_RTM) || defined(_WIN32)
-    CLR_Debug::Printf("Cannot find any entrypoint!\r\n");
+    trace_debug("Cannot find any entrypoint!\r\n");
 #endif
     NANOCLR_SET_AND_LEAVE(CLR_E_ENTRYPOINT_NOT_FOUND);
     }
@@ -490,30 +435,6 @@ HRESULT CLR_RT_ExecutionEngine::Execute(wchar_t *entryPointArgs, int maxContextS
   NANOCLR_CHECK_HRESULT(NewThread(thMain, ref.DereferenceDelegate(), ThreadPriority_Normal, -1));
   }
 
-  {
-  CLR_RT_StackFrame *stack = thMain->CurrentFrame();
-
-  if (stack->m_call.m_target->numArgs > 0)
-    {
-    // Main entrypoint takes an optional String[] parameter.
-    // Set the arg to NULL, if that's the case.
-
-#if defined(WIN32)
-    if (entryPointArgs != NULL)
-      {
-      NANOCLR_CHECK_HRESULT(CreateEntryPointArgs(stack->m_arguments[0], entryPointArgs));
-      }
-    else
-#else
-    (void)entryPointArgs;
-#endif
-    {
-    NANOCLR_CHECK_HRESULT(
-      CLR_RT_HeapBlock_Array::CreateInstance(stack->m_arguments[0], 0, g_CLR_RT_WellKnownTypes.m_String));
-    }
-    }
-  }
-
   // To debug static constructors, the thread should be created after the entrypoint thread.
   NANOCLR_CHECK_HRESULT(WaitForDebugger());
 
@@ -525,7 +446,7 @@ HRESULT CLR_RT_ExecutionEngine::Execute(wchar_t *entryPointArgs, int maxContextS
     HRESULT hr2 = ScheduleThreads(maxContextSwitch);
     NANOCLR_CHECK_HRESULT(hr2);
 
-    if (CLR_EE_DBG_IS(RebootPending) || CLR_EE_DBG_IS(ExitPending) || CLR_EE_REBOOT_IS(ClrOnly))
+    if (CLR_EE_DBG_IS(RebootPending) || CLR_EE_DBG_IS(ExitPending))
       {
       NANOCLR_SET_AND_LEAVE(S_FALSE);
       }
@@ -559,7 +480,7 @@ HRESULT CLR_RT_ExecutionEngine::Execute(wchar_t *entryPointArgs, int maxContextS
 #if defined(NANOCLR_GC_VERBOSE)
         if (s_CLR_RT_fTrace_GC >= c_CLR_RT_Trace_Info)
           {
-          CLR_Debug::Printf("    Memory: Forcing GC.\r\n");
+          trace_debug("    Memory: Forcing GC.\r\n");
           }
 #endif
         PerformGarbageCollection();
@@ -567,9 +488,9 @@ HRESULT CLR_RT_ExecutionEngine::Execute(wchar_t *entryPointArgs, int maxContextS
 #if defined(NANOCLR_GC_VERBOSE)
         if (s_CLR_RT_fTrace_Memory > c_CLR_RT_Trace_Info)
           {
-          CLR_UINT32 inUse = g_CLR_RT_GarbageCollector.m_totalBytes - g_CLR_RT_GarbageCollector.m_freeBytes;
+          uint32_t inUse = g_CLR_RT_GarbageCollector.m_totalBytes - g_CLR_RT_GarbageCollector.m_freeBytes;
 
-          CLR_Debug::Printf("    Memory: INUSE: %d\r\n", (int)inUse);
+          trace_debug("    Memory: INUSE: %d\r\n", (int)inUse);
           }
 #endif
         }
@@ -583,25 +504,11 @@ HRESULT CLR_RT_ExecutionEngine::Execute(wchar_t *entryPointArgs, int maxContextS
 
   NANOCLR_CLEANUP();
 
-#if defined(NANOCLR_PROFILE_NEW)
-  /* g_CLR_RT_ExecutionEngine.Cleanup() gets called too late to flush things out on the emulator since it
-   * only gets called when the finalizer dealing with the managed half of the emulator runs.
-   */
-  g_CLR_PRF_Profiler.Stream_Flush();
-#endif
-
 #if defined(WIN32)
-#if defined(NANOCLR_PROFILE_NEW)
-  if (CLR_EE_PRF_IS(Enabled))
-    {
-    // Clients do not get all the messages they want if a program happens to end and the emulator terminates before
-    // the pipe can be read; furthermore the emulator must be able to persist until all required data is requested.
-    CLR_EE_DBG_SET(Stopped);
-    }
-#endif
 
   // By skipping the whole CLRStartup routine, the Monitor_Program_Exit message never gets sent to clients.
-  CLR_EE_DBG_EVENT_BROADCAST(CLR_DBG_Commands::c_Monitor_ProgramExit, 0, NULL, WP_Flags_c_NonCritical);
+  debug_program_exit(0);
+
   WaitForDebugger();
 #endif
 
@@ -610,7 +517,7 @@ HRESULT CLR_RT_ExecutionEngine::Execute(wchar_t *entryPointArgs, int maxContextS
 
 bool CLR_RT_ExecutionEngine::EnsureSystemThread(CLR_RT_Thread *&thread, int priority)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
 
   if (thread == NULL)
     {
@@ -624,7 +531,7 @@ bool CLR_RT_ExecutionEngine::EnsureSystemThread(CLR_RT_Thread *&thread, int prio
 
 void CLR_RT_ExecutionEngine::SpawnTimer()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   NANOCLR_FOREACH_NODE(CLR_RT_HeapBlock_Timer, timer, m_timers)
     {
     if (timer->m_flags & CLR_RT_HeapBlock_Timer::c_Triggered)
@@ -648,19 +555,19 @@ void CLR_RT_ExecutionEngine::StaticConstructorTerminationCallback(void *arg)
   {
   (void)arg;
 
-  NATIVE_PROFILE_CLR_CORE();
+ 
   g_CLR_RT_ExecutionEngine.SpawnStaticConstructor(g_CLR_RT_ExecutionEngine.m_cctorThread);
   }
 
-bool CLR_RT_ExecutionEngine::SpawnStaticConstructorHelper(CLR_RT_Assembly *assembly, const CLR_RT_MethodDef_Index &idx)
+bool CLR_RT_ExecutionEngine::SpawnStaticConstructorHelper(CLR_RT_Assembly *assembly, uint32_t idx)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_RT_MethodDef_Index idxNext;
+ 
+  uint32_t idxNext;
 
   _ASSERTE(m_cctorThread != NULL);
   _ASSERTE(m_cctorThread->CanThreadBeReused());
 
-  idxNext.m_data = idx.m_data;
+  idxNext = idx;
 
   _ASSERTE(assembly != NULL);
 
@@ -691,7 +598,7 @@ bool CLR_RT_ExecutionEngine::SpawnStaticConstructorHelper(CLR_RT_Assembly *assem
 
 void CLR_RT_ExecutionEngine::SpawnStaticConstructor(CLR_RT_Thread *&pCctorThread)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock_Delegate *dlg = NULL;
 
   if (!EnsureSystemThread(pCctorThread, (ThreadPriority)ThreadPriority_Highest +1))
@@ -701,7 +608,7 @@ void CLR_RT_ExecutionEngine::SpawnStaticConstructor(CLR_RT_Thread *&pCctorThread
 
   if (dlg != NULL)
     {
-    CLR_RT_MethodDef_Index idx = dlg->DelegateFtn();
+    uint32_t idx = dlg->DelegateFtn();
     CLR_RT_MethodDef_Instance inst;
 
     // Find next static constructor for given idx
@@ -710,7 +617,7 @@ void CLR_RT_ExecutionEngine::SpawnStaticConstructor(CLR_RT_Thread *&pCctorThread
 
     // This is ok if idx is no longer valid.  SpawnStaticConstructorHelper will call FindNextStaticConstructor
     // which will fail
-    idx.m_data++;
+    idx++;
 
     if (SpawnStaticConstructorHelper(inst.m_assm, idx))
       return;
@@ -722,8 +629,8 @@ void CLR_RT_ExecutionEngine::SpawnStaticConstructor(CLR_RT_Thread *&pCctorThread
     // Find an AppDomainAssembly that does not have it's static constructor bit set...
     if ((pASSM->m_flags & CLR_RT_Assembly::StaticConstructorsExecuted) == 0)
       {
-      CLR_RT_MethodDef_Index idx;
-      idx.Set(pASSM->m_idx, 0);
+      uint32_t idx;
+      idx = create_index(pASSM->m_idx, 0);
       bool fDepedenciesRun = true;
 
       // Check that all dependent assemblies have had static constructors run.
@@ -751,13 +658,13 @@ void CLR_RT_ExecutionEngine::FinalizerTerminationCallback(void *arg)
   {
   (void)arg;
 
-  NATIVE_PROFILE_CLR_CORE();
+ 
   g_CLR_RT_ExecutionEngine.SpawnFinalizer();
   }
 
 void CLR_RT_ExecutionEngine::SpawnFinalizer()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
 
   CLR_RT_HeapBlock_Finalizer *fin = (CLR_RT_HeapBlock_Finalizer *)m_finalizersPending.FirstNode();
   if (fin->Next() != NULL)
@@ -803,7 +710,7 @@ void CLR_RT_ExecutionEngine::UpdateToLowestExecutionCounter(CLR_RT_Thread *pThre
   pThread->m_executionCounter = m_GlobalExecutionCounter - 1;
   }
 
-void CLR_RT_ExecutionEngine::RetrieveCurrentMethod(CLR_UINT32 &assmIdx, CLR_UINT32 &methodIdx)
+void CLR_RT_ExecutionEngine::RetrieveCurrentMethod(uint32_t &assmIdx, uint32_t &methodIdx)
   {
   assmIdx = 0;
   methodIdx = 0;
@@ -814,13 +721,13 @@ void CLR_RT_ExecutionEngine::RetrieveCurrentMethod(CLR_UINT32 &assmIdx, CLR_UINT
 
     if (stack)
       {
-      assmIdx = stack->m_call.Assembly();
-      methodIdx = stack->m_call.Method();
+      assmIdx = get_assembly_index(stack->m_call.m_index);
+      methodIdx = get_method_index(stack->m_call.m_index);
       }
     }
   }
 
-void CLR_RetrieveCurrentMethod(CLR_UINT32 &assmIdx, CLR_UINT32 &methodIdx)
+void CLR_RetrieveCurrentMethod(uint32_t &assmIdx, uint32_t &methodIdx)
   {
   g_CLR_RT_ExecutionEngine.RetrieveCurrentMethod(assmIdx, methodIdx);
   }
@@ -850,10 +757,12 @@ void CLR_DebuggerBreak()
     }
   }
 
+#define EXECUTION_COUNTER_MAXIMUM 0x40000000
+#define EXECUTION_COUNTER_ADJUSTMENT 0x00000001
+
 HRESULT CLR_RT_ExecutionEngine::ScheduleThreads(int maxContextSwitch)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+   HRESULT hr;
 
   // We run threads based on the m_executionCounter.
   // The thread with highest m_executionCounter is chosen for execution.
@@ -876,22 +785,10 @@ HRESULT CLR_RT_ExecutionEngine::ScheduleThreads(int maxContextSwitch)
 
   while (maxContextSwitch-- > 0)
     {
-
-    /*
-#if defined(WIN32)
-    if (HAL_Windows_IsShutdownPending())
-      {
-      NANOCLR_SET_AND_LEAVE(CLR_S_NO_THREADS);
-      }
-#endif
-*/
-
-#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
     if (CLR_EE_DBG_IS(Stopped))
       {
       NANOCLR_SET_AND_LEAVE(CLR_S_NO_READY_THREADS);
       }
-#endif //#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
 
     CLR_RT_Thread *th = NULL;
 
@@ -1004,11 +901,11 @@ HRESULT CLR_RT_ExecutionEngine::ScheduleThreads(int maxContextSwitch)
   NANOCLR_CLEANUP_END();
   }
 
-CLR_UINT32 CLR_RT_ExecutionEngine::WaitForActivity()
+uint32_t CLR_RT_ExecutionEngine::WaitForActivity()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
 
-  CLR_INT64 timeoutMin = ProcessTimer();
+  int64_t timeoutMin = ProcessTimer();
 
   if (m_threadsReady.IsEmpty() == false)
     return 0; // Someone woke up...
@@ -1034,9 +931,9 @@ CLR_UINT32 CLR_RT_ExecutionEngine::WaitForActivity()
   return 0;
   }
 
-CLR_UINT32 CLR_RT_ExecutionEngine::WaitForActivity(CLR_UINT32 powerLevel, CLR_UINT32 events, CLR_INT64 timeout_ms)
+uint32_t CLR_RT_ExecutionEngine::WaitForActivity(uint32_t powerLevel, uint32_t events, int64_t timeout_ms)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
 
   return WaitSystemEvents(powerLevel, events, timeout_ms);
 
@@ -1054,7 +951,7 @@ CLR_UINT32 CLR_RT_ExecutionEngine::WaitForActivity(CLR_UINT32 powerLevel, CLR_UI
 
 void CLR_RT_ExecutionEngine::PutInProperList(CLR_RT_Thread *th)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   switch (th->m_status)
     {
     case CLR_RT_Thread::TH_S_Ready:
@@ -1082,7 +979,7 @@ void CLR_RT_ExecutionEngine::PutInProperList(CLR_RT_Thread *th)
 
 void CLR_RT_ExecutionEngine::AbortAllThreads(CLR_RT_DblLinkedList &threads)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   NANOCLR_FOREACH_NODE(CLR_RT_Thread, th, threads)
     {
     if ((th->m_flags & CLR_RT_Thread::TH_F_Aborted) == 0)
@@ -1097,7 +994,7 @@ void CLR_RT_ExecutionEngine::AbortAllThreads(CLR_RT_DblLinkedList &threads)
 
 void CLR_RT_ExecutionEngine::ReleaseAllThreads(CLR_RT_DblLinkedList &threads)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   while (true)
     {
     CLR_RT_Thread *th = (CLR_RT_Thread *)threads.ExtractFirstNode();
@@ -1110,7 +1007,7 @@ void CLR_RT_ExecutionEngine::ReleaseAllThreads(CLR_RT_DblLinkedList &threads)
 
 void CLR_RT_ExecutionEngine::InsertThreadRoundRobin(CLR_RT_DblLinkedList &threads, CLR_RT_Thread *thTarget)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_Thread *th;
 
   thTarget->Unlink();
@@ -1150,11 +1047,11 @@ HRESULT CLR_RT_ExecutionEngine::NewThread(
   CLR_RT_Thread *&thRes,
   CLR_RT_HeapBlock_Delegate *pDelegate,
   int priority,
-  CLR_INT32 id,
-  CLR_UINT32 flags)
+  int32_t id,
+  uint32_t flags)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_CHECK_HRESULT(
     CLR_RT_Thread::CreateInstance(id != -1 ? id : ++m_lastPid, pDelegate, priority, thRes, flags));
@@ -1176,7 +1073,7 @@ HRESULT CLR_RT_ExecutionEngine::NewThread(
   NANOCLR_CLEANUP_END();
   }
 
-CLR_INT32 CLR_RT_ExecutionEngine::GetNextThreadId()
+int32_t CLR_RT_ExecutionEngine::GetNextThreadId()
   {
   return ++m_lastPid;
   }
@@ -1185,15 +1082,15 @@ CLR_INT32 CLR_RT_ExecutionEngine::GetNextThreadId()
 
 CLR_RT_HeapBlock *CLR_RT_ExecutionEngine::ExtractHeapBlocksForArray(
   CLR_RT_TypeDef_Instance &inst,
-  CLR_UINT32 length,
+  uint32_t length,
   const CLR_RT_ReflectionDef_Index &reflex)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_DataType dt = (CLR_DataType)inst.m_target->dataType;
   const CLR_RT_DataTypeLookup &dtl = c_CLR_RT_DataTypeLookup[dt];
 
-  CLR_UINT32 totLength = (CLR_UINT32)(sizeof(CLR_RT_HeapBlock_Array) + length * dtl.m_sizeInBytes);
-  CLR_UINT32 lengthHB = CONVERTFROMSIZETOHEAPBLOCKS(totLength);
+  uint32_t totLength = (uint32_t)(sizeof(CLR_RT_HeapBlock_Array) + length * dtl.m_sizeInBytes);
+  uint32_t lengthHB = CONVERTFROMSIZETOHEAPBLOCKS(totLength);
 
   if (lengthHB > CLR_RT_HeapBlock::HB_MaxSize)
     return NULL;
@@ -1208,22 +1105,18 @@ CLR_RT_HeapBlock *CLR_RT_ExecutionEngine::ExtractHeapBlocksForArray(
     pArray->m_typeOfElement = dt;
     pArray->m_sizeOfElement = dtl.m_sizeInBytes;
     pArray->m_fReference = (dtl.m_flags & CLR_RT_DataTypeLookup::c_Numeric) == 0;
-
-#if defined(NANOCLR_PROFILE_NEW_ALLOCATIONS)
-    g_CLR_PRF_Profiler.TrackObjectCreation(pArray);
-#endif
     }
 
   return pArray;
   }
 
 CLR_RT_HeapBlock *CLR_RT_ExecutionEngine::ExtractHeapBlocksForClassOrValueTypes(
-  CLR_UINT32 dataType,
-  CLR_UINT32 flags,
-  const CLR_RT_TypeDef_Index &cls,
-  CLR_UINT32 length)
+  uint32_t dataType,
+  uint32_t flags,
+  uint32_t cls,
+  uint32_t length)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   if (length > CLR_RT_HeapBlock::HB_MaxSize)
     return NULL;
 
@@ -1235,30 +1128,26 @@ CLR_RT_HeapBlock *CLR_RT_ExecutionEngine::ExtractHeapBlocksForClassOrValueTypes(
   if (hb)
     {
     hb->SetObjectCls(cls);
-
-#if defined(NANOCLR_PROFILE_NEW_ALLOCATIONS)
-    g_CLR_PRF_Profiler.TrackObjectCreation(hb);
-#endif
     }
 
   return hb;
   }
 
 CLR_RT_HeapBlock *CLR_RT_ExecutionEngine::ExtractHeapBytesForObjects(
-  CLR_UINT32 dataType,
-  CLR_UINT32 flags,
-  CLR_UINT32 length)
+  uint32_t dataType,
+  uint32_t flags,
+  uint32_t length)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   return ExtractHeapBlocksForObjects(dataType, flags, CONVERTFROMSIZETOHEAPBLOCKS(length));
   }
 
 CLR_RT_HeapBlock *CLR_RT_ExecutionEngine::ExtractHeapBlocksForObjects(
-  CLR_UINT32 dataType,
-  CLR_UINT32 flags,
-  CLR_UINT32 length)
+  uint32_t dataType,
+  uint32_t flags,
+  uint32_t length)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   if (length > CLR_RT_HeapBlock::HB_MaxSize)
     return NULL;
 
@@ -1268,24 +1157,17 @@ CLR_RT_HeapBlock *CLR_RT_ExecutionEngine::ExtractHeapBlocksForObjects(
 
   CLR_RT_HeapBlock *hb = ExtractHeapBlocks(m_heap, dataType, flags, length);
 
-#if defined(NANOCLR_PROFILE_NEW_ALLOCATIONS)
-  if (hb)
-    {
-    g_CLR_PRF_Profiler.TrackObjectCreation(hb);
-    }
-#endif
-
   return hb;
   }
 
 //--//
 
 CLR_RT_HeapBlock_Node *CLR_RT_ExecutionEngine::ExtractHeapBlocksForEvents(
-  CLR_UINT32 dataType,
-  CLR_UINT32 flags,
-  CLR_UINT32 length)
+  uint32_t dataType,
+  uint32_t flags,
+  uint32_t length)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   if (length > CLR_RT_HeapBlock::HB_MaxSize)
     return NULL;
 
@@ -1296,10 +1178,6 @@ CLR_RT_HeapBlock_Node *CLR_RT_ExecutionEngine::ExtractHeapBlocksForEvents(
   if (hb)
     {
     hb->GenericNode_Initialize();
-
-#if defined(NANOCLR_PROFILE_NEW_ALLOCATIONS)
-    g_CLR_PRF_Profiler.TrackObjectCreation(hb);
-#endif
     }
 
   return hb;
@@ -1307,15 +1185,15 @@ CLR_RT_HeapBlock_Node *CLR_RT_ExecutionEngine::ExtractHeapBlocksForEvents(
 
 CLR_RT_HeapBlock *CLR_RT_ExecutionEngine::ExtractHeapBlocks(
   CLR_RT_DblLinkedList &heap,
-  CLR_UINT32 dataType,
-  CLR_UINT32 flags,
-  CLR_UINT32 length)
+  uint32_t dataType,
+  uint32_t flags,
+  uint32_t length)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
 #if !defined(BUILD_RTM)
   if (m_heapState == c_HeapState_UnderGC && ((flags & CLR_RT_HeapBlock::HB_SpecialGCAllocation) == 0))
     {
-    CLR_Debug::Printf("Internal error: call to memory allocation during garbage collection!!!\r\n");
+    trace_debug("Internal error: call to memory allocation during garbage collection!!!\r\n");
 
     // Getting here during a GC is possible, since the watchdog ISR may now require
     // dynamic memory allocation for logging.  Returning NULL means the watchdog log will
@@ -1370,7 +1248,7 @@ CLR_RT_HeapBlock *CLR_RT_ExecutionEngine::ExtractHeapBlocks(
                 {
                 if (phase != 0)
                   {
-                  CLR_Debug::Printf("ExtractHeapBlocks succeeded at phase %d\r\n", phase);
+                  trace_debug("ExtractHeapBlocks succeeded at phase %d\r\n", phase);
                   }
                 }
 #endif
@@ -1395,7 +1273,7 @@ CLR_RT_HeapBlock *CLR_RT_ExecutionEngine::ExtractHeapBlocks(
 #if defined(NANOCLR_GC_VERBOSE)
             if (s_CLR_RT_fTrace_Memory >= c_CLR_RT_Trace_Info)
               {
-              CLR_Debug::Printf(
+              trace_debug(
                 "    Memory: ExtractHeapBlocks: %d bytes needed.\r\n",
                 length * sizeof(CLR_RT_HeapBlock));
               }
@@ -1407,7 +1285,7 @@ CLR_RT_HeapBlock *CLR_RT_ExecutionEngine::ExtractHeapBlocks(
 
           default: // Total failure...
 #if !defined(BUILD_RTM)
-            CLR_Debug::Printf(
+            trace_debug(
               "Failed allocation for %d blocks, %d bytes\r\n\r\n",
               length,
               length * sizeof(CLR_RT_HeapBlock));
@@ -1428,9 +1306,9 @@ CLR_RT_HeapBlock *CLR_RT_ExecutionEngine::ExtractHeapBlocks(
     }
   }
 
-CLR_RT_HeapBlock *CLR_RT_ExecutionEngine::AccessStaticField(const CLR_RT_FieldDef_Index &fd)
+CLR_RT_HeapBlock *CLR_RT_ExecutionEngine::AccessStaticField(uint32_t fd)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_FieldDef_Instance inst;
 
   if (inst.InitializeFromIndex(fd) && inst.m_target->flags & CLR_RECORD_FIELDDEF::FD_Static)
@@ -1443,14 +1321,14 @@ CLR_RT_HeapBlock *CLR_RT_ExecutionEngine::AccessStaticField(const CLR_RT_FieldDe
 
 HRESULT CLR_RT_ExecutionEngine::InitializeReference(CLR_RT_HeapBlock &ref, CLR_RT_SignatureParser &parser)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   //
   // WARNING!!!
   //
   // If you change this method, change "CLR_RT_ExecutionEngine::InitializeLocals" too.
   //
 
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   CLR_RT_SignatureParser::Element res;
   CLR_DataType dt;
@@ -1499,8 +1377,8 @@ HRESULT CLR_RT_ExecutionEngine::InitializeReference(
   const CLR_RECORD_FIELDDEF *target,
   CLR_RT_Assembly *assm)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_SignatureParser parser;
   parser.Initialize_FieldDef(assm, target);
@@ -1517,24 +1395,24 @@ HRESULT CLR_RT_ExecutionEngine::InitializeLocals(
   CLR_RT_Assembly *assm,
   const CLR_RECORD_METHODDEF *md)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   //
   // WARNING!!!
   //
   // This method is a shortcut for the following code:
   //
 
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   CLR_PMETADATA sig = assm->GetSignature(md->locals);
-  CLR_UINT32 count = md->numLocals;
+  uint32_t count = md->numLocals;
   bool fZeroed = false;
 
   while (count)
     {
     CLR_DataType dt = DATATYPE_VOID;
-    CLR_RT_TypeDef_Index cls;
-    CLR_UINT32 levels = 0;
+    uint32_t cls;
+    uint32_t levels = 0;
     CLR_DataType dtModifier = DATATYPE_VOID;
 
     while (true)
@@ -1557,8 +1435,8 @@ HRESULT CLR_RT_ExecutionEngine::InitializeLocals(
         case DATATYPE_CLASS:
         case DATATYPE_VALUETYPE:
         {
-        CLR_UINT32 tk = CLR_TkFromStream(sig);
-        CLR_UINT32 idx = CLR_DataFromTk(tk);
+        uint32_t tk = CLR_TkFromStream(sig);
+        uint32_t idx = CLR_DataFromTk(tk);
 
         switch (CLR_TypeFromTk(tk))
           {
@@ -1580,7 +1458,7 @@ HRESULT CLR_RT_ExecutionEngine::InitializeLocals(
             break;
 
           case TBL_TypeDef:
-            cls.Set(assm->m_idx, idx);
+            cls = create_index(assm->m_idx, idx);
             break;
 
           default:
@@ -1591,7 +1469,7 @@ HRESULT CLR_RT_ExecutionEngine::InitializeLocals(
 
         default:
         {
-        const CLR_RT_TypeDef_Index *cls2 = c_CLR_RT_DataTypeLookup[dt].m_cls;
+        const uint32_t *cls2 = c_CLR_RT_DataTypeLookup[dt].m_cls;
 
         if (cls2 == NULL)
           {
@@ -1671,10 +1549,10 @@ HRESULT CLR_RT_ExecutionEngine::InitializeLocals(
 
 //--//
 
-HRESULT CLR_RT_ExecutionEngine::NewObjectFromIndex(CLR_RT_HeapBlock &reference, const CLR_RT_TypeDef_Index &cls)
+HRESULT CLR_RT_ExecutionEngine::NewObjectFromIndex(CLR_RT_HeapBlock &reference, uint32_t cls)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_TypeDef_Instance inst;
 
@@ -1688,8 +1566,8 @@ HRESULT CLR_RT_ExecutionEngine::NewObjectFromIndex(CLR_RT_HeapBlock &reference, 
 
 HRESULT CLR_RT_ExecutionEngine::NewObject(CLR_RT_HeapBlock &reference, const CLR_RT_TypeDef_Instance &inst)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   reference.SetObjectReference(NULL);
 
@@ -1698,7 +1576,7 @@ HRESULT CLR_RT_ExecutionEngine::NewObject(CLR_RT_HeapBlock &reference, const CLR
   //
   // You cannot create an array this way.
   //
-  if (inst.m_data == g_CLR_RT_WellKnownTypes.m_Array.m_data)
+  if (inst.m_index == g_CLR_RT_WellKnownTypes.m_Array)
     {
     NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
     }
@@ -1737,7 +1615,7 @@ HRESULT CLR_RT_ExecutionEngine::NewObject(CLR_RT_HeapBlock &reference, const CLR
       {
       int clsFields = inst.m_target->iFields_Num;
       int totFields = inst.CrossReference().m_totalFields + CLR_RT_HeapBlock::HB_Object_Fields_Offset;
-      CLR_RT_HeapBlock *obj = ExtractHeapBlocksForClassOrValueTypes(dt, 0, inst, totFields);
+      CLR_RT_HeapBlock *obj = ExtractHeapBlocksForClassOrValueTypes(dt, 0, inst.m_index, totFields);
       CHECK_ALLOCATION(obj);
 
       reference.SetObjectReference(obj);
@@ -1747,7 +1625,7 @@ HRESULT CLR_RT_ExecutionEngine::NewObject(CLR_RT_HeapBlock &reference, const CLR
       CLR_RT_Assembly *assm = NULL;
       CLR_RT_TypeDef_Instance instSub = inst;
 
-      NANOCLR_CHECK_HRESULT(obj->SetObjectCls(inst));
+      NANOCLR_CHECK_HRESULT(obj->SetObjectCls(inst.m_index));
 
       //
       // Initialize field types, from last to first.
@@ -1796,17 +1674,17 @@ HRESULT CLR_RT_ExecutionEngine::NewObject(CLR_RT_HeapBlock &reference, const CLR
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT CLR_RT_ExecutionEngine::NewObject(CLR_RT_HeapBlock &reference, CLR_UINT32 tk, CLR_RT_Assembly *assm)
+HRESULT CLR_RT_ExecutionEngine::NewObject(CLR_RT_HeapBlock &reference, uint32_t tk, CLR_RT_Assembly *assm)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_TypeDef_Instance res;
 
   if (res.ResolveToken(tk, assm) == false)
     NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
 
-  NANOCLR_CHECK_HRESULT(NewObjectFromIndex(reference, res));
+  NANOCLR_CHECK_HRESULT(NewObjectFromIndex(reference, res.m_index));
 
   NANOCLR_NOCLEANUP();
   }
@@ -1815,8 +1693,8 @@ HRESULT CLR_RT_ExecutionEngine::NewObject(CLR_RT_HeapBlock &reference, CLR_UINT3
 
 HRESULT CLR_RT_ExecutionEngine::CloneObject(CLR_RT_HeapBlock &reference, const CLR_RT_HeapBlock &source)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   const CLR_RT_HeapBlock *obj = &source;
   CLR_DataType dt;
@@ -1872,17 +1750,17 @@ HRESULT CLR_RT_ExecutionEngine::CloneObject(CLR_RT_HeapBlock &reference, const C
 
 HRESULT CLR_RT_ExecutionEngine::CopyValueType(CLR_RT_HeapBlock *destination, const CLR_RT_HeapBlock *source)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   if (destination != source)
     {
-    const CLR_RT_TypeDef_Index &cls = source->ObjectCls();
-    if (cls.m_data == destination->ObjectCls().m_data)
+    uint32_t cls = source->ObjectCls();
+    if (cls == destination->ObjectCls())
       {
       CLR_RT_TypeDef_Instance inst;
       inst.InitializeFromIndex(cls);
-      CLR_UINT32 totFields = inst.CrossReference().m_totalFields;
+      uint32_t totFields = inst.CrossReference().m_totalFields;
 
       if (source->IsBoxed())
         destination->Box();
@@ -1914,8 +1792,8 @@ HRESULT CLR_RT_ExecutionEngine::CopyValueType(CLR_RT_HeapBlock *destination, con
 
 HRESULT CLR_RT_ExecutionEngine::NewArrayList(CLR_RT_HeapBlock &ref, int size, CLR_RT_HeapBlock_Array *&array)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   const int minCapacity = CLR_RT_ArrayListHelper::c_defaultCapacity;
   int count = size;
@@ -1934,10 +1812,10 @@ HRESULT CLR_RT_ExecutionEngine::NewArrayList(CLR_RT_HeapBlock &ref, int size, CL
 HRESULT CLR_RT_ExecutionEngine::FindFieldDef(
   CLR_RT_TypeDef_Instance &inst,
   const char *szText,
-  CLR_RT_FieldDef_Index &res)
+  uint32_t &res)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_TypeDef_Instance local = inst;
 
@@ -1955,10 +1833,10 @@ HRESULT CLR_RT_ExecutionEngine::FindFieldDef(
 HRESULT CLR_RT_ExecutionEngine::FindFieldDef(
   CLR_RT_HeapBlock &reference,
   const char *szText,
-  CLR_RT_FieldDef_Index &res)
+  uint32_t &res)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock *obj;
   CLR_RT_TypeDef_Instance inst;
@@ -1981,11 +1859,11 @@ HRESULT CLR_RT_ExecutionEngine::FindFieldDef(
 
 HRESULT CLR_RT_ExecutionEngine::FindField(CLR_RT_HeapBlock &reference, const char *szText, CLR_RT_HeapBlock *&field)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_FieldDef_Instance inst;
-  CLR_RT_FieldDef_Index idx;
+  uint32_t idx;
   CLR_RT_HeapBlock *res;
 
   field = NULL;
@@ -2015,8 +1893,8 @@ HRESULT CLR_RT_ExecutionEngine::FindField(CLR_RT_HeapBlock &reference, const cha
 
 HRESULT CLR_RT_ExecutionEngine::SetField(CLR_RT_HeapBlock &reference, const char *szText, CLR_RT_HeapBlock &value)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock *field;
 
@@ -2029,8 +1907,8 @@ HRESULT CLR_RT_ExecutionEngine::SetField(CLR_RT_HeapBlock &reference, const char
 
 HRESULT CLR_RT_ExecutionEngine::GetField(CLR_RT_HeapBlock &reference, const char *szText, CLR_RT_HeapBlock &value)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock *field;
 
@@ -2045,7 +1923,7 @@ HRESULT CLR_RT_ExecutionEngine::GetField(CLR_RT_HeapBlock &reference, const char
 
 CLR_RT_HeapBlock_Lock *CLR_RT_ExecutionEngine::FindLockObject(CLR_RT_DblLinkedList &threads, CLR_RT_HeapBlock &object)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   NANOCLR_FOREACH_NODE(CLR_RT_Thread, th, threads)
     {
     NANOCLR_FOREACH_NODE(CLR_RT_HeapBlock_Lock, lock, th->m_locks)
@@ -2066,7 +1944,7 @@ CLR_RT_HeapBlock_Lock *CLR_RT_ExecutionEngine::FindLockObject(CLR_RT_DblLinkedLi
 
 CLR_RT_HeapBlock_Lock *CLR_RT_ExecutionEngine::FindLockObject(CLR_RT_HeapBlock &object)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock_Lock *lock;
 
   if (object.DataType() == DATATYPE_OBJECT)
@@ -2099,7 +1977,7 @@ CLR_RT_HeapBlock_Lock *CLR_RT_ExecutionEngine::FindLockObject(CLR_RT_HeapBlock &
 
 void CLR_RT_ExecutionEngine::DeleteLockRequests(CLR_RT_Thread *thTarget, CLR_RT_SubThread *sthTarget)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   if ((thTarget && thTarget->m_lockRequestsCount) || (sthTarget && sthTarget->m_lockRequestsCount))
     {
     DeleteLockRequests(thTarget, sthTarget, m_threadsReady);
@@ -2112,7 +1990,7 @@ void CLR_RT_ExecutionEngine::DeleteLockRequests(
   CLR_RT_SubThread *sthTarget,
   CLR_RT_DblLinkedList &threads)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   NANOCLR_FOREACH_NODE(CLR_RT_Thread, th, threads)
     {
     NANOCLR_FOREACH_NODE(CLR_RT_HeapBlock_Lock, lock, th->m_locks)
@@ -2137,11 +2015,11 @@ void CLR_RT_ExecutionEngine::DeleteLockRequests(
   }
 
 
-CLR_INT64 CLR_RT_ExecutionEngine::ProcessTimer()
+int64_t CLR_RT_ExecutionEngine::ProcessTimer()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
 
-  CLR_INT64 timeoutMin;
+  int64_t timeoutMin;
 
   timeoutMin = m_maximumTimeToActive; // max sleep.
 
@@ -2191,9 +2069,9 @@ CLR_INT64 CLR_RT_ExecutionEngine::ProcessTimer()
   return timeoutMin;
   }
 
-void CLR_RT_ExecutionEngine::ProcessTimeEvent(CLR_UINT32 event)
+void CLR_RT_ExecutionEngine::ProcessTimeEvent(uint32_t event)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   SYSTEMTIME systemTime;
 
   HAL_Time_ToSystemTime(HAL_Time_CurrentTime(), &systemTime);
@@ -2202,7 +2080,7 @@ void CLR_RT_ExecutionEngine::ProcessTimeEvent(CLR_UINT32 event)
     {
     if (timer->m_flags & CLR_RT_HeapBlock_Timer::c_EnabledTimer)
       {
-      CLR_UINT32 val = timer->m_flags & CLR_RT_HeapBlock_Timer::c_AnyChange;
+      uint32_t val = timer->m_flags & CLR_RT_HeapBlock_Timer::c_AnyChange;
 
       if (val)
         {
@@ -2222,20 +2100,20 @@ void CLR_RT_ExecutionEngine::ProcessTimeEvent(CLR_UINT32 event)
 
 void CLR_RT_ExecutionEngine::InvalidateTimerCache()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   g_CLR_RT_ExecutionEngine.m_timerCache = false;
   }
 
 //--//--//
 
-bool CLR_RT_ExecutionEngine::IsTimeExpired(const CLR_INT64 &timeExpire, CLR_INT64 &timeoutMin)
+bool CLR_RT_ExecutionEngine::IsTimeExpired(const int64_t &timeExpire, int64_t &timeoutMin)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
 
-  if (timeExpire <= (CLR_INT64)HAL_Time_CurrentTime())
+  if (timeExpire <= (int64_t)HAL_Time_CurrentTime())
     return true;
 
-  CLR_INT64 diff = timeExpire - HAL_Time_CurrentTime();
+  int64_t diff = timeExpire - HAL_Time_CurrentTime();
 
   if (diff < timeoutMin)
     {
@@ -2245,15 +2123,15 @@ bool CLR_RT_ExecutionEngine::IsTimeExpired(const CLR_INT64 &timeExpire, CLR_INT6
   return false;
   }
 
-bool CLR_RT_ExecutionEngine::IsThereEnoughIdleTime(CLR_UINT32 expectedMsec)
+bool CLR_RT_ExecutionEngine::IsThereEnoughIdleTime(uint32_t expectedMsec)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   /*
   if (::Events_MaskedRead(g_CLR_HW_Hardware.m_wakeupEvents))
     return false;
     */
 
-  CLR_INT64 now = HAL_Time_CurrentTime();
+  int64_t now = HAL_Time_CurrentTime();
 
   if (now + expectedMsec * TIME_CONVERSION__TO_MILLISECONDS >= m_currentNextActivityTime)
     return false;
@@ -2263,16 +2141,16 @@ bool CLR_RT_ExecutionEngine::IsThereEnoughIdleTime(CLR_UINT32 expectedMsec)
 
 //--//
 
-void CLR_RT_ExecutionEngine::CheckTimers(CLR_INT64 &timeoutMin)
+void CLR_RT_ExecutionEngine::CheckTimers(int64_t &timeoutMin)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   bool fAnyTimersExpired = false;
 
   NANOCLR_FOREACH_NODE(CLR_RT_HeapBlock_Timer, timer, m_timers)
     {
     if (timer->m_flags & CLR_RT_HeapBlock_Timer::c_EnabledTimer)
       {
-      CLR_INT64 expire = timer->m_timeExpire;
+      int64_t expire = timer->m_timeExpire;
       if (IsTimeExpired(expire, timeoutMin))
         {
 
@@ -2294,13 +2172,13 @@ void CLR_RT_ExecutionEngine::CheckTimers(CLR_INT64 &timeoutMin)
     }
   }
 
-void CLR_RT_ExecutionEngine::CheckThreads(CLR_INT64 &timeoutMin, CLR_RT_DblLinkedList &threads)
+void CLR_RT_ExecutionEngine::CheckThreads(int64_t &timeoutMin, CLR_RT_DblLinkedList &threads)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
 
   NANOCLR_FOREACH_NODE(CLR_RT_Thread, th, threads)
     {
-    CLR_INT64 expire;
+    int64_t expire;
 
 #if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
     if (th->m_flags & CLR_RT_Thread::TH_F_Suspended)
@@ -2406,11 +2284,11 @@ void CLR_RT_ExecutionEngine::CheckThreads(CLR_INT64 &timeoutMin, CLR_RT_DblLinke
 HRESULT CLR_RT_ExecutionEngine::LockObject(
   CLR_RT_HeapBlock &reference,
   CLR_RT_SubThread *sth,
-  const CLR_INT64 &timeExpire,
+  const int64_t &timeExpire,
   bool fForce)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Lock *lock;
 
@@ -2428,8 +2306,8 @@ HRESULT CLR_RT_ExecutionEngine::LockObject(
 
 HRESULT CLR_RT_ExecutionEngine::UnlockObject(CLR_RT_HeapBlock &reference, CLR_RT_SubThread *sth)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Lock *lock;
 
@@ -2442,10 +2320,10 @@ HRESULT CLR_RT_ExecutionEngine::UnlockObject(CLR_RT_HeapBlock &reference, CLR_RT
 
 //--//
 
-HRESULT CLR_RT_ExecutionEngine::Sleep(CLR_RT_Thread *caller, const CLR_INT64 &timeExpire)
+HRESULT CLR_RT_ExecutionEngine::Sleep(CLR_RT_Thread *caller, const int64_t &timeExpire)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   caller->m_waitForEvents_Timeout = timeExpire;
   CLR_RT_ExecutionEngine::InvalidateTimerCache();
@@ -2460,12 +2338,12 @@ HRESULT CLR_RT_ExecutionEngine::Sleep(CLR_RT_Thread *caller, const CLR_INT64 &ti
 
 HRESULT CLR_RT_ExecutionEngine::WaitEvents(
   CLR_RT_Thread *caller,
-  const CLR_INT64 &timeExpire,
-  CLR_UINT32 events,
+  const int64_t &timeExpire,
+  uint32_t events,
   bool &fSuccess)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   if (m_raisedEvents & events)
     {
@@ -2477,7 +2355,7 @@ HRESULT CLR_RT_ExecutionEngine::WaitEvents(
     {
     fSuccess = false;
 
-    if ((CLR_INT64)HAL_Time_CurrentTime() < timeExpire)
+    if ((int64_t)HAL_Time_CurrentTime() < timeExpire)
       {
       caller->m_waitForEvents = events;
       caller->m_waitForEvents_Timeout = timeExpire;
@@ -2491,9 +2369,9 @@ HRESULT CLR_RT_ExecutionEngine::WaitEvents(
   NANOCLR_NOCLEANUP();
   }
 
-void CLR_RT_ExecutionEngine::SignalEvents(CLR_RT_DblLinkedList &threads, CLR_UINT32 events)
+void CLR_RT_ExecutionEngine::SignalEvents(CLR_RT_DblLinkedList &threads, uint32_t events)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   m_raisedEvents |= events;
 
   NANOCLR_FOREACH_NODE(CLR_RT_Thread, th, threads)
@@ -2509,9 +2387,9 @@ void CLR_RT_ExecutionEngine::SignalEvents(CLR_RT_DblLinkedList &threads, CLR_UIN
   NANOCLR_FOREACH_NODE_END();
   }
 
-void CLR_RT_ExecutionEngine::SignalEvents(CLR_UINT32 events)
+void CLR_RT_ExecutionEngine::SignalEvents(uint32_t events)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   // Why does the ready queue need to be checked.
   SignalEvents(m_threadsReady, events);
   SignalEvents(m_threadsWaiting, events);
@@ -2524,7 +2402,7 @@ bool CLR_RT_ExecutionEngine::IsInstanceOf(
   CLR_RT_TypeDescriptor &descTarget,
   bool isInstInstruction)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_TypeDef_Instance &inst = desc.m_handlerCls;
   CLR_RT_TypeDef_Instance &instTarget = descTarget.m_handlerCls;
   bool fArray = false;
@@ -2547,10 +2425,10 @@ bool CLR_RT_ExecutionEngine::IsInstanceOf(
       //
       // Casting from <type>[] to System.Array or System.Object is always allowed.
       //
-      if (inst.m_data == g_CLR_RT_WellKnownTypes.m_Array.m_data ||
-        inst.m_data == g_CLR_RT_WellKnownTypes.m_Object.m_data ||
-        inst.m_data == g_CLR_RT_WellKnownTypes.m_IList.m_data ||
-        inst.m_data == g_CLR_RT_WellKnownTypes.m_ICloneable.m_data)
+      if (inst.m_index == g_CLR_RT_WellKnownTypes.m_Array ||
+        inst.m_index == g_CLR_RT_WellKnownTypes.m_Object ||
+        inst.m_index == g_CLR_RT_WellKnownTypes.m_IList ||
+        inst.m_index == g_CLR_RT_WellKnownTypes.m_ICloneable)
         {
         return true;
         }
@@ -2562,8 +2440,8 @@ bool CLR_RT_ExecutionEngine::IsInstanceOf(
       }
     }
 
-  CLR_UINT32 semantic = (inst.m_target->flags & CLR_RECORD_TYPEDEF::TD_Semantics_Mask);
-  CLR_UINT32 semanticTarget = (instTarget.m_target->flags & CLR_RECORD_TYPEDEF::TD_Semantics_Mask);
+  uint32_t semantic = (inst.m_target->flags & CLR_RECORD_TYPEDEF::TD_Semantics_Mask);
+  uint32_t semanticTarget = (instTarget.m_target->flags & CLR_RECORD_TYPEDEF::TD_Semantics_Mask);
 
   if (fArray)
     {
@@ -2575,7 +2453,7 @@ bool CLR_RT_ExecutionEngine::IsInstanceOf(
 
   do
     {
-    if (inst.m_data == instTarget.m_data)
+    if (inst.m_index == instTarget.m_index)
       {
       return true;
       }
@@ -2594,7 +2472,7 @@ bool CLR_RT_ExecutionEngine::IsInstanceOf(
         if (FAILED(parser.Advance(res)))
           break;
 
-        if (res.m_cls.m_data == instTarget.m_data)
+        if (res.m_cls == instTarget.m_index)
           {
           return true;
           }
@@ -2605,9 +2483,9 @@ bool CLR_RT_ExecutionEngine::IsInstanceOf(
     return false;
   }
 
-bool CLR_RT_ExecutionEngine::IsInstanceOf(const CLR_RT_TypeDef_Index &cls, const CLR_RT_TypeDef_Index &clsTarget)
+bool CLR_RT_ExecutionEngine::IsInstanceOf(uint32_t cls, uint32_t clsTarget)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_TypeDescriptor desc;
   CLR_RT_TypeDescriptor descTarget;
 
@@ -2619,9 +2497,9 @@ bool CLR_RT_ExecutionEngine::IsInstanceOf(const CLR_RT_TypeDef_Index &cls, const
   return IsInstanceOf(desc, descTarget, false);
   }
 
-bool CLR_RT_ExecutionEngine::IsInstanceOf(CLR_RT_HeapBlock &ref, const CLR_RT_TypeDef_Index &clsTarget)
+bool CLR_RT_ExecutionEngine::IsInstanceOf(CLR_RT_HeapBlock &ref, uint32_t clsTarget)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_TypeDescriptor desc;
   CLR_RT_TypeDescriptor descTarget;
 
@@ -2636,10 +2514,10 @@ bool CLR_RT_ExecutionEngine::IsInstanceOf(CLR_RT_HeapBlock &ref, const CLR_RT_Ty
 bool CLR_RT_ExecutionEngine::IsInstanceOf(
   CLR_RT_HeapBlock &obj,
   CLR_RT_Assembly *assm,
-  CLR_UINT32 token,
+  uint32_t token,
   bool isInstInstruction)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_TypeDescriptor desc;
   CLR_RT_TypeDescriptor descTarget;
   CLR_RT_TypeDef_Instance clsTarget;
@@ -2653,15 +2531,15 @@ bool CLR_RT_ExecutionEngine::IsInstanceOf(
     //
     // Shortcut for identity.
     //
-    if (desc.m_handlerCls.m_data == clsTarget.m_data)
+    if (desc.m_handlerCls.m_index == clsTarget.m_index)
       return true;
 
-    if (FAILED(descTarget.InitializeFromType(clsTarget)))
+    if (FAILED(descTarget.InitializeFromType(clsTarget.m_index)))
       return false;
     }
   else if (defTarget.ResolveToken(token, assm))
     {
-    if (FAILED(descTarget.InitializeFromTypeSpec(defTarget)))
+    if (FAILED(descTarget.InitializeFromTypeSpec(defTarget.m_index)))
       return false;
     }
   else
@@ -2674,12 +2552,12 @@ bool CLR_RT_ExecutionEngine::IsInstanceOf(
 
 HRESULT CLR_RT_ExecutionEngine::CastToType(
   CLR_RT_HeapBlock &ref,
-  CLR_UINT32 tk,
+  uint32_t tk,
   CLR_RT_Assembly *assm,
   bool isInstInstruction)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   if (ref.DataType() == DATATYPE_OBJECT && ref.Dereference() == NULL)
     {
@@ -2704,10 +2582,10 @@ HRESULT CLR_RT_ExecutionEngine::CastToType(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HRESULT CLR_RT_ExecutionEngine::InitTimeout(CLR_INT64 &timeExpire, const CLR_INT64 &timeout)
+HRESULT CLR_RT_ExecutionEngine::InitTimeout(int64_t &timeExpire, const int64_t &timeout)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   if (timeout < 0)
     {
@@ -2731,10 +2609,10 @@ HRESULT CLR_RT_ExecutionEngine::InitTimeout(CLR_INT64 &timeExpire, const CLR_INT
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT CLR_RT_ExecutionEngine::InitTimeout(CLR_INT64 &timeExpire, CLR_INT32 timeout)
+HRESULT CLR_RT_ExecutionEngine::InitTimeout(int64_t &timeExpire, int32_t timeout)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   if (timeout < 0)
     {
@@ -2757,16 +2635,16 @@ HRESULT CLR_RT_ExecutionEngine::InitTimeout(CLR_INT64 &timeExpire, CLR_INT32 tim
 
 void CLR_RT_ExecutionEngine::SetDebuggingInfoBreakpoints(bool fSet)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   for (size_t pos = 0; pos < m_breakpointsNum; pos++)
     {
-    CLR_DBG_Commands::Debugging_Execution_BreakpointDef &def = m_breakpoints[pos];
+    const execution_breakpoint_t &def = m_breakpoints[pos];
 
-    if (def.m_flags & CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_HARD)
+    if (def.m_flags & c_HARD)
       {
       CLR_RT_MethodDef_Instance inst;
 
-      if (inst.InitializeFromIndex(def.m_md))
+      if (inst.InitializeFromIndex(def.m_method_index))
         {
         inst.DebuggingInfo().SetBreakpoint(fSet);
         }
@@ -2774,14 +2652,14 @@ void CLR_RT_ExecutionEngine::SetDebuggingInfoBreakpoints(bool fSet)
     }
   }
 
-void CLR_RT_ExecutionEngine::InstallBreakpoints(CLR_DBG_Commands::Debugging_Execution_BreakpointDef *data, size_t num)
+void CLR_RT_ExecutionEngine::InstallBreakpoints(const execution_breakpoint_t *data, size_t num)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   SetDebuggingInfoBreakpoints(false);
 
   if (m_breakpoints)
     {
-    CLR_RT_Memory::Release(m_breakpoints);
+    CLR_RT_Memory::Release((void *) m_breakpoints);
 
     m_breakpoints = NULL;
     m_breakpointsNum = 0;
@@ -2789,9 +2667,9 @@ void CLR_RT_ExecutionEngine::InstallBreakpoints(CLR_DBG_Commands::Debugging_Exec
 
   if (num)
     {
-    size_t len = num * sizeof(CLR_DBG_Commands::Debugging_Execution_BreakpointDef);
+    size_t len = num * sizeof(execution_breakpoint_t);
 
-    m_breakpoints = (CLR_DBG_Commands::Debugging_Execution_BreakpointDef *)CLR_RT_Memory::Allocate(
+    m_breakpoints = (execution_breakpoint_t *)CLR_RT_Memory::Allocate(
       len,
       CLR_RT_HeapBlock::HB_CompactOnFailure);
     if (m_breakpoints)
@@ -2808,18 +2686,15 @@ void CLR_RT_ExecutionEngine::InstallBreakpoints(CLR_DBG_Commands::Debugging_Exec
   Breakpoint_Threads_Prepare(m_threadsWaiting);
   }
 
-void CLR_RT_ExecutionEngine::StopOnBreakpoint(
-  CLR_DBG_Commands::Debugging_Execution_BreakpointDef &def,
-  CLR_RT_Thread *th)
+void CLR_RT_ExecutionEngine::StopOnBreakpoint(execution_breakpoint_t *def, CLR_RT_Thread *th)
   {
-  NATIVE_PROFILE_CLR_CORE();
   if (CLR_EE_DBG_IS_NOT(BreakpointsDisabled))
     {
     if (m_breakpointsActiveNum < ARRAYSIZE(m_breakpointsActive))
       {
-      CLR_DBG_Commands::Debugging_Execution_BreakpointDef &bp = m_breakpointsActive[m_breakpointsActiveNum++];
+      execution_breakpoint_t &bp = m_breakpointsActive[m_breakpointsActiveNum++];
 
-      bp = def;
+      bp = *def;
 
       CLR_EE_DBG_SET(Stopped);
 
@@ -2831,11 +2706,10 @@ void CLR_RT_ExecutionEngine::StopOnBreakpoint(
 
       if (m_breakpointsActiveNum == 1)
         {
-        CLR_EE_DBG_EVENT_SEND(
-          CLR_DBG_Commands::c_Debugging_Execution_BreakpointHit,
-          sizeof(CLR_DBG_Commands::Debugging_Execution_BreakpointDef),
-          &m_breakpointsActive[0],
-          WP_Flags_c_NonCritical);
+        debugger_event_args_t args;
+        args.version = sizeof(debugger_event_args_t);
+        args.reason = &bp;
+        debug_breakpoint(&args);
         }
       }
     else
@@ -2846,17 +2720,17 @@ void CLR_RT_ExecutionEngine::StopOnBreakpoint(
   }
 
 void CLR_RT_ExecutionEngine::StopOnBreakpoint(
-  CLR_DBG_Commands::Debugging_Execution_BreakpointDef &def,
+  execution_breakpoint_t &def,
   CLR_RT_StackFrame *stack,
   CLR_PMETADATA ip)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   if (ip == NULL)
     ip = stack->m_IP;
 
   def.m_depth = stack->m_depth;
-  def.m_md = stack->m_call;
-  def.m_IP = (CLR_UINT32)(ip - stack->m_IPstart);
+  def.m_method_index = stack->m_call;
+  def.m_IP = (uint32_t)(ip - stack->m_IPstart);
 
   // Don't fail for special cases regarding messages dealing with exception handling.
   _ASSERTE(def.m_IP == 0xffffffff || ip >= stack->m_IPstart);
@@ -2865,16 +2739,16 @@ void CLR_RT_ExecutionEngine::StopOnBreakpoint(
   StopOnBreakpoint(def, stack->m_owningThread);
   }
 
-bool CLR_RT_ExecutionEngine::DequeueActiveBreakpoint(CLR_DBG_Commands::Debugging_Execution_BreakpointDef &def)
+bool CLR_RT_ExecutionEngine::DequeueActiveBreakpoint(execution_breakpoint_t &def)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   if (m_breakpointsActiveNum)
     {
     def = m_breakpointsActive[0];
 
     if (--m_breakpointsActiveNum == 0)
       {
-      def.m_flags |= CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_LAST_BREAKPOINT;
+      def.m_flags |= c_LAST_BREAKPOINT;
       }
 
     memmove(
@@ -2891,16 +2765,16 @@ bool CLR_RT_ExecutionEngine::DequeueActiveBreakpoint(CLR_DBG_Commands::Debugging
 //--//
 
 void CLR_RT_ExecutionEngine::Breakpoint_System_Event(
-  CLR_DBG_Commands::Debugging_Execution_BreakpointDef &hit,
-  CLR_UINT16 event,
+  execution_breakpoint_t &hit,
+  uint16_t event,
   CLR_RT_Thread *th,
   CLR_RT_StackFrame *stack,
   CLR_PMETADATA ip)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   for (size_t pos = 0; pos < m_breakpointsNum; pos++)
     {
-    CLR_DBG_Commands::Debugging_Execution_BreakpointDef &def = m_breakpoints[pos];
+    execution_breakpoint_t &def = m_breakpoints[pos];
 
     if (stack != NULL)
       {
@@ -2909,8 +2783,7 @@ void CLR_RT_ExecutionEngine::Breakpoint_System_Event(
       th = stack->m_owningThread;
       }
 
-    if (th == NULL || (def.m_pid == th->m_pid) ||
-      def.m_pid == CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_PID_ANY)
+    if (th == NULL || (def.m_pid == th->m_pid) || def.m_pid == c_PID_ANY)
       {
       if (def.m_flags & event)
         {
@@ -2932,41 +2805,25 @@ void CLR_RT_ExecutionEngine::Breakpoint_System_Event(
 
 void CLR_RT_ExecutionEngine::Breakpoint_Assemblies_Loaded()
   {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_DBG_Commands::Debugging_Execution_BreakpointDef hit;
-  NANOCLR_CLEAR(hit);
-
-  for (size_t i = 0; i < this->m_breakpointsActiveNum; i++)
-    {
-    CLR_DBG_Commands::Debugging_Execution_BreakpointDef &def = this->m_breakpointsActive[i];
-
-    if (def.m_flags & CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_ASSEMBLIES_LOADED)
-      {
-      // There is already one queued AssembliesLoaded breakpoint.  No need to send another one.
-      return;
-      }
-    }
-
-  Breakpoint_System_Event(
-    hit,
-    CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_ASSEMBLIES_LOADED,
-    m_currentThread,
-    NULL,
-    NULL);
+  debugger_event_args_t args;
+  args.version = sizeof(debugger_event_args_t);
+  args.flags = c_ASSEMBLIES_LOADED;
+  args.pid = m_currentThread->m_pid;
+  debug_breakpoint(&args);
   }
 
 void CLR_RT_ExecutionEngine::Breakpoint_Threads_Prepare(CLR_RT_DblLinkedList &threads)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   NANOCLR_FOREACH_NODE(CLR_RT_Thread, th, threads)
     {
     th->m_fHasJMCStepper = false;
 
     for (size_t pos = 0; pos < m_breakpointsNum; pos++)
       {
-      CLR_DBG_Commands::Debugging_Execution_BreakpointDef &def = m_breakpoints[pos];
+      execution_breakpoint_t &def = m_breakpoints[pos];
 
-      if (def.m_flags & CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_STEP_JMC)
+      if (def.m_flags & c_STEP_JMC)
         {
         if (def.m_pid == th->m_pid)
           {
@@ -2988,9 +2845,9 @@ void CLR_RT_ExecutionEngine::Breakpoint_Threads_Prepare(CLR_RT_DblLinkedList &th
         {
         for (size_t pos = 0; pos < m_breakpointsNum; pos++)
           {
-          CLR_DBG_Commands::Debugging_Execution_BreakpointDef &def = m_breakpoints[pos];
+          execution_breakpoint_t &def = m_breakpoints[pos];
 
-          if (def.m_flags & CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_STEP)
+          if (def.m_flags & c_STEP)
             {
             if (def.m_pid == th->m_pid && def.m_depth == call->m_depth)
               {
@@ -3011,9 +2868,9 @@ void CLR_RT_ExecutionEngine::Breakpoint_Threads_Prepare(CLR_RT_DblLinkedList &th
           {
           for (size_t pos = 0; pos < m_breakpointsNum; pos++)
             {
-            CLR_DBG_Commands::Debugging_Execution_BreakpointDef &def = m_breakpoints[pos];
+            execution_breakpoint_t &def = m_breakpoints[pos];
 
-            if (def.m_flags & CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_STEP)
+            if (def.m_flags & c_STEP)
               {
               if (def.m_pid == th->m_pid && def.m_depth == (call->m_depth - 1))
                 {
@@ -3033,40 +2890,34 @@ void CLR_RT_ExecutionEngine::Breakpoint_Threads_Prepare(CLR_RT_DblLinkedList &th
 
 void CLR_RT_ExecutionEngine::Breakpoint_Thread_Terminated(CLR_RT_Thread *th)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_DBG_Commands::Debugging_Execution_BreakpointDef hit;
-  NANOCLR_CLEAR(hit);
-  CLR_UINT16 evt = CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_THREAD_TERMINATED;
+  debugger_event_args_t args;
+  args.version = sizeof(debugger_event_args_t);
+  args.flags = c_THREAD_TERMINATED;
+  if (th->m_scratchPad > 0)
+    args.flags |= c_EVAL_COMPLETE;
+  args.pid = th->m_pid;
+  args.depth = 0xFFFFFFFF;
 
-  hit.m_depth = 0xFFFFFFFF;
-
-  if (th->m_scratchPad >= 0)
-    {
-    evt |= CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_EVAL_COMPLETE;
-    }
-
-  Breakpoint_System_Event(hit, evt, th, NULL, NULL);
+  debug_breakpoint(&args);
   }
 
 void CLR_RT_ExecutionEngine::Breakpoint_Thread_Created(CLR_RT_Thread *th)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_DBG_Commands::Debugging_Execution_BreakpointDef hit;
-  NANOCLR_CLEAR(hit);
+  debugger_event_args_t args;
+  args.version = sizeof(debugger_event_args_t);
+  args.flags = c_THREAD_CREATED;
+  args.pid = th->m_pid;
 
-  Breakpoint_System_Event(hit, CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_THREAD_CREATED, th, NULL, NULL);
+  debug_breakpoint(&args);
   }
 
-//--//
-
-void CLR_RT_ExecutionEngine::Breakpoint_StackFrame_Push(CLR_RT_StackFrame *stack, CLR_UINT32 reason)
+void CLR_RT_ExecutionEngine::Breakpoint_StackFrame_Push(CLR_RT_StackFrame *stack, uint32_t reason)
   {
-  NATIVE_PROFILE_CLR_CORE();
   CLR_RT_Thread *th = stack->m_owningThread;
   int pid = th->m_pid;
-  CLR_UINT32 depthMax = stack->m_depth - 1;
-  CLR_UINT16 flags = CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_STEP_IN;
-  CLR_UINT32 depthMin = depthMax;
+  uint32_t depthMax = stack->m_depth - 1;
+  uint16_t flags = c_STEP_IN;
+  uint32_t depthMin = depthMax;
 
   if (stack->m_flags & CLR_RT_StackFrame::c_PseudoStackFrameForFilter)
     {
@@ -3078,13 +2929,12 @@ void CLR_RT_ExecutionEngine::Breakpoint_StackFrame_Push(CLR_RT_StackFrame *stack
     depthMin = us.m_handlerStack->m_depth;
     // If we popped off frames from AppDomain transitions that had steppers, we want to break there as well.
     depthMax = 0xffffffff;
-    flags |= CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_STEP_OVER |
-      CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_STEP_OUT;
+    flags |= c_STEP_OVER | c_STEP_OUT;
     }
 
   for (size_t pos = 0; pos < m_breakpointsNum; pos++)
     {
-    CLR_DBG_Commands::Debugging_Execution_BreakpointDef &def = m_breakpoints[pos];
+    execution_breakpoint_t &def = m_breakpoints[pos];
 
     if (def.m_flags & flags)
       {
@@ -3092,7 +2942,7 @@ void CLR_RT_ExecutionEngine::Breakpoint_StackFrame_Push(CLR_RT_StackFrame *stack
         {
         bool fStop;
 
-        if (def.m_flags & CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_STEP_JMC)
+        if (def.m_flags & c_STEP_JMC)
           {
           fStop = stack->m_call.DebuggingInfo().IsJMC();
           }
@@ -3102,8 +2952,7 @@ void CLR_RT_ExecutionEngine::Breakpoint_StackFrame_Push(CLR_RT_StackFrame *stack
           }
 
         if (def.m_depth == depthMin &&
-          (def.m_flags & CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_STEP) ==
-          CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_STEP_OUT)
+          (def.m_flags & c_STEP) == c_STEP_OUT)
           {
           // In the case a user did a step out in a frame, we don't want to break if a filter gets pushed from
           // that frame. However, if there is a step in or over on that frame, we should break.
@@ -3112,9 +2961,9 @@ void CLR_RT_ExecutionEngine::Breakpoint_StackFrame_Push(CLR_RT_StackFrame *stack
 
         if (fStop)
           {
-          CLR_DBG_Commands::Debugging_Execution_BreakpointDef hit = def;
+          execution_breakpoint_t hit = def;
 
-          hit.m_flags = CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_STEP_IN;
+          hit.m_flags = c_STEP_IN;
           hit.m_depthExceptionHandler = reason;
 
           StopOnBreakpoint(hit, stack, NULL);
@@ -3128,24 +2977,24 @@ void CLR_RT_ExecutionEngine::Breakpoint_StackFrame_Push(CLR_RT_StackFrame *stack
 
 void CLR_RT_ExecutionEngine::Breakpoint_StackFrame_Pop(CLR_RT_StackFrame *stack, bool stepEH)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   int pid = stack->m_owningThread->m_pid;
-  CLR_UINT32 depth = stack->m_depth;
+  uint32_t depth = stack->m_depth;
   CLR_RT_StackFrame *caller = stack->Caller();
 
   if (caller->Prev() || stepEH)
     {
     for (size_t pos = 0; pos < m_breakpointsNum; pos++)
       {
-      CLR_DBG_Commands::Debugging_Execution_BreakpointDef &def = m_breakpoints[pos];
+      execution_breakpoint_t &def = m_breakpoints[pos];
 
-      if (def.m_flags & CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_STEP_OUT)
+      if (def.m_flags & c_STEP_OUT)
         {
         if (def.m_pid == pid)
           {
           bool fStop;
 
-          if (def.m_flags & CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_STEP_JMC)
+          if (def.m_flags & c_STEP_JMC)
             {
             fStop = (depth <= def.m_depth) && caller->m_call.DebuggingInfo().IsJMC();
             }
@@ -3156,19 +3005,19 @@ void CLR_RT_ExecutionEngine::Breakpoint_StackFrame_Pop(CLR_RT_StackFrame *stack,
 
           if (fStop)
             {
-            CLR_DBG_Commands::Debugging_Execution_BreakpointDef hit = def;
+            execution_breakpoint_t hit = def;
 
-            hit.m_flags = CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_STEP_OUT;
+            hit.m_flags = c_STEP_OUT;
 
             if (stepEH)
               {
               hit.m_depthExceptionHandler =
-                CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_DEPTH_STEP_EXCEPTION_HANDLER;
+                c_DEPTH_STEP_EXCEPTION_HANDLER;
               }
             else
               {
               hit.m_depthExceptionHandler =
-                CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_DEPTH_STEP_RETURN;
+                c_DEPTH_STEP_RETURN;
               }
 
             StopOnBreakpoint(hit, (stepEH) ? stack : caller, NULL);
@@ -3181,20 +3030,19 @@ void CLR_RT_ExecutionEngine::Breakpoint_StackFrame_Pop(CLR_RT_StackFrame *stack,
 
 void CLR_RT_ExecutionEngine::Breakpoint_StackFrame_Step(CLR_RT_StackFrame *stack, CLR_PMETADATA ip)
   {
-  NATIVE_PROFILE_CLR_CORE();
   int pid = stack->m_owningThread->m_pid;
-  CLR_UINT32 depth = stack->m_depth;
-  CLR_UINT32 IPoffset = (CLR_UINT32)(ip - stack->m_IPstart);
+  uint32_t depth = stack->m_depth;
+  uint32_t IPoffset = (uint32_t)(ip - stack->m_IPstart);
 
   for (size_t pos = 0; pos < m_breakpointsNum; pos++)
     {
-    CLR_DBG_Commands::Debugging_Execution_BreakpointDef &def = m_breakpoints[pos];
+    execution_breakpoint_t &def = m_breakpoints[pos];
 
-    if (def.m_flags & CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_STEP_OVER)
+    if (def.m_flags & c_STEP_OVER)
       {
       if (def.m_pid == pid && def.m_depth == depth && (IPoffset < def.m_IPStart || IPoffset >= def.m_IPEnd))
         {
-        if (def.m_flags & CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_STEP_JMC)
+        if (def.m_flags & c_STEP_JMC)
           {
           if (!stack->m_call.DebuggingInfo().IsJMC())
             {
@@ -3202,9 +3050,9 @@ void CLR_RT_ExecutionEngine::Breakpoint_StackFrame_Step(CLR_RT_StackFrame *stack
             }
           }
 
-        CLR_DBG_Commands::Debugging_Execution_BreakpointDef hit = def;
+        execution_breakpoint_t hit = def;
 
-        hit.m_flags = CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_STEP_OVER;
+        hit.m_flags = c_STEP_OVER;
 
         StopOnBreakpoint(hit, stack, ip);
         }
@@ -3216,27 +3064,31 @@ void CLR_RT_ExecutionEngine::Breakpoint_StackFrame_Step(CLR_RT_StackFrame *stack
 
 void CLR_RT_ExecutionEngine::Breakpoint_StackFrame_Hard(CLR_RT_StackFrame *stack, CLR_PMETADATA ip)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   if (stack->Prev() != NULL && ip != NULL)
     {
-    CLR_UINT32 IPoffset = (CLR_UINT32)(ip - stack->m_IPstart);
+    uint32_t IPoffset = (uint32_t)(ip - stack->m_IPstart);
 
     for (size_t pos = 0; pos < m_breakpointsNum; pos++)
       {
-      CLR_DBG_Commands::Debugging_Execution_BreakpointDef &def = m_breakpoints[pos];
+      execution_breakpoint_t &def = m_breakpoints[pos];
 
-      if (def.m_flags & CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_HARD)
+      if (def.m_flags & c_HARD)
         {
         if (def.m_pid == stack->m_owningThread->m_pid ||
-          def.m_pid == CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_PID_ANY)
+          def.m_pid == c_PID_ANY)
           {
-          if (def.m_md.m_data == stack->m_call.m_data && def.m_IP == IPoffset)
+          if (def.m_method_index == stack->m_call.m_index && def.m_IP == IPoffset)
             {
-            CLR_DBG_Commands::Debugging_Execution_BreakpointDef hit = def;
+            debugger_event_args_t hit;
+            memset(&hit, 0, sizeof(debugger_event_args_t));
+            hit.version = sizeof(debugger_event_args_t);
+            hit.ip = ip;
+            hit.stack = stack;
+            hit.reason = &m_breakpoints[pos];
+            hit.flags = c_HARD;
 
-            hit.m_flags = CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_HARD;
-
-            StopOnBreakpoint(hit, stack, ip);
+            debug_breakpoint(&hit);
             }
           }
         }
@@ -3244,129 +3096,67 @@ void CLR_RT_ExecutionEngine::Breakpoint_StackFrame_Hard(CLR_RT_StackFrame *stack
     }
   }
 
-void CLR_RT_ExecutionEngine::Breakpoint_StackFrame_Break(CLR_RT_StackFrame *stack)
+void CLR_RT_ExecutionEngine::Breakpoint_Exception(CLR_RT_StackFrame *stack, uint32_t reason, CLR_PMETADATA ip)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_DBG_Commands::Debugging_Execution_BreakpointDef hit;
-  NANOCLR_CLEAR(hit);
+  debugger_event_args_t args;
+  memset(&args, 0, sizeof(debugger_event_args_t));
+  args.version = sizeof(debugger_event_args_t);
+  args.flags = c_EXCEPTION_THROWN;
+  args.stack = stack;
+  args.ip = ip;
+  args.depth = reason;
+  args.pid = stack->m_owningThread->m_pid;
 
-  Breakpoint_System_Event(hit, CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_BREAK, NULL, stack, NULL);
-  }
-
-//--//
-
-void CLR_RT_ExecutionEngine::Breakpoint_Exception(CLR_RT_StackFrame *stack, CLR_UINT32 reason, CLR_PMETADATA ip)
-  {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_DBG_Commands::Debugging_Execution_BreakpointDef hit;
-  NANOCLR_CLEAR(hit);
-  hit.m_depthExceptionHandler = reason;
-
-  Breakpoint_System_Event(
-    hit,
-    CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_EXCEPTION_THROWN,
-    NULL,
-    stack,
-    ip);
+  debug_breakpoint(&args);
   }
 
 void CLR_RT_ExecutionEngine::Breakpoint_Exception_Uncaught(CLR_RT_Thread *th)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_DBG_Commands::Debugging_Execution_BreakpointDef hit;
-  NANOCLR_CLEAR(hit);
+  debugger_event_args_t args;
+  memset(&args, 0, sizeof(debugger_event_args_t));
+  args.version = sizeof(debugger_event_args_t);
+  args.flags = c_EXCEPTION_THROWN;
+  args.depth = c_DEPTH_UNCAUGHT;
+  args.exception_handler_depth = c_DEPTH_UNCAUGHT;
+  args.pid = th->m_pid;
 
-  hit.m_depth = CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_DEPTH_UNCAUGHT;
-  hit.m_depthExceptionHandler = CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_DEPTH_UNCAUGHT;
-
-  Breakpoint_System_Event(
-    hit,
-    CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_EXCEPTION_THROWN,
-    th,
-    NULL,
-    NULL);
+  debug_breakpoint(&args);
   }
 
 void CLR_RT_ExecutionEngine::Breakpoint_Exception_Intercepted(CLR_RT_StackFrame *stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_DBG_Commands::Debugging_Execution_BreakpointDef hit;
-  NANOCLR_CLEAR(hit);
-  CLR_UINT16 event = CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_EXCEPTION_CAUGHT |
-    CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_EXCEPTION_UNWIND;
+  debugger_event_args_t args;
+  memset(&args, 0, sizeof(debugger_event_args_t));
+  args.version = sizeof(debugger_event_args_t);
+  args.flags = c_EXCEPTION_CAUGHT | c_EXCEPTION_UNWIND;
+  args.stack = stack;
+  args.exception_handler_depth = stack->m_depth;
+  args.pid = stack->m_owningThread.m_pid;
 
-  hit.m_depthExceptionHandler = stack->m_depth;
-
-  Breakpoint_System_Event(hit, event, NULL, stack, NULL);
+  debug_breakpoint(&args);
   }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-CLR_UINT32 CLR_RT_ExecutionEngine::WaitSystemEvents(CLR_UINT32 powerLevel, CLR_UINT32 events, CLR_INT64 timeExpire)
+uint32_t CLR_RT_ExecutionEngine::WaitSystemEvents(uint32_t powerLevel, uint32_t events, int64_t timeExpire)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_INT32 timeout;
+ 
+  int32_t timeout;
 
-  CLR_UINT32 res = 0;
+  uint32_t res = 0;
 
   m_currentNextActivityTime = timeExpire + HAL_Time_CurrentTime();
 
-  timeout = (CLR_INT32)timeExpire / TIME_CONVERSION__TO_MILLISECONDS;
+  timeout = (int32_t)timeExpire / TIME_CONVERSION__TO_MILLISECONDS;
 
   if (timeout == 0)
     timeout = 1;
 
-#if defined(NANOCLR_TRACE_SYSTEMEVENTWAIT)
-  CLR_INT64 start = HAL_Time_CurrentTime();
-#endif
-
-#if defined(NANOCLR_STRESS_GC)
-  if (timeout > 100)
-    {
-    CLR_INT64 startGC = HAL_Time_CurrentTime();
-
-    g_CLR_RT_ExecutionEngine.PerformHeapCompaction();
-
-    CLR_INT64 endGC = HAL_Time_CurrentTime();
-
-    timeout -= (CLR_INT32)((endGC - startGC) / TIME_CONVERSION__TO_MILLISECONDS);
-    }
-#endif
-
-  // UNDONE: FIXME
-  // ::Watchdog_GetSetEnabled( bool, bool );
-  // TODO check if the watchdog needs to be feed here... don't think so
-  Watchdog_Reset();
-
-  // wait for a wakeup call (some sort of event).
+   // wait for a wakeup call (some sort of event).
   CPU_Sleep();
   //res = ::Events_WaitForEvents(powerLevel, events, timeout);
   // UNDONE: FIXME
   // ::Watchdog_GetSetEnabled( bool, bool );
   // TODO check if the watchdog needs to be feed here... don't think so
   Watchdog_Reset();
-
-#if defined(NANOCLR_TRACE_SYSTEMEVENTWAIT)
-  CLR_INT64 stop = HAL_Time_CurrentTime();
-  CLR_INT64 stop2 = HAL_Time_CurrentTime();
-
-  static CLR_INT64 totalRequested = 0;
-  static CLR_INT64 totalActual = 0;
-  static CLR_INT64 samples = 0;
-
-  totalRequested += timeout;
-  totalActual += (stop - start) - (stop2 - stop);
-  samples += 1;
-
-  if (samples == 10000)
-    {
-    CLR_Debug::Printf("Wait %lld %lld\r\n", totalRequested / samples, totalActual / samples);
-
-    totalRequested = 0;
-    totalActual = 0;
-    samples = 0;
-    }
-#endif
 
   m_currentNextActivityTime = 0;
 

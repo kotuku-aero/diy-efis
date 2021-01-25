@@ -95,32 +95,13 @@ enum CLR_OPCODE
 #define __int64 long long
 #endif
 
-typedef unsigned char CLR_UINT8;
-typedef unsigned short CLR_UINT16;
-typedef unsigned int CLR_UINT32;
-typedef unsigned __int64 CLR_UINT64;
-typedef signed char CLR_INT8;
-typedef signed short CLR_INT16;
-typedef signed int CLR_INT32;
-typedef signed __int64 CLR_INT64;
-
-typedef CLR_UINT16 CLR_OFFSET;
-typedef CLR_UINT32 CLR_OFFSET_LONG;
-typedef CLR_UINT16 CLR_IDX;
-typedef CLR_UINT16 CLR_STRING;
-typedef CLR_UINT16 CLR_SIG;
-typedef const CLR_UINT8* CLR_PMETADATA;
+typedef const uint8_t* CLR_PMETADATA;
 
 //--//
 // may need to change later
-typedef CLR_INT64 CLR_INT64_TEMP_CAST;
-typedef CLR_UINT64 CLR_UINT64_TEMP_CAST;
-
-#if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
+typedef int64_t CLR_INT64_TEMP_CAST;
+typedef uint64_t CLR_UINT64_TEMP_CAST;
 typedef double CLR_DOUBLE_TEMP_CAST;
-#else
-typedef CLR_INT64 CLR_DOUBLE_TEMP_CAST;
-#endif
 
 #define CLR_SIG_INVALID 0xFFFF
 
@@ -220,8 +201,8 @@ enum CLR_LOGICAL_OPCODE
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-static const CLR_IDX CLR_EmptyIndex = 0xFFFF;
-static const CLR_UINT32 CLR_EmptyToken = 0xFFFFFFFF;
+static const uint16_t CLR_EmptyIndex = 0xFFFF;
+static const uint32_t CLR_EmptyToken = 0xFFFFFFFF;
 static const size_t CLR_MaxStreamSize_AssemblyRef = 0x0000FFFF;
 static const size_t CLR_MaxStreamSize_TypeRef = 0x0000FFFF;
 static const size_t CLR_MaxStreamSize_FieldRef = 0x0000FFFF;
@@ -440,44 +421,44 @@ enum CLR_ReflectionType
   };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-inline CLR_UINT32 CLR_DataFromTk(CLR_UINT32 tk)
+inline uint32_t CLR_DataFromTk(uint32_t tk)
   {
   return tk & 0x00FFFFFF;
   }
-inline CLR_TABLESENUM CLR_TypeFromTk(CLR_UINT32 tk)
+inline CLR_TABLESENUM CLR_TypeFromTk(uint32_t tk)
   {
   return (CLR_TABLESENUM)(tk >> 24);
   }
-inline CLR_UINT32 CLR_TkFromType(CLR_TABLESENUM tbl, CLR_UINT32 data)
+inline uint32_t CLR_TkFromType(CLR_TABLESENUM tbl, uint32_t data)
   {
-  return ((((CLR_UINT32)tbl) << 24) & 0xFF000000) | (data & 0x00FFFFFF);
+  return ((((uint32_t)tbl) << 24) & 0xFF000000) | (data & 0x00FFFFFF);
   }
 #if 0
 // Used on LE host to target BE
-inline CLR_UINT32     CLR_TkFromType(CLR_TABLESENUM tbl, CLR_UINT32 data) { return (((CLR_UINT32)(tbl) & 0xFF) | (data & 0xFFFFFF00)); }
-inline CLR_UINT32     CLR_DataFromTk(CLR_UINT32 tk) { return                  tk & 0xFFFFFF00; }
-inline CLR_TABLESENUM CLR_TypeFromTk(CLR_UINT32 tk) { return (CLR_TABLESENUM)(tk & 0xFF); }
+inline uint32_t     CLR_TkFromType(CLR_TABLESENUM tbl, uint32_t data) { return (((uint32_t)(tbl) & 0xFF) | (data & 0xFFFFFF00)); }
+inline uint32_t     CLR_DataFromTk(uint32_t tk) { return                  tk & 0xFFFFFF00; }
+inline CLR_TABLESENUM CLR_TypeFromTk(uint32_t tk) { return (CLR_TABLESENUM)(tk & 0xFF); }
 #endif
 //--//
 
-inline CLR_UINT32 CLR_UncompressStringToken(CLR_UINT32 tk)
+inline uint32_t CLR_UncompressStringToken(uint32_t tk)
   {
   return CLR_TkFromType(TBL_Strings, tk);
   }
 
-inline CLR_UINT32 CLR_UncompressTypeToken(CLR_UINT32 tk)
+inline uint32_t CLR_UncompressTypeToken(uint32_t tk)
   {
   static const CLR_TABLESENUM c_lookup[3] = { TBL_TypeDef, TBL_TypeRef, TBL_TypeSpec };
   return CLR_TkFromType(c_lookup[(tk >> 14) & 3], 0x3fff & tk);
   }
 
-inline CLR_UINT32 CLR_UncompressFieldToken(CLR_UINT32 tk)
+inline uint32_t CLR_UncompressFieldToken(uint32_t tk)
   {
   static const CLR_TABLESENUM c_lookup[2] = { TBL_FieldDef, TBL_FieldRef };
   return CLR_TkFromType(c_lookup[(tk >> 15) & 1], 0x7fff & tk);
   }
 
-inline CLR_UINT32 CLR_UncompressMethodToken(CLR_UINT32 tk)
+inline uint32_t CLR_UncompressMethodToken(uint32_t tk)
   {
   static const CLR_TABLESENUM c_lookup[2] = { TBL_MethodDef, TBL_MethodRef };
   return CLR_TkFromType(c_lookup[(tk >> 15) & 1], 0x7fff & tk);
@@ -485,36 +466,36 @@ inline CLR_UINT32 CLR_UncompressMethodToken(CLR_UINT32 tk)
 
 #if defined(_WIN32)
 
-extern CLR_UINT32 CLR_ReadTokenCompressed(CLR_PMETADATA& ip, CLR_OPCODE opcode);
+extern uint32_t CLR_ReadTokenCompressed(CLR_PMETADATA& ip, CLR_OPCODE opcode);
 
 #endif
 
 //--//
 
-HRESULT CLR_CompressTokenHelper(const CLR_TABLESENUM* tables, CLR_UINT16 cTables, CLR_UINT32& tk);
+HRESULT CLR_CompressTokenHelper(const CLR_TABLESENUM* tables, uint16_t cTables, uint32_t& tk);
 
-inline HRESULT CLR_CompressStringToken(CLR_UINT32& tk)
+inline HRESULT CLR_CompressStringToken(uint32_t& tk)
   {
   static const CLR_TABLESENUM c_lookup[1] = { TBL_Strings };
 
   return CLR_CompressTokenHelper(c_lookup, ARRAYSIZE(c_lookup), tk);
   }
 
-inline HRESULT CLR_CompressTypeToken(CLR_UINT32& tk)
+inline HRESULT CLR_CompressTypeToken(uint32_t& tk)
   {
   static const CLR_TABLESENUM c_lookup[3] = { TBL_TypeDef, TBL_TypeRef, TBL_TypeSpec };
 
   return CLR_CompressTokenHelper(c_lookup, ARRAYSIZE(c_lookup), tk);
   }
 
-inline HRESULT CLR_CompressFieldToken(CLR_UINT32& tk)
+inline HRESULT CLR_CompressFieldToken(uint32_t& tk)
   {
   static const CLR_TABLESENUM c_lookup[2] = { TBL_FieldDef, TBL_FieldRef };
 
   return CLR_CompressTokenHelper(c_lookup, ARRAYSIZE(c_lookup), tk);
   }
 
-inline HRESULT CLR_CompressMethodToken(CLR_UINT32& tk)
+inline HRESULT CLR_CompressMethodToken(uint32_t& tk)
   {
   static const CLR_TABLESENUM c_lookup[2] = { TBL_MethodDef, TBL_MethodRef };
 
@@ -523,25 +504,25 @@ inline HRESULT CLR_CompressMethodToken(CLR_UINT32& tk)
 
 //--//
 
-inline bool CLR_CompressData(CLR_UINT32 val, CLR_UINT8*& p)
+inline bool CLR_CompressData(uint32_t val, uint8_t*& p)
   {
-  CLR_UINT8* ptr = p;
+  uint8_t* ptr = p;
 
   if (val <= 0x7F)
     {
-    *ptr++ = (CLR_UINT8)(val);
+    *ptr++ = (uint8_t)(val);
     }
   else if (val <= 0x3FFF)
     {
-    *ptr++ = (CLR_UINT8)((val >> 8) | 0x80);
-    *ptr++ = (CLR_UINT8)((val));
+    *ptr++ = (uint8_t)((val >> 8) | 0x80);
+    *ptr++ = (uint8_t)((val));
     }
   else if (val <= 0x1FFFFFFF)
     {
-    *ptr++ = (CLR_UINT8)((val >> 24) | 0xC0);
-    *ptr++ = (CLR_UINT8)((val >> 16));
-    *ptr++ = (CLR_UINT8)((val >> 8));
-    *ptr++ = (CLR_UINT8)((val));
+    *ptr++ = (uint8_t)((val >> 24) | 0xC0);
+    *ptr++ = (uint8_t)((val >> 16));
+    *ptr++ = (uint8_t)((val >> 8));
+    *ptr++ = (uint8_t)((val));
     }
   else
     {
@@ -553,10 +534,10 @@ inline bool CLR_CompressData(CLR_UINT32 val, CLR_UINT8*& p)
   return true;
   }
 
-inline CLR_UINT32 CLR_UncompressData(const CLR_UINT8*& p)
+inline uint32_t CLR_UncompressData(const uint8_t*& p)
   {
   CLR_PMETADATA ptr = p;
-  CLR_UINT32 val = *ptr++;
+  uint32_t val = *ptr++;
   // Handle smallest data inline.
   if ((val & 0x80) == 0x00) // 0??? ????
     {
@@ -564,14 +545,14 @@ inline CLR_UINT32 CLR_UncompressData(const CLR_UINT8*& p)
   else if ((val & 0xC0) == 0x80) // 10?? ????
     {
     val = (val & 0x3F) << 8;
-    val |= (CLR_UINT32)*ptr++;
+    val |= (uint32_t)*ptr++;
     }
   else // 110? ????
     {
     val = (val & 0x1F) << 24;
-    val |= (CLR_UINT32)*ptr++ << 16;
-    val |= (CLR_UINT32)*ptr++ << 8;
-    val |= (CLR_UINT32)*ptr++ << 0;
+    val |= (uint32_t)*ptr++ << 16;
+    val |= (uint32_t)*ptr++ << 8;
+    val |= (uint32_t)*ptr++ << 0;
     }
 #if 0
   // Handle smallest data inline.
@@ -581,14 +562,14 @@ inline CLR_UINT32 CLR_UncompressData(const CLR_UINT8*& p)
   else if ((val & 0xC0) == 0x80)  // 10?? ????
     {
     val = (val & 0x3F);
-    val |= ((CLR_UINT32)*ptr++ << 8);
+    val |= ((uint32_t)*ptr++ << 8);
     }
   else // 110? ????
     {
     val = (val & 0x1F);
-    val |= (CLR_UINT32)*ptr++ << 8;
-    val |= (CLR_UINT32)*ptr++ << 16;
-    val |= (CLR_UINT32)*ptr++ << 24;
+    val |= (uint32_t)*ptr++ << 8;
+    val |= (uint32_t)*ptr++ << 16;
+    val |= (uint32_t)*ptr++ << 24;
     }
 
 #endif
@@ -598,16 +579,16 @@ inline CLR_UINT32 CLR_UncompressData(const CLR_UINT8*& p)
   return val;
   }
 
-inline CLR_DataType CLR_UncompressElementType(const CLR_UINT8*& p)
+inline CLR_DataType CLR_UncompressElementType(const uint8_t*& p)
   {
   return (CLR_DataType)*p++;
   }
 
-inline CLR_UINT32 CLR_TkFromStream(const CLR_UINT8*& p)
+inline uint32_t CLR_TkFromStream(const uint8_t*& p)
   {
   static const CLR_TABLESENUM c_lookup[4] = { TBL_TypeDef, TBL_TypeRef, TBL_TypeSpec, TBL_Max };
 
-  CLR_UINT32 data = CLR_UncompressData(p);
+  uint32_t data = CLR_UncompressData(p);
 
   return CLR_TkFromType(c_lookup[data & 3], data >> 2);
   }
@@ -617,200 +598,200 @@ inline CLR_UINT32 CLR_TkFromStream(const CLR_UINT8*& p)
 #if defined(__GNUC__)
 
 #define NANOCLR_READ_UNALIGNED_UINT8(arg, ip)                                                                          \
-    arg = *(const CLR_UINT8 *)ip;                                                                                      \
-    ip += sizeof(CLR_UINT8)
+    arg = *(const uint8_t *)ip;                                                                                      \
+    ip += sizeof(uint8_t)
 template <typename T> __inline void NANOCLR_READ_UNALIGNED_UINT16(T& arg, CLR_PMETADATA& ip)
   {
-  arg = (CLR_UINT16)(*(const CLR_UINT8*)ip);
-  ip += sizeof(CLR_UINT8);
-  arg |= (CLR_UINT16)(*(const CLR_UINT8*)ip) << 8;
-  ip += sizeof(CLR_UINT8);
+  arg = (uint16_t)(*(const uint8_t*)ip);
+  ip += sizeof(uint8_t);
+  arg |= (uint16_t)(*(const uint8_t*)ip) << 8;
+  ip += sizeof(uint8_t);
   }
 template <typename T> __inline void NANOCLR_READ_UNALIGNED_UINT32(T& arg, CLR_PMETADATA& ip)
   {
-  arg = (CLR_UINT32)(*(const CLR_UINT8*)ip);
-  ip += sizeof(CLR_UINT8);
-  arg |= (CLR_UINT32)(*(const CLR_UINT8*)ip) << 8;
-  ip += sizeof(CLR_UINT8);
-  arg |= (CLR_UINT32)(*(const CLR_UINT8*)ip) << 16;
-  ip += sizeof(CLR_UINT8);
-  arg |= (CLR_UINT32)(*(const CLR_UINT8*)ip) << 24;
-  ip += sizeof(CLR_UINT8);
+  arg = (uint32_t)(*(const uint8_t*)ip);
+  ip += sizeof(uint8_t);
+  arg |= (uint32_t)(*(const uint8_t*)ip) << 8;
+  ip += sizeof(uint8_t);
+  arg |= (uint32_t)(*(const uint8_t*)ip) << 16;
+  ip += sizeof(uint8_t);
+  arg |= (uint32_t)(*(const uint8_t*)ip) << 24;
+  ip += sizeof(uint8_t);
   }
 template <typename T> __inline void NANOCLR_READ_UNALIGNED_UINT64(T& arg, CLR_PMETADATA& ip)
   {
-  arg = (CLR_UINT64)(*(const CLR_UINT8*)ip);
-  ip += sizeof(CLR_UINT8);
-  arg |= (CLR_UINT64)(*(const CLR_UINT8*)ip) << 8;
-  ip += sizeof(CLR_UINT8);
-  arg |= (CLR_UINT64)(*(const CLR_UINT8*)ip) << 16;
-  ip += sizeof(CLR_UINT8);
-  arg |= (CLR_UINT64)(*(const CLR_UINT8*)ip) << 24;
-  ip += sizeof(CLR_UINT8);
-  arg |= (CLR_UINT64)(*(const CLR_UINT8*)ip) << 32;
-  ip += sizeof(CLR_UINT8);
-  arg |= (CLR_UINT64)(*(const CLR_UINT8*)ip) << 40;
-  ip += sizeof(CLR_UINT8);
-  arg |= (CLR_UINT64)(*(const CLR_UINT8*)ip) << 48;
-  ip += sizeof(CLR_UINT8);
-  arg |= (CLR_UINT64)(*(const CLR_UINT8*)ip) << 56;
-  ip += sizeof(CLR_UINT8);
+  arg = (uint64_t)(*(const uint8_t*)ip);
+  ip += sizeof(uint8_t);
+  arg |= (uint64_t)(*(const uint8_t*)ip) << 8;
+  ip += sizeof(uint8_t);
+  arg |= (uint64_t)(*(const uint8_t*)ip) << 16;
+  ip += sizeof(uint8_t);
+  arg |= (uint64_t)(*(const uint8_t*)ip) << 24;
+  ip += sizeof(uint8_t);
+  arg |= (uint64_t)(*(const uint8_t*)ip) << 32;
+  ip += sizeof(uint8_t);
+  arg |= (uint64_t)(*(const uint8_t*)ip) << 40;
+  ip += sizeof(uint8_t);
+  arg |= (uint64_t)(*(const uint8_t*)ip) << 48;
+  ip += sizeof(uint8_t);
+  arg |= (uint64_t)(*(const uint8_t*)ip) << 56;
+  ip += sizeof(uint8_t);
   }
 
 #define NANOCLR_READ_UNALIGNED_INT8(arg, ip)                                                                           \
-    arg = *(const CLR_INT8 *)ip;                                                                                       \
-    ip += sizeof(CLR_INT8)
+    arg = *(const int8_t *)ip;                                                                                       \
+    ip += sizeof(int8_t)
 template <typename T> __inline void NANOCLR_READ_UNALIGNED_INT16(T& arg, CLR_PMETADATA& ip)
   {
-  arg = (CLR_UINT16)(*(const CLR_UINT8*)ip);
-  ip += sizeof(CLR_UINT8);
-  arg |= (CLR_UINT16)(*(const CLR_UINT8*)ip) << 8;
-  ip += sizeof(CLR_UINT8);
-  arg = (CLR_INT16)arg;
+  arg = (uint16_t)(*(const uint8_t*)ip);
+  ip += sizeof(uint8_t);
+  arg |= (uint16_t)(*(const uint8_t*)ip) << 8;
+  ip += sizeof(uint8_t);
+  arg = (int16_t)arg;
   }
 template <typename T> __inline void NANOCLR_READ_UNALIGNED_INT32(T& arg, CLR_PMETADATA& ip)
   {
-  arg = (CLR_UINT32)(*(const CLR_UINT8*)ip);
-  ip += sizeof(CLR_UINT8);
-  arg |= (CLR_UINT32)(*(const CLR_UINT8*)ip) << 8;
-  ip += sizeof(CLR_UINT8);
-  arg |= (CLR_UINT32)(*(const CLR_UINT8*)ip) << 16;
-  ip += sizeof(CLR_UINT8);
-  arg |= (CLR_UINT32)(*(const CLR_UINT8*)ip) << 24;
-  ip += sizeof(CLR_UINT8);
-  arg = (CLR_INT32)arg;
+  arg = (uint32_t)(*(const uint8_t*)ip);
+  ip += sizeof(uint8_t);
+  arg |= (uint32_t)(*(const uint8_t*)ip) << 8;
+  ip += sizeof(uint8_t);
+  arg |= (uint32_t)(*(const uint8_t*)ip) << 16;
+  ip += sizeof(uint8_t);
+  arg |= (uint32_t)(*(const uint8_t*)ip) << 24;
+  ip += sizeof(uint8_t);
+  arg = (int32_t)arg;
   }
 template <typename T> __inline void NANOCLR_READ_UNALIGNED_INT64(T& arg, CLR_PMETADATA& ip)
   {
-  arg = (CLR_UINT64)(*(const CLR_UINT8*)ip);
-  ip += sizeof(CLR_UINT8);
-  arg |= (CLR_UINT64)(*(const CLR_UINT8*)ip) << 8;
-  ip += sizeof(CLR_UINT8);
-  arg |= (CLR_UINT64)(*(const CLR_UINT8*)ip) << 16;
-  ip += sizeof(CLR_UINT8);
-  arg |= (CLR_UINT64)(*(const CLR_UINT8*)ip) << 24;
-  ip += sizeof(CLR_UINT8);
-  arg |= (CLR_UINT64)(*(const CLR_UINT8*)ip) << 32;
-  ip += sizeof(CLR_UINT8);
-  arg |= (CLR_UINT64)(*(const CLR_UINT8*)ip) << 40;
-  ip += sizeof(CLR_UINT8);
-  arg |= (CLR_UINT64)(*(const CLR_UINT8*)ip) << 48;
-  ip += sizeof(CLR_UINT8);
-  arg |= (CLR_UINT64)(*(const CLR_UINT8*)ip) << 56;
-  ip += sizeof(CLR_UINT8);
-  arg = (CLR_INT64)arg;
+  arg = (uint64_t)(*(const uint8_t*)ip);
+  ip += sizeof(uint8_t);
+  arg |= (uint64_t)(*(const uint8_t*)ip) << 8;
+  ip += sizeof(uint8_t);
+  arg |= (uint64_t)(*(const uint8_t*)ip) << 16;
+  ip += sizeof(uint8_t);
+  arg |= (uint64_t)(*(const uint8_t*)ip) << 24;
+  ip += sizeof(uint8_t);
+  arg |= (uint64_t)(*(const uint8_t*)ip) << 32;
+  ip += sizeof(uint8_t);
+  arg |= (uint64_t)(*(const uint8_t*)ip) << 40;
+  ip += sizeof(uint8_t);
+  arg |= (uint64_t)(*(const uint8_t*)ip) << 48;
+  ip += sizeof(uint8_t);
+  arg |= (uint64_t)(*(const uint8_t*)ip) << 56;
+  ip += sizeof(uint8_t);
+  arg = (int64_t)arg;
   }
 
 #elif defined(_MSC_VER)
 
 #define NANOCLR_READ_UNALIGNED_UINT8(arg, ip)                                                                          \
-    arg = *(__declspec(align(1)) const CLR_UINT8 *)ip;                                                                 \
-    ip += sizeof(CLR_UINT8)
+    arg = *(__declspec(align(1)) const uint8_t *)ip;                                                                 \
+    ip += sizeof(uint8_t)
 #define NANOCLR_READ_UNALIGNED_UINT16(arg, ip)                                                                         \
-    arg = *(__declspec(align(1)) const CLR_UINT16 *)ip;                                                                \
-    ip += sizeof(CLR_UINT16)
+    arg = *(__declspec(align(1)) const uint16_t *)ip;                                                                \
+    ip += sizeof(uint16_t)
 #define NANOCLR_READ_UNALIGNED_UINT32(arg, ip)                                                                         \
-    arg = *(__declspec(align(1)) const CLR_UINT32 *)ip;                                                                \
-    ip += sizeof(CLR_UINT32)
+    arg = *(__declspec(align(1)) const uint32_t *)ip;                                                                \
+    ip += sizeof(uint32_t)
 #define NANOCLR_READ_UNALIGNED_UINT64(arg, ip)                                                                         \
-    arg = *(__declspec(align(1)) const CLR_UINT64 *)ip;                                                                \
-    ip += sizeof(CLR_UINT64)
+    arg = *(__declspec(align(1)) const uint64_t *)ip;                                                                \
+    ip += sizeof(uint64_t)
 
 #define NANOCLR_READ_UNALIGNED_INT8(arg, ip)                                                                           \
-    arg = *(__declspec(align(1)) const CLR_INT8 *)ip;                                                                  \
-    ip += sizeof(CLR_INT8)
+    arg = *(__declspec(align(1)) const int8_t *)ip;                                                                  \
+    ip += sizeof(int8_t)
 #define NANOCLR_READ_UNALIGNED_INT16(arg, ip)                                                                          \
-    arg = *(__declspec(align(1)) const CLR_INT16 *)ip;                                                                 \
-    ip += sizeof(CLR_INT16)
+    arg = *(__declspec(align(1)) const int16_t *)ip;                                                                 \
+    ip += sizeof(int16_t)
 #define NANOCLR_READ_UNALIGNED_INT32(arg, ip)                                                                          \
-    arg = *(__declspec(align(1)) const CLR_INT32 *)ip;                                                                 \
-    ip += sizeof(CLR_INT32)
+    arg = *(__declspec(align(1)) const int32_t *)ip;                                                                 \
+    ip += sizeof(int32_t)
 #define NANOCLR_READ_UNALIGNED_INT64(arg, ip)                                                                          \
-    arg = *(__declspec(align(1)) const CLR_INT64 *)ip;                                                                 \
-    ip += sizeof(CLR_INT64)
+    arg = *(__declspec(align(1)) const int64_t *)ip;                                                                 \
+    ip += sizeof(int64_t)
 
 //--//
 
 #define NANOCLR_WRITE_UNALIGNED_UINT8(ip, arg)                                                                         \
-    *(__declspec(align(1)) CLR_UINT8 *)ip = arg;                                                                       \
-    ip += sizeof(CLR_UINT8)
+    *(__declspec(align(1)) uint8_t *)ip = arg;                                                                       \
+    ip += sizeof(uint8_t)
 #define NANOCLR_WRITE_UNALIGNED_UINT16(ip, arg)                                                                        \
-    *(__declspec(align(1)) CLR_UINT16 *)ip = arg;                                                                      \
-    ip += sizeof(CLR_UINT16)
+    *(__declspec(align(1)) uint16_t *)ip = arg;                                                                      \
+    ip += sizeof(uint16_t)
 #define NANOCLR_WRITE_UNALIGNED_UINT32(ip, arg)                                                                        \
-    *(__declspec(align(1)) CLR_UINT32 *)ip = arg;                                                                      \
-    ip += sizeof(CLR_UINT32)
+    *(__declspec(align(1)) uint32_t *)ip = arg;                                                                      \
+    ip += sizeof(uint32_t)
 #define NANOCLR_WRITE_UNALIGNED_UINT64(ip, arg)                                                                        \
-    *(__declspec(align(1)) CLR_UINT64 *)ip = arg;                                                                      \
-    ip += sizeof(CLR_UINT64)
+    *(__declspec(align(1)) uint64_t *)ip = arg;                                                                      \
+    ip += sizeof(uint64_t)
 
 #define NANOCLR_WRITE_UNALIGNED_INT8(ip, arg)                                                                          \
-    *(__declspec(align(1)) CLR_INT8 *)ip = arg;                                                                        \
-    ip += sizeof(CLR_INT8)
+    *(__declspec(align(1)) int8_t *)ip = arg;                                                                        \
+    ip += sizeof(int8_t)
 #define NANOCLR_WRITE_UNALIGNED_INT16(ip, arg)                                                                         \
-    *(__declspec(align(1)) CLR_INT16 *)ip = arg;                                                                       \
-    ip += sizeof(CLR_INT16)
+    *(__declspec(align(1)) int16_t *)ip = arg;                                                                       \
+    ip += sizeof(int16_t)
 #define NANOCLR_WRITE_UNALIGNED_INT32(ip, arg)                                                                         \
-    *(__declspec(align(1)) CLR_INT32 *)ip = arg;                                                                       \
-    ip += sizeof(CLR_INT32)
+    *(__declspec(align(1)) int32_t *)ip = arg;                                                                       \
+    ip += sizeof(int32_t)
 #define NANOCLR_WRITE_UNALIGNED_INT64(ip, arg)                                                                         \
-    *(__declspec(align(1)) CLR_INT64 *)ip = arg;                                                                       \
-    ip += sizeof(CLR_INT64)
+    *(__declspec(align(1)) int64_t *)ip = arg;                                                                       \
+    ip += sizeof(int64_t)
 
 #else // TODO: __packed is compiler specific... Which compiler is this for?
 
 #define NANOCLR_READ_UNALIGNED_UINT8(arg, ip)                                                                          \
-    arg = *(__packed CLR_UINT8 *)ip;                                                                                   \
-    ip += sizeof(CLR_UINT8)
+    arg = *(__packed uint8_t *)ip;                                                                                   \
+    ip += sizeof(uint8_t)
 #define NANOCLR_READ_UNALIGNED_UINT16(arg, ip)                                                                         \
-    arg = *(__packed CLR_UINT16 *)ip;                                                                                  \
-    ip += sizeof(CLR_UINT16)
+    arg = *(__packed uint16_t *)ip;                                                                                  \
+    ip += sizeof(uint16_t)
 #define NANOCLR_READ_UNALIGNED_UINT32(arg, ip)                                                                         \
-    arg = *(__packed CLR_UINT32 *)ip;                                                                                  \
-    ip += sizeof(CLR_UINT32)
+    arg = *(__packed uint32_t *)ip;                                                                                  \
+    ip += sizeof(uint32_t)
 #define NANOCLR_READ_UNALIGNED_UINT64(arg, ip)                                                                         \
-    arg = *(__packed CLR_UINT64 *)ip;                                                                                  \
-    ip += sizeof(CLR_UINT64)
+    arg = *(__packed uint64_t *)ip;                                                                                  \
+    ip += sizeof(uint64_t)
 #define NANOCLR_READ_UNALIGNED_INT8(arg, ip)                                                                           \
-    arg = *(__packed CLR_INT8 *)ip;                                                                                    \
-    ip += sizeof(CLR_INT8)
+    arg = *(__packed int8_t *)ip;                                                                                    \
+    ip += sizeof(int8_t)
 #define NANOCLR_READ_UNALIGNED_INT16(arg, ip)                                                                          \
-    arg = *(__packed CLR_INT16 *)ip;                                                                                   \
-    ip += sizeof(CLR_INT16)
+    arg = *(__packed int16_t *)ip;                                                                                   \
+    ip += sizeof(int16_t)
 #define NANOCLR_READ_UNALIGNED_INT32(arg, ip)                                                                          \
-    arg = *(__packed CLR_INT32 *)ip;                                                                                   \
-    ip += sizeof(CLR_INT32)
+    arg = *(__packed int32_t *)ip;                                                                                   \
+    ip += sizeof(int32_t)
 #define NANOCLR_READ_UNALIGNED_INT64(arg, ip)                                                                          \
-    arg = *(__packed CLR_INT64 *)ip;                                                                                   \
-    ip += sizeof(CLR_INT64)
+    arg = *(__packed int64_t *)ip;                                                                                   \
+    ip += sizeof(int64_t)
 
 //--//
 
 #define NANOCLR_WRITE_UNALIGNED_UINT8(ip, arg)                                                                         \
-    *(__packed CLR_UINT8 *)ip = arg;                                                                                   \
-    ip += sizeof(CLR_UINT8)
+    *(__packed uint8_t *)ip = arg;                                                                                   \
+    ip += sizeof(uint8_t)
 #define NANOCLR_WRITE_UNALIGNED_UINT16(ip, arg)                                                                        \
-    *(__packed CLR_UINT16 *)ip = arg;                                                                                  \
-    ip += sizeof(CLR_UINT16)
+    *(__packed uint16_t *)ip = arg;                                                                                  \
+    ip += sizeof(uint16_t)
 #define NANOCLR_WRITE_UNALIGNED_UINT32(ip, arg)                                                                        \
-    *(__packed CLR_UINT32 *)ip = arg;                                                                                  \
-    ip += sizeof(CLR_UINT32)
+    *(__packed uint32_t *)ip = arg;                                                                                  \
+    ip += sizeof(uint32_t)
 #define NANOCLR_WRITE_UNALIGNED_UINT64(ip, arg)                                                                        \
-    *(__packed CLR_UINT64 *)ip = arg;                                                                                  \
-    ip += sizeof(CLR_UINT64)
+    *(__packed uint64_t *)ip = arg;                                                                                  \
+    ip += sizeof(uint64_t)
 
 #define NANOCLR_WRITE_UNALIGNED_INT8(ip, arg)                                                                          \
-    *(__packed CLR_INT8 *)ip = arg;                                                                                    \
-    ip += sizeof(CLR_INT8)
+    *(__packed int8_t *)ip = arg;                                                                                    \
+    ip += sizeof(int8_t)
 #define NANOCLR_WRITE_UNALIGNED_INT16(ip, arg)                                                                         \
-    *(__packed CLR_INT16 *)ip = arg;                                                                                   \
-    ip += sizeof(CLR_INT16)
+    *(__packed int16_t *)ip = arg;                                                                                   \
+    ip += sizeof(int16_t)
 #define NANOCLR_WRITE_UNALIGNED_INT32(ip, arg)                                                                         \
-    *(__packed CLR_INT32 *)ip = arg;                                                                                   \
-    ip += sizeof(CLR_INT32)
+    *(__packed int32_t *)ip = arg;                                                                                   \
+    ip += sizeof(int32_t)
 #define NANOCLR_WRITE_UNALIGNED_INT64(ip, arg)                                                                         \
-    *(__packed CLR_INT64 *)ip = arg;                                                                                   \
-    ip += sizeof(CLR_INT64)
+    *(__packed int64_t *)ip = arg;                                                                                   \
+    ip += sizeof(int64_t)
 
 #endif
 
@@ -870,45 +851,45 @@ inline CLR_OPCODE CLR_ReadNextOpcodeCompressed(CLR_PMETADATA& ip)
 //--//
 
 #define FETCH_ARG_UINT8(arg, ip)                                                                                       \
-    CLR_UINT32 arg;                                                                                                    \
+    uint32_t arg;                                                                                                    \
     NANOCLR_READ_UNALIGNED_UINT8(arg, ip)
 #define FETCH_ARG_UINT16(arg, ip)                                                                                      \
-    CLR_UINT32 arg;                                                                                                    \
+    uint32_t arg;                                                                                                    \
     NANOCLR_READ_UNALIGNED_UINT16(arg, ip)
 #define FETCH_ARG_UINT32(arg, ip)                                                                                      \
-    CLR_UINT32 arg;                                                                                                    \
+    uint32_t arg;                                                                                                    \
     NANOCLR_READ_UNALIGNED_UINT32(arg, ip)
 #define FETCH_ARG_UINT64(arg, ip)                                                                                      \
-    CLR_UINT64 arg;                                                                                                    \
+    uint64_t arg;                                                                                                    \
     NANOCLR_READ_UNALIGNED_UINT64(arg, ip)
 
 #define FETCH_ARG_INT8(arg, ip)                                                                                        \
-    CLR_INT32 arg;                                                                                                     \
+    int32_t arg;                                                                                                     \
     NANOCLR_READ_UNALIGNED_INT8(arg, ip)
 #define FETCH_ARG_INT16(arg, ip)                                                                                       \
-    CLR_INT32 arg;                                                                                                     \
+    int32_t arg;                                                                                                     \
     NANOCLR_READ_UNALIGNED_INT16(arg, ip)
 #define FETCH_ARG_INT32(arg, ip)                                                                                       \
-    CLR_INT32 arg;                                                                                                     \
+    int32_t arg;                                                                                                     \
     NANOCLR_READ_UNALIGNED_INT32(arg, ip)
 #define FETCH_ARG_INT64(arg, ip)                                                                                       \
-    CLR_INT64 arg;                                                                                                     \
+    int64_t arg;                                                                                                     \
     NANOCLR_READ_UNALIGNED_INT64(arg, ip)
 
 #define FETCH_ARG_COMPRESSED_STRINGTOKEN(arg, ip)                                                                      \
-    CLR_UINT32 arg;                                                                                                    \
+    uint32_t arg;                                                                                                    \
     NANOCLR_READ_UNALIGNED_COMPRESSED_STRINGTOKEN(arg, ip)
 #define FETCH_ARG_COMPRESSED_FIELDTOKEN(arg, ip)                                                                       \
-    CLR_UINT32 arg;                                                                                                    \
+    uint32_t arg;                                                                                                    \
     NANOCLR_READ_UNALIGNED_COMPRESSED_FIELDTOKEN(arg, ip)
 #define FETCH_ARG_COMPRESSED_TYPETOKEN(arg, ip)                                                                        \
-    CLR_UINT32 arg;                                                                                                    \
+    uint32_t arg;                                                                                                    \
     NANOCLR_READ_UNALIGNED_COMPRESSED_TYPETOKEN(arg, ip)
 #define FETCH_ARG_COMPRESSED_METHODTOKEN(arg, ip)                                                                      \
-    CLR_UINT32 arg;                                                                                                    \
+    uint32_t arg;                                                                                                    \
     NANOCLR_READ_UNALIGNED_COMPRESSED_METHODTOKEN(arg, ip)
 #define FETCH_ARG_TOKEN(arg, ip)                                                                                       \
-    CLR_UINT32 arg;                                                                                                    \
+    uint32_t arg;                                                                                                    \
     NANOCLR_READ_UNALIGNED_UINT32(arg, ip)
 
 //--//
@@ -958,32 +939,32 @@ struct CLR_Debug
 
 struct CLR_RECORD_VERSION
   {
-  CLR_UINT16 iMajorVersion;
-  CLR_UINT16 iMinorVersion;
-  CLR_UINT16 iBuildNumber;
-  CLR_UINT16 iRevisionNumber;
+  uint16_t iMajorVersion;
+  uint16_t iMinorVersion;
+  uint16_t iBuildNumber;
+  uint16_t iRevisionNumber;
   };
 
 struct CLR_RECORD_ASSEMBLY
   {
-  static const CLR_UINT32 c_Flags_NeedReboot = 0x00000001;
+  static const uint32_t c_Flags_NeedReboot = 0x00000001;
 
-  CLR_UINT8 marker[8];
+  uint8_t marker[8];
   //
-  CLR_UINT32 headerCRC;
-  CLR_UINT32 assemblyCRC;
-  CLR_UINT32 flags;
+  uint32_t headerCRC;
+  uint32_t assemblyCRC;
+  uint32_t flags;
   //
-  CLR_UINT32 nativeMethodsChecksum;
-  CLR_UINT32 patchEntryOffset;
+  uint32_t nativeMethodsChecksum;
+  uint32_t patchEntryOffset;
   //
   CLR_RECORD_VERSION version;
   //
-  CLR_STRING assemblyName; // TBL_Strings
-  CLR_UINT16 stringTableVersion;
+  uint16_t assemblyName; // TBL_Strings
+  uint16_t stringTableVersion;
   //
-  CLR_OFFSET_LONG startOfTables[TBL_Max];
-  CLR_UINT32 numOfPatchedMethods;
+  uint32_t startOfTables[TBL_Max];
+  uint32_t numOfPatchedMethods;
   //
   // For every table, a number of bytes that were padded to the end of the table
   // to align to unsigned long.  Each table starts at a unsigned long boundary, and ends
@@ -992,7 +973,7 @@ struct CLR_RECORD_ASSEMBLY
   // compact form to hold this information, but it only costs 16 bytes/assembly.
   // Trying to only align some of the tables is just much more hassle than it's worth.
   // And, of course, this field also has to be unsigned long-aligned.
-  CLR_UINT8 paddingOfTables[((TBL_Max - 1) + 3) / 4 * 4];
+  uint8_t paddingOfTables[((TBL_Max - 1) + 3) / 4 * 4];
   //--//
 
   bool GoodHeader() const;
@@ -1002,110 +983,110 @@ struct CLR_RECORD_ASSEMBLY
   void ComputeCRC();
 #endif
 
-  CLR_OFFSET_LONG SizeOfTable(CLR_TABLESENUM tbl) const
+  uint32_t SizeOfTable(CLR_TABLESENUM tbl) const
     {
     return startOfTables[tbl + 1] - startOfTables[tbl] - paddingOfTables[tbl];
     }
 
-  CLR_OFFSET_LONG TotalSize() const
+  uint32_t TotalSize() const
     {
     return startOfTables[TBL_EndOfAssembly];
     }
 
   //--//
 
-  static CLR_UINT32 ComputeAssemblyHash(const char* name, const CLR_RECORD_VERSION& ver);
+  static uint32_t ComputeAssemblyHash(const char* name, const CLR_RECORD_VERSION& ver);
   };
 
 struct CLR_RECORD_ASSEMBLYREF
   {
-  CLR_STRING name; // TBL_Strings
-  CLR_UINT16 pad;
+  uint16_t name; // TBL_Strings
+  uint16_t pad;
   //
   CLR_RECORD_VERSION version;
   };
 
 struct CLR_RECORD_TYPEREF
   {
-  CLR_STRING name;      // TBL_Strings
-  CLR_STRING nameSpace; // TBL_Strings
+  uint16_t name;      // TBL_Strings
+  uint16_t nameSpace; // TBL_Strings
   //
-  CLR_IDX scope; // TBL_AssemblyRef | TBL_TypeRef // 0x8000
-  CLR_UINT16 pad;
+  uint16_t scope; // TBL_AssemblyRef | TBL_TypeRef // 0x8000
+  uint16_t pad;
   };
 
 struct CLR_RECORD_FIELDREF
   {
-  CLR_STRING name;   // TBL_Strings
-  CLR_IDX container; // TBL_TypeRef
+  uint16_t name;   // TBL_Strings
+  uint16_t container; // TBL_TypeRef
   //
-  CLR_SIG sig; // TBL_Signatures
-  CLR_UINT16 pad;
+  uint16_t sig; // TBL_Signatures
+  uint16_t pad;
   };
 
 struct CLR_RECORD_METHODREF
   {
-  CLR_STRING name;   // TBL_Strings
-  CLR_IDX container; // TBL_TypeRef
+  uint16_t name;   // TBL_Strings
+  uint16_t container; // TBL_TypeRef
   //
-  CLR_SIG sig; // TBL_Signatures
-  CLR_UINT16 pad;
+  uint16_t sig; // TBL_Signatures
+  uint16_t pad;
   };
 
 struct CLR_RECORD_TYPEDEF
   {
-  static const CLR_UINT16 TD_Scope_Mask = 0x0007;
-  static const CLR_UINT16 TD_Scope_NotPublic = 0x0000;         // Class is not public scope.
-  static const CLR_UINT16 TD_Scope_Public = 0x0001;            // Class is public scope.
-  static const CLR_UINT16 TD_Scope_NestedPublic = 0x0002;      // Class is nested with public visibility.
-  static const CLR_UINT16 TD_Scope_NestedPrivate = 0x0003;     // Class is nested with private visibility.
-  static const CLR_UINT16 TD_Scope_NestedFamily = 0x0004;      // Class is nested with family visibility.
-  static const CLR_UINT16 TD_Scope_NestedAssembly = 0x0005;    // Class is nested with assembly visibility.
-  static const CLR_UINT16 TD_Scope_NestedFamANDAssem = 0x0006; // Class is nested with family and assembly visibility.
-  static const CLR_UINT16 TD_Scope_NestedFamORAssem = 0x0007;  // Class is nested with family or assembly visibility.
+  static const uint16_t TD_Scope_Mask = 0x0007;
+  static const uint16_t TD_Scope_NotPublic = 0x0000;         // Class is not public scope.
+  static const uint16_t TD_Scope_Public = 0x0001;            // Class is public scope.
+  static const uint16_t TD_Scope_NestedPublic = 0x0002;      // Class is nested with public visibility.
+  static const uint16_t TD_Scope_NestedPrivate = 0x0003;     // Class is nested with private visibility.
+  static const uint16_t TD_Scope_NestedFamily = 0x0004;      // Class is nested with family visibility.
+  static const uint16_t TD_Scope_NestedAssembly = 0x0005;    // Class is nested with assembly visibility.
+  static const uint16_t TD_Scope_NestedFamANDAssem = 0x0006; // Class is nested with family and assembly visibility.
+  static const uint16_t TD_Scope_NestedFamORAssem = 0x0007;  // Class is nested with family or assembly visibility.
 
-  static const CLR_UINT16 TD_Serializable = 0x0008;
+  static const uint16_t TD_Serializable = 0x0008;
 
-  static const CLR_UINT16 TD_Semantics_Mask = 0x0030;
-  static const CLR_UINT16 TD_Semantics_Class = 0x0000;
-  static const CLR_UINT16 TD_Semantics_ValueType = 0x0010;
-  static const CLR_UINT16 TD_Semantics_Interface = 0x0020;
-  static const CLR_UINT16 TD_Semantics_Enum = 0x0030;
+  static const uint16_t TD_Semantics_Mask = 0x0030;
+  static const uint16_t TD_Semantics_Class = 0x0000;
+  static const uint16_t TD_Semantics_ValueType = 0x0010;
+  static const uint16_t TD_Semantics_Interface = 0x0020;
+  static const uint16_t TD_Semantics_Enum = 0x0030;
 
-  static const CLR_UINT16 TD_Abstract = 0x0040;
-  static const CLR_UINT16 TD_Sealed = 0x0080;
+  static const uint16_t TD_Abstract = 0x0040;
+  static const uint16_t TD_Sealed = 0x0080;
 
-  static const CLR_UINT16 TD_SpecialName = 0x0100;
-  static const CLR_UINT16 TD_Delegate = 0x0200;
-  static const CLR_UINT16 TD_MulticastDelegate = 0x0400;
+  static const uint16_t TD_SpecialName = 0x0100;
+  static const uint16_t TD_Delegate = 0x0200;
+  static const uint16_t TD_MulticastDelegate = 0x0400;
 
-  static const CLR_UINT16 TD_Patched = 0x0800;
+  static const uint16_t TD_Patched = 0x0800;
 
-  static const CLR_UINT16 TD_BeforeFieldInit = 0x1000;
-  static const CLR_UINT16 TD_HasSecurity = 0x2000;
-  static const CLR_UINT16 TD_HasFinalizer = 0x4000;
-  static const CLR_UINT16 TD_HasAttributes = 0x8000;
+  static const uint16_t TD_BeforeFieldInit = 0x1000;
+  static const uint16_t TD_HasSecurity = 0x2000;
+  static const uint16_t TD_HasFinalizer = 0x4000;
+  static const uint16_t TD_HasAttributes = 0x8000;
 
-  CLR_STRING name;      // TBL_Strings
-  CLR_STRING nameSpace; // TBL_Strings
+  uint16_t name;      // TBL_Strings
+  uint16_t nameSpace; // TBL_Strings
   //
-  CLR_IDX extends;       // TBL_TypeDef | TBL_TypeRef // 0x8000
-  CLR_IDX enclosingType; // TBL_TypeDef
+  uint16_t extends;       // TBL_TypeDef | TBL_TypeRef // 0x8000
+  uint16_t enclosingType; // TBL_TypeDef
   //
-  CLR_SIG interfaces;    // TBL_Signatures
-  CLR_IDX methods_First; // TBL_MethodDef
+  uint16_t interfaces;    // TBL_Signatures
+  uint16_t methods_First; // TBL_MethodDef
   //
-  CLR_UINT8 vMethods_Num;
-  CLR_UINT8 iMethods_Num;
-  CLR_UINT8 sMethods_Num;
-  CLR_UINT8 dataType;
+  uint8_t vMethods_Num;
+  uint8_t iMethods_Num;
+  uint8_t sMethods_Num;
+  uint8_t dataType;
   //
-  CLR_IDX sFields_First; // TBL_FieldDef
-  CLR_IDX iFields_First; // TBL_FieldDef
+  uint16_t sFields_First; // TBL_FieldDef
+  uint16_t iFields_First; // TBL_FieldDef
   //
-  CLR_UINT8 sFields_Num;
-  CLR_UINT8 iFields_Num;
-  CLR_UINT16 flags;
+  uint8_t sFields_Num;
+  uint8_t iFields_Num;
+  uint16_t flags;
 
   //--//
 
@@ -1121,108 +1102,108 @@ struct CLR_RECORD_TYPEDEF
 
 struct CLR_RECORD_FIELDDEF
   {
-  static const CLR_UINT16 FD_Scope_Mask = 0x0007;
-  static const CLR_UINT16 FD_Scope_PrivateScope = 0x0000; // Member not referenceable.
-  static const CLR_UINT16 FD_Scope_Private = 0x0001;      // Accessible only by the parent type.
-  static const CLR_UINT16 FD_Scope_FamANDAssem = 0x0002;  // Accessible by sub-types only in this Assembly.
-  static const CLR_UINT16 FD_Scope_Assembly = 0x0003;     // Accessibly by anyone in the Assembly.
-  static const CLR_UINT16 FD_Scope_Family = 0x0004;       // Accessible only by type and sub-types.
-  static const CLR_UINT16 FD_Scope_FamORAssem = 0x0005; // Accessibly by sub-types anywhere, plus anyone in assembly.
-  static const CLR_UINT16 FD_Scope_Public = 0x0006;     // Accessibly by anyone who has visibility to this scope.
+  static const uint16_t FD_Scope_Mask = 0x0007;
+  static const uint16_t FD_Scope_PrivateScope = 0x0000; // Member not referenceable.
+  static const uint16_t FD_Scope_Private = 0x0001;      // Accessible only by the parent type.
+  static const uint16_t FD_Scope_FamANDAssem = 0x0002;  // Accessible by sub-types only in this Assembly.
+  static const uint16_t FD_Scope_Assembly = 0x0003;     // Accessibly by anyone in the Assembly.
+  static const uint16_t FD_Scope_Family = 0x0004;       // Accessible only by type and sub-types.
+  static const uint16_t FD_Scope_FamORAssem = 0x0005; // Accessibly by sub-types anywhere, plus anyone in assembly.
+  static const uint16_t FD_Scope_Public = 0x0006;     // Accessibly by anyone who has visibility to this scope.
 
-  static const CLR_UINT16 FD_NotSerialized = 0x0008; // Field does not have to be serialized when type is remoted.
+  static const uint16_t FD_NotSerialized = 0x0008; // Field does not have to be serialized when type is remoted.
 
-  static const CLR_UINT16 FD_Static = 0x0010;   // Defined on type, else per instance.
-  static const CLR_UINT16 FD_InitOnly = 0x0020; // Field may only be initialized, not written to after init.
-  static const CLR_UINT16 FD_Literal = 0x0040;  // Value is compile time constant.
+  static const uint16_t FD_Static = 0x0010;   // Defined on type, else per instance.
+  static const uint16_t FD_InitOnly = 0x0020; // Field may only be initialized, not written to after init.
+  static const uint16_t FD_Literal = 0x0040;  // Value is compile time constant.
 
-  static const CLR_UINT16 FD_SpecialName = 0x0100; // field is special.  Name describes how.
-  static const CLR_UINT16 FD_HasDefault = 0x0200;  // Field has default.
-  static const CLR_UINT16 FD_HasFieldRVA = 0x0400; // Field has RVA.
+  static const uint16_t FD_SpecialName = 0x0100; // field is special.  Name describes how.
+  static const uint16_t FD_HasDefault = 0x0200;  // Field has default.
+  static const uint16_t FD_HasFieldRVA = 0x0400; // Field has RVA.
 
-  static const CLR_UINT16 FD_NoReflection = 0x0800; // field does not allow reflection
+  static const uint16_t FD_NoReflection = 0x0800; // field does not allow reflection
 
-  static const CLR_UINT16 FD_HasAttributes = 0x8000;
+  static const uint16_t FD_HasAttributes = 0x8000;
 
-  CLR_STRING name; // TBL_Strings
-  CLR_SIG sig;     // TBL_Signatures
+  uint16_t name; // TBL_Strings
+  uint16_t sig;     // TBL_Signatures
   //
-  CLR_SIG defaultValue; // TBL_Signatures
-  CLR_UINT16 flags;
+  uint16_t defaultValue; // TBL_Signatures
+  uint16_t flags;
   };
 
 struct CLR_RECORD_METHODDEF
   {
-  static const CLR_UINT32 MD_Scope_Mask = 0x00000007;
-  static const CLR_UINT32 MD_Scope_PrivateScope = 0x00000000; // Member not referenceable.
-  static const CLR_UINT32 MD_Scope_Private = 0x00000001;      // Accessible only by the parent type.
-  static const CLR_UINT32 MD_Scope_FamANDAssem = 0x00000002;  // Accessible by sub-types only in this Assembly.
-  static const CLR_UINT32 MD_Scope_Assem = 0x00000003;        // Accessibly by anyone in the Assembly.
-  static const CLR_UINT32 MD_Scope_Family = 0x00000004;       // Accessible only by type and sub-types.
-  static const CLR_UINT32 MD_Scope_FamORAssem =
+  static const uint32_t MD_Scope_Mask = 0x00000007;
+  static const uint32_t MD_Scope_PrivateScope = 0x00000000; // Member not referenceable.
+  static const uint32_t MD_Scope_Private = 0x00000001;      // Accessible only by the parent type.
+  static const uint32_t MD_Scope_FamANDAssem = 0x00000002;  // Accessible by sub-types only in this Assembly.
+  static const uint32_t MD_Scope_Assem = 0x00000003;        // Accessibly by anyone in the Assembly.
+  static const uint32_t MD_Scope_Family = 0x00000004;       // Accessible only by type and sub-types.
+  static const uint32_t MD_Scope_FamORAssem =
     0x00000005;                                       // Accessibly by sub-types anywhere, plus anyone in assembly.
-  static const CLR_UINT32 MD_Scope_Public = 0x00000006; // Accessibly by anyone who has visibility to this scope.
+  static const uint32_t MD_Scope_Public = 0x00000006; // Accessibly by anyone who has visibility to this scope.
 
-  static const CLR_UINT32 MD_Static = 0x00000010;    // Defined on type, else per instance.
-  static const CLR_UINT32 MD_Final = 0x00000020;     // Method may not be overridden.
-  static const CLR_UINT32 MD_Virtual = 0x00000040;   // Method virtual.
-  static const CLR_UINT32 MD_HideBySig = 0x00000080; // Method hides by name+sig, else just by name.
+  static const uint32_t MD_Static = 0x00000010;    // Defined on type, else per instance.
+  static const uint32_t MD_Final = 0x00000020;     // Method may not be overridden.
+  static const uint32_t MD_Virtual = 0x00000040;   // Method virtual.
+  static const uint32_t MD_HideBySig = 0x00000080; // Method hides by name+sig, else just by name.
 
-  static const CLR_UINT32 MD_VtableLayoutMask = 0x00000100;
-  static const CLR_UINT32 MD_ReuseSlot = 0x00000000;   // The default.
-  static const CLR_UINT32 MD_NewSlot = 0x00000100;     // Method always gets a new slot in the vtable.
-  static const CLR_UINT32 MD_Abstract = 0x00000200;    // Method does not provide an implementation.
-  static const CLR_UINT32 MD_SpecialName = 0x00000400; // Method is special.  Name describes how.
-  static const CLR_UINT32 MD_NativeProfiled = 0x00000800;
+  static const uint32_t MD_VtableLayoutMask = 0x00000100;
+  static const uint32_t MD_ReuseSlot = 0x00000000;   // The default.
+  static const uint32_t MD_NewSlot = 0x00000100;     // Method always gets a new slot in the vtable.
+  static const uint32_t MD_Abstract = 0x00000200;    // Method does not provide an implementation.
+  static const uint32_t MD_SpecialName = 0x00000400; // Method is special.  Name describes how.
+  static const uint32_t MD_NativeProfiled = 0x00000800;
 
-  static const CLR_UINT32 MD_Constructor = 0x00001000;
-  static const CLR_UINT32 MD_StaticConstructor = 0x00002000;
-  static const CLR_UINT32 MD_Finalizer = 0x00004000;
+  static const uint32_t MD_Constructor = 0x00001000;
+  static const uint32_t MD_StaticConstructor = 0x00002000;
+  static const uint32_t MD_Finalizer = 0x00004000;
 
-  static const CLR_UINT32 MD_DelegateConstructor = 0x00010000;
-  static const CLR_UINT32 MD_DelegateInvoke = 0x00020000;
-  static const CLR_UINT32 MD_DelegateBeginInvoke = 0x00040000;
-  static const CLR_UINT32 MD_DelegateEndInvoke = 0x00080000;
+  static const uint32_t MD_DelegateConstructor = 0x00010000;
+  static const uint32_t MD_DelegateInvoke = 0x00020000;
+  static const uint32_t MD_DelegateBeginInvoke = 0x00040000;
+  static const uint32_t MD_DelegateEndInvoke = 0x00080000;
 
-  static const CLR_UINT32 MD_Synchronized = 0x01000000;
-  static const CLR_UINT32 MD_GloballySynchronized = 0x02000000;
-  static const CLR_UINT32 MD_Patched = 0x04000000;
-  static const CLR_UINT32 MD_EntryPoint = 0x08000000;
-  static const CLR_UINT32 MD_RequireSecObject = 0x10000000; // Method calls another method containing security code.
-  static const CLR_UINT32 MD_HasSecurity = 0x20000000;      // Method has security associate with it.
-  static const CLR_UINT32 MD_HasExceptionHandlers = 0x40000000;
-  static const CLR_UINT32 MD_HasAttributes = 0x80000000;
+  static const uint32_t MD_Synchronized = 0x01000000;
+  static const uint32_t MD_GloballySynchronized = 0x02000000;
+  static const uint32_t MD_Patched = 0x04000000;
+  static const uint32_t MD_EntryPoint = 0x08000000;
+  static const uint32_t MD_RequireSecObject = 0x10000000; // Method calls another method containing security code.
+  static const uint32_t MD_HasSecurity = 0x20000000;      // Method has security associate with it.
+  static const uint32_t MD_HasExceptionHandlers = 0x40000000;
+  static const uint32_t MD_HasAttributes = 0x80000000;
 
-  CLR_STRING name; // TBL_Strings
-  CLR_OFFSET RVA;
+  uint16_t name; // TBL_Strings
+  uint16_t RVA;
   //
-  CLR_UINT32 flags;
+  uint32_t flags;
   //
-  CLR_UINT8 retVal;
-  CLR_UINT8 numArgs;
-  CLR_UINT8 numLocals;
-  CLR_UINT8 lengthEvalStack;
+  uint8_t retVal;
+  uint8_t numArgs;
+  uint8_t numLocals;
+  uint8_t lengthEvalStack;
   //
-  CLR_SIG locals; // TBL_Signatures
-  CLR_SIG sig;    // TBL_Signatures
+  uint16_t locals; // TBL_Signatures
+  uint16_t sig;    // TBL_Signatures
   };
 
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif
-// pragma required here because compiler is not too happy with the cast to CLR_UINT32* from a CLR_UINT16 variable
+// pragma required here because compiler is not too happy with the cast to uint32_t* from a uint16_t variable
 
 struct CLR_RECORD_ATTRIBUTE
   {
-  CLR_UINT16 ownerType; // one of TBL_TypeDef, TBL_MethodDef, or TBL_FieldDef.
-  CLR_UINT16 ownerIdx;  // TBL_TypeDef | TBL_MethodDef | TBL_FielfDef
-  CLR_UINT16 constructor;
-  CLR_SIG data; // TBL_Signatures
+  uint16_t ownerType; // one of TBL_TypeDef, TBL_MethodDef, or TBL_FieldDef.
+  uint16_t ownerIdx;  // TBL_TypeDef | TBL_MethodDef | TBL_FielfDef
+  uint16_t constructor;
+  uint16_t data; // TBL_Signatures
 
-  CLR_UINT32 Key() const
+  uint32_t Key() const
     {
-    return *(CLR_UINT32*)&ownerType;
+    return *(uint32_t*)&ownerType;
     }
   };
 
@@ -1232,69 +1213,69 @@ struct CLR_RECORD_ATTRIBUTE
 
 struct CLR_RECORD_TYPESPEC
   {
-  CLR_SIG sig; // TBL_Signatures
-  CLR_UINT16 pad;
+  uint16_t sig; // TBL_Signatures
+  uint16_t pad;
   };
 
 struct CLR_RECORD_EH
   {
-  static const CLR_UINT16 EH_Catch = 0x0000;
-  static const CLR_UINT16 EH_CatchAll = 0x0001;
-  static const CLR_UINT16 EH_Finally = 0x0002;
-  static const CLR_UINT16 EH_Filter = 0x0003;
+  static const uint16_t EH_Catch = 0x0000;
+  static const uint16_t EH_CatchAll = 0x0001;
+  static const uint16_t EH_Finally = 0x0002;
+  static const uint16_t EH_Filter = 0x0003;
 
   //--//
 
-  CLR_UINT16 mode;
+  uint16_t mode;
   union {
-    CLR_IDX classToken; // TBL_TypeDef | TBL_TypeRef
-    CLR_OFFSET filterStart;
+    uint16_t classToken; // TBL_TypeDef | TBL_TypeRef
+    uint16_t filterStart;
     };
-  CLR_OFFSET tryStart;
-  CLR_OFFSET tryEnd;
-  CLR_OFFSET handlerStart;
-  CLR_OFFSET handlerEnd;
+  uint16_t tryStart;
+  uint16_t tryEnd;
+  uint16_t handlerStart;
+  uint16_t handlerEnd;
 
   //--//
 
-  static CLR_PMETADATA ExtractEhFromByteCode(CLR_PMETADATA ipEnd, const CLR_RECORD_EH*& ptrEh, CLR_UINT32& numEh);
+  static CLR_PMETADATA ExtractEhFromByteCode(CLR_PMETADATA ipEnd, const CLR_RECORD_EH*& ptrEh, uint32_t& numEh);
 
-  CLR_UINT32 GetToken() const;
+  uint32_t GetToken() const;
   };
 
 CT_ASSERT_UNIQUE_NAME(sizeof(CLR_RECORD_EH) == 12, CLR_RECORD_EH)
 
 struct CLR_RECORD_RESOURCE_FILE
   {
-  static const CLR_UINT32 CURRENT_VERSION = 2;
+  static const uint32_t CURRENT_VERSION = 2;
 
-  CLR_UINT32 version;
-  CLR_UINT32 sizeOfHeader;
-  CLR_UINT32 sizeOfResourceHeader;
-  CLR_UINT32 numberOfResources;
-  CLR_STRING name; // TBL_Strings
-  CLR_UINT16 pad;
-  CLR_UINT32 offset; // TBL_Resource
+  uint32_t version;
+  uint32_t sizeOfHeader;
+  uint32_t sizeOfResourceHeader;
+  uint32_t numberOfResources;
+  uint16_t name; // TBL_Strings
+  uint16_t pad;
+  uint32_t offset; // TBL_Resource
   };
 
 struct CLR_RECORD_RESOURCE
   {
-  static const CLR_UINT8 RESOURCE_Invalid = 0x00;
-  static const CLR_UINT8 RESOURCE_Bitmap = 0x01;
-  static const CLR_UINT8 RESOURCE_Font = 0x02;
-  static const CLR_UINT8 RESOURCE_String = 0x03;
-  static const CLR_UINT8 RESOURCE_Binary = 0x04;
+  static const uint8_t RESOURCE_Invalid = 0x00;
+  static const uint8_t RESOURCE_Bitmap = 0x01;
+  static const uint8_t RESOURCE_Font = 0x02;
+  static const uint8_t RESOURCE_String = 0x03;
+  static const uint8_t RESOURCE_Binary = 0x04;
 
-  static const CLR_UINT8 FLAGS_PaddingMask = 0x03;
-  static const CLR_INT16 SENTINEL_ID = 0x7FFF;
+  static const uint8_t FLAGS_PaddingMask = 0x03;
+  static const int16_t SENTINEL_ID = 0x7FFF;
 
   //
   // Sorted on id
   //
-  CLR_INT16 id;
-  CLR_UINT8 kind;
-  CLR_UINT8 flags;
-  CLR_UINT32 offset;
+  int16_t id;
+  uint8_t kind;
+  uint8_t flags;
+  uint32_t offset;
   };
 
 #if defined(_MSC_VER)

@@ -7,7 +7,7 @@
 
 HRESULT Library_corlib_native_CanFly_Runtime::HasFlag___STATIC__BOOLEAN__SystemEnum__SystemEnum(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   CLR_RT_TypeDescriptor enumTypeDesc;
   CLR_RT_TypeDescriptor flagTypeDesc;
@@ -33,7 +33,7 @@ HRESULT Library_corlib_native_CanFly_Runtime::HasFlag___STATIC__BOOLEAN__SystemE
   NANOCLR_CHECK_HRESULT(flagValue->PerformUnboxing(flagTypeDesc.m_handlerCls));
 
   // check if both types are equivalent
-  if (enumTypeDesc.m_handlerCls.Type() != flagTypeDesc.m_handlerCls.Type())
+  if (get_type_index( enumTypeDesc.m_handlerCls.m_index) != get_type_index(flagTypeDesc.m_handlerCls.m_index))
     {
     NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
     }

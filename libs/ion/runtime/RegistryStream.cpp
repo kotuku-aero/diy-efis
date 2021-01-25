@@ -25,7 +25,7 @@ HRESULT Library_corlib_native_CanFly_Syscall::RegStreamOpen___STATIC__I4__U4__ST
   SetResult_INT32(stack, hr);
 
   if (succeeded(hr))
-    stack.Arg2().Dereference()->SetInteger((CLR_UINT32)retValue);
+    stack.Arg2().Dereference()->SetInteger((uint32_t)retValue);
 
   return S_OK;
   }
@@ -54,7 +54,7 @@ HRESULT Library_corlib_native_CanFly_Syscall::RegStreamCreate___STATIC__I4__U4__
   SetResult_INT32(stack, hr);
 
   if (succeeded(hr))
-    stack.Arg2().Dereference()->SetInteger((CLR_UINT32)retValue);
+    stack.Arg2().Dereference()->SetInteger((uint32_t)retValue);
 
   return S_OK;
   }

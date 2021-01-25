@@ -12,7 +12,7 @@
 struct BackTrackExecution
   {
   CLR_RT_Assembly *m_assm;
-  CLR_RT_MethodDef_Index m_call;
+  uint32_t m_call;
   CLR_PMETADATA m_IPstart;
   CLR_PMETADATA m_IP;
   int m_pid;
@@ -80,7 +80,7 @@ bool g_CLR_RT_fBadStack;
 
 bool CLR_RT_HeapBlock::InitObject()
   {
-  NATIVE_PROFILE_CLR_CORE();
+
   CLR_RT_HeapBlock *obj = this;
   CLR_DataType dt = obj->DataType();
   const CLR_RT_DataTypeLookup &dtl = c_CLR_RT_DataTypeLookup[dt];
@@ -93,7 +93,7 @@ bool CLR_RT_HeapBlock::InitObject()
 
   if (dt == DATATYPE_VALUETYPE && obj->IsBoxed() == false)
     {
-    CLR_UINT32 num = obj->DataSize();
+    uint32_t num = obj->DataSize();
 
     while (--num)
       {
@@ -122,8 +122,8 @@ bool CLR_RT_HeapBlock::InitObject()
 
 HRESULT CLR_RT_HeapBlock::Convert_Internal(CLR_DataType et)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+
+  HRESULT hr;
 
   CLR_DataType dt = DataType();
   const CLR_RT_DataTypeLookup &dtlSrc = c_CLR_RT_DataTypeLookup[dt];
@@ -147,15 +147,15 @@ HRESULT CLR_RT_HeapBlock::Convert_Internal(CLR_DataType et)
     case DATATYPE_I4:
     case DATATYPE_U4:
     {
-    CLR_UINT64 res = (CLR_UINT64)NumericByRef().u4;
+    uint64_t res = (uint64_t)NumericByRef().u4;
 
     if ((dtlSrc.m_flags & CLR_RT_DataTypeLookup::c_Signed) &&
       (dtlDst.m_flags & CLR_RT_DataTypeLookup::c_Signed))
       {
-      CLR_UINT32 shift = 64 - dtlSrc.m_sizeInBits;
+      uint32_t shift = 64 - dtlSrc.m_sizeInBits;
 
       res <<= shift;
-      res = (CLR_UINT64)((CLR_INT64)res >> shift);
+      res = (uint64_t)((int64_t)res >> shift);
       }
 
     NumericByRef().u8 = res;
@@ -224,13 +224,13 @@ HRESULT CLR_RT_HeapBlock::Convert_Internal(CLR_DataType et)
 
     switch (scaleOut)
       {
-      // Direct casting of negative double to CLR_UINT64 is returns zero for RVDS 3.1 compiler.
+      // Direct casting of negative double to uint64_t is returns zero for RVDS 3.1 compiler.
       // Double cast looks as most portable way.
       case -1:
-        NumericByRef().u8 = (CLR_UINT64)(CLR_INT64)val;
+        NumericByRef().u8 = (uint64_t)(int64_t)val;
         break;
       case 0:
-        NumericByRef().s8 = (CLR_INT64)val;
+        NumericByRef().s8 = (int64_t)val;
         break;
       case 1:
         NumericByRef().r4 = (float)val;
@@ -256,7 +256,7 @@ HRESULT CLR_RT_HeapBlock::Convert_Internal(CLR_DataType et)
 
 CLR_RT_Thread::UnwindStack *CLR_RT_Thread::PushEH()
   {
-  NATIVE_PROFILE_CLR_CORE();
+
   if (m_nestedExceptionsPos < (int)ARRAYSIZE(m_nestedExceptions))
     {
     memset(&m_nestedExceptions[m_nestedExceptionsPos], 0, sizeof(UnwindStack));
@@ -265,7 +265,7 @@ CLR_RT_Thread::UnwindStack *CLR_RT_Thread::PushEH()
   else
     {
 #if !defined(BUILD_RTM)
-    CLR_Debug::Printf("WARNING: TOO MANY NESTED EXCEPTIONS!!\r\n");
+    trace_debug("WARNING: TOO MANY NESTED EXCEPTIONS!!\r\n");
 #endif
     // clip the oldest exception in the nest
     memmove(
@@ -278,7 +278,7 @@ CLR_RT_Thread::UnwindStack *CLR_RT_Thread::PushEH()
 
 void CLR_RT_Thread::PopEH_Inner(CLR_RT_StackFrame *stack, CLR_PMETADATA ip)
   {
-  NATIVE_PROFILE_CLR_CORE();
+
   //
   // We could be jumping outside of a nested exception handler.
   //
@@ -321,11 +321,11 @@ bool CLR_RT_Thread::FindEhBlock(
   CLR_RT_ExceptionHandler &eh,
   bool onlyFinallys)
   {
-  NATIVE_PROFILE_CLR_CORE();
+
   CLR_RT_Assembly *assm = stack->m_call.m_assm;
   CLR_RT_ExceptionHandler *ptrEhExt = NULL;
   const CLR_RECORD_EH *ptrEh = NULL;
-  CLR_UINT32 numEh = 0;
+  uint32_t numEh = 0;
 
   // FROM is always non-NULL and indicates the current IP
   _ASSERTE(from);
@@ -340,9 +340,9 @@ bool CLR_RT_Thread::FindEhBlock(
     {
     if (!onlyFinallys || s_CLR_RT_fTrace_Exceptions >= c_CLR_RT_Trace_Obnoxious)
       {
-      CLR_Debug::Printf("Unwinding at ");
+      trace_debug("Unwinding at ");
       CLR_RT_DUMP::METHOD(stack->m_call);
-      CLR_Debug::Printf(" [IP: %04x - %d]\r\n", (size_t)stack->m_IP, (stack->m_IP - stack->m_IPstart));
+      trace_debug(" [IP: %04x - %d]\r\n", (size_t)stack->m_IP, (stack->m_IP - stack->m_IPstart));
       }
     }
 #endif
@@ -353,13 +353,13 @@ bool CLR_RT_Thread::FindEhBlock(
       {
       case CLR_RT_StackFrame::c_MethodKind_Interpreted:
       {
-      CLR_OFFSET ipMethod_Start;
-      CLR_OFFSET ipMethod_End;
+      uint16_t ipMethod_Start;
+      uint16_t ipMethod_End;
 
       if (assm->FindMethodBoundaries(stack->m_call.Method(), ipMethod_Start, ipMethod_End))
         {
         const CLR_RECORD_EH *ptrEh2;
-        CLR_UINT32 numEh2;
+        uint32_t numEh2;
 
         CLR_RECORD_EH::ExtractEhFromByteCode(
           stack->m_IPstart + (ipMethod_End - ipMethod_Start),
@@ -399,7 +399,7 @@ bool CLR_RT_Thread::FindEhBlock(
         {
         if (to == NULL || s_CLR_RT_fTrace_Exceptions >= c_CLR_RT_Trace_Obnoxious)
           {
-          CLR_Debug::Printf(
+          trace_debug(
             "Checking EH: %04X-%04X => %04X\r\n",
             (size_t)ptrEhExt->m_tryStart,
             (size_t)ptrEhExt->m_tryEnd,
@@ -434,7 +434,7 @@ bool CLR_RT_Thread::FindEhBlock(
 #if defined(NANOCLR_TRACE_EXCEPTIONS)
             if (s_CLR_RT_fTrace_Exceptions >= c_CLR_RT_Trace_Obnoxious)
               {
-              CLR_Debug::Printf("Found match for a 'finally'\r\n");
+              trace_debug("Found match for a 'finally'\r\n");
               }
 #endif
 
@@ -449,7 +449,7 @@ bool CLR_RT_Thread::FindEhBlock(
 #if defined(NANOCLR_TRACE_EXCEPTIONS)
             if (s_CLR_RT_fTrace_Exceptions >= c_CLR_RT_Trace_Annoying)
               {
-              CLR_Debug::Printf("Found match for a 'catch all'\r\n");
+              trace_debug("Found match for a 'catch all'\r\n");
               }
 #endif
 
@@ -466,11 +466,11 @@ bool CLR_RT_Thread::FindEhBlock(
                 {
                 if (ptrEhExt->IsFilter())
                   {
-                  CLR_Debug::Printf("Trying a 'filter'\r\n");
+                  trace_debug("Trying a 'filter'\r\n");
                   }
                 else
                   {
-                  CLR_Debug::Printf("Found match for a 'catch'\r\n");
+                  trace_debug("Found match for a 'catch'\r\n");
                   }
                 }
 #endif
@@ -491,7 +491,7 @@ bool CLR_RT_Thread::FindEhBlock(
     {
     if (to == NULL || s_CLR_RT_fTrace_Exceptions >= c_CLR_RT_Trace_Obnoxious)
       {
-      CLR_Debug::Printf("No match\r\n");
+      trace_debug("No match\r\n");
       }
     }
 #endif
@@ -503,8 +503,8 @@ bool CLR_RT_Thread::FindEhBlock(
 
 HRESULT CLR_RT_Thread::Execute()
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+
+  HRESULT hr;
 
   CLR_RT_Thread *currentThreadSav = g_CLR_RT_ExecutionEngine.m_currentThread;
 
@@ -560,7 +560,7 @@ HRESULT CLR_RT_Thread::Execute()
             {
             BackTrackExecution &track = s_track[(s_trackPos + i) % ARRAYSIZE(s_track)];
 
-            CLR_Debug::Printf(" %3d ", track.m_depth);
+            trace_debug(" %3d ", track.m_depth);
 
             CLR_RT_MethodDef_Instance inst;
             inst.InitializeFromIndex(track.m_call);
@@ -568,7 +568,7 @@ HRESULT CLR_RT_Thread::Execute()
             // track.m_assm->DumpOpcodeDirect( inst, track.m_IP, track.m_IPstart, track.m_pid );
             }
 
-          CLR_Debug::Printf("\r\n");
+          trace_debug("\r\n");
 #endif
 
           (void)ExceptionCreateInstance(m_currentException, hr, stack);
@@ -617,8 +617,8 @@ HRESULT CLR_RT_Thread::Execute()
 
 HRESULT CLR_RT_Thread::Execute_Inner()
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+
+  HRESULT hr;
 
   while (m_timeQuantumExpired == false && !CLR_EE_DBG_IS(Stopped))
     {
@@ -692,11 +692,7 @@ HRESULT CLR_RT_Thread::Execute_Inner()
       }
 
     {
-#if defined(NANOCLR_PROFILE_NEW_CALLS)
-    CLR_PROF_HANDLER_CALLCHAIN(pm2, stack->m_callchain);
-#endif
-
-    CLR_UINT32 methodKind = (stack->m_flags & CLR_RT_StackFrame::c_MethodKind_Mask);
+    uint32_t methodKind = (stack->m_flags & CLR_RT_StackFrame::c_MethodKind_Mask);
 
     switch (methodKind)
       {
@@ -803,8 +799,8 @@ HRESULT CLR_RT_Thread::Execute_Inner()
 
 HRESULT CLR_RT_Thread::Execute_DelegateInvoke(CLR_RT_StackFrame &stackArg)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+
+  HRESULT hr;
 
   CLR_RT_StackFrame *stack = &stackArg;
 
@@ -812,7 +808,7 @@ HRESULT CLR_RT_Thread::Execute_DelegateInvoke(CLR_RT_StackFrame &stackArg)
   CLR_RT_HeapBlock_Delegate *dlg;
   CLR_RT_HeapBlock *array;
   CLR_RT_HeapBlock *ptr;
-  CLR_UINT32 num;
+  uint32_t num;
 
   ptr = &stack->m_arguments[0];
   if (ptr->DataType() != DATATYPE_OBJECT)
@@ -876,8 +872,8 @@ HRESULT CLR_RT_Thread::Execute_DelegateInvoke(CLR_RT_StackFrame &stackArg)
 
 HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+
+  HRESULT hr;
 
   CLR_RT_StackFrame *stack = &stackArg;
 
@@ -902,7 +898,6 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
 #if defined(NANOCLR_TRACE_EXCEPTIONS) && defined(_WIN32)
     if (s_CLR_RT_fTrace_Exceptions >= c_CLR_RT_Trace_Annoying)
       {
-      CLR_PROF_HANDLER_SUSPEND_TIME();
 
       BackTrackExecution &track = s_track[s_trackPos++];
       s_trackPos %= ARRAYSIZE(s_track);
@@ -915,13 +910,11 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
       NANOCLR_FOREACH_NODE_BACKWARD_END();
 
       track.m_assm = assm;
-      track.m_call = stack->m_call;
+      track.m_call = stack->m_call.m_index;
       track.m_IP = ip;
       track.m_IPstart = stack->m_IPstart;
       track.m_pid = stack->m_owningThread->m_pid;
       track.m_depth = depth;
-
-      CLR_PROF_HANDLER_RESUME_TIME();
       }
 #endif
 
@@ -1225,7 +1218,7 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
         evalPos++;
         CHECKSTACK(stack, evalPos);
 
-        evalPos[0].SetInteger((CLR_INT32)op - (CLR_INT32)CEE_LDC_I4_0);
+        evalPos[0].SetInteger((int32_t)op - (int32_t)CEE_LDC_I4_0);
         break;
         }
 
@@ -1237,7 +1230,7 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
         evalPos++;
         CHECKSTACK(stack, evalPos);
 
-        evalPos[0].SetInteger((CLR_INT32)arg);
+        evalPos[0].SetInteger((int32_t)arg);
         break;
         }
 
@@ -1249,7 +1242,7 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
         evalPos++;
         CHECKSTACK(stack, evalPos);
 
-        evalPos[0].SetInteger((CLR_INT32)arg);
+        evalPos[0].SetInteger((int32_t)arg);
         break;
         }
 
@@ -1263,7 +1256,7 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
         evalPos++;
         CHECKSTACK(stack, evalPos);
 
-        evalPos[0].SetInteger((CLR_INT64)arg);
+        evalPos[0].SetInteger((int64_t)arg);
         break;
         }
 
@@ -1277,11 +1270,7 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
         evalPos++;
         CHECKSTACK(stack, evalPos);
 
-#if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
         evalPos[0].SetFloatFromBits(arg);
-#else
-        NANOCLR_CHECK_HRESULT(evalPos[0].SetFloatIEEE754(arg));
-#endif
         break;
         }
 
@@ -1294,11 +1283,7 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
 
         evalPos++;
         CHECKSTACK(stack, evalPos);
-#if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
         evalPos[0].SetDoubleFromBits(arg);
-#else
-        NANOCLR_CHECK_HRESULT(evalPos[0].SetDoubleIEEE754(arg));
-#endif
         break;
         }
 
@@ -1550,19 +1535,19 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
 
         FETCH_ARG_UINT8(arg, ip);
 
-        CLR_UINT32 numCases = arg;
-        CLR_UINT32 caseSelected = evalPos[1].NumericByRef().u4;
+        uint32_t numCases = arg;
+        uint32_t caseSelected = evalPos[1].NumericByRef().u4;
 
         if (caseSelected < numCases)
           {
-          CLR_PMETADATA ipsub = ip + (CLR_INT32)caseSelected * sizeof(CLR_INT16);
+          CLR_PMETADATA ipsub = ip + (int32_t)caseSelected * sizeof(int16_t);
 
           FETCH_ARG_INT16(offset, ipsub);
 
           ip += offset;
           }
 
-        ip += (CLR_INT32)numCases * sizeof(CLR_INT16);
+        ip += (int32_t)numCases * sizeof(int16_t);
         break;
         }
 
@@ -1967,7 +1952,7 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
         CLR_RT_MethodDef_Instance calleeInst;
         if (calleeInst.ResolveToken(arg, assm) == false)
           NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
-        CLR_RT_TypeDef_Index cls;
+        uint32_t cls;
         CLR_RT_HeapBlock *pThis;
 
         pThis = &evalPos[1 - calleeInst.m_target->numArgs]; // Point to the first arg, 'this' if an instance
@@ -2002,7 +1987,7 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
           }
         else // Non delegate
           {
-          CLR_RT_MethodDef_Index calleeReal;
+          uint32_t calleeReal;
 
           if ((calleeInst.m_target->flags & CLR_RECORD_METHODDEF::MD_Static) == 0)
             {
@@ -2036,18 +2021,18 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
               }
             }
           }
-          {
+        {
 #ifndef CLR_NO_IL_INLINE
-          if (stack->PushInline(ip, assm, evalPos, calleeInst, pThis))
-            {
-            fDirty = true;
-            break;
-            }
+        if (stack->PushInline(ip, assm, evalPos, calleeInst, pThis))
+          {
+          fDirty = true;
+          break;
+          }
 #endif
 
-          WRITEBACK(stack, evalPos, ip, fDirty);
-          NANOCLR_CHECK_HRESULT(CLR_RT_StackFrame::Push(th, calleeInst, -1));
-          }
+        WRITEBACK(stack, evalPos, ip, fDirty);
+        NANOCLR_CHECK_HRESULT(CLR_RT_StackFrame::Push(th, calleeInst, -1));
+        }
 
         goto Execute_Restart;
         }
@@ -2119,7 +2104,7 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
         FETCH_ARG_COMPRESSED_TYPETOKEN(arg, ip);
 
         CLR_RT_TypeDef_Instance type;
-        CLR_RT_TypeDef_Index cls;
+        uint32_t cls;
 
         if (type.ResolveToken(arg, assm) == false)
           NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
@@ -2176,7 +2161,7 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
           NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
         CLR_RT_TypeDef_Instance cls;
         CLR_RT_HeapBlock *top;
-        CLR_INT32 changes;
+        int32_t changes;
 
         cls.InitializeFromMethod(calleeInst); // This is the class to create!
 
@@ -2211,7 +2196,7 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
             NANOCLR_CHECK_HRESULT(CLR_E_NULL_REFERENCE);
             }
 
-          dlg->m_cls = cls;
+          dlg->m_cls = cls.m_index;
 
           CLR_RT_MethodDef_Instance dlgInst;
 
@@ -2365,7 +2350,7 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
             goto Execute_LoadAndPromote;
           case DATATYPE_DATETIME:
           case DATATYPE_TIMESPAN:
-            evalPos[0].SetInteger((CLR_INT64)obj->NumericByRefConst().s8);
+            evalPos[0].SetInteger((int64_t)obj->NumericByRefConst().s8);
             break;
           default:
             NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
@@ -2584,7 +2569,7 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
 
         FETCH_ARG_COMPRESSED_TYPETOKEN(arg, ip);
 
-        CLR_UINT32 size = evalPos[0].NumericByRef().u4;
+        uint32_t size = evalPos[0].NumericByRef().u4;
 
         UPDATESTACK(stack, evalPos);
 
@@ -2693,7 +2678,7 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
         //</LDELEMA>
         // <LDOBJ>
         CLR_RT_TypeDef_Instance type;
-        CLR_RT_TypeDef_Index cls;
+        uint32_t cls;
 
         if (!type.ResolveToken(arg, assm))
           NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
@@ -2888,7 +2873,7 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
           if (sig.ResolveToken(arg, assm) == false)
             NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
 
-          evalPos[0].SetReflection(sig);
+          evalPos[0].SetReflection(sig.m_index);
           }
           break;
 
@@ -2899,7 +2884,7 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
           if (cls.ResolveToken(arg, assm) == false)
             NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
 
-          evalPos[0].SetReflection(cls);
+          evalPos[0].SetReflection(cls.m_index);
           }
           break;
 
@@ -2910,7 +2895,7 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
           if (field.ResolveToken(arg, assm) == false)
             NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
 
-          evalPos[0].SetReflection(field);
+          evalPos[0].SetReflection(field.m_index);
           }
           break;
 
@@ -2951,7 +2936,7 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
       OPDEF(CEE_LEAVE, "leave", Pop0, Push0, InlineBrTarget, IPrimitive, 1, 0xFF, 0xDD, BRANCH)
         OPDEF(CEE_LEAVE_S, "leave.s", Pop0, Push0, ShortInlineBrTarget, IPrimitive, 1, 0xFF, 0xDE, BRANCH)
         {
-        CLR_INT32 arg;
+        int32_t arg;
 
         EMPTYSTACK(stack, evalPos);
 
@@ -3076,7 +3061,7 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
 
         UPDATESTACK(stack, evalPos);
 
-        NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_Delegate::CreateInstance(evalPos[0], method, stack));
+        NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_Delegate::CreateInstance(evalPos[0], method.m_index, stack));
         break;
         }
 
@@ -3089,13 +3074,13 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
         CLR_RT_MethodDef_Instance callee;
         if (callee.ResolveToken(arg, assm) == false)
           NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
-        CLR_RT_TypeDef_Index cls;
+        uint32_t cls;
 
         NANOCLR_CHECK_HRESULT(CLR_RT_TypeDescriptor::ExtractTypeIndexFromObject(evalPos[0], cls));
 
-        CLR_RT_MethodDef_Index calleeReal;
+        uint32_t calleeReal;
 
-        if (g_CLR_RT_EventCache.FindVirtualMethod(cls, callee, calleeReal) == false)
+        if (g_CLR_RT_EventCache.FindVirtualMethod(cls, callee.m_index, &calleeReal) == false)
           {
           NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
           }
@@ -3144,9 +3129,6 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
           }
         break;
         }
-
-      //----------------------------------------------------------------------------------------------------------//
-
       OPDEF(CEE_SIZEOF, "sizeof", Pop0, PushI, InlineType, IPrimitive, 2, 0xFE, 0x1C, NEXT)
         {
         FETCH_ARG_COMPRESSED_TYPETOKEN(arg, ip);
@@ -3154,7 +3136,7 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
         CLR_RT_TypeDef_Instance clsInst;
         if (clsInst.ResolveToken(arg, assm) == false)
           NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
-        CLR_INT32 len;
+        int32_t len;
 
         if (clsInst.m_target->dataType)
           {
@@ -3172,9 +3154,6 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
         evalPos[0].SetInteger(len);
         break;
         }
-
-      //----------------------------------------------------------------------------------------------------------//
-
       OPDEF(CEE_CONSTRAINED, "constrained.", Pop0, Push0, InlineType, IPrefix, 2, 0xFE, 0x16, META)
         {
         FETCH_ARG_COMPRESSED_TYPETOKEN(arg, ip);
@@ -3182,9 +3161,6 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
         // nop
         break;
         }
-
-      //----------------------------------------------------------------------------------------------------------//
-
       OPDEF(CEE_ENDFILTER, "endfilter", PopI, Push0, InlineNone, IPrimitive, 2, 0xFE, 0x11, RETURN)
         {
 
@@ -3214,16 +3190,16 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
       // Unsupported opcodes...
       //
       OPDEF(CEE_ARGLIST, "arglist", Pop0, PushI, InlineNone, IPrimitive, 2, 0xFE, 0x00, NEXT)
-        OPDEF(CEE_CPBLK, "cpblk", PopI + PopI + PopI, Push0, InlineNone, IPrimitive, 2, 0xFE, 0x17, NEXT)
-        OPDEF(CEE_JMP, "jmp", Pop0, Push0, InlineMethod, IPrimitive, 1, 0xFF, 0x27, CALL)
-        OPDEF(CEE_INITBLK, "initblk", PopI + PopI + PopI, Push0, InlineNone, IPrimitive, 2, 0xFE, 0x18, NEXT)
-        OPDEF(CEE_CALLI, "calli", VarPop, VarPush, InlineSig, IPrimitive, 1, 0xFF, 0x29, CALL)
-        OPDEF(CEE_CKFINITE, "ckfinite", Pop1, PushR8, InlineNone, IPrimitive, 1, 0xFF, 0xC3, NEXT)
-        OPDEF(CEE_LOCALLOC, "localloc", PopI, PushI, InlineNone, IPrimitive, 2, 0xFE, 0x0F, NEXT)
-        OPDEF(CEE_MKREFANY, "mkrefany", PopI, Push1, InlineType, IPrimitive, 1, 0xFF, 0xC6, NEXT)
-        OPDEF(CEE_REFANYTYPE, "refanytype", Pop1, PushI, InlineNone, IPrimitive, 2, 0xFE, 0x1D, NEXT)
-        OPDEF(CEE_REFANYVAL, "refanyval", Pop1, PushI, InlineType, IPrimitive, 1, 0xFF, 0xC2, NEXT)
-        OPDEF(CEE_READONLY, "readonly.", Pop0, Push0, InlineNone, IPrefix, 2, 0xFE, 0x1E, META)
+      OPDEF(CEE_CPBLK, "cpblk", PopI + PopI + PopI, Push0, InlineNone, IPrimitive, 2, 0xFE, 0x17, NEXT)
+      OPDEF(CEE_JMP, "jmp", Pop0, Push0, InlineMethod, IPrimitive, 1, 0xFF, 0x27, CALL)
+      OPDEF(CEE_INITBLK, "initblk", PopI + PopI + PopI, Push0, InlineNone, IPrimitive, 2, 0xFE, 0x18, NEXT)
+      OPDEF(CEE_CALLI, "calli", VarPop, VarPush, InlineSig, IPrimitive, 1, 0xFF, 0x29, CALL)
+      OPDEF(CEE_CKFINITE, "ckfinite", Pop1, PushR8, InlineNone, IPrimitive, 1, 0xFF, 0xC3, NEXT)
+      OPDEF(CEE_LOCALLOC, "localloc", PopI, PushI, InlineNone, IPrimitive, 2, 0xFE, 0x0F, NEXT)
+      OPDEF(CEE_MKREFANY, "mkrefany", PopI, Push1, InlineType, IPrimitive, 1, 0xFF, 0xC6, NEXT)
+      OPDEF(CEE_REFANYTYPE, "refanytype", Pop1, PushI, InlineNone, IPrimitive, 2, 0xFE, 0x1D, NEXT)
+      OPDEF(CEE_REFANYVAL, "refanyval", Pop1, PushI, InlineType, IPrimitive, 1, 0xFF, 0xC2, NEXT)
+      OPDEF(CEE_READONLY, "readonly.", Pop0, Push0, InlineNone, IPrefix, 2, 0xFE, 0x1E, META)
 
         NANOCLR_CHECK_HRESULT(CLR_Checks::VerifyUnsupportedInstruction(op));
       break;
@@ -3236,16 +3212,12 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
 #undef OPDEF
       }
 
-#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
     if (stack->m_flags & CLR_RT_StackFrame::c_HasBreakpoint)
       {
       g_CLR_RT_ExecutionEngine.Breakpoint_StackFrame_Step(stack, ip);
       }
-#endif //#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
 
     continue;
-
-    //--//
 
   Execute_LoadAndPromote:
 
@@ -3259,28 +3231,28 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
 
       case DATATYPE_BOOLEAN:
         res.ChangeDataType(DATATYPE_I4);
-        res.NumericByRef().u4 = (CLR_UINT32)res.NumericByRef().u1;
+        res.NumericByRef().u4 = (uint32_t)res.NumericByRef().u1;
         break;
       case DATATYPE_I1:
         res.ChangeDataType(DATATYPE_I4);
-        res.NumericByRef().s4 = (CLR_INT32)res.NumericByRef().s1;
+        res.NumericByRef().s4 = (int32_t)res.NumericByRef().s1;
         break;
       case DATATYPE_U1:
         res.ChangeDataType(DATATYPE_I4);
-        res.NumericByRef().u4 = (CLR_UINT32)res.NumericByRef().u1;
+        res.NumericByRef().u4 = (uint32_t)res.NumericByRef().u1;
         break;
 
       case DATATYPE_CHAR:
         res.ChangeDataType(DATATYPE_I4);
-        res.NumericByRef().u4 = (CLR_UINT32)res.NumericByRef().u2;
+        res.NumericByRef().u4 = (uint32_t)res.NumericByRef().u2;
         break;
       case DATATYPE_I2:
         res.ChangeDataType(DATATYPE_I4);
-        res.NumericByRef().s4 = (CLR_INT32)res.NumericByRef().s2;
+        res.NumericByRef().s4 = (int32_t)res.NumericByRef().s2;
         break;
       case DATATYPE_U2:
         res.ChangeDataType(DATATYPE_I4);
-        res.NumericByRef().u4 = (CLR_UINT32)res.NumericByRef().u2;
+        res.NumericByRef().u4 = (uint32_t)res.NumericByRef().u2;
         break;
 
       case DATATYPE_I4:
@@ -3330,7 +3302,7 @@ HRESULT CLR_RT_Thread::Execute_IL(CLR_RT_StackFrame &stackArg)
 
   Execute_BR:
     {
-    CLR_INT32 offset;
+    int32_t offset;
 
     if (c_CLR_RT_OpcodeLookup[op].m_opParam == CLR_OpcodeParam_ShortBrTarget)
       {

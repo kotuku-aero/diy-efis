@@ -11,154 +11,15 @@
 
 void CLR_RT_HeapBlock::InitializeToZero()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_Memory::ZeroFill(&m_data, this->DataSize() * sizeof(*this) - offsetof(CLR_RT_HeapBlock, m_data));
   }
 
-//--//--//--//--//--//
-
-#if defined(NANOCLR_EMULATED_FLOATINGPOINT)
-
-HRESULT CLR_RT_HeapBlock::SetFloatIEEE754(const CLR_UINT32 arg)
-  {
-
-  CLR_INT32 res;
-  CLR_UINT32 mantissa = (arg & 0x007FFFFF) | 0x00800000;
-  int exponent = (int)((arg >> 23) & 0x000000FF) - 127;
-
-  exponent -= (23 - CLR_RT_HeapBlock::HB_FloatShift);
-
-  if (arg == 0)
-    {
-    res = 0;
-    }
-  else if (exponent <= -31)
-    {
-    res = 0;
-
-    //
-    // Uncomment to produce an overflow exception for emulated floating points
-    //
-    // return CLR_E_OUT_OF_RANGE;
-    }
-  else if (exponent >= 31)
-    {
-    res = 0x7FFFFFFF;
-
-    //
-    // Uncomment to produce an overflow exception for emulated floating points
-    //
-    // return CLR_E_OUT_OF_RANGE;
-    }
-  else
-    {
-    if (exponent > 0)
-      {
-      CLR_UINT64 tmpRes;
-
-      tmpRes = ((CLR_UINT64)mantissa) << exponent;
-
-      if (0 != (tmpRes >> 31))
-        {
-        res = 0x7FFFFFFF;
-
-        //
-        // Uncomment to produce an overflow exception for emulated floating points
-        //
-        // return CLR_E_OUT_OF_RANGE;
-        }
-      else
-        {
-        res = (CLR_UINT32)tmpRes;
-        }
-      }
-    else if (exponent < 0)
-      res = mantissa >> (-exponent);
-    else
-      res = mantissa;
-    }
-
-  if (arg & 0x80000000)
-    res = -res;
-
-  SetFloat(res);
-
-  return S_OK;
-  }
-
-HRESULT CLR_RT_HeapBlock::SetDoubleIEEE754(const CLR_UINT64 &arg)
-  {
-
-  CLR_INT64 res;
-  CLR_UINT64 mantissa = (arg & ULONGLONGCONSTANT(0x000FFFFFFFFFFFFF)) | ULONGLONGCONSTANT(0x0010000000000000);
-  int exponent = (int)((arg >> 52) & ULONGLONGCONSTANT(0x00000000000007FF)) - 1023;
-
-  CLR_UINT64 mask = ULONGLONGCONSTANT(0xFFFFFFFFFFFFFFFF);
-
-  exponent -= (52 - CLR_RT_HeapBlock::HB_DoubleShift);
-
-  if (arg == 0)
-    {
-    res = 0;
-    }
-  else if (exponent <= -63)
-    {
-    res = 0;
-
-    //
-    // Uncomment to produce an overflow exception for emulated floating points
-    //
-    // return CLR_E_OUT_OF_RANGE;
-    }
-  else if (exponent >= 63)
-    {
-    res = ULONGLONGCONSTANT(0x7FFFFFFFFFFFFFFF);
-
-    //
-    // Uncomment to produce an overflow exception for emulated floating points
-    //
-    // return CLR_E_OUT_OF_RANGE;
-    }
-  else
-    {
-    if (exponent > 0)
-      {
-      mask <<= (63 - exponent);
-
-      if (0 != (mask & mantissa))
-        {
-        res = ULONGLONGCONSTANT(0x7FFFFFFFFFFFFFFF);
-
-        //
-        // Uncomment to produce an overflow exception for emulated floating points
-        //
-        // return CLR_E_OUT_OF_RANGE;
-        }
-      else
-        {
-        res = mantissa << exponent;
-        }
-      }
-    else if (exponent < 0)
-      res = mantissa >> (-exponent);
-    else
-      res = mantissa;
-    }
-
-  if (arg & ULONGLONGCONSTANT(0x8000000000000000))
-    res = -res;
-
-  SetDouble(res);
-
-  return S_OK;
-  }
-
-#endif
 
 HRESULT CLR_RT_HeapBlock::EnsureObjectReference(CLR_RT_HeapBlock *&obj)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   switch (this->DataType())
     {
@@ -202,8 +63,8 @@ HRESULT CLR_RT_HeapBlock::EnsureObjectReference(CLR_RT_HeapBlock *&obj)
 
 HRESULT CLR_RT_HeapBlock::SetReflection(const CLR_RT_ReflectionDef_Index &reflex)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   m_id.raw = CLR_RT_HEAPBLOCK_RAW_ID(DATATYPE_REFLECTION, 0, 1);
   m_data.reflection = reflex;
@@ -211,10 +72,10 @@ HRESULT CLR_RT_HeapBlock::SetReflection(const CLR_RT_ReflectionDef_Index &reflex
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT CLR_RT_HeapBlock::SetReflection(const CLR_RT_Assembly_Index &assm)
+HRESULT CLR_RT_HeapBlock::SetReflectionAssembly(uint32_t assm)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   m_id.raw = CLR_RT_HEAPBLOCK_RAW_ID(DATATYPE_REFLECTION, 0, 1);
   m_data.reflection.m_kind = REFLECTION_ASSEMBLY;
@@ -224,10 +85,10 @@ HRESULT CLR_RT_HeapBlock::SetReflection(const CLR_RT_Assembly_Index &assm)
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT CLR_RT_HeapBlock::SetReflection(const CLR_RT_TypeSpec_Index &sig)
+HRESULT CLR_RT_HeapBlock::SetReflection(uint32_t sig)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_TypeDescriptor desc;
 
@@ -239,10 +100,10 @@ HRESULT CLR_RT_HeapBlock::SetReflection(const CLR_RT_TypeSpec_Index &sig)
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT CLR_RT_HeapBlock::SetReflection(const CLR_RT_TypeDef_Index &cls)
+HRESULT CLR_RT_HeapBlock::SetReflectionClass(uint32_t cls)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   m_id.raw = CLR_RT_HEAPBLOCK_RAW_ID(DATATYPE_REFLECTION, 0, 1);
   m_data.reflection.m_kind = REFLECTION_TYPE;
@@ -252,10 +113,10 @@ HRESULT CLR_RT_HeapBlock::SetReflection(const CLR_RT_TypeDef_Index &cls)
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT CLR_RT_HeapBlock::SetReflection(const CLR_RT_FieldDef_Index &fd)
+HRESULT CLR_RT_HeapBlock::SetReflectionField(uint32_t fd)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   m_id.raw = CLR_RT_HEAPBLOCK_RAW_ID(DATATYPE_REFLECTION, 0, 1);
   m_data.reflection.m_kind = REFLECTION_FIELD;
@@ -265,10 +126,10 @@ HRESULT CLR_RT_HeapBlock::SetReflection(const CLR_RT_FieldDef_Index &fd)
   NANOCLR_NOCLEANUP_NOLABEL();
   }
 
-HRESULT CLR_RT_HeapBlock::SetReflection(const CLR_RT_MethodDef_Index &md)
+HRESULT CLR_RT_HeapBlock::SetReflectionMethod(uint32_t md)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_MethodDef_Instance inst;
 
@@ -286,10 +147,10 @@ HRESULT CLR_RT_HeapBlock::SetReflection(const CLR_RT_MethodDef_Index &md)
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT CLR_RT_HeapBlock::SetObjectCls(const CLR_RT_TypeDef_Index &cls)
+HRESULT CLR_RT_HeapBlock::SetObjectCls(uint32_t cls)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_TypeDef_Instance inst;
 
@@ -308,8 +169,8 @@ HRESULT CLR_RT_HeapBlock::SetObjectCls(const CLR_RT_TypeDef_Index &cls)
 
 HRESULT CLR_RT_HeapBlock::InitializeArrayReference(CLR_RT_HeapBlock &ref, int index)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Array *array;
 
@@ -326,7 +187,7 @@ HRESULT CLR_RT_HeapBlock::InitializeArrayReference(CLR_RT_HeapBlock &ref, int in
     NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
     }
 
-  if (index < 0 || index >= (CLR_INT32)array->m_numOfElements)
+  if (index < 0 || index >= (int32_t)array->m_numOfElements)
     {
     NANOCLR_SET_AND_LEAVE(CLR_E_INDEX_OUT_OF_RANGE);
     }
@@ -338,7 +199,7 @@ HRESULT CLR_RT_HeapBlock::InitializeArrayReference(CLR_RT_HeapBlock &ref, int in
 
 void CLR_RT_HeapBlock::InitializeArrayReferenceDirect(CLR_RT_HeapBlock_Array &array, int index)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   m_id.raw = CLR_RT_HEAPBLOCK_RAW_ID(DATATYPE_ARRAY_BYREF, 0, 1);
   m_data.arrayReference.array = &array;
   m_data.arrayReference.index = index;
@@ -346,7 +207,7 @@ void CLR_RT_HeapBlock::InitializeArrayReferenceDirect(CLR_RT_HeapBlock_Array &ar
 
 void CLR_RT_HeapBlock::FixArrayReferenceForValueTypes()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock_Array *array = m_data.arrayReference.array;
 
   //
@@ -372,8 +233,8 @@ void CLR_RT_HeapBlock::FixArrayReferenceForValueTypes()
 
 HRESULT CLR_RT_HeapBlock::LoadFromReference(CLR_RT_HeapBlock &ref)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock tmp;
   CLR_RT_HeapBlock *obj;
@@ -383,36 +244,36 @@ HRESULT CLR_RT_HeapBlock::LoadFromReference(CLR_RT_HeapBlock &ref)
     {
     CLR_RT_HeapBlock_Array *array = ref.m_data.arrayReference.array;
     FAULT_ON_NULL(array);
-    CLR_UINT8 *src = array->GetElement(ref.m_data.arrayReference.index);
-    CLR_UINT32 size = array->m_sizeOfElement;
+    uint8_t *src = array->GetElement(ref.m_data.arrayReference.index);
+    uint32_t size = array->m_sizeOfElement;
 
     if (!array->m_fReference)
       {
-      CLR_UINT32 second = 0;
-      CLR_UINT32 first;
+      uint32_t second = 0;
+      uint32_t first;
 
       SetDataId(CLR_RT_HEAPBLOCK_RAW_ID(array->m_typeOfElement, 0, 1));
 
       if (size == 4)
         {
-        first = ((CLR_UINT32 *)src)[0];
+        first = ((uint32_t *)src)[0];
         }
       else if (size == 8)
         {
-        first = ((CLR_UINT32 *)src)[0];
-        second = ((CLR_UINT32 *)src)[1];
+        first = ((uint32_t *)src)[0];
+        second = ((uint32_t *)src)[1];
         }
       else if (size == 1)
         {
-        first = ((CLR_UINT8 *)src)[0];
+        first = ((uint8_t *)src)[0];
         }
       else
         {
-        first = ((CLR_UINT16 *)src)[0];
+        first = ((uint16_t *)src)[0];
         }
 
-      ((CLR_UINT32 *)&NumericByRef())[0] = first;
-      ((CLR_UINT32 *)&NumericByRef())[1] = second;
+      ((uint32_t *)&NumericByRef())[0] = first;
+      ((uint32_t *)&NumericByRef())[1] = second;
 
       NANOCLR_SET_AND_LEAVE(S_OK);
       }
@@ -479,8 +340,8 @@ HRESULT CLR_RT_HeapBlock::LoadFromReference(CLR_RT_HeapBlock &ref)
 
 HRESULT CLR_RT_HeapBlock::StoreToReference(CLR_RT_HeapBlock &ref, int size)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock *obj;
   CLR_DataType dt = ref.DataType();
@@ -489,11 +350,11 @@ HRESULT CLR_RT_HeapBlock::StoreToReference(CLR_RT_HeapBlock &ref, int size)
     {
     CLR_RT_HeapBlock_Array *array = ref.m_data.arrayReference.array;
     FAULT_ON_NULL(array);
-    CLR_UINT8 *dst = array->GetElement(ref.m_data.arrayReference.index);
+    uint8_t *dst = array->GetElement(ref.m_data.arrayReference.index);
 
     if (!array->m_fReference)
       {
-      CLR_INT32 sizeArray = array->m_sizeOfElement;
+      int32_t sizeArray = array->m_sizeOfElement;
 
       //
       // Cannot copy NULL reference to a primitive type array.
@@ -561,25 +422,25 @@ HRESULT CLR_RT_HeapBlock::StoreToReference(CLR_RT_HeapBlock &ref, int size)
           }
         }
 
-      CLR_UINT32 first = ((CLR_UINT32 *)&obj->NumericByRef())[0];
-      CLR_UINT32 second = ((CLR_UINT32 *)&obj->NumericByRef())[1];
+      uint32_t first = ((uint32_t *)&obj->NumericByRef())[0];
+      uint32_t second = ((uint32_t *)&obj->NumericByRef())[1];
 
       if (sizeArray == 4)
         {
-        ((CLR_UINT32 *)dst)[0] = (CLR_UINT32)first;
+        ((uint32_t *)dst)[0] = (uint32_t)first;
         }
       else if (sizeArray == 8)
         {
-        ((CLR_UINT32 *)dst)[0] = (CLR_UINT32)first;
-        ((CLR_UINT32 *)dst)[1] = (CLR_UINT32)second;
+        ((uint32_t *)dst)[0] = (uint32_t)first;
+        ((uint32_t *)dst)[1] = (uint32_t)second;
         }
       else if (sizeArray == 1)
         {
-        ((CLR_UINT8 *)dst)[0] = (CLR_UINT8)first;
+        ((uint8_t *)dst)[0] = (uint8_t)first;
         }
       else
         {
-        ((CLR_UINT16 *)dst)[0] = (CLR_UINT16)first;
+        ((uint16_t *)dst)[0] = (uint16_t)first;
         }
 
       NANOCLR_SET_AND_LEAVE(S_OK);
@@ -636,8 +497,8 @@ HRESULT CLR_RT_HeapBlock::StoreToReference(CLR_RT_HeapBlock &ref, int size)
 
 HRESULT CLR_RT_HeapBlock::Reassign(const CLR_RT_HeapBlock &value)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock *obj;
   CLR_RT_HeapBlock ref;
@@ -753,8 +614,8 @@ void CLR_RT_HeapBlock::AssignAndPinReferencedObject(const CLR_RT_HeapBlock &valu
 
 HRESULT CLR_RT_HeapBlock::PerformBoxingIfNeeded()
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   // we need to box the optimized value types...
   bool fBox = (c_CLR_RT_DataTypeLookup[this->DataType()].m_flags & CLR_RT_DataTypeLookup::c_OptimizedValueType) != 0;
@@ -784,8 +645,8 @@ HRESULT CLR_RT_HeapBlock::PerformBoxingIfNeeded()
 
 HRESULT CLR_RT_HeapBlock::PerformBoxing(const CLR_RT_TypeDef_Instance &cls)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock tmp;
   CLR_RT_HeapBlock *obj = this;
@@ -878,8 +739,8 @@ HRESULT CLR_RT_HeapBlock::PerformBoxing(const CLR_RT_TypeDef_Instance &cls)
 
 HRESULT CLR_RT_HeapBlock::PerformUnboxing(const CLR_RT_TypeDef_Instance &cls)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock *src;
 
@@ -930,7 +791,7 @@ HRESULT CLR_RT_HeapBlock::PerformUnboxing(const CLR_RT_TypeDef_Instance &cls)
 
 CLR_RT_HeapBlock *CLR_RT_HeapBlock::FixBoxingReference()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   //
   // Not boxed, nothing to do.
   //
@@ -961,7 +822,7 @@ CLR_RT_HeapBlock *CLR_RT_HeapBlock::FixBoxingReference()
 
 bool CLR_RT_HeapBlock::IsZero() const
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   switch (DataType())
     {
     case DATATYPE_OBJECT:
@@ -985,30 +846,30 @@ bool CLR_RT_HeapBlock::IsZero() const
 
 void CLR_RT_HeapBlock::Promote()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
 
   switch (DataType())
     {
     case DATATYPE_I1:
       m_id.type.dataType = DATATYPE_I4;
-      m_data.numeric.s4 = (CLR_INT32)m_data.numeric.s1;
+      m_data.numeric.s4 = (int32_t)m_data.numeric.s1;
       break;
 
     case DATATYPE_I2:
       m_id.type.dataType = DATATYPE_I4;
-      m_data.numeric.s4 = (CLR_INT32)m_data.numeric.s2;
+      m_data.numeric.s4 = (int32_t)m_data.numeric.s2;
       break;
 
     case DATATYPE_BOOLEAN:
     case DATATYPE_U1:
       m_id.type.dataType = DATATYPE_I4;
-      m_data.numeric.u4 = (CLR_UINT32)m_data.numeric.u1;
+      m_data.numeric.u4 = (uint32_t)m_data.numeric.u1;
       break;
 
     case DATATYPE_CHAR:
     case DATATYPE_U2:
       m_id.type.dataType = DATATYPE_I4;
-      m_data.numeric.u4 = (CLR_UINT32)m_data.numeric.u2;
+      m_data.numeric.u4 = (uint32_t)m_data.numeric.u2;
       break;
 
     default:
@@ -1019,9 +880,9 @@ void CLR_RT_HeapBlock::Promote()
 
 //--//
 
-CLR_UINT32 CLR_RT_HeapBlock::GetHashCode(CLR_RT_HeapBlock *ptr, bool fRecurse, CLR_UINT32 crc = 0)
+uint32_t CLR_RT_HeapBlock::GetHashCode(CLR_RT_HeapBlock *ptr, bool fRecurse, uint32_t crc = 0)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   if (!ptr)
     return 0;
 
@@ -1064,7 +925,7 @@ CLR_UINT32 CLR_RT_HeapBlock::GetHashCode(CLR_RT_HeapBlock *ptr, bool fRecurse, C
     case DATATYPE_DELEGATE_HEAD:
     {
     CLR_RT_HeapBlock_Delegate *dlg = (CLR_RT_HeapBlock_Delegate *)ptr;
-    const CLR_RT_MethodDef_Index &ftn = dlg->DelegateFtn();
+    const uint32_t &ftn = dlg->DelegateFtn();
 
     crc = GetHashCode(&dlg->m_object, false, crc);
 
@@ -1089,7 +950,7 @@ CLR_UINT32 CLR_RT_HeapBlock::GetHashCode(CLR_RT_HeapBlock *ptr, bool fRecurse, C
   return crc;
   }
 
-CLR_UINT32 CLR_RT_HeapBlock::GetAtomicDataUsedBytes() const
+uint32_t CLR_RT_HeapBlock::GetAtomicDataUsedBytes() const
 
   {
   switch (DataType())
@@ -1131,7 +992,7 @@ bool CLR_RT_HeapBlock::ObjectsEqual(
   const CLR_RT_HeapBlock &pArgRight,
   bool fSameReference)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   if (&pArgLeft == &pArgRight)
     return true;
 
@@ -1144,7 +1005,7 @@ bool CLR_RT_HeapBlock::ObjectsEqual(
           {
           const CLR_RT_HeapBlock *objLeft = &pArgLeft;
           const CLR_RT_HeapBlock *objRight = &pArgRight;
-          CLR_UINT32 num = pArgLeft.DataSize();
+          uint32_t num = pArgLeft.DataSize();
 
           while (--num)
             {
@@ -1206,7 +1067,7 @@ bool CLR_RT_HeapBlock::ObjectsEqual(
 
           if ((dtl.m_flags & CLR_RT_DataTypeLookup::c_Reference) == 0)
             {
-            CLR_UINT32 size = (dtl.m_sizeInBits + 7) / 8;
+            uint32_t size = (dtl.m_sizeInBits + 7) / 8;
 
             if (memcmp(&pArgLeft.DataByRefConst(), &pArgRight.DataByRefConst(), size) == 0)
               {
@@ -1225,13 +1086,13 @@ bool CLR_RT_HeapBlock::ObjectsEqual(
 
 static const CLR_RT_HeapBlock *FixReflectionForType(const CLR_RT_HeapBlock &src, CLR_RT_HeapBlock &tmp)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   const CLR_RT_ReflectionDef_Index &rd = src.ReflectionDataConst();
 
   if (rd.m_kind == REFLECTION_TYPE)
     {
     CLR_RT_TypeDef_Instance inst;
-    CLR_UINT32 levels;
+    uint32_t levels;
 
     if (inst.InitializeFromReflection(rd, &levels) && levels == 0)
       {
@@ -1250,9 +1111,9 @@ static const CLR_RT_HeapBlock *FixReflectionForType(const CLR_RT_HeapBlock &src,
 
 //--//
 
-static inline int CompareValues_Numeric(CLR_INT32 left, CLR_INT32 right)
+static inline int CompareValues_Numeric(int32_t left, int32_t right)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   if (left > right)
     return 1;
   if (left < right)
@@ -1260,9 +1121,9 @@ static inline int CompareValues_Numeric(CLR_INT32 left, CLR_INT32 right)
   /**************/ return 0;
   }
 
-static inline int CompareValues_Numeric(CLR_UINT32 left, CLR_UINT32 right)
+static inline int CompareValues_Numeric(uint32_t left, uint32_t right)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   if (left > right)
     return 1;
   if (left < right)
@@ -1270,9 +1131,9 @@ static inline int CompareValues_Numeric(CLR_UINT32 left, CLR_UINT32 right)
   /**************/ return 0;
   }
 
-static int CompareValues_Numeric(const CLR_INT64 left, const CLR_INT64 right)
+static int CompareValues_Numeric(const int64_t left, const int64_t right)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
 
   if (left > right)
     return 1;
@@ -1281,9 +1142,9 @@ static int CompareValues_Numeric(const CLR_INT64 left, const CLR_INT64 right)
   /**************/ return 0;
   }
 
-static int CompareValues_Numeric(const CLR_UINT64 left, const CLR_UINT64 right)
+static int CompareValues_Numeric(const uint64_t left, const uint64_t right)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   if (left > right)
     return 1;
   if (left < right)
@@ -1293,49 +1154,49 @@ static int CompareValues_Numeric(const CLR_UINT64 left, const CLR_UINT64 right)
 
 static int CompareValues_Numeric(const CLR_RT_HeapBlock &left, const CLR_RT_HeapBlock &right, bool fSigned, int bytes)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
 
   switch (bytes)
     {
     case 4:
       if (fSigned)
         return CompareValues_Numeric(
-          (CLR_INT32)left.NumericByRefConst().s4,
-          (CLR_INT32)right.NumericByRefConst().s4);
+          (int32_t)left.NumericByRefConst().s4,
+          (int32_t)right.NumericByRefConst().s4);
       else
         return CompareValues_Numeric(
-          (CLR_UINT32)left.NumericByRefConst().u4,
-          (CLR_UINT32)right.NumericByRefConst().u4);
+          (uint32_t)left.NumericByRefConst().u4,
+          (uint32_t)right.NumericByRefConst().u4);
 
     case 8:
       if (fSigned)
         return CompareValues_Numeric(
-          (CLR_INT64)left.NumericByRefConst().s8,
-          (CLR_INT64)right.NumericByRefConst().s8);
+          (int64_t)left.NumericByRefConst().s8,
+          (int64_t)right.NumericByRefConst().s8);
       else
         return CompareValues_Numeric(
-          (CLR_UINT64)left.NumericByRefConst().u8,
-          (CLR_UINT64)right.NumericByRefConst().u8);
+          (uint64_t)left.NumericByRefConst().u8,
+          (uint64_t)right.NumericByRefConst().u8);
 
     case 2:
       if (fSigned)
         return CompareValues_Numeric(
-          (CLR_INT32)left.NumericByRefConst().s2,
-          (CLR_INT32)right.NumericByRefConst().s2);
+          (int32_t)left.NumericByRefConst().s2,
+          (int32_t)right.NumericByRefConst().s2);
       else
         return CompareValues_Numeric(
-          (CLR_UINT32)left.NumericByRefConst().u2,
-          (CLR_UINT32)right.NumericByRefConst().u2);
+          (uint32_t)left.NumericByRefConst().u2,
+          (uint32_t)right.NumericByRefConst().u2);
 
     case 1:
       if (fSigned)
         return CompareValues_Numeric(
-          (CLR_INT32)left.NumericByRefConst().s1,
-          (CLR_INT32)right.NumericByRefConst().s1);
+          (int32_t)left.NumericByRefConst().s1,
+          (int32_t)right.NumericByRefConst().s1);
       else
         return CompareValues_Numeric(
-          (CLR_UINT32)left.NumericByRefConst().u1,
-          (CLR_UINT32)right.NumericByRefConst().u1);
+          (uint32_t)left.NumericByRefConst().u1,
+          (uint32_t)right.NumericByRefConst().u1);
 
     default:
       return -1;
@@ -1344,7 +1205,7 @@ static int CompareValues_Numeric(const CLR_RT_HeapBlock &left, const CLR_RT_Heap
 
 static inline int CompareValues_Pointers(const CLR_RT_HeapBlock *left, const CLR_RT_HeapBlock *right)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   if (left > right)
     return 1;
   if (left < right)
@@ -1352,9 +1213,9 @@ static inline int CompareValues_Pointers(const CLR_RT_HeapBlock *left, const CLR
   /**************/ return 0;
   }
 
-CLR_INT32 CLR_RT_HeapBlock::Compare_Values(const CLR_RT_HeapBlock &left, const CLR_RT_HeapBlock &right, bool fSigned)
+int32_t CLR_RT_HeapBlock::Compare_Values(const CLR_RT_HeapBlock &left, const CLR_RT_HeapBlock &right, bool fSigned)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_DataType leftDataType = left.DataType();
   CLR_DataType rightDataType = right.DataType();
 
@@ -1394,8 +1255,8 @@ CLR_INT32 CLR_RT_HeapBlock::Compare_Values(const CLR_RT_HeapBlock &left, const C
       CLR_RT_HeapBlock_Delegate_List *rightDlg = (CLR_RT_HeapBlock_Delegate_List *)&right;
       CLR_RT_HeapBlock *leftPtr = leftDlg->GetDelegates();
       CLR_RT_HeapBlock *rightPtr = rightDlg->GetDelegates();
-      CLR_UINT32 leftLen = leftDlg->m_length;
-      CLR_UINT32 rightLen = rightDlg->m_length;
+      uint32_t leftLen = leftDlg->m_length;
+      uint32_t rightLen = rightDlg->m_length;
 
       while (leftLen > 0 && rightLen > 0)
         {
@@ -1421,8 +1282,8 @@ CLR_INT32 CLR_RT_HeapBlock::Compare_Values(const CLR_RT_HeapBlock &left, const C
       {
       CLR_RT_HeapBlock_Delegate *leftDlg = (CLR_RT_HeapBlock_Delegate *)&left;
       CLR_RT_HeapBlock_Delegate *rightDlg = (CLR_RT_HeapBlock_Delegate *)&right;
-      CLR_UINT32 leftData = leftDlg->DelegateFtn().m_data;
-      CLR_UINT32 rightData = rightDlg->DelegateFtn().m_data;
+      uint32_t leftData = leftDlg->DelegateFtn().m_data;
+      uint32_t rightData = rightDlg->DelegateFtn().m_data;
 
       if (leftData > rightData)
         return 1;
@@ -1597,13 +1458,10 @@ CLR_INT32 CLR_RT_HeapBlock::Compare_Values(const CLR_RT_HeapBlock &left, const C
         }
       else
         {
-        CLR_Debug::Printf(
-          "\r\n\r\nRUNTIME ERROR: comparing two values of different size: %d vs. %d!!!\r\n\r\n\r\n",
+        trace_debug(
+          "RUNTIME ERROR: comparing two values of different size: %d vs. %d!!!\r\n",
           leftDataType,
           rightDataType);
-#if defined(NANOCLR_PROFILE_NEW)
-        g_CLR_PRF_Profiler.DumpHeap();
-#endif
         }
       }
     }
@@ -1615,8 +1473,8 @@ CLR_INT32 CLR_RT_HeapBlock::Compare_Values(const CLR_RT_HeapBlock &left, const C
 
 HRESULT CLR_RT_HeapBlock::NumericAdd(const CLR_RT_HeapBlock &right)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   switch (DataType())
     {
@@ -1637,45 +1495,11 @@ HRESULT CLR_RT_HeapBlock::NumericAdd(const CLR_RT_HeapBlock &right)
       break;
 
     case DATATYPE_R4:
-#if defined(NANOCLR_EMULATED_FLOATINGPOINT)
-    {
-    CLR_INT32 orig = (CLR_INT32)m_data.numeric.r4;
-    CLR_INT32 rhs = (CLR_INT32)right.m_data.numeric.r4;
-#endif
     m_data.numeric.r4 += right.m_data.numeric.r4;
-
-#if defined(NANOCLR_EMULATED_FLOATINGPOINT)
-    if (rhs > 0 && orig > 0 && orig > (CLR_INT32)m_data.numeric.r4)
-      {
-      m_data.numeric.r4 = 0x7FFFFFFF; /*return CLR_E_OUT_OF_RANGE*/
-      }
-    else if (rhs < 0 && orig < 0 && orig < (CLR_INT32)m_data.numeric.r4)
-      {
-      m_data.numeric.r4 = (CLR_INT32)(CLR_UINT32)0x80000000; /*return CLR_E_OUT_OF_RANGE*/
-      }
-    }
-#endif
     break;
 
     case DATATYPE_R8:
-#if defined(NANOCLR_EMULATED_FLOATINGPOINT)
-    {
-    CLR_INT64 orig = (CLR_INT64)m_data.numeric.r8;
-    CLR_INT64 rhs = (CLR_INT64)right.m_data.numeric.r8;
-#endif
     m_data.numeric.r8 += right.m_data.numeric.r8;
-
-#if defined(NANOCLR_EMULATED_FLOATINGPOINT)
-    if (rhs > 0 && orig > 0 && orig > (CLR_INT64)m_data.numeric.r8)
-      {
-      m_data.numeric.r8 = (CLR_INT64)ULONGLONGCONSTANT(0x7FFFFFFFFFFFFFFF); /*return CLR_E_OUT_OF_RANGE*/
-      }
-    else if (rhs < 0 && orig < 0 && orig < (CLR_INT64)m_data.numeric.r8)
-      {
-      m_data.numeric.r8 = (CLR_INT64)ULONGLONGCONSTANT(0x8000000000000000); /*return CLR_E_OUT_OF_RANGE*/
-      }
-    }
-#endif
     break;
 
     // Adding of value to array reference is like advancing the index in array.
@@ -1699,8 +1523,8 @@ HRESULT CLR_RT_HeapBlock::NumericAdd(const CLR_RT_HeapBlock &right)
 
 HRESULT CLR_RT_HeapBlock::NumericSub(const CLR_RT_HeapBlock &right)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   switch (DataType())
     {
@@ -1721,48 +1545,11 @@ HRESULT CLR_RT_HeapBlock::NumericSub(const CLR_RT_HeapBlock &right)
       break;
 
     case DATATYPE_R4:
-#if defined(NANOCLR_EMULATED_FLOATINGPOINT)
-    {
-    CLR_INT32 orig = (CLR_INT32)m_data.numeric.r8;
-    CLR_INT32 rhs = (CLR_INT32)right.m_data.numeric.r4;
-#endif
     m_data.numeric.r4 -= right.m_data.numeric.r4;
-
-#if defined(NANOCLR_EMULATED_FLOATINGPOINT)
-    if (rhs < 0 && orig > 0 && orig > (CLR_INT32)m_data.numeric.r4)
-      {
-      m_data.numeric.r4 = 0x7FFFFFFF; /*return CLR_E_OUT_OF_RANGE*/
-      }
-    else if (rhs > 0 && orig < 0 && orig < (CLR_INT32)m_data.numeric.r4)
-      {
-      m_data.numeric.r4 = (CLR_INT32)(CLR_UINT32)0x80000000; /*return CLR_E_OUT_OF_RANGE*/
-      }
-    }
-#endif
-
     break;
 
     case DATATYPE_R8:
-#if defined(NANOCLR_EMULATED_FLOATINGPOINT)
-    {
-    CLR_INT64 orig = (CLR_INT64)m_data.numeric.r8;
-    CLR_INT64 rhs = (CLR_INT64)right.m_data.numeric.r8;
-#endif
-
     m_data.numeric.r8 -= right.m_data.numeric.r8;
-
-#if defined(NANOCLR_EMULATED_FLOATINGPOINT)
-    if (rhs < 0 && orig > 0 && orig > (CLR_INT64)m_data.numeric.r8)
-      {
-      m_data.numeric.r8 = (CLR_INT64)ULONGLONGCONSTANT(0x7FFFFFFFFFFFFFFF); /*return CLR_E_OUT_OF_RANGE*/
-      }
-    else if (rhs > 0 && orig < 0 && orig < (CLR_INT64)m_data.numeric.r8)
-      {
-      m_data.numeric.r8 = (CLR_INT64)ULONGLONGCONSTANT(0x8000000000000000); /*return CLR_E_OUT_OF_RANGE*/
-      }
-    }
-#endif
-
     break;
 
     // Substructing of value to array reference is like decreasing the index in array.
@@ -1785,8 +1572,8 @@ HRESULT CLR_RT_HeapBlock::NumericSub(const CLR_RT_HeapBlock &right)
 
 HRESULT CLR_RT_HeapBlock::NumericMul(const CLR_RT_HeapBlock &right)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   switch (DataType())
     {
@@ -1807,69 +1594,11 @@ HRESULT CLR_RT_HeapBlock::NumericMul(const CLR_RT_HeapBlock &right)
       break;
 
     case DATATYPE_R4:
-#if defined(NANOCLR_EMULATED_FLOATINGPOINT)
-    {
-    CLR_INT32 orig = (CLR_INT32)m_data.numeric.r4;
-    CLR_INT32 rhs;
-#endif
     m_data.numeric.r4 = m_data.numeric.r4 * right.m_data.numeric.r4;
-
-#if defined(NANOCLR_EMULATED_FLOATINGPOINT)
-    rhs = (CLR_INT32)right.m_data.numeric.r4;
-
-    if (orig != 0 && rhs != 0)
-      {
-      CLR_INT32 ret_value = (CLR_INT32)m_data.numeric.r4;
-      bool isNeg = orig < 0;
-
-      if (rhs < 0)
-        isNeg = !isNeg;
-
-      if (!isNeg && (ret_value < 0 || ret_value < orig || ret_value < rhs))
-        {
-        m_data.numeric.r4 = 0x7FFFFFFF; /* return CLR_E_OUT_OF_RANGE; */
-        }
-      else if (isNeg && (ret_value > 0 || ret_value > orig || ret_value > rhs))
-        {
-        m_data.numeric.r4 = (CLR_INT32)(CLR_UINT32)0x80000000; /* return CLR_E_OUT_OF_RANGE; */
-        }
-      }
-    }
-#endif
     break;
 
     case DATATYPE_R8:
-#if defined(NANOCLR_EMULATED_FLOATINGPOINT)
-    {
-    CLR_INT64 orig = (CLR_INT64)m_data.numeric.r8;
-    CLR_INT64 rhs;
-#endif
     m_data.numeric.r8 = m_data.numeric.r8 * right.m_data.numeric.r8;
-
-#if defined(NANOCLR_EMULATED_FLOATINGPOINT)
-    rhs = (CLR_INT64)right.m_data.numeric.r8;
-
-    if (orig != 0 && rhs != 0)
-      {
-      CLR_INT64 ret_value = (CLR_INT64)m_data.numeric.r8;
-      bool isNeg = orig < 0;
-
-      if (rhs < 0)
-        isNeg = !isNeg;
-
-      if (!isNeg && (ret_value < 0 || ret_value < orig || ret_value < rhs))
-        {
-        m_data.numeric.r8 =
-          (CLR_INT64)ULONGLONGCONSTANT(0x7FFFFFFFFFFFFFFF); /* return CLR_E_OUT_OF_RANGE; */
-        }
-      else if (isNeg && (ret_value > 0 || ret_value > orig || ret_value > rhs))
-        {
-        m_data.numeric.r8 =
-          (CLR_INT64)ULONGLONGCONSTANT(0x8000000000000000); /* return CLR_E_OUT_OF_RANGE; */
-        }
-      }
-    }
-#endif
     break;
 
     default:
@@ -1881,8 +1610,8 @@ HRESULT CLR_RT_HeapBlock::NumericMul(const CLR_RT_HeapBlock &right)
 
 HRESULT CLR_RT_HeapBlock::NumericDiv(const CLR_RT_HeapBlock &right)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   if (right.IsZero())
     NANOCLR_SET_AND_LEAVE(CLR_E_DIVIDE_BY_ZERO);
@@ -1916,8 +1645,8 @@ HRESULT CLR_RT_HeapBlock::NumericDiv(const CLR_RT_HeapBlock &right)
 
 HRESULT CLR_RT_HeapBlock::NumericDivUn(const CLR_RT_HeapBlock &right)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   if (right.IsZero())
     NANOCLR_SET_AND_LEAVE(CLR_E_DIVIDE_BY_ZERO);
@@ -1943,8 +1672,8 @@ HRESULT CLR_RT_HeapBlock::NumericDivUn(const CLR_RT_HeapBlock &right)
 
 HRESULT CLR_RT_HeapBlock::NumericRem(const CLR_RT_HeapBlock &right)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   if (right.IsZero())
     NANOCLR_SET_AND_LEAVE(CLR_E_DIVIDE_BY_ZERO);
@@ -1966,9 +1695,6 @@ HRESULT CLR_RT_HeapBlock::NumericRem(const CLR_RT_HeapBlock &right)
     case DATATYPE_I8:
       m_data.numeric.s8 %= right.m_data.numeric.s8;
       break;
-
-#if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
-
     case DATATYPE_R4:
       m_data.numeric.r4 = fmod(m_data.numeric.r4, right.m_data.numeric.r4);
       break;
@@ -1977,19 +1703,6 @@ HRESULT CLR_RT_HeapBlock::NumericRem(const CLR_RT_HeapBlock &right)
       m_data.numeric.r8 =
         fmod((CLR_DOUBLE_TEMP_CAST)m_data.numeric.r8, (CLR_DOUBLE_TEMP_CAST)right.m_data.numeric.r8);
       break;
-
-#else
-
-    case DATATYPE_R4:
-      m_data.numeric.r4 %= right.m_data.numeric.r4;
-      break;
-
-    case DATATYPE_R8:
-      m_data.numeric.r8 %= right.m_data.numeric.r8;
-      break;
-
-#endif
-
     default:
       NANOCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
     }
@@ -1999,8 +1712,8 @@ HRESULT CLR_RT_HeapBlock::NumericRem(const CLR_RT_HeapBlock &right)
 
 HRESULT CLR_RT_HeapBlock::NumericRemUn(const CLR_RT_HeapBlock &right)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   if (right.IsZero())
     NANOCLR_SET_AND_LEAVE(CLR_E_DIVIDE_BY_ZERO);
@@ -2026,8 +1739,8 @@ HRESULT CLR_RT_HeapBlock::NumericRemUn(const CLR_RT_HeapBlock &right)
 
 HRESULT CLR_RT_HeapBlock::NumericShl(const CLR_RT_HeapBlock &right)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   switch (DataType())
     {
@@ -2050,8 +1763,8 @@ HRESULT CLR_RT_HeapBlock::NumericShl(const CLR_RT_HeapBlock &right)
 
 HRESULT CLR_RT_HeapBlock::NumericShr(const CLR_RT_HeapBlock &right)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   switch (DataType())
     {
@@ -2080,8 +1793,8 @@ HRESULT CLR_RT_HeapBlock::NumericShr(const CLR_RT_HeapBlock &right)
 
 HRESULT CLR_RT_HeapBlock::NumericShrUn(const CLR_RT_HeapBlock &right)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   switch (DataType())
     {
@@ -2104,8 +1817,8 @@ HRESULT CLR_RT_HeapBlock::NumericShrUn(const CLR_RT_HeapBlock &right)
 
 HRESULT CLR_RT_HeapBlock::NumericNeg()
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   switch (DataType())
     {
@@ -2138,7 +1851,7 @@ HRESULT CLR_RT_HeapBlock::NumericNeg()
 
 CLR_RT_HeapBlock *CLR_RT_HeapBlock::ExtractValueBlock(int offset)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock *ptr = Dereference();
 
   if (ptr)
@@ -2149,9 +1862,9 @@ CLR_RT_HeapBlock *CLR_RT_HeapBlock::ExtractValueBlock(int offset)
   return ptr;
   }
 
-void CLR_RT_HeapBlock::ReadValue(CLR_INT64 &val, int offset)
+void CLR_RT_HeapBlock::ReadValue(int64_t &val, int offset)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock *ptr = ExtractValueBlock(offset);
 
   if (ptr)
@@ -2160,15 +1873,15 @@ void CLR_RT_HeapBlock::ReadValue(CLR_INT64 &val, int offset)
     }
   else
     {
-    CLR_INT32 val2 = 0;
+    int32_t val2 = 0;
 
     val = val2;
     }
   }
 
-void CLR_RT_HeapBlock::WriteValue(const CLR_INT64 &val, int offset)
+void CLR_RT_HeapBlock::WriteValue(const int64_t &val, int offset)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock *ptr = ExtractValueBlock(offset);
 
   if (ptr)
@@ -2179,25 +1892,25 @@ void CLR_RT_HeapBlock::WriteValue(const CLR_INT64 &val, int offset)
 
 void CLR_RT_HeapBlock::Relocate__HeapBlock()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HEAPBLOCK_RELOCATE(this);
   }
 
 void CLR_RT_HeapBlock::Relocate_String()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_data.string.m_text);
     }
 
 void CLR_RT_HeapBlock::Relocate_Obj()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_data.objectReference.ptr);
   }
 
 void CLR_RT_HeapBlock::Relocate_Cls()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_data.objectHeader.lock);
 
   CLR_RT_GarbageCollector::Heap_Relocate(this + 1, DataSize() - 1);
@@ -2205,13 +1918,13 @@ void CLR_RT_HeapBlock::Relocate_Cls()
 
 void CLR_RT_HeapBlock::Relocate_Ref()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_data.objectReference.ptr);
   }
 
 void CLR_RT_HeapBlock::Relocate_ArrayRef()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_data.arrayReference.array);
   }
 
@@ -2221,7 +1934,7 @@ void CLR_RT_HeapBlock::Relocate_ArrayRef()
 
 void CLR_RT_HeapBlock::Debug_CheckPointer() const
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   if (m_id.type.dataType == DATATYPE_OBJECT)
     {
     Debug_CheckPointer(Dereference());
@@ -2230,7 +1943,7 @@ void CLR_RT_HeapBlock::Debug_CheckPointer() const
 
 void CLR_RT_HeapBlock::Debug_CheckPointer(void *ptr)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   switch ((size_t)ptr)
     {
     case 0xCFCFCFCF:
@@ -2245,14 +1958,14 @@ void CLR_RT_HeapBlock::Debug_CheckPointer(void *ptr)
 
 void CLR_RT_HeapBlock::Debug_ClearBlock(int data)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_UINT32 size = DataSize();
+ 
+  uint32_t size = DataSize();
 
   if (size > 1)
     {
     CLR_RT_HeapBlock_Raw *ptr = (CLR_RT_HeapBlock_Raw *)this;
-    CLR_UINT32 raw1 = CLR_RT_HEAPBLOCK_RAW_ID(DATATYPE_OBJECT, 0, 1);
-    CLR_UINT32 raw2;
+    uint32_t raw1 = CLR_RT_HEAPBLOCK_RAW_ID(DATATYPE_OBJECT, 0, 1);
+    uint32_t raw2;
 
     raw2 = data & 0xFF;
     raw2 = raw2 | (raw2 << 8);

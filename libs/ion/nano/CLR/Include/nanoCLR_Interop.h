@@ -36,7 +36,6 @@ extern HRESULT NANOCLR_DEBUG_PROCESS_EXCEPTION(HRESULT hr, const char* szFunc, c
 #endif
 
 
-#define NANOCLR_HEADER()							HRESULT hr
 #define NANOCLR_CHECK_HRESULT(expr)					{ if(FAILED(hr = (expr))) NANOCLR_LEAVE(); }
 #define NANOCLR_EXIT_ON_SUCCESS(expr)				{ if(SUCCEEDED(hr = (expr))) NANOCLR_LEAVE(); }
 #define NANOCLR_SET_AND_LEAVE(expr)					{ hr = (expr); NANOCLR_LEAVE(); }
@@ -277,15 +276,8 @@ HRESULT Interop_Marshal_INT8_ByRef(const CLR_RT_StackFrame& stackFrame, void* pH
 HRESULT Interop_Marshal_INT16_ByRef(const CLR_RT_StackFrame& stackFrame, void* pHeapBlock, unsigned int paramIndex, signed short int*& pParam);
 HRESULT Interop_Marshal_INT32_ByRef(const CLR_RT_StackFrame& stackFrame, void* pHeapBlock, unsigned int paramIndex, signed int*& pParam);
 HRESULT Interop_Marshal_INT64_ByRef(const CLR_RT_StackFrame& stackFrame, void* pHeapBlock, unsigned int paramIndex, signed __int64*& pParam);
-#if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
 HRESULT Interop_Marshal_float_ByRef(const CLR_RT_StackFrame& stackFrame, void* pHeapBlock, unsigned int paramIndex, float*& pParam);
 HRESULT Interop_Marshal_double_ByRef(const CLR_RT_StackFrame& stackFrame, void* pHeapBlock, unsigned int paramIndex, double*& pParam);
-#else
-HRESULT Interop_Marshal_float_ByRef(const CLR_RT_StackFrame& stackFrame, void* pHeapBlock, unsigned int paramIndex, signed int*& pParam);
-HRESULT Interop_Marshal_double_ByRef(const CLR_RT_StackFrame& stackFrame, void* pHeapBlock, unsigned int paramIndex, signed __int64*& pParam);
-
-#endif
-
 
 // For unsuppoted types return NULL reference
 
@@ -338,14 +330,8 @@ signed char& Interop_Marshal_GetField_INT8(CLR_RT_HeapBlock* pThis, unsigned int
 signed short int& Interop_Marshal_GetField_INT16(CLR_RT_HeapBlock* pThis, unsigned int fieldIndex);
 signed int& Interop_Marshal_GetField_INT32(CLR_RT_HeapBlock* pThis, unsigned int fieldIndex);
 signed __int64& Interop_Marshal_GetField_INT64(CLR_RT_HeapBlock* pThis, unsigned int fieldIndex);
-//----------------- Float point types - float and double
-#if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
 float& Interop_Marshal_GetField_float(CLR_RT_HeapBlock* pThis, unsigned int fieldIndex);
 double& Interop_Marshal_GetField_double(CLR_RT_HeapBlock* pThis, unsigned int fieldIndex);
-#else
-signed int& Interop_Marshal_GetField_float(CLR_RT_HeapBlock* pThis, unsigned int fieldIndex);
-signed __int64& Interop_Marshal_GetField_double(CLR_RT_HeapBlock* pThis, unsigned int fieldIndex);
-#endif
 
 // For all other unsupported types we always return NULL reference.
 UNSUPPORTED_TYPE& Interop_Marshal_GetField_UNSUPPORTED_TYPE(CLR_RT_HeapBlock* pThis, unsigned int fieldIndex);

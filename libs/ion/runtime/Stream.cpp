@@ -102,7 +102,7 @@ HRESULT Library_corlib_native_CanFly_Syscall::StreamGetPos___STATIC__I4__U4__BYR
   SetResult_INT32(stack, hr);
 
   if (succeeded(hr))
-    stack.Arg1().Dereference()->SetInteger((CLR_UINT32)retValue);
+    stack.Arg1().Dereference()->SetInteger((uint32_t)retValue);
 
   return S_OK;
   }

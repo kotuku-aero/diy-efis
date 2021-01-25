@@ -71,7 +71,7 @@ HRESULT Library_corlib_native_CanFly_Syscall::OpenScreen___STATIC__I4__U2__U2__B
   SetResult_INT32(stack, hr);
 
   if (succeeded(hr))
-    stack.Arg2().Dereference()->SetInteger((CLR_UINT32)hwnd);
+    stack.Arg2().Dereference()->SetInteger((uint32_t)hwnd);
 
   return S_OK;
   }
@@ -115,7 +115,7 @@ HRESULT Library_corlib_native_CanFly_Syscall::CreateWindow___STATIC__I4__U4__I4_
   SetResult_INT32(stack, hr);
 
   if (succeeded(hr))
-    stack.Arg6().Dereference()->SetInteger((CLR_UINT32)hwnd);
+    stack.Arg6().Dereference()->SetInteger((uint32_t)hwnd);
 
   return S_OK;
   }
@@ -158,7 +158,7 @@ HRESULT Library_corlib_native_CanFly_Syscall::CreateChildWindow___STATIC__I4__U4
   SetResult_INT32(stack, hr);
 
   if (succeeded(hr))
-    stack.Arg6().Dereference()->SetInteger((CLR_UINT32)hwnd);
+    stack.Arg6().Dereference()->SetInteger((uint32_t)hwnd);
 
   return S_OK;
   }
@@ -365,7 +365,7 @@ HRESULT Library_corlib_native_CanFly_Syscall::GetParent___STATIC__I4__U4__BYREF_
   SetResult_INT32(stack, hr);
 
   if (succeeded(hr))
-    stack.Arg1().Dereference()->SetInteger((CLR_UINT32)hwnd);
+    stack.Arg1().Dereference()->SetInteger((uint32_t)hwnd);
 
   return S_OK;
   }
@@ -394,7 +394,7 @@ HRESULT Library_corlib_native_CanFly_Syscall::GetWindowById___STATIC__I4__U4__U2
   SetResult_INT32(stack, hr);
 
   if (succeeded(hr))
-    stack.Arg2().Dereference()->SetInteger((CLR_UINT32)hndl);
+    stack.Arg2().Dereference()->SetInteger((uint32_t)hndl);
 
   return S_OK;
   }
@@ -421,7 +421,7 @@ HRESULT Library_corlib_native_CanFly_Syscall::GetFirstChild___STATIC__I4__U4__BY
   SetResult_INT32(stack, hr);
 
   if (succeeded(hr))
-    stack.Arg1().Dereference()->SetInteger((CLR_UINT32)hndl);
+    stack.Arg1().Dereference()->SetInteger((uint32_t)hndl);
 
   return S_OK;
   }
@@ -449,7 +449,7 @@ HRESULT Library_corlib_native_CanFly_Syscall::GetNextSibling___STATIC__I4__U4__B
   SetResult_INT32(stack, hr);
 
   if (succeeded(hr))
-    stack.Arg1().Dereference()->SetInteger((CLR_UINT32)hndl);
+    stack.Arg1().Dereference()->SetInteger((uint32_t)hndl);
 
   return S_OK;
   }
@@ -476,7 +476,7 @@ HRESULT Library_corlib_native_CanFly_Syscall::GetPreviousSibling___STATIC__I4__U
   SetResult_INT32(stack, hr);
 
   if (succeeded(hr))
-    stack.Arg1().Dereference()->SetInteger((CLR_UINT32)hndl);
+    stack.Arg1().Dereference()->SetInteger((uint32_t)hndl);
 
   return S_OK;
   }
@@ -606,7 +606,7 @@ HRESULT Library_corlib_native_CanFly_Syscall::CreateRectCanvas___STATIC__I4__I4_
   SetResult_INT32(stack, hr);
 
   if (succeeded(hr))
-    stack.Arg2().Dereference()->SetInteger((CLR_UINT32)hndl);
+    stack.Arg2().Dereference()->SetInteger((uint32_t)hndl);
 
   return S_OK;
   }
@@ -633,7 +633,7 @@ HRESULT Library_corlib_native_CanFly_Syscall::CreatePngCanvas___STATIC__I4__U4__
   SetResult_INT32(stack, hr);
 
   if (succeeded(hr))
-    stack.Arg1().Dereference()->SetInteger((CLR_UINT32)hndl);
+    stack.Arg1().Dereference()->SetInteger((uint32_t)hndl);
 
   return S_OK;
   }
@@ -773,7 +773,7 @@ HRESULT Library_corlib_native_CanFly_Syscall::CreatePen___STATIC__I4__U4__U2__U2
   SetResult_INT32(stack, hr);
 
   if (succeeded(hr))
-    stack.Arg3().Dereference()->SetInteger((CLR_UINT32)pen);
+    stack.Arg3().Dereference()->SetInteger((uint32_t)pen);
 
   return S_OK;
   }

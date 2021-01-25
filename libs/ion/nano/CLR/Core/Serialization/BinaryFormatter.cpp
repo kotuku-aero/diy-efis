@@ -36,7 +36,7 @@ CLR_RT_HeapBlock *CLR_RT_BinaryFormatter::TypeHandler::FixNull(CLR_RT_HeapBlock 
 HRESULT CLR_RT_BinaryFormatter::TypeHandler::TypeHandler_Initialize(CLR_RT_BinaryFormatter *bf, SerializationHintsAttribute *hints, CLR_RT_TypeDescriptor *expected)
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   NANOCLR_CLEAR(*this);
 
@@ -60,7 +60,7 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::TypeHandler_Initialize(CLR_RT_Binar
 HRESULT CLR_RT_BinaryFormatter::TypeHandler::SetValue(CLR_RT_HeapBlock *v)
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   m_value = NULL;
   m_type = NULL;
@@ -194,7 +194,7 @@ CLR_DataType CLR_RT_BinaryFormatter::TypeHandler::GetDataType(CLR_RT_TypeDescrip
   return (CLR_DataType)type->m_handlerCls.m_target->dataType;
   }
 
-CLR_UINT32 CLR_RT_BinaryFormatter::TypeHandler::GetSizeOfType(CLR_RT_TypeDescriptor *type)
+uint32_t CLR_RT_BinaryFormatter::TypeHandler::GetSizeOfType(CLR_RT_TypeDescriptor *type)
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
   return c_CLR_RT_DataTypeLookup[type->GetDataType()].m_sizeInBits;
@@ -211,9 +211,9 @@ bool CLR_RT_BinaryFormatter::TypeHandler::GetSignOfType(CLR_RT_TypeDescriptor *t
 HRESULT CLR_RT_BinaryFormatter::TypeHandler::EmitSignature(int &res)
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
-  CLR_UINT32 idx;
+  uint32_t idx;
   int        mask = SignatureRequirements();
 
   if ((mask & c_Signature_Type) == 0)
@@ -298,8 +298,8 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::EmitSignature(int &res)
       appDomain = g_CLR_RT_ExecutionEngine.GetCurrentAppDomain();
       }
 
-    NANOCLR_CHECK_HRESULT(m_bf->WriteBits((CLR_UINT32)(size_t)ptr, 32));
-    NANOCLR_CHECK_HRESULT(m_bf->WriteBits((CLR_UINT32)(size_t)appDomain, 32));
+    NANOCLR_CHECK_HRESULT(m_bf->WriteBits((uint32_t)(size_t)ptr, 32));
+    NANOCLR_CHECK_HRESULT(m_bf->WriteBits((uint32_t)(size_t)appDomain, 32));
     }
 
     res = c_Action_None; NANOCLR_SET_AND_LEAVE(S_OK);
@@ -307,7 +307,7 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::EmitSignature(int &res)
 #endif
 
   idx = m_bf->SearchDuplicate(m_value);
-  if (idx != (CLR_UINT32)-1)
+  if (idx != (uint32_t)-1)
     {
     //
     // No duplicates allowed for fixed-type objects.
@@ -336,7 +336,7 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::EmitSignature(int &res)
 HRESULT CLR_RT_BinaryFormatter::TypeHandler::EmitSignature_Inner(int mask, CLR_RT_TypeDescriptor *type, CLR_RT_HeapBlock *value)
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   // Unbox reflection types
   if (value && value->DataType() == DATATYPE_OBJECT)
@@ -399,7 +399,7 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::EmitSignature_Inner(int mask, CLR_R
 
       if ((mask & c_Signature_Type) != 0)
         {
-        NANOCLR_CHECK_HRESULT(m_bf->WriteBits((CLR_UINT32)type->m_reflex.m_levels, TE_ArrayDepth));
+        NANOCLR_CHECK_HRESULT(m_bf->WriteBits((uint32_t)type->m_reflex.m_levels, TE_ArrayDepth));
 
         CLR_RT_TypeDescriptor typeSub; typeSub.InitializeFromType(type->m_reflex.m_data.m_type);
 
@@ -433,11 +433,11 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::EmitSignature_Inner(int mask, CLR_R
           NANOCLR_SET_AND_LEAVE(CLR_E_SERIALIZATION_VIOLATION);
           }
 
-        NANOCLR_SET_AND_LEAVE(m_bf->WriteBits((CLR_UINT32)sizeReal, bitsMax));
+        NANOCLR_SET_AND_LEAVE(m_bf->WriteBits((uint32_t)sizeReal, bitsMax));
         }
       else
         {
-        NANOCLR_SET_AND_LEAVE(m_bf->WriteCompressedUnsigned((CLR_UINT32)sizeReal));
+        NANOCLR_SET_AND_LEAVE(m_bf->WriteCompressedUnsigned((uint32_t)sizeReal));
         }
       }
     else
@@ -485,7 +485,7 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::EmitSignature_Inner(int mask, CLR_R
 HRESULT CLR_RT_BinaryFormatter::TypeHandler::ReadSignature(int &res)
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   int mask = SignatureRequirements();
 
@@ -501,9 +501,9 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::ReadSignature(int &res)
 
   if ((mask & c_Signature_Header) != 0)
     {
-    CLR_UINT32 levelOne;
-    CLR_UINT32 levelTwo;
-    CLR_UINT32 levelThree;
+    uint32_t levelOne;
+    uint32_t levelTwo;
+    uint32_t levelThree;
 
 
     NANOCLR_CHECK_HRESULT(m_bf->ReadBits(levelOne, TE_L1));
@@ -521,7 +521,7 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::ReadSignature(int &res)
     if (levelOne == TE_L1_Duplicate)
       {
       CLR_RT_HeapBlock *dup;
-      CLR_UINT32        idx;
+      uint32_t        idx;
 
       NANOCLR_CHECK_HRESULT(m_bf->ReadCompressedUnsigned(idx));
 
@@ -559,7 +559,7 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::ReadSignature(int &res)
         {
         if ((mask & c_Signature_Type) != 0)
           {
-          CLR_UINT32 et;
+          uint32_t et;
 
           NANOCLR_CHECK_HRESULT(m_bf->ReadBits(et, TE_ElementType));
 
@@ -571,7 +571,7 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::ReadSignature(int &res)
         {
         if ((mask & c_Signature_Type) != 0)
           {
-          CLR_UINT32 depth;
+          uint32_t depth;
 
           NANOCLR_CHECK_HRESULT(m_bf->ReadBits(depth, TE_ArrayDepth));
 
@@ -592,7 +592,7 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::ReadSignature(int &res)
 
             if (levelTwo == TE_L2_Primitive)
               {
-              CLR_UINT32 et;
+              uint32_t et;
 
               NANOCLR_CHECK_HRESULT(m_bf->ReadBits(et, TE_ElementType));
 
@@ -633,7 +633,7 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::ReadSignature(int &res)
         else if (levelThree == TE_L3_Reflection)
           {
           CLR_RT_ReflectionDef_Index value;
-          CLR_UINT64                 data;
+          uint64_t                 data;
 
           _ASSERTE(m_bf->m_flags & CLR_RT_BinaryFormatter::c_Flags_Marshal);
 
@@ -648,8 +648,8 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::ReadSignature(int &res)
           }
         else if (levelThree == TE_L3_MBRO)
           {
-          CLR_UINT32 uintPtr;
-          CLR_UINT32 uintAppDomain;
+          uint32_t uintPtr;
+          uint32_t uintAppDomain;
           CLR_RT_HeapBlock *ptr;
           CLR_RT_AppDomain *appDomain;
 
@@ -693,7 +693,7 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::ReadSignature(int &res)
 
   if (m_type->m_flags & (CLR_RT_DataTypeLookup::c_Array | CLR_RT_DataTypeLookup::c_ArrayList))
     {
-    CLR_UINT32 len;
+    uint32_t len;
 
     if (mask & c_Signature_Length)
       {
@@ -724,7 +724,7 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::ReadSignature(int &res)
 
       len = m_hints.m_arraySize;
 
-      if (len == (CLR_UINT32)-1)
+      if (len == (uint32_t)-1)
         {
         len = m_bf->BitsAvailable();
 
@@ -782,11 +782,11 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::ReadSignature(int &res)
 HRESULT CLR_RT_BinaryFormatter::TypeHandler::EmitValue(int &res)
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   CLR_RT_HeapBlock *value = m_value->FixBoxingReference();
-  CLR_UINT64        val;
-  CLR_UINT32        bits;
+  uint64_t        val;
+  uint32_t        bits;
   bool              fSigned;
 
   // unbox reflection types
@@ -814,7 +814,7 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::EmitValue(int &res)
       case REFLECTION_METHOD:
       case REFLECTION_FIELD:
       {
-      CLR_UINT64 data;
+      uint64_t data;
 
       _ASSERTE(m_bf->m_flags & CLR_RT_BinaryFormatter::c_Flags_Marshal);
 
@@ -831,18 +831,18 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::EmitValue(int &res)
 
   if (m_type->m_handlerCls.m_data == g_CLR_RT_WellKnownTypes.m_DateTime.m_data)
     {
-    CLR_INT64 *pVal = GetValuePtr(*value);
+    int64_t *pVal = GetValuePtr(*value);
     FAULT_ON_NULL(pVal);
 
-    val = *(CLR_UINT64 *)pVal;
+    val = *(uint64_t *)pVal;
     bits = 64;
     fSigned = false;
     }
   else if (m_type->m_handlerCls.m_data == g_CLR_RT_WellKnownTypes.m_TimeSpan.m_data)
     {
-    CLR_INT64 *pVal = GetValuePtr(*value); FAULT_ON_NULL(pVal);
+    int64_t *pVal = GetValuePtr(*value); FAULT_ON_NULL(pVal);
 
-    val = *(CLR_UINT64 *)pVal;
+    val = *(uint64_t *)pVal;
     bits = 64;
     fSigned = true;
     }
@@ -853,13 +853,13 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::EmitValue(int &res)
     if (bits == CLR_RT_DataTypeLookup::c_VariableSize)
       {
       const char *szText = value->RecoverString();
-      CLR_UINT32 len = szText ? (CLR_UINT32)hal_strlen_s(szText) : 0xFFFFFFFF;
+      uint32_t len = szText ? (uint32_t)hal_strlen_s(szText) : 0xFFFFFFFF;
 
       NANOCLR_CHECK_HRESULT(m_bf->WriteCompressedUnsigned(len));
 
-      if (len != (CLR_UINT32)-1)
+      if (len != (uint32_t)-1)
         {
-        NANOCLR_CHECK_HRESULT(m_bf->WriteArray((CLR_UINT8 *)szText, len));
+        NANOCLR_CHECK_HRESULT(m_bf->WriteArray((uint8_t *)szText, len));
         }
 
       res = c_Action_None; NANOCLR_SET_AND_LEAVE(S_OK);
@@ -888,8 +888,8 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::EmitValue(int &res)
       valPtr = valPtr->TransparentProxyDereference();
       }
 
-    NANOCLR_CHECK_HRESULT(m_bf->WriteBits((CLR_UINT32)(size_t)valPtr, 32));
-    NANOCLR_CHECK_HRESULT(m_bf->WriteBits((CLR_UINT32)(size_t)appDomain, 32));
+    NANOCLR_CHECK_HRESULT(m_bf->WriteBits((uint32_t)(size_t)valPtr, 32));
+    NANOCLR_CHECK_HRESULT(m_bf->WriteBits((uint32_t)(size_t)appDomain, 32));
 
     NANOCLR_SET_AND_LEAVE(S_OK);
     }
@@ -901,14 +901,14 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::EmitValue(int &res)
     }
 
   {
-  CLR_UINT32 shift = 64 - bits;
+  uint32_t shift = 64 - bits;
 
   if (shift)
     {
     val <<= shift;
 
-    if (fSigned) val = (CLR_UINT64)((CLR_INT64)val >> shift);
-    else        val = (CLR_UINT64)((CLR_UINT64)val >> shift);
+    if (fSigned) val = (uint64_t)((int64_t)val >> shift);
+    else        val = (uint64_t)((uint64_t)val >> shift);
     }
   }
 
@@ -918,13 +918,13 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::EmitValue(int &res)
 
   if (fSigned)
     {
-    CLR_INT64 valS = (CLR_INT64)val;
+    int64_t valS = (int64_t)val;
 
-    if (m_hints.m_scale != 0) valS /= (CLR_INT64)m_hints.m_scale;
+    if (m_hints.m_scale != 0) valS /= (int64_t)m_hints.m_scale;
 
     if (bits != 64)
       {
-      CLR_INT64 maxVal = (LONGLONGCONSTANT(1) << (bits - 1)) - 1;
+      int64_t maxVal = (LONGLONGCONSTANT(1) << (bits - 1)) - 1;
 
       if (valS < (-maxVal - 1) || valS > maxVal)
         {
@@ -932,17 +932,17 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::EmitValue(int &res)
         }
       }
 
-    val = (CLR_UINT64)valS;
+    val = (uint64_t)valS;
     }
   else
     {
-    CLR_UINT64 valU = (CLR_UINT64)val;
+    uint64_t valU = (uint64_t)val;
 
-    if (m_hints.m_scale != 0) valU /= (CLR_UINT64)m_hints.m_scale;
+    if (m_hints.m_scale != 0) valU /= (uint64_t)m_hints.m_scale;
 
     if (bits != 64)
       {
-      CLR_UINT64 maxVal = (ULONGLONGCONSTANT(1) << bits) - 1;
+      uint64_t maxVal = (ULONGLONGCONSTANT(1) << bits) - 1;
 
       if (valU > maxVal)
         {
@@ -950,7 +950,7 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::EmitValue(int &res)
         }
       }
 
-    val = (CLR_UINT64)valU;
+    val = (uint64_t)valU;
     }
 
   NANOCLR_CHECK_HRESULT(m_bf->WriteBits(val, bits));
@@ -963,26 +963,26 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::EmitValue(int &res)
 HRESULT CLR_RT_BinaryFormatter::TypeHandler::ReadValue(int &res)
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
-  CLR_UINT64 *dst;
-  CLR_UINT64  val;
-  CLR_UINT32  bits;
+  uint64_t *dst;
+  uint64_t  val;
+  uint32_t  bits;
   bool        fSigned;
 
   if (m_type->m_handlerCls.m_data == g_CLR_RT_WellKnownTypes.m_DateTime.m_data)
     {
-    CLR_INT64 *pVal = GetValuePtr(*m_value); FAULT_ON_NULL(pVal);
+    int64_t *pVal = GetValuePtr(*m_value); FAULT_ON_NULL(pVal);
 
-    dst = (CLR_UINT64 *)pVal;
+    dst = (uint64_t *)pVal;
     bits = 64;
     fSigned = false;
     }
   else if (m_type->m_handlerCls.m_data == g_CLR_RT_WellKnownTypes.m_TimeSpan.m_data)
     {
-    CLR_INT64 *pVal = GetValuePtr(*m_value); FAULT_ON_NULL(pVal);
+    int64_t *pVal = GetValuePtr(*m_value); FAULT_ON_NULL(pVal);
 
-    dst = (CLR_UINT64 *)pVal;
+    dst = (uint64_t *)pVal;
     bits = 64;
     fSigned = true;
     }
@@ -993,7 +993,7 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::ReadValue(int &res)
 
     if (bits == CLR_RT_DataTypeLookup::c_VariableSize)
       {
-      CLR_UINT32 len;
+      uint32_t len;
 
       NANOCLR_CHECK_HRESULT(m_bf->ReadCompressedUnsigned(len));
 
@@ -1006,7 +1006,7 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::ReadValue(int &res)
         CLR_RT_HeapBlock_String *str = CLR_RT_HeapBlock_String::CreateInstance(*m_value, len); CHECK_ALLOCATION(str);
         char *dst = (char *)str->StringText();
 
-        NANOCLR_CHECK_HRESULT(m_bf->ReadArray((CLR_UINT8 *)dst, len));
+        NANOCLR_CHECK_HRESULT(m_bf->ReadArray((uint8_t *)dst, len));
         dst[len] = 0;
         }
 
@@ -1021,7 +1021,7 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::ReadValue(int &res)
       m_value->SetDataId(CLR_RT_HEAPBLOCK_RAW_ID(m_type->GetDataType(), 0, 1));
       m_value->ClearData();
 
-      dst = (CLR_UINT64 *)&m_value->NumericByRef().u8;
+      dst = (uint64_t *)&m_value->NumericByRef().u8;
 
       fSigned = TypeHandler::GetSignOfType(m_type);
       }
@@ -1041,7 +1041,7 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::ReadValue(int &res)
 
     val <<= revBits;
 
-    if (fSigned) val = (CLR_UINT64)((CLR_INT64)val >> revBits);
+    if (fSigned) val = (uint64_t)((int64_t)val >> revBits);
     else        val = (val >> revBits);
     }
 
@@ -1062,7 +1062,7 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::ReadValue(int &res)
 HRESULT CLR_RT_BinaryFormatter::TypeHandler::TrackObject(int &res)
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   if (m_type->m_flags & (CLR_RT_DataTypeLookup::c_Array | CLR_RT_DataTypeLookup::c_ArrayList))
     {
@@ -1088,7 +1088,7 @@ HRESULT CLR_RT_BinaryFormatter::TypeHandler::TrackObject(int &res)
 HRESULT CLR_RT_BinaryFormatter::State::CreateInstance(CLR_RT_BinaryFormatter *parent, SerializationHintsAttribute *hints, CLR_RT_HeapBlock *type)
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   CLR_RT_TypeDef_Instance     inst;
   CLR_RT_TypeDescriptor       desc;
@@ -1123,7 +1123,7 @@ HRESULT CLR_RT_BinaryFormatter::State::CreateInstance(CLR_RT_BinaryFormatter *pa
 HRESULT CLR_RT_BinaryFormatter::State::CreateInstance(CLR_RT_BinaryFormatter *parent, SerializationHintsAttribute *hints, CLR_RT_TypeDescriptor *type)
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   State *ptr = EVENTCACHE_EXTRACT_NODE_INITTOZERO(g_CLR_RT_EventCache, State, DATATYPE_SERIALIZER_STATE);
 
@@ -1149,7 +1149,7 @@ void CLR_RT_BinaryFormatter::State::DestroyInstance()
 HRESULT CLR_RT_BinaryFormatter::State::FindHints(SerializationHintsAttribute &hints, const CLR_RT_TypeDef_Instance &cls)
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   NANOCLR_CLEAR(hints);
 
@@ -1181,7 +1181,7 @@ HRESULT CLR_RT_BinaryFormatter::State::FindHints(SerializationHintsAttribute &hi
 HRESULT CLR_RT_BinaryFormatter::State::FindHints(SerializationHintsAttribute &hints, const CLR_RT_FieldDef_Instance &fld)
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   NANOCLR_CLEAR(hints);
 
@@ -1226,7 +1226,7 @@ HRESULT CLR_RT_BinaryFormatter::State::FindHints(SerializationHintsAttribute &hi
 HRESULT CLR_RT_BinaryFormatter::State::AssignAndFixBoxing(CLR_RT_HeapBlock &dst)
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   CLR_RT_HeapBlock *src = m_value.m_value;
   CLR_DataType      dt = dst.DataType();
@@ -1271,7 +1271,7 @@ HRESULT CLR_RT_BinaryFormatter::State::AssignAndFixBoxing(CLR_RT_HeapBlock &dst)
       else if (src->DataType() == DATATYPE_REFLECTION)
         {
         const CLR_RT_ReflectionDef_Index *reflex;
-        const CLR_RT_TypeDef_Index *cls = 0;
+        const uint32_t *cls = 0;
         CLR_RT_HeapBlock *pDst = &dst;
 
         reflex = &(src->ReflectionDataConst());
@@ -1336,7 +1336,7 @@ HRESULT CLR_RT_BinaryFormatter::State::AssignAndFixBoxing(CLR_RT_HeapBlock &dst)
 HRESULT CLR_RT_BinaryFormatter::State::GetValue()
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   State *prev = (State *)Prev();
   if (prev->Prev() == NULL)
@@ -1365,7 +1365,7 @@ HRESULT CLR_RT_BinaryFormatter::State::GetValue()
 HRESULT CLR_RT_BinaryFormatter::State::SetValueAndDestroyInstance()
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   if (m_parent->m_fDeserialize)
     {
@@ -1401,7 +1401,7 @@ HRESULT CLR_RT_BinaryFormatter::State::SetValueAndDestroyInstance()
 HRESULT CLR_RT_BinaryFormatter::State::Advance()
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   if (m_value_NeedProcessing)
     {
@@ -1418,7 +1418,7 @@ HRESULT CLR_RT_BinaryFormatter::State::Advance()
       {
       if (m_parent->m_flags & CLR_RT_BinaryFormatter::c_Flags_Marshal)
         {
-        CLR_RT_TypeDef_Index idx; idx.Clear();
+        uint32_t idx; idx.Clear();
         CLR_RT_HeapBlock *value = m_value.m_value;
 
         if (value && value->DataType() == DATATYPE_REFLECTION)
@@ -1572,14 +1572,14 @@ HRESULT CLR_RT_BinaryFormatter::State::Advance()
 HRESULT CLR_RT_BinaryFormatter::State::AdvanceToTheNextField()
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   while (NANOCLR_INDEX_IS_VALID(m_fields_CurrentClass))
     {
     if (m_fields_CurrentField < m_fields_CurrentClass.m_target->iFields_Num)
       {
       int                      offset = m_fields_CurrentClass.m_target->iFields_First + m_fields_CurrentField++;
-      CLR_RT_FieldDef_Index    idx; idx.Set(m_fields_CurrentClass.Assembly(), offset);
+      uint32_t    idx; idx.Set(m_fields_CurrentClass.Assembly(), offset);
       CLR_RT_FieldDef_Instance inst; inst.InitializeFromIndex(idx);
 
       m_fields_Pointer = m_value.m_value->Dereference() + inst.CrossReference().m_offset;
@@ -1620,16 +1620,16 @@ HRESULT CLR_RT_BinaryFormatter::State::AdvanceToTheNextField()
 HRESULT CLR_RT_BinaryFormatter::State::AdvanceToTheNextElement()
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   if (m_array_ExpectedType && (c_CLR_RT_DataTypeLookup[m_array->m_typeOfElement].m_flags & CLR_RT_DataTypeLookup::c_Numeric))
     {
-    CLR_UINT8 *ptr = m_array->GetFirstElement();
-    CLR_UINT32 bits = TypeHandler::GetSizeOfType(m_array_ExpectedType);
+    uint8_t *ptr = m_array->GetFirstElement();
+    uint32_t bits = TypeHandler::GetSizeOfType(m_array_ExpectedType);
     int        count = m_array_LastPos;
     bool       fDeserialize = m_parent->m_fDeserialize;
-    CLR_UINT32 size;
-    CLR_UINT64 val;
+    uint32_t size;
+    uint64_t val;
 
     size = bits / 8; if (size == 0) size = 1;
 
@@ -1678,18 +1678,18 @@ HRESULT CLR_RT_BinaryFormatter::State::AdvanceToTheNextElement()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HRESULT CLR_RT_BinaryFormatter::CreateInstance(CLR_UINT8 *buf, int len, CLR_RT_BinaryFormatter *&res)
+HRESULT CLR_RT_BinaryFormatter::CreateInstance(uint8_t *buf, int len, CLR_RT_BinaryFormatter *&res)
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   CLR_RT_BinaryFormatter *ptr = EVENTCACHE_EXTRACT_NODE(g_CLR_RT_EventCache, CLR_RT_BinaryFormatter, DATATYPE_SERIALIZER_HEAD);
 
   res = ptr; CHECK_ALLOCATION(ptr);
 
   ptr->m_stream = NULL;                      // CLR_RT_HeapBlock_MemoryStream* m_stream;
-  ptr->m_idx = 0;                         // CLR_UINT32                     m_idx;
-  ptr->m_lastTypeRead = 0;                         // CLR_UINT32                     m_lastTypeRead;
+  ptr->m_idx = 0;                         // uint32_t                     m_idx;
+  ptr->m_lastTypeRead = 0;                         // uint32_t                     m_lastTypeRead;
   ptr->m_duplicates.DblLinkedList_Initialize();    // CLR_RT_DblLinkedList           m_duplicates;            // EVENT HEAP - NO RELOCATION - list of CLR_RT_BinaryFormatter::DuplicateTracker
   ptr->m_states.DblLinkedList_Initialize();    // CLR_RT_DblLinkedList           m_states;                // EVENT HEAP - NO RELOCATION - list of CLR_RT_BinaryFormatter::State
                                                    //
@@ -1717,7 +1717,7 @@ void CLR_RT_BinaryFormatter::DestroyInstance()
 HRESULT CLR_RT_BinaryFormatter::Advance()
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   while (true)
     {
@@ -1748,10 +1748,10 @@ void CLR_RT_BinaryFormatter::PrepareForGC(void *data)
     }
   }
 
-HRESULT CLR_RT_BinaryFormatter::Serialize(CLR_RT_HeapBlock &refData, CLR_RT_HeapBlock &object, CLR_RT_HeapBlock *cls, CLR_UINT32 flags)
+HRESULT CLR_RT_BinaryFormatter::Serialize(CLR_RT_HeapBlock &refData, CLR_RT_HeapBlock &object, CLR_RT_HeapBlock *cls, uint32_t flags)
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   CLR_RT_BinaryFormatter *bf = NULL;
   CLR_RT_ProtectFromGC    pgc((void **)&bf, CLR_RT_BinaryFormatter::PrepareForGC);
@@ -1781,10 +1781,10 @@ HRESULT CLR_RT_BinaryFormatter::Serialize(CLR_RT_HeapBlock &refData, CLR_RT_Heap
   NANOCLR_CLEANUP_END();
   }
 
-HRESULT CLR_RT_BinaryFormatter::Deserialize(CLR_RT_HeapBlock &refData, CLR_RT_HeapBlock &object, CLR_RT_HeapBlock *cls, CLR_UINT32 *unknownType, CLR_UINT32 flags)
+HRESULT CLR_RT_BinaryFormatter::Deserialize(CLR_RT_HeapBlock &refData, CLR_RT_HeapBlock &object, CLR_RT_HeapBlock *cls, uint32_t *unknownType, uint32_t flags)
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Array *array = object.DereferenceArray();
 
@@ -1798,10 +1798,10 @@ HRESULT CLR_RT_BinaryFormatter::Deserialize(CLR_RT_HeapBlock &refData, CLR_RT_He
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT CLR_RT_BinaryFormatter::Deserialize(CLR_RT_HeapBlock &refData, CLR_UINT8 *data, CLR_UINT32 size, CLR_RT_HeapBlock *cls, CLR_UINT32 *unknownType, CLR_UINT32 flags)
+HRESULT CLR_RT_BinaryFormatter::Deserialize(CLR_RT_HeapBlock &refData, uint8_t *data, uint32_t size, CLR_RT_HeapBlock *cls, uint32_t *unknownType, uint32_t flags)
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   CLR_RT_BinaryFormatter *bf = NULL;
   CLR_RT_ProtectFromGC    pgc((void **)&bf, CLR_RT_BinaryFormatter::PrepareForGC);
@@ -1841,7 +1841,7 @@ HRESULT CLR_RT_BinaryFormatter::Deserialize(CLR_RT_HeapBlock &refData, CLR_UINT8
 HRESULT CLR_RT_BinaryFormatter::TrackDuplicate(CLR_RT_HeapBlock *object)
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   DuplicateTracker *ptr = EVENTCACHE_EXTRACT_NODE(g_CLR_RT_EventCache, DuplicateTracker, DATATYPE_SERIALIZER_DUPLICATE);
 
@@ -1855,7 +1855,7 @@ HRESULT CLR_RT_BinaryFormatter::TrackDuplicate(CLR_RT_HeapBlock *object)
   NANOCLR_NOCLEANUP();
   }
 
-CLR_UINT32 CLR_RT_BinaryFormatter::SearchDuplicate(CLR_RT_HeapBlock *object)
+uint32_t CLR_RT_BinaryFormatter::SearchDuplicate(CLR_RT_HeapBlock *object)
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
   object = TypeHandler::FixDereference(object);
@@ -1869,10 +1869,10 @@ CLR_UINT32 CLR_RT_BinaryFormatter::SearchDuplicate(CLR_RT_HeapBlock *object)
     }
   NANOCLR_FOREACH_NODE_END();
 
-  return (CLR_UINT32)-1;
+  return (uint32_t)-1;
   }
 
-CLR_RT_HeapBlock *CLR_RT_BinaryFormatter::GetDuplicate(CLR_UINT32 idx)
+CLR_RT_HeapBlock *CLR_RT_BinaryFormatter::GetDuplicate(uint32_t idx)
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
   NANOCLR_FOREACH_NODE(DuplicateTracker, ptr, m_duplicates)
@@ -1891,21 +1891,21 @@ CLR_RT_HeapBlock *CLR_RT_BinaryFormatter::GetDuplicate(CLR_UINT32 idx)
 
 int     CLR_RT_BinaryFormatter::BitsAvailable() { return m_stream->BitsAvailable(); }
 
-HRESULT CLR_RT_BinaryFormatter::ReadBits(CLR_UINT32 &res, int bits) { return m_stream->ReadBits(res, bits); }
-HRESULT CLR_RT_BinaryFormatter::WriteBits(CLR_UINT32  val, int bits) { return m_stream->WriteBits(val, bits); }
+HRESULT CLR_RT_BinaryFormatter::ReadBits(uint32_t &res, int bits) { return m_stream->ReadBits(res, bits); }
+HRESULT CLR_RT_BinaryFormatter::WriteBits(uint32_t  val, int bits) { return m_stream->WriteBits(val, bits); }
 
-HRESULT CLR_RT_BinaryFormatter::ReadBits(CLR_UINT64 &res, int bits) { return m_stream->ReadBits(res, bits); }
-HRESULT CLR_RT_BinaryFormatter::WriteBits(CLR_UINT64  val, int bits) { return m_stream->WriteBits(val, bits); }
+HRESULT CLR_RT_BinaryFormatter::ReadBits(uint64_t &res, int bits) { return m_stream->ReadBits(res, bits); }
+HRESULT CLR_RT_BinaryFormatter::WriteBits(uint64_t  val, int bits) { return m_stream->WriteBits(val, bits); }
 
-HRESULT CLR_RT_BinaryFormatter::ReadArray(CLR_UINT8 *buf, int bytes) { return m_stream->ReadArray(buf, bytes); }
-HRESULT CLR_RT_BinaryFormatter::WriteArray(const CLR_UINT8 *buf, int bytes) { return m_stream->WriteArray(buf, bytes); }
+HRESULT CLR_RT_BinaryFormatter::ReadArray(uint8_t *buf, int bytes) { return m_stream->ReadArray(buf, bytes); }
+HRESULT CLR_RT_BinaryFormatter::WriteArray(const uint8_t *buf, int bytes) { return m_stream->WriteArray(buf, bytes); }
 
-HRESULT CLR_RT_BinaryFormatter::ReadCompressedUnsigned(CLR_UINT32 &val)
+HRESULT CLR_RT_BinaryFormatter::ReadCompressedUnsigned(uint32_t &val)
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
-  CLR_UINT32 extra;
+  uint32_t extra;
 
   NANOCLR_CHECK_HRESULT(m_stream->ReadBits(val, 8));
 
@@ -1939,10 +1939,10 @@ HRESULT CLR_RT_BinaryFormatter::ReadCompressedUnsigned(CLR_UINT32 &val)
   NANOCLR_CLEANUP_END();
   }
 
-HRESULT CLR_RT_BinaryFormatter::WriteCompressedUnsigned(CLR_UINT32 val)
+HRESULT CLR_RT_BinaryFormatter::WriteCompressedUnsigned(uint32_t val)
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   int bits;
 
@@ -1982,7 +1982,7 @@ HRESULT CLR_RT_BinaryFormatter::WriteCompressedUnsigned(CLR_UINT32 val)
 HRESULT CLR_RT_BinaryFormatter::ReadType(CLR_RT_ReflectionDef_Index &val)
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   NANOCLR_CHECK_HRESULT(m_stream->ReadBits(m_lastTypeRead, 32));
 
@@ -1994,17 +1994,17 @@ HRESULT CLR_RT_BinaryFormatter::ReadType(CLR_RT_ReflectionDef_Index &val)
 HRESULT CLR_RT_BinaryFormatter::WriteType(const CLR_RT_ReflectionDef_Index &val)
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(WriteType(val.GetTypeHash()));
 
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT CLR_RT_BinaryFormatter::WriteType(CLR_UINT32 hash)
+HRESULT CLR_RT_BinaryFormatter::WriteType(uint32_t hash)
   {
   NATIVE_PROFILE_CLR_SERIALIZATION();
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   if (hash == 0xFFFFFFFF || hash == 0)
     {

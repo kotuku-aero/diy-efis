@@ -5,10 +5,10 @@
 //
 #include "Core.h"
 
-HRESULT CLR_RT_HeapBlock_ArrayList::GetItem(CLR_INT32 index, CLR_RT_HeapBlock *&value)
+HRESULT CLR_RT_HeapBlock_ArrayList::GetItem(int32_t index, CLR_RT_HeapBlock *&value)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   if (index < 0 || index >= GetSize()) NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
 
@@ -17,10 +17,10 @@ HRESULT CLR_RT_HeapBlock_ArrayList::GetItem(CLR_INT32 index, CLR_RT_HeapBlock *&
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT CLR_RT_HeapBlock_ArrayList::SetItem(CLR_INT32 index, CLR_RT_HeapBlock *value)
+HRESULT CLR_RT_HeapBlock_ArrayList::SetItem(int32_t index, CLR_RT_HeapBlock *value)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   if (index < 0 || index >= GetSize()) NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
 
@@ -30,14 +30,14 @@ HRESULT CLR_RT_HeapBlock_ArrayList::SetItem(CLR_INT32 index, CLR_RT_HeapBlock *v
   }
 
 // May Trigger GC, but parameter value will be protected
-HRESULT CLR_RT_HeapBlock_ArrayList::Add(CLR_RT_HeapBlock *value, CLR_INT32 &index)
+HRESULT CLR_RT_HeapBlock_ArrayList::Add(CLR_RT_HeapBlock *value, int32_t &index)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Array *items = GetItems();
-  CLR_INT32               size = GetSize();
-  CLR_INT32               capacity = items->m_numOfElements;
+  int32_t               size = GetSize();
+  int32_t               capacity = items->m_numOfElements;
 
   if (size == capacity)
     {
@@ -62,8 +62,8 @@ HRESULT CLR_RT_HeapBlock_ArrayList::Add(CLR_RT_HeapBlock *value, CLR_INT32 &inde
 
 HRESULT CLR_RT_HeapBlock_ArrayList::Clear()
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_CHECK_HRESULT(GetItems()->ClearElements(0, GetSize()));
 
@@ -73,14 +73,14 @@ HRESULT CLR_RT_HeapBlock_ArrayList::Clear()
   }
 
 // May Trigger GC, but parameter value will be protected
-HRESULT CLR_RT_HeapBlock_ArrayList::Insert(CLR_INT32 index, CLR_RT_HeapBlock *value)
+HRESULT CLR_RT_HeapBlock_ArrayList::Insert(int32_t index, CLR_RT_HeapBlock *value)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Array *items = GetItems();
-  CLR_INT32               size = GetSize();
-  CLR_INT32               capacity = items->m_numOfElements;
+  int32_t               size = GetSize();
+  int32_t               capacity = items->m_numOfElements;
 
   if (index < 0 || index > size) NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
 
@@ -115,13 +115,13 @@ HRESULT CLR_RT_HeapBlock_ArrayList::Insert(CLR_INT32 index, CLR_RT_HeapBlock *va
   NANOCLR_NOCLEANUP();
   }
 
-HRESULT CLR_RT_HeapBlock_ArrayList::RemoveAt(CLR_INT32 index)
+HRESULT CLR_RT_HeapBlock_ArrayList::RemoveAt(int32_t index)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Array *items = GetItems();
-  CLR_INT32               size = GetSize();
+  int32_t               size = GetSize();
 
   if (index < 0 || index >= size) NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
 
@@ -148,13 +148,13 @@ HRESULT CLR_RT_HeapBlock_ArrayList::RemoveAt(CLR_INT32 index)
   }
 
 // May Trigger GC
-HRESULT CLR_RT_HeapBlock_ArrayList::SetCapacity(CLR_UINT32 newCapacity)
+HRESULT CLR_RT_HeapBlock_ArrayList::SetCapacity(uint32_t newCapacity)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Array *items = GetItems();
-  CLR_UINT32               size = GetSize();
+  uint32_t               size = GetSize();
 
   if (newCapacity != items->m_numOfElements) // if capacity is changing
     {
@@ -185,14 +185,14 @@ HRESULT CLR_RT_HeapBlock_ArrayList::SetCapacity(CLR_UINT32 newCapacity)
   }
 
 // May Trigger GC
-HRESULT CLR_RT_HeapBlock_ArrayList::EnsureCapacity(CLR_INT32 min, CLR_INT32 currentCapacity)
+HRESULT CLR_RT_HeapBlock_ArrayList::EnsureCapacity(int32_t min, int32_t currentCapacity)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   if (currentCapacity < min)
     {
-    CLR_INT32 newCapacity = currentCapacity * 3 / 2;
+    int32_t newCapacity = currentCapacity * 3 / 2;
 
     if (newCapacity < min) newCapacity = min;
 

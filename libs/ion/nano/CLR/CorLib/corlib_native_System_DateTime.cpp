@@ -27,17 +27,17 @@ enum DateTimePart
 // !!! KEEP IN SYNC WITH DateTime._UTCMask (in managed code)  !!! //
 // !!! KEEP IN SYNC WITH DateTime._tickMask (in managed code) !!! //
 ////////////////////////////////////////////////////////////////////
-CLR_INT64 s_UTCMask = ULONGLONGCONSTANT(0x8000000000000000);
-CLR_INT64 s_TickMask = ULONGLONGCONSTANT(0x7FFFFFFFFFFFFFFF);
+int64_t s_UTCMask = ULONGLONGCONSTANT(0x8000000000000000);
+int64_t s_TickMask = ULONGLONGCONSTANT(0x7FFFFFFFFFFFFFFF);
 
 HRESULT Library_corlib_native_CanFly_Runtime::ToTicks___STATIC__U8__I4__I4__I4__I4__I4__I4__I4(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock *pArg = &(stack.Arg0());
   SYSTEMTIME        st;
-  CLR_INT64 value;
+  int64_t value;
 
   NANOCLR_CLEAR(st);
   st.wYear = pArg[0].NumericByRef().s4;
@@ -72,7 +72,7 @@ HRESULT Library_corlib_native_CanFly_Runtime::ToTicks___STATIC__U8__I4__I4__I4__
     }
 
 
-  value = (CLR_INT64)HAL_Time_ConvertFromSystemTime(&st) | s_UTCMask;
+  value = (int64_t)HAL_Time_ConvertFromSystemTime(&st) | s_UTCMask;
   stack.SetResult_I8(value);
 
   NANOCLR_NOCLEANUP();
@@ -80,13 +80,13 @@ HRESULT Library_corlib_native_CanFly_Runtime::ToTicks___STATIC__U8__I4__I4__I4__
 
 HRESULT Library_corlib_native_CanFly_Runtime::GetDateTimePart___STATIC__I4__U8__I4(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   signed int days;
   SYSTEMTIME st;
 
-  CLR_INT64 value = stack.Arg0().NumericByRef().s8;
+  int64_t value = stack.Arg0().NumericByRef().s8;
   DateTimePart dateTimePart = (DateTimePart)stack.Arg1().NumericByRef().s4;
 
   HAL_Time_ToSystemTime(value, &st);
@@ -141,12 +141,12 @@ HRESULT Library_corlib_native_CanFly_Runtime::GetDateTimePart___STATIC__I4__U8__
 
 HRESULT Library_corlib_native_CanFly_Runtime::DaysInMonth___STATIC__I4__I4__I4(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
-  CLR_INT32 year = stack.Arg0().NumericByRef().s4;
-  CLR_INT32 month = stack.Arg1().NumericByRef().s4;
-  CLR_INT32 days = 0;
+  int32_t year = stack.Arg0().NumericByRef().s4;
+  int32_t month = stack.Arg1().NumericByRef().s4;
+  int32_t days = 0;
 
   NANOCLR_CHECK_HRESULT(HAL_Time_DaysInMonth(year, month, &days));
 
@@ -157,10 +157,10 @@ HRESULT Library_corlib_native_CanFly_Runtime::DaysInMonth___STATIC__I4__I4__I4(C
 
 HRESULT Library_corlib_native_CanFly_Runtime::UtcNow___STATIC__U8(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
-  CLR_INT64 val;
+  int64_t val;
 
   val = HAL_Time_CurrentDateTime(false) | s_UTCMask;
   stack.SetResult_I8(val);

@@ -8,8 +8,8 @@
 
 HRESULT Library_corlib_native_CanFly_Runtime::ValueTypeEquals___STATIC__BOOLEAN__SystemValueType__OBJECT(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   stack.SetResult_Boolean(CLR_RT_HeapBlock::ObjectsEqual(stack.Arg0(), stack.Arg1(), false));
 

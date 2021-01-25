@@ -6,7 +6,7 @@
 #include "CorLib.h"
 
 
-static const CLR_UINT16 c_WhiteSpaces[] =
+static const uint16_t c_WhiteSpaces[] =
   {
       0x0009,
       0x000A,
@@ -41,8 +41,8 @@ static const CLR_UINT16 c_WhiteSpaces[] =
 
 HRESULT ConvertToCharArray(const char *szText, CLR_RT_HeapBlock &ref, CLR_RT_HeapBlock_Array *&array, int startIndex, int length)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_UnicodeHelper uh;
   int                  totLength;
@@ -61,7 +61,7 @@ HRESULT ConvertToCharArray(const char *szText, CLR_RT_HeapBlock &ref, CLR_RT_Hea
 
   array = ref.DereferenceArray();
 
-  uh.m_outputUTF16 = (CLR_UINT16 *)array->GetFirstElement();
+  uh.m_outputUTF16 = (uint16_t *)array->GetFirstElement();
   uh.m_outputUTF16_size = array->m_numOfElements;
 
   //
@@ -75,17 +75,17 @@ HRESULT ConvertToCharArray(const char *szText, CLR_RT_HeapBlock &ref, CLR_RT_Hea
 
 static HRESULT ConvertToCharArray(CLR_RT_StackFrame &stack, CLR_RT_HeapBlock &ref, CLR_RT_HeapBlock_Array *&array, int startIndex, int length)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   return ConvertToCharArray(stack.Arg0().RecoverString(), ref, array, startIndex, length);
   }
 
 static HRESULT FromCharArray(CLR_RT_StackFrame &stack, int startIndex, int length)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Array *array;
-  CLR_UINT32              len;
+  uint32_t              len;
 
   array = stack.Arg1().DereferenceArray();
   if (!array || array->m_numOfElements == 0)
@@ -102,7 +102,7 @@ static HRESULT FromCharArray(CLR_RT_StackFrame &stack, int startIndex, int lengt
     if (CLR_RT_HeapBlock_Array::CheckRange(startIndex, length, len) == false)
       NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
 
-    NANOCLR_SET_AND_LEAVE(CLR_RT_HeapBlock_String::CreateInstance(stack.Arg0(), (CLR_UINT16 *)array->GetElement(startIndex), length));
+    NANOCLR_SET_AND_LEAVE(CLR_RT_HeapBlock_String::CreateInstance(stack.Arg0(), (uint16_t *)array->GetElement(startIndex), length));
     }
 
   NANOCLR_NOCLEANUP();
@@ -111,8 +111,8 @@ static HRESULT FromCharArray(CLR_RT_StackFrame &stack, int startIndex, int lengt
 
 static HRESULT ToCharArray(CLR_RT_StackFrame &stack, int startIndex, int length)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Array *array;
 
@@ -123,15 +123,15 @@ static HRESULT ToCharArray(CLR_RT_StackFrame &stack, int startIndex, int length)
 
 static HRESULT IndexOf(CLR_RT_StackFrame &stack, int mode)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   const char *szText;
   int                  startIndex;
   int                  count;
   int                  pos;
   const char *pString;
-  const CLR_UINT16 *pChars;
+  const uint16_t *pChars;
   int                  iChars = 0;
   CLR_RT_UnicodeHelper inputIterator;
   int                  inputLen;
@@ -144,14 +144,14 @@ static HRESULT IndexOf(CLR_RT_StackFrame &stack, int mode)
 
   if (mode & c_IndexOf__SingleChar)
     {
-    pChars = (CLR_UINT16 *)&stack.Arg1().NumericByRefConst().u2;
+    pChars = (uint16_t *)&stack.Arg1().NumericByRefConst().u2;
     iChars = 1;
     }
   else if (mode & c_IndexOf__MultipleChars)
     {
     CLR_RT_HeapBlock_Array *array = stack.Arg1().DereferenceArray(); FAULT_ON_NULL(array);
 
-    pChars = (const CLR_UINT16 *)array->GetFirstElement();
+    pChars = (const uint16_t *)array->GetFirstElement();
     iChars = array->m_numOfElements;
     }
   else if (mode & c_IndexOf__String)
@@ -251,8 +251,8 @@ static HRESULT IndexOf(CLR_RT_StackFrame &stack, int mode)
 
         while (true)
           {
-          CLR_UINT16 bufInput[3];
-          CLR_UINT16 bufSearch[3];
+          uint16_t bufInput[3];
+          uint16_t bufSearch[3];
 
           inputString.m_outputUTF16 = bufInput;
           inputString.m_outputUTF16_size = MAXSTRLEN(bufInput);
@@ -319,7 +319,7 @@ static HRESULT IndexOf(CLR_RT_StackFrame &stack, int mode)
       // iterate thru all positions
       while (count-- > 0)
         {
-        CLR_UINT16 buf[3];
+        uint16_t buf[3];
 
         inputIterator.m_outputUTF16 = buf;
         inputIterator.m_outputUTF16_size = MAXSTRLEN(buf);
@@ -377,21 +377,21 @@ Exit:
 
 static HRESULT ChangeCase(CLR_RT_StackFrame &stack, bool fToUpper)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock        refTmp; refTmp.SetObjectReference(NULL);
   CLR_RT_ProtectFromGC    gc(refTmp);
   CLR_RT_HeapBlock_Array *arrayTmp;
-  CLR_UINT16 *ptr;
+  uint16_t *ptr;
 
   NANOCLR_CHECK_HRESULT(ConvertToCharArray(stack, refTmp, arrayTmp, 0, -1));
 
-  ptr = (CLR_UINT16 *)arrayTmp->GetFirstElement();
+  ptr = (uint16_t *)arrayTmp->GetFirstElement();
 
-  for (CLR_UINT32 i = 0; i < arrayTmp->m_numOfElements; i++)
+  for (uint32_t i = 0; i < arrayTmp->m_numOfElements; i++)
     {
-    CLR_UINT16 c = *ptr;
+    uint16_t c = *ptr;
 
     if (fToUpper)
       {
@@ -405,15 +405,15 @@ static HRESULT ChangeCase(CLR_RT_StackFrame &stack, bool fToUpper)
     *ptr++ = c;
     }
 
-  NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_String::CreateInstance(stack.PushValue(), (CLR_UINT16 *)arrayTmp->GetFirstElement(), arrayTmp->m_numOfElements));
+  NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_String::CreateInstance(stack.PushValue(), (uint16_t *)arrayTmp->GetFirstElement(), arrayTmp->m_numOfElements));
 
   NANOCLR_NOCLEANUP();
   }
 
 static HRESULT Substring(CLR_RT_StackFrame &stack, int startIndex, int length)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock        refTmp; refTmp.SetObjectReference(NULL);
   CLR_RT_ProtectFromGC    gc(refTmp);
@@ -432,7 +432,7 @@ static HRESULT Substring(CLR_RT_StackFrame &stack, int startIndex, int length)
     if (length < 0 || (startIndex + length) >(int)arrayTmp->m_numOfElements) NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
     }
 
-  NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_String::CreateInstance(stack.PushValue(), (CLR_UINT16 *)arrayTmp->GetElement(startIndex), length));
+  NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_String::CreateInstance(stack.PushValue(), (uint16_t *)arrayTmp->GetElement(startIndex), length));
 
   NANOCLR_NOCLEANUP();
   }
@@ -440,26 +440,26 @@ static HRESULT Substring(CLR_RT_StackFrame &stack, int startIndex, int length)
 
 static HRESULT Trim(CLR_RT_StackFrame &stack, CLR_RT_HeapBlock_Array *arrayTrimChars, bool fStart, bool fEnd)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock        refTmp; refTmp.SetObjectReference(NULL);
   CLR_RT_ProtectFromGC    gc(refTmp);
   CLR_RT_HeapBlock_Array *arrayTmp;
-  CLR_UINT16 *pSrcStart;
-  CLR_UINT16 *pSrcEnd;
+  uint16_t *pSrcStart;
+  uint16_t *pSrcEnd;
 
   NANOCLR_CHECK_HRESULT(ConvertToCharArray(stack, refTmp, arrayTmp, 0, -1));
 
-  pSrcStart = (CLR_UINT16 *)arrayTmp->GetFirstElement();
+  pSrcStart = (uint16_t *)arrayTmp->GetFirstElement();
   pSrcEnd = &pSrcStart[arrayTmp->m_numOfElements];
 
-  const CLR_UINT16 *pTrim;
-  CLR_UINT32        iTrim;
+  const uint16_t *pTrim;
+  uint32_t        iTrim;
 
   if (arrayTrimChars && arrayTrimChars->m_numOfElements)
     {
-    pTrim = (const CLR_UINT16 *)arrayTrimChars->GetFirstElement();
+    pTrim = (const uint16_t *)arrayTrimChars->GetFirstElement();
     iTrim = arrayTrimChars->m_numOfElements;
     }
   else
@@ -474,8 +474,8 @@ static HRESULT Trim(CLR_RT_StackFrame &stack, CLR_RT_HeapBlock_Array *arrayTrimC
     {
     while (pSrcStart < pSrcEnd)
       {
-      const CLR_UINT16 *p = pTrim;
-      CLR_UINT32        i;
+      const uint16_t *p = pTrim;
+      uint32_t        i;
 
       for (i = 0; i < iTrim; i++, p++)
         {
@@ -492,8 +492,8 @@ static HRESULT Trim(CLR_RT_StackFrame &stack, CLR_RT_HeapBlock_Array *arrayTrimC
     {
     while (pSrcStart < pSrcEnd)
       {
-      const CLR_UINT16 *p = pTrim;
-      CLR_UINT32        i;
+      const uint16_t *p = pTrim;
+      uint32_t        i;
 
       for (i = 0; i < iTrim; i++, p++)
         {
@@ -507,21 +507,21 @@ static HRESULT Trim(CLR_RT_StackFrame &stack, CLR_RT_HeapBlock_Array *arrayTrimC
     }
 
 
-  NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_String::CreateInstance(stack.PushValue(), pSrcStart, (CLR_UINT32)(pSrcEnd - pSrcStart)));
+  NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_String::CreateInstance(stack.PushValue(), pSrcStart, (uint32_t)(pSrcEnd - pSrcStart)));
 
   NANOCLR_NOCLEANUP();
   }
 
 static HRESULT Split(CLR_RT_StackFrame &stack, CLR_RT_HeapBlock &chars, int maxStrings)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Array *arraySrc;
   CLR_RT_HeapBlock_Array *arrayChars;
   CLR_RT_HeapBlock_Array *arrayDst;
-  const CLR_UINT16 *pChars;
-  CLR_UINT32 cChars;
+  const uint16_t *pChars;
+  uint32_t cChars;
 
   if (maxStrings < 0)
     {
@@ -541,7 +541,7 @@ static HRESULT Split(CLR_RT_StackFrame &stack, CLR_RT_HeapBlock &chars, int maxS
 
     if (arrayChars != NULL && arrayChars->m_numOfElements > 0)
       {
-      pChars = (CLR_UINT16 *)arrayChars->GetFirstElement();
+      pChars = (uint16_t *)arrayChars->GetFirstElement();
       cChars = arrayChars->m_numOfElements;
       }
     else
@@ -560,13 +560,13 @@ static HRESULT Split(CLR_RT_StackFrame &stack, CLR_RT_HeapBlock &chars, int maxS
 
     for (int pass = 0; pass < 2; pass++)
       {
-      CLR_UINT16 *pSrcStart = (CLR_UINT16 *)arraySrc->GetFirstElement();
-      CLR_UINT16 *pSrc = pSrcStart;
+      uint16_t *pSrcStart = (uint16_t *)arraySrc->GetFirstElement();
+      uint16_t *pSrc = pSrcStart;
       int         count = 0;
       bool        fFound = false;
       bool fContinueSearching = true;
 
-      for (CLR_UINT32 iSrc = 0; iSrc <= arraySrc->m_numOfElements; iSrc++, pSrc++)
+      for (uint32_t iSrc = 0; iSrc <= arraySrc->m_numOfElements; iSrc++, pSrc++)
         {
         if (iSrc == arraySrc->m_numOfElements)
           {
@@ -578,9 +578,9 @@ static HRESULT Split(CLR_RT_StackFrame &stack, CLR_RT_HeapBlock &chars, int maxS
           }
         else if (fContinueSearching)
           {
-          const CLR_UINT16 *pCharsT = pChars;
+          const uint16_t *pCharsT = pChars;
 
-          for (CLR_UINT32 iChars = 0; iChars < cChars; iChars++)
+          for (uint32_t iChars = 0; iChars < cChars; iChars++)
             {
             if (pSrc[0] == *pCharsT++)
               {
@@ -596,7 +596,7 @@ static HRESULT Split(CLR_RT_StackFrame &stack, CLR_RT_HeapBlock &chars, int maxS
             {
             CLR_RT_HeapBlock *str = (CLR_RT_HeapBlock *)arrayDst->GetElement(count);
 
-            NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_String::CreateInstance(*str, pSrcStart, (CLR_UINT32)(pSrc - pSrcStart)));
+            NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_String::CreateInstance(*str, pSrcStart, (uint32_t)(pSrc - pSrcStart)));
 
             pSrcStart = pSrc + 1;
             }
@@ -625,14 +625,14 @@ static HRESULT Split(CLR_RT_StackFrame &stack, CLR_RT_HeapBlock &chars, int maxS
 
 HRESULT StringConcat(CLR_RT_StackFrame &stack, CLR_RT_HeapBlock *array, int num)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock *ptrSrc;
   const char *szTextSrc;
   char *szTextDst = NULL;
-  CLR_UINT32              totLen;
-  CLR_UINT32              len;
+  uint32_t              totLen;
+  uint32_t              len;
 
   totLen = 0;
 
@@ -648,7 +648,7 @@ HRESULT StringConcat(CLR_RT_StackFrame &stack, CLR_RT_HeapBlock *array, int num)
       szTextSrc = ptrSrc->RecoverString();
       if (szTextSrc)
         {
-        len = (CLR_UINT32)hal_strlen_s(szTextSrc);
+        len = (uint32_t)hal_strlen_s(szTextSrc);
 
         if (i == 0)
           {
@@ -683,8 +683,8 @@ HRESULT StringConcat(CLR_RT_StackFrame &stack, CLR_RT_HeapBlock *array, int num)
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringCompareTo___STATIC__I4__STRING__OBJECT(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(StringCompare___STATIC__I4__STRING__STRING(stack));
 
@@ -693,8 +693,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringCompareTo___STATIC__I4__STRI
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringCompareTo___STATIC__I4__STRING__STRING(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(StringCompare___STATIC__I4__STRING__STRING(stack));
 
@@ -703,12 +703,12 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringCompareTo___STATIC__I4__STRI
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringCharAt___STATIC__CHAR__STRING__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   const char* szText;
   CLR_RT_UnicodeHelper uh;
-  CLR_UINT16           buf[3];
+  uint16_t           buf[3];
   int                  len;
   int                  index;
 
@@ -735,8 +735,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringCharAt___STATIC__CHAR__STRIN
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringToCharArray___STATIC__SZARRAY_CHAR__STRING(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(ToCharArray(stack, 0, -1));
 
@@ -745,8 +745,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringToCharArray___STATIC__SZARRA
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringToCharArray___STATIC__SZARRAY_CHAR__STRING__I4__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(ToCharArray(stack, stack.Arg1().NumericByRef().s4, stack.Arg2().NumericByRef().s4));
 
@@ -755,8 +755,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringToCharArray___STATIC__SZARRA
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringLength___STATIC__I4__STRING(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   const char* szText = stack.Arg0().RecoverString(); FAULT_ON_NULL(szText);
 
@@ -769,8 +769,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringLength___STATIC__I4__STRING(
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringSplit___STATIC__SZARRAY_STRING__STRING__SZARRAY_CHAR(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(Split(stack, stack.Arg1(), 0x7FFFFFFF)); /// Sending INT_MAX instead of -1. 
 
@@ -779,8 +779,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringSplit___STATIC__SZARRAY_STRI
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringSplit___STATIC__SZARRAY_STRING__STRING__SZARRAY_CHAR__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(Split(stack, stack.Arg1(), stack.Arg2().NumericByRef().s4));
 
@@ -789,8 +789,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringSplit___STATIC__SZARRAY_STRI
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringSubstring___STATIC__STRING__STRING__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(Substring(stack, stack.Arg1().NumericByRef().s4, -1));
 
@@ -799,10 +799,10 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringSubstring___STATIC__STRING__
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringSubstring___STATIC__STRING__STRING__I4__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
-  CLR_INT32 length = stack.Arg2().NumericByRef().s4;
+  int32_t length = stack.Arg2().NumericByRef().s4;
 
   if (length < 0) 
     NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
@@ -814,8 +814,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringSubstring___STATIC__STRING__
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringTrim___STATIC__STRING__STRING__SZARRAY_CHAR(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(Trim(stack, stack.Arg1().DereferenceArray(), true, true));
 
@@ -824,8 +824,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringTrim___STATIC__STRING__STRIN
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringTrimStart___STATIC__STRING__STRING__SZARRAY_CHAR(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(Trim(stack, stack.Arg1().DereferenceArray(), true, false));
 
@@ -834,8 +834,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringTrimStart___STATIC__STRING__
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringTrimEnd___STATIC__STRING__STRING__SZARRAY_CHAR(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(Trim(stack, stack.Arg1().DereferenceArray(), false, true));
 
@@ -844,8 +844,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringTrimEnd___STATIC__STRING__ST
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringCtor___STATIC__VOID__STRING__SZARRAY_CHAR__I4__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(FromCharArray(stack, stack.Arg2().NumericByRef().s4, stack.Arg3().NumericByRef().s4));
 
@@ -854,8 +854,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringCtor___STATIC__VOID__STRING_
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringCtor___STATIC__VOID__STRING__SZARRAY_CHAR(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(FromCharArray(stack, 0, -1));
 
@@ -864,10 +864,10 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringCtor___STATIC__VOID__STRING_
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringCtor___STATIC__VOID__STRING__CHAR__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
-  CLR_UINT16 ch = stack.Arg1().NumericByRef().u2;
+  uint16_t ch = stack.Arg1().NumericByRef().u2;
   int        len = stack.Arg2().NumericByRef().s4; if (len < 0) NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
 
   {
@@ -878,8 +878,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringCtor___STATIC__VOID__STRING_
 
   {
   CLR_RT_HeapBlock_Array* tmpArray = tmp.DereferenceArray();
-  CLR_UINT16* pTmp = (CLR_UINT16*)tmpArray->GetFirstElement();
-  CLR_UINT16* p;
+  uint16_t* pTmp = (uint16_t*)tmpArray->GetFirstElement();
+  uint16_t* p;
 
   p = pTmp; while (len--) *p++ = ch;
 
@@ -893,8 +893,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringCtor___STATIC__VOID__STRING_
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringCompare___STATIC__I4__STRING__STRING(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock& pThis = stack.Arg0(); // String references are special, they don't point to an object, they are the object. So use stack.Arg0() instead of stack.This()
   CLR_RT_HeapBlock& pArg = stack.Arg1();
@@ -906,8 +906,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringCompare___STATIC__I4__STRING
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringIndexOf___STATIC__I4__STRING__CHAR(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(IndexOf(stack, c_IndexOf__SingleChar));
 
@@ -916,8 +916,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringIndexOf___STATIC__I4__STRING
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringIndexOf___STATIC__I4__STRING__CHAR__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(IndexOf(stack, c_IndexOf__SingleChar | c_IndexOf__StartIndex));
 
@@ -926,8 +926,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringIndexOf___STATIC__I4__STRING
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringIndexOf___STATIC__I4__STRING__CHAR__I4__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(IndexOf(stack, c_IndexOf__SingleChar | c_IndexOf__StartIndex | c_IndexOf__Count));
 
@@ -936,8 +936,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringIndexOf___STATIC__I4__STRING
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringIndexOfAny___STATIC__I4__STRING__SZARRAY_CHAR(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(IndexOf(stack, c_IndexOf__MultipleChars));
 
@@ -946,8 +946,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringIndexOfAny___STATIC__I4__STR
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringIndexOfAny___STATIC__I4__STRING__SZARRAY_CHAR__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(IndexOf(stack, c_IndexOf__MultipleChars | c_IndexOf__StartIndex));
 
@@ -956,8 +956,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringIndexOfAny___STATIC__I4__STR
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringIndexOfAny___STATIC__I4__STRING__SZARRAY_CHAR__I4__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(IndexOf(stack, c_IndexOf__MultipleChars | c_IndexOf__StartIndex | c_IndexOf__Count));
 
@@ -966,8 +966,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringIndexOfAny___STATIC__I4__STR
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringIndexOf___STATIC__I4__STRING__STRING(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(IndexOf(stack, c_IndexOf__String));
 
@@ -976,8 +976,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringIndexOf___STATIC__I4__STRING
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringIndexOf___STATIC__I4__STRING__STRING__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(IndexOf(stack, c_IndexOf__String | c_IndexOf__StartIndex));
 
@@ -986,8 +986,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringIndexOf___STATIC__I4__STRING
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringIndexOf___STATIC__I4__STRING__STRING__I4__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(IndexOf(stack, c_IndexOf__String | c_IndexOf__StartIndex | c_IndexOf__Count));
 
@@ -996,8 +996,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringIndexOf___STATIC__I4__STRING
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringLastIndexOf___STATIC__I4__STRING__CHAR(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(IndexOf(stack, c_IndexOf__SingleChar | c_IndexOf__Last));
 
@@ -1006,8 +1006,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringLastIndexOf___STATIC__I4__ST
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringLastIndexOf___STATIC__I4__STRING__CHAR__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(IndexOf(stack, c_IndexOf__SingleChar | c_IndexOf__Last | c_IndexOf__StartIndex));
 
@@ -1016,8 +1016,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringLastIndexOf___STATIC__I4__ST
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringLastIndexOf___STATIC__I4__STRING__CHAR__I4__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(IndexOf(stack, c_IndexOf__SingleChar | c_IndexOf__Last | c_IndexOf__StartIndex | c_IndexOf__Count));
 
@@ -1026,8 +1026,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringLastIndexOf___STATIC__I4__ST
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringLastIndexOfAny___STATIC__I4__SZARRAY_CHAR(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(IndexOf(stack, c_IndexOf__MultipleChars | c_IndexOf__Last));
 
@@ -1036,8 +1036,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringLastIndexOfAny___STATIC__I4_
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringLastIndexOfAny___STATIC__I4__STRING__SZARRAY_CHAR(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(IndexOf(stack, c_IndexOf__MultipleChars | c_IndexOf__Last));
 
@@ -1046,8 +1046,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringLastIndexOfAny___STATIC__I4_
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringLastIndexOfAny___STATIC__I4__STRING__SZARRAY_CHAR__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(IndexOf(stack, c_IndexOf__MultipleChars | c_IndexOf__Last | c_IndexOf__StartIndex));
 
@@ -1056,8 +1056,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringLastIndexOfAny___STATIC__I4_
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringLastIndexOfAny___STATIC__I4__STRING__SZARRAY_CHAR__I4__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(IndexOf(stack, c_IndexOf__MultipleChars | c_IndexOf__Last | c_IndexOf__StartIndex | c_IndexOf__Count));
 
@@ -1066,8 +1066,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringLastIndexOfAny___STATIC__I4_
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringLastIndexOf___STATIC__I4__STRING__STRING(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(IndexOf(stack, c_IndexOf__String | c_IndexOf__Last));
 
@@ -1076,8 +1076,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringLastIndexOf___STATIC__I4__ST
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringLastIndexOf___STATIC__I4__STRING__STRING__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(IndexOf(stack, c_IndexOf__String | c_IndexOf__Last | c_IndexOf__StartIndex));
 
@@ -1086,8 +1086,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringLastIndexOf___STATIC__I4__ST
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringLastIndexOf___STATIC__I4__STRING__STRING__I4__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(IndexOf(stack, c_IndexOf__String | c_IndexOf__Last | c_IndexOf__StartIndex | c_IndexOf__Count));
 
@@ -1096,8 +1096,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringLastIndexOf___STATIC__I4__ST
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringToLower___STATIC__STRING__STRING(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(ChangeCase(stack, false));
 
@@ -1106,8 +1106,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringToLower___STATIC__STRING__ST
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringToUpper___STATIC__STRING__STRING(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(ChangeCase(stack, true));
 
@@ -1116,8 +1116,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringToUpper___STATIC__STRING__ST
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringTrim___STATIC__STRING__STRING(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(Trim(stack, NULL, true, true));
 
@@ -1126,8 +1126,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringTrim___STATIC__STRING__STRIN
 
 HRESULT Library_corlib_native_CanFly_Runtime::Equals___STATIC__BOOLEAN__STRING__STRING(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   stack.SetResult_Boolean(CLR_RT_HeapBlock::Compare_Unsigned_Values(stack.Arg0(), stack.Arg1()) == 0);
 
@@ -1136,8 +1136,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::Equals___STATIC__BOOLEAN__STRING__
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringConcat___STATIC__STRING__STRING__STRING(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(StringConcat(stack, &stack.Arg0(), 2));
 
@@ -1146,8 +1146,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringConcat___STATIC__STRING__STR
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringConcat___STATIC__STRING__STRING__STRING__STRING(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(StringConcat(stack, &stack.Arg0(), 3));
 
@@ -1156,8 +1156,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringConcat___STATIC__STRING__STR
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringConcat___STATIC__STRING__STRING__STRING__STRING__STRING(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_SET_AND_LEAVE(StringConcat(stack, &stack.Arg0(), 4));
 
@@ -1166,8 +1166,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::StringConcat___STATIC__STRING__STR
 
 HRESULT Library_corlib_native_CanFly_Runtime::StringConcat___STATIC__STRING__SZARRAY_STRING(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Array* pArray = stack.Arg0().DereferenceArray(); FAULT_ON_NULL(pArray);
 

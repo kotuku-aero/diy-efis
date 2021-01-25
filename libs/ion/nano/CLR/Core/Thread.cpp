@@ -13,20 +13,20 @@ HRESULT CLR_RT_SubThread::CreateInstance(
   int priority,
   CLR_RT_SubThread *&sthRef)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_SubThread *sth = EVENTCACHE_EXTRACT_NODE(g_CLR_RT_EventCache, CLR_RT_SubThread, DATATYPE_SUBTHREAD);
   CHECK_ALLOCATION(sth);
 
   sth->m_owningThread = th;        // CLR_RT_Thread*     m_owningThread;
   sth->m_owningStackFrame = stack; // CLR_RT_StackFrame* m_owningStackFrame;
-  sth->m_lockRequestsCount = 0;    // CLR_UINT32         m_lockRequestsCount;
+  sth->m_lockRequestsCount = 0;    // uint32_t         m_lockRequestsCount;
                                    //
   sth->m_priority = priority;      // int                m_priority;
 
-  sth->m_timeConstraint = TIMEOUT_INFINITE; // CLR_INT64          m_timeConstraint;
-  sth->m_status = 0;                        // CLR_UINT32         m_status;
+  sth->m_timeConstraint = TIMEOUT_INFINITE; // int64_t          m_timeConstraint;
+  sth->m_status = 0;                        // uint32_t         m_status;
 
   th->m_subThreads.LinkAtBack(sth);
 
@@ -39,7 +39,7 @@ HRESULT CLR_RT_SubThread::CreateInstance(
 
 void CLR_RT_SubThread::DestroyInstance(CLR_RT_Thread *th, CLR_RT_SubThread *sthBase, int flags)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   //
   // You cannot destroy a subthread without destroying all the children subthreads.
   //
@@ -90,7 +90,7 @@ void CLR_RT_SubThread::DestroyInstance(CLR_RT_Thread *th, CLR_RT_SubThread *sthB
 
 bool CLR_RT_SubThread::ChangeLockRequestCount(int diff)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_Thread *th = m_owningThread;
 
   this->m_lockRequestsCount += diff;
@@ -127,21 +127,21 @@ void CLR_RT_Thread::BringExecCounterToDate(int iGlobalExecutionCounter)
 
 bool CLR_RT_Thread::IsFinalizerThread()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   return g_CLR_RT_ExecutionEngine.m_finalizerThread == this;
   }
 
 bool CLR_RT_Thread::CanThreadBeReused()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   return (m_flags & CLR_RT_Thread::TH_F_System) &&
     (m_status == CLR_RT_Thread::TH_S_Terminated || m_status == CLR_RT_Thread::TH_S_Unstarted);
   }
 
 HRESULT CLR_RT_Thread::PushThreadProcDelegate(CLR_RT_HeapBlock_Delegate *pDelegate)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_MethodDef_Instance inst;
 
@@ -191,10 +191,10 @@ HRESULT CLR_RT_Thread::PushThreadProcDelegate(CLR_RT_HeapBlock_Delegate *pDelega
   NANOCLR_CLEANUP_END();
   }
 
-HRESULT CLR_RT_Thread::CreateInstance(int pid, int priority, CLR_RT_Thread *&th, CLR_UINT32 flags)
+HRESULT CLR_RT_Thread::CreateInstance(int pid, int priority, CLR_RT_Thread *&th, uint32_t flags)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_SubThread *sth;
 
@@ -209,8 +209,8 @@ HRESULT CLR_RT_Thread::CreateInstance(int pid, int priority, CLR_RT_Thread *&th,
   th->Initialize();
 
   th->m_pid = pid;                                 // int                        m_pid;
-  th->m_status = TH_S_Unstarted;                   // CLR_UINT32                 m_status;
-  th->m_flags = flags;                             // CLR_UINT32                 m_flags;
+  th->m_status = TH_S_Unstarted;                   // uint32_t                 m_status;
+  th->m_flags = flags;                             // uint32_t                 m_flags;
   th->m_executionCounter = 0;                      // int                        m_executionCounter;
   th->m_timeQuantumExpired = false;                // bool                       m_timeQuantumExpired;
                                                    //
@@ -225,12 +225,12 @@ HRESULT CLR_RT_Thread::CreateInstance(int pid, int priority, CLR_RT_Thread *&th,
   th->m_terminationCallback = NULL;                    // ThreadTerminationCallback  m_terminationCallback;
   th->m_terminationParameter = NULL;                   // void*                      m_terminationParameter;
                                                        //
-  th->m_waitForEvents = 0;                             // CLR_UINT32                 m_waitForEvents;
-  th->m_waitForEvents_Timeout = TIMEOUT_INFINITE;      // CLR_INT64                  m_waitForEvents_Timeout;
-  th->m_waitForEvents_IdleTimeWorkItem = TIMEOUT_ZERO; // CLR_INT64 m_waitForEvents_IdleTimeWorkItem;
+  th->m_waitForEvents = 0;                             // uint32_t                 m_waitForEvents;
+  th->m_waitForEvents_Timeout = TIMEOUT_INFINITE;      // int64_t                  m_waitForEvents_Timeout;
+  th->m_waitForEvents_IdleTimeWorkItem = TIMEOUT_ZERO; // int64_t m_waitForEvents_IdleTimeWorkItem;
                                                        //
   th->m_locks.DblLinkedList_Initialize();              // CLR_RT_DblLinkedList       m_locks;
-  th->m_lockRequestsCount = 0;                         // CLR_UINT32                 m_lockRequestsCount;
+  th->m_lockRequestsCount = 0;                         // uint32_t                 m_lockRequestsCount;
   th->m_waitForObject = NULL;
   //
   th->m_stackFrames.DblLinkedList_Initialize(); // CLR_RT_DblLinkedList       m_stackFrames;
@@ -274,10 +274,10 @@ HRESULT CLR_RT_Thread::CreateInstance(
   CLR_RT_HeapBlock_Delegate *pDelegate,
   int priority,
   CLR_RT_Thread *&th,
-  CLR_UINT32 flags)
+  uint32_t flags)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   NANOCLR_CHECK_HRESULT(CreateInstance(pid, priority, th, flags));
 
@@ -291,7 +291,7 @@ HRESULT CLR_RT_Thread::CreateInstance(
 
 void CLR_RT_Thread::DestroyInstance()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   DetachAll();
 
   Passivate();
@@ -308,7 +308,7 @@ void CLR_RT_Thread::DestroyInstance()
 
 bool CLR_RT_Thread::ReleaseWhenDeadEx()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   // maybe separate for shutdown....
   // These threads live forever?!!?
   if (m_flags & CLR_RT_Thread::TH_F_System)
@@ -333,7 +333,7 @@ bool CLR_RT_Thread::ReleaseWhenDeadEx()
 
 void CLR_RT_Thread::ProtectFromGCCallback(void *state)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_Thread *th = (CLR_RT_Thread *)state;
 
   g_CLR_RT_GarbageCollector.Thread_Mark(th);
@@ -343,8 +343,8 @@ void CLR_RT_Thread::ProtectFromGCCallback(void *state)
 
 HRESULT CLR_RT_Thread::Suspend()
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   if ((m_flags & CLR_RT_Thread::TH_F_Suspended) == 0 && m_status != CLR_RT_Thread::TH_S_Terminated)
     {
@@ -358,8 +358,8 @@ HRESULT CLR_RT_Thread::Suspend()
 
 HRESULT CLR_RT_Thread::Resume()
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   if ((m_flags & CLR_RT_Thread::TH_F_Suspended) != 0 && m_status != CLR_RT_Thread::TH_S_Terminated)
     {
@@ -373,8 +373,8 @@ HRESULT CLR_RT_Thread::Resume()
 
 HRESULT CLR_RT_Thread::Terminate()
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   m_status = CLR_RT_Thread::TH_S_Terminated;
 
@@ -395,8 +395,8 @@ HRESULT CLR_RT_Thread::Terminate()
 
 HRESULT CLR_RT_Thread::Abort()
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   //
   // Only abort a non-terminated thread...
@@ -419,7 +419,7 @@ HRESULT CLR_RT_Thread::Abort()
 
 void CLR_RT_Thread::Restart(bool fDeleteEvent)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   //
   // Wake up and queue.
   //
@@ -436,7 +436,7 @@ void CLR_RT_Thread::Restart(bool fDeleteEvent)
 
 void CLR_RT_Thread::OnThreadTerminated()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   SignalAll();
 
   //
@@ -454,7 +454,7 @@ void CLR_RT_Thread::OnThreadTerminated()
 
 void CLR_RT_Thread::Passivate()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   m_flags &=
     ~(CLR_RT_Thread::TH_F_Suspended | CLR_RT_Thread::TH_F_ContainsDoomedAppDomain | CLR_RT_Thread::TH_F_Aborted);
 
@@ -507,7 +507,7 @@ void CLR_RT_Thread::Passivate()
 
 bool CLR_RT_Thread::CouldBeActivated()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   if (m_waitForEvents_Timeout != TIMEOUT_INFINITE)
     return true;
   if (m_waitForEvents)
@@ -518,13 +518,13 @@ bool CLR_RT_Thread::CouldBeActivated()
 
 void CLR_RT_Thread::RecoverFromGC()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CheckAll();
   }
 
 void CLR_RT_Thread::Relocate()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_dlg);
 
   m_currentException.Relocate__HeapBlock();
@@ -550,7 +550,7 @@ void CLR_RT_Thread::Relocate()
 
 void CLR_RT_Thread::DumpStack()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   const char *szStatus;
 
   switch (m_status)
@@ -569,7 +569,7 @@ void CLR_RT_Thread::DumpStack()
       break;
     }
 
-  CLR_Debug::Printf(
+  trace_debug(
     "Thread: %d %d %s %s\r\n",
     m_pid,
     GetThreadPriority(),
@@ -578,9 +578,9 @@ void CLR_RT_Thread::DumpStack()
 
   NANOCLR_FOREACH_NODE_BACKWARD(CLR_RT_StackFrame, stack, m_stackFrames)
     {
-    CLR_Debug::Printf("    ");
+    trace_debug("    ");
     CLR_RT_DUMP::METHOD(stack->m_call);
-    CLR_Debug::Printf(" [IP: %04x]\r\n", (stack->m_IP - stack->m_IPstart));
+    trace_debug(" [IP: %04x]\r\n", (stack->m_IP - stack->m_IPstart));
     }
   NANOCLR_FOREACH_NODE_BACKWARD_END();
   }
@@ -591,8 +591,8 @@ void CLR_RT_Thread::DumpStack()
 
 void CLR_RT_Thread::ProcessException_FilterPseudoFrameCopyVars(CLR_RT_StackFrame *to, CLR_RT_StackFrame *from)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  CLR_UINT8 numArgs = from->m_call.m_target->numArgs;
+ 
+  uint8_t numArgs = from->m_call.m_target->numArgs;
 
   if (numArgs)
     {
@@ -607,11 +607,11 @@ void CLR_RT_Thread::ProcessException_FilterPseudoFrameCopyVars(CLR_RT_StackFrame
 
 HRESULT CLR_RT_Thread::ProcessException_EndFilter()
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_StackFrame *stack = CurrentFrame();
-  CLR_INT32 choice = stack->PopValue().NumericByRef().s4;
+  int32_t choice = stack->PopValue().NumericByRef().s4;
 
   UnwindStack &us = m_nestedExceptions[m_nestedExceptionsPos - 1];
 
@@ -642,7 +642,7 @@ HRESULT CLR_RT_Thread::ProcessException_EndFilter()
 #if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
     g_CLR_RT_ExecutionEngine.Breakpoint_Exception(
       us.m_handlerStack,
-      CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_DEPTH_EXCEPTION_HANDLER_FOUND,
+      c_DEPTH_EXCEPTION_HANDLER_FOUND,
       us.m_handlerBlockStart);
 #endif //#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
     }
@@ -687,8 +687,8 @@ HRESULT CLR_RT_Thread::ProcessException_EndFilter()
 
 HRESULT CLR_RT_Thread::ProcessException_EndFinally()
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_StackFrame *stack = CurrentFrame();
   UnwindStack &us = m_nestedExceptions[m_nestedExceptionsPos - 1];
@@ -755,8 +755,8 @@ HRESULT CLR_RT_Thread::ProcessException_EndFinally()
 
 HRESULT CLR_RT_Thread::ProcessException_Phase1()
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   // Load the UnwindStack entry to process, as created/loaded by ProcessException
   UnwindStack &us = m_nestedExceptions[m_nestedExceptionsPos - 1];
@@ -794,7 +794,7 @@ HRESULT CLR_RT_Thread::ProcessException_Phase1()
         {
         g_CLR_RT_ExecutionEngine.Breakpoint_Exception(
           stack,
-          CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_DEPTH_EXCEPTION_FIRST_CHANCE,
+          c_DEPTH_EXCEPTION_FIRST_CHANCE,
           NULL);
         us.SetPhase(UnwindStack::p_1_SearchingForHandler_1_SentFirstChance);
 
@@ -812,7 +812,7 @@ HRESULT CLR_RT_Thread::ProcessException_Phase1()
         {
         g_CLR_RT_ExecutionEngine.Breakpoint_Exception(
           stack,
-          CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_DEPTH_EXCEPTION_USERS_CHANCE,
+          c_DEPTH_EXCEPTION_USERS_CHANCE,
           NULL);
         us.SetPhase(UnwindStack::p_1_SearchingForHandler_2_SentUsersChance);
         if (CLR_EE_DBG_IS(Stopped))
@@ -866,7 +866,7 @@ HRESULT CLR_RT_Thread::ProcessException_Phase1()
             us.m_currentBlockEnd = eh.m_handlerStart;
 
             // Create a pseudo-frame at the top of the stack so the filter can call other functions.
-            CLR_UINT8 numArgs = stack->m_call.m_target->numArgs;
+            uint8_t numArgs = stack->m_call.m_target->numArgs;
 
 #if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
             // We don't want to send any breakpoints until after we set the IP appropriately
@@ -920,7 +920,7 @@ HRESULT CLR_RT_Thread::ProcessException_Phase1()
 #if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
             g_CLR_RT_ExecutionEngine.Breakpoint_StackFrame_Push(
               newStack,
-              CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_DEPTH_STEP_INTERCEPT);
+              c_DEPTH_STEP_INTERCEPT);
 #endif //#if defined(NANOCLR_ENABLE_SOURCELEVELDEBUGGING)
 
             // Return a success value to break out of ProcessException and to signal that execution of IL
@@ -937,7 +937,7 @@ HRESULT CLR_RT_Thread::ProcessException_Phase1()
               {
               g_CLR_RT_ExecutionEngine.Breakpoint_Exception(
                 stack,
-                CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_DEPTH_EXCEPTION_HANDLER_FOUND,
+                c_DEPTH_EXCEPTION_HANDLER_FOUND,
                 eh.m_handlerStart);
               if (CLR_EE_DBG_IS(Stopped))
                 {
@@ -969,7 +969,7 @@ HRESULT CLR_RT_Thread::ProcessException_Phase1()
         // desktop.
         g_CLR_RT_ExecutionEngine.Breakpoint_Exception(
           stack,
-          CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_DEPTH_EXCEPTION_HANDLER_FOUND,
+          c_DEPTH_EXCEPTION_HANDLER_FOUND,
           stack->m_IPstart - 1);
         if (CLR_EE_DBG_IS(Stopped))
           {
@@ -1050,8 +1050,8 @@ HRESULT CLR_RT_Thread::ProcessException_Phase1()
 
 HRESULT CLR_RT_Thread::ProcessException_Phase2()
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   /*
    * Start running through the stack frames, running all finally handlers and popping them off until
@@ -1299,7 +1299,7 @@ HRESULT CLR_RT_Thread::ProcessException_Phase2()
     // special case thread abort exception
   if ((this->m_flags & CLR_RT_Thread::TH_F_Aborted) == 0)
     {
-    CLR_Debug::Printf(" Uncaught exception \r\n");
+    trace_debug(" Uncaught exception \r\n");
     // Perhaps some stronger notification is needed.  Consider CLR 2.0's fail-fast work
     // We could kill the application, and perhaps even store relevant data to dump to the user
     // when they connect to the PC.  Save the state so the debug API for the uncaught exception could be
@@ -1313,8 +1313,8 @@ HRESULT CLR_RT_Thread::ProcessException_Phase2()
 
 HRESULT CLR_RT_Thread::ProcessException()
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
   CLR_RT_StackFrame *stack = CurrentFrame();
   UnwindStack *us = NULL;
 

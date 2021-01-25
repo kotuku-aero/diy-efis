@@ -14,10 +14,10 @@
 
 HRESULT Library_corlib_native_CanFly_Runtime::GenerateNewGuid___STATIC__SZARRAY_U1(CLR_RT_StackFrame &stack)
   {
-  NANOCLR_HEADER();
+  HRESULT hr;
 
   CLR_RT_Random       rand;
-  CLR_UINT8 *buf;
+  uint8_t *buf;
   CLR_RT_HeapBlock &top = stack.PushValueAndClear();
 
   // Create a array of 16 bytes on top of stack to return

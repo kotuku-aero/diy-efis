@@ -7,10 +7,10 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HRESULT CLR_RT_HeapBlock_Timer::CreateInstance(CLR_UINT32 flags, CLR_RT_HeapBlock &owner, CLR_RT_HeapBlock &tmRef)
+HRESULT CLR_RT_HeapBlock_Timer::CreateInstance(uint32_t flags, CLR_RT_HeapBlock &owner, CLR_RT_HeapBlock &tmRef)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Timer *timer = NULL;
 
@@ -47,8 +47,8 @@ HRESULT CLR_RT_HeapBlock_Timer::CreateInstance(CLR_UINT32 flags, CLR_RT_HeapBloc
 
 HRESULT CLR_RT_HeapBlock_Timer::ExtractInstance(CLR_RT_HeapBlock &ref, CLR_RT_HeapBlock_Timer *&timer)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_ObjectToEvent_Source *src = CLR_RT_ObjectToEvent_Source::ExtractInstance(ref); FAULT_ON_NULL(src);
 
@@ -61,7 +61,7 @@ HRESULT CLR_RT_HeapBlock_Timer::ExtractInstance(CLR_RT_HeapBlock &ref, CLR_RT_He
 
 void CLR_RT_HeapBlock_Timer::RecoverFromGC()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CheckAll();
 
   ReleaseWhenDead();
@@ -71,7 +71,7 @@ void CLR_RT_HeapBlock_Timer::RecoverFromGC()
 
 void CLR_RT_HeapBlock_Timer::Trigger()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   if (m_references.IsEmpty()) return;
 
   if (m_flags & CLR_RT_HeapBlock_Timer::c_Executing)
@@ -84,7 +84,7 @@ void CLR_RT_HeapBlock_Timer::Trigger()
 
 void CLR_RT_HeapBlock_Timer::SpawnTimer(CLR_RT_Thread *th)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   //Only one managed timer max
   _ASSERTE(m_references.NumOfNodes() == 1);
 
@@ -127,7 +127,7 @@ void CLR_RT_HeapBlock_Timer::SpawnTimer(CLR_RT_Thread *th)
 
 void CLR_RT_HeapBlock_Timer::ThreadTerminationCallback(void *param)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock_Timer *pThis = (CLR_RT_HeapBlock_Timer *)param;
 
   pThis->m_flags &= ~CLR_RT_HeapBlock_Timer::c_Executing;
@@ -139,11 +139,11 @@ void CLR_RT_HeapBlock_Timer::ThreadTerminationCallback(void *param)
 
 void CLR_RT_HeapBlock_Timer::Reschedule()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   if ((m_flags & CLR_RT_HeapBlock_Timer::c_Recurring) &&
     (m_flags & CLR_RT_HeapBlock_Timer::c_EnabledTimer))
     {
-    CLR_UINT64 expire = m_timeLastExpiration + m_timeFrequency;
+    uint64_t expire = m_timeLastExpiration + m_timeFrequency;
 
     //
     // Normally, adding the 'timeFrequency' will put the expiration in the future.
@@ -163,19 +163,19 @@ void CLR_RT_HeapBlock_Timer::Reschedule()
 
 void CLR_RT_HeapBlock_Timer::AdjustNextFixedExpire(const SYSTEMTIME &systemTime, bool fNext)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   SYSTEMTIME st = systemTime;
-  CLR_INT64  baseTime;
-  CLR_INT64  add;
+  int64_t  baseTime;
+  int64_t  add;
 
   CLR_RT_ExecutionEngine::InvalidateTimerCache();
 
   switch (m_flags & CLR_RT_HeapBlock_Timer::c_AnyChange)
     {
-    case CLR_RT_HeapBlock_Timer::c_SecondChange: add = TIME_CONVERSION__ONESECOND * (CLR_INT64)TIME_CONVERSION__TO_SECONDS;                                               break;
-    case CLR_RT_HeapBlock_Timer::c_MinuteChange: add = TIME_CONVERSION__ONEMINUTE * (CLR_INT64)TIME_CONVERSION__TO_SECONDS; st.wSecond = 0;                               break;
-    case CLR_RT_HeapBlock_Timer::c_HourChange: add = TIME_CONVERSION__ONEHOUR * (CLR_INT64)TIME_CONVERSION__TO_SECONDS; st.wSecond = 0; st.wMinute = 0;               break;
-    case CLR_RT_HeapBlock_Timer::c_DayChange: add = TIME_CONVERSION__ONEDAY * (CLR_INT64)TIME_CONVERSION__TO_SECONDS; st.wSecond = 0; st.wMinute = 0; st.wHour = 0; break;
+    case CLR_RT_HeapBlock_Timer::c_SecondChange: add = TIME_CONVERSION__ONESECOND * (int64_t)TIME_CONVERSION__TO_SECONDS;                                               break;
+    case CLR_RT_HeapBlock_Timer::c_MinuteChange: add = TIME_CONVERSION__ONEMINUTE * (int64_t)TIME_CONVERSION__TO_SECONDS; st.wSecond = 0;                               break;
+    case CLR_RT_HeapBlock_Timer::c_HourChange: add = TIME_CONVERSION__ONEHOUR * (int64_t)TIME_CONVERSION__TO_SECONDS; st.wSecond = 0; st.wMinute = 0;               break;
+    case CLR_RT_HeapBlock_Timer::c_DayChange: add = TIME_CONVERSION__ONEDAY * (int64_t)TIME_CONVERSION__TO_SECONDS; st.wSecond = 0; st.wMinute = 0; st.wHour = 0; break;
 
     default: return;
     }
@@ -204,17 +204,17 @@ bool CLR_RT_HeapBlock_Timer::CheckDisposed(CLR_RT_StackFrame &stack)
   return true;
   }
 
-HRESULT CLR_RT_HeapBlock_Timer::ConfigureObject(CLR_RT_StackFrame &stack, CLR_UINT32 flags)
+HRESULT CLR_RT_HeapBlock_Timer::ConfigureObject(CLR_RT_StackFrame &stack, uint32_t flags)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock *pThis = stack.This();
   CLR_RT_HeapBlock *args = &(stack.Arg1());
   CLR_RT_HeapBlock_Timer *timer;
 
-  const CLR_INT64 maxTime = (CLR_INT64)0x7FFFFFFF * (CLR_INT64)TIME_CONVERSION__TO_MILLISECONDS;
-  const CLR_INT64 minTime = 0;
+  const int64_t maxTime = (int64_t)0x7FFFFFFF * (int64_t)TIME_CONVERSION__TO_MILLISECONDS;
+  const int64_t minTime = 0;
 
   if (flags & CLR_RT_HeapBlock_Timer::c_ACTION_Create)
     {
@@ -232,7 +232,7 @@ HRESULT CLR_RT_HeapBlock_Timer::ConfigureObject(CLR_RT_StackFrame &stack, CLR_UI
 
   if (flags & CLR_RT_HeapBlock_Timer::c_ACTION_Create)
     {
-    CLR_UINT32 anyChange = (flags & CLR_RT_HeapBlock_Timer::c_AnyChange);
+    uint32_t anyChange = (flags & CLR_RT_HeapBlock_Timer::c_AnyChange);
 
     if (anyChange)
       {
@@ -272,7 +272,7 @@ HRESULT CLR_RT_HeapBlock_Timer::ConfigureObject(CLR_RT_StackFrame &stack, CLR_UI
       }
     else if (flags & CLR_RT_HeapBlock_Timer::c_INPUT_TimeSpan)
       {
-      CLR_INT64 *pVal;
+      int64_t *pVal;
 
       pVal = GetValuePtr(args[0]);
       FAULT_ON_NULL(pVal);

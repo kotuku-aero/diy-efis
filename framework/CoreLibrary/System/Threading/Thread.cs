@@ -14,44 +14,38 @@ namespace System.Threading
   public sealed class Thread
   {
     // these fields are required in the native end
-#pragma warning disable 0169
     private Delegate _delegate;
-    private int _priority;
-    [Reflection.FieldNoReflection]
-    private object _thread;
-    [Reflection.FieldNoReflection]
-    private object _appDomain;
-    private int _id;
-#pragma warning restore 0169
+    private uint _thread;
 
     /// <summary>
     /// Initializes a new instance of the Thread class.
     /// </summary>
     /// <param name="start">A ThreadStart delegate that represents the methods to be invoked when this thread begins executing.</param>
-    public Thread(ThreadStart start)
+    public Thread(ThreadStart start, ThreadPriority priority = ThreadPriority.Normal, string name = null)
     {
-      CanFly.Runtime.ThreadCtor(this, start);
+      if (CanFly.Runtime.ThreadCtor( (byte)priority, name, start, this, out _thread) < 0)
+        throw new ApplicationException("Cannot start thread");
     }
 
     /// <summary>
     /// Causes the operating system to change the state of the current instance to ThreadState.Running.
     /// </summary>
-    public void Start() { CanFly.Runtime.ThreadStart(this); }
+    public void Start() { CanFly.Runtime.ThreadStart(_thread); }
 
     /// <summary>
     /// Raises a ThreadAbortException in the thread on which it is invoked, to begin the process of terminating the thread. Calling this method usually terminates the thread.
     /// </summary>
-    public void Abort() { CanFly.Runtime.ThreadAbort(this); }
+    public void Abort() { CanFly.Runtime.ThreadAbort(_thread); }
 
     /// <summary>
     /// Either suspends the thread, or if the thread is already suspended, has no effect.
     /// </summary>
-    public void Suspend() { CanFly.Runtime.ThreadSuspend(this); }
+    public void Suspend() { CanFly.Runtime.ThreadSuspend(_thread); }
 
     /// <summary>
     /// Obsolete : Resumes a thread that has been suspended.
     /// </summary>
-    public void Resume() { CanFly.Runtime.ThreadResume(this); }
+    public void Resume() { CanFly.Runtime.ThreadResume(_thread); }
 
     /// <summary>
     /// Gets or sets a value indicating the scheduling priority of a thread.
@@ -59,17 +53,23 @@ namespace System.Threading
     /// <value>One of the ThreadPriority values. The default value is ThreadPriority.Normal.</value>
     public ThreadPriority Priority
     {
-      get { return CanFly.Runtime.GetThreadPriority(this); }
-      set { CanFly.Runtime.SetThreadPriority(this, value); }
+      get 
+      {
+        byte priority;
+
+        CanFly.Runtime.GetThreadPriority(_thread, out priority);
+        return (ThreadPriority)priority;
+      }
+      set { CanFly.Runtime.SetThreadPriority(_thread, (byte) value); }
     }
 
     /// <summary>
     /// Gets a unique identifier for the current managed thread.
     /// </summary>
     /// <value>An integer that represents a unique identifier for this managed thread.</value>
-    public int ManagedThreadId
+    public uint ManagedThreadId
     {
-      get { return CanFly.Runtime.GetManagedThreadId(this); }
+      get { return _thread; }
     }
 
     /// <summary>
@@ -78,27 +78,17 @@ namespace System.Threading
     /// <value>true if this thread has been started and has not terminated normally or aborted; otherwise, false.</value>
     public bool IsAlive
     {
-      get { return CanFly.Runtime.ThreadIsAlive(this); }
+      get { return CanFly.Runtime.ThreadIsAlive(_thread) == 0; }
     }
 
     /// <summary>
-    /// Blocks the calling thread until the thread represented by this instance terminates, while continuing to perform standard COM and SendMessage pumping.
-    /// </summary>
-    public void Join() { CanFly.Runtime.ThreadJoin(this); }
-
-    /// <summary>
-    /// Blocks the calling thread until the thread represented by this instance terminates or the specified time elapses, while continuing to perform standard COM and SendMessage pumping.
-    /// </summary>
-    /// <param name="millisecondsTimeout">The number of milliseconds to wait for the thread to terminate.</param>
-    /// <returns>true if the thread has terminated; false if the thread has not terminated after the amount of time specified by the millisecondsTimeout parameter has elapsed.</returns>
-    public bool Join(int millisecondsTimeout) { return CanFly.Runtime.ThreadJoin(this, millisecondsTimeout); }
-
-    /// <summary>
-    /// Blocks the calling thread until the thread represented by this instance terminates or the specified time elapses, while continuing to perform standard COM and SendMessage pumping.
+    /// Blocks the calling thread until the thread represented by this instance terminates or the specified time
+    /// elapses, while continuing to perform standard COM and SendMessage pumping.
     /// </summary>
     /// <param name="timeout">A TimeSpan set to the amount of time to wait for the thread to terminate.</param>
-    /// <returns>true if the thread terminated; false if the thread has not terminated after the amount of time specified by the timeout parameter has elapsed.</returns>
-    public bool Join(TimeSpan timeout) { return CanFly.Runtime.ThreadJoin(this, timeout.Milliseconds); }
+    /// <returns>true if the thread terminated; false if the thread has not terminated after the amount
+    /// of time specified by the timeout parameter has elapsed.</returns>
+    public bool Join(TimeSpan timeout) { return CanFly.Runtime.ThreadWaitTillFinished(_thread, timeout.Milliseconds) == 0; }
 
     /// <summary>
     /// Suspends the current thread for the specified number of milliseconds.
@@ -144,7 +134,15 @@ namespace System.Threading
     /// <value>A Thread that is the representation of the currently running thread.</value>
     public static Thread CurrentThread
     {
-      get { return CanFly.Runtime.GetCurrentThread(); }
+      get 
+      {
+        uint id;
+        CanFly.Runtime.ThreadGetCurrentId(out id);
+        object arg;
+        CanFly.Runtime.ThreadGetArg(id, out arg);
+
+        return (Thread)arg;
+      }
     }
 
     /// <summary>
@@ -153,7 +151,13 @@ namespace System.Threading
     /// <value>One of the ThreadState values indicating the state of the current thread. The initial value is Unstarted.</value>
     public ThreadState ThreadState
     {
-      get { return CanFly.Runtime.GetThreadState(this); }
+      get
+      {
+        uint state;
+        CanFly.Runtime.GetThreadState(_thread, out state);
+
+        return (ThreadState)state;
+      }
     }
   }
 }

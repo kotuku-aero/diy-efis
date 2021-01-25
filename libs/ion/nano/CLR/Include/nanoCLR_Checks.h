@@ -22,10 +22,10 @@ struct CLR_RT_DUMP
 #define DECL_POSTFIX {}
 #endif
 
-  static void TYPE(const CLR_RT_TypeDef_Index& cls) DECL_POSTFIX;
+  static void TYPE(uint32_t cls) DECL_POSTFIX;
   static void TYPE(const CLR_RT_ReflectionDef_Index& reflex) DECL_POSTFIX;
-  static void METHOD(const CLR_RT_MethodDef_Index& method) DECL_POSTFIX;
-  static void FIELD(const CLR_RT_FieldDef_Index& field) DECL_POSTFIX;
+  static void METHOD(uint32_t method) DECL_POSTFIX;
+  static void FIELD(uint32_t field) DECL_POSTFIX;
   static void OBJECT(CLR_RT_HeapBlock* ptr, const char* text) DECL_POSTFIX;
 
   //--//

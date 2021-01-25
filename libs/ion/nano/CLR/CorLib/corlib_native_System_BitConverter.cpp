@@ -30,8 +30,8 @@ char *ByteArrayToHex(unsigned char *pInput, int index, int length)
 
 HRESULT Library_corlib_native_CanFly_Runtime::IsLittleEndian___STATIC__BOOLEAN(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   unsigned long x = 0x12345678;
   unsigned char *p = reinterpret_cast<unsigned char *>(&x);
@@ -42,14 +42,10 @@ HRESULT Library_corlib_native_CanFly_Runtime::IsLittleEndian___STATIC__BOOLEAN(C
 
 HRESULT Library_corlib_native_CanFly_Runtime::DoubleToInt64Bits___STATIC__I8__R8(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
-#if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
   double input = stack.Arg0().NumericByRefConst().r8;
-#else
-  CLR_INT64 input = stack.Arg0().NumericByRefConst().r8;
-#endif
   __int64 *p = reinterpret_cast<__int64 *>(&input);
   stack.SetResult_I8(*p);
 
@@ -58,8 +54,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::DoubleToInt64Bits___STATIC__I8__R8
 
 HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__BOOLEAN(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   bool input = stack.Arg0().NumericByRefConst().u1 != 0;
 
@@ -73,8 +69,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__BOO
 
 HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__CHAR(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   wchar_t input = stack.Arg0().NumericByRefConst().u2;
 
@@ -88,54 +84,39 @@ HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__CHA
 
 HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__R8(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
-#if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
   double input = stack.Arg0().NumericByRefConst().r8;
-#else
-  CLR_INT64 input = stack.Arg0().NumericByRefConst().r8;
-#endif
 
   NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_Array::CreateInstance(stack.PushValueAndClear(), 8, g_CLR_RT_WellKnownTypes.m_UInt8));
   {
   unsigned char *p = stack.TopValue().DereferenceArray()->GetFirstElement();
-#if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
+
   *reinterpret_cast<double *>(p) = input;
-#else
-  *reinterpret_cast<CLR_INT64 *>(p) = input;
-#endif
   }
   NANOCLR_NOCLEANUP();
   }
 
 HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__R4(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
-#if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
   float input = stack.Arg0().NumericByRefConst().r4;
-#else
-  CLR_INT32 input = stack.Arg0().NumericByRefConst().r4;
-#endif
 
   NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_Array::CreateInstance(stack.PushValueAndClear(), 4, g_CLR_RT_WellKnownTypes.m_UInt8));
   {
   unsigned char *p = stack.TopValue().DereferenceArray()->GetFirstElement();
-#if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
   *reinterpret_cast<float *>(p) = input;
-#else
-  *reinterpret_cast<CLR_INT32 *>(p) = input;
-#endif
   }
   NANOCLR_NOCLEANUP();
   }
 
 HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   int input = stack.Arg0().NumericByRefConst().s4;
 
@@ -149,8 +130,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__I4(
 
 HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__I8(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   __int64 input = stack.Arg0().NumericByRefConst().s8;
 
@@ -164,8 +145,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__I8(
 
 HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__I2(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   short input = stack.Arg0().NumericByRefConst().s2;
 
@@ -179,8 +160,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__I2(
 
 HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__U4(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   unsigned int input = stack.Arg0().NumericByRefConst().u4;
 
@@ -194,8 +175,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__U4(
 
 HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__U8(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   unsigned __int64 input = stack.Arg0().NumericByRefConst().u8;
 
@@ -209,8 +190,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__U8(
 
 HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__U2(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   unsigned short input = stack.Arg0().NumericByRefConst().u2;
 
@@ -224,15 +205,11 @@ HRESULT Library_corlib_native_CanFly_Runtime::GetBytes___STATIC__SZARRAY_U1__U2(
 
 HRESULT Library_corlib_native_CanFly_Runtime::Int64BitsToDouble___STATIC__R8__I8(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   __int64 input = stack.Arg0().NumericByRefConst().s8;
-#if !defined(NANOCLR_EMULATED_FLOATINGPOINT)
   double *p = reinterpret_cast<double *>(&input);
-#else
-  CLR_INT64 *p = reinterpret_cast<CLR_INT64 *>(&input);
-#endif
   stack.SetResult_R8(*p);
 
   NANOCLR_NOCLEANUP_NOLABEL();
@@ -240,8 +217,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::Int64BitsToDouble___STATIC__R8__I8
 
 HRESULT Library_corlib_native_CanFly_Runtime::ToBoolean___STATIC__BOOLEAN__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   unsigned char *p = NULL;
   unsigned char b = 0;
@@ -264,8 +241,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::ToBoolean___STATIC__BOOLEAN__SZARR
 
 HRESULT Library_corlib_native_CanFly_Runtime::ToChar___STATIC__CHAR__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   unsigned char *p = NULL;
   int index = 0;
@@ -291,8 +268,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::ToChar___STATIC__CHAR__SZARRAY_U1_
 
 HRESULT Library_corlib_native_CanFly_Runtime::ToDouble___STATIC__R8__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   unsigned char *p = NULL;
   int index = 0;
@@ -320,8 +297,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::ToDouble___STATIC__R8__SZARRAY_U1_
 
 HRESULT Library_corlib_native_CanFly_Runtime::ToSingle___STATIC__R4__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   unsigned char *p = NULL;
   int index = 0;
@@ -349,8 +326,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::ToSingle___STATIC__R4__SZARRAY_U1_
 
 HRESULT Library_corlib_native_CanFly_Runtime::ToInt16___STATIC__I2__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   unsigned char *p = NULL;
   int index = 0;
@@ -377,8 +354,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::ToInt16___STATIC__I2__SZARRAY_U1__
 
 HRESULT Library_corlib_native_CanFly_Runtime::ToInt32___STATIC__I4__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   unsigned char *p = NULL;
   int index = 0;
@@ -406,13 +383,13 @@ HRESULT Library_corlib_native_CanFly_Runtime::ToInt32___STATIC__I4__SZARRAY_U1__
 
 HRESULT Library_corlib_native_CanFly_Runtime::ToInt64___STATIC__I8__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   unsigned char *p = NULL;
   int index = 0;
 
-  CLR_INT64 value = 0;
+  int64_t value = 0;
   unsigned char *pValue = (unsigned char *)(&value);
 
   CLR_RT_HeapBlock_Array *pArray = stack.Arg0().DereferenceArray();
@@ -436,12 +413,12 @@ HRESULT Library_corlib_native_CanFly_Runtime::ToInt64___STATIC__I8__SZARRAY_U1__
 
 HRESULT Library_corlib_native_CanFly_Runtime::ToUInt16___STATIC__U2__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   unsigned char *p = NULL;
   int index = 0;
-  CLR_UINT16 value = 0;
+  uint16_t value = 0;
   unsigned char *pValue = (unsigned char *)(&value);
 
   CLR_RT_HeapBlock_Array *pArray = stack.Arg0().DereferenceArray();
@@ -463,12 +440,12 @@ HRESULT Library_corlib_native_CanFly_Runtime::ToUInt16___STATIC__U2__SZARRAY_U1_
 
 HRESULT Library_corlib_native_CanFly_Runtime::ToUInt32___STATIC__U4__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   unsigned char *p = NULL;
   int index = 0;
-  CLR_UINT32 value = 0;
+  uint32_t value = 0;
   unsigned char *pValue = (unsigned char *)(&value);
 
   CLR_RT_HeapBlock_Array *pArray = stack.Arg0().DereferenceArray();
@@ -490,12 +467,12 @@ HRESULT Library_corlib_native_CanFly_Runtime::ToUInt32___STATIC__U4__SZARRAY_U1_
 
 HRESULT Library_corlib_native_CanFly_Runtime::ToUInt64___STATIC__U8__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   unsigned char *p = NULL;
   int index = 0;
-  CLR_UINT64 value = 0;
+  uint64_t value = 0;
   unsigned char *pValue = (unsigned char *)(&value);
 
   CLR_RT_HeapBlock_Array *pArray = stack.Arg0().DereferenceArray();
@@ -519,8 +496,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::ToUInt64___STATIC__U8__SZARRAY_U1_
 
 HRESULT Library_corlib_native_CanFly_Runtime::ToString___STATIC__STRING__SZARRAY_U1(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_Array *pArray = stack.Arg0().DereferenceArray();
   FAULT_ON_NULL_ARG(pArray);
@@ -542,8 +519,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::ToString___STATIC__STRING__SZARRAY
 
 HRESULT Library_corlib_native_CanFly_Runtime::ToString___STATIC__STRING__SZARRAY_U1__I4(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   int index = 0;
 
@@ -570,8 +547,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::ToString___STATIC__STRING__SZARRAY
 
 HRESULT Library_corlib_native_CanFly_Runtime::ToString___STATIC__STRING__SZARRAY_U1__I4__I4(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   int index = 0;
   int length = 0;

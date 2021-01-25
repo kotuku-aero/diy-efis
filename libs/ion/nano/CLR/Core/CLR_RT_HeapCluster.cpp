@@ -7,9 +7,9 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void CLR_RT_HeapCluster::HeapCluster_Initialize(CLR_UINT32 size, CLR_UINT32 blockSize)
+void CLR_RT_HeapCluster::HeapCluster_Initialize(uint32_t size, uint32_t blockSize)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   GenericNode_Initialize();
 
   size = (size - sizeof(*this)) / sizeof(CLR_RT_HeapBlock);
@@ -22,7 +22,7 @@ void CLR_RT_HeapCluster::HeapCluster_Initialize(CLR_UINT32 size, CLR_UINT32 bloc
   // Scan memory looking for possible objects to salvage.  This method returns false if HeapPersistence is stubbed
   // which requires us to set up the free list.
   //
-  // used to be CLR_RT_HeapBlock_WeakReference::PrepareForRecovery( CLR_RT_HeapBlock_Node* ptr, CLR_RT_HeapBlock_Node* end, CLR_UINT32 blockSize )
+  // used to be CLR_RT_HeapBlock_WeakReference::PrepareForRecovery( CLR_RT_HeapBlock_Node* ptr, CLR_RT_HeapBlock_Node* end, uint32_t blockSize )
 
   CLR_RT_HeapBlock_Node *ptr = m_payloadStart;
   CLR_RT_HeapBlock_Node *end = m_payloadEnd;
@@ -54,7 +54,7 @@ void CLR_RT_HeapCluster::HeapCluster_Initialize(CLR_UINT32 size, CLR_UINT32 bloc
 
       if (array->m_typeOfElement == DATATYPE_U1 && array->m_fReference == 0)
         {
-        CLR_UINT32 tot = sizeof(*array) + array->m_sizeOfElement * array->m_numOfElements;
+        uint32_t tot = sizeof(*array) + array->m_sizeOfElement * array->m_numOfElements;
 
         if (array->DataSize() == CONVERTFROMSIZETOHEAPBLOCKS(tot) && (ptr + ptr->DataSize()) <= end)
           {
@@ -68,7 +68,7 @@ void CLR_RT_HeapCluster::HeapCluster_Initialize(CLR_UINT32 size, CLR_UINT32 bloc
 
     if ((unsigned int)(ptr + blockSize) > (unsigned int)end)
       {
-      blockSize = (CLR_UINT32)(end - ptr);
+      blockSize = (uint32_t)(end - ptr);
       }
 
     ptr->SetDataId(CLR_RT_HEAPBLOCK_RAW_ID(DATATYPE_FREEBLOCK, 0, blockSize));
@@ -79,7 +79,7 @@ void CLR_RT_HeapCluster::HeapCluster_Initialize(CLR_UINT32 size, CLR_UINT32 bloc
     {
     if ((unsigned int)(ptr + blockSize) > (unsigned int)m_payloadEnd)
       {
-      blockSize = (CLR_UINT32)(m_payloadEnd - ptr);
+      blockSize = (uint32_t)(m_payloadEnd - ptr);
       }
 
     ptr->SetDataId(CLR_RT_HEAPBLOCK_RAW_ID(DATATYPE_FREEBLOCK, 0, blockSize));
@@ -91,11 +91,11 @@ void CLR_RT_HeapCluster::HeapCluster_Initialize(CLR_UINT32 size, CLR_UINT32 bloc
   m_freeList.ValidateList();
   }
 
-CLR_RT_HeapBlock *CLR_RT_HeapCluster::ExtractBlocks(CLR_UINT32 dataType, CLR_UINT32 flags, CLR_UINT32 length)
+CLR_RT_HeapBlock *CLR_RT_HeapCluster::ExtractBlocks(uint32_t dataType, uint32_t flags, uint32_t length)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock_Node *res = NULL;
-  CLR_UINT32             available = 0;
+  uint32_t             available = 0;
 
   m_freeList.ValidateList();
 
@@ -189,7 +189,7 @@ CLR_RT_HeapBlock *CLR_RT_HeapCluster::ExtractBlocks(CLR_UINT32 dataType, CLR_UIN
 
 void CLR_RT_HeapCluster::RecoverFromGC()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
 
   CLR_RT_HeapBlock_Node *ptr = m_payloadStart;
   CLR_RT_HeapBlock_Node *end = m_payloadEnd;
@@ -207,15 +207,11 @@ void CLR_RT_HeapCluster::RecoverFromGC()
     if (ptr->IsAlive() == false)
       {
       CLR_RT_HeapBlock_Node *next = ptr;
-      CLR_UINT32             lenTot = 0;
+      uint32_t             lenTot = 0;
 
       do
         {
         ValidateBlock(next);
-
-#if defined(NANOCLR_PROFILE_NEW_ALLOCATIONS)
-        g_CLR_PRF_Profiler.TrackObjectDeletion(next);
-#endif
 
         NANOCLR_CHECK_EARLY_COLLECTION(next);
 
@@ -255,9 +251,9 @@ void CLR_RT_HeapCluster::RecoverFromGC()
   m_freeList.Tail()->SetNext(NULL);
   }
 
-CLR_RT_HeapBlock_Node *CLR_RT_HeapCluster::InsertInOrder(CLR_RT_HeapBlock_Node *node, CLR_UINT32 size)
+CLR_RT_HeapBlock_Node *CLR_RT_HeapCluster::InsertInOrder(CLR_RT_HeapBlock_Node *node, uint32_t size)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_HeapBlock_Node *ptr;
 
   NANOCLR_FOREACH_NODE__NODECL(CLR_RT_HeapBlock_Node, ptr, m_freeList)
@@ -298,34 +294,34 @@ CLR_RT_HeapBlock_Node *CLR_RT_HeapCluster::InsertInOrder(CLR_RT_HeapBlock_Node *
 
 void CLR_RT_HeapCluster::ValidateBlock(CLR_RT_HeapBlock *ptr)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
 
   while (true)
     {
     if (ptr < m_payloadStart || ptr >= m_payloadEnd)
       {
-      CLR_Debug::Printf("Block beyond cluster limits: %08x [%08x : %08x-%08x]\r\n", (size_t)ptr, (size_t)this, (size_t)m_payloadStart, (size_t)m_payloadEnd);
+      trace_debug("Block beyond cluster limits: %08x [%08x : %08x-%08x]\r\n", (size_t)ptr, (size_t)this, (size_t)m_payloadStart, (size_t)m_payloadEnd);
 
       break;
       }
 
     if (ptr->DataType() >= DATATYPE_FIRST_INVALID)
       {
-      CLR_Debug::Printf("Bad Block Type: %08x %02x [%08x : %08x-%08x]\r\n", (size_t)ptr, ptr->DataType(), (size_t)this, (size_t)m_payloadStart, (size_t)m_payloadEnd);
+      trace_debug("Bad Block Type: %08x %02x [%08x : %08x-%08x]\r\n", (size_t)ptr, ptr->DataType(), (size_t)this, (size_t)m_payloadStart, (size_t)m_payloadEnd);
 
       break;
       }
 
     if (ptr->DataSize() == 0)
       {
-      CLR_Debug::Printf("Bad Block null-size: %08x [%08x : %08x-%08x]\r\n", (size_t)ptr, (size_t)this, (size_t)m_payloadStart, (size_t)m_payloadEnd);
+      trace_debug("Bad Block null-size: %08x [%08x : %08x-%08x]\r\n", (size_t)ptr, (size_t)this, (size_t)m_payloadStart, (size_t)m_payloadEnd);
 
       break;
       }
 
     if (ptr + ptr->DataSize() > m_payloadEnd)
       {
-      CLR_Debug::Printf("Bad Block size: %d %08x [%08x : %08x-%08x]\r\n", ptr->DataSize(), (size_t)ptr, (size_t)this, (size_t)m_payloadStart, (size_t)m_payloadEnd);
+      trace_debug("Bad Block size: %d %08x [%08x : %08x-%08x]\r\n", ptr->DataSize(), (size_t)ptr, (size_t)this, (size_t)m_payloadStart, (size_t)m_payloadEnd);
 
       break;
       }

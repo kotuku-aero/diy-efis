@@ -8,8 +8,8 @@
 
 HRESULT Library_corlib_native_CanFly_Runtime::ArrayListGet___STATIC__OBJECT__SystemCollectionsArrayList__I4(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_ArrayList *pThis = (CLR_RT_HeapBlock_ArrayList *)stack.Arg0().Dereference(); FAULT_ON_NULL(pThis);
   CLR_RT_HeapBlock *value;
@@ -23,8 +23,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::ArrayListGet___STATIC__OBJECT__Sys
 
 HRESULT Library_corlib_native_CanFly_Runtime::ArrayListSet___STATIC__VOID__SystemCollectionsArrayList__I4__OBJECT(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_ArrayList *pThis = (CLR_RT_HeapBlock_ArrayList *)stack.Arg0().Dereference(); FAULT_ON_NULL(pThis);
 
@@ -35,11 +35,11 @@ HRESULT Library_corlib_native_CanFly_Runtime::ArrayListSet___STATIC__VOID__Syste
 
 HRESULT Library_corlib_native_CanFly_Runtime::ArrayListAdd___STATIC__I4__SystemCollectionsArrayList__OBJECT(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_ArrayList *pThis = (CLR_RT_HeapBlock_ArrayList *)stack.Arg0().Dereference(); FAULT_ON_NULL(pThis);
-  CLR_INT32                   index;
+  int32_t                   index;
 
   NANOCLR_CHECK_HRESULT(pThis->Add(stack.Arg1().Dereference(), index));
 
@@ -50,8 +50,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::ArrayListAdd___STATIC__I4__SystemC
 
 HRESULT Library_corlib_native_CanFly_Runtime::ArrayListClear___STATIC__VOID__SystemCollectionsArrayList(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_ArrayList *pThis = (CLR_RT_HeapBlock_ArrayList *)stack.Arg0().Dereference(); FAULT_ON_NULL(pThis);
 
@@ -62,8 +62,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::ArrayListClear___STATIC__VOID__Sys
 
 HRESULT Library_corlib_native_CanFly_Runtime::ArrayListInsert___STATIC__VOID__SystemCollectionsArrayList__I4__OBJECT(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_ArrayList *pThis = (CLR_RT_HeapBlock_ArrayList *)stack.Arg0().Dereference(); FAULT_ON_NULL(pThis);
 
@@ -74,8 +74,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::ArrayListInsert___STATIC__VOID__Sy
 
 HRESULT Library_corlib_native_CanFly_Runtime::ArrayListRemoveAt___STATIC__VOID__SystemCollectionsArrayList__I4(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_ArrayList *pThis = (CLR_RT_HeapBlock_ArrayList *)stack.Arg0().Dereference(); FAULT_ON_NULL(pThis);
 
@@ -86,8 +86,8 @@ HRESULT Library_corlib_native_CanFly_Runtime::ArrayListRemoveAt___STATIC__VOID__
 
 HRESULT Library_corlib_native_CanFly_Runtime::SetCapacity___STATIC__VOID__SystemCollectionsArrayList__I4(CLR_RT_StackFrame &stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
 
   CLR_RT_HeapBlock_ArrayList *pThis = (CLR_RT_HeapBlock_ArrayList *)stack.Arg0().Dereference(); FAULT_ON_NULL(pThis);

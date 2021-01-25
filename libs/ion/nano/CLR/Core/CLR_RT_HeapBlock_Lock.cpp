@@ -9,8 +9,8 @@
 
 HRESULT CLR_RT_HeapBlock_Lock::CreateInstance(CLR_RT_HeapBlock_Lock *&lock, CLR_RT_Thread *th, CLR_RT_HeapBlock &resource)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   lock = EVENTCACHE_EXTRACT_NODE(g_CLR_RT_EventCache, CLR_RT_HeapBlock_Lock, DATATYPE_LOCK_HEAD); CHECK_ALLOCATION(lock);
 
@@ -50,7 +50,7 @@ HRESULT CLR_RT_HeapBlock_Lock::CreateInstance(CLR_RT_HeapBlock_Lock *&lock, CLR_
 
 void CLR_RT_HeapBlock_Lock::DestroyOwner(CLR_RT_SubThread *sth)
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   NANOCLR_FOREACH_NODE(CLR_RT_HeapBlock_Lock::Owner, owner, m_owners)
     {
     if (owner->m_owningSubThread == sth)
@@ -68,7 +68,7 @@ void CLR_RT_HeapBlock_Lock::DestroyOwner(CLR_RT_SubThread *sth)
 
 void CLR_RT_HeapBlock_Lock::ChangeOwner()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   m_owners.DblLinkedList_PushToCache();
 
   while (true)
@@ -136,10 +136,10 @@ void CLR_RT_HeapBlock_Lock::ChangeOwner()
   g_CLR_RT_EventCache.Append_Node(this);
   }
 
-HRESULT CLR_RT_HeapBlock_Lock::IncrementOwnership(CLR_RT_HeapBlock_Lock *lock, CLR_RT_SubThread *sth, const CLR_INT64 &timeExpire, bool fForce)
+HRESULT CLR_RT_HeapBlock_Lock::IncrementOwnership(CLR_RT_HeapBlock_Lock *lock, CLR_RT_SubThread *sth, const int64_t &timeExpire, bool fForce)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_Thread *th = sth->m_owningThread;
   CLR_RT_Thread *thOwner = lock->m_owningThread;
@@ -177,8 +177,8 @@ HRESULT CLR_RT_HeapBlock_Lock::IncrementOwnership(CLR_RT_HeapBlock_Lock *lock, C
 
 HRESULT CLR_RT_HeapBlock_Lock::DecrementOwnership(CLR_RT_HeapBlock_Lock *lock, CLR_RT_SubThread *sth)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_Thread *th = sth->m_owningThread;
 
@@ -213,12 +213,12 @@ HRESULT CLR_RT_HeapBlock_Lock::DecrementOwnership(CLR_RT_HeapBlock_Lock *lock, C
 
 void CLR_RT_HeapBlock_Lock::Relocate()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   m_resource.Relocate__HeapBlock();
   }
 
 void CLR_RT_HeapBlock_Lock::Relocate_Owner()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   }
 

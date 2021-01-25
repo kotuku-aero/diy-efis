@@ -7,11 +7,11 @@
 
 HRESULT Library_corlib_native_CanFly_Runtime::Abs___STATIC__I4__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
-  CLR_INT32 d = stack.Arg0().NumericByRefConst().s4;
-  CLR_INT32 res = abs(d);
+  int32_t d = stack.Arg0().NumericByRefConst().s4;
+  int32_t res = abs(d);
 
   stack.SetResult_I4(res);
 
@@ -20,12 +20,12 @@ HRESULT Library_corlib_native_CanFly_Runtime::Abs___STATIC__I4__I4(CLR_RT_StackF
 
 HRESULT Library_corlib_native_CanFly_Runtime::Max___STATIC__I4__I4__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
-  CLR_INT32 x = stack.Arg0().NumericByRefConst().s4;
-  CLR_INT32 y = stack.Arg1().NumericByRefConst().s4;
-  CLR_INT32 res = x >= y ? x : y;
+  int32_t x = stack.Arg0().NumericByRefConst().s4;
+  int32_t y = stack.Arg1().NumericByRefConst().s4;
+  int32_t res = x >= y ? x : y;
 
   stack.SetResult_I4(res);
 
@@ -34,12 +34,12 @@ HRESULT Library_corlib_native_CanFly_Runtime::Max___STATIC__I4__I4__I4(CLR_RT_St
 
 HRESULT Library_corlib_native_CanFly_Runtime::Min___STATIC__I4__I4__I4(CLR_RT_StackFrame& stack)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
-  CLR_INT32 x = stack.Arg0().NumericByRefConst().s4;
-  CLR_INT32 y = stack.Arg1().NumericByRefConst().s4;
-  CLR_INT32 res = x <= y ? x : y;
+  int32_t x = stack.Arg0().NumericByRefConst().s4;
+  int32_t y = stack.Arg1().NumericByRefConst().s4;
+  int32_t res = x <= y ? x : y;
 
   stack.SetResult_I4(res);
 

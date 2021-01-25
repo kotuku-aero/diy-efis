@@ -9,7 +9,7 @@
 
 void CLR_RT_DblLinkedList::DblLinkedList_Initialize()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   m_first = Tail();
   m_null = NULL;
   m_last = Head();
@@ -17,7 +17,7 @@ void CLR_RT_DblLinkedList::DblLinkedList_Initialize()
 
 void CLR_RT_DblLinkedList::DblLinkedList_PushToCache()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   ValidateList();
 
   while (true)
@@ -30,7 +30,7 @@ void CLR_RT_DblLinkedList::DblLinkedList_PushToCache()
 
 void CLR_RT_DblLinkedList::DblLinkedList_Release()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   ValidateList();
 
   while (true)
@@ -43,7 +43,7 @@ void CLR_RT_DblLinkedList::DblLinkedList_Release()
 
 int CLR_RT_DblLinkedList::NumOfNodes()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   ValidateList();
 
   int num = 0;
@@ -59,7 +59,7 @@ int CLR_RT_DblLinkedList::NumOfNodes()
 
 void CLR_RT_DblLinkedList::Relocate()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
   CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_first);
   CLR_RT_GarbageCollector::Heap_Relocate((void **)&m_last);
   }
@@ -68,7 +68,7 @@ void CLR_RT_DblLinkedList::Relocate()
 
 void CLR_RT_DblLinkedList::ValidateList()
   {
-  NATIVE_PROFILE_CLR_CORE();
+ 
 
   if (m_null != NULL) NANOCLR_DEBUG_STOP();
 

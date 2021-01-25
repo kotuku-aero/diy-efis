@@ -16,9 +16,6 @@
     <Filter Include="runtime">
       <UniqueIdentifier>{59bc259c-f689-433a-b8e5-ce83ac717344}</UniqueIdentifier>
     </Filter>
-    <Filter Include="builtin">
-      <UniqueIdentifier>{4aa8b87f-9cdb-4213-bc4b-e6a4d78f923c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="nano">
       <UniqueIdentifier>{57ad1642-cc9f-4dde-94c9-f2d884781e90}</UniqueIdentifier>
     </Filter>
@@ -58,17 +55,8 @@
     <Filter Include="nano\CLR\Include">
       <UniqueIdentifier>{68a8e34f-7157-439c-8c58-8a344c753d98}</UniqueIdentifier>
     </Filter>
-    <Filter Include="nano\CLR\Messaging">
-      <UniqueIdentifier>{3bd59eb7-2c10-4872-9a13-baf846da49b2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="nano\CLR\Startup">
-      <UniqueIdentifier>{61fc6d8d-21e1-464c-809d-a5aecf88d31e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="nano\CLR\System.Math">
       <UniqueIdentifier>{4cdec243-f3e9-4770-9a6d-41aec1dfcfd3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="nano\CLR\WireProtocol">
-      <UniqueIdentifier>{25a4a0fd-9221-4275-853b-4840d83ef51f}</UniqueIdentifier>
     </Filter>
     <Filter Include="nano\HAL">
       <UniqueIdentifier>{8a09cb54-f609-43ea-9f93-a081cb85e5ac}</UniqueIdentifier>
@@ -126,12 +114,6 @@
     <ClCompile Include="..\..\libs\ion\runtime\PointArray.cpp">
       <Filter>runtime</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\ion\comm_service.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\ion\debug_service.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libs\ion\targetHAL_Time.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -152,9 +134,6 @@
     </ClCompile>
     <ClCompile Include="..\..\libs\ion\runtime\FileStream.cpp">
       <Filter>runtime</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\ion\builtin\mscorlib.c">
-      <Filter>builtin</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libs\ion\nano\CLR\Core\Cache.cpp">
       <Filter>nano\CLR\Core</Filter>
@@ -393,35 +372,17 @@
     <ClCompile Include="..\..\libs\ion\nano\CLR\Diagnostics\Info.cpp">
       <Filter>nano\CLR\Diagnostics</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\ion\nano\CLR\Diagnostics\Profile.cpp">
-      <Filter>nano\CLR\Diagnostics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\ion\nano\CLR\Diagnostics\Profiler.cpp">
-      <Filter>nano\CLR\Diagnostics</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libs\ion\nano\CLR\Helpers\Base64\base64.c">
       <Filter>nano\CLR\Helpers\Base64</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libs\ion\nano\CLR\Helpers\TinyPrintf\printf.c">
       <Filter>nano\CLR\Helpers\TinyPrintf</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\ion\nano\CLR\Messaging\Messaging.cpp">
-      <Filter>nano\CLR\Messaging</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\ion\nano\CLR\Startup\CLRStartup.cpp">
-      <Filter>nano\CLR\Startup</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libs\ion\nano\CLR\System.Math\nf_native_system_math.cpp">
       <Filter>nano\CLR\System.Math</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libs\ion\nano\CLR\System.Math\nf_native_system_math_System_Math.cpp">
       <Filter>nano\CLR\System.Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\ion\nano\CLR\WireProtocol\WireProtocol_App_Interface.c">
-      <Filter>nano\CLR\WireProtocol</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\ion\nano\CLR\WireProtocol\WireProtocol_Message.c">
-      <Filter>nano\CLR\WireProtocol</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libs\ion\nano\HAL\nanoHAL_SystemInformation.cpp">
       <Filter>nano\HAL</Filter>
@@ -458,6 +419,9 @@
     </ClCompile>
     <ClCompile Include="..\..\libs\ion\nano\System.Text\nf_system_text_System_Text_UTF8Encoding.cpp">
       <Filter>nano\System.Text</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\ion\ion_debugger.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -518,16 +482,10 @@
     <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_Interop.h">
       <Filter>nano\CLR\Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_Messaging.h">
-      <Filter>nano\CLR\Include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_ParseOptions.h">
       <Filter>nano\CLR\Include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_PlatformDef.h">
-      <Filter>nano\CLR\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_Profiling.h">
       <Filter>nano\CLR\Include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nanoCLR_Runtime.h">
@@ -559,24 +517,6 @@
     </ClInclude>
     <ClInclude Include="..\..\libs\ion\nano\CLR\Include\nf_errors_exceptions.h">
       <Filter>nano\CLR\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\WireProtocol.h">
-      <Filter>nano\CLR\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\WireProtocol_App_Interface.h">
-      <Filter>nano\CLR\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\WireProtocol_HAL_Interface.h">
-      <Filter>nano\CLR\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\WireProtocol_Message.h">
-      <Filter>nano\CLR\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libs\ion\nano\CLR\Include\WireProtocol_MonitorCommands.h">
-      <Filter>nano\CLR\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libs\ion\nano\CLR\Startup\CLRStartup.h">
-      <Filter>nano\CLR\Startup</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libs\ion\nano\CLR\System.Math\nf_native_system_math.h">
       <Filter>nano\CLR\System.Math</Filter>
@@ -628,6 +568,9 @@
     </ClInclude>
     <ClInclude Include="..\..\libs\ion\nano\System.Text\nf_system_text.h">
       <Filter>nano\System.Text</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\ion\ion_debugger.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -7,10 +7,10 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HRESULT CLR_RT_HeapBlock_LockRequest::CreateInstance(CLR_RT_HeapBlock_Lock *lock, CLR_RT_SubThread *sth, const CLR_INT64 &timeExpire, bool fForce)
+HRESULT CLR_RT_HeapBlock_LockRequest::CreateInstance(CLR_RT_HeapBlock_Lock *lock, CLR_RT_SubThread *sth, const int64_t &timeExpire, bool fForce)
   {
-  NATIVE_PROFILE_CLR_CORE();
-  NANOCLR_HEADER();
+ 
+  HRESULT hr;
 
   CLR_RT_HeapBlock_LockRequest *req = EVENTCACHE_EXTRACT_NODE(g_CLR_RT_EventCache, CLR_RT_HeapBlock_LockRequest, DATATYPE_LOCK_REQUEST_HEAD); CHECK_ALLOCATION(req);
 
