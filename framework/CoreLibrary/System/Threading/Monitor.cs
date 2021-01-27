@@ -6,23 +6,23 @@
 
 namespace System.Threading
 {
-    using System;
+  using System;
+
+  /// <summary>
+  /// Provides a mechanism that synchronizes access to objects.
+  /// </summary>
+  public static class Monitor
+  {
+    /// <summary>
+    /// Acquires an exclusive lock on the specified object.
+    /// </summary>
+    /// <param name="obj">The object on which to acquire the monitor lock.</param>
+    public static void Enter(Object obj) { CanFly.Runtime.MonitorExit(obj); }
 
     /// <summary>
-    /// Provides a mechanism that synchronizes access to objects.
+    /// Releases an exclusive lock on the specified object.
     /// </summary>
-    public static class Monitor
-    {
-        /// <summary>
-        /// Acquires an exclusive lock on the specified object.
-        /// </summary>
-        /// <param name="obj">The object on which to acquire the monitor lock.</param>
-        public static void Enter(Object obj) { CanFly.Runtime.MonitorEnter(obj); }
-
-        /// <summary>
-        /// Releases an exclusive lock on the specified object.
-        /// </summary>
-        /// <param name="obj">The object on which to release the lock.</param>
-        public static void Exit(Object obj) { CanFly.Runtime.MonitorExit(obj); }
-    }
+    /// <param name="obj">The object on which to release the lock.</param>
+    public static void Exit(Object obj) { CanFly.Runtime.MonitorExit(obj); }
+  }
 }

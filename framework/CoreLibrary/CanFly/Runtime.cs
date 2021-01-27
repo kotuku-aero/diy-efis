@@ -323,66 +323,9 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern String StringConcat(String[] values);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void AutoResetEventCtor(System.Threading.AutoResetEvent obj, bool initialState);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern bool AutoResetEventReset(System.Threading.AutoResetEvent obj);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern bool AutoResetEventSet(System.Threading.AutoResetEvent obj);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int Increment(ref int location);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int Decrement(ref int location);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int Exchange(ref int location1, int value);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int CompareExchange(ref int location1, int value, int comparand);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void ManualResetEventCtor(System.Threading.ManualResetEvent obj, bool initialState);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern bool ManualResetEventReset(System.Threading.ManualResetEvent obj);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern bool ManualResetEventSet(System.Threading.ManualResetEvent obj);
-    [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void MonitorEnter(Object obj);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void MonitorExit(Object obj);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern uint ThreadCtor(byte priority, string name, System.Threading.ThreadStart start, object arg, out uint id);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern uint ThreadGetArg(uint id, out object arg);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern uint ThreadGetCurrentId(out uint id);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern uint ThreadStart(uint id);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern uint ThreadAbort(uint id);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern uint ThreadSuspend(uint id);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern uint ThreadResume(uint id);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern uint GetThreadPriority(uint id, out byte priority);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern uint SetThreadPriority(uint id, byte priority);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern uint ThreadIsAlive(uint id);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern uint ThreadSleep(int millisecondsTimeout);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern uint GetThreadState(uint id, out uint state);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern uint ThreadWaitTillFinished(uint id, int waitWilliseconds);
-
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void TimerCtor(System.Threading.Timer obj, System.Threading.TimerCallback callback, Object state, int dueTime, int period);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern bool TimerChange(System.Threading.Timer obj, int dueTime, int period);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void TimerDispose(System.Threading.Timer obj);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern bool WaitHandleWaitOne(System.Threading.WaitHandle obj, int millisecondsTimeout, bool exitContext);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int WaitMultiple(System.Threading.WaitHandle[] waitHandles, int millisecondsTimeout, bool exitContext, bool waitAll);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern bool ValueTypeEquals(ValueType obj, Object obj1);
     [MethodImpl(MethodImplOptions.InternalCall)]

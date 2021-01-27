@@ -17,19 +17,35 @@ namespace System.Threading
     /// <param name="initialState">true to set the initial state to signaled; false to set the initial state to non-signaled.</param>
     public AutoResetEvent(bool initialState)
     {
-      CanFly.Runtime.AutoResetEventCtor(this, initialState);
+      if (initialState)
+        CanFly.Syscall.SemaphoreSignal(handle);
     }
 
     /// <summary>
     /// Sets the state of the event to nonsignaled, causing threads to block.
     /// </summary>
     /// <returns>true if the operation succeeds; otherwise, false.</returns>
-    public bool Reset() { return CanFly.Runtime.AutoResetEventReset(this); }
+    public bool Reset()
+    {
+      // remove the counter
+      return CanFly.Syscall.SemaphoreWait(handle, 0) == 0;
+    }
 
     /// <summary>
     /// Sets the state of the event to signaled, allowing one or more waiting threads to proceed.
     /// </summary>
     /// <returns>true if the operation succeeds; otherwise, false.</returns>
-    public bool Set() { return CanFly.Runtime.AutoResetEventSet(this); }
+    public bool Set()
+    { 
+      return CanFly.Syscall.SemaphoreSignal(handle) == 0;
+    }
+
+    public override bool WaitOne(int millisecondsTimeout, bool exitContext)
+    {
+      if (base.WaitOne(millisecondsTimeout, exitContext))
+        return Set();
+
+      return false;
+    }
   }
 }

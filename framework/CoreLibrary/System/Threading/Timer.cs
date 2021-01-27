@@ -20,23 +20,46 @@ namespace System.Threading
   public sealed class Timer : MarshalByRefObject, IDisposable
   {
     // these fields are required in the native end
-#pragma warning disable 0169
-    [Reflection.FieldNoReflection]
-    private object _timer;
+    private uint _semaphore;
+    private uint _thread;
+    private int _dueTime;
+    private int _period;
     private object _state;
     private TimerCallback _callback;
-#pragma warning restore 0169
 
     /// <summary>
     /// Initializes a new instance of the Timer class, using a 32-bit signed integer to specify the time interval.
     /// </summary>
     /// <param name="callback">A TimerCallback delegate representing a method to be executed.</param>
     /// <param name="state">An object containing information to be used by the callback method, or null.</param>
-    /// <param name="dueTime">The amount of time to delay before callback is invoked, in milliseconds. Specify Timeout.Infinite to prevent the timer from starting. Specify zero (0) to start the timer immediately.</param>
+    /// <param name="dueTime">The amount of time to delay before callback is invoked, in milliseconds. 
+    /// Specify Timeout.Infinite to prevent the timer from starting. Specify zero (0) to start the timer immediately.</param>
     /// <param name="period">The time interval between invocations of callback, in milliseconds. Specify Timeout.Infinite to disable periodic signaling.</param>
     public Timer(TimerCallback callback, Object state, int dueTime, int period)
     {
-      CanFly.Runtime.TimerCtor(this, callback, state, dueTime, period);
+      if (CanFly.Syscall.SemaphoreCreate(out _semaphore) < 0)
+        throw new ApplicationException();
+
+      _dueTime = dueTime;
+      _period = period;
+
+      if (CanFly.Syscall.CreateThread((byte)ThreadPriority.Normal, null, Run, Thread.CurrentThread, out _thread) < 0)
+        throw new ApplicationException();
+    }
+
+    private void Run()
+    {
+      while(_period > 0 || _dueTime > 0)
+      {
+        CanFly.Syscall.SemaphoreWait(_semaphore, (uint)(_dueTime > 0 ? _dueTime : _period));
+        _dueTime = 0;
+
+        if(_period > 0)
+          _callback(_state);
+      }
+
+      // signal so the dispose handler does not wait
+      CanFly.Syscall.SemaphoreSignal(_semaphore);
     }
 
     /// <summary>
@@ -59,7 +82,16 @@ namespace System.Threading
     /// <param name="period">The time interval between invocations of the callback method specified when the Timer was constructed, in milliseconds. 
     /// Specify Timeout.Infinite to disable periodic signaling.</param>
     /// <returns>true if the timer was successfully updated; otherwise, false.</returns>
-    public bool Change(int dueTime, int period) { return CanFly.Runtime.TimerChange(this, dueTime, period); }
+    public bool Change(int dueTime, int period)
+    {
+      _dueTime = dueTime;
+      _period = period;
+
+      // force update
+      CanFly.Syscall.SemaphoreSignal(_semaphore);
+
+      return true;
+    }
 
     /// <summary>
     /// Changes the start time and the interval between method invocations for a timer, using TimeSpan values to measure time intervals.
@@ -68,12 +100,24 @@ namespace System.Threading
     /// Specify negative one (-1) milliseconds to prevent the timer from restarting. Specify zero (0) to restart the timer immediately.</param>
     /// <param name="period">The time interval between invocations of the callback method specified when the Timer was constructed. Specify negative one (-1) milliseconds to disable periodic signaling.</param>
     /// <returns>true if the timer was successfully updated; otherwise, false.</returns>
-    public bool Change(TimeSpan dueTime, TimeSpan period) { return CanFly.Runtime.TimerChange(this, dueTime.Milliseconds, period.Milliseconds); }
+    public bool Change(TimeSpan dueTime, TimeSpan period) 
+    { 
+      return Change(dueTime.Milliseconds, period.Milliseconds);
+    }
 
     /// <summary>
     /// Releases all resources used by the current instance of Timer.
     /// </summary>
-    public void Dispose() { CanFly.Runtime.TimerDispose(this); }
+    public void Dispose() 
+    {
+      _dueTime = 0;
+      _period = 0;
+      CanFly.Syscall.SemaphoreSignal(_semaphore);
+      // the thread signals on exit
+      CanFly.Syscall.SemaphoreWait(_semaphore, uint.MaxValue);
+
+      CanFly.Syscall.SemaphoreClose(_semaphore);
+    }
   }
 }
 

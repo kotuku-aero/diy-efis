@@ -12,6 +12,56 @@ namespace CanFly
     // These are simple wrappers around the canfly calls.  the uint returned
     // is a CanFly error code.
     [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int SystemInformation(out long machine_id, out uint version);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int Ticks(out uint ticks);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int Yield();
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int CreateThread(byte priority, string name, System.Threading.ThreadStart start, object arg, out uint id);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int ThreadGetArg(uint id, out object arg);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int ThreadGetCurrentId(out uint id);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int ThreadStart(uint id);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int ThreadAbort(uint id);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int ThreadSuspend(uint id);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int ThreadResume(uint id);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int GetThreadPriority(uint id, out byte priority);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int SetThreadPriority(uint id, byte priority);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int ThreadIsAlive(uint id);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int ThreadSleep(int millisecondsTimeout);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int GetThreadState(uint id, out uint state);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int LockObject(Object obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int UnLockObject(Object obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int SemaphoreCreate(out uint handle);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int SemaphoreClose(uint handle);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int SemaphoreSignal(uint handle);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int SemaphoreWait(uint handle, uint milliseconds);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int InterlockedIncrement(ref int location, out int old_value);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int InterlockedDecrement(ref int location, out int old_value);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int InterlockedExchange(ref int location, int value, out int old_value);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int InterlockedCompareExchange(ref int location, int value, int compare);
+    [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern int RegCreateKey(uint parent, string name, out uint key);
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern int RegOpenKey(uint parent, string name, out uint key);
