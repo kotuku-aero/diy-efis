@@ -22,32 +22,13 @@ namespace System.Globalization
         internal const String _universalSortableDateTimePattern = "yyyy'-'MM'-'dd HH':'mm':'ss'Z'";
         internal String _fullDateTimePattern = "dddd, dd MMMM yyyy HH:mm:ss";
 
-        internal DateTimeFormatInfo(CultureInfo cultureInfo)
-        {
-        }
-
-        /// <summary>
-        /// Gets a read-only DateTimeFormatInfo object that formats values based on the current culture.
-        /// </summary>
-        /// <value>A read-only DateTimeFormatInfo object based on the CultureInfo object for the current thread.</value>
-        public static DateTimeFormatInfo CurrentInfo
-        {
-            get
-            {
-                return CultureInfo.CurrentUICulture.DateTimeFormat;
-            }
-        }
-
         /// <summary>
         /// Gets the string designator for hours that are "ante meridiem" (before noon).
         /// </summary>
         /// <value>The string designator for hours that are ante meridiem. The default for InvariantInfo is "AM".</value>
         public String AMDesignator
         {
-            get
-            {
-                return "AM";
-            }
+            get { return "AM"; }
         }
 
         /// <summary>
@@ -56,10 +37,7 @@ namespace System.Globalization
         /// <value>The string that separates the components of a date, that is, the year, month, and day. The default for InvariantInfo is "/".</value>
         public String DateSeparator
         {
-            get
-            {
-                return "/";
-            }
+            get { return "/"; }
         }
 
         /// <summary>
@@ -68,10 +46,7 @@ namespace System.Globalization
         /// <value>The custom format string for a long date and long time value.</value>
         public String FullDateTimePattern
         {
-            get
-            {
-                return _fullDateTimePattern;
-            }
+            get { return _fullDateTimePattern; }
         }
 
         /// <summary>

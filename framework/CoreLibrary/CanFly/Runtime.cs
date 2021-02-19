@@ -103,22 +103,9 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern String GetStackTrace(Exception ex);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern bool AnyPendingFinalizers();
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SuppressFinalize(Object obj);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void ReRegisterForFinalize(Object obj);
-
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern System.Globalization.CultureInfo GetCurrentUICultureInternal();
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetCurrentUICultureInternal(System.Globalization.CultureInfo value);
-
-
-    [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern string ToBase64String(byte[] inArray, int offset, int length, bool insertLineBreaks);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern byte[] FromBase64CharArray(char[] inArray, int length);
+    internal static extern byte[] FromBase64String(string inString);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern ulong ToTicks(int year, int month, int day, int hour, int minute, int second, int millisecond);
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -195,11 +182,6 @@ namespace CanFly
     internal static extern int Min(int val1, int val2);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern int Max(int val1, int val2);
-
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern bool Equals(MulticastDelegate d1, MulticastDelegate d2);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern bool NotEquals(MulticastDelegate d1, MulticastDelegate d2);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern String FormatNative(Object value, char format, int precision);
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -322,10 +304,6 @@ namespace CanFly
     internal static extern String StringConcat(String str0, String str1, String str2, String str3);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern String StringConcat(String[] values);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void MonitorEnter(Object obj);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void MonitorExit(Object obj);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern bool ValueTypeEquals(ValueType obj, Object obj1);
     [MethodImpl(MethodImplOptions.InternalCall)]

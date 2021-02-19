@@ -21,7 +21,7 @@ namespace System
   // form
   //
   //  public static String Format(XXX value, String format);
-  //  public static String Format(XXX value, String format, NumberFormatInfo info);
+  //  public static String Format(XXX value, String format);
   //
   // where XXX is the name of the particular numeric class. The methods convert
   // the numeric value to a string using the format string given by the
@@ -259,7 +259,7 @@ namespace System
   //
   //  public static XXX Parse(String s);
   //  public static XXX Parse(String s, int style);
-  //  public static XXX Parse(String s, int style, NumberFormatInfo info);
+  //  public static XXX Parse(String s, int style);
   //
   // where XXX is the name of the particular numeric class. The methods convert a
   // string to a numeric value. The optional style parameter specifies the
@@ -279,7 +279,7 @@ namespace System
   //This class contains only static members and does not need to be serializable
   internal static class Number
   {
-    public static String Format(Object value, bool isInteger, String format, NumberFormatInfo info)
+    public static String Format(Object value, bool isInteger, String format)
     {
       char formatCh;
       int precision;
@@ -293,9 +293,9 @@ namespace System
         // No processing needed, simply return "0" (native code returns empty string for this special case)
         if (isInteger && result == String.Empty && format == "N0") return "0";
 
-        return PostProcessInteger(value, result, formatCh, precision, info);
+        return PostProcessInteger(value, result, formatCh, precision);
       }
-      return PostProcessFloat(result, formatCh, precision, info);
+      return PostProcessFloat(result, formatCh, precision);
     }
 
     private static void ValidateFormat(String format, out char formatCh, out int precision)
@@ -361,7 +361,7 @@ namespace System
       }
     }
 
-    private static String PostProcessInteger(Object value, String original, char format, int precision, NumberFormatInfo info)
+    private static String PostProcessInteger(Object value, String original, char format, int precision)
     {
       String result = original;
 
@@ -392,45 +392,45 @@ namespace System
 
         case 'N':
           // InsertGroupSeparators, AppendTrailingZeros, ReplaceNegativeSign
-          result = InsertGroupSeparators(result, info);
+          result = InsertGroupSeparators(result);
           goto case 'F'; // falls through
         case 'F':
           // AppendTrailingZeros, ReplaceNegativeSign
-          result = AppendTrailingZeros(result, precision, info);
+          result = AppendTrailingZeros(result, precision);
           goto case 'G'; // falls through
         case 'G':
-          result = ReplaceNegativeSign(result, info);
+          result = ReplaceNegativeSign(result);
           break;
       }
 
       return result;
     }
 
-    private static String PostProcessFloat(String original, char format, int precision, NumberFormatInfo info)
+    private static String PostProcessFloat(String original, char format, int precision)
     {
       String result = original;
 
       if (format == 'N')
       {
-        result = InsertGroupSeparators(result, info);
+        result = InsertGroupSeparators(result);
       }
 
-      result = AppendFloatTrailingZeros(result, precision, info);
-      result = ReplaceDecimalSeperator(result, info);
-      result = ReplaceNegativeSign(result, info);
+      result = AppendFloatTrailingZeros(result, precision);
+      result = ReplaceDecimalSeperator(result);
+      result = ReplaceNegativeSign(result);
 
       return result;
     }
 
-    private static String AppendTrailingZeros(String original, int count, NumberFormatInfo info)
+    private static String AppendTrailingZeros(String original, int count)
     {
       if (count > 0)
       {
-        return original + info.NumberDecimalSeparator + new String('0', count);
+        return original + "." + new String('0', count);
       }
       return original;
     }
-    private static String AppendFloatTrailingZeros(String original, int count, NumberFormatInfo info)
+    private static String AppendFloatTrailingZeros(String original, int count)
     {
       // find decimal separator
       int pos = original.IndexOf('.');
@@ -447,32 +447,33 @@ namespace System
       return original;
     }
 
-    private static String ReplaceNegativeSign(String original, NumberFormatInfo info)
+    private static String ReplaceNegativeSign(String original)
     {
       if (original[0] == '-')
       {
-        return info.NegativeSign + original.Substring(1);
+        return "-" + original.Substring(1);
       }
       return original;
     }
 
-    private static String ReplaceDecimalSeperator(String original, NumberFormatInfo info)
+    private static String ReplaceDecimalSeperator(String original)
     {
       int pos = original.IndexOf('.');
 
       if (pos != -1)
       {
-        return original.Substring(0, pos) + info.NumberDecimalSeparator + original.Substring(pos + 1);
+        return original.Substring(0, pos) + "." + original.Substring(pos + 1);
       }
       return original;
     }
 
-    private static String InsertGroupSeparators(String original, NumberFormatInfo info)
+    private static String InsertGroupSeparators(String original)
     {
       int digitsStartPos = (original[0] == '-') ? 1 : 0;
 
       int decimalPointPos = original.IndexOf('.');
-      if (decimalPointPos == -1) decimalPointPos = original.Length;
+      if (decimalPointPos == -1)
+        decimalPointPos = original.Length;
 
       String prefix = (digitsStartPos == 1) ? "-" : "";
       String suffix = original.Substring(decimalPointPos);
@@ -480,28 +481,21 @@ namespace System
 
       String result = String.Empty;
 
-      int[] groupSizes = info.NumberGroupSizes;
-
       int sizeInd = 0;
-      int size = groupSizes[sizeInd];
+      int size = 3;
       int pos = digits.Length - size;
 
-      String seperator = info.NumberGroupSeparator;
-      int lastSizeInd = groupSizes.Length - 1;
-
+      String seperator = ",";
       while (pos > 0)
       {
         result = seperator + digits.Substring(pos, size) + result;
 
-        if (sizeInd < lastSizeInd)
-        {
-          sizeInd++;
-          size = groupSizes[sizeInd];
+        sizeInd++;
+        size = 3;
 
-          if (size == 0) // per spec, when we see a 0, we leave the remaining digits ungrouped.
-          {
-            break;
-          }
+        if (size == 0) // per spec, when we see a 0, we leave the remaining digits ungrouped.
+        {
+          break;
         }
 
         pos -= size;

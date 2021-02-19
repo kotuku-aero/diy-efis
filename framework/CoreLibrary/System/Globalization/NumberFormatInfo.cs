@@ -50,11 +50,9 @@ namespace System.Globalization
         internal String _negativeSign = "-";
         internal String _numberDecimalSeparator = ".";
         internal String _numberGroupSeparator = ",";
-        private readonly CultureInfo _cultureInfo;
 
-        internal NumberFormatInfo(CultureInfo cultureInfo)
+        internal NumberFormatInfo()
         {
-            _cultureInfo = cultureInfo;
         }
 
         /// <summary>
@@ -67,18 +65,6 @@ namespace System.Globalization
             get
             {
                 return _numberGroupSizes;
-            }
-        }
-
-        /// <summary>
-        /// Gets a read-only NumberFormatInfo that formats values based on the current culture.
-        /// </summary>
-        /// <value>A read-only NumberFormatInfo based on the culture of the current thread.</value>
-        public static NumberFormatInfo CurrentInfo
-        {
-            get
-            {
-                return CultureInfo.CurrentUICulture.NumberFormat;
             }
         }
 

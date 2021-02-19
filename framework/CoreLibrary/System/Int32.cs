@@ -33,7 +33,7 @@ namespace System
         /// <returns>The string representation of the value of this instance, consisting of a negative sign if the value is negative, and a sequence of digits ranging from 0 to 9 with no leading zeroes.</returns>
         public override String ToString()
         {
-            return Number.Format(_value, true, "G", NumberFormatInfo.CurrentInfo);
+            return Number.Format(_value, true, "G");
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace System
         /// <returns>he string representation of the value of this instance as specified by format.</returns>
         public String ToString(String format)
         {
-            return Number.Format(_value, true, format, NumberFormatInfo.CurrentInfo);
+            return Number.Format(_value, true, format);
         }
 
         /// <summary>

@@ -28,7 +28,9 @@ namespace System
     }
 
     /// <summary>
-    /// Copies a range of elements from an Array starting at the specified source index and pastes them to another Array starting at the specified destination index. The length and the indexes are specified as 32-bit integers.
+    /// Copies a range of elements from an Array starting at the specified source
+    /// index and pastes them to another Array starting at the specified
+    /// destination index. The length and the indexes are specified as 32-bit integers.
     /// </summary>
     /// <param name="sourceArray">The Array that contains the data to copy.</param>
     /// <param name="sourceIndex">A 32-bit integer that represents the index in the sourceArray at which copying begins.</param>
@@ -37,11 +39,12 @@ namespace System
     /// <param name="length">A 32-bit integer that represents the number of elements to copy.</param>
     public static void Copy(Array sourceArray, int sourceIndex, Array destinationArray, int destinationIndex, int length)
     {
-      
+      CanFly.Runtime.Copy(sourceArray, sourceIndex, destinationArray, destinationIndex, length);
     }
 
     /// <summary>
-    /// Sets a range of elements in the Array to zero, to false, or to  null reference (Nothing in Visual Basic), depending on the element type.
+    /// Sets a range of elements in the Array to zero, to false, or to  null reference
+    /// (Nothing in Visual Basic), depending on the element type.
     /// </summary>
     /// <param name="array">The Array whose elements need to be cleared.</param>
     /// <param name="index">The starting index of the range of elements to clear.</param>
@@ -276,13 +279,17 @@ namespace System
     }
 
     /// <summary>
-    /// Searches for the specified object and returns the index of the first occurrence within the range of elements in the one-dimensional Array that starts at the specified index and contains the specified number of elements.
+    /// Searches for the specified object and returns the index of the first occurrence within 
+    /// the range of elements in the one-dimensional Array that starts at the specified index and 
+    /// contains the specified number of elements.
     /// </summary>
     /// <param name="array">The one-dimensional Array to search.</param>
     /// <param name="value">The object to locate in array.</param>
     /// <param name="startIndex">The starting index of the search. 0 (zero) is valid in an empty array.</param>
     /// <param name="count">The number of elements in the section to search.</param>
-    /// <returns>The index of the first occurrence of value within the range of elements in array that starts at startIndex and contains the number of elements specified in count, if found; otherwise, the lower bound of the array minus 1.</returns>
+    /// <returns>The index of the first occurrence of value within the range of elements in 
+    /// array that starts at startIndex and contains the number of elements specified in count, 
+    /// if found; otherwise, the lower bound of the array minus 1.</returns>
     public static int IndexOf(Array array, Object value, int startIndex, int count)
     {
       // Try calling a quick native method to handle primitive types.
@@ -299,7 +306,8 @@ namespace System
       {
         var obj = array.GetValue(i);
 
-        if (Equals(obj, value)) return i;
+        if (Equals(obj, value))
+          return i;
       }
 
       return -1;

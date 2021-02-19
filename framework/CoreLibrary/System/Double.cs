@@ -155,7 +155,7 @@ namespace System
         return _naNSymbol;
       }
 
-      return Number.Format(_value, false, format, NumberFormatInfo.CurrentInfo);
+      return Number.Format(_value, false, format);
     }
 
     /// <summary>

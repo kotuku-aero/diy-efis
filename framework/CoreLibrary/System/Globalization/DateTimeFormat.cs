@@ -229,7 +229,13 @@ namespace System.Globalization
     //
     //  Actions: Format the DateTime instance using the specified format.
     //
-    private static String FormatCustomized(DateTime dateTime, String format, DateTimeFormatInfo dtfi)
+
+    private static readonly string[] abbrDayNames = { "sun", "mon", "tue", "wed", "thu", "fri", "sat" };
+    private static readonly string[] dayNames = { "sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday" };
+    private static readonly string[] abbrMonthNames = { "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec" };
+    private static readonly string[] monthNames = { "january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december" };
+
+    private static String FormatCustomized(DateTime dateTime, String format)
     {
       var result = String.Empty;
       var i = 0;
@@ -246,11 +252,11 @@ namespace System.Globalization
         switch (ch)
         {
           case ':':
-            tempResult = dtfi.TimeSeparator;
+            tempResult = ":";
             tokenLen = 1;
             break;
           case '/':
-            tempResult = dtfi.DateSeparator;
+            tempResult = "/";
             tokenLen = 1;
             break;
           case '\'':
@@ -266,7 +272,7 @@ namespace System.Globalization
             // Besides, we will not allow "%%" appear in the pattern.
             if (nextChar >= 0 && nextChar != '%')
             {
-              tempResult = FormatCustomized(dateTime, ((char)nextChar).ToString(), dtfi);
+              tempResult = FormatCustomized(dateTime, ((char)nextChar).ToString());
               tokenLen = 2;
             }
             else
@@ -349,21 +355,21 @@ namespace System.Globalization
               {
                 if (dateTime.Hour < 12)
                 {
-                  if (dtfi.AMDesignator.Length >= 1) tempResult = dtfi.AMDesignator[0].ToString();
+                  tempResult = "AM";
                 }
                 else
                 {
-                  if (dtfi.PMDesignator.Length >= 1) tempResult = dtfi.PMDesignator[0].ToString();
+                  tempResult = "PM";
                 }
 
               }
-              else tempResult = dateTime.Hour < 12 ? dtfi.AMDesignator : dtfi.PMDesignator;
+              else tempResult = dateTime.Hour < 12 ? "AM" : "PM";
               break;
             case 'd':
               //
               // tokenLen == 1 : Day of month as digits with no leading zero.
               // tokenLen == 2 : Day of month as digits with leading zero for single-digit months.
-              // tokenLen == 3 : Day of week as a three-leter abbreviation.
+              // tokenLen == 3 : Day of week as a three-letter abbreviation.
               // tokenLen >= 4 : Day of week as its full name.
               //
               if (tokenLen <= 2) tempResult = FormatDigits(dateTime.Day, tokenLen);
@@ -371,7 +377,7 @@ namespace System.Globalization
               {
                 var dayOfWeek = (int)dateTime.DayOfWeek;
 
-                tempResult = tokenLen == 3 ? dtfi.AbbreviatedDayNames[dayOfWeek] : dtfi.DayNames[dayOfWeek];
+                tempResult = tokenLen == 3 ? abbrDayNames[dayOfWeek] : dayNames[dayOfWeek];
               }
               break;
             case 'M':
@@ -383,7 +389,7 @@ namespace System.Globalization
               //
               var month = dateTime.Month;
               if (tokenLen <= 2) tempResult = FormatDigits(month, tokenLen);
-              else tempResult = tokenLen == 3 ? dtfi.AbbreviatedMonthNames[month - 1] : dtfi.MonthNames[month - 1];
+              else tempResult = tokenLen == 3 ? abbrMonthNames[month - 1] : monthNames[month - 1];
               break;
             case 'y':
               // Notes about OS behavior:
@@ -469,12 +475,12 @@ namespace System.Globalization
       return realFormat;
     }
 
-    internal static String Format(DateTime dateTime, String format, DateTimeFormatInfo dtfi)
+    internal static String Format(DateTime dateTime, String format)
     {
-      if (format == null || format.Length == 0) format = "G";
-      if (format.Length == 1) format = GetRealFormat(format, dtfi);
+      if (format == null || format.Length == 0)
+        format = "G";
 
-      return FormatCustomized(dateTime, format, dtfi);
+      return FormatCustomized(dateTime, format);
     }
   }
 }

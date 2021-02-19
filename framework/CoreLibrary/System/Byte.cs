@@ -35,7 +35,7 @@ namespace System
         /// <remarks>The return value is formatted with the general numeric format specifier ("G") and the NumberFormatInfo object for the thread current culture.</remarks>
         public override String ToString()
         {
-            return Number.Format(_value, true, "G", NumberFormatInfo.CurrentInfo);
+            return Number.Format(_value, true, "G");
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace System
         /// <returns>The string representation of the current Byte object, formatted as specified by the format parameter.</returns>
         public String ToString(String format)
         {
-            return Number.Format(_value, true, format, NumberFormatInfo.CurrentInfo);
+            return Number.Format(_value, true, format);
         }
 
         /// <summary>

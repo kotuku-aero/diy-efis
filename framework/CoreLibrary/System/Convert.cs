@@ -292,19 +292,18 @@ namespace System
     /// </summary>
     /// <param name="inString">The string to convert.</param>
     /// <returns>An array of 8-bit unsigned integers that is equivalent to <paramref name="inString"/></returns>
-    /// <remarks>s is composed of base-64 digits, white-space characters, and trailing padding characters. The base-64 digits in ascending order from zero are the uppercase characters "A" to "Z", lowercase characters "a" to "z", numerals "0" to "9", and the symbols "+" and "/".
-    /// The white-space characters, and their Unicode names and hexadecimal code points, are tab(CHARACTER TABULATION, U+0009), newline(LINE FEED, U+000A), carriage return (CARRIAGE RETURN, U+000D), and blank(SPACE, U+0020). An arbitrary number of white-space characters can appear in s because all white-space characters are ignored.
+    /// <remarks>s is composed of base-64 digits, white-space characters, and trailing padding characters. 
+    /// The base-64 digits in ascending order from zero are the uppercase characters "A" to "Z", 
+    /// lowercase characters "a" to "z", numerals "0" to "9", and the symbols "+" and "/".
+    /// The white-space characters, and their Unicode names and hexadecimal code points, 
+    /// are tab(CHARACTER TABULATION, U+0009), newline(LINE FEED, U+000A), carriage return 
+    /// (CARRIAGE RETURN, U+000D), and blank(SPACE, U+0020). An arbitrary number of white-space characters 
+    /// can appear in s because all white-space characters are ignored.
     /// The valueless character, "=", is used for trailing padding. The end of s can consist of zero, one, or two padding characters.
     /// </remarks>
     public static byte[] FromBase64String(string inString)
     {
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-      if (inString == null) throw new ArgumentNullException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-
-      var chArray = inString.ToCharArray();
-
-      return FromBase64CharArray(chArray, 0, chArray.Length);
+      return CanFly.Runtime.FromBase64String(inString);
     }
 
     /// <summary>
@@ -316,24 +315,7 @@ namespace System
     /// <returns>An array of 8-bit unsigned integers equivalent to <paramref name="length"/> elements at position <paramref name="offset"/> in <paramref name="inArray"/>.</returns>
     public static byte[] FromBase64CharArray(char[] inArray, int offset, int length)
     {
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-      if (inArray == null) throw new ArgumentNullException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-      if (length < 0) throw new ArgumentOutOfRangeException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-      if (offset < 0) throw new ArgumentOutOfRangeException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-      if (offset > inArray.Length - length) throw new ArgumentOutOfRangeException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-
-      // copy to new array
-      var destinationArray = new char[length];
-      Array.Copy(inArray, offset, destinationArray, 0, length);
-
-      return CanFly.Runtime.FromBase64CharArray(destinationArray, length);
+      return CanFly.Runtime.FromBase64String(new string(inArray, offset, length));
     }
 
   }

@@ -139,7 +139,6 @@ namespace System.IO
         public virtual void Close()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         /// <summary>

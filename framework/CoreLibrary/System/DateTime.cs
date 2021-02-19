@@ -616,14 +616,14 @@ namespace System
     /// Converts the value of the current <see cref="DateTime"/> object to its equivalent string representation.
     /// </summary>
     /// <returns>A string representation of the value of the current <see cref="DateTime"/> object.</returns>
-    public override string ToString() => DateTimeFormat.Format(this, null, DateTimeFormatInfo.CurrentInfo);
+    public override string ToString() => DateTimeFormat.Format(this, null);
 
     /// <summary>
     /// Converts the value of the current <see cref="DateTime"/> object to its equivalent string representation using the specified format.
     /// </summary>
     /// <param name="format">A standard or custom date and time format string (see Remarks). </param>
     /// <returns>A string representation of value of the current DateTime object as specified by format.</returns>
-    public string ToString(string format) => DateTimeFormat.Format(this, format, DateTimeFormatInfo.CurrentInfo);
+    public string ToString(string format) => DateTimeFormat.Format(this, format);
 
     /// <summary>
     /// Adds a specified time interval to a specified date and time, yielding a new date and time.

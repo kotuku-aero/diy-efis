@@ -47,7 +47,7 @@
     <NFMDP_PE_NoBitmapCompression>true</NFMDP_PE_NoBitmapCompression>
     <!-- we like verbose -->
     <NFMDP_STUB_Verbose>true</NFMDP_STUB_Verbose>
-    <NF_GenerateStubsDirectory>..\..\..\libs\ion\nano\CLR\CorLib</NF_GenerateStubsDirectory>
+    <NF_GenerateStubsDirectory>..\..\..\libs\ion\clr</NF_GenerateStubsDirectory>
     <NF_GenerateSkeletonProjectName>corlib_native</NF_GenerateSkeletonProjectName>
     <!-- this is one is absolutly mandatory for the base class library -->
     <NFMDP_STUB_SkeletonWithoutInterop>true</NFMDP_STUB_SkeletonWithoutInterop>
@@ -101,8 +101,6 @@
     <Compile Include="System\EventHandler.cs" />
     <Compile Include="System\Exception.cs" />
     <Compile Include="System\FlagsAttribute.cs" />
-    <Compile Include="System\GC.cs" />
-    <Compile Include="System\Globalization\CultureInfo.cs" />
     <Compile Include="System\Globalization\DateTimeFormat.cs" />
     <Compile Include="System\Globalization\DateTimeFormatInfo.cs" />
     <Compile Include="System\Globalization\NumberFormatInfo.cs" />
@@ -126,7 +124,6 @@
     <Compile Include="System\IO\Stream.cs" />
     <Compile Include="System\MarshalByRefObject.cs" />
     <Compile Include="System\Math.cs" />
-    <Compile Include="System\MulticastDelegate.cs" />
     <Compile Include="System\NonSerializedAttribute.cs" />
     <Compile Include="System\NotImplementedException.cs" />
     <Compile Include="System\NotSupportedException.cs" />
@@ -169,7 +166,6 @@
     <Compile Include="System\Threading\AutoResetEvent.cs" />
     <Compile Include="System\Threading\Interlocked.cs" />
     <Compile Include="System\Threading\ManualResetEvent.cs" />
-    <Compile Include="System\Threading\Monitor.cs" />
     <Compile Include="System\Threading\Thread.cs" />
     <Compile Include="System\Threading\ThreadAbortException.cs" />
     <Compile Include="System\Threading\ThreadPriority.cs" />

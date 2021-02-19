@@ -14,9 +14,6 @@ namespace CanFly
       // screen does nothing, as is a canvas only.
     }
 
-    private class WidgetLock { };
-    private static WidgetLock widgetLock = new WidgetLock();
-
     /// <summary>
     /// Return the singleton screen widget
     /// </summary>
@@ -26,14 +23,10 @@ namespace CanFly
       {
         if (_screen == null)
         {
-          lock (widgetLock)
-            if (_screen == null)
-            {
-              uint handle;
-              ExceptionHelper.ThrowIfFailed(Syscall.OpenScreen(0, 0, out handle));
+          uint handle;
+          ExceptionHelper.ThrowIfFailed(Syscall.OpenScreen(0, 0, out handle));
 
-              _screen = new Screen(handle);
-            }
+          _screen = new Screen(handle);
         }
 
         return _screen;
