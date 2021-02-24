@@ -22,13 +22,21 @@ namespace System.Threading
     }
 
     /// <summary>
-    /// Sets the state of the event to nonsignaled, causing threads to block.
+    /// Sets the state of the event to non signaled, causing threads to block.
     /// </summary>
     /// <returns>true if the operation succeeds; otherwise, false.</returns>
     public bool Reset()
     {
       // remove the counter
-      return CanFly.Syscall.SemaphoreWait(handle, 0) == 0;
+      try
+      {
+        CanFly.Syscall.SemaphoreWait(handle, 0);
+      }
+      catch
+      {
+        return false;
+      }
+      return true;
     }
 
     /// <summary>
@@ -37,7 +45,15 @@ namespace System.Threading
     /// <returns>true if the operation succeeds; otherwise, false.</returns>
     public bool Set()
     { 
-      return CanFly.Syscall.SemaphoreSignal(handle) == 0;
+      try
+      {
+        CanFly.Syscall.SemaphoreSignal(handle);
+      }
+      catch
+      {
+        return false;
+      }
+      return true;
     }
 
     public override bool WaitOne(int millisecondsTimeout, bool exitContext)

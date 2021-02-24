@@ -21,8 +21,7 @@ namespace System.Threading
 
     protected WaitHandle()
     {
-      if (CanFly.Syscall.SemaphoreCreate(out handle) < 0)
-        throw new ApplicationException("Cannot create handle");
+      CanFly.Syscall.SemaphoreCreate(out handle);
     }
 
     /// <summary>
@@ -33,9 +32,14 @@ namespace System.Threading
     /// <returns>true if the current instance receives a signal; otherwise, false.</returns>
     public virtual bool WaitOne(int millisecondsTimeout, bool exitContext)
     {
-      int result = CanFly.Syscall.SemaphoreWait(handle, (uint) millisecondsTimeout);
-      if (result == -15)
+      try
+      {
+        CanFly.Syscall.SemaphoreWait(handle, (uint) millisecondsTimeout);
+      }
+      catch
+      {
         return false;
+      }
 
       return true;
     }
@@ -101,16 +105,23 @@ namespace System.Threading
       uint currentTicks;
 
       // not nice, but syscall callback not implemented yet
-      while (CanFly.Syscall.Ticks(out currentTicks) == 0 && currentTicks < ticks)
+      do
       {
+        CanFly.Syscall.Yield();
         for (int i = 0; i < waitHandles.Length; i++)
         {
-          if (CanFly.Syscall.SemaphoreWait(waitHandles[i].handle, 0) == 0)
+          try
+          {
+            CanFly.Syscall.SemaphoreWait(waitHandles[i].handle, 0);
             return i;
+          }
+          catch
+          {
+          }
         }
 
-        CanFly.Syscall.Yield();
-      }
+        CanFly.Syscall.Ticks(out currentTicks);
+      } while (currentTicks < ticks);
 
       return -1;
     }

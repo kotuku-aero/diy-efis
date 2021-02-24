@@ -37,14 +37,12 @@ namespace System.Threading
     /// <param name="period">The time interval between invocations of callback, in milliseconds. Specify Timeout.Infinite to disable periodic signaling.</param>
     public Timer(TimerCallback callback, Object state, int dueTime, int period)
     {
-      if (CanFly.Syscall.SemaphoreCreate(out _semaphore) < 0)
-        throw new ApplicationException();
+      CanFly.Syscall.SemaphoreCreate(out _semaphore);
 
       _dueTime = dueTime;
       _period = period;
 
-      if (CanFly.Syscall.CreateThread((byte)ThreadPriority.Normal, null, Run, Thread.CurrentThread, out _thread) < 0)
-        throw new ApplicationException();
+      CanFly.Syscall.CreateThread((byte)ThreadPriority.Normal, null, Run, this, out _thread);
     }
 
     private void Run()

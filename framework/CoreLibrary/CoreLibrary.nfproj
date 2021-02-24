@@ -56,7 +56,6 @@
   </PropertyGroup>
   <Import Project="$(NanoFrameworkProjectSystemPath)NFProjectSystem.props" Condition="Exists('$(NanoFrameworkProjectSystemPath)NFProjectSystem.props')" />
   <ItemGroup>
-    <Compile Include="CanFly\CanFlyExceptionHelper.cs" />
     <Compile Include="CanFly\Runtime.cs" />
     <Compile Include="CanFly\Syscall.cs" />
     <Compile Include="System\Action.cs" />
@@ -124,6 +123,7 @@
     <Compile Include="System\IO\Stream.cs" />
     <Compile Include="System\MarshalByRefObject.cs" />
     <Compile Include="System\Math.cs" />
+    <Compile Include="System\MulticastDelegate.cs" />
     <Compile Include="System\NonSerializedAttribute.cs" />
     <Compile Include="System\NotImplementedException.cs" />
     <Compile Include="System\NotSupportedException.cs" />

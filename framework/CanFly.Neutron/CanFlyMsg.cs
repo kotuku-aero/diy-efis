@@ -610,7 +610,7 @@ public sealed class CanFlyMsg
         throw new InvalidCastException();
 
       float value;
-      ExceptionHelper.ThrowIfFailed(Syscall.GetFloat(_b4, _b5, _b6, _b7, out value));
+      Syscall.GetFloat(_b4, _b5, _b6, _b7, out value);
 
       return value;
     }
@@ -621,7 +621,7 @@ public sealed class CanFlyMsg
         throw new InvalidCastException();
 
       int value;
-      ExceptionHelper.ThrowIfFailed(Syscall.GetInt32(_b4, _b5, _b6, _b7, out value));
+      Syscall.GetInt32(_b4, _b5, _b6, _b7, out value);
 
       return value;
     }
@@ -633,7 +633,7 @@ public sealed class CanFlyMsg
         throw new InvalidCastException();
 
       uint value;
-      ExceptionHelper.ThrowIfFailed(Syscall.GetUInt32(_b4, _b5, _b6, _b7, out value));
+      Syscall.GetUInt32(_b4, _b5, _b6, _b7, out value);
 
       return value;
     }
@@ -645,7 +645,7 @@ public sealed class CanFlyMsg
         throw new InvalidCastException();
 
       short value;
-      ExceptionHelper.ThrowIfFailed(Syscall.GetInt16(_b4, _b5, out value));
+      Syscall.GetInt16(_b4, _b5, out value);
 
       return value;
     }
@@ -657,7 +657,7 @@ public sealed class CanFlyMsg
         throw new InvalidCastException();
 
       ushort value;
-      ExceptionHelper.ThrowIfFailed(Syscall.GetUInt16(_b4, _b5, out value));
+      Syscall.GetUInt16(_b4, _b5, out value);
 
       return value;
     }
@@ -686,9 +686,8 @@ public sealed class CanFlyMsg
         throw new InvalidCastException();
 
       short[] value = new short[2];
-      ExceptionHelper.ThrowIfFailed(Syscall.GetInt16(_b4, _b5, out value[0]));
-
-      ExceptionHelper.ThrowIfFailed(Syscall.GetInt16(_b6, _b7, out value[1]));
+      Syscall.GetInt16(_b4, _b5, out value[0]);
+      Syscall.GetInt16(_b6, _b7, out value[1]);
 
       return value;
     }
@@ -700,9 +699,8 @@ public sealed class CanFlyMsg
         throw new InvalidCastException();
 
       ushort[] value = new ushort[2];
-      ExceptionHelper.ThrowIfFailed(Syscall.GetUInt16(_b4, _b5, out value[0]));
-
-      ExceptionHelper.ThrowIfFailed(Syscall.GetUInt16(_b6, _b7, out value[1]));
+      Syscall.GetUInt16(_b4, _b5, out value[0]);
+      Syscall.GetUInt16(_b6, _b7, out value[1]);
 
       return value;
     }

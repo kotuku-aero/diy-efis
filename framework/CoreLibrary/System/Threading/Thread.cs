@@ -1,9 +1,3 @@
-//
-// Copyright (c) .NET Foundation and Contributors
-// Portions Copyright (c) Microsoft Corporation.  All rights reserved.
-// See LICENSE file in the project root for full license information.
-//
-
 namespace System.Threading
 {
   using System;
@@ -23,12 +17,10 @@ namespace System.Threading
     /// <param name="start">A ThreadStart delegate that represents the methods to be invoked when this thread begins executing.</param>
     public Thread(ThreadStart start, ThreadPriority priority = ThreadPriority.Normal, string name = null)
     {
-      if (CanFly.Syscall.SemaphoreCreate(out _completed) < 0)
-        throw new ApplicationException("Cannot create completion semaphore");
-
       _start = start;
-      if (CanFly.Syscall.CreateThread( (byte)priority, name, Run, this, out _thread) < 0)
-        throw new ApplicationException("Cannot start thread");
+
+      CanFly.Syscall.SemaphoreCreate(out _completed);
+      CanFly.Syscall.CreateThread((byte)priority, name, Run, this, out _thread);
     }
 
     private void Run()
@@ -43,16 +35,6 @@ namespace System.Threading
       _thread = 0;
       CanFly.Syscall.SemaphoreClose(_completed);
     }
-
-    /// <summary>
-    /// Causes the operating system to change the state of the current instance to ThreadState.Running.
-    /// </summary>
-    public void Start() { CanFly.Syscall.ThreadStart(_thread); }
-
-    /// <summary>
-    /// Raises a ThreadAbortException in the thread on which it is invoked, to begin the process of terminating the thread. Calling this method usually terminates the thread.
-    /// </summary>
-    public void Abort() { CanFly.Syscall.ThreadAbort(_thread); }
 
     /// <summary>
     /// Either suspends the thread, or if the thread is already suspended, has no effect.
@@ -90,15 +72,6 @@ namespace System.Threading
     }
 
     /// <summary>
-    /// Gets a value indicating the execution status of the current thread.
-    /// </summary>
-    /// <value>true if this thread has been started and has not terminated normally or aborted; otherwise, false.</value>
-    public bool IsAlive
-    {
-      get { return CanFly.Syscall.ThreadIsAlive(_thread) == 0; }
-    }
-
-    /// <summary>
     /// Blocks the calling thread until the thread represented by this instance terminates or the specified time
     /// elapses.
     /// </summary>
@@ -107,8 +80,14 @@ namespace System.Threading
     /// of time specified by the timeout parameter has elapsed.</returns>
     public bool Join(TimeSpan timeout) 
     {
-      if (CanFly.Syscall.SemaphoreWait(_completed, (uint)timeout.TotalMilliseconds) == 15)
+      try
+      {
+        CanFly.Syscall.SemaphoreWait(_completed, (uint)timeout.TotalMilliseconds);
+      }
+      catch
+      {
         return false;
+      }
 
       return true;
     }
@@ -125,7 +104,7 @@ namespace System.Threading
     /// You can specify Timeout.Infinite for the <paramref name="millisecondsTimeout"/> parameter to suspend the thread indefinitely. However, we recommend that you use other <see cref="System.Threading"/> classes such as <see cref="AutoResetEvent"/>, <see cref="ManualResetEvent"/>, <see cref="Monitor"/> or <see cref="WaitHandle"/> instead to synchronize threads or manage resources.
     /// The system clock ticks at a specific rate called the clock resolution. The actual timeout might not be exactly the specified timeout, because the specified timeout will be adjusted to coincide with clock ticks. 
     /// </remarks>
-    public static void Sleep(int millisecondsTimeout) { CanFly.Syscall.ThreadSleep(millisecondsTimeout); }
+    public void Sleep(uint millisecondsTimeout) { CanFly.Syscall.ThreadSleep(_thread, millisecondsTimeout); }
 
     /// <summary>
     /// Suspends the current thread for the specified amount of time.
@@ -139,16 +118,16 @@ namespace System.Threading
     /// You can specify <see cref="Timeout.Infinite"/> for the <paramref name="timeout"/> parameter to suspend the thread indefinitely. However, we recommend that you use other <see cref="System.Threading"/> classes such as <see cref="AutoResetEvent"/>, <see cref="ManualResetEvent"/>, <see cref="Monitor"/> or <see cref="WaitHandle"/> instead to synchronize threads or manage resources.
     /// The system clock ticks at a specific rate called the clock resolution. The actual timeout might not be exactly the specified timeout, because the specified timeout will be adjusted to coincide with clock ticks. 
     /// </remarks>
-    public static void Sleep(TimeSpan timeout)
+    public void Sleep(TimeSpan timeout)
     {
       long tm = timeout.Ticks / TimeSpan.TicksPerMillisecond;
-      if (tm < -1 || tm > Int32.MaxValue)
+      if (tm < -1 || tm > UInt32.MaxValue)
       {
 #pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
         throw new ArgumentOutOfRangeException();
 #pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
       }
-      Sleep((int)tm);
+      Sleep((uint)tm);
     }
 
 
@@ -166,21 +145,6 @@ namespace System.Threading
         CanFly.Syscall.ThreadGetArg(id, out arg);
 
         return (Thread)arg;
-      }
-    }
-
-    /// <summary>
-    /// Gets a value containing the states of the current thread.
-    /// </summary>
-    /// <value>One of the ThreadState values indicating the state of the current thread. The initial value is Unstarted.</value>
-    public ThreadState ThreadState
-    {
-      get
-      {
-        uint state;
-        CanFly.Syscall.GetThreadState(_thread, out state);
-
-        return (ThreadState)state;
       }
     }
   }

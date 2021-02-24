@@ -182,6 +182,11 @@ namespace CanFly
     internal static extern int Min(int val1, int val2);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern int Max(int val1, int val2);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern bool Equals(MulticastDelegate d1, MulticastDelegate d2);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern bool NotEquals(MulticastDelegate d1, MulticastDelegate d2);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern String FormatNative(Object value, char format, int precision);
     [MethodImpl(MethodImplOptions.InternalCall)]

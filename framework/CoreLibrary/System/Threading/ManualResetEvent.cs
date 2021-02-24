@@ -27,7 +27,15 @@ namespace System.Threading
     /// <returns>true if the operation succeeds; otherwise, false.</returns>
     public bool Reset()
     {
-      return CanFly.Syscall.SemaphoreWait(handle, 0) == 0;
+      try
+      {
+        CanFly.Syscall.SemaphoreWait(handle, 0);
+      }
+      catch
+      {
+        return false;
+      }
+      return true;
     }
 
     /// <summary>
@@ -36,7 +44,16 @@ namespace System.Threading
     /// <returns>true if the operation succeeds; otherwise, false.</returns>
     public bool Set()
     {
-      return CanFly.Syscall.SemaphoreSignal(handle) == 0;
+      try
+      {
+        CanFly.Syscall.SemaphoreSignal(handle);
+      }
+      catch
+      {
+        return false;
+      }
+
+      return true;
     }
   }
 }
