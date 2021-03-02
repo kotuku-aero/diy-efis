@@ -86,7 +86,7 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void RegSetBool(uint parent, string name, bool value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegEnumKey(uint key, ref ushort child, out string name);
+    public static extern void RegEnumKey(uint key, ref uint child, out string name);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void OpenScreen(ushort orientation, ushort id, out uint handle);
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -104,7 +104,7 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void SetWindowPos(uint window, int left, int top, int right, int bottom);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void GetWindowData(uint window, out CanFlyEventHandler data);
+    internal static extern void GetWindowData(uint window, out object widget);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void SetWindowData(uint window, CanFlyEventHandler wndproc);
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -246,7 +246,7 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void PackUInt16(ushort value, ref byte b0, ref byte b1);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void StreamEof(uint stream);
+    internal static extern void StreamEof(uint stream, out bool is_eof);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void StreamRead(uint stream, ushort size, out byte[] value);
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -312,7 +312,7 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void PointArrayGetPoint(uint handle, ushort index, out int x, out int y);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void PointArrayIndexOf(uint handle, int x, int y, out ushort index);
+    internal static extern void PointArrayIndexOf(uint handle, int x, int y, out int index);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void PointArrayRemoveAt(uint handle, ushort index);
     [MethodImpl(MethodImplOptions.InternalCall)]

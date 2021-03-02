@@ -13,9 +13,9 @@ namespace CanFly
     /// Create a point array, will be initialzied with Point(0, 0)
     /// </summary>
     /// <param name="numPoints"></param>
-    public PointArray(uint numPoints = 0)
+    public PointArray(ushort numPoints = 0)
     {
-      ExceptionHelper.ThrowIfFailed(Syscall.PointArrayCreate(numPoints, out _handle));
+      Syscall.PointArrayCreate(numPoints, out _handle);
     }
     /// <summary>
     /// Create a point array from a list of points
@@ -26,9 +26,9 @@ namespace CanFly
       if (points == null)
         throw new ArgumentNullException();
 
-      uint len = (uint)points.Length;
-      ExceptionHelper.ThrowIfFailed(Syscall.PointArrayCreate(len, out _handle));
-      for (uint i = 0; i < len; i++)
+      ushort len = (ushort)points.Length;
+      Syscall.PointArrayCreate(len, out _handle);
+      for (ushort i = 0; i < len; i++)
         this[i] = points[i];
     }
 
@@ -37,7 +37,7 @@ namespace CanFly
       get { return _handle; }
     }
 
-    public Point this[uint index]
+    public Point this[ushort index]
     {
       get
       {
@@ -55,12 +55,12 @@ namespace CanFly
       }
     }
 
-    public uint Count
+    public ushort Count
     {
       get 
       {
-        uint value;
-        ExceptionHelper.ThrowIfFailed(Syscall.PointArraySize(_handle, out value));
+        ushort value;
+        Syscall.PointArraySize(_handle, out value);
         return value;
       }
       set { Syscall.PointArrayResize(_handle, value); }
@@ -68,8 +68,9 @@ namespace CanFly
 
     public uint Add(Point value)
     {
-      uint size;
-      ExceptionHelper.ThrowIfFailed(Syscall.PointArrayAppend(_handle, value.X, value.Y, out size));
+      ushort size;
+      Syscall.PointArrayAppend(_handle, value.X, value.Y, out size);
+
       return size;
     }
 
@@ -80,8 +81,10 @@ namespace CanFly
 
     public bool Contains(Point value)
     {
-      uint index;
-      return Syscall.PointArrayIndexOf(_handle, value.X, value.Y, out index) == 0;
+      int index;
+      Syscall.PointArrayIndexOf(_handle, value.X, value.Y, out index);
+
+      return index >= 0;
     }
     public void Dispose()
     {
@@ -92,7 +95,7 @@ namespace CanFly
     private class PointEnumerator : IEnumerator
     {
       private PointArray _outer;
-      private uint _index;
+      private ushort _index;
 
       public PointEnumerator(PointArray outer)
       {
@@ -125,30 +128,31 @@ namespace CanFly
       return new PointEnumerator(this);
     }
 
-    public uint IndexOf(Point value)
+    public int IndexOf(Point value)
     {
-      uint index;
-      ExceptionHelper.ThrowIfFailed(Syscall.PointArrayIndexOf(_handle, value.X, value.Y, out index));
+      int index;
+      Syscall.PointArrayIndexOf(_handle, value.X, value.Y, out index);
+
       return index;
     }
 
-    public void Insert(uint index, Point value)
+    public void Insert(ushort index, Point value)
     {
       Syscall.PointArrayInsertAt(_handle, index, value.X, value.Y);
     }
 
     public void Remove(Point value)
     {
-      uint index;
-      ExceptionHelper.ThrowIfFailed(Syscall.PointArrayIndexOf(_handle, value.X, value.Y, out index));
+      int index;
+      Syscall.PointArrayIndexOf(_handle, value.X, value.Y, out index);
 
       if (index >= 0)
-        Syscall.PointArrayRemoveAt(_handle, (uint) index);
+        Syscall.PointArrayRemoveAt(_handle, (ushort) index);
     }
 
-    public void RemoveAt(uint index)
+    public void RemoveAt(ushort index)
     {
-      ExceptionHelper.ThrowIfFailed(Syscall.PointArrayRemoveAt(_handle, index));
+      Syscall.PointArrayRemoveAt(_handle, index);
     }
   }
 }

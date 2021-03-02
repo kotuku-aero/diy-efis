@@ -261,7 +261,8 @@ namespace CanFly.Proton
 
       // open a step key
       uint step_key;
-      if (Syscall.RegOpenKey(key, "step", out step_key) == 0)
+
+      if (TryRegOpenKey(key, "step", out step_key))
       {
         steps = new ArrayList();
 
@@ -272,7 +273,7 @@ namespace CanFly.Proton
           // this stops as soon as the first key is not found
           uint child_key;
 
-          while (Syscall.RegOpenKey(step_key, i.ToString(), out child_key) == 0)
+          while (TryRegOpenKey(step_key, i.ToString(), out child_key))
           {
             step_t new_step = new step_t();
 
@@ -287,14 +288,14 @@ namespace CanFly.Proton
       }
 
       uint ticks_key;
-      if (Syscall.RegOpenKey(key, "tick", out ticks_key) == 0)
+      if (TryRegOpenKey(key, "tick", out ticks_key))
       {
         ticks = new ArrayList();
 
         for (int i = 0; i < 99; i++)
         {
           uint child_key;
-          while (Syscall.RegOpenKey(ticks_key, i.ToString(), out child_key) == 0)
+          while (TryRegOpenKey(ticks_key, i.ToString(), out child_key))
           {
             // tick-0=650, 650
             // param1 . tick point

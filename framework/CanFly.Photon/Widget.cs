@@ -5,7 +5,7 @@ namespace CanFly
 {
   /// <summary>
   /// A Widget is a class that can handle messages from the internal
-  /// can message bus, as well as haviond child windows.
+  /// can message bus, as well as having child windows.
   /// </summary>
   public abstract class Widget : GdiObject
   {
@@ -46,7 +46,7 @@ namespace CanFly
     /// <param name="hwnd"></param>
     internal Widget(uint hwnd) : base(hwnd)
     {
-      Syscall.SetWindowData(Handle, this, OnMessage);
+      Syscall.SetWindowData(Handle, OnMessage);
       eventInfoTable = new ArrayList();
 
       ClipRect = WindowRect;
@@ -55,7 +55,7 @@ namespace CanFly
     private static uint CreateChildWindow(uint parent, int left, int top, int right, int bottom, ushort id)
     {
       uint handle;
-      ExceptionHelper.ThrowIfFailed(Syscall.CreateChildWindow(parent, left, top, right, bottom, id, out handle));
+      Syscall.CreateChildWindow(parent, left, top, right, bottom, id, out handle);
 
       return handle;
     }
@@ -69,7 +69,7 @@ namespace CanFly
     protected Widget(Widget parent, Rect bounds, ushort id)
       : base(CreateChildWindow(parent.Handle, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom, id))
     {
-      Syscall.SetWindowData(Handle, this, OnMessage);
+      Syscall.SetWindowData(Handle, OnMessage);
       // default clipping rectangle
       ClipRect = WindowRect;
 
@@ -211,7 +211,7 @@ namespace CanFly
         return null;
 
       object wndData;
-      ExceptionHelper.ThrowIfFailed(Syscall.GetWindowData(handle, out wndData));
+      Syscall.GetWindowData(handle, out wndData);
 
       return (Widget)wndData;
     }
@@ -224,7 +224,7 @@ namespace CanFly
       get
       {
         uint parentHndl;
-        ExceptionHelper.ThrowIfFailed(Syscall.GetParent(Handle, out parentHndl));
+        Syscall.GetParent(Handle, out parentHndl);
 
         return GetWidget(parentHndl);
       }
@@ -238,7 +238,7 @@ namespace CanFly
     public Widget GetWidgetById(ushort id)
     {
       uint handle;
-      ExceptionHelper.ThrowIfFailed(Syscall.GetWindowById(Handle, id, out handle));
+      Syscall.GetWindowById(Handle, id, out handle);
 
       return GetWidget(handle);
     }
@@ -250,7 +250,7 @@ namespace CanFly
       get
       {
         uint handle;
-        ExceptionHelper.ThrowIfFailed(Syscall.GetFirstChild(Handle, out handle));
+        Syscall.GetFirstChild(Handle, out handle);
 
         return GetWidget(handle);
       }
@@ -263,7 +263,7 @@ namespace CanFly
       get
       {
         uint handle;
-        ExceptionHelper.ThrowIfFailed(Syscall.GetNextSibling(Handle, out handle));
+        Syscall.GetNextSibling(Handle, out handle);
 
         return GetWidget(handle);
       }
@@ -276,7 +276,7 @@ namespace CanFly
       get
       {
         uint handle;
-        ExceptionHelper.ThrowIfFailed(Syscall.GetPreviousSibling(Handle, out handle));
+        Syscall.GetPreviousSibling(Handle, out handle);
 
         return GetWidget(handle);
       }
@@ -307,11 +307,11 @@ namespace CanFly
       get 
       {
         byte value;
-        ExceptionHelper.ThrowIfFailed(Syscall.GetZOrder(Handle, out value));
+        Syscall.GetZOrder(Handle, out value);
 
         return value;
       }
-      set { ExceptionHelper.ThrowIfFailed(Syscall.SetZOrder(Handle, value)); }
+      set { Syscall.SetZOrder(Handle, value); }
     }
     /// <summary>
     /// Invalidate the area of the canvas.
@@ -322,7 +322,7 @@ namespace CanFly
       if (rect == null)
         rect = WindowRect;
 
-      ExceptionHelper.ThrowIfFailed(Syscall.InvalidateRect(Handle, rect.Left, rect.Right, rect.Top, rect.Bottom));
+      Syscall.InvalidateRect(Handle, rect.Left, rect.Right, rect.Top, rect.Bottom);
     }
     /// <summary>
     /// Return true if the window is invalid
@@ -332,7 +332,7 @@ namespace CanFly
       get
       {
         bool value;
-        ExceptionHelper.ThrowIfFailed(Syscall.IsInvalid(Handle, out value));
+        Syscall.IsInvalid(Handle, out value);
 
         return value;
       }
@@ -452,63 +452,170 @@ namespace CanFly
 
     public bool TryRegGetString(uint key, string name, out string value)
     {
-      return Syscall.RegGetString(key, name, out value) == 0;
+      value = null;
+      try
+      {
+        Syscall.RegGetString(key, name, out value);
+      }
+      catch
+      {
+        return false;
+      }
+
+      return true;
     }
 
     public bool TryOpenFont(string name, ushort pixels, out Font font)
     {
       font = null;
       uint handle;
-      if (Syscall.OpenFont(name, pixels, out handle) != 0)
+      try
+      {
+        Syscall.OpenFont(name, pixels, out handle);
+
+        font = new Font(handle);
+      }
+      catch
+      {
         return false;
-      font = new Font(handle);
+      }
 
       return true;
     }
 
     public bool TryRegGetBool(uint key, string name, out bool value)
     {
-      return Syscall.RegGetBool(key, name, out value) == 0;
+      value = false;
+      try
+      {
+        Syscall.RegGetBool(key, name, out value);
+      }
+      catch
+      {
+        return false;
+      }
+
+      return true;
     }
 
     public bool TryRegGetFloat(uint key, string name, out float value)
     {
-      return Syscall.RegGetFloat(key, name, out value) == 0;
+      value = 0;
+      try
+      {
+        Syscall.RegGetFloat(key, name, out value);
+      }
+      catch
+      {
+        return false;
+      }
+
+      return true;
     }
 
     public bool TryRegGetUint8(uint key, string name, out byte value)
     {
-      return Syscall.RegGetUint8(key, name, out value)== 0;
+      value = 0;
+      try
+      {
+        Syscall.RegGetUint8(key, name, out value);
+      }
+      catch
+      {
+        return false;
+      }
+
+      return true;
     }
     
     public bool TryRegGetUint16(uint key, string name, out ushort value)
     {
-      return Syscall.RegGetUint16(key, name, out value) == 0;
+      value = 0;
+      try
+      {
+        Syscall.RegGetUint16(key, name, out value);
+      }
+      catch
+      {
+        return false;
+      }
+
+      return true;
     }
     
     public bool TryRegGetUint32(uint key, string name, out uint value)
     {
-      return Syscall.RegGetUint32(key, name, out value)== 0;
+      value = 0;
+      try
+      {
+        Syscall.RegGetUint32(key, name, out value);
+      }
+      catch
+      {
+        return false;
+      }
+
+      return true;
     }
 
     public bool TryRegGetInt8(uint key, string name, out sbyte value)
     {
-      return Syscall.RegGetInt8(key, name, out value)== 0;
+      value = 0;
+      try
+      {
+        Syscall.RegGetInt8(key, name, out value);
+      }
+      catch
+      {
+        return false;
+      }
+
+      return true;
     }
     
     public bool TryRegGetInt16(uint key, string name, out short value)
     {
-      return Syscall.RegGetInt16(key, name, out value)== 0;
+      value = 0;
+      try
+      {
+        Syscall.RegGetInt16(key, name, out value);
+      }
+      catch
+      {
+        return false;
+      }
+
+      return true;
     }
    
     public bool TryRegGetUInt16(uint key, string name, out ushort value)
     {
-      return Syscall.RegGetUint16(key, name, out value)== 0;
+      value = 0;
+      try
+      {
+        Syscall.RegGetUint16(key, name, out value);
+      }
+      catch
+      {
+        return false;
+      }
+
+      return true;
     }
     
     public bool TryRegGetInt32(uint key, string name, out int value)
     {
-      return Syscall.RegGetInt32(key, name, out value) == 0;
+      value = 0;
+      try
+      {
+        Syscall.RegGetInt32(key, name, out value);
+      }
+      catch
+      {
+        return false;
+      }
+
+      return true;
     }
 
     public bool TryRegGetRect(uint key, out Rect rect)
@@ -541,7 +648,17 @@ namespace CanFly
 
     public bool TryRegOpenKey(uint key, string name, out uint child)
     {
-      return Syscall.RegOpenKey(key, name, out child) == 0;
+      child = 0;
+      try
+      {
+        Syscall.RegOpenKey(key, name, out child);
+      }
+      catch
+      {
+        return false;
+      }
+
+      return true;
     }
 
     /// <summary>

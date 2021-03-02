@@ -24,8 +24,7 @@ namespace CanFly
     public static Canvas Create(Extent extent)
     {
       uint handle;
-      if (Syscall.CreateRectCanvas(extent.Dx, extent.Dy, out handle) < 0)
-        throw new InvalidOperationException();
+      Syscall.CreateRectCanvas(extent.Dx, extent.Dy, out handle);
 
       return new Canvas(handle);
     }
@@ -41,7 +40,7 @@ namespace CanFly
     public static Canvas Create(Stream pngStream)
     {
       uint handle;
-      ExceptionHelper.ThrowIfFailed(Syscall.CreatePngCanvas(pngStream.Handle, out handle));
+      Syscall.CreatePngCanvas(pngStream.Handle, out handle);
       return new Canvas(handle);
     }
   }

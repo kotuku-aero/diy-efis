@@ -27,7 +27,7 @@ namespace CanFly
     /// <param name="pointSize">Size of the font requested</param>
     public Font(string fontName, uint pointSize)
     {
-      ExceptionHelper.ThrowIfFailed(CanFly.Syscall.GetFont(fontName, pointSize, out _hndl));
+      CanFly.Syscall.GetFont(fontName, pointSize, out _hndl);
 
       if (_hndl == 0)
         throw new InvalidOperationException();

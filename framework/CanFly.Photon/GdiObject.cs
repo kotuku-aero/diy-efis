@@ -162,14 +162,14 @@ namespace CanFly
     public uint GetPixel(Point pt)
     {
       uint color;
-      ExceptionHelper.ThrowIfFailed(Syscall.GetPixel(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, pt.X, pt.Y, out color));
+      Syscall.GetPixel(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, pt.X, pt.Y, out color);
       return color;
     }
 
     public uint SetPixel(Point pt, uint color)
     {
       uint value;
-      ExceptionHelper.ThrowIfFailed(Syscall.SetPixel(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, pt.X, pt.Y, color, out value));
+      Syscall.SetPixel(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, pt.X, pt.Y, color, out value);
       return value;
     }
     /// <summary>

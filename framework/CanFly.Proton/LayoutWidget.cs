@@ -110,7 +110,7 @@ namespace CanFly.Proton
       // the hive must have series of hives that form windows
 
       uint menu;
-      if (Syscall.RegOpenKey(hive, "menu", out menu) == 0)
+      if (TryRegOpenKey(hive, "menu", out menu))
       {
         // this stores a cache of loaded keys.
         _keyMappings = new Hashtable();
@@ -160,7 +160,7 @@ namespace CanFly.Proton
         string widgetName;
         ushort nextDefaultId = 0x8000;
         string name;
-        while (Syscall.RegEnumKey(menu, ref child, out name) == 0)
+        while (TryRegEnumKey(menu, ref child, out name))
         {
           string widgetType;
           if (!TryRegGetString(child, "type", out widgetType))
@@ -197,6 +197,21 @@ namespace CanFly.Proton
       AddEventListener(PhotonID.id_menu_dn, OnMenuDown);
       AddEventListener(PhotonID.id_menu_cancel, OnMenuCancel);
       AddEventListener(PhotonID.id_menu_ok, OnMenuOk);
+    }
+
+    private bool TryRegEnumKey(uint key, ref uint child, out string name)
+    {
+      name = null;
+      try
+      {
+        Syscall.RegEnumKey(key, ref child, out name);
+      }
+      catch
+      {
+        return false;
+      }
+
+      return true;
     }
 
     public delegate Widget CreateCustomWidget(Widget parent, uint hive, string widgetType, Rect bounds, ushort id);
@@ -242,7 +257,7 @@ namespace CanFly.Proton
     {
       activeKeys = null;
       uint hive;
-      if(Syscall.RegOpenKey(menu, keys_name, out hive)== 0)
+      if(TryRegOpenKey(menu, keys_name, out hive))
       {
         // open the key
         LoadFromRegistry(keys_name, hive);
@@ -501,7 +516,7 @@ namespace CanFly.Proton
     /// Assign the expression that is used to test if this menu item is enabled
     /// </summary>
     /// <param name="item">Item to assign to</param>
-    /// <param name="expr">xpression in the form <param>:<expression></param>
+    /// <param name="expr">expression in the form <param>:<expression></param>
     private void item_assign_enabler(MenuItem item, string expr)
     {
 
@@ -1028,7 +1043,7 @@ static MenuItem MenuItemAt(Menu menu, ushort index)
 
         uint child = 0;
         string itemName;
-        while (Syscall.RegEnumKey(key, ref child, out itemName)== 0)
+        while (TryRegEnumKey(key, ref child, out itemName))
         {
           // the protocol assumes all child keys are menu items
           MenuItem item = ParseItem(child);

@@ -24,7 +24,7 @@ namespace CanFly
         if (_screen == null)
         {
           uint handle;
-          ExceptionHelper.ThrowIfFailed(Syscall.OpenScreen(0, 0, out handle));
+          Syscall.OpenScreen(0, 0, out handle);
 
           _screen = new Screen(handle);
         }

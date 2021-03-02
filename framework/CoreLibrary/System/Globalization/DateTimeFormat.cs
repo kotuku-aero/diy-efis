@@ -122,7 +122,7 @@ namespace System.Globalization
     internal const int _maxSecondsFractionDigits = 3;
     ////////////////////////////////////////////////////////////////////////////
     //
-    // Format the positive integer value to a string and perfix with assigned
+    // Format the positive integer value to a string and prefix with assigned
     // length of leading zero.
     //
     // Parameters:
@@ -135,7 +135,10 @@ namespace System.Globalization
     //  The function can format to Int32.MaxValue.
     //
     ////////////////////////////////////////////////////////////////////////////
-    private static String FormatDigits(int value, int len) { return CanFly.Runtime.FormatDigits(value, len); }
+    private static String FormatDigits(int value, int len) 
+    {
+      return CanFly.Runtime.FormatDigits(value, len); 
+    }
 
     private static int ParseRepeatPattern(String format, int pos, char patternChar)
     {
