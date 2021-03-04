@@ -9,6 +9,11 @@ namespace CanFly
     {
     }
 
+    public void ProcessMessages()
+    {
+      CanFly.Syscall.ProcessMessages(Handle);
+    }
+
     protected override void OnPaint(CanFlyMsg e)
     {
       // screen does nothing, as is a canvas only.

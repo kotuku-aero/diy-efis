@@ -44,14 +44,7 @@ namespace CanFly.Proton
     // This holds the global root menu for the system
     //
     private Keys _rootKeys;
-    private System.Threading.AutoResetEvent _shutdownEvent;
     private short menuTimeout = 25;             // 5-second timeout
-
-    public void Run()
-    {
-      // wait till a menu item requests the loop to exit and the device will reset.
-      _shutdownEvent.WaitOne();
-    }
 
     //
     // this holds the active key handler for the current popup menu.  If there is
@@ -103,7 +96,6 @@ namespace CanFly.Proton
       : base(parent, parent.WindowRect, id)
     {
       _key = hive;
-      _shutdownEvent = new System.Threading.AutoResetEvent(false);
 
       // load the layout....
 

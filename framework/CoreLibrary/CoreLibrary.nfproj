@@ -163,17 +163,7 @@
     <Compile Include="System\SystemException.cs" />
     <Compile Include="System\TargetFrameworkAttribute.cs" />
     <Compile Include="System\ThreadAttributes.cs" />
-    <Compile Include="System\Threading\AutoResetEvent.cs" />
     <Compile Include="System\Threading\Interlocked.cs" />
-    <Compile Include="System\Threading\ManualResetEvent.cs" />
-    <Compile Include="System\Threading\Thread.cs" />
-    <Compile Include="System\Threading\ThreadAbortException.cs" />
-    <Compile Include="System\Threading\ThreadPriority.cs" />
-    <Compile Include="System\Threading\ThreadStart.cs" />
-    <Compile Include="System\Threading\ThreadState.cs" />
-    <Compile Include="System\Threading\Timeout.cs" />
-    <Compile Include="System\Threading\Timer.cs" />
-    <Compile Include="System\Threading\WaitHandle.cs" />
     <Compile Include="System\TimeSpan.cs" />
     <Compile Include="System\TypeCode.cs" />
     <Compile Include="System\TypedReference.cs" />

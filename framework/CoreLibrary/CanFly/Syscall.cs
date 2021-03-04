@@ -3,6 +3,8 @@ using System.Runtime.CompilerServices;
 
 namespace CanFly
 {
+  public delegate void ThreadStart();
+
   public delegate void CanFlyEventHandler(ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7);
   public static class Syscall
   {
@@ -18,7 +20,7 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void Yield();
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateThread(byte priority, string name, System.Threading.ThreadStart start, object arg, out uint id);
+    internal static extern void CreateThread(byte priority, string name, ThreadStart start, object arg, out uint id);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void ThreadGetArg(uint id, out object arg);
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -95,6 +97,13 @@ namespace CanFly
     internal static extern void CreateChildWindow(uint parent, int left, int top, int right, int bottom, ushort id, out uint handle);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void CloseWindow(uint hwnd);
+    /// <summary>
+    /// Process the message queue
+    /// </summary>
+    /// <param name="screen">Screen to receive windows messages from</param>
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void ProcessMessages(uint screen);
+
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void GetWindowRect(uint window, out int left, out int top, out int right, out int bottom);
 

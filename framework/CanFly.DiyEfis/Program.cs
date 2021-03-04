@@ -26,7 +26,7 @@ namespace CanFly.DiyEfis
       Proton.LayoutWidget layoutWidget = new Proton.LayoutWidget(Screen.Instance, orientation, 0, layoutKey);
 
       // this never returns, unless a reboot is requested.
-      layoutWidget.Run();
+      Screen.Instance.ProcessMessages();
     }
   }
 }
