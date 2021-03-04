@@ -58,7 +58,7 @@ namespace CanFly.Proton
     private readonly string hours_value = "TTS";
     private readonly string qnh_value = "QNH";
 
-    public AnnunciatorWidget(Widget parent, Rect bounds, ushort id, uint key)
+    public AnnunciatorWidget(Widget parent, Rect bounds, ushort id, ushort key)
   : base(parent, bounds, id)
     {
       if (!TryRegGetBool(key, "draw-border", out draw_border))

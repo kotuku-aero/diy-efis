@@ -62,7 +62,7 @@ namespace CanFly.Proton
     private bool _localizerAquired;
     private Font _font;
 
-    public AttitudeWidget(Widget parent, Rect bounds, ushort id, uint key)
+    public AttitudeWidget(Widget parent, Rect bounds, ushort id, ushort key)
   : base(parent, bounds, id)
     {
       TryRegGetUint16(key, "critical-aoa", out _criticalAOA);

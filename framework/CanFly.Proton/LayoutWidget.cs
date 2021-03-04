@@ -65,7 +65,7 @@ namespace CanFly.Proton
     private short _menuStartX;
     private short _menuStartY;
 
-    private uint _key; // window key
+    private ushort _key; // window key
 
     // map of root _menus
     private Hashtable _keyMappings;
@@ -92,16 +92,38 @@ namespace CanFly.Proton
     /// This is called by the runtime.  It cannot be called directly
     /// </summary>
     /// <param name="parent"></param>
-    public LayoutWidget(Widget parent, ushort orientation, ushort id, uint hive)
+    public LayoutWidget(Widget parent, ushort orientation, ushort id, ushort hive)
       : base(parent, parent.WindowRect, id)
     {
       _key = hive;
 
       // load the layout....
+      // must be 0 on first call
+      ushort child = 0;
+      ushort nextDefaultId = 0x8000;
+      string name;
+      while (TryRegEnumKey(hive, ref child, out name))
+      {
+        string widgetType;
+        if (!TryRegGetString(child, "type", out widgetType))
+          continue;
+
+        ushort widgetId;
+
+        if (!TryRegGetUint16(child, "id", out widgetId))
+          widgetId = nextDefaultId++;
+
+        Rect bounds;
+
+        if (!TryRegGetRect(child, out bounds))
+          bounds = new Rect(WindowRect.TopLeft, new Extent(0, 0));
+
+        Widget widget = CreateWidget(parent, child, widgetType, bounds, widgetId);
+      }
 
       // the hive must have series of hives that form windows
 
-      uint menu;
+      ushort menu;
       if (TryRegOpenKey(hive, "menu", out menu))
       {
         // this stores a cache of loaded keys.
@@ -144,32 +166,6 @@ namespace CanFly.Proton
         // check for the font
         if (!LookupFont(menu, "font", out _font))
           OpenFont("neo", 9, out _font);
-
-        // attach all of our event handlers now
-
-        // must be 0 on first call
-        uint child = 0;
-        string widgetName;
-        ushort nextDefaultId = 0x8000;
-        string name;
-        while (TryRegEnumKey(menu, ref child, out name))
-        {
-          string widgetType;
-          if (!TryRegGetString(child, "type", out widgetType))
-            continue;
-
-          ushort widgetId;
-
-          if (!TryRegGetUint16(child, "id", out widgetId))
-            widgetId = nextDefaultId++;
-
-          Rect bounds;
-
-          if (!TryRegGetRect(child, out bounds))
-            bounds = new Rect(WindowRect.TopLeft, new Extent(0, 0));
-
-          Widget widget = CreateWidget(parent, child, widgetType, bounds, widgetId);
-        }
       }
 
       Screen.Instance.AfterPaint += Instance_AfterPaint;
@@ -191,7 +187,7 @@ namespace CanFly.Proton
       AddEventListener(PhotonID.id_menu_ok, OnMenuOk);
     }
 
-    private bool TryRegEnumKey(uint key, ref uint child, out string name)
+    private bool TryRegEnumKey(ushort key, ref ushort child, out string name)
     {
       name = null;
       try
@@ -206,7 +202,7 @@ namespace CanFly.Proton
       return true;
     }
 
-    public delegate Widget CreateCustomWidget(Widget parent, uint hive, string widgetType, Rect bounds, ushort id);
+    public delegate Widget CreateCustomWidget(Widget parent, ushort hive, string widgetType, Rect bounds, ushort id);
 
     private static CreateCustomWidget customWidgetConstructor = null;
 
@@ -215,7 +211,7 @@ namespace CanFly.Proton
       customWidgetConstructor = creator;
     }
 
-    private Widget CreateWidget(Widget parent, uint hive, string widgetType, Rect bounds, ushort id)
+    private Widget CreateWidget(Widget parent, ushort hive, string widgetType, Rect bounds, ushort id)
     {
       if (customWidgetConstructor != null)
       {
@@ -245,10 +241,10 @@ namespace CanFly.Proton
       return null;
     }
 
-    private bool FindKeys(uint menu, string keys_name, out Keys activeKeys)
+    private bool FindKeys(ushort menu, string keys_name, out Keys activeKeys)
     {
       activeKeys = null;
-      uint hive;
+      ushort hive;
       if(TryRegOpenKey(menu, keys_name, out hive))
       {
         // open the key
@@ -648,7 +644,7 @@ namespace CanFly.Proton
       new DatatypeLookup("FLOAT", CanFlyDataType.Float, 4),
     };
 
-    private CanFlyMsg LoadCanMessage(uint key)
+    private CanFlyMsg LoadCanMessage(ushort key)
     {
       CanFlyMsg result = null;
       ushort id;
@@ -820,7 +816,7 @@ namespace CanFly.Proton
         menuItem.ControllingVariable = msg;
     }
 
-    private void LoadItemDefaults(uint key, MenuItem menuItem)
+    private void LoadItemDefaults(ushort key, MenuItem menuItem)
     {
       menuItem.EventHandler(DefaultMsgHandler);
 
@@ -829,7 +825,7 @@ namespace CanFly.Proton
       TryRegGetString(key, "caption", out strValue);
       menuItem.Caption = strValue;
 
-      uint enable_key;
+      ushort enable_key;
       if (TryRegOpenKey(key, "enable", out enable_key))
       {
         if (TryRegGetUint16(enable_key, "id", out ushortValue))
@@ -863,7 +859,7 @@ static MenuItem MenuItemAt(Menu menu, ushort index)
       return menu.MenuItems.Count;
     }
 
-    internal MenuItem ParseItem(uint key)
+    internal MenuItem ParseItem(ushort key)
     {
       string itemType;
       if (!TryRegGetString(key, "type", out itemType))
@@ -890,7 +886,7 @@ static MenuItem MenuItemAt(Menu menu, ushort index)
       return null;
     }
 
-    internal MenuItem LoadMenuPopup(uint key)
+    internal MenuItem LoadMenuPopup(ushort key)
     {
       MenuItemPopup result = new MenuItemPopup(this, key);
       LoadItemDefaults(key, result);
@@ -902,7 +898,7 @@ static MenuItem MenuItemAt(Menu menu, ushort index)
       return result;
     }
 
-    internal MenuItem LoadMenuChecklist(uint key)
+    internal MenuItem LoadMenuChecklist(ushort key)
     {
       MenuItemChecklist result = new MenuItemChecklist(this, key);
       LoadItemDefaults(key, result);
@@ -910,7 +906,7 @@ static MenuItem MenuItemAt(Menu menu, ushort index)
       return result;
     }
 
-    internal MenuItem LoadMenuEdit(uint key)
+    internal MenuItem LoadMenuEdit(ushort key)
     {
       MenuItemEdit result = new MenuItemEdit(this, key);
       LoadItemDefaults(key, result);
@@ -918,7 +914,7 @@ static MenuItem MenuItemAt(Menu menu, ushort index)
       return result;
     }
 
-    internal MenuItem LoadMenuEvent(uint key)
+    internal MenuItem LoadMenuEvent(ushort key)
     {
       MenuItemEvent result = new MenuItemEvent(this, key);
       LoadItemDefaults(key, result);
@@ -926,7 +922,7 @@ static MenuItem MenuItemAt(Menu menu, ushort index)
       return result;
     }
 
-    internal MenuItem LoadMenuEnter(uint key)
+    internal MenuItem LoadMenuEnter(ushort key)
     {
       MenuItemEnter result = new MenuItemEnter(this, key);
       LoadItemDefaults(key, result);
@@ -934,7 +930,7 @@ static MenuItem MenuItemAt(Menu menu, ushort index)
       return result;
     }
 
-    internal MenuItem LoadMenuCancel(uint key)
+    internal MenuItem LoadMenuCancel(ushort key)
     {
       MenuItemCancel result = new MenuItemCancel(this, key);
       LoadItemDefaults(key, result);
@@ -942,7 +938,7 @@ static MenuItem MenuItemAt(Menu menu, ushort index)
       return result;
     }
 
-    internal MenuItem LoadMenuItem(uint key)
+    internal MenuItem LoadMenuItem(ushort key)
     {
       MenuItemItem result = new MenuItemItem(this, key);
       LoadItemDefaults(key, result);
@@ -950,7 +946,7 @@ static MenuItem MenuItemAt(Menu menu, ushort index)
       return result;
     }
 
-    private Keys LoadFromRegistry(string name, uint keys_key)
+    private Keys LoadFromRegistry(string name, ushort keys_key)
     {
       Keys theKeys = new Keys();
       _keyMappings.Add(name, theKeys);
@@ -959,7 +955,7 @@ static MenuItem MenuItemAt(Menu menu, ushort index)
       // must be done before we load any items so if they recurse we don't get
       // created more than once!
 
-      uint child;
+      ushort child;
       if (TryRegOpenKey(keys_key, "key0", out child))
         theKeys.Key0 = ParseItem(child);
 
@@ -1007,7 +1003,7 @@ static MenuItem MenuItemAt(Menu menu, ushort index)
       else
       {
         // see if the key is found
-        uint keys_key;
+        ushort keys_key;
         if (!TryRegOpenKey(_key, name, out keys_key))
           return null;
 
@@ -1025,7 +1021,7 @@ static MenuItem MenuItemAt(Menu menu, ushort index)
         popup = (Menu)_menus[name];
       else
       {
-        uint key;
+        ushort key;
         if (!TryRegOpenKey(_key, name, out key))
           return null;
 
@@ -1033,7 +1029,7 @@ static MenuItem MenuItemAt(Menu menu, ushort index)
 
         _menus.Add(name, popup);
 
-        uint child = 0;
+        ushort child = 0;
         string itemName;
         while (TryRegEnumKey(key, ref child, out itemName))
         {

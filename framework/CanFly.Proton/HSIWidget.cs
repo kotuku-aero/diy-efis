@@ -62,7 +62,7 @@ namespace CanFly.Proton
     private Font font;
     private string waypoint_name;
 
-    internal HSIWidget(Widget parent, Rect bounds, ushort id, uint key)
+    internal HSIWidget(Widget parent, Rect bounds, ushort id, ushort key)
     : base(parent, bounds, id)
     {
       if (!LookupColor(key, "background-color", out background_color))

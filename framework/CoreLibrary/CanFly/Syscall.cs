@@ -48,47 +48,47 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void InterlockedDecrement(ref int location, out int old_value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegCreateKey(uint parent, string name, out uint key);
+    public static extern void RegCreateKey(ushort parent, string name, out ushort key);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegOpenKey(uint parent, string name, out uint key);
+    public static extern void RegOpenKey(ushort parent, string name, out ushort key);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegGetInt8(uint parent, string name, out sbyte value);
+    public static extern void RegGetInt8(ushort parent, string name, out sbyte value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegSetInt8(uint parent, string name, sbyte value);
+    public static extern void RegSetInt8(ushort parent, string name, sbyte value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegGetUint8(uint parent, string name, out byte value);
+    public static extern void RegGetUint8(ushort parent, string name, out byte value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegSetUint8(uint parent, string name, byte value);
+    public static extern void RegSetUint8(ushort parent, string name, byte value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegGetInt16(uint parent, string name, out short value);
+    public static extern void RegGetInt16(ushort parent, string name, out short value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegSetInt16(uint parent, string name, short value);
+    public static extern void RegSetInt16(ushort parent, string name, short value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegGetUint16(uint parent, string name, out ushort value);
+    public static extern void RegGetUint16(ushort parent, string name, out ushort value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegSetUint16(uint parent, string name, ushort value);
+    public static extern void RegSetUint16(ushort parent, string name, ushort value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegGetInt32(uint parent, string name, out int value);
+    public static extern void RegGetInt32(ushort parent, string name, out int value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegSetInt32(uint parent, string name, int value);
+    public static extern void RegSetInt32(ushort parent, string name, int value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegGetUint32(uint parent, string name, out uint value);
+    public static extern void RegGetUint32(ushort parent, string name, out uint value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegSetUint32(uint parent, string name, uint value);
+    public static extern void RegSetUint32(ushort parent, string name, uint value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegGetString(uint parent, string name, out string value);
+    public static extern void RegGetString(ushort parent, string name, out string value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegSetString(uint parent, string name, string value);
+    public static extern void RegSetString(ushort parent, string name, string value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegGetFloat(uint parent, string name, out float value);
+    public static extern void RegGetFloat(ushort parent, string name, out float value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegSetFloat(uint parent, string name, float value);
+    public static extern void RegSetFloat(ushort parent, string name, float value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegGetBool(uint parent, string name, out bool value);
+    public static extern void RegGetBool(ushort parent, string name, out bool value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegSetBool(uint parent, string name, bool value);
+    public static extern void RegSetBool(ushort parent, string name, bool value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegEnumKey(uint key, ref uint child, out string name);
+    public static extern void RegEnumKey(ushort key, ref ushort child, out string name);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void OpenScreen(ushort orientation, ushort id, out uint handle);
     [MethodImpl(MethodImplOptions.InternalCall)]

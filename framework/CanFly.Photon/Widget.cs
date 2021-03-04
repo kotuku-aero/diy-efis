@@ -450,7 +450,7 @@ namespace CanFly
       return false;
     }
 
-    public bool TryRegGetString(uint key, string name, out string value)
+    public bool TryRegGetString(ushort key, string name, out string value)
     {
       value = null;
       try
@@ -483,7 +483,7 @@ namespace CanFly
       return true;
     }
 
-    public bool TryRegGetBool(uint key, string name, out bool value)
+    public bool TryRegGetBool(ushort key, string name, out bool value)
     {
       value = false;
       try
@@ -498,7 +498,7 @@ namespace CanFly
       return true;
     }
 
-    public bool TryRegGetFloat(uint key, string name, out float value)
+    public bool TryRegGetFloat(ushort key, string name, out float value)
     {
       value = 0;
       try
@@ -513,7 +513,7 @@ namespace CanFly
       return true;
     }
 
-    public bool TryRegGetUint8(uint key, string name, out byte value)
+    public bool TryRegGetUint8(ushort key, string name, out byte value)
     {
       value = 0;
       try
@@ -528,7 +528,7 @@ namespace CanFly
       return true;
     }
     
-    public bool TryRegGetUint16(uint key, string name, out ushort value)
+    public bool TryRegGetUint16(ushort key, string name, out ushort value)
     {
       value = 0;
       try
@@ -543,7 +543,7 @@ namespace CanFly
       return true;
     }
     
-    public bool TryRegGetUint32(uint key, string name, out uint value)
+    public bool TryRegGetUint32(ushort key, string name, out uint value)
     {
       value = 0;
       try
@@ -558,7 +558,7 @@ namespace CanFly
       return true;
     }
 
-    public bool TryRegGetInt8(uint key, string name, out sbyte value)
+    public bool TryRegGetInt8(ushort key, string name, out sbyte value)
     {
       value = 0;
       try
@@ -573,7 +573,7 @@ namespace CanFly
       return true;
     }
     
-    public bool TryRegGetInt16(uint key, string name, out short value)
+    public bool TryRegGetInt16(ushort key, string name, out short value)
     {
       value = 0;
       try
@@ -588,7 +588,7 @@ namespace CanFly
       return true;
     }
    
-    public bool TryRegGetUInt16(uint key, string name, out ushort value)
+    public bool TryRegGetUInt16(ushort key, string name, out ushort value)
     {
       value = 0;
       try
@@ -603,7 +603,7 @@ namespace CanFly
       return true;
     }
     
-    public bool TryRegGetInt32(uint key, string name, out int value)
+    public bool TryRegGetInt32(ushort key, string name, out int value)
     {
       value = 0;
       try
@@ -618,7 +618,7 @@ namespace CanFly
       return true;
     }
 
-    public bool TryRegGetRect(uint key, out Rect rect)
+    public bool TryRegGetRect(ushort key, out Rect rect)
     {
       rect = new Rect();
 
@@ -646,7 +646,7 @@ namespace CanFly
       return true;
     }
 
-    public bool TryRegOpenKey(uint key, string name, out uint child)
+    public bool TryRegOpenKey(ushort key, string name, out ushort child)
     {
       child = 0;
       try

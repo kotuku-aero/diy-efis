@@ -72,7 +72,7 @@ namespace CanFly.Proton
     /// <param name="bounds">Area to draw relative to parent</param>
     /// <param name="id">id of this window</param>
     /// <param name="key">registry key with settings in</param>
-    public AirspeedWidget(Widget parent, Rect bounds, ushort id, uint key) 
+    public AirspeedWidget(Widget parent, Rect bounds, ushort id, ushort key) 
       : base(parent, bounds, id)
     {
       if (!TryRegGetUint16(key, "pix-per-unit", out _pixelsPerUnit))

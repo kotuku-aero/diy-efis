@@ -130,7 +130,7 @@ namespace CanFly.Proton
     private float scale;
     private float offset;
 
-    public GaugeWidget(Widget parent, Rect bounds, ushort id, uint key)
+    public GaugeWidget(Widget parent, Rect bounds, ushort id, ushort key)
   : base(parent, bounds, id)
     {
       Rect rect_wnd = WindowRect;
@@ -260,7 +260,7 @@ namespace CanFly.Proton
       gauge_radii = uint_value;
 
       // open a step key
-      uint step_key;
+      ushort step_key;
 
       if (TryRegOpenKey(key, "step", out step_key))
       {
@@ -271,7 +271,7 @@ namespace CanFly.Proton
         for (i = 0; i < 99; i++)
         {
           // this stops as soon as the first key is not found
-          uint child_key;
+          ushort child_key;
 
           while (TryRegOpenKey(step_key, i.ToString(), out child_key))
           {
@@ -287,14 +287,14 @@ namespace CanFly.Proton
         }
       }
 
-      uint ticks_key;
+      ushort ticks_key;
       if (TryRegOpenKey(key, "tick", out ticks_key))
       {
         ticks = new ArrayList();
 
         for (int i = 0; i < 99; i++)
         {
-          uint child_key;
+          ushort child_key;
           while (TryRegOpenKey(ticks_key, i.ToString(), out child_key))
           {
             // tick-0=650, 650

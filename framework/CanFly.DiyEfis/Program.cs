@@ -4,8 +4,8 @@ namespace CanFly.DiyEfis
   {
     public static void Main()
     {
-      uint protonKey = 0;
-      uint layoutKey = 0;
+      ushort protonKey = 0;
+      ushort layoutKey = 0;
       ushort orientation;
       string layoutName;
       // all except orientation are required
