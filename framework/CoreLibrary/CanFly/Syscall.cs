@@ -139,9 +139,14 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void CanvasClose(uint handle);
     [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void CanvasRender(uint handle);
+    [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void CreateRectCanvas(int dx, int dy, out uint handle);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void CreatePngCanvas(uint stream, out uint handle);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void CreateGeospatialCanvas(uint stream, uint key, out uint handle);
+
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void LoadPng(uint canvas, uint stream, int x, int y);
     [MethodImpl(MethodImplOptions.InternalCall)]

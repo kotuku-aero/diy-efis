@@ -175,14 +175,12 @@ namespace CanFly
     internal static extern String FormatDigits(int value, int len);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern byte[] GenerateNewGuid();
-
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern int Abs(int val);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern int Min(int val1, int val2);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern int Max(int val1, int val2);
-
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern bool Equals(MulticastDelegate d1, MulticastDelegate d2);
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -196,8 +194,6 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern int ObjectGetHashCode(Object obj);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern Object ObjectMemberwiseClone(Object obj);
-    [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void RandomCtor(Random obj);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void RandomCtor(Random obj, int seed);
@@ -209,20 +205,6 @@ namespace CanFly
     internal static extern double RandomNextDouble(Random obj);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void RandomNextBytes(Random obj, byte[] buffer);
-
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void InitializeArray(Array array, RuntimeFieldHandle fldHandle);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern Object GetObjectValue(Object obj);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void RunClassConstructor(RuntimeTypeHandle type);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int OffsetToStringData();
-
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern bool IsTransparentProxy(Object proxy);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern bool Equals(String a, String b);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern char StringCharAt(String obj, int index);
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -232,19 +214,11 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern int StringLength(String obj);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern String[] StringSplit(String obj, char[] separator);
-    [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern String[] StringSplit(String obj, char[] separator, int count);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern String StringSubstring(String obj, int startIndex);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern String StringSubstring(String obj, int startIndex, int length);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern String StringTrim(String obj, char[] trimChars);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern String StringTrimStart(String obj, char[] trimChars);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern String StringTrimEnd(String obj, char[] trimChars);
+    internal static extern String StringTrim(String obj, char[] trimChars, bool trimStart, bool trimEnd);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void StringCtor(String obj, char[] value, int startIndex, int length);
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -254,65 +228,19 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern int StringCompare(String strA, String strB);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int StringCompareTo(String obj, Object value);
+    internal static extern int StringIndexOf(String obj, char value, int startIndex, int count, bool reverse);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int StringCompareTo(String obj, String strB);
+    internal static extern int StringIndexOfAny(String obj, char[] anyOf, int startIndex, int count, bool reverse);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int StringIndexOf(String obj, char value);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int StringIndexOf(String obj, char value, int startIndex);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int StringIndexOf(String obj, char value, int startIndex, int count);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int StringIndexOfAny(String obj, char[] anyOf);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int StringIndexOfAny(String obj, char[] anyOf, int startIndex);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int StringIndexOfAny(String obj, char[] anyOf, int startIndex, int count);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int StringIndexOf(String obj, String value);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int StringIndexOf(String obj, String value, int startIndex);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int StringIndexOf(String obj, String value, int startIndex, int count);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int StringLastIndexOf(String obj, char value);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int StringLastIndexOf(String obj, char value, int startIndex);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int StringLastIndexOf(String obj, char value, int startIndex, int count);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int StringLastIndexOfAny(char[] anyOf);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int StringLastIndexOfAny(String obj, char[] anyOf);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int StringLastIndexOfAny(String obj, char[] anyOf, int startIndex);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int StringLastIndexOfAny(String obj, char[] anyOf, int startIndex, int count);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int StringLastIndexOf(String obj, String value);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int StringLastIndexOf(String obj, String value, int startIndex);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int StringLastIndexOf(String obj, String value, int startIndex, int count);
+    internal static extern int StringIndexOf(String obj, String value, int startIndex, int count, bool reverse);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern String StringToLower(String obj);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern String StringToUpper(String obj);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern String StringTrim(String obj);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern String StringConcat(String str0, String str1);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern String StringConcat(String str0, String str1, String str2);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern String StringConcat(String str0, String str1, String str2, String str3);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern String StringConcat(String[] values);
+    internal static extern String StringConcat(String left, String right);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern bool ValueTypeEquals(ValueType obj, Object obj1);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void WeakReferenceCtor(WeakReference obj, Object target);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern bool WeakReferenceIsAlive(WeakReference obj);
     [MethodImpl(MethodImplOptions.InternalCall)]

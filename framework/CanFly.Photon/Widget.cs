@@ -192,7 +192,7 @@ namespace CanFly
         return new Rect(left, top, right, bottom);
 
       }
-      set { Syscall.SetWindowPos(Handle, value.Left, value.Right, value.Top, value.Bottom); ; }
+      set { Syscall.SetWindowPos(Handle, (short) value.Left, (short)value.Right, (short)value.Top, (short) value.Bottom); ; }
     }
 
     public void SendMessage(CanFlyMsg msg)
@@ -322,7 +322,7 @@ namespace CanFly
       if (rect == null)
         rect = WindowRect;
 
-      Syscall.InvalidateRect(Handle, rect.Left, rect.Right, rect.Top, rect.Bottom);
+      Syscall.InvalidateRect(Handle, (short)rect.Left, (short)rect.Right, (short)rect.Top, (short)rect.Bottom);
     }
     /// <summary>
     /// Return true if the window is invalid
@@ -360,18 +360,18 @@ namespace CanFly
 
       Extent size_medium = TextExtent(small_font, "00");
 
-      Point pt = new Point(
-        bounds.Right - (digits == 1 ? size_medium.Dx >>= 1 : size_medium.Dx),
+      Point pt = new Point((short)(
+        bounds.Right - (digits == 1 ? size_medium.Dx >>= 1 : size_medium.Dx)),
         bounds.Top);
 
-      pt.Y += (bounds.Bottom - bounds.Top) >> 1;
-      pt.Y -= size_medium.Dy >> 1;
+      pt.Y += (short)((bounds.Bottom - bounds.Top) >> 1);
+      pt.Y -= (short)(size_medium.Dy >> 1);
 
       if (digits == 1)
         value *= 10;
 
       // calc the interval / pixel ratio
-      pt.Y += (int)((value % 10) * (size_medium.Dy / 10.0));
+      pt.Y += (short)((value % 10) * (size_medium.Dy / 10.0));
       int minor = (value / 10) * 10;
 
       int large_value = minor / 100;
@@ -415,8 +415,8 @@ namespace CanFly
       
       pt.X -= large_size.Dx;
       pt.Y = bounds.Top;
-      pt.Y += (bounds.Bottom - bounds.Top) >> 1;
-      pt.Y -= large_size.Dy >> 1;
+      pt.Y += (short)((bounds.Bottom - bounds.Top) >> 1);
+      pt.Y -= (short)(large_size.Dy >> 1);
 
       DrawText(large_font, fg_color, bg_color, str, pt, bounds, TextOutStyle.Clipped);
 
@@ -623,12 +623,12 @@ namespace CanFly
       rect = new Rect();
 
       int value;
-      if (!TryRegGetInt32(key, "left", out value))
+      if (!TryRegGetInt32(key, "x", out value))
         value = 0;
 
       rect.Left = value;
 
-      if (!TryRegGetInt32(key, "top", out value))
+      if (!TryRegGetInt32(key, "y", out value))
         value = 0;
 
       rect.Top = value;

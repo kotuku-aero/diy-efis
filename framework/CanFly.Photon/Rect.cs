@@ -39,8 +39,8 @@ namespace CanFly
     {
       _left = pt.X;
       _top = pt.Y;
-      _right = _left + extent.Dx;
-      _bottom = _left + extent.Dy;
+      _right = (int)(_left + extent.Dx);
+      _bottom = (int)(_left + extent.Dy);
     }
     /// <summary>
     /// 
@@ -57,12 +57,12 @@ namespace CanFly
 
     public int Width
     {
-      get { return Math.Abs(_right - _left); }
+      get { return (int) Math.Abs(_right - _left); }
     }
 
     public int Height
     {
-      get { return Math.Abs(_bottom - _top); }
+      get { return (int) Math.Abs(_bottom - _top); }
     }
 
     public int Left
@@ -93,7 +93,7 @@ namespace CanFly
     {
       get
       {
-        return new Extent(Math.Abs(_right - _left), Math.Abs(_bottom - _top));
+        return new Extent((int) Math.Abs(_right - _left), (int) Math.Abs(_bottom - _top));
       }
     }
 

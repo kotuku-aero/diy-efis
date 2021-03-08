@@ -66,13 +66,5 @@ namespace System
     /// </summary>
     /// <returns>A hash code for the current object.</returns>
     public virtual int GetHashCode() { return CanFly.Runtime.ObjectGetHashCode(this); }
-
-
-    /// <summary>
-    /// Creates a shallow copy of the current Object.
-    /// </summary>
-    /// <returns>A shallow copy of the current Object.</returns>
-    protected Object MemberwiseClone() { return CanFly.Runtime.ObjectMemberwiseClone(this); }
-
   }
 }

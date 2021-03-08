@@ -22,6 +22,7 @@ namespace CanFly.DiyEfis
         orientation = 0;
       }
 
+
       // load the main window
       Proton.LayoutWidget layoutWidget = new Proton.LayoutWidget(Screen.Instance, orientation, 0, layoutKey);
 

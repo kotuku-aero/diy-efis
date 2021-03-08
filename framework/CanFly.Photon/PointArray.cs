@@ -28,6 +28,7 @@ namespace CanFly
 
       ushort len = (ushort)points.Length;
       Syscall.PointArrayCreate(len, out _handle);
+
       for (ushort i = 0; i < len; i++)
         this[i] = points[i];
     }

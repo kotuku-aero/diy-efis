@@ -18,7 +18,7 @@ namespace System
     /// <param name="target">The object to track or null.</param>
     public WeakReference(Object target)
     {
-      CanFly.Runtime.WeakReferenceCtor(this, target);
+      CanFly.Runtime.SetWeakReferenceTarget(this, target);
     }
 
     /// <summary>

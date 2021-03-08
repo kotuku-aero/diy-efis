@@ -43,5 +43,24 @@ namespace CanFly
       Syscall.CreatePngCanvas(pngStream.Handle, out handle);
       return new Canvas(handle);
     }
+    /// <summary>
+    /// Create a new canvas that will render a gis database
+    /// </summary>
+    /// <param name="gisData">GIS database stream</param>
+    /// <param name="key">Registry key describing the viewport and visibility</param>
+    /// <returns>Canvas that can be updated</returns>
+    public static Canvas CreateGeospatial(Stream gisData, uint key)
+    {
+      uint handle;
+      Syscall.CreateGeospatialCanvas(gisData.Handle, key, out handle);
+      return new Canvas(handle);
+    }
+    /// <summary>
+    /// Render the canvas, applicable to Png and Spatial canvases
+    /// </summary>
+    public void Render()
+    {
+      Syscall.CanvasRender(Handle);
+    }
   }
 }
