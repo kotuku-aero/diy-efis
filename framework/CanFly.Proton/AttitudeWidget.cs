@@ -84,6 +84,8 @@ namespace CanFly.Proton
 
       Rect wnd_rect = WindowRect;
 
+      _widgetMedian = new Point();
+
       short value;
       if (TryRegGetInt16(key, "center-x", out value))
         _widgetMedian.X = value;
