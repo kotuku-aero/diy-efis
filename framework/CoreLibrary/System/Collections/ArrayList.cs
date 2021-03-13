@@ -15,16 +15,18 @@ namespace System.Collections
   public sealed class ArrayList : IList, ICloneable
   {
     private Object[] _items;
-    private int _size;
-
-    private const int DefaultCapacity = 4;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ArrayList"/> class that is empty and has the default initial capacity.
     /// </summary>
     public ArrayList()
     {
-      _items = new Object[DefaultCapacity];
+      _items = new Object[0];
+    }
+
+    private ArrayList(int capacity)
+    {
+      _items = new object[capacity];
     }
 
     /// <summary>
@@ -39,7 +41,7 @@ namespace System.Collections
       set { SetCapacity(value); }
     }
 
-    private void SetCapacity(int capacity) { CanFly.Runtime.SetCapacity(this, capacity); }
+    private void SetCapacity(int capacity) { CanFly.Runtime.SetCapacity(_items, capacity); }
 
     /// <summary>
     /// Gets the number of elements actually contained in the <see cref="ArrayList"/>.
@@ -49,7 +51,7 @@ namespace System.Collections
     /// </value>
     public int Count
     {
-      get { return _size; }
+      get { return _items.Length; }
     }
 
     /// <summary>
@@ -103,15 +105,15 @@ namespace System.Collections
     /// <returns></returns>
     public Object this[int index]
     {
-      get { return CanFly.Runtime.ArrayListGet(this, index); }
-      set { CanFly.Runtime.ArrayListSet(this, index, value); }
+      get { return CanFly.Runtime.ArrayListGet(_items, index); }
+      set { CanFly.Runtime.ArrayListSet(_items, index, value); }
     }
     /// <summary>
     /// Adds an object to the end of the <see cref="ArrayList"/>.
     /// </summary>
     /// <param name="value"></param>
     /// <returns>The <see cref="Object"/> to be added to the end of the <see cref="ArrayList"/>. The value can be <see langword="null"/>.</returns>
-    public int Add(Object value) { return CanFly.Runtime.ArrayListAdd(this, value); }
+    public int Add(Object value) { return CanFly.Runtime.ArrayListAdd(_items, value); }
 
     /// <summary>
     /// Searches the entire sorted <see cref="ArrayList"/> for an element using the specified comparer and returns the zero-based index of the element.
@@ -123,13 +125,13 @@ namespace System.Collections
     /// <returns>The zero-based index of value in the sorted <see cref="ArrayList"/>, if value is found; otherwise, a negative number, which is the bitwise complement of the index of the next element that is larger than value or, if there is no larger element, the bitwise complement of Count.</returns>
     public int BinarySearch(Object value, IComparer comparer)
     {
-      return Array.BinarySearch(_items, 0, _size, value, comparer);
+      return Array.BinarySearch(_items, 0, _items.Length, value, comparer);
     }
 
     /// <summary>
     /// Removes all elements from the <see cref="ArrayList"/>.
     /// </summary>
-    public void Clear() { CanFly.Runtime.ArrayListClear(this); }
+    public void Clear() { CanFly.Runtime.ArrayListClear(_items); }
 
     /// <summary>
     /// Creates a shallow copy of the <see cref="ArrayList"/>.
@@ -137,17 +139,9 @@ namespace System.Collections
     /// <returns>A shallow copy of the <see cref="ArrayList"/>.</returns>
     public Object Clone()
     {
-      var arrayList = new ArrayList();
+      var arrayList = new ArrayList(_items.Length);
 
-      if (_size > DefaultCapacity)
-      {
-        // only re-allocate a new array if the size isn't what we need.
-        // otherwise, the one allocated in the constructor will be just fine
-        arrayList._items = new Object[_size];
-      }
-
-      arrayList._size = _size;
-      Array.Copy(_items, 0, arrayList._items, 0, _size);
+      Array.Copy(_items, 0, arrayList._items, 0, _items.Length);
       return arrayList;
     }
 
@@ -158,7 +152,7 @@ namespace System.Collections
     /// <returns>The<see cref="Object"/> to locate in the <see cref="ArrayList"/>.The value can be <see langword="null"/>.</returns>
     public bool Contains(Object value)
     {
-      return Array.IndexOf(_items, value, 0, _size) >= 0;
+      return Array.IndexOf(_items, value, 0, _items.Length) >= 0;
     }
 
     /// <summary>
@@ -177,7 +171,7 @@ namespace System.Collections
     /// <param name="index">The zero-based index in array at which copying begins. </param>
     public void CopyTo(Array array, int index)
     {
-      Array.Copy(_items, 0, array, index, _size);
+      Array.Copy(_items, 0, array, index, _items.Length);
     }
 
     /// <summary>
@@ -186,7 +180,7 @@ namespace System.Collections
     /// <returns>An IEnumerator for the entire <see cref="ArrayList"/>.</returns>
     public IEnumerator GetEnumerator()
     {
-      return new Array.SzArrayEnumerator(_items, 0, _size);
+      return new Array.SzArrayEnumerator(_items, 0, _items.Length);
     }
 
     /// <summary>
@@ -196,7 +190,7 @@ namespace System.Collections
     /// <returns>The zero-based index of the first occurrence of value within the entire <see cref="ArrayList"/>, if found; otherwise, -1.</returns>
     public int IndexOf(Object value)
     {
-      return Array.IndexOf(_items, value, 0, _size);
+      return Array.IndexOf(_items, value, 0, _items.Length);
     }
 
     /// <summary>
@@ -207,7 +201,7 @@ namespace System.Collections
     /// <returns>The zero-based index of the first occurrence of value within the range of elements in the <see cref="ArrayList"/> that extends from startIndex to the last element, if found; otherwise, -1.</returns>
     public int IndexOf(Object value, int startIndex)
     {
-      return Array.IndexOf(_items, value, startIndex, _size - startIndex);
+      return Array.IndexOf(_items, value, startIndex, _items.Length - startIndex);
     }
 
     /// <summary>
@@ -227,7 +221,7 @@ namespace System.Collections
     /// </summary>
     /// <param name="index">The zero-based index at which <para>value</para> should be inserted.</param>
     /// <param name="value">The <see cref="Object"/> to insert. The `value` can be <see langword="null"/>.</param>
-    public void Insert(int index, Object value) { CanFly.Runtime.ArrayListInsert(this, index, value); }
+    public void Insert(int index, Object value) { CanFly.Runtime.ArrayListInsert(_items, index, value); }
 
     /// <summary>
     /// Removes the first occurrence of a specific object from the <see cref="ArrayList"/>.
@@ -235,7 +229,7 @@ namespace System.Collections
     /// <param name="value">The <see cref="Object"/> to remove from the <see cref="ArrayList"/>. The value can be <see langword="null"/>.</param>
     public void Remove(Object value)
     {
-      var index = Array.IndexOf(_items, value, 0, _size);
+      var index = Array.IndexOf(_items, value, 0, _items.Length);
       if (index >= 0)
         RemoveAt(index);
     }
@@ -244,6 +238,6 @@ namespace System.Collections
     /// Removes the element at the specified index of the <see cref="ArrayList"/>.
     /// </summary>
     /// <param name="index">The zero-based index of the element to remove.</param>
-    public void RemoveAt(int index) { CanFly.Runtime.ArrayListRemoveAt(this, index); }
+    public void RemoveAt(int index) { CanFly.Runtime.ArrayListRemoveAt(_items, index); }
   }
 }

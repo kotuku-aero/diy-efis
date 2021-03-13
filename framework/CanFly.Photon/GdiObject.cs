@@ -95,7 +95,7 @@ namespace CanFly
     public void Ellipse(Pen pen, uint color, Rect area)
     {
       Syscall.Ellipse(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom,
-        pen.Handle, color, area.Left, area.Top, area.Right, area.Bottom);
+        Pen.SafeHandle(pen), color, area.Left, area.Top, area.Right, area.Bottom);
     }
     /// <summary>
     /// Draw a polygon
@@ -106,7 +106,7 @@ namespace CanFly
     public void Polygon(Pen pen, uint color, params Point[] points)
     {
       using(PointArray pts = new PointArray(points))
-        Syscall.Polygon(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, pen.Handle, color, pts.Handle);
+        Syscall.Polygon(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, Pen.SafeHandle(pen), color, pts.Handle);
     }
     /// <summary>
     /// Draw a polygon
@@ -116,7 +116,7 @@ namespace CanFly
     /// <param name="pts">Points to draw</param>
     public void Polygon(Pen pen, uint color, PointArray pts)
     {
-      Syscall.Polygon(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, pen.Handle, color, pts.Handle);
+      Syscall.Polygon(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, Pen.SafeHandle(pen), color, pts.Handle);
     }
     /// <summary>
     /// Draw a rectangle
@@ -126,7 +126,8 @@ namespace CanFly
     /// <param name="area">Area to draw</param>
     public void Rectangle(Pen pen, uint color, Rect area)
     {
-      Syscall.Rectangle(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, pen.Handle, color, 
+
+      Syscall.Rectangle(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, Pen.SafeHandle(pen), color, 
         area.Left, area.Top, area.Right, area.Bottom);
     }
     /// <summary>
@@ -138,7 +139,7 @@ namespace CanFly
     /// <param name="radius">Radius of corners</param>
     public void RoundRect(Pen pen, uint color, Rect area, int radius)
     {
-      Syscall.RoundRect(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, pen.Handle, color, 
+      Syscall.RoundRect(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, Pen.SafeHandle(pen), color, 
         area.Left, area.Top, area.Right, area.Bottom, radius);
     }
     /// <summary>
@@ -185,7 +186,7 @@ namespace CanFly
     public void Arc(Pen pen, Point pt, int radius, int start, int end)
     {
       Syscall.Arc(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, 
-        pen.Handle, pt.X, pt.Y,
+        Pen.SafeHandle(pen), pt.X, pt.Y,
         radius, start, end);
     }
     /// <summary>
@@ -200,7 +201,7 @@ namespace CanFly
     public void Pie(Pen pen, uint color, Point pt, int start, int end, int radii, int inner)
     {
       Syscall.Pie(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom,
-        pen.Handle, color, pt.X, pt.Y, start, end, radii, inner);
+        Pen.SafeHandle(pen), color, pt.X, pt.Y, start, end, radii, inner);
     }
     /// <summary>
     /// Draw a string

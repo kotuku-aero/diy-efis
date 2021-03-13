@@ -64,7 +64,7 @@ namespace System.Diagnostics
     [Conditional("DEBUG")]
     public static void Write(string message)
     {
-      CanFly.Runtime.OutNative(message, false);
+      CanFly.Runtime.DebuggerPrint(message, false);
     }
     /// <summary>
     /// Writes a message followed by a line terminator to the trace listeners in the Listeners collection.
@@ -76,7 +76,7 @@ namespace System.Diagnostics
     [Conditional("DEBUG")]
     public static void WriteLine(string message)
     {
-      CanFly.Runtime.OutNative(message, true);
+      CanFly.Runtime.DebuggerPrint(message, true);
     }
   }
 }

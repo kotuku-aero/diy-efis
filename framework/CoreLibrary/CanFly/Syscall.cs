@@ -301,12 +301,11 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void RewindDirectoryEntry(uint hndl);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void GetFont(string fontName, uint pointSize, out uint handle);
+    internal static extern void GetFont(string fontName, ushort pointSize, out uint handle);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void ReleaseFont(uint hndl);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void LoadFont(uint streamHandle);
-
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void PointArrayCreate(ushort numPoints, out uint handle);
     [MethodImpl(MethodImplOptions.InternalCall)]

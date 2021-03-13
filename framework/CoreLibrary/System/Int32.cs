@@ -30,10 +30,11 @@ namespace System
         /// <summary>
         /// Converts the numeric value of this instance to its equivalent string representation.
         /// </summary>
-        /// <returns>The string representation of the value of this instance, consisting of a negative sign if the value is negative, and a sequence of digits ranging from 0 to 9 with no leading zeroes.</returns>
+        /// <returns>The string representation of the value of this instance, consisting of a negative sign if the value
+        /// is negative, and a sequence of digits ranging from 0 to 9 with no leading zeroes.</returns>
         public override String ToString()
         {
-            return Number.Format(_value, true, "G");
+            return Number.Format(_value, true, null);
         }
 
         /// <summary>

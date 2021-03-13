@@ -25,7 +25,7 @@ namespace CanFly
     /// </summary>
     /// <param name="fontName">Name of the font to load</param>
     /// <param name="pointSize">Size of the font requested</param>
-    public Font(string fontName, uint pointSize)
+    public Font(string fontName, ushort pointSize)
     {
       CanFly.Syscall.GetFont(fontName, pointSize, out _hndl);
 

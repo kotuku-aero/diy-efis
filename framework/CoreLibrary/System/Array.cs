@@ -61,7 +61,7 @@ namespace System
     /// <returns>The value at the specified position in the one-dimensional Array.</returns>
     public Object GetValue(int index)
     {
-      return ((IList)this)[index];
+      return CanFly.Runtime.GetArrayAt(this, index);
     }
 
     /// <summary>
@@ -132,7 +132,7 @@ namespace System
 
     internal void SetByIndex(int index, object value)
     {
-      ((IList)this)[index] = value;
+      CanFly.Runtime.SetArrayAt(this, index, value);
     }
 
     int IList.Add(Object value)

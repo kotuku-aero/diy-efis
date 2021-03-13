@@ -40,6 +40,11 @@ namespace CanFly
     public event CanFlyMsgHandler BeforePaint = null;
     public event CanFlyMsgHandler AfterPaint = null;
 
+    static Widget()
+    {
+      eventInfoTable = new ArrayList();
+    }
+
     /// <summary>
     /// Private constructor for the screen
     /// </summary>
@@ -47,7 +52,6 @@ namespace CanFly
     internal Widget(uint hwnd) : base(hwnd)
     {
       Syscall.SetWindowData(Handle, OnMessage);
-      eventInfoTable = new ArrayList();
 
       ClipRect = WindowRect;
     }
@@ -73,10 +77,8 @@ namespace CanFly
       // default clipping rectangle
       ClipRect = WindowRect;
 
-      eventInfoTable = new ArrayList();
-
       // hook the paint message
-      AddEventListener(PhotonID.id_paint, OnPaint);
+      AddEventListener(PhotonID.id_paint, OnPaintMsg);
     }
 
     private void OnPaintMsg(CanFlyMsg e)
@@ -114,6 +116,7 @@ namespace CanFly
       if (eventInfo == null)
       {
         eventInfo = new EventInfo(this, message_id);
+        eventInfoTable.Add(eventInfo);
       }
 
       eventInfo.Handler += eventListener;
@@ -170,7 +173,7 @@ namespace CanFly
         int top;
         int bottom;
 
-        Syscall.GetWindowRect(Handle, out left, out right, out top, out bottom);
+        Syscall.GetWindowRect(Handle, out left, out top, out right, out bottom);
 
         return new Rect(left, top, right, bottom);
       }
@@ -187,7 +190,7 @@ namespace CanFly
         int top;
         int bottom;
 
-        Syscall.GetWindowPos(Handle, out left, out right, out top, out bottom);
+        Syscall.GetWindowPos(Handle, out left, out top, out right, out bottom);
 
         return new Rect(left, top, right, bottom);
 
@@ -422,32 +425,218 @@ namespace CanFly
 
     }
 
-    public bool LookupFont(uint key, string name, out Font font)
+    public bool LookupFont(ushort key, string name, out Font font)
     {
       font = null;
+      uint hndl;
+      try
+      {
+        ushort fontSize;
+        string fontName;
 
-      return false;
+        ushort fontKey;
+        CanFly.Syscall.RegOpenKey(key, name, out fontKey);
+
+
+        CanFly.Syscall.RegGetString(fontKey, "name", out fontName);
+        CanFly.Syscall.RegGetUint16(fontKey, "size", out fontSize);
+
+        return OpenFont(fontName, fontSize, out font);
+      }
+      catch
+      {
+        return false;
+      }
     }
 
-    public bool LookupColor(uint key, string name, out uint color)
+    public bool LookupColor(ushort key, string name, out uint color)
     {
       color = Colors.Black;
+      try
+      {
+        string color_str;
+        CanFly.Syscall.RegGetString(key, name, out color_str);
 
-      return false;
+        if(color_str[0] == '0')
+        {
+          // parse number
+          if (color_str[1] == 'x')
+            color = Convert.ToUInt32(color_str.Substring(2), 16);
+          else
+            color = Convert.ToUInt32(color_str);
+        }
+        else
+        {
+          switch(color_str.ToLower())
+          {
+            case "white":
+              color = Colors.White;
+              break;
+            case "black":
+              color = Colors.Black;
+              break;
+            case "gray":
+              color = Colors.Gray;
+              break;
+            case "light-gray":
+              color = Colors.LightGray;
+              break;
+            case "dark-gray":
+              color = Colors.DarkGray;
+              break;
+            case "red":
+              color = Colors.Red;
+              break;
+            case "pink":
+              color = Colors.Pink;
+              break;
+            case "blue":
+              color = Colors.Blue;
+              break;
+            case "green":
+              color = Colors.Green;
+              break;
+            case "light-green":
+              color = Colors.LightGreen;
+              break;
+            case "yellow":
+              color = Colors.Yellow;
+              break;
+            case "magenta":
+              color = Colors.Magenta;
+              break;
+            case "cyan":
+              color = Colors.Cyan;
+              break;
+            case "pale-yellow":
+              color = Colors.PaleYellow;
+              break;
+            case "light-yellow":
+              color = Colors.LightYellow;
+              break;
+            case "lime-green":
+              color = Colors.White;
+              break;
+            case "teal":
+              color = Colors.Teal;
+              break;
+            case "dark-green":
+              color = Colors.DarkGreen;
+              break;
+            case "maroon":
+              color = Colors.Maroon;
+              break;
+            case "purple":
+              color = Colors.Purple;
+              break;
+            case "orange":
+              color = Colors.Orange;
+              break;
+            case "khaki":
+              color = Colors.Khaki;
+              break;
+            case "olive":
+              color = Colors.Olive;
+              break;
+            case "brown":
+              color = Colors.Brown;
+              break;
+            case "navy":
+              color = Colors.Navy;
+              break;
+            case "light-blue":
+              color = Colors.LightBlue;
+              break;
+            case "faded-blue":
+              color = Colors.FadedBlue;
+              break;
+            case "light-grey":
+              color = Colors.LightGrey;
+              break;
+            case "dark-grey":
+              color = Colors.DarkGray;
+              break;
+            case "hollow":
+              color = Colors.Hollow;
+              break;
+
+          }
+}
+      }
+      catch
+      {
+        return false;
+      }
+
+      return true;
     }
 
-    public bool LookupPen(uint key, string name, out Pen pen)
+    public bool LookupPen(ushort key, string name, out Pen pen)
     {
       pen = null;
 
+      try
+      {
+        ushort width;
+        string style;
+        uint color;
+
+        ushort penKey;
+        CanFly.Syscall.RegOpenKey(key, name, out penKey);
+
+        CanFly.Syscall.RegGetUint16(penKey, "width", out width);
+        CanFly.Syscall.RegGetString(penKey, "style", out style);
+        CanFly.Syscall.RegGetUint32(penKey, "color", out color);
+
+        PenStyle theStyle = PenStyle.Solid;
+
+        switch (style)
+        {
+          case "solid":
+            theStyle = PenStyle.Solid;
+            break;
+          case "dash":
+            theStyle = PenStyle.Dash;
+            break;
+          case "dot":
+            theStyle = PenStyle.Dot;
+            break;
+          case "dash_dot":
+            theStyle = PenStyle.DashDot;
+            break;
+          case "dash_dot_dot":
+            theStyle = PenStyle.DashDotDot;
+            break;
+          case "null":
+            theStyle = PenStyle.Null;
+            break;
+        }
+
+
+        pen = new Pen(color, width, theStyle);
+      }
+      catch
+      {
+        return false;
+      }
+
       return false;
     }
 
-    public bool OpenFont(string name, ushort pixels, out Font font)
+    public bool OpenFont(string name, ushort size, out Font font)
     {
       font = null;
 
-      return false;
+      try
+      {
+        font = new Font(name, size);
+      }
+      catch
+      {
+        return false;
+      }
+
+      return true;
     }
 
     public bool TryRegGetString(ushort key, string name, out string value)

@@ -22,6 +22,16 @@ namespace CanFly
       Syscall.CreatePen(color, width, (ushort) style, out _handle);
     }
 
+    /// <summary>
+    /// Return the handle or 0 if null
+    /// </summary>
+    /// <param name="pen"></param>
+    /// <returns></returns>
+    static public uint SafeHandle(Pen pen)
+    {
+      return pen == null ? 0 : pen.Handle;
+    }
+
     public void Dispose()
     {
       Syscall.DisposePen(_handle);

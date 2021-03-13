@@ -135,26 +135,25 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern Delegate DelegateRemove(Delegate source, Delegate value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetCapacity(System.Collections.ArrayList list, int capacity);
+    internal static extern void SetCapacity(Object[] list, int capacity);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern object ArrayListGet(System.Collections.ArrayList list, int index);
+    internal static extern object ArrayListGet(Object[] list, int index);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void ArrayListSet(System.Collections.ArrayList list, int index, object value);
+    internal static extern void ArrayListSet(Object[] list, int index, object value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern int ArrayListAdd(System.Collections.ArrayList list, Object value);
+    internal static extern int ArrayListAdd(Object[] list, Object value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void ArrayListClear(System.Collections.ArrayList list);
+    internal static extern void ArrayListClear(Object[] list);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void ArrayListInsert(System.Collections.ArrayList list, int index, Object value);
+    internal static extern void ArrayListInsert(Object[] list, int index, Object value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void ArrayListRemoveAt(System.Collections.ArrayList list, int index);
-    // Debugging methods
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal extern static void OutNative(string text, bool addLineFeed);
+    internal static extern void ArrayListRemoveAt(Object[] list, int index);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern bool DebuggerIsAttached();
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void DebuggerBreak();
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void DebuggerPrint(string message, bool newLine);
 
     ////////////////////////////////////////////////////////////////////////////
     //

@@ -118,6 +118,7 @@ namespace CanFly.Proton
         if (!TryRegGetRect(child, out bounds))
           bounds = new Rect(WindowRect.TopLeft, new Extent(0, 0));
 
+        // this window lays out the windows, but the screen owns the children.
         Widget widget = CreateWidget(parent, child, widgetType, bounds, widgetId);
       }
 
