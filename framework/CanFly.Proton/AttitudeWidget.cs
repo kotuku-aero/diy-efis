@@ -224,15 +224,15 @@ namespace CanFly.Proton
 
       /////////////////////////////////////////////////////////////////////////////
       // we now draw the image of the bank angle marks
-      Polyline(Pens.GreenPen, RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 104, 60), _roll), RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 94, 66), _roll));
-      Polyline(Pens.GreenPen, RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 60, 17), _roll), RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 54, 27), _roll));
-      Polyline(Pens.GreenPen, RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 40, 11), _roll), RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 37, 19), _roll));
-      Polyline(Pens.GreenPen, RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 20, 6), _roll), RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 18, 14), _roll));
-      Polyline(Pens.GreenPen, RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 20, 6), _roll), RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 18, 14), _roll));
-      Polyline(Pens.GreenPen, RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 39, 11), _roll), RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 36, 19), _roll));
-      Polyline(Pens.GreenPen, RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 59, 17), _roll), RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 53, 27), _roll));
-      Polyline(Pens.GreenPen, RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 103, 60), _roll), RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 93, 66), _roll));
-      Polyline(Pens.GreenPen3, RotatePoint(_widgetMedian, new Point(_widgetMedian.X, 0), _roll), RotatePoint(_widgetMedian, new Point(_widgetMedian.X, 12), _roll));
+      Line(Pens.GreenPen, RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 104, 60), _roll), RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 94, 66), _roll));
+      Line(Pens.GreenPen, RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 60, 17), _roll), RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 54, 27), _roll));
+      Line(Pens.GreenPen, RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 40, 11), _roll), RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 37, 19), _roll));
+      Line(Pens.GreenPen, RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 20, 6), _roll), RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 18, 14), _roll));
+      Line(Pens.GreenPen, RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 20, 6), _roll), RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 18, 14), _roll));
+      Line(Pens.GreenPen, RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 39, 11), _roll), RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 36, 19), _roll));
+      Line(Pens.GreenPen, RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 59, 17), _roll), RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 53, 27), _roll));
+      Line(Pens.GreenPen, RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 103, 60), _roll), RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 93, 66), _roll));
+      Line(Pens.GreenPen3, RotatePoint(_widgetMedian, new Point(_widgetMedian.X, 0), _roll), RotatePoint(_widgetMedian, new Point(_widgetMedian.X, 12), _roll));
 
       /////////////////////////////////////////////////////////////////////////////
       //	Draw the rotated roll/pitch indicator
