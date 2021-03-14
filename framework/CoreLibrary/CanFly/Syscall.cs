@@ -170,6 +170,9 @@ namespace CanFly
       int clipLeft, int clipTop, int clipRight, int clipBottom,
       uint penHandle, uint pointsHandle);
     [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void Line(uint canvas, int clipLeft, int clipTop, int clipRight, int clipBottom,
+      uint penHandle, int from_x, int from_y, int to_x, int to_y);
+    [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void Ellipse(uint canvas, int clipLeft, int clipTop, int clipRight, int clipBottom,
       uint pen, uint color, int left, int top, int right, int bottom);
     [MethodImpl(MethodImplOptions.InternalCall)]

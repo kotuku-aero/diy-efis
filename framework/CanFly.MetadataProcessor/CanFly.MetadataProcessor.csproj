@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{9A97D31D-E80C-450E-97D5-0AE818AE62A2}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CanFly.MetadataProcessor</RootNamespace>
+    <AssemblyName>CanFly.MetadataProcessor</AssemblyName>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Mono.Cecil.0.11.3\lib\net40\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Mdb, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Mono.Cecil.0.11.3\lib\net40\Mono.Cecil.Mdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Pdb, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Mono.Cecil.0.11.3\lib\net40\Mono.Cecil.Pdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Rocks, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Mono.Cecil.0.11.3\lib\net40\Mono.Cecil.Rocks.dll</HintPath>
+    </Reference>
+    <Reference Include="mustache-sharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5885df51f4df0041, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\mustache-sharp.1.0.0\lib\net45\mustache-sharp.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CanFlyAssemblyBuilder.cs" />
+    <Compile Include="CanFlyAssemblyDefinition.cs" />
+    <Compile Include="CanFlyDependencyGenerator.cs" />
+    <Compile Include="CanFlyDumperGenerator.cs" />
+    <Compile Include="CanFlySkeletonGenerator.cs" />
+    <Compile Include="DumpGenerator\AssemblyRef.cs" />
+    <Compile Include="DumpGenerator\AttFixedArgs.cs" />
+    <Compile Include="DumpGenerator\AttributeCustom.cs" />
+    <Compile Include="DumpGenerator\DumpAllTable.cs" />
+    <Compile Include="DumpGenerator\DumpTemplates.cs" />
+    <Compile Include="DumpGenerator\ExceptionHandler.cs" />
+    <Compile Include="DumpGenerator\FieldDef.cs" />
+    <Compile Include="DumpGenerator\GenericParam.cs" />
+    <Compile Include="DumpGenerator\ILCode.cs" />
+    <Compile Include="DumpGenerator\InterfaceDef.cs" />
+    <Compile Include="DumpGenerator\LocalDef.cs" />
+    <Compile Include="DumpGenerator\MemberRef.cs" />
+    <Compile Include="DumpGenerator\MethodDef.cs" />
+    <Compile Include="DumpGenerator\TypeDef.cs" />
+    <Compile Include="DumpGenerator\TypeRef.cs" />
+    <Compile Include="DumpGenerator\UserString.cs" />
+    <Compile Include="Endianness\nanoBinaryWriter.cs" />
+    <Compile Include="Extensions\ByteArrayExtensions.cs" />
+    <Compile Include="Extensions\MethodDefinitionExtensions.cs" />
+    <Compile Include="Extensions\ParameterDefintionExtensions.cs" />
+    <Compile Include="Extensions\TypeDefinitionExtensions.cs" />
+    <Compile Include="Extensions\TypeReferenceExtensions.cs" />
+    <Compile Include="ICanFlyTable.cs" />
+    <Compile Include="Mono.Cecil\CodeWriter.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SkeletonGenerator\AssemblyClass.cs" />
+    <Compile Include="SkeletonGenerator\AssemblyClassStubs.cs" />
+    <Compile Include="SkeletonGenerator\AssemblyClassTable.cs" />
+    <Compile Include="SkeletonGenerator\AssemblyLookupTable.cs" />
+    <Compile Include="SkeletonGenerator\SkeletonTemplates.cs" />
+    <Compile Include="Tables\ICustomStringSorter.cs" />
+    <Compile Include="Tables\nanoAssemblyReferenceTable.cs" />
+    <Compile Include="Tables\nanoAttributesTable.cs" />
+    <Compile Include="Tables\nanoByteCodeTable.cs" />
+    <Compile Include="Tables\nanoEmptyTable.cs" />
+    <Compile Include="Tables\nanoFieldDefinitionTable.cs" />
+    <Compile Include="Tables\nanoFieldReferenceTable.cs" />
+    <Compile Include="Tables\nanoGenericParamTable.cs" />
+    <Compile Include="Tables\nanoMethodDefinitionTable.cs" />
+    <Compile Include="Tables\nanoMethodReferenceTable.cs" />
+    <Compile Include="Tables\nanoReferenceTableBase.cs" />
+    <Compile Include="Tables\nanoResourceDataTable.cs" />
+    <Compile Include="Tables\nanoResourceFileTable.cs" />
+    <Compile Include="Tables\nanoResourcesTable.cs" />
+    <Compile Include="Tables\nanoSignaturesTable.cs" />
+    <Compile Include="Tables\nanoStringTable.cs" />
+    <Compile Include="Tables\nanoTablesContext.cs" />
+    <Compile Include="Tables\nanoTypeDefinitionTable.cs" />
+    <Compile Include="Tables\nanoTypeReferenceTable.cs" />
+    <Compile Include="Tables\nanoTypeSpecificationsTable.cs" />
+    <Compile Include="Utility\Crc32.cs" />
+    <Compile Include="Utility\LoadHintsAssemblyResolver.cs" />
+    <Compile Include="Utility\nanoBitmapProcessor.cs" />
+    <Compile Include="Utility\nanoCLR_DataType.cs" />
+    <Compile Include="Utility\nanoDependencyGeneratorWriter.cs" />
+    <Compile Include="Utility\nanoFontProcessor.cs" />
+    <Compile Include="Utility\nanoPdbxFileWriter.cs" />
+    <Compile Include="Utility\nanoSerializationType.cs" />
+    <Compile Include="Utility\nanoStringsConstants.cs" />
+    <Compile Include="Utility\nanoTypeDefinitionFlags.cs" />
+    <Compile Include="Utility\NativeMethodsCrc.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="package.nuspec" />
+    <None Include="packages.config" />
+    <None Include="packages.lock.json" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
