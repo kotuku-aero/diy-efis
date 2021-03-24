@@ -15,12 +15,12 @@ namespace CanFly.Tools.MetadataProcessor
 {
     internal sealed class nanoDependencyGeneratorWriter
     {
-        private readonly nanoTablesContext _context;
+        private readonly TablesContext _context;
         private readonly AssemblyDefinition _assemblyDefinition;
 
         public nanoDependencyGeneratorWriter(
             AssemblyDefinition assemblyDefinition, 
-            nanoTablesContext context)
+            TablesContext context)
         {
             _context = context;
             _assemblyDefinition = assemblyDefinition;

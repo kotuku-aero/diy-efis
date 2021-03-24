@@ -29,17 +29,17 @@ namespace CanFly.Tools.MetadataProcessor
         /// <summary>
         /// Binary writer for writing byte code in correct endianess.
         /// </summary>
-	    private readonly nanoBinaryWriter _writer;
+	    private readonly CLRBinaryWriter _writer;
 
         /// <summary>
         /// String literals table (used for obtaining string literal ID).
         /// </summary>
-        private readonly nanoStringTable _stringTable;
+        private readonly StringTable _stringTable;
 
         /// <summary>
         /// Assembly tables context - contains all tables used for building target assembly.
         /// </summary>
-        private readonly nanoTablesContext _context;
+        private readonly TablesContext _context;
 
         /// <summary>
         /// Creates new instance of <see cref="Mono.Cecil.Cil.CodeWriter"/> object.
@@ -52,9 +52,9 @@ namespace CanFly.Tools.MetadataProcessor
         /// </param>
         public CodeWriter(
 	        MethodDefinition method,
-            nanoBinaryWriter writer,
-            nanoStringTable stringTable,
-            nanoTablesContext context)
+            CLRBinaryWriter writer,
+            StringTable stringTable,
+            TablesContext context)
 	    {
             _stringTable = stringTable;
 
@@ -84,7 +84,7 @@ namespace CanFly.Tools.MetadataProcessor
         /// <param name="stringTable">String table for populating strings from method.</param>
         public static IEnumerable<Tuple<uint, uint>> PreProcessMethod(
             MethodDefinition methodDefinition,
-            nanoStringTable stringTable)
+            StringTable stringTable)
         {
             if (!methodDefinition.HasBody)
             {

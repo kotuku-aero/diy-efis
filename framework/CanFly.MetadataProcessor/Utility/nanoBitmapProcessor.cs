@@ -20,7 +20,7 @@ namespace CanFly.Tools.MetadataProcessor
         }
 
         public void Process(
-            nanoBinaryWriter writer)
+            CLRBinaryWriter writer)
         {
             writer.WriteUInt32((uint)_bitmap.Width);
             writer.WriteUInt32((uint)_bitmap.Height);

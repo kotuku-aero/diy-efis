@@ -12,7 +12,7 @@ namespace CanFly.Tools.MetadataProcessor.Core.Extensions
     {
         public static bool IncludeInStub(this TypeDefinition value)
         {
-            var typeDefFlags = nanoTypeDefinitionTable.GetFlags(value);
+            var typeDefFlags = TypeDefinitionTable.GetFlags(value);
 
             if ( typeDefFlags.HasFlag(nanoTypeDefinitionFlags.TD_Delegate) ||
                  typeDefFlags.HasFlag(nanoTypeDefinitionFlags.TD_MulticastDelegate))
@@ -34,9 +34,9 @@ namespace CanFly.Tools.MetadataProcessor.Core.Extensions
 
         public static bool IsToExclude(this TypeDefinition value)
         {
-            return nanoTablesContext.ClassNamesToExclude.Contains(value.FullName) ||
-                   nanoTablesContext.ClassNamesToExclude.Contains(value.Name) ||
-                   nanoTablesContext.ClassNamesToExclude.Contains(value.DeclaringType?.FullName);
+            return TablesContext.ClassNamesToExclude.Contains(value.FullName) ||
+                   TablesContext.ClassNamesToExclude.Contains(value.Name) ||
+                   TablesContext.ClassNamesToExclude.Contains(value.DeclaringType?.FullName);
         }
 
         public static EnumDeclaration ToEnumDeclaration(this TypeDefinition source)

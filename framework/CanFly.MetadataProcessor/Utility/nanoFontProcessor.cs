@@ -38,7 +38,7 @@ namespace CanFly.Tools.MetadataProcessor
         /// </summary>
         /// <param name="writer">Endianness-aware binary writer.</param>
         public void Process(
-            nanoBinaryWriter writer)
+            CLRBinaryWriter writer)
         {
             using (var stream = new MemoryStream(_fontResouce, false))
             using (var reader = new BinaryReader(stream))

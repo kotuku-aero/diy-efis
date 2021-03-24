@@ -12,7 +12,7 @@ namespace CanFly.Tools.MetadataProcessor.Core.Extensions
     {
         public static bool IsToInclude(this TypeReference value)
         {
-            return !nanoTablesContext.IgnoringAttributes.Contains(value.FullName);
+            return !TablesContext.IgnoringAttributes.Contains(value.FullName);
         }
 
         public static string TypeSignatureAsString(this TypeReference type)
@@ -28,7 +28,7 @@ namespace CanFly.Tools.MetadataProcessor.Core.Extensions
             }
 
             nanoCLR_DataType dataType;
-            if (nanoSignaturesTable.PrimitiveTypes.TryGetValue(type.FullName, out dataType))
+            if (SignaturesTable.PrimitiveTypes.TryGetValue(type.FullName, out dataType))
             {
                 switch (dataType)
                 {
@@ -109,7 +109,7 @@ namespace CanFly.Tools.MetadataProcessor.Core.Extensions
         public static string ToNativeTypeAsString(this TypeReference type)
         {
             nanoCLR_DataType dataType;
-            if (nanoSignaturesTable.PrimitiveTypes.TryGetValue(type.FullName, out dataType))
+            if (SignaturesTable.PrimitiveTypes.TryGetValue(type.FullName, out dataType))
             {
                 switch (dataType)
                 {
@@ -181,7 +181,7 @@ namespace CanFly.Tools.MetadataProcessor.Core.Extensions
         public static string ToCLRTypeAsString(this TypeReference type)
         {
             nanoCLR_DataType dataType;
-            if (nanoSignaturesTable.PrimitiveTypes.TryGetValue(type.FullName, out dataType))
+            if (SignaturesTable.PrimitiveTypes.TryGetValue(type.FullName, out dataType))
             {
                 switch (dataType)
                 {
@@ -255,7 +255,7 @@ namespace CanFly.Tools.MetadataProcessor.Core.Extensions
         public static nanoSerializationType ToSerializationType(this TypeReference value)
         {
             nanoCLR_DataType dataType;
-            if (nanoSignaturesTable.PrimitiveTypes.TryGetValue(value.FullName, out dataType))
+            if (SignaturesTable.PrimitiveTypes.TryGetValue(value.FullName, out dataType))
             {
                 switch (dataType)
                 {

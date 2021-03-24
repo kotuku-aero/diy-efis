@@ -9,13 +9,12 @@ namespace CanFly.Tools.MetadataProcessor
   /// <summary>
   /// Common interface for all metadata tables in .NET nanoFramework assembly.
   /// </summary>
-  public interface InanoTable
+  public interface IAssemblyTable
   {
     /// <summary>
     /// Writes metadata table from memory representation into output stream.
     /// </summary>
     /// <param name="writer">Binary writer with correct endianness.</param>
-    void Write(
-        nanoBinaryWriter writer);
+    void Write(CLRBinaryWriter writer);
   }
 }

@@ -158,7 +158,7 @@ namespace CanFly.Tools.MetadataProcessor
             // try getting primitive type
 
             nanoCLR_DataType myType;
-            if(nanoSignaturesTable.PrimitiveTypes.TryGetValue(parameterType.FullName, out myType))
+            if(SignaturesTable.PrimitiveTypes.TryGetValue(parameterType.FullName, out myType))
             {
                 if (myType == nanoCLR_DataType.DATATYPE_LAST_PRIMITIVE)
                 {
@@ -198,13 +198,13 @@ namespace CanFly.Tools.MetadataProcessor
             }
         }
 
-        internal void UpdateCrc(nanoTypeDefinitionTable typeDefinitionTable)
+        internal void UpdateCrc(TypeDefinitionTable typeDefinitionTable)
         {
             foreach (var c in typeDefinitionTable.Items)
             {
                 if (c.IncludeInStub() && !IsClassToExclude(c))
                 {
-                    foreach (var m in nanoTablesContext.GetOrderedMethods(c.Methods))
+                    foreach (var m in TablesContext.GetOrderedMethods(c.Methods))
                     {
                         UpdateCrc(m);
                     }
