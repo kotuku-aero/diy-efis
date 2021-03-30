@@ -61,10 +61,18 @@ namespace CanFly
 
     public class Options
     {
-      [Option('p', "parse", Required = false, HelpText = "<path-to-assembly-file> Analyses .NET assembly.")]
-      public string ParseFilename { get; set; }
-      [Option('c', "compile", Required = false, HelpText = "<path-to-PE-file> Compiles an assembly into CanFly format. Optionally flags if this it's a core library.")]
+      [Option('c', "compile", Required = false, HelpText = "<path-to-DLL-file> Compiles an assembly into CanFly format. ")]
       public string CompileFilename { get; set; }
+      [Option('m', "mscorlib", DefaultValue = false, Required=false, HelpText = "Is the core library")]
+      public bool IsCoreLibrary { get; set; }
+      [Option('p', "pefile", Required =false, HelpText = "Output file, defaults to c=<filename> with .dll replaced with .pe")]
+      public string OutFile { get; set; }
+      [Option('v', "verbose", Required =false, DefaultValue =false, HelpText ="Verbose logging of processor")]
+      public bool Verbose { get; set; }
+      [Option('r', "reference", Required = false, HelpText="Add library to reference, path to a library")]
+      public string[] References { get; set; }
+      [Option('o', "optimize", Required =false, DefaultValue = false, HelpText ="Optimize the compiler output")]
+      public bool Optimization { get; set; }
 
       [HelpOption]
       public string GetUsage()
