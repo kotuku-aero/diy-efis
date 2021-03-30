@@ -1,5 +1,0 @@
-#include "../../libs/ion/ion.cli"
-
-recv_can <ENUM:can_ids:id> <ENUM:can_types:type> <UINT16:session> { <STRING:val1> { <STRING:val2> { <STRING:val3> { <STRING:val4> } } } }
-
-exit
