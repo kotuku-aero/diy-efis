@@ -1,7 +1,7 @@
 {
   "version": 1,
   "dependencies": {
-    ".NETFramework,Version=v4.7.1": {
+    ".NETFramework,Version=v4.7.2": {
       "Mono.Cecil": {
         "type": "Direct",
         "requested": "[0.11.3, 0.11.3]",

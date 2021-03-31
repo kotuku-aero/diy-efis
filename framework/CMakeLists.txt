@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
+set (CMAKE_GENERATOR "Unix Makefiles" CACHE INTERNAL "" FORCE)
 
 # set the project name and enable the C# builder for
 # canfly apps
@@ -7,7 +8,6 @@ project(diy-efis VERSION 1.0.0 LANGUAGES CSharp)
 # this is the build system that compiles the
 # C# v1 files into a .pe assembly that is then packaged into
 # an .app file
-
 set(CMAKE_SYSTEM_NAME CanFly)
 
 # this is the core library.  It has special build flags.  Please
