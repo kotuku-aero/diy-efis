@@ -10,7 +10,7 @@ namespace System
     /// Provides a type- and memory-safe representation of a contiguous region of arbitrary byte array
     /// </summary>
     [Serializable, CLSCompliant(false)]
-    public readonly ref struct SpanByte
+    public struct SpanByte
     {
         private readonly byte[] _array;
         private readonly int _start;
@@ -44,14 +44,14 @@ namespace System
             {
                 if ((length > array.Length - start) || (start > array.Length))
                 {
-                    throw new ArgumentOutOfRangeException($"Array length too small");
+                    throw new ArgumentOutOfRangeException("Array length too small");
                 }
             }
             else
             {
                 if ((start != 0) || (length != 0))
                 {
-                    throw new ArgumentOutOfRangeException($"Array is null but start and length are not 0");
+                    throw new ArgumentOutOfRangeException("Array is null but start and length are not 0");
                 }
             }
 
@@ -71,7 +71,7 @@ namespace System
             {
                 if (index > _length)
                 {
-                    throw new ArgumentOutOfRangeException($"Index out of range");
+                    throw new ArgumentOutOfRangeException("Index out of range");
                 }
 
                 return _array[_start + index];
@@ -80,7 +80,7 @@ namespace System
             {
                 if (index > _length)
                 {
-                    throw new ArgumentOutOfRangeException($"Index out of range");
+                    throw new ArgumentOutOfRangeException("Index out of range");
                 }
 
                 _array[_start + index] = value;
@@ -90,18 +90,27 @@ namespace System
         /// <summary>
         /// Returns an empty System.Span object.
         /// </summary>
-        public static SpanByte Empty => new SpanByte();
+        public static SpanByte Empty
+        {
+          get { return new SpanByte(); }
+        }
 
         /// <summary>
         /// Returns the length of the current span.
         /// </summary>
-        public int Length => _length;
+        public int Length
+        {
+          get { return _length; }
+        }
 
         /// <summary>
         /// Returns a value that indicates whether the current System.Span is empty.
         /// true if the current span is empty; otherwise, false.
         /// </summary>
-        public bool IsEmpty => _length == 0;
+        public bool IsEmpty
+        {
+          get { return _length == 0; }
+        }
 
         /// <summary>
         /// Copies the contents of this System.Span into a destination System.Span.
@@ -114,7 +123,7 @@ namespace System
         {
             if (destination.Length < _length)
             {
-                throw new ArgumentException($"Destination too small");
+                throw new ArgumentException("Destination too small");
             }
 
             for (int i = 0; i < _length; i++)
@@ -133,7 +142,7 @@ namespace System
         {
             if ((start > _length) || (start < 0))
             {
-                throw new ArgumentOutOfRangeException($"start is less than zero or greater than length");
+                throw new ArgumentOutOfRangeException("start is less than zero or greater than length");
             }
 
             return new SpanByte(_array, _start + start, _length - start);
@@ -150,7 +159,7 @@ namespace System
         {
             if ((start < 0) || (length < 0) || (start + length > _length))
             {
-                throw new ArgumentOutOfRangeException($"start or start + length is less than zero or greater than length");
+                throw new ArgumentOutOfRangeException("start or start + length is less than zero or greater than length");
             }
 
             return new SpanByte(_array, _start + start, length);

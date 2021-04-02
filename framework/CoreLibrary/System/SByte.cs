@@ -15,9 +15,7 @@ namespace System
     public struct SByte
     {
         // this field is required in the native end
-#pragma warning disable 0649
         private sbyte _value;
-#pragma warning restore 0649
 
         /// <summary>
         /// Represents the largest possible value of SByte. This field is constant.
@@ -59,9 +57,8 @@ namespace System
         [CLSCompliant(false)]
         public static sbyte Parse(String s)
         {
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-            if (s == null) throw new ArgumentNullException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
+            if (s == null)
+             throw new ArgumentNullException();
 
             return Convert.ToSByte(s);
         }

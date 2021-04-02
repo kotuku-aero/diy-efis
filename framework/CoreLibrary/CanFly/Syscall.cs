@@ -6,7 +6,7 @@ namespace CanFly
   public delegate void ThreadStart();
 
   public delegate void CanFlyEventHandler(ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7);
-  public static class Syscall
+  public class Syscall
   {
     /*******************************************************/
     // CanFly operating system routines

@@ -198,18 +198,18 @@ namespace System
     /// <exception cref="System.InvalidOperationException">comparer is  null reference (Nothing in Visual Basic), value does not implement the IComparable interface, and the search encounters an element that does not implement the IComparable interface.</exception>
     public static int BinarySearch(Array array, int index, int length, Object value, IComparer comparer)
     {
-      var lo = index;
-      var hi = index + length - 1;
+      int lo = index;
+      int hi = index + length - 1;
       while (lo <= hi)
       {
-        var i = (lo + hi) >> 1;
+        int i = (lo + hi) >> 1;
 
         int c;
         if (comparer == null)
         {
           try
           {
-            var elementComparer = array.GetValue(i) as IComparable;
+            IComparable elementComparer = array.GetValue(i) as IComparable;
             c = elementComparer.CompareTo(value);
           }
           catch (Exception e)
@@ -300,11 +300,11 @@ namespace System
         return retVal;
       }
 
-      var endIndex = startIndex + count;
+      int endIndex = startIndex + count;
 
-      for (var i = startIndex; i < endIndex; i++)
+      for (int i = startIndex; i < endIndex; i++)
       {
-        var obj = array.GetValue(i);
+        object obj = array.GetValue(i);
 
         if (Equals(obj, value))
           return i;

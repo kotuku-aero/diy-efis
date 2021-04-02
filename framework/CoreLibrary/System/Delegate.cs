@@ -10,16 +10,7 @@ namespace System
   /// Represents a delegate, which is a data structure that refers to a static method or to a class instance and an instance method of that class.
   /// </summary>
   [Serializable]
-#pragma warning disable CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
-#pragma warning disable CS0661 // Type defines operator == or operator != but does not override Object.GetHashCode()
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////
-  // GetHashCode() implementation is provided by general native function CLR_RT_HeapBlock::GetHashCode //
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////
-#pragma warning disable S1206 // "Equals(Object)" and "GetHashCode()" should be overridden in pairs
   public abstract class Delegate
-#pragma warning restore S1206 // "Equals(Object)" and "GetHashCode()" should be overridden in pairs
-#pragma warning restore CS0661 // Type defines operator == or operator != but does not override Object.GetHashCode()
-#pragma warning restore CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
   {
 
     /// <summary>

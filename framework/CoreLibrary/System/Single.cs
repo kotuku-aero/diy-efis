@@ -15,10 +15,7 @@ namespace System
   [Serializable]
   public struct Single
   {
-    // this field is required in the native end
-#pragma warning disable 0649
     internal float _value;
-#pragma warning restore 0649
 
     /// <summary>
     /// Represents the smallest possible value of Single. This field is constant.
@@ -47,14 +44,10 @@ namespace System
     /// </summary>
     public const float PositiveInfinity = 1.0f / 0.0f;
 
-#pragma warning disable S1764 // Identical expressions should not be used on both sides of a binary operator
-    // intended as the purpose is to a NaN value
-
     /// <summary>
     /// Represents a value that is not a number (NaN). This field is constant.
     /// </summary>
     public const float NaN = 0.0f / 0.0f;
-#pragma warning restore S1764 // Identical expressions should not be used on both sides of a binary operator
 
     /// <summary>
     /// Returns a value indicating whether the specified number evaluates to negative or positive infinity.
@@ -126,9 +119,8 @@ namespace System
     /// <exception cref="System.ArgumentNullException"></exception>
     public static float Parse(string s)
     {
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-      if (s == null) throw new ArgumentNullException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
+      if (s == null)
+       throw new ArgumentNullException();
 
       return Convert.ToSingle(s);
     }

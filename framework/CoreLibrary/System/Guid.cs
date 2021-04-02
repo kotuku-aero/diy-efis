@@ -97,13 +97,10 @@ namespace System
     public Guid(byte[] b)
     {
       if (b == null)
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
         throw new ArgumentNullException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
+
       if (b.Length != 16)
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
         throw new ArgumentException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
 
       _a = b[3] << 24 | b[2] << 16 | b[1] << 8 | b[0];
       _b = (short)(b[5] << 8 | b[4]);
@@ -150,9 +147,7 @@ namespace System
       }
       if (!(value is Guid))
       {
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
         throw new ArgumentException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
       }
 
       Guid g = (Guid)value;

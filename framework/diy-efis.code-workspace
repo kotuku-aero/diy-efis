@@ -1,0 +1,26 @@
+{
+  "folders": [
+    {
+      "path": "CanFly.DiyEfis"
+    },
+    {
+      "path": "CanFly.Neutron"
+    },
+    {
+      "path": "CanFly.Photon"
+    },
+    {
+      "path": "CanFly.Proton"
+    },
+    {
+      "path": "CoreLibrary"
+    },
+    {
+      "path": "System.Collections"
+    },
+    {
+      "path": "System.Math"
+    },
+  ]
+
+}

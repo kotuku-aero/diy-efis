@@ -14,10 +14,7 @@ namespace System
     [Serializable, CLSCompliant(false)]
     public struct UInt16
     {
-        // this field is required in the native end
-#pragma warning disable 0649
         private ushort _value;
-#pragma warning restore 0649
 
         /// <summary>
         /// Represents the largest possible value of UInt16. This field is constant.
@@ -58,9 +55,8 @@ namespace System
         [CLSCompliant(false)]
         public static ushort Parse(String s)
         {
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-            if (s == null) throw new ArgumentNullException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
+            if (s == null)
+             throw new ArgumentNullException();
 
             return Convert.ToUInt16(s);
         }

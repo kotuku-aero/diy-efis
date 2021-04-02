@@ -27,9 +27,8 @@ namespace System
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         public Version(int major, int minor, int build, int revision)
         {
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-            if (major < 0 || minor < 0 || revision < 0 || build < 0) throw new ArgumentOutOfRangeException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
+            if (major < 0 || minor < 0 || revision < 0 || build < 0)
+             throw new ArgumentOutOfRangeException();
 
             _Major = major;
             _Minor = minor;
@@ -45,12 +44,10 @@ namespace System
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         public Version(int major, int minor)
         {
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-            if (major < 0) throw new ArgumentOutOfRangeException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-            if (minor < 0) throw new ArgumentOutOfRangeException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
+            if (major < 0)
+             throw new ArgumentOutOfRangeException();
+            if (minor < 0)
+             throw new ArgumentOutOfRangeException();
 
             _Major = major;
             _Minor = minor;
@@ -64,25 +61,37 @@ namespace System
         /// Gets the value of the major component of the version number for the current Version object.
         /// </summary>
         /// <value>The major version number.</value>
-        public int Major => _Major;
+        public int Major 
+        {
+            get { return _Major; }
+        }
 
         /// <summary>
         /// Gets the value of the minor component of the version number for the current Version object.
         /// </summary>
         /// <value>The minor version number.</value>
-        public int Minor => _Minor;
+        public int Minor
+        {
+          get { return _Minor; }
+        }
 
         /// <summary>
         /// Gets the value of the revision component of the version number for the current Version object.
         /// </summary>
         /// <value>The revision version number.</value>
-        public int Revision => _Revision;
+        public int Revision 
+        {
+          get { return _Revision; }
+        }
 
         /// <summary>
         /// Gets the value of the build component of the version number for the current Version object.
         /// </summary>
         /// <value>The build version number.</value>
-        public int Build => _Build;
+        public int Build
+        {
+          get { return _Build; }
+        }
 
         /// <summary>
         /// Returns a value indicating whether the current Version object is equal to a specified object.
@@ -91,9 +100,10 @@ namespace System
         /// <returns>true if the current Version object and obj are both Version objects, and every component of the current Version object matches the corresponding component of obj; otherwise, false.</returns>
         public override bool Equals(Object obj)
         {
-            if (!(obj is Version)) return false;
+            if (!(obj is Version))
+             return false;
 
-            var v = (Version)obj;
+            Version v = (Version)obj;
             // check that major, minor, build & revision numbers match
             return _Major == v._Major && _Minor == v._Minor && _Build == v._Build && _Revision == v._Revision;
         }
@@ -106,7 +116,7 @@ namespace System
         /// major.minor[.build[.revision]]</returns>
         public override String ToString()
         {
-            var retStr = _Major + "." + _Minor;
+            string retStr = _Major + "." + _Minor;
 
             // Adds _Build and then _Revision if they are positive. They could be -1 in this case not added.
             if (_Build >= 0)

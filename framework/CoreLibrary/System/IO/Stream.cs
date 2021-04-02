@@ -205,10 +205,11 @@ namespace System.IO
         /// <returns>The unsigned byte cast to an Int32, or -1 if at the end of the stream.</returns>
         public virtual int ReadByte()
         {
-            var oneByteArray = new byte[1];
-            var r = Read(oneByteArray, 0, 1);
+            byte[] oneByteArray = new byte[1];
+            int r = Read(oneByteArray, 0, 1);
 
-            if (r == 0) return -1;
+            if (r == 0)
+              return -1;
 
             return oneByteArray[0];
         }
@@ -227,7 +228,7 @@ namespace System.IO
         /// <param name="value">The byte to write to the stream.</param>
         public virtual void WriteByte(byte value)
         {
-            var oneByteArray = new byte[1];
+            byte[] oneByteArray = new byte[1];
             oneByteArray[0] = value;
             Write(oneByteArray, 0, 1);
         }

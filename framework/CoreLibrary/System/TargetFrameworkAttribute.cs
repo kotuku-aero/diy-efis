@@ -22,9 +22,9 @@ namespace System.Runtime.Versioning
         /// <exception cref="System.ArgumentNullException"></exception>
         public TargetFrameworkAttribute(String frameworkName)
         {
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-            if (frameworkName == null) throw new ArgumentNullException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
+            if (frameworkName == null)
+             throw new ArgumentNullException();
+
             _frameworkName = frameworkName;
         }
 
@@ -39,7 +39,6 @@ namespace System.Runtime.Versioning
             get { return _frameworkName; }
         }
 
-#pragma warning disable S2292 // Trivial properties should be auto-implemented
         /// <summary>
         /// Gets the display name of the .NET Framework version against which an assembly was built.
         /// </summary>
@@ -47,7 +46,6 @@ namespace System.Runtime.Versioning
         /// The display name of the .NET Framework version.
         /// </value>
         public String FrameworkDisplayName
-#pragma warning restore S2292 // Trivial properties should be auto-implemented
         {
             get { return _frameworkDisplayName; }
             set { _frameworkDisplayName = value; }

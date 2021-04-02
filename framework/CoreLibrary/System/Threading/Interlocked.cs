@@ -14,7 +14,7 @@ namespace System.Threading
   /// <summary>
   /// Provides atomic operations for variables that are shared by multiple threads.
   /// </summary>
-  public static class Interlocked
+  public class Interlocked
   {
     /// <summary>
     /// Increments a specified variable and stores the result, as an atomic operation.

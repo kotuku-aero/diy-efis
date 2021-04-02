@@ -9,7 +9,7 @@ namespace System.Diagnostics
   /// <summary>
   /// Provides a set of methods and properties that help debug your code.
   /// </summary>
-  public static class Debug
+  public class Debug
   {
 
     /// <summary>

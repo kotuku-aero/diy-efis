@@ -17,12 +17,6 @@ namespace System
   /// </remarks>
   public class Random
   {
-    // this field needs to be here because it's required for the native implementation
-#pragma warning disable 0169
-    private object _random;
-#pragma warning restore 0169
-
-
     /// <summary>
     /// Initializes a new instance of the Random class. 
     /// If the provider is algorithm based the initialisation is performed using a time-

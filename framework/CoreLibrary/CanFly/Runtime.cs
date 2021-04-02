@@ -7,7 +7,7 @@ namespace CanFly
   /// Class holding all system calls.  The order of this class never changes.
   /// Methods can be added to the end of it, but never removed.
   /// </summary>
-  internal static class Runtime
+  internal class Runtime
   {
     /**************************************************************************************/
     // mscorlib routines
@@ -42,17 +42,11 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern byte[] GetBytes(short value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-#pragma warning disable CS3001 // Argument type 'uint' is not CLS-compliant
     internal static extern byte[] GetBytes(uint value);
-#pragma warning restore CS3001 // Argument type 'uint' is not CLS-compliant
     [MethodImpl(MethodImplOptions.InternalCall)]
-#pragma warning disable CS3001 // Argument type 'ulong' is not CLS-compliant
     internal static extern byte[] GetBytes(ulong value);
-#pragma warning restore CS3001 // Argument type 'ulong' is not CLS-compliant
     [MethodImpl(MethodImplOptions.InternalCall)]
-#pragma warning disable CS3001 // Argument type 'ushort' is not CLS-compliant
     internal static extern byte[] GetBytes(ushort value);
-#pragma warning restore CS3001 // Argument type 'ushort' is not CLS-compliant
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern double Int64BitsToDouble(long value);
     [MethodImpl(MethodImplOptions.InternalCall)]

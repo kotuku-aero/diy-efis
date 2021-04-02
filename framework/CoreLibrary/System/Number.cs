@@ -277,7 +277,7 @@ namespace System
   // NaNs or Infinities.
   //
   //This class contains only static members and does not need to be serializable
-  internal static class Number
+  internal class Number
   {
     public static String Format(Object value, bool isInteger, String format)
     {
@@ -323,20 +323,16 @@ namespace System
         if (formatLen > 4)
         {
           // Invalid Format
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
           throw new ArgumentException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
         }
 
         for (int i = 1; i < formatLen; i++)
         {
-          var digit = (ushort)(format[i] - '0');
+          ushort digit = (ushort)(format[i] - '0');
 
           if (digit > 9)
           {
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
             throw new ArgumentException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
           }
 
           precision = precision * 10 + digit;
@@ -355,9 +351,7 @@ namespace System
           if (formatLen == 1) precision = 2; // if no precision is specified, use the default
           break;
         default:
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
           throw new ArgumentException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
       }
     }
 

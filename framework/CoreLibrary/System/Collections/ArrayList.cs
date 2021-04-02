@@ -139,7 +139,7 @@ namespace System.Collections
     /// <returns>A shallow copy of the <see cref="ArrayList"/>.</returns>
     public Object Clone()
     {
-      var arrayList = new ArrayList(_items.Length);
+      ArrayList arrayList = new ArrayList(_items.Length);
 
       Array.Copy(_items, 0, arrayList._items, 0, _items.Length);
       return arrayList;
@@ -229,7 +229,7 @@ namespace System.Collections
     /// <param name="value">The <see cref="Object"/> to remove from the <see cref="ArrayList"/>. The value can be <see langword="null"/>.</param>
     public void Remove(Object value)
     {
-      var index = Array.IndexOf(_items, value, 0, _items.Length);
+      int index = Array.IndexOf(_items, value, 0, _items.Length);
       if (index >= 0)
         RemoveAt(index);
     }

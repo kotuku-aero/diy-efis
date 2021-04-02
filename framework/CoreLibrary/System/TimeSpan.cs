@@ -156,25 +156,38 @@ namespace System
     /// Gets the minutes component of the time interval represented by the current <see cref="TimeSpan"/> structure.
     /// </summary>
     /// <value>The minute component of this instance. The return value ranges from -59 through 59.</value>
-    public int Minutes => (int)((_ticks / TicksPerMinute) % 60);
+    public int Minutes
+    {
+      get { return (int)((_ticks / TicksPerMinute) % 60); }
+    }
+     
 
     /// <summary>
     /// Gets the seconds component of the time interval represented by the current <see cref="TimeSpan"/> structure.
     /// </summary>
     /// <value>The second component of this instance. The return value ranges from -59 through 59.</value>
-    public int Seconds => (int)((_ticks / TicksPerSecond) % 60);
+    public int Seconds 
+    {
+      get { return (int)((_ticks / TicksPerSecond) % 60); }
+    }
 
     /// <summary>
     /// Gets the value of the current <see cref="TimeSpan"/> structure expressed in whole and fractional days.
     /// </summary>
     /// <value>The total number of days represented by this instance.</value>
-    public double TotalDays => (_ticks) * DaysPerTick;
+    public double TotalDays 
+    {
+      get { return (_ticks) * DaysPerTick; }
+    }
 
     /// <summary>
     /// Gets the value of the current <see cref="TimeSpan"/> structure expressed in whole and fractional hours.
     /// </summary>
     /// <value>The total number of hours represented by this instance.</value>
-    public double TotalHours => _ticks * HoursPerTick;
+    public double TotalHours
+    {
+      get { return  _ticks * HoursPerTick; }
+    }
 
     /// <summary>
     /// Gets the value of the current <see cref="TimeSpan"/> structure expressed in whole and fractional milliseconds.
@@ -199,20 +212,29 @@ namespace System
     /// Gets the value of the current <see cref="TimeSpan"/> structure expressed in whole and fractional minutes.
     /// </summary>
     /// <value>The total number of minutes represented by this instance.</value>
-    public double TotalMinutes => _ticks * MinutesPerTick;
+    public double TotalMinutes
+    {
+      get { return _ticks * MinutesPerTick; }
+    }
 
     /// <summary>
     /// Gets the value of the current <see cref="TimeSpan"/> structure expressed in whole and fractional seconds.
     /// </summary>
     /// <value>The total number of seconds represented by this instance.</value>
-    public double TotalSeconds => _ticks * SecondsPerTick;
+    public double TotalSeconds
+    {
+      get { return _ticks * SecondsPerTick; }
+    }
 
     /// <summary>
     /// Returns a new <see cref="TimeSpan"/> object whose value is the sum of the specified <see cref="TimeSpan"/> object and this instance.
     /// </summary>
     /// <param name="ts">The time interval to add.</param>
     /// <returns>A new object that represents the value of this instance plus the value of ts.</returns>
-    public TimeSpan Add(TimeSpan ts) => new TimeSpan(_ticks + ts._ticks);
+    public TimeSpan Add(TimeSpan ts)
+    {
+       return new TimeSpan(_ticks + ts._ticks); 
+    }
 
     /// <summary>
     /// Compares two <see cref="TimeSpan"/> values and returns an integer that indicates whether the first value is shorter than, equal to, or longer than the second value.
@@ -263,7 +285,10 @@ namespace System
     /// Returns a new <see cref="TimeSpan"/> object whose value is the absolute value of the current <see cref="TimeSpan"/> object.
     /// </summary>
     /// <returns>A new object whose value is the absolute value of the current <see cref="TimeSpan"/> object.</returns>
-    public TimeSpan Duration() => new TimeSpan(_ticks >= 0 ? _ticks : -_ticks);
+    public TimeSpan Duration()
+    {
+       return  new TimeSpan(_ticks >= 0 ? _ticks : -_ticks);
+    }
 
     /// <summary>
     /// Returns a value indicating whether this instance is equal to a specified object.
@@ -290,7 +315,10 @@ namespace System
     /// Returns a new <see cref="TimeSpan"/> object whose value is the negated value of this instance.
     /// </summary>
     /// <returns>A new object with the same numeric value as this instance, but with the opposite sign.</returns>
-    public TimeSpan Negate() => new TimeSpan(-_ticks);
+    public TimeSpan Negate()
+    {
+      return new TimeSpan(-_ticks);
+    }
 
     /// <summary>
     /// Returns a new <see cref="TimeSpan"/> object whose value is the difference between the specified <see cref="TimeSpan"/> object and this instance.

@@ -74,7 +74,7 @@ namespace System
         {
             get
             {
-                var s = base.Message;
+                string s = base.Message;
                 if (!(_paramName == null || _paramName.Length == 0))
                     return s + "\n" + "Invalid argument " + "'" + _paramName + "'";
                 return s;

@@ -15,9 +15,7 @@ namespace System
     public struct UInt32
     {
         // this field is required in the native end
-#pragma warning disable 0649
         private uint _value;
-#pragma warning restore 0649
 
         /// <summary>
         /// Represents the largest possible value of UInt32. This field is constant.
@@ -58,9 +56,8 @@ namespace System
         [CLSCompliant(false)]
         public static uint Parse(String s)
         {
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-            if (s == null) throw new ArgumentNullException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
+            if (s == null)
+             throw new ArgumentNullException();
 
             return Convert.ToUInt32(s);
         }

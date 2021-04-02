@@ -11,16 +11,7 @@ namespace System
   /// Represents text as a sequence of UTF-16 code units.
   /// </summary>
   [Serializable]
-#pragma warning disable CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
-#pragma warning disable CS0661 // Type defines operator == or operator != but does not override Object.GetHashCode()
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////
-  // GetHashCode() implementation is provided by general native function CLR_RT_HeapBlock::GetHashCode //
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////
-#pragma warning disable S1206 // "Equals(Object)" and "GetHashCode()" should be overridden in pairs
   public sealed class String : IComparable, IEnumerable
-#pragma warning restore S1206 // "Equals(Object)" and "GetHashCode()" should be overridden in pairs
-#pragma warning restore CS0661 // Type defines operator == or operator != but does not override Object.GetHashCode()
-#pragma warning restore CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
   {
     /// <summary>
     /// **Not supported in NanoFramework**  
@@ -49,7 +40,7 @@ namespace System
     /// <returns>true if obj is a String and its value is the same as this instance; otherwise, false. If obj is null, the method returns false.</returns>
     public override bool Equals(object obj)
     {
-      var s = obj as String;
+      string s = obj as String;
       return s != null && Equals(this, s);
     }
 
@@ -466,12 +457,13 @@ namespace System
     /// <exception cref="ArgumentNullException"></exception>
     public static String Concat(params Object[] args)
     {
-      if (args == null) throw new ArgumentNullException("args");
+      if (args == null)
+        throw new ArgumentNullException("args");
 
-      var length = args.Length;
-      var sArgs = new String[length];
+      int length = args.Length;
+      string[] sArgs = new String[length];
 
-      for (var i = 0; i < length; i++)
+      for (int i = 0; i < length; i++)
       {
         sArgs[i] = args[i] == null ? Empty : args[i].ToString();
       }
@@ -531,20 +523,20 @@ namespace System
     /// <returns>A copy of format in which the format items have been replaced by the string representation of the corresponding objects in args.</returns>
     public static string Format(string format, params object[] args)
     {
-      var index = 0;
-      var alignment = 0;
-      var chr = '\0';
-      var len = format.Length;
-      var fmt = Empty;
-      var token = Empty;
-      var output = Empty;
+      int index = 0;
+      int alignment = 0;
+      char chr = '\0';
+      int len = format.Length;
+      string fmt = Empty;
+      string token = Empty;
+      string output = Empty;
 
-      if (format is null)
+      if (format == null)
       {
         throw new ArgumentNullException("format can't be null");
       }
 
-      for (var i = 0; i < len; i++)
+      for (int i = 0; i < len; i++)
       {
         token = Empty;
         chr = format[i];
@@ -723,19 +715,22 @@ namespace System
       return output;
     }
 
+    public String PadLeft(int totalWidth)
+    {
+      return PadLeft(totalWidth, ' ');
+    }
+
     /// <summary>
     /// Returns a new string that right-aligns the characters in this instance by padding them on the left with a specified Unicode character, for a specified total length.
     /// </summary>
     /// <param name="totalWidth">The number of characters in the resulting string, equal to the number of original characters plus any additional padding characters.</param>
     /// <param name="paddingChar">A Unicode padding character.</param>
     /// <returns></returns>
-    public String PadLeft(int totalWidth, char paddingChar = ' ')
+    public String PadLeft(int totalWidth, char paddingChar)
     {
       if (totalWidth < 0)
       {
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
         throw new ArgumentOutOfRangeException("totalWidth can't be less than 0");
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
       }
 
       if (Length >= totalWidth)
@@ -748,19 +743,22 @@ namespace System
       }
     }
 
+    public String PadRight(int totalWidth)
+    {
+      return PadRight(totalWidth, ' ');
+    }
+
     /// <summary>
     /// Returns a new string that left-aligns the characters in this string by padding them on the right with a specified Unicode character, for a specified total length.
     /// </summary>
     /// <param name="totalWidth">The number of characters in the resulting string, equal to the number of original characters plus any additional padding characters.</param>
     /// <param name="paddingChar">A Unicode padding character.</param>
     /// <returns></returns>
-    public String PadRight(int totalWidth, char paddingChar = ' ')
+    public String PadRight(int totalWidth, char paddingChar)
     {
       if (totalWidth < 0)
       {
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
         throw new ArgumentOutOfRangeException("totalWidth can't be less than 0");
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
       }
 
       if (Length >= totalWidth)

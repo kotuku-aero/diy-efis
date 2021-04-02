@@ -88,8 +88,8 @@ namespace System
     /// <returns>A string representation of the current exception.</returns>
     public override String ToString()
     {
-      var message = Message;
-      var s = base.ToString();
+      string message = Message;
+      string s = base.ToString();
 
       if (message != null && message.Length > 0)
       {

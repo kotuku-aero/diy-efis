@@ -9,7 +9,7 @@ namespace System
   /// <summary>
   /// Converts base data types to an array of bytes, and an array of bytes to base data types.
   /// </summary>
-  public static class BitConverter
+  public class BitConverter
   {
     /// <summary>
     /// Indicates the byte order ("endianess") in which data is stored in this computer architecture.

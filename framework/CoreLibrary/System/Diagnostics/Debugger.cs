@@ -9,7 +9,7 @@ namespace System.Diagnostics
   /// <summary>
   /// Enables communication with a debugger. This class cannot be inherited.
   /// </summary>
-  public static class Debugger
+  public class Debugger
   {
     /// <summary>
     /// Gets a value that indicates whether a debugger is attached to the process.

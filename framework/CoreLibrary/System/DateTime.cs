@@ -76,9 +76,6 @@ namespace System
   /// Represents an instant in time, typically expressed as a date and time of day.
   /// </summary>
   [Serializable]
-#if NANOCLR_REFLECTION
-    [DebuggerDisplay("{DateTimeDisplay,nq}")]
-#endif // NANOCLR_REFLECTION
   public struct DateTime
   {
     /// Our origin is at 1601/01/01:00:00:00.000
@@ -169,12 +166,10 @@ namespace System
     /// <exception cref="System.ArgumentOutOfRangeException"><paramref name="ticks"/> - Ticks must be between <see cref="DateTime.MinValue"/> and <see cref="DateTime.MaxValue"/>.</exception>
     public DateTime(long ticks)
     {
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
       if (ticks < MinTicks || ticks > MaxTicks)
       {
         throw new ArgumentOutOfRangeException();
       }
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
 
       // need to subtract our ticks at origin
       ticks -= _ticksAtOrigin;
@@ -201,9 +196,7 @@ namespace System
 
       if (kind != DateTimeKind.Utc)
       {
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
         throw new ArgumentException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
       }
     }
 
@@ -332,12 +325,15 @@ namespace System
     public static int Compare(DateTime t1, DateTime t2)
     {
       // Get ticks
-      var t1Ticks = t1.Ticks;
-      var t2Ticks = t2.Ticks;
+      long t1Ticks = t1.Ticks;
+      long t2Ticks = t2.Ticks;
 
       // Compare ticks.
-      if (t1Ticks > t2Ticks) return 1;
-      if (t1Ticks < t2Ticks) return -1;
+      if (t1Ticks > t2Ticks)
+        return 1;
+
+      if (t1Ticks < t2Ticks)
+        return -1;
 
       // Values are equal
       return 0;
@@ -379,7 +375,7 @@ namespace System
         // "this" may still have type int64.
         // Conversion to object and back is a workaround.
         object o = this;
-        var thisTime = (DateTime)o;
+        DateTime thisTime = (DateTime)o;
 
         return Compare(thisTime, (DateTime)obj) == 0;
       }
@@ -420,7 +416,7 @@ namespace System
     /// </value>
     public int Day
     {
-      get => GetDateTimePart(DateTimePart.Day);
+      get { return GetDateTimePart(DateTimePart.Day); }
     }
 
     /// <summary>
@@ -431,7 +427,7 @@ namespace System
     /// </value>
     public DayOfWeek DayOfWeek
     {
-      get => (DayOfWeek)GetDateTimePart(DateTimePart.DayOfWeek);
+      get { return (DayOfWeek)GetDateTimePart(DateTimePart.DayOfWeek); }
     }
 
     /// <summary>
@@ -456,10 +452,7 @@ namespace System
     /// </value>
     public int Hour
     {
-      get
-      {
-        return GetDateTimePart(DateTimePart.Hour);
-      }
+      get { return GetDateTimePart(DateTimePart.Hour); }
     }
 
     /// <summary>
@@ -469,9 +462,12 @@ namespace System
     /// One of the enumeration values that indicates what the current time represents.
     /// </value>
     /// <remarks>
-    /// Despite the default in the full .NET Framework is <see cref="DateTimeKind.Local"/> this won't never happen because nanoFramework only supports UTC time.
+    /// Despite the default in the full .NET Framework is <see cref="DateTimeKind.Local"/> this won't never happen because the canFlyFramework only supports UTC time.
     /// </remarks>
-    public DateTimeKind Kind => DateTimeKind.Utc; // always UTC in nanoFramework
+    public DateTimeKind Kind
+    {
+      get { return DateTimeKind.Utc; }
+    }
 
     /// <summary>
     /// Gets the milliseconds component of the date represented by this instance.
@@ -481,10 +477,7 @@ namespace System
     /// </value>
     public int Millisecond
     {
-      get
-      {
-        return GetDateTimePart(DateTimePart.Millisecond);
-      }
+      get { return GetDateTimePart(DateTimePart.Millisecond); }
     }
 
     /// <summary>
@@ -495,10 +488,7 @@ namespace System
     /// </value>
     public int Minute
     {
-      get
-      {
-        return GetDateTimePart(DateTimePart.Minute);
-      }
+      get{ return GetDateTimePart(DateTimePart.Minute);}
     }
 
     /// <summary>
@@ -509,10 +499,7 @@ namespace System
     /// </value>
     public int Month
     {
-      get
-      {
-        return GetDateTimePart(DateTimePart.Month);
-      }
+      get{ return GetDateTimePart(DateTimePart.Month); }
     }
 
     /// <summary>
@@ -536,7 +523,7 @@ namespace System
     /// </value>
     public int Second
     {
-      get => GetDateTimePart(DateTimePart.Second);
+      get { return GetDateTimePart(DateTimePart.Second); }
     }
 
     /// <summary>
@@ -547,10 +534,7 @@ namespace System
     /// </value>
     public long Ticks
     {
-      get
-      {
-        return (long)(_ticks & _tickMask) + _ticksAtOrigin;
-      }
+      get { return (long)(_ticks & _tickMask) + _ticksAtOrigin; }
     }
 
     /// <summary>
@@ -561,10 +545,7 @@ namespace System
     /// </value>
     public TimeSpan TimeOfDay
     {
-      get
-      {
-        return new TimeSpan(Ticks % TicksPerDay);
-      }
+      get { return new TimeSpan(Ticks % TicksPerDay); }
     }
 
     /// <summary>
@@ -586,10 +567,7 @@ namespace System
     /// </value>
     public int Year
     {
-      get
-      {
-        return GetDateTimePart(DateTimePart.Year);
-      }
+      get { return GetDateTimePart(DateTimePart.Year); }
     }
 
     /// <summary>
@@ -616,14 +594,20 @@ namespace System
     /// Converts the value of the current <see cref="DateTime"/> object to its equivalent string representation.
     /// </summary>
     /// <returns>A string representation of the value of the current <see cref="DateTime"/> object.</returns>
-    public override string ToString() => DateTimeFormat.Format(this, null);
+    public override string ToString()
+    {
+      return DateTimeFormat.Format(this, null);
+    }
 
     /// <summary>
     /// Converts the value of the current <see cref="DateTime"/> object to its equivalent string representation using the specified format.
     /// </summary>
     /// <param name="format">A standard or custom date and time format string (see Remarks). </param>
     /// <returns>A string representation of value of the current DateTime object as specified by format.</returns>
-    public string ToString(string format) => DateTimeFormat.Format(this, format);
+    public string ToString(string format)
+    {
+      return DateTimeFormat.Format(this, format);
+    }
 
     /// <summary>
     /// Adds a specified time interval to a specified date and time, yielding a new date and time.
@@ -757,9 +741,7 @@ namespace System
 
       if (seconds < 0 || seconds > MaxSeconds)
       {
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
         throw new ArgumentOutOfRangeException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
       }
 
       long ticks = (seconds * TicksPerSecond) + UnixEpochTicks;
@@ -807,9 +789,6 @@ namespace System
       return ((int)internalTicks) ^ ((int)(internalTicks >> 0x20));
 
     }
-
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private string DateTimeDisplay => $"{{{new DateTime(Ticks).ToString()}}}";
 
     private int GetDateTimePart(DateTimePart part)
     {

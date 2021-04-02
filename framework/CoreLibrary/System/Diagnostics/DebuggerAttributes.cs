@@ -278,18 +278,15 @@ namespace System.Diagnostics
         {
             set
             {
-                if (value == null) throw new ArgumentNullException("value");
-
-#pragma warning disable S4275 // Getters and setters should access the expected fields
+                if (value == null)
+                 throw new ArgumentNullException("value");
                 _targetName = value.FullName + "," + value.Assembly.FullName;
-#pragma warning restore S4275 // Getters and setters should access the expected fields
                 _target = value;
             }
 
             get { return _target; }
         }
 
-#pragma warning disable S2292 // Trivial properties should be auto-implemented
         /// <summary>
         /// Gets or sets the name of the target type.
         /// </summary>
@@ -297,7 +294,6 @@ namespace System.Diagnostics
         /// The name of the target type.
         /// </value>
         public string TargetTypeName
-#pragma warning restore S2292 // Trivial properties should be auto-implemented
         {
             get { return _targetName; }
             set { _targetName = value; }
@@ -348,25 +344,21 @@ namespace System.Diagnostics
             get { return _value; }
         }
 
-#pragma warning disable S2292 // Trivial properties should be auto-implemented
         /// <summary>
         /// Gets or sets the name to display in the debugger variable windows.
         /// </summary>
         /// <value>The name to display in the debugger variable windows.</value>
         public string Name
-#pragma warning restore S2292 // Trivial properties should be auto-implemented
         {
             get { return _name; }
             set { _name = value; }
         }
 
-#pragma warning disable S2292 // Trivial properties should be auto-implemented
         /// <summary>
         /// Gets or sets the string to display in the type column of the debugger variable windows.
         /// </summary>
         /// <value>The string to display in the type column of the debugger variable windows.</value>
         public string Type
-#pragma warning restore S2292 // Trivial properties should be auto-implemented
         {
             get { return _type; }
             set { _type = value; }
@@ -381,24 +373,21 @@ namespace System.Diagnostics
         {
             set
             {
-                if (value == null) throw new ArgumentNullException("value");
+                if (value == null)
+                 throw new ArgumentNullException("value");
 
-#pragma warning disable S4275 // Getters and setters should access the expected fields
                 _targetName = value.FullName + "," + value.Assembly.FullName;
-#pragma warning restore S4275 // Getters and setters should access the expected fields
                 _target = value;
             }
 
             get { return _target; }
         }
 
-#pragma warning disable S2292 // Trivial properties should be auto-implemented
         /// <summary>
         /// Gets or sets the type name of the attribute's target.
         /// </summary>
         /// <value>The name of the attribute's target type.</value>
         public string TargetTypeName
-#pragma warning restore S2292 // Trivial properties should be auto-implemented
         {
             get { return _targetName; }
             set { _targetName = value; }

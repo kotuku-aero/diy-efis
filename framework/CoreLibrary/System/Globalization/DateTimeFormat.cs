@@ -116,8 +116,7 @@ namespace System.Globalization
 
 
   //This class contains only static members and does not require the serializable attribute.
-  internal static
-  class DateTimeFormat
+  internal  class DateTimeFormat
   {
     internal const int _maxSecondsFractionDigits = 3;
     ////////////////////////////////////////////////////////////////////////////
@@ -142,8 +141,8 @@ namespace System.Globalization
 
     private static int ParseRepeatPattern(String format, int pos, char patternChar)
     {
-      var len = format.Length;
-      var index = pos + 1;
+      int len = format.Length;
+      int index = pos + 1;
       while (index < len && format[index] == patternChar)
       {
         index++;
@@ -161,15 +160,15 @@ namespace System.Globalization
       //
       // NOTE : pos will be the index of the quote character in the 'format' string.
       //
-      var result = String.Empty;
-      var formatLen = format.Length;
-      var beginPos = pos;
-      var quoteChar = format[pos++]; // Get the character used to quote the following string.
+      string result = String.Empty;
+      int formatLen = format.Length;
+      int beginPos = pos;
+      char quoteChar = format[pos++]; // Get the character used to quote the following string.
 
-      var foundQuote = false;
+      bool foundQuote = false;
       while (pos < formatLen)
       {
-        var ch = format[pos++];
+        char ch = format[pos++];
         if (ch == quoteChar)
         {
           foundQuote = true;
@@ -222,7 +221,8 @@ namespace System.Globalization
     //
     private static int ParseNextChar(String format, int pos)
     {
-      if (pos >= format.Length - 1) return -1;
+      if (pos >= format.Length - 1)
+        return -1;
 
       return format[pos + 1];
     }
@@ -240,17 +240,17 @@ namespace System.Globalization
 
     private static String FormatCustomized(DateTime dateTime, String format)
     {
-      var result = String.Empty;
-      var i = 0;
+      string result = String.Empty;
+      int i = 0;
       int tokenLen = 1;
-      var formatLen = format.Length;
+      int formatLen = format.Length;
 
       while (i < formatLen)
       {
-        var ch = format[i];
+        char ch = format[i];
         int nextChar;
-        var doneParsingCh = true;
-        var tempResult = String.Empty;
+        bool doneParsingCh = true;
+        string tempResult = String.Empty;
 
         switch (ch)
         {
@@ -321,8 +321,10 @@ namespace System.Globalization
           switch (ch)
           {
             case 'h':
-              var hour12 = dateTime.Hour % 12;
-              if (hour12 == 0) hour12 = 12;
+              int hour12 = dateTime.Hour % 12;
+              if (hour12 == 0)
+                hour12 = 12;
+              
               tempResult = FormatDigits(hour12, tokenLen);
               break;
             case 'H':
@@ -337,8 +339,8 @@ namespace System.Globalization
             case 'f':
               if (tokenLen <= _maxSecondsFractionDigits)
               {
-                var precision = 3;
-                var fraction = dateTime.Millisecond;
+                int precision = 3;
+                int fraction = dateTime.Millisecond;
 
                 // Note: Need to add special case when tokenLen > precision to begin with
                 // if we're to change MaxSecondsFractionDigits to be more than 3
@@ -351,7 +353,8 @@ namespace System.Globalization
 
                 tempResult = FormatDigits(fraction, tokenLen);
               }
-              else throw new ArgumentException("Format_InvalidString");
+              else
+                throw new ArgumentException("Format_InvalidString");
               break;
             case 't':
               if (tokenLen == 1)
@@ -378,7 +381,7 @@ namespace System.Globalization
               if (tokenLen <= 2) tempResult = FormatDigits(dateTime.Day, tokenLen);
               else
               {
-                var dayOfWeek = (int)dateTime.DayOfWeek;
+                int dayOfWeek = (int)dateTime.DayOfWeek;
 
                 tempResult = tokenLen == 3 ? abbrDayNames[dayOfWeek] : dayNames[dayOfWeek];
               }
@@ -390,9 +393,11 @@ namespace System.Globalization
               // tokenLen == 3 : Month as a three-letter abbreviation.
               // tokenLen >= 4 : Month as its full name.
               //
-              var month = dateTime.Month;
-              if (tokenLen <= 2) tempResult = FormatDigits(month, tokenLen);
-              else tempResult = tokenLen == 3 ? abbrMonthNames[month - 1] : monthNames[month - 1];
+              int month = dateTime.Month;
+              if (tokenLen <= 2)
+                tempResult = FormatDigits(month, tokenLen);
+              else
+                tempResult = tokenLen == 3 ? abbrMonthNames[month - 1] : monthNames[month - 1];
               break;
             case 'y':
               // Notes about OS behavior:
@@ -400,11 +405,12 @@ namespace System.Globalization
               // yy: Always print (year % 100) with leading zero.
               // yyy/yyyy/yyyyy/... : Print year value.  With leading zeros.
 
-              var year = dateTime.Year;
+              int year = dateTime.Year;
 
               tempResult = tokenLen <= 2 ? FormatDigits(year % 100, tokenLen) : year.ToString();
 
-              if (tempResult.Length < tokenLen) tempResult = new string('0', tokenLen - tempResult.Length) + tempResult;
+              if (tempResult.Length < tokenLen) 
+                tempResult = new string('0', tokenLen - tempResult.Length) + tempResult;
               break;
 
             default:

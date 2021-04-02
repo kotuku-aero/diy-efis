@@ -30,14 +30,7 @@ namespace System.ComponentModel
     /// Specifies that a property or method is viewable in an editor. This class cannot be inherited.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum | AttributeTargets.Constructor | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Event | AttributeTargets.Interface | AttributeTargets.Delegate)]
-#pragma warning disable CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    // GetHashCode() implementation is provided by general native function CLR_RT_HeapBlock::GetHashCode //
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////
-#pragma warning disable S1206 // "Equals(Object)" and "GetHashCode()" should be overridden in pairs
     public sealed class EditorBrowsableAttribute : Attribute
-#pragma warning restore S1206 // "Equals(Object)" and "GetHashCode()" should be overridden in pairs
-#pragma warning restore CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
     {
         private readonly EditorBrowsableState _browsableState;
 
@@ -64,8 +57,9 @@ namespace System.ComponentModel
         {
             if (obj == this) return true;
 
-            var attribute1 = obj as EditorBrowsableAttribute;
-            if (attribute1 != null) return (attribute1._browsableState == _browsableState);
+            EditorBrowsableAttribute attribute1 = obj as EditorBrowsableAttribute;
+            if (attribute1 != null)
+             return (attribute1._browsableState == _browsableState);
 
             return false;
         }

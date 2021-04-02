@@ -27,7 +27,7 @@ namespace System
   /// Converts a base data type to another base data type.
   /// </summary>
   [ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)]
-  public static class Convert
+  public class Convert
   {
     private static long NativeToInt64(string value, bool signed, long min, long max, int fromBase)
     {
@@ -38,6 +38,7 @@ namespace System
     {
       return CanFly.Runtime.NativeToDouble(value); 
     }
+
     /// <summary>
     /// Converts the value of the specified 8-bit unsigned integer to an equivalent Boolean value.
     /// </summary>
@@ -71,10 +72,15 @@ namespace System
     /// </remarks>
     /// <exception cref="ArgumentException"><paramref name="fromBase"/> is not 2, 8, 10, or 16.</exception>
     /// <exception cref="NotImplementedException">If the platform doesn't have support to convert from non-base 10 values.</exception>
-    [CLSCompliant(false)]
-    public static sbyte ToSByte(string value, int fromBase = 10)
+
+    public static sbyte ToSByte(string value, int fromBase)
     {
       return (sbyte)NativeToInt64(value, true, SByte.MinValue, SByte.MaxValue, fromBase);
+    }
+
+    public static sbyte ToSByte(string value)
+    {
+      return (sbyte)NativeToInt64(value, true, SByte.MinValue, SByte.MaxValue, 10);
     }
 
     /// <summary>
@@ -89,9 +95,14 @@ namespace System
     /// </remarks>
     /// <exception cref="ArgumentException"><paramref name="fromBase"/> is not 2, 8, 10, or 16.</exception>
     /// <exception cref="NotImplementedException">If the platform doesn't have support to convert from non-base 10 values.</exception>
-    public static byte ToByte(string value, int fromBase = 10)
+    public static byte ToByte(string value, int fromBase)
     {
       return (byte)NativeToInt64(value, false, Byte.MinValue, Byte.MaxValue, fromBase);
+    }
+
+    public static byte ToByte(string value)
+    {
+      return (byte)NativeToInt64(value, false, Byte.MinValue, Byte.MaxValue, 10);
     }
 
     /// <summary>
@@ -106,9 +117,14 @@ namespace System
     /// </remarks>
     /// <exception cref="ArgumentException"><paramref name="fromBase"/> is not 2, 8, 10, or 16.</exception>
     /// <exception cref="NotImplementedException">If the platform doesn't have support to convert from non-base 10 values.</exception>
-    public static short ToInt16(string value, int fromBase = 10)
+    public static short ToInt16(string value, int fromBase)
     {
       return (short)NativeToInt64(value, true, Int16.MinValue, Int16.MaxValue, fromBase);
+    }
+
+    public static short ToInt16(string value)
+    {
+      return (short)NativeToInt64(value, true, Int16.MinValue, Int16.MaxValue, 10);
     }
 
     /// <summary>
@@ -123,10 +139,14 @@ namespace System
     /// </remarks>
     /// <exception cref="ArgumentException"><paramref name="fromBase"/> is not 2, 8, 10, or 16.</exception>
     /// <exception cref="NotImplementedException">If the platform doesn't have support to convert from non-base 10 values.</exception>
-    [CLSCompliant(false)]
-    public static ushort ToUInt16(string value, int fromBase = 10)
+    public static ushort ToUInt16(string value, int fromBase)
     {
       return (ushort)NativeToInt64(value, false, UInt16.MinValue, UInt16.MaxValue, fromBase);
+    }
+
+    public static ushort ToUInt16(string value)
+    {
+      return (ushort)NativeToInt64(value, false, UInt16.MinValue, UInt16.MaxValue, 10);
     }
 
     /// <summary>
@@ -141,9 +161,14 @@ namespace System
     /// </remarks>
     /// <exception cref="ArgumentException"><paramref name="fromBase"/> is not 2, 8, 10, or 16.</exception>
     /// <exception cref="NotImplementedException">If the platform doesn't have support to convert from non-base 10 values.</exception>
-    public static int ToInt32(string value, int fromBase = 10)
+    public static int ToInt32(string value, int fromBase)
     {
       return (int)NativeToInt64(value, true, Int32.MinValue, Int32.MaxValue, fromBase);
+    }
+
+    public static int ToInt32(string value)
+    {
+      return (int)NativeToInt64(value, true, Int32.MinValue, Int32.MaxValue, 10);
     }
 
     /// <summary>
@@ -158,10 +183,14 @@ namespace System
     /// </remarks>
     /// <exception cref="ArgumentException"><paramref name="fromBase"/> is not 2, 8, 10, or 16.</exception>
     /// <exception cref="NotImplementedException">If the platform doesn't have support to convert from non-base 10 values.</exception>
-    [CLSCompliant(false)]
-    public static uint ToUInt32(string value, int fromBase = 10)
+    public static uint ToUInt32(string value, int fromBase)
     {
       return (uint)NativeToInt64(value, false, UInt32.MinValue, UInt32.MaxValue, fromBase);
+    }
+
+   public static uint ToUInt32(string value)
+    {
+      return (uint)NativeToInt64(value, false, UInt32.MinValue, UInt32.MaxValue, 10);
     }
 
     /// <summary>
@@ -176,9 +205,14 @@ namespace System
     /// </remarks>
     /// <exception cref="ArgumentException"><paramref name="fromBase"/> is not 2, 8, 10, or 16.</exception>
     /// <exception cref="NotImplementedException">If the platform doesn't have support to convert from non-base 10 values.</exception>
-    public static long ToInt64(string value, int fromBase = 10)
+    public static long ToInt64(string value, int fromBase)
     {
       return NativeToInt64(value, true, Int64.MinValue, Int64.MaxValue, fromBase);
+    }
+
+    public static long ToInt64(string value)
+    {
+      return NativeToInt64(value, true, Int64.MinValue, Int64.MaxValue, 10);
     }
 
     /// <summary>
@@ -193,12 +227,15 @@ namespace System
     /// </remarks>
     /// <exception cref="ArgumentException"><paramref name="fromBase"/> is not 2, 8, 10, or 16.</exception>
     /// <exception cref="NotImplementedException">If the platform doesn't have support to convert from non-base 10 values.</exception>
-    [CLSCompliant(false)]
-    public static ulong ToUInt64(string value, int fromBase = 10)
+    public static ulong ToUInt64(string value, int fromBase)
     {
       return (ulong)NativeToInt64(value, true, 0, 0, fromBase);
     }
 
+    public static ulong ToUInt64(string value)
+    {
+      return (ulong)NativeToInt64(value, true, 0, 0, 10);
+    }
     /// <summary>
     /// Converts the specified string representation of a number to an equivalent double-precision floating-point number.
     /// </summary>
@@ -226,9 +263,8 @@ namespace System
     /// <returns>The String representation, in base 64, of the contents of <paramref name="inArray"/>.</returns>
     public static string ToBase64String(byte[] inArray)
     {
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-      if (inArray == null) throw new ArgumentNullException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
+      if (inArray == null)
+       throw new ArgumentNullException();
 
       return ToBase64String(inArray, 0, inArray.Length, Base64FormattingOptions.None);
     }
@@ -241,9 +277,7 @@ namespace System
     /// <returns>The string representation in base 64 of the elements in <paramref name="inArray"/>.</returns>
     public static String ToBase64String(byte[] inArray, Base64FormattingOptions options)
     {
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
       if (inArray == null) throw new ArgumentNullException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
 
       return ToBase64String(inArray, 0, inArray.Length, options);
     }
@@ -271,18 +305,10 @@ namespace System
     public static string ToBase64String(byte[] inArray, int offset, int length, Base64FormattingOptions options)
     {
       //Do data verfication
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
       if (inArray == null) throw new ArgumentNullException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
       if (length < 0) throw new ArgumentOutOfRangeException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
       if (offset < 0) throw new ArgumentOutOfRangeException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
       if (options < Base64FormattingOptions.None || options > Base64FormattingOptions.InsertLineBreaks) throw new ArgumentException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
 
       return CanFly.Runtime.ToBase64String(inArray, offset, length, options == Base64FormattingOptions.InsertLineBreaks);
     }

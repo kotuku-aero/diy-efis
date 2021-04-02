@@ -7,7 +7,7 @@
 namespace System
 {
 
-  internal static class MathInternal
+  internal class MathInternal
   {
     internal static int Abs(int val) { return CanFly.Runtime.Abs(val); }
 

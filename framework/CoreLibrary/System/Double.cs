@@ -19,9 +19,7 @@ namespace System
     internal const string _positiveInfinitySymbol = "Infinity";
 
     // this field is required in the native end
-#pragma warning disable 0649
     internal double _value;
-#pragma warning restore 0649
 
     /// <summary>
     /// Represents the smallest possible value of a Double. This field is constant.
@@ -50,14 +48,10 @@ namespace System
     /// </summary>
     public const double PositiveInfinity = 1.0 / 0.0;
 
-#pragma warning disable S1764 // Identical expressions should not be used on both sides of a binary operator
-    // intended as the purpose is to a NaN value
-
     /// <summary>
     /// Represents a value that is not a number (NaN). This field is constant.
     /// </summary>
     public const double NaN = 0.0 / 0.0;
-#pragma warning restore S1764 // Identical expressions should not be used on both sides of a binary operator
 
     /// <summary>
     /// Compares this instance to a specified double-precision floating-point number and returns an integer that indicates whether the value of this instance is less than, equal to, or greater than the value of the specified double-precision floating-point number.
@@ -119,9 +113,8 @@ namespace System
     /// <exception cref="System.ArgumentNullException"></exception>
     public static double Parse(String s)
     {
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-      if (s == null) throw new ArgumentNullException();
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
+      if (s == null)
+       throw new ArgumentNullException();
 
       return Convert.ToDouble(s);
     }

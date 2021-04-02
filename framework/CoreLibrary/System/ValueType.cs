@@ -10,14 +10,7 @@ namespace System
   /// Provides the base class for value types.
   /// </summary>
   [Serializable]
-#pragma warning disable CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////
-  // GetHashCode() implementation is provided by general native function CLR_RT_HeapBlock::GetHashCode //
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////
-#pragma warning disable S1206 // "Equals(Object)" and "GetHashCode()" should be overridden in pairs
   public abstract class ValueType
-#pragma warning restore S1206 // "Equals(Object)" and "GetHashCode()" should be overridden in pairs
-#pragma warning restore CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
   {
 
     /// <summary>
