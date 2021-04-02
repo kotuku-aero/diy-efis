@@ -480,7 +480,13 @@ namespace CanFly
       DrawText(large_font, fg_color, bg_color, str, pt, bounds, TextOutStyle.Clipped);
 
     }
-
+    /// <summary>
+    /// Lookup a font definition based on settings in a config hive
+    /// </summary>
+    /// <param name="key">Configuration hive to look for font settings</param>
+    /// <param name="name">Name of the Font definition registry key</param>
+    /// <param name="font">Handle to the font</param>
+    /// <returns>true if the font was defined</returns>
     public bool LookupFont(ushort key, string name, out Font font)
     {
       font = null;
@@ -491,7 +497,6 @@ namespace CanFly
 
         ushort fontKey;
         CanFly.Syscall.RegOpenKey(key, name, out fontKey);
-
 
         CanFly.Syscall.RegGetString(fontKey, "name", out fontName);
         CanFly.Syscall.RegGetUint16(fontKey, "size", out fontSize);
