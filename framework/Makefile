@@ -1,26 +1,41 @@
 NAME=diy-efis
 
 CC=csc.exe
-MDP=CanFly.Build.exe
 FLAGS=
-MDPFLAGS=
-SRC=*.cs
 LIBS=
 RM =rm -rf
 
-all: $(NAME)
 
-$(NAME).pe: $(SRC)
-	$(CC) $(FLAGS) $(LIBS) $(SRC) -out:$(NAME)
-	$(MDP) -c $(NAME)
+ASSEMBLIES := \
+	./assemblies/mscorlib.pe \
+	./assemblies/System.Collections.pe \
+	./assemblies/System.Math.pe \
+	./assemblies/System.Text.pe \
+	./assemblies/CanFly.Neutron.pe \
+	./assemblies/CanFly.Photon.pe \
+	./assemblies/CanFly.Proton.pe \
+	./assemblies/CanFly.DiyEfis.pe
 
+SUBDIRS := \
+	CoreLibrary \
+	System.Collections \
+	System.Math \
+	System.Text \
+	CanFly.Neutron \
+	CanFly.Photon \
+	CanFly.Proton \
+	CanFly.DiyEfis
+
+define FOREACH
+	for DIR in SUBDIRS; do \
+		$(MAKE) -C $$FIR $(1); \
+	done
+endef
+
+.PHONY: build
+build:
+	$(call FOREACH, build)
+
+.PHONY: clean
 clean:
-
-fclean: clean
-	$(RM) $(NAME)
-
-re: fclean all
-
-run: re
-	./$(NAME)
-
+	$(call FOREACH, clean)

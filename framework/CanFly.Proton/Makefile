@@ -1,7 +1,7 @@
 NAME=CanFly.Proton
 
 CSC=csc.exe
-MDP=CanFly.Build.exe
+MDP=../assemblies/CanFly.Build.exe
 FLAGS=-langversion:1 -nostdlib -target:library
 MDPFLAGS=-d $(NAME).pdb
 
@@ -25,9 +25,10 @@ SRC= \
 	MenuItemItem.cs \
 	MenuItemMenu.cs \
 	MenuItemPopup.cs \
+	Pens.cs \
 	Properties/AssemblyInfo.cs
 
-LIBS=-reference:../assemblies/mscorlib.dll;../assemblies/CanFly.Neutron.dll;../assemblies/CanFly.Photon.dll
+LIBS=-reference:../assemblies/mscorlib.dll;../assemblies/CanFly.Neutron.dll;../assemblies/CanFly.Photon.dll;../assemblies/System.Collections.dll;../assemblies/System.Math.dll
 RM =rm -rf
 
 OUTPATH=../assemblies
@@ -36,7 +37,7 @@ all: $(NAME)
 
 $(NAME) : $(SRC)
 	$(CSC) $(FLAGS) $(LIBS) $(SRC) -out:$(OUTPATH)/$(NAME).dll
-#	$(MDP) -c $(OUTPATH)/$(NAME).dll -o $(OUTPATH)/$(NAME).pe
+	$(MDP) -c $(OUTPATH)/$(NAME).dll -p $(OUTPATH)/$(NAME).pe
 
 clean:
 

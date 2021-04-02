@@ -3,7 +3,7 @@ NAME=mscorlib
 
 
 CSC=csc.exe
-MDP=CanFly.Build.exe
+MDP=../assemblies/CanFly.Build.exe
 FLAGS=-noconfig -target:library @coreAssembly.rsp
 MDPFLAGS=-d $(NAME).pdb
 
@@ -132,7 +132,7 @@ all: $(NAME)
 
 $(NAME) : $(SRC)
 	$(CSC) $(FLAGS) $(LIBS) $(SRC) -out:$(OUTPATH)/$(NAME).dll
-#	$(MDP) -c $(OUTPATH)/$(NAME).dll -o $(OUTPATH)/$(NAME).pe
+	$(MDP) -c $(OUTPATH)/$(NAME).dll -p $(OUTPATH)/$(NAME).pe -m
 
 clean:
 

@@ -1,7 +1,7 @@
 NAME=System.Math
 
 CSC=csc.exe
-MDP=CanFly.Build.exe
+MDP=../assemblies/CanFly.Build.exe
 FLAGS=-langversion:1 -nostdlib -target:library
 MDPFLAGS=-d $(NAME).pdb
 
@@ -18,7 +18,7 @@ all: $(NAME)
 
 $(NAME) : $(SRC)
 	$(CSC) $(FLAGS) $(LIBS) $(SRC) -out:$(OUTPATH)/$(NAME).dll
-#	$(MDP) -c $(OUTPATH)/$(NAME).dll -o $(OUTPATH)/$(NAME).pe
+	$(MDP) -c $(OUTPATH)/$(NAME).dll -p $(OUTPATH)/$(NAME).pe
 
 clean:
 

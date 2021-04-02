@@ -382,43 +382,43 @@ namespace CanFly.Proton
 
     private void OnKey7(CanFlyMsg msg)
     {
-      HandleKey(msg, _activeKeys?.Key7);
+      HandleKey(msg, _activeKeys == null ? null : _activeKeys.Key7);
     }
 
     private void OnKey6(CanFlyMsg msg)
     {
-      HandleKey(msg, _activeKeys?.Key6);
+      HandleKey(msg, _activeKeys == null ? null : _activeKeys.Key6);
     }
 
     private void OnKey5(CanFlyMsg msg)
     {
-      HandleKey(msg, _activeKeys?.Key5);
+      HandleKey(msg, _activeKeys == null ? null : _activeKeys.Key5);
     }
 
     private void OnKey4(CanFlyMsg msg)
     {
-      HandleKey(msg, _activeKeys?.Key4);
+      HandleKey(msg, _activeKeys == null ? null : _activeKeys.Key4);
     }
 
     private void OnKey3(CanFlyMsg msg)
     {
-      HandleKey(msg, _activeKeys?.Key3);
+      HandleKey(msg, _activeKeys == null ? null : _activeKeys.Key3);
     }
 
     private void OnKey2(CanFlyMsg msg)
     {
-      HandleKey(msg, _activeKeys?.Key2);
+      HandleKey(msg, _activeKeys == null ? null : _activeKeys.Key2);
     }
 
 
     private void OnKey1(CanFlyMsg msg)
     {
-      HandleKey(msg, _activeKeys?.Key1);
+      HandleKey(msg, _activeKeys == null ? null : _activeKeys.Key1);
     }
 
     private void OnKey0(CanFlyMsg msg)
     {
-      HandleKey(msg, _activeKeys?.Key0);
+      HandleKey(msg, _activeKeys == null ? null : _activeKeys.Key0);
     }
 
     private void HandleKey(CanFlyMsg msg, MenuItem key)
@@ -584,14 +584,7 @@ namespace CanFly.Proton
     /// <param name="item"></param>
     private void ShowItemEditor(MenuItem item)
     {
-      if (item.ItemType == MenuItemType.MiEdit)
-      {
-        // select the popup menu
-        item.EditorOpen = true;
-
-        // TODO: edit the item....
-      }
-
+      item.Edit(null);
     }
 
     /// <summary>

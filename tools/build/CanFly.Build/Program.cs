@@ -79,7 +79,8 @@ namespace CanFly
       {
         try
         {
-          if (Verbose) System.Console.WriteLine("Parsing assembly...");
+          if (Verbose)
+            System.Console.WriteLine("Parsing assembly...");
 
           _assemblyDefinition = AssemblyDefinition.ReadAssembly(fileName,
               new ReaderParameters { AssemblyResolver = new LoadHintsAssemblyResolver(_loadHints) });
@@ -98,14 +99,17 @@ namespace CanFly
       {
         try
         {
-          if (Verbose) System.Console.WriteLine("Compiling assembly...");
+          if (Verbose)
+            System.Console.WriteLine("Compiling assembly...");
 
           _assemblyBuilder = new nanoAssemblyBuilder(_assemblyDefinition, _classNamesToExclude, VerboseMinimize, isCoreLibrary);
 
-          using (var stream = File.Open(Path.ChangeExtension(fileName, "tmp"), FileMode.Create, FileAccess.ReadWrite))
-          using (var writer = new BinaryWriter(stream))
+          using (FileStream stream = File.Open(Path.ChangeExtension(fileName, "tmp"), FileMode.Create, FileAccess.ReadWrite))
           {
-            _assemblyBuilder.Write(GetBinaryWriter(writer));
+            using (BinaryWriter writer = new BinaryWriter(stream))
+            {
+              _assemblyBuilder.Write(GetBinaryWriter(writer));
+            }
           }
         }
         catch (Exception)
@@ -120,21 +124,25 @@ namespace CanFly
           // OK to delete tmp PE file
           File.Delete(Path.ChangeExtension(fileName, "tmp"));
 
-          if (Verbose) System.Console.WriteLine("Minimizing assembly...");
+          if (Verbose)
+            System.Console.WriteLine("Minimizing assembly...");
 
           _assemblyBuilder.Minimize();
 
-          if (Verbose) System.Console.WriteLine("Recompiling assembly...");
+          if (Verbose)
+            System.Console.WriteLine("Recompiling assembly...");
 
-          using (var stream = File.Open(fileName, FileMode.Create, FileAccess.ReadWrite))
-          using (var writer = new BinaryWriter(stream))
+          using (FileStream stream = File.Open(Path.ChangeExtension(fileName, "pe"), FileMode.Create, FileAccess.ReadWrite))
           {
-            _assemblyBuilder.Write(GetBinaryWriter(writer));
-          }
+            using (var writer = new BinaryWriter(stream))
+            {
+              _assemblyBuilder.Write(GetBinaryWriter(writer));
+            }
 
-          using (var writer = XmlWriter.Create(Path.ChangeExtension(fileName, "pdbx")))
-          {
-            _assemblyBuilder.Write(writer);
+            using (var writer = XmlWriter.Create(Path.ChangeExtension(fileName, "pdbx")))
+            {
+              _assemblyBuilder.Write(writer);
+            }
           }
 
           if (DumpMetadata)
@@ -145,14 +153,9 @@ namespace CanFly
             dumper.DumpAll();
           }
         }
-        catch (ArgumentException ex)
+        catch (Exception ex)
         {
           System.Console.Error.WriteLine($"Exception minimizing assembly: {ex.Message}.");
-        }
-        catch (Exception)
-        {
-          System.Console.Error.WriteLine($"Exception minimizing assembly.");
-          throw;
         }
       }
 
@@ -227,7 +230,7 @@ namespace CanFly
 
     public class Options
     {
-      [Option('c', "compile", Required = false, HelpText = "<path-to-DLL-file> Compiles an assembly into CanFly format. ")]
+      [Option('c', "compile", Required = true, HelpText = "<path-to-DLL-file> Compiles an assembly into CanFly format. ")]
       public string CompileFilename { get; set; }
       [Option('d', "debug", Required = false, DefaultValue =false, HelpText="Emit debug tables in the assembly.")]
       public bool DebugInformation { get; set; }
@@ -258,10 +261,8 @@ namespace CanFly
       md.Verbose = options.Verbose;
       md.DebugInformation = options.DebugInformation;
 
-      if(!String.IsNullOrEmpty(options.CompileFilename))
-      {
-        md.Compile(options.CompileFilename, options.IsCoreLibrary);
-      }
+      md.Parse(options.CompileFilename);
+      md.Compile(options.CompileFilename, options.IsCoreLibrary);
 
       if(options.IsCoreLibrary)
       {

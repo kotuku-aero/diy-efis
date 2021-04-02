@@ -6,12 +6,12 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("CanFly")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("diy-efis main program")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("CanFly")]
+[assembly: AssemblyCompany("Kotuku Aerospace Limited")]
+[assembly: AssemblyProduct("DiyEfis")]
 [assembly: AssemblyCopyright("Copyright © Kotuku Aerospace Limited")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyTrademark("CanFly")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

@@ -313,7 +313,7 @@ namespace CanFly.Tools.MetadataProcessor
         IEnumerable<TypeDefinition> types,
         string mainModuleName)
     {
-      var processedTypes = new HashSet<string>(StringComparer.Ordinal);
+      HashSet<string> processedTypes = new HashSet<string>(StringComparer.Ordinal);
       return SortTypesAccordingUsagesImpl(
           types.OrderBy(item => item.FullName),
           mainModuleName, processedTypes)
@@ -341,9 +341,9 @@ namespace CanFly.Tools.MetadataProcessor
           }
         }
 
-        foreach (var implement in SortTypesAccordingUsagesImpl(
+        foreach (TypeDefinition implement in SortTypesAccordingUsagesImpl(
             type.Interfaces.Select(itf => itf.InterfaceType.Resolve())
-                .Where(item => item.Module.FileName == mainModuleName),
+                .Where(item => item == null ? false : item.Module.FileName == mainModuleName),
             mainModuleName, processedTypes))
         {
           yield return implement;

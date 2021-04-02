@@ -39,16 +39,6 @@ it must be removed as soon as possible after the code fragment is identified.
 */
 namespace CanFly.Proton
 {
-  public enum MenuItemType
-  {
-    MiMenu, // item is a menu
-    MiCancel, // item is a cancel option
-    MiEnter, // item is an accept option
-    MiEvent, // item is an event generator
-    MiEdit, // item is a property editor
-    MiChecklist, // item is a selection item
-  };
-
   public enum MenuItemActionResult
   {
     MiaNothing, // no change to menu state
@@ -61,7 +51,6 @@ namespace CanFly.Proton
 
   public abstract class MenuItem
   {
-    private MenuItemType _itemType;
     private string _caption;
 
     private string _enableRegex;
@@ -115,7 +104,7 @@ namespace CanFly.Proton
 
     public abstract MenuItemActionResult Evaluate(CanFlyMsg msg);
 
-    public virtual void Edit(MenuItem item, CanFlyMsg msg)
+    public virtual void Edit(CanFlyMsg msg)
     {
 
     }
@@ -135,12 +124,6 @@ namespace CanFly.Proton
     public void EventHandler(MenuItemMsgHandler handler)
     {
       msgHandler = handler;
-    }
-
-    public MenuItemType ItemType
-    {
-      get { return _itemType; }
-      set { _itemType = value; }
     }
 
     public string Caption
