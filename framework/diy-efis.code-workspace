@@ -21,6 +21,9 @@
     {
       "path": "System.Math"
     },
+    {
+      "path": "assemblies"
+    }
   ]
 
 }

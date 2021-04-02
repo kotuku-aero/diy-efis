@@ -313,8 +313,13 @@ public sealed class CanFlyMsg
     public ushort Length
     {
       get { return (ushort)((_flags & 0xF000) >> 12); }
-      private set { _flags = (ushort)((_flags & 0xF000) | ((value & 0x0F) << 12)); }
     }
+
+    private void SetLength(ushort value)
+    {
+      _flags = (ushort)((_flags & 0xF000) | ((value & 0x0F) << 12));
+    }
+
     /// <summary>
     /// ID of the CAN message
     /// </summary>
@@ -384,7 +389,7 @@ public sealed class CanFlyMsg
     public CanFlyMsg(ushort id, CanFlyDataType dataType, uint rawData)
     {
       CanID = id;
-      Length = 8;
+      SetLength(8);
     }
 
     internal CanFlyMsg(ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7)
@@ -413,7 +418,11 @@ public sealed class CanFlyMsg
     public CanFlyDataType DataType 
     {
       get { return (CanFlyDataType) _b1; } 
-      private set { _b1 = (byte)value; }
+    }
+
+    private void SetDataType(CanFlyDataType value)
+    {
+       _b1 = (byte)value;
     }
     /// <summary>
     /// The service code
@@ -439,10 +448,10 @@ public sealed class CanFlyMsg
     /// <param name="v"></param>
     public CanFlyMsg(ushort id, uint value)
     {
-      Length = 8;
+      SetLength(8);
       CanID = id;
       NodeId = 0;
-      DataType = CanFlyDataType.UInt32;
+      SetDataType(CanFlyDataType.UInt32);
       ServiceCode = 0;
       MessageCode = 0;
       Syscall.PackUInt32(value, ref _b4, ref _b5, ref _b6, ref _b7);
@@ -450,10 +459,10 @@ public sealed class CanFlyMsg
 
     public CanFlyMsg(ushort id, int value)
     {
-      Length = 8;
+      SetLength(8);
       CanID = id;
       NodeId = 0;
-      DataType = CanFlyDataType.Int32;
+      SetDataType(CanFlyDataType.Int32);
       ServiceCode = 0;
       MessageCode = 0;
       Syscall.PackInt32(value, ref _b4, ref _b5, ref _b6, ref _b7);
@@ -462,10 +471,10 @@ public sealed class CanFlyMsg
 
     public CanFlyMsg(ushort id, ushort value)
     {
-      Length = 6;
+      SetLength(6);
       CanID = id;
       NodeId = 0;
-      DataType = CanFlyDataType.UShort;
+      SetDataType(CanFlyDataType.UShort);
       ServiceCode = 0;
       MessageCode = 0;
       Syscall.PackUInt16(value, ref _b4, ref _b5);
@@ -476,10 +485,10 @@ public sealed class CanFlyMsg
 
     public CanFlyMsg(ushort id, short value)
     {
-      Length = 6;
+      SetLength(6);
       CanID = id;
       NodeId = 0;
-      DataType = CanFlyDataType.Short;
+      SetDataType(CanFlyDataType.Short);
       ServiceCode = 0;
       MessageCode = 0;
       Syscall.PackInt16(value, ref _b4, ref _b5);
@@ -490,10 +499,10 @@ public sealed class CanFlyMsg
 
     public CanFlyMsg(ushort id, ushort v1, ushort v2)
     {
-      Length = 8;
+      SetLength(8);
       CanID = id;
       NodeId = 0;
-      DataType = CanFlyDataType.UShort2;
+      SetDataType(CanFlyDataType.UShort2);
       ServiceCode = 0;
       MessageCode = 0;
       Syscall.PackUInt16(v1, ref _b4, ref _b5);
@@ -503,10 +512,10 @@ public sealed class CanFlyMsg
 
     public CanFlyMsg(ushort id, short v1, short v2)
     {
-      Length = 8;
+      SetLength(8);
       CanID = id;
       NodeId = 0;
-      DataType = CanFlyDataType.Short2;
+      SetDataType(CanFlyDataType.Short2);
       ServiceCode = 0;
       MessageCode = 0;
       Syscall.PackInt16(v1, ref _b4, ref _b5);
@@ -516,10 +525,10 @@ public sealed class CanFlyMsg
 
     public CanFlyMsg(ushort id, float v)
     {
-      Length = 8;
+      SetLength(8);
       CanID = id;
       NodeId = 0;
-      DataType = CanFlyDataType.Float;
+      SetDataType(CanFlyDataType.Float);
       ServiceCode = 0;
       MessageCode = 0;
       Syscall.PackFloat(v, ref _b4, ref _b5, ref _b6, ref _b7);
@@ -528,10 +537,10 @@ public sealed class CanFlyMsg
 
     public CanFlyMsg(ushort id, char c)
     {
-      Length = 5;
+      SetLength(5);
       CanID = id;
       NodeId = 0;
-      DataType = CanFlyDataType.Char;
+      SetDataType(CanFlyDataType.Char);
       ServiceCode = 0;
       MessageCode = 0;
       _b4 = (byte) c;
@@ -542,10 +551,10 @@ public sealed class CanFlyMsg
 
     public CanFlyMsg(ushort id, byte b0)
     {
-      Length = 5;
+      SetLength(5);
       CanID = id;
       NodeId = 0;
-      DataType = CanFlyDataType.UChar;
+      SetDataType(CanFlyDataType.UChar);
       ServiceCode = 0;
       MessageCode = 0;
       _b4 = b0;
@@ -556,10 +565,10 @@ public sealed class CanFlyMsg
 
     public CanFlyMsg(ushort id, byte b0, byte b1)
     {
-      Length = 6;
+      SetLength(6);
       CanID = id;
       NodeId = 0;
-      DataType = CanFlyDataType.UChar2;
+      SetDataType(CanFlyDataType.UChar2);
       ServiceCode = 0;
       MessageCode = 0;
       _b4 = b0;
@@ -571,10 +580,10 @@ public sealed class CanFlyMsg
 
     public CanFlyMsg(ushort id, char c0, char c1)
     {
-      Length = 6;
+      SetLength(6);
       CanID = id;
       NodeId = 0;
-      DataType = CanFlyDataType.Char2;
+      SetDataType(CanFlyDataType.Char2);
       ServiceCode = 0;
       MessageCode = 0;
       _b4 = (byte)c0;
@@ -586,10 +595,10 @@ public sealed class CanFlyMsg
 
     public CanFlyMsg(ushort id, byte b0, byte b1, byte b2)
     {
-      Length = 7;
+      SetLength(7);
       CanID = id;
       NodeId = 0;
-      DataType = CanFlyDataType.UChar3;
+      SetDataType(CanFlyDataType.UChar3);
       ServiceCode = 0;
       MessageCode = 0;
       _b4 = b0;
@@ -601,10 +610,10 @@ public sealed class CanFlyMsg
 
     public CanFlyMsg(ushort id, char c0, char c1, char c2)
     {
-      Length = 7;
+      SetLength(7);
       CanID = id;
       NodeId = 0;
-      DataType = CanFlyDataType.Char3;
+      SetDataType(CanFlyDataType.Char3);
       ServiceCode = 0;
       MessageCode = 0;
       _b4 = (byte)c0;
@@ -616,10 +625,10 @@ public sealed class CanFlyMsg
 
     public CanFlyMsg(ushort id, byte b0, byte b1, byte b2, byte b3)
     {
-      Length = 8;
+      SetLength(8);
       CanID = id;
       NodeId = 0;
-      DataType = CanFlyDataType.UChar4;
+      SetDataType(CanFlyDataType.UChar4);
       ServiceCode = 0;
       MessageCode = 0;
       _b4 = b0;
@@ -631,10 +640,10 @@ public sealed class CanFlyMsg
 
     public CanFlyMsg(ushort id, char c0, char c1, char c2, char c3)
     {
-      Length = 8;
+      SetLength(8);
       CanID = id;
       NodeId = 0;
-      DataType = CanFlyDataType.Char4;
+      SetDataType(CanFlyDataType.Char4);
       ServiceCode = 0;
       MessageCode = 0;
       _b4 = (byte)c0;

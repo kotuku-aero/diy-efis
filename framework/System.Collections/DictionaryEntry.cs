@@ -15,17 +15,13 @@ namespace System.Collections
     /// Gets or sets the key in the key/value pair.
     /// </summary>
     /// <returns>The key in the key/value pair.</returns>
-#pragma warning disable S1104 // need this field with this name to follow API
     public Object Key;
-#pragma warning restore S1104 // Fields should not have public accessibility
 
     /// <summary>
     /// Gets or sets the value in the key/value pair.
     /// </summary>
     /// <returns>The value in the key/value pair.</returns>
-#pragma warning disable S1104 // need this field with this name to follow API
     public Object Value;
-#pragma warning restore S1104 // Fields should not have public accessibility
 
     /// <summary>
     /// Initializes an instance of the DictionaryEntry type with the specified key and value.

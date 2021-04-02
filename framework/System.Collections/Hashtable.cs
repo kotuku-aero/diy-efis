@@ -60,7 +60,6 @@ namespace System.Collections
       _growthFactor = 2;
     }
 
-#pragma warning disable S2292 // Trivial properties should be auto-implemented
     /// <summary>
     /// MaxLoadFactor Property is the value used to trigger a rehash.
     /// Default value is 2.
@@ -68,19 +67,16 @@ namespace System.Collections
     /// While a value of 1 maintains a constant time complexity at the cost of increased memory requirements.   
     /// </summary>
     public int MaxLoadFactor
-#pragma warning restore S2292 // Trivial properties should be auto-implemented
     {
       get { return _maxLoadFactor; }
       set { _maxLoadFactor = value; }
     }
 
-#pragma warning disable S2292 // Trivial properties should be auto-implemented
     /// <summary>
     /// GrowthFactor Property is a multiplier to increase the HashTable size by during a rehash.
     /// Default value is 2.
     /// </summary>
     public double GrowthFactor
-#pragma warning restore S2292 // Trivial properties should be auto-implemented
     {
       get { return _growthFactor; }
       set { _growthFactor = value; }
@@ -89,8 +85,8 @@ namespace System.Collections
     //adding for internal purposes
     private void Add(ref Entry[] buckets, object key, object value, bool overwrite)
     {
-      var whichBucket = Hash(key, _numberOfBuckets);
-      var match = EntryForKey(key, buckets[whichBucket]);
+      int whichBucket = Hash(key, _numberOfBuckets);
+      Entry match = EntryForKey(key, buckets[whichBucket]);
 
       if (match != null && overwrite)
       {
@@ -104,7 +100,7 @@ namespace System.Collections
       }
       else
       {            // insert at front
-        var newOne = new Entry(key, value, ref buckets[whichBucket]);
+        Entry newOne = new Entry(key, value, ref buckets[whichBucket]);
         buckets[whichBucket] = newOne;
         _count++;
       }
@@ -115,7 +111,7 @@ namespace System.Collections
     // Hash function.
     private int Hash(object key, int numOfBuckets)
     {
-      var hashcode = key.GetHashCode();
+      int hashcode = key.GetHashCode();
 
       if (hashcode < 0)
       {
@@ -147,7 +143,7 @@ namespace System.Collections
       _numberOfBuckets = newSize;
       _count = 0;
 
-      for (var i = 0; i < _buckets.Length; i++)
+      for (int i = 0; i < _buckets.Length; i++)
       {
         if (_buckets[i] != null)
         {
@@ -166,14 +162,12 @@ namespace System.Collections
     {
       if (index < 0 && index > _numberOfBuckets)
       {
-#pragma warning disable S112 // General exceptions should never be thrown
         throw new IndexOutOfRangeException("index");
-#pragma warning restore S112 // General exceptions should never be thrown
       }
 
       for (int i = index; i < _numberOfBuckets; i++)
       {
-        var j = 0;
+        int j = 0;
 
         for (Entry cur = _buckets[i]; cur != null && j < array.Length; cur = cur.next)
         {
@@ -198,7 +192,7 @@ namespace System.Collections
     /// <returns>A new object that represents a clone of the object.</returns>
     public object Clone()
     {
-      var ht = new Hashtable();
+      Hashtable ht = new Hashtable();
       ht.InitializeHashTable(_numberOfBuckets, _maxLoadFactor);
       ht._count = _count;
       ht._loadFactor = _loadFactor;
@@ -264,13 +258,11 @@ namespace System.Collections
     public void CopyTo(Array array, int index)
     {
       if (index < 0 && index > _buckets.Length)
-#pragma warning disable S112 // General exceptions should never be thrown
         throw new IndexOutOfRangeException("index");
-#pragma warning restore S112 // General exceptions should never be thrown
 
       for (int i = index; i < _buckets.Length; i++)
       {
-        var j = 0;
+        int j = 0;
 
         for (Entry cur = _buckets[i]; cur != null && j < array.Length; cur = cur.next)
         {
@@ -348,8 +340,8 @@ namespace System.Collections
           throw new ArgumentNullException("key is null");
         }
 
-        var whichBucket = Hash(key, _numberOfBuckets);
-        var match = EntryForKey(key, _buckets[whichBucket]);
+        int whichBucket = Hash(key, _numberOfBuckets);
+        Entry match = EntryForKey(key, _buckets[whichBucket]);
 
         if (match != null)
         {
@@ -414,8 +406,8 @@ namespace System.Collections
         throw new ArgumentNullException("key is null");
       }
 
-      var whichBucket = Hash(key, _numberOfBuckets);
-      var match = EntryForKey(key, _buckets[whichBucket]);
+      int whichBucket = Hash(key, _numberOfBuckets);
+      Entry match = EntryForKey(key, _buckets[whichBucket]);
 
       if (match != null)
       {
@@ -436,8 +428,8 @@ namespace System.Collections
         throw new ArgumentNullException("key is null");
       }
 
-      var whichBucket = Hash(key, _numberOfBuckets);
-      var match = EntryForKey(key, _buckets[whichBucket]);
+      int whichBucket = Hash(key, _numberOfBuckets);
+      Entry match = EntryForKey(key, _buckets[whichBucket]);
 
       //does entry exist?
       if (match == null)

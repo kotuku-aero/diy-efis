@@ -52,11 +52,15 @@ namespace CanFly
     /// Create a point array, will be initialzied with Point(0, 0)
     /// </summary>
     /// <param name="numPoints"></param>
-    public PointArray(ushort numPoints = 0)
+    public PointArray()
+    {
+      Syscall.PointArrayCreate(0, out _handle);
+    }
+     public PointArray(ushort numPoints)
     {
       Syscall.PointArrayCreate(numPoints, out _handle);
     }
-    /// <summary>
+   /// <summary>
     /// Create a point array from a list of points
     /// </summary>
     /// <param name="points"></param>

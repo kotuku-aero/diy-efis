@@ -65,7 +65,8 @@ namespace CanFly
       public ushort EventID {  get { return eventID; } }
       public void OnMessage(CanFlyMsg msg)
       {
-        handler?.Invoke(msg);
+        if(handler != null)
+          handler.Invoke(msg);
       }
 
       public event CanFlyMsgHandler Handler
@@ -242,9 +243,14 @@ namespace CanFly
       Syscall.SendMessage(InternalHandle, msg.Flags, msg.Data0, msg.Data1, msg.Data2, msg.Data3, msg.Data4, msg.Data5, msg.Data6, msg.Data7);
     }
 
-    public void PostMessage(CanFlyMsg msg, uint maxWait = 0)
+    public void PostMessage(CanFlyMsg msg, uint maxWait)
     {
       Syscall.PostMessage(InternalHandle, maxWait, msg.Flags, msg.Data0, msg.Data1, msg.Data2, msg.Data3, msg.Data4, msg.Data5, msg.Data6, msg.Data7);
+    }
+
+    public void PostMessage(CanFlyMsg msg)
+    {
+      Syscall.PostMessage(InternalHandle, 0, msg.Flags, msg.Data0, msg.Data1, msg.Data2, msg.Data3, msg.Data4, msg.Data5, msg.Data6, msg.Data7);
     }
 
     private Widget GetWidget(uint handle)
@@ -355,14 +361,25 @@ namespace CanFly
       }
       set { Syscall.SetZOrder(Handle, value); }
     }
+
     /// <summary>
     /// Invalidate the area of the canvas.
     /// </summary>
     /// <param name="rect">hint as to rectangle invalidated</param>
-    public void InvalidateRect(Rect rect = null)
+    public void InvalidateRect(Rect rect)
     {
       if (rect == null)
         rect = WindowRect;
+
+      Syscall.InvalidateRect(Handle, (short)rect.Left, (short)rect.Right, (short)rect.Top, (short)rect.Bottom);
+    }
+  
+    /// <summary>
+    /// Invalidate the area of the canvas.
+    /// </summary>
+    public void InvalidateRect()
+    {
+      Rect rect = WindowRect;
 
       Syscall.InvalidateRect(Handle, (short)rect.Left, (short)rect.Right, (short)rect.Top, (short)rect.Bottom);
     }
@@ -467,7 +484,6 @@ namespace CanFly
     public bool LookupFont(ushort key, string name, out Font font)
     {
       font = null;
-      uint hndl;
       try
       {
         ushort fontSize;

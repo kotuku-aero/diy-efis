@@ -1,4 +1,4 @@
-NAME=System.Math
+NAME=Canfly.DiyEfis
 
 CSC=csc.exe
 MDP=CanFly.Build.exe
@@ -6,10 +6,10 @@ FLAGS=-langversion:1 -nostdlib -target:library
 MDPFLAGS=-d $(NAME).pdb
 
 SRC= \
-	Math.cs \
+	Program.cs \
 	Properties/AssemblyInfo.cs
 
-LIBS=-reference:../assemblies/mscorlib.dll
+LIBS=-reference:../assemblies/mscorlib.dll;../assemblies/CanFly.Photon.dll;../assemblies/CanFly.Proton.dll
 RM =rm -rf
 
 OUTPATH=../assemblies

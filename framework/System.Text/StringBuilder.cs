@@ -45,34 +45,30 @@ namespace System.Text
     {
       get
       {
-        var chunkPrevious = this;
+        StringBuilder chunkPrevious = this;
         while (true)
         {
-          var num = index - chunkPrevious._chunkOffset;
+          int num = index - chunkPrevious._chunkOffset;
           if (num >= 0)
           {
             if (num >= chunkPrevious._chunkLength)
             {
-#pragma warning disable S112 // General exceptions should never be thrown
               throw new IndexOutOfRangeException();
-#pragma warning restore S112 // General exceptions should never be thrown
             }
             return chunkPrevious._chunkChars[num];
           }
           chunkPrevious = chunkPrevious._chunkPrevious;
           if (chunkPrevious == null)
           {
-#pragma warning disable S112 // General exceptions should never be thrown
             throw new IndexOutOfRangeException();
-#pragma warning restore S112 // General exceptions should never be thrown
           }
         }
       }
       set
       {
-        var chunkPrevious = this;
+        StringBuilder chunkPrevious = this;
       Label_0002:
-        var num = index - chunkPrevious._chunkOffset;
+        int num = index - chunkPrevious._chunkOffset;
         if (num >= 0)
         {
           if (num >= chunkPrevious._chunkLength)
@@ -108,13 +104,19 @@ namespace System.Text
       }
       set
       {
-        if (value < 0) throw new ArgumentOutOfRangeException("value");
-        if (value > MaxCapacity) throw new ArgumentOutOfRangeException("value");
-        if (value < Length) throw new ArgumentOutOfRangeException("value");
+        if (value < 0)
+          throw new ArgumentOutOfRangeException("value");
+
+        if (value > MaxCapacity)
+          throw new ArgumentOutOfRangeException("value");
+
+        if (value < Length)
+          throw new ArgumentOutOfRangeException("value");
+
         if (Capacity != value)
         {
-          var num = value - _chunkOffset;
-          var destinationArray = new char[num];
+          int num = value - _chunkOffset;
+          char[] destinationArray = new char[num];
           Array.Copy(_chunkChars, destinationArray, _chunkLength);
           _chunkChars = destinationArray;
         }
@@ -134,9 +136,13 @@ namespace System.Text
       }
       set
       {
-        if (value < 0) throw new ArgumentOutOfRangeException("value");
-        if (value > MaxCapacity) throw new ArgumentOutOfRangeException("value");
-        var capacity = Capacity;
+        if (value < 0)
+          throw new ArgumentOutOfRangeException("value");
+
+        if (value > MaxCapacity)
+          throw new ArgumentOutOfRangeException("value");
+
+        int capacity = Capacity;
         if (value == 0 && _chunkPrevious == null)
         {
           _chunkLength = 0;
@@ -144,18 +150,18 @@ namespace System.Text
         }
         else
         {
-          var repeatCount = value - Length;
+          int repeatCount = value - Length;
           if (repeatCount > 0)
           {
             Append('\0', repeatCount);
           }
           else
           {
-            var builder = FindChunkForIndex(value);
+            StringBuilder builder = FindChunkForIndex(value);
             if (builder != this)
             {
-              var num3 = capacity - builder._chunkOffset;
-              var destinationArray = new char[num3];
+              int num3 = capacity - builder._chunkOffset;
+              char[] destinationArray = new char[num3];
               Array.Copy(builder._chunkChars, destinationArray, builder._chunkLength);
               _chunkChars = destinationArray;
               _chunkPrevious = builder._chunkPrevious;
@@ -179,13 +185,23 @@ namespace System.Text
     /// <param name="startIndex">The position within value where the substring begins.</param>
     /// <param name="length">The number of characters in the substring.</param>
     /// <param name="capacity">The suggested starting size of the StringBuilder.</param>
-    public unsafe StringBuilder(string value, int startIndex, int length, int capacity)
+    public StringBuilder(string value, int startIndex, int length, int capacity)
     {
-      if (capacity < 0) throw new ArgumentOutOfRangeException("capacity");
-      if (length < 0) throw new ArgumentOutOfRangeException("length");
-      if (startIndex < 0) throw new ArgumentOutOfRangeException("startIndex");
-      if (value == null) value = string.Empty;
-      if (startIndex > value.Length - length) throw new ArgumentOutOfRangeException("length");
+      if (capacity < 0)
+        throw new ArgumentOutOfRangeException("capacity");
+
+      if (length < 0)
+        throw new ArgumentOutOfRangeException("length");
+
+      if (startIndex < 0)
+        throw new ArgumentOutOfRangeException("startIndex");
+
+      if (value == null)
+        value = string.Empty;
+
+      if (startIndex > value.Length - length)
+        throw new ArgumentOutOfRangeException("length");
+
       _maxCapacity = 0x7fffffff;
       if (capacity == 0) capacity = 0x10;
       if (capacity < length) capacity = length;
@@ -380,10 +396,11 @@ namespace System.Text
     {
       if (value != null && value != string.Empty)
       {
-        var chunkChars = _chunkChars;
-        var chunkLength = _chunkLength;
-        var length = value.Length;
-        var num3 = chunkLength + length;
+        char[] chunkChars = _chunkChars;
+        int chunkLength = _chunkLength;
+        int length = value.Length;
+        int num3 = chunkLength + length;
+
         if (num3 < chunkChars.Length)
         {
           if (length <= 2)
@@ -397,7 +414,7 @@ namespace System.Text
           }
           else
           {
-            var tmp = value.ToCharArray();
+            char[] tmp = value.ToCharArray();
             Array.Copy(tmp, 0, chunkChars, chunkLength, length);
           }
           _chunkLength = num3;
@@ -410,14 +427,12 @@ namespace System.Text
       return this;
     }
 
-#pragma warning disable CS3001 // Argument type 'sbyte' is not CLS-compliant
     /// <summary>
     /// Appends the string representation of a specified 8-bit signed integer to this instance. 
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <returns>A reference to this instance after the append operation has completed.</returns>
     public StringBuilder Append(sbyte value)
-#pragma warning restore CS3001 // Argument type 'sbyte' is not CLS-compliant
     {
       return Append(value.ToString());
     }
@@ -432,38 +447,32 @@ namespace System.Text
       return Append(value.ToString());
     }
 
-#pragma warning disable CS3001 // Argument type 'ushort' is not CLS-compliant
     /// <summary>
     /// Appends the string representation of a specified 16-bit unsigned integer to this instance. 
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <returns>A reference to this instance after the append operation has completed.</returns>
     public StringBuilder Append(ushort value)
-#pragma warning restore CS3001 // Argument type 'ushort' is not CLS-compliant
     {
       return Append(value.ToString());
     }
 
-#pragma warning disable CS3001 // Argument type 'uint' is not CLS-compliant
     /// <summary>
     /// Appends the string representation of a specified 32-bit unsigned integer to this instance. 
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <returns>A reference to this instance after the append operation has completed.</returns>
     public StringBuilder Append(uint value)
-#pragma warning restore CS3001 // Argument type 'uint' is not CLS-compliant
     {
       return Append(value.ToString());
     }
 
-#pragma warning disable CS3001 // Argument type 'ulong' is not CLS-compliant
     /// <summary>
     /// Appends the string representation of a specified 64-bit unsigned integer to this instance. 
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <returns>A reference to this instance after the append operation has completed.</returns>
     public StringBuilder Append(ulong value)
-#pragma warning restore CS3001 // Argument type 'ulong' is not CLS-compliant
     {
       return Append(value.ToString());
     }
@@ -477,16 +486,22 @@ namespace System.Text
     /// <returns>A reference to this instance after the append operation has completed.</returns>
     public StringBuilder Append(string value, int startIndex, int count)
     {
-      if (startIndex < 0) throw new ArgumentOutOfRangeException("startIndex");
-      if (count < 0) throw new ArgumentOutOfRangeException("count");
+      if (startIndex < 0)
+        throw new ArgumentOutOfRangeException("startIndex");
+      if (count < 0)
+        throw new ArgumentOutOfRangeException("count");
+
       if (value == null)
       {
-        if (startIndex != 0 || count != 0) throw new ArgumentNullException("value");
+        if (startIndex != 0 || count != 0)
+          throw new ArgumentNullException("value");
         return this;
       }
       if (count != 0)
       {
-        if (startIndex > value.Length - count) throw new ArgumentOutOfRangeException("startIndex");
+        if (startIndex > value.Length - count)
+          throw new ArgumentOutOfRangeException("startIndex");
+
         Append(value.Substring(startIndex, count));
       }
       return this;
@@ -501,21 +516,24 @@ namespace System.Text
     /// <returns>A reference to this instance after the append operation has completed.</returns>
     public StringBuilder Append(char[] value, int startIndex, int charCount)
     {
-      if (startIndex < 0) throw new ArgumentOutOfRangeException("startIndex");
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-      if (charCount < 0) throw new ArgumentOutOfRangeException("count");
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
+      if (startIndex < 0)
+        throw new ArgumentOutOfRangeException("startIndex");
+      if (charCount < 0)
+        throw new ArgumentOutOfRangeException("count");
+
       if (value == null)
       {
-        if (startIndex != 0 || charCount != 0) throw new ArgumentNullException("value");
+        if (startIndex != 0 || charCount != 0)
+          throw new ArgumentNullException("value");
+
         return this;
       }
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-      if (charCount > value.Length - startIndex) throw new ArgumentOutOfRangeException("count");
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
+      if (charCount > value.Length - startIndex)
+        throw new ArgumentOutOfRangeException("count");
+
       if (charCount != 0)
       {
-        for (var i = startIndex; i < startIndex + charCount; ++i)
+        for (int i = startIndex; i < startIndex + charCount; ++i)
         {
           Append(value[i], 1);
         }
@@ -534,7 +552,7 @@ namespace System.Text
       if (repeatCount < 0) throw new ArgumentOutOfRangeException("repeatCount");
       if (repeatCount != 0)
       {
-        var chunkLength = _chunkLength;
+        int chunkLength = _chunkLength;
         while (repeatCount > 0)
         {
           if (chunkLength < _chunkChars.Length)
@@ -562,11 +580,15 @@ namespace System.Text
     /// <returns>A reference to this instance after the excise operation has completed.</returns>
     public StringBuilder Remove(int startIndex, int length)
     {
-      if (length < 0) throw new ArgumentOutOfRangeException("length");
-      if (startIndex < 0) throw new ArgumentOutOfRangeException("startIndex");
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-      if (length > Length - startIndex) throw new ArgumentOutOfRangeException("index");
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
+      if (length < 0)
+        throw new ArgumentOutOfRangeException("length");
+
+      if (startIndex < 0)
+        throw new ArgumentOutOfRangeException("startIndex");
+
+      if (length > Length - startIndex)
+        throw new ArgumentOutOfRangeException("index");
+
       if (Length == length && startIndex == 0)
       {
         Length = 0;
@@ -587,20 +609,23 @@ namespace System.Text
     /// <returns>A string whose value is the same as this instance.</returns>
     public override string ToString()
     {
-      var result = new char[Length];
-      var chunkPrevious = this;
+      char[] result = new char[Length];
+      StringBuilder chunkPrevious = this;
+
       do
       {
         if (chunkPrevious._chunkLength > 0)
         {
-          var chunkChars = chunkPrevious._chunkChars;
-          var chunkOffset = chunkPrevious._chunkOffset;
-          var chunkLength = chunkPrevious._chunkLength;
+          char[] chunkChars = chunkPrevious._chunkChars;
+          int chunkOffset = chunkPrevious._chunkOffset;
+          int chunkLength = chunkPrevious._chunkLength;
+
           Array.Copy(chunkChars, 0, result, chunkOffset, chunkLength);
         }
         chunkPrevious = chunkPrevious._chunkPrevious;
       }
       while (chunkPrevious != null);
+
       return new string(result);
     }
 
@@ -612,28 +637,37 @@ namespace System.Text
     /// <returns>A string whose value is the same as the specified substring of this instance.</returns>
     public string ToString(int startIndex, int length)
     {
-      var num = Length;
-      if (startIndex < 0) throw new ArgumentOutOfRangeException("startIndex");
-      if (startIndex > num) throw new ArgumentOutOfRangeException("startIndex");
-      if (length < 0) throw new ArgumentOutOfRangeException("length");
-      if (startIndex > num - length) throw new ArgumentOutOfRangeException("length");
+      int num = Length;
+      if (startIndex < 0)
+        throw new ArgumentOutOfRangeException("startIndex");
 
-      var chunkPrevious = this;
-      var num2 = startIndex + length;
-      var result = new char[Length];
-      var num3 = length;
+      if (startIndex > num)
+        throw new ArgumentOutOfRangeException("startIndex");
+
+      if (length < 0)
+        throw new ArgumentOutOfRangeException("length");
+
+      if (startIndex > num - length)
+        throw new ArgumentOutOfRangeException("length");
+
+      StringBuilder chunkPrevious = this;
+      int num2 = startIndex + length;
+      char[] result = new char[Length];
+      int num3 = length;
+
       while (num3 > 0)
       {
-        var chunkLength = num2 - chunkPrevious._chunkOffset;
+        int chunkLength = num2 - chunkPrevious._chunkOffset;
         if (chunkLength >= 0)
         {
           if (chunkLength > chunkPrevious._chunkLength)
           {
             chunkLength = chunkPrevious._chunkLength;
           }
-          var num5 = num3;
-          var charCount = num5;
-          var index = chunkLength - num5;
+          int num5 = num3;
+          int charCount = num5;
+          int index = chunkLength - num5;
+
           if (index < 0)
           {
             charCount += index;
@@ -642,13 +676,13 @@ namespace System.Text
           num3 -= charCount;
           if (charCount > 0)
           {
-            var chunkChars = chunkPrevious._chunkChars;
+            char[] chunkChars = chunkPrevious._chunkChars;
+
             if (charCount + num3 > length || charCount + index > chunkChars.Length)
             {
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
               throw new ArgumentOutOfRangeException("chunkCount");
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
             }
+
             Array.Copy(chunkChars, index, result, 0, charCount);
           }
         }
@@ -666,24 +700,27 @@ namespace System.Text
     /// <returns>A reference to this instance after insertion has completed.</returns>
     public StringBuilder Insert(int index, string value, int count)
     {
-      if (count < 0) throw new ArgumentOutOfRangeException("count");
+      if (count < 0)
+        throw new ArgumentOutOfRangeException("count");
 
-      var length = Length;
-      if (index > length) throw new ArgumentOutOfRangeException("index");
+      int length = Length;
+      if (index > length)
+        throw new ArgumentOutOfRangeException("index");
+
       if (value != null && value.Length != 0 && count != 0)
       {
         StringBuilder builder;
         int num3;
         long num2 = value.Length * count;
-#pragma warning disable S112 // General exceptions should never be thrown
-        if (num2 > MaxCapacity - Length) throw new OutOfMemoryException();
-#pragma warning restore S112 // General exceptions should never be thrown
+        if (num2 > MaxCapacity - Length)
+          throw new OutOfMemoryException();
+
         MakeRoom(index, (int)num2, out builder, out num3, false);
-        var chars = value.ToCharArray();
-        var charLength = chars.Length;
+        char[] chars = value.ToCharArray();
+        int charLength = chars.Length;
         while (count > 0)
         {
-          var cindex = 0;
+          int cindex = 0;
           ReplaceInPlaceAtChunk(ref builder, ref num3, chars, ref cindex, charLength);
           --count;
         }
@@ -701,19 +738,26 @@ namespace System.Text
     /// <returns>A reference to this instance after the insert operation has completed.</returns>
     public StringBuilder Insert(int index, char[] value, int startIndex, int charCount)
     {
-      var length = Length;
-      if (index > length) throw new ArgumentOutOfRangeException("index");
+      int length = Length;
+      if (index > length)
+        throw new ArgumentOutOfRangeException("index");
+
       if (value == null)
       {
         if (startIndex != 0 || charCount != 0) throw new ArgumentNullException("index");
         return this;
       }
-      if (startIndex < 0) throw new ArgumentOutOfRangeException("startIndex");
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-      if (charCount < 0) throw new ArgumentOutOfRangeException("count");
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-      if (startIndex > value.Length - charCount) throw new ArgumentOutOfRangeException("startIndex");
-      if (charCount > 0) Insert(index, new string(value, startIndex, charCount), 1);
+      if (startIndex < 0)
+        throw new ArgumentOutOfRangeException("startIndex");
+
+      if (charCount < 0)
+        throw new ArgumentOutOfRangeException("count");
+
+      if (startIndex > value.Length - charCount)
+        throw new ArgumentOutOfRangeException("startIndex");
+
+      if (charCount > 0)
+        Insert(index, new string(value, startIndex, charCount), 1);
 
       return this;
     }
@@ -728,19 +772,24 @@ namespace System.Text
     /// <returns>A reference to this instance with oldChar replaced by newChar in the range from startIndex to startIndex + count -1.</returns>
     public StringBuilder Replace(char oldChar, char newChar, int startIndex, int count)
     {
-      var length = Length;
-      if (startIndex > length) throw new ArgumentOutOfRangeException("startIndex");
-      if (count < 0 || startIndex > length - count) throw new ArgumentOutOfRangeException("count");
+      int length = Length;
+      if (startIndex > length)
+        throw new ArgumentOutOfRangeException("startIndex");
 
-      var num2 = startIndex + count;
-      var chunkPrevious = this;
+      if (count < 0 || startIndex > length - count)
+        throw new ArgumentOutOfRangeException("count");
+
+      int num2 = startIndex + count;
+      StringBuilder chunkPrevious = this;
     Label_0048:
-      var num3 = num2 - chunkPrevious._chunkOffset;
-      var num4 = startIndex - chunkPrevious._chunkOffset;
+      int num3 = num2 - chunkPrevious._chunkOffset;
+      int num4 = startIndex - chunkPrevious._chunkOffset;
+
       if (num3 >= 0)
       {
-        var index = MathInternal.Max(num4, 0);
-        var num6 = MathInternal.Min(chunkPrevious._chunkLength, num3);
+        int index = MathInternal.Max(num4, 0);
+        int num6 = MathInternal.Min(chunkPrevious._chunkLength, num3);
+
         while (index < num6)
         {
           if (chunkPrevious._chunkChars[index] == oldChar)
@@ -779,19 +828,29 @@ namespace System.Text
     /// <returns>A reference to this instance with all instances of oldValue replaced by newValue in the range from startIndex to startIndex + count - 1.</returns>
     public StringBuilder Replace(string oldValue, string newValue, int startIndex, int count)
     {
-      var length = Length;
-      if (startIndex > length) throw new ArgumentOutOfRangeException("startIndex");
-      if (count < 0 || startIndex > length - count) throw new ArgumentOutOfRangeException("count");
-      if (oldValue == null) throw new ArgumentNullException("oldValue");
-      if (oldValue.Length == 0) throw new ArgumentException("oldValue");
-      if (newValue == null) newValue = string.Empty;
+      int length = Length;
+      if (startIndex > length)
+        throw new ArgumentOutOfRangeException("startIndex");
 
-      var newLength = newValue.Length;
-      var oldLength = oldValue.Length;
+      if (count < 0 || startIndex > length - count)
+        throw new ArgumentOutOfRangeException("count");
+
+      if (oldValue == null)
+        throw new ArgumentNullException("oldValue");
+
+      if (oldValue.Length == 0)
+        throw new ArgumentException("oldValue");
+
+      if (newValue == null)
+        newValue = string.Empty;
+
+      int newLength = newValue.Length;
+      int oldLength = oldValue.Length;
       int[] sourceArray = null;
-      var replacementsCount = 0;
-      var chunk = FindChunkForIndex(startIndex);
-      var indexInChunk = startIndex - chunk._chunkOffset;
+      int replacementsCount = 0;
+      StringBuilder chunk = FindChunkForIndex(startIndex);
+      int indexInChunk = startIndex - chunk._chunkOffset;
+
       //While there is a replacement remaining
       while (count > 0)
       {
@@ -806,7 +865,7 @@ namespace System.Text
           else if (replacementsCount >= sourceArray.Length)
           {
             //We have more matches than allocated for resize the buffer
-            var destinationArray = new int[sourceArray.Length * 3 / 2 + 4];
+            int[] destinationArray = new int[sourceArray.Length * 3 / 2 + 4];
             Array.Copy(sourceArray, destinationArray, sourceArray.Length);
             sourceArray = destinationArray;
           }
@@ -831,7 +890,7 @@ namespace System.Text
         if (indexInChunk >= chunk._chunkLength || count == 0)
         {
           //Determine the index
-          var index = indexInChunk + chunk._chunkOffset;
+          int index = indexInChunk + chunk._chunkOffset;
           //Replace the remaining characters
           ReplaceAllInChunk(sourceArray, replacementsCount, chunk, oldLength, newValue);
           //Move the index
@@ -913,38 +972,44 @@ namespace System.Text
       if (replacementsCount > 0)
       {
         //Determine the amount of characters to remove
-        var count = (value.Length - removeCount) * replacementsCount;
+        int count = (value.Length - removeCount) * replacementsCount;
         //Scope the working chunk
-        var chunk = sourceChunk;
+        StringBuilder chunk = sourceChunk;
         //Determine the index of the first replacement
-        var indexInChunk = replacements[0];
+        int indexInChunk = replacements[0];
         //If there is a character being added make room
-        if (count > 0) MakeRoom(chunk._chunkOffset + indexInChunk, count, out chunk, out indexInChunk, true);
+        if (count > 0)
+          MakeRoom(chunk._chunkOffset + indexInChunk, count, out chunk, out indexInChunk, true);
+
         //Start at the first replacement
-        var index = 0;
-        var replacementIndex = 0;
-        var chars = value.ToCharArray();
+        int index = 0;
+        int replacementIndex = 0;
+        char[] chars = value.ToCharArray();
       ReplaceValue:
         //Replace the value                 
         ReplaceInPlaceAtChunk(ref chunk, ref indexInChunk, chars, ref replacementIndex, value.Length);
-        if (replacementIndex == value.Length) replacementIndex = 0;
+        if (replacementIndex == value.Length)
+          replacementIndex = 0;
 
         //Determine the next replacement 
-        var valueIndex = replacements[index] + removeCount;
+        int valueIndex = replacements[index] + removeCount;
         //Move the pointer of the working replacement
         ++index;
         //If we are not past the replacement boundry
         if (index < replacementsCount)
         {
           //Determine the next replacement
-          var nextIndex = replacements[index];
+          int nextIndex = replacements[index];
+
           //If there is a character remaining to be replaced
           if (count != 0)
           {
             //Replace it
             ReplaceInPlaceAtChunk(ref chunk, ref indexInChunk, sourceChunk._chunkChars, ref valueIndex, nextIndex - valueIndex);
           }//Move the pointer
-          else indexInChunk += nextIndex - valueIndex;
+          else
+            indexInChunk += nextIndex - valueIndex;
+
           goto ReplaceValue;//Finish replacing
         }
         //We are are done and there is charcters to be removed they are at the end
@@ -963,12 +1028,13 @@ namespace System.Text
 
     private void ReplaceInPlaceAtChunk(ref StringBuilder chunk, ref int indexInChunk, char[] value, ref int valueIndex, int count)
     {
-      if (count == 0) return;
+      if (count == 0)
+        return;
 
       while (true)
       {
         //int num = chunk.m_ChunkLength - indexInChunk;
-        var length = MathInternal.Min(chunk._chunkLength - indexInChunk, count);
+        int length = MathInternal.Min(chunk._chunkLength - indexInChunk, count);
         //ThreadSafeCopy(value, ref valueIndex, chunk.m_ChunkChars, ref indexInChunk, num2);
         Array.Copy(value, valueIndex, chunk._chunkChars, indexInChunk, length);
         indexInChunk += length;
@@ -985,9 +1051,9 @@ namespace System.Text
 
     internal void MakeRoom(int index, int count, out StringBuilder chunk, out int indexInChunk, bool doneMoveFollowingChars)
     {
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-      if (count + Length > _maxCapacity) throw new ArgumentOutOfRangeException("requiredLength");
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
+      if (count + Length > _maxCapacity)
+        throw new ArgumentOutOfRangeException("requiredLength");
+
       chunk = this;
       while (chunk._chunkOffset > index)
       {
@@ -997,7 +1063,7 @@ namespace System.Text
       indexInChunk = index - chunk._chunkOffset;
       if (!doneMoveFollowingChars && chunk._chunkLength <= 0x20 && chunk._chunkChars.Length - chunk._chunkLength >= count)
       {
-        var chunkLength = chunk._chunkLength;
+        int chunkLength = chunk._chunkLength;
         while (chunkLength > indexInChunk)
         {
           chunkLength--;
@@ -1007,13 +1073,13 @@ namespace System.Text
       }
       else
       {
-        var builder = new StringBuilder(MathInternal.Max(count, 0x10), chunk._maxCapacity, chunk._chunkPrevious);
+        StringBuilder builder = new StringBuilder(MathInternal.Max(count, 0x10), chunk._maxCapacity, chunk._chunkPrevious);
         builder._chunkLength = count;
-        var length = MathInternal.Min(count, indexInChunk);
+        int length = MathInternal.Min(count, indexInChunk);
         if (length > 0)
         {
           Array.Copy(chunk._chunkChars, 0, builder._chunkChars, 0, length);
-          var nextLength = indexInChunk - length;
+          int nextLength = indexInChunk - length;
           if (nextLength >= 0)
           {
             Array.Copy(chunk._chunkChars, length, chunk._chunkChars, 0, nextLength);
@@ -1032,23 +1098,27 @@ namespace System.Text
 
     internal StringBuilder FindChunkForIndex(int index)
     {
-      var chunkPrevious = this;
-      while (chunkPrevious._chunkOffset > index) chunkPrevious = chunkPrevious._chunkPrevious;
+      StringBuilder chunkPrevious = this;
+      while (chunkPrevious._chunkOffset > index)
+        chunkPrevious = chunkPrevious._chunkPrevious;
+
       return chunkPrevious;
     }
 
     internal void AppendHelper(ref string value)
     {
-      if (value == null || value == string.Empty) return;
+      if (value == null || value == string.Empty)
+        return;
+
       Append(value.ToCharArray(), value.Length);
     }
 
     internal void ExpandByABlock(int minBlockCharCount)
     {
-#pragma warning disable S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-      if (minBlockCharCount + Length > _maxCapacity) throw new ArgumentOutOfRangeException("requiredLength");
-#pragma warning restore S3928 // Parameter names used into ArgumentException constructors should match an existing one 
-      var num = MathInternal.Max(minBlockCharCount, MathInternal.Min(Length, 0x1f40));
+      if (minBlockCharCount + Length > _maxCapacity)
+        throw new ArgumentOutOfRangeException("requiredLength");
+
+      int num = MathInternal.Max(minBlockCharCount, MathInternal.Min(Length, 0x1f40));
       _chunkPrevious = new StringBuilder(this);
       _chunkOffset += _chunkLength;
       _chunkLength = 0;
@@ -1056,19 +1126,18 @@ namespace System.Text
       if (_chunkOffset + num < num)
       {
         _chunkChars = null;
-#pragma warning disable S112 // General exceptions should never be thrown
         throw new OutOfMemoryException();
-#pragma warning restore S112 // General exceptions should never be thrown
       }
       _chunkChars = new char[num];
     }
 
     internal void Remove(int startIndex, int count, out StringBuilder chunk, out int indexInChunk)
     {
-      var num = startIndex + count;
+      int num = startIndex + count;
       chunk = this;
       StringBuilder builder = null;
-      var sourceIndex = 0;
+      int sourceIndex = 0;
+
       while (true)
       {
         if (num - chunk._chunkOffset >= 0)
@@ -1081,8 +1150,9 @@ namespace System.Text
           if (startIndex - chunk._chunkOffset >= 0)
           {
             indexInChunk = startIndex - chunk._chunkOffset;
-            var destinationIndex = indexInChunk;
-            var num4 = builder._chunkLength - sourceIndex;
+            int destinationIndex = indexInChunk;
+            int num4 = builder._chunkLength - sourceIndex;
+
             if (builder != chunk)
             {
               destinationIndex = 0;
@@ -1111,7 +1181,8 @@ namespace System.Text
 
     internal void Append(char[] value, int valueCount)
     {
-      var num = valueCount + _chunkLength;
+      int num = valueCount + _chunkLength;
+
       if (num <= _chunkChars.Length)
       {
         //ThreadSafeCopy(value, this.m_ChunkChars, this.m_ChunkLength, valueCount);
@@ -1120,14 +1191,15 @@ namespace System.Text
       }
       else
       {
-        var count = _chunkChars.Length - _chunkLength;
+        int count = _chunkChars.Length - _chunkLength;
         if (count > 0)
         {
           //ThreadSafeCopy(value, this.m_ChunkChars, this.m_ChunkLength, count);
           Array.Copy(value, 0, _chunkChars, _chunkLength, count);
           _chunkLength = _chunkChars.Length;
         }
-        var minBlockCharCount = valueCount - count;
+
+        int minBlockCharCount = valueCount - count;
         ExpandByABlock(minBlockCharCount);
         //ThreadSafeCopy(value + count, this.m_ChunkChars, 0, minBlockCharCount);
         Array.Copy(value, count, _chunkChars, 0, minBlockCharCount);

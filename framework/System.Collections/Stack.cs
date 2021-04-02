@@ -58,9 +58,7 @@ namespace System.Collections
     /// Removes all Objects from the Stack.
     /// </summary>
     [MethodImpl(MethodImplOptions.InternalCall)]
-#pragma warning disable S4200 // Native methods should be wrapped
     public virtual extern void Clear();
-#pragma warning restore S4200 // Native methods should be wrapped
 
     /// <summary>
     /// Creates a shallow copy of the Stack.
@@ -68,8 +66,8 @@ namespace System.Collections
     /// <returns>A shallow copy of the Stack.</returns>
     public virtual Object Clone()
     {
-      var stack = new Stack();
-      var capacity = DefaultCapacity;
+      Stack stack = new Stack();
+      int capacity = DefaultCapacity;
 
       if (_size > DefaultCapacity)
       {
@@ -110,7 +108,8 @@ namespace System.Collections
     /// <returns>An IEnumerator for the Stack.</returns>
     public virtual IEnumerator GetEnumerator()
     {
-      var capacity = _array.Length;
+      int capacity = _array.Length;
+
       return new Array.SzArrayEnumerator(_array, capacity - _size, capacity);
     }
 
@@ -119,27 +118,21 @@ namespace System.Collections
     /// </summary>
     /// <returns>The Object at the top of the Stack.</returns>
     [MethodImpl(MethodImplOptions.InternalCall)]
-#pragma warning disable S4200 // Native methods should be wrapped
     public virtual extern Object Peek();
-#pragma warning restore S4200 // Native methods should be wrapped
 
     /// <summary>
     /// Removes and returns the object at the top of the Stack.
     /// </summary>
     /// <returns>The Object removed from the top of the Stack.</returns>
     [MethodImpl(MethodImplOptions.InternalCall)]
-#pragma warning disable S4200 // Native methods should be wrapped
     public virtual extern Object Pop();
-#pragma warning restore S4200 // Native methods should be wrapped
 
     /// <summary>
     /// Inserts an object at the top of the Stack.
     /// </summary>
     /// <param name="obj">The Object to push onto the Stack.</param>
     [MethodImpl(MethodImplOptions.InternalCall)]
-#pragma warning disable S4200 // Native methods should be wrapped
     public virtual extern void Push(Object obj);
-#pragma warning restore S4200 // Native methods should be wrapped
 
     /// <summary>
     /// Copies the Stack to a new array, in the same order Pop would return the items.
@@ -147,7 +140,7 @@ namespace System.Collections
     /// <returns>A new array containing copies of the elements of the Stack.</returns>
     public virtual Object[] ToArray()
     {
-      var objArray = new Object[_size];
+      object[] objArray = new Object[_size];
 
       Array.Copy(_array, _array.Length - _size, objArray, 0, _size);
 

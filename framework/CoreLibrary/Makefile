@@ -1,5 +1,7 @@
 NAME=mscorlib
 
+
+
 CSC=csc.exe
 MDP=CanFly.Build.exe
 FLAGS=-noconfig -target:library @coreAssembly.rsp
@@ -124,7 +126,7 @@ SRC= \
 LIBS=
 RM =rm -rf
 
-OUTPATH=Debug
+OUTPATH=../assemblies
 
 all: $(NAME)
 

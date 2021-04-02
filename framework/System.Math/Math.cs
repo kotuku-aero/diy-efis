@@ -10,7 +10,7 @@ namespace System
     /// <summary>
     /// Provides constants and static methods for trigonometric, logarithmic, and other common mathematical functions.
     /// </summary>
-    public static class Math
+    public class Math
     {
         /// <summary>
         /// Represents the ratio of the circumference of a circle to its diameter, specified by the constant, π.

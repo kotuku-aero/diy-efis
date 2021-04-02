@@ -1,4 +1,4 @@
-NAME=System.Math
+NAME=System.Collections
 
 CSC=csc.exe
 MDP=CanFly.Build.exe
@@ -6,7 +6,11 @@ FLAGS=-langversion:1 -nostdlib -target:library
 MDPFLAGS=-d $(NAME).pdb
 
 SRC= \
-	Math.cs \
+	DictionaryEntry.cs \
+	Hashtable.cs \
+	IDictionary.cs \
+	Queue.cs \
+	Stack.cs \
 	Properties/AssemblyInfo.cs
 
 LIBS=-reference:../assemblies/mscorlib.dll

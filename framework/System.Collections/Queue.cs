@@ -12,9 +12,6 @@ namespace System.Collections
   /// <summary>
   /// A circular-array implementation of a queue. Enqueue can be O(n).  Dequeue is O(1).
   /// </summary>
-#if NANOCLR_REFLECTION
-    [DebuggerDisplay("Count = {Count}")]
-#endif // NANOCLR_REFLECTION
   [Serializable]
   public class Queue : ICollection, ICloneable
   {
@@ -52,7 +49,7 @@ namespace System.Collections
     /// <returns>A shallow copy of the Queue.</returns>
     public virtual Object Clone()
     {
-      var q = new Queue();
+      Queue q = new Queue();
 
       if (_size > DefaultCapacity)
       {
@@ -94,9 +91,7 @@ namespace System.Collections
     /// Removes all objects from the Queue.
     /// </summary>
     [MethodImpl(MethodImplOptions.InternalCall)]
-#pragma warning disable S4200 // Native methods should be wrapped
     public virtual extern void Clear();
-#pragma warning restore S4200 // Native methods should be wrapped
 
     /// <summary>
     /// Copies the Queue elements to an existing one-dimensional Array, starting at
@@ -105,18 +100,14 @@ namespace System.Collections
     /// <param name="array">The one-dimensional Array that is the destination of the elements copied from Queue.</param>
     /// <param name="index">The zero-based index in array at which copying begins.</param>
     [MethodImpl(MethodImplOptions.InternalCall)]
-#pragma warning disable S4200 // Native methods should be wrapped
     public virtual extern void CopyTo(Array array, int index);
-#pragma warning restore S4200 // Native methods should be wrapped
 
     /// <summary>
     /// Adds an object to the end of the Queue.
     /// </summary>
     /// <param name="obj">The object to add to the Queue.</param>
     [MethodImpl(MethodImplOptions.InternalCall)]
-#pragma warning disable S4200 // Native methods should be wrapped
     public virtual extern void Enqueue(Object obj);
-#pragma warning restore S4200 // Native methods should be wrapped
 
     /// <summary>
     /// Returns an enumerator that iterates through the Queue.
@@ -124,9 +115,10 @@ namespace System.Collections
     /// <returns>An IEnumerator for the Queue.</returns>
     public virtual IEnumerator GetEnumerator()
     {
-      var endIndex = _tail;
+      int endIndex = _tail;
 
-      if (_size > 0 && _tail <= _head) endIndex += _array.Length;
+      if (_size > 0 && _tail <= _head)
+        endIndex += _array.Length;
 
       return new Array.SzArrayEnumerator(_array, _head, endIndex);
     }
@@ -136,18 +128,14 @@ namespace System.Collections
     /// </summary>
     /// <returns>The object that is removed from the beginning of the Queue.</returns>
     [MethodImpl(MethodImplOptions.InternalCall)]
-#pragma warning disable S4200 // Native methods should be wrapped
     public virtual extern Object Dequeue();
-#pragma warning restore S4200 // Native methods should be wrapped
 
     /// <summary>
     /// Returns the object at the beginning of the Queue without removing it.
     /// </summary>
     /// <returns>The object at the beginning of the Queue.</returns>
     [MethodImpl(MethodImplOptions.InternalCall)]
-#pragma warning disable S4200 // Native methods should be wrapped
     public virtual extern Object Peek();
-#pragma warning restore S4200 // Native methods should be wrapped
 
     /// <summary>
     /// Determines whether an element is in the Queue.
@@ -169,7 +157,7 @@ namespace System.Collections
     /// <returns>A new array containing elements copied from the Queue.</returns>
     public virtual Object[] ToArray()
     {
-      var arr = new Object[_size];
+      object[] arr = new Object[_size];
 
       CopyTo(arr, 0);
 
