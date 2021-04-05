@@ -46,7 +46,7 @@ namespace CanFly.Tools.MetadataProcessor
 {{#newline}}
 
 {{#each Enums}}
-typedef enum __nfpack {{EnumName}}{{#newline}}
+typedef enum {{EnumName}}{{#newline}}
 {
 {{#newline}}
 {{#each Items}}

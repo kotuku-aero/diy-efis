@@ -20,14 +20,14 @@ SRC= \
 	Widget.cs \
 	Properties/AssemblyInfo.cs
 
-LIBS=-reference:../assemblies/mscorlib.dll;../assemblies/CanFly.Neutron.dll;../assemblies/System.Math.dll
+LIBS=-reference:../assemblies/mscorlib.dll;../assemblies/CanFly.Neutron.dll
 RM =rm -rf
 
 OUTPATH=../assemblies
 
-all: $(NAME)
+all: $(OUTPATH)/$(NAME).pe
 
-$(NAME) : $(SRC)
+$(OUTPATH)/$(NAME).pe : $(SRC)
 	$(CSC) $(FLAGS) $(LIBS) $(SRC) -out:$(OUTPATH)/$(NAME).dll
 	$(MDP) -c $(OUTPATH)/$(NAME).dll -p $(OUTPATH)/$(NAME).pe
 

@@ -15,8 +15,6 @@ namespace System
   [Serializable]
   public struct Single
   {
-    internal float _value;
-
     /// <summary>
     /// Represents the smallest possible value of Single. This field is constant.
     /// </summary>
@@ -108,7 +106,7 @@ namespace System
     /// </returns>
     public int CompareTo(float value)
     {
-      return ((double)_value).CompareTo((double)value);
+      return ((double)CanFly.Runtime.ToFloat(this)).CompareTo((double)value);
     }
 
     /// <summary>
@@ -154,7 +152,7 @@ namespace System
         return double._naNSymbol;
       }
 
-      return Number.Format(_value, false, format);
+      return Number.Format(CanFly.Runtime.ToFloat(this), false, format);
     }
 
     /// <summary>

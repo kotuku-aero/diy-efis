@@ -178,7 +178,7 @@ namespace CanFly
       }
 
       public void GenerateSkeleton(
-          string file,
+          string skeletonPath,
           string name,
           string project,
           bool withoutInteropCode,
@@ -186,13 +186,14 @@ namespace CanFly
       {
         try
         {
-          if (Verbose) System.Console.WriteLine("Generating skeleton files...");
+          if (Verbose)
+            System.Console.WriteLine("Generating skeleton files...");
 
           var skeletonGenerator = new nanoSkeletonGenerator(
               _assemblyBuilder.TablesContext,
-              file,
-              name,
-              project,
+              skeletonPath,
+              "mscorlib",
+              "corlib.native",
               withoutInteropCode,
               isCoreLibrary);
 
@@ -240,6 +241,8 @@ namespace CanFly
       public string OutFile { get; set; }
       [Option('v', "verbose", Required =false, DefaultValue =false, HelpText ="Verbose logging of processor")]
       public bool Verbose { get; set; }
+      [Option('s', "skelton", Required =false, HelpText = "Path to skeleton file directory")]
+      public string SkeltonPath { get; set; }
 
       [HelpOption]
       public string GetUsage()
@@ -266,14 +269,15 @@ namespace CanFly
 
       if(options.IsCoreLibrary)
       {
-        /*
+        if (String.IsNullOrEmpty(options.SkeltonPath))
+          throw new ApplicationException("If the core library is compiled, the skeleton directory must be provided");
+        else
         md.GenerateSkeleton(
-            file,
-            name,
-            project,
+            options.SkeltonPath,
+            "mscorlib.native",
+            "mscorlib.native",
             true,
             true);
-        */
       }
     }
   }

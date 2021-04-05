@@ -14,9 +14,6 @@ namespace System
     [Serializable]
     public struct Int16
     {
-        // this field is required in the native end
-        internal short _value;
-
         /// <summary>
         /// Represents the largest possible value of an Int16. This field is constant.
         /// </summary>
@@ -34,7 +31,7 @@ namespace System
         /// <returns>The string representation of the value of this instance, consisting of a minus sign if the value is negative, and a sequence of digits ranging from 0 to 9 with no leading zeroes.</returns>
         public override String ToString()
         {
-            return Number.Format(_value, true, "G");
+            return Number.Format(CanFly.Runtime.ToInt16(this), true, "G");
         }
 
         /// <summary>
@@ -44,7 +41,7 @@ namespace System
         /// <returns>The string representation of the value of this instance as specified by format.</returns>
         public String ToString(String format)
         {
-            return Number.Format(_value, true, format);
+            return Number.Format(CanFly.Runtime.ToInt16(this), true, format);
         }
 
         /// <summary>
@@ -55,10 +52,10 @@ namespace System
         /// <exception cref="ArgumentNullException"></exception>
         public static short Parse(String s)
         {
-            if (s == null)
-             throw new ArgumentNullException();
+          if (s == null)
+            throw new ArgumentNullException();
 
-            return Convert.ToInt16(s);
+          return Convert.ToInt16(s);
         }
 
     }

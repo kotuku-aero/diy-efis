@@ -67,6 +67,7 @@ namespace CanFly.DiyEfis
 
       // this never returns, unless a reboot is requested.
       Screen.Instance.ProcessMessages();
+     
     }
   }
 }

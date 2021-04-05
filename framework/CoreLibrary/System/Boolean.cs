@@ -21,16 +21,13 @@ namespace System
         /// </summary>
         public static readonly string TrueString = "True";
 
-        // this field is required in the native end
-        private bool _value;
-
         /// <summary>
         /// Converts the value of this instance to its equivalent string representation (either "True" or "False").
         /// </summary>
         /// <returns>TrueString if the value of this instance is true, or FalseString if the value of this instance is false.</returns>
         public override String ToString()
         {
-            return _value ? TrueString : FalseString;
+          return CanFly.Runtime.ToBoolean(this) ? TrueString : FalseString;
         }
 
     }

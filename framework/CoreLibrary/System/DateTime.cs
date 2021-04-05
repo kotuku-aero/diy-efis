@@ -82,7 +82,7 @@ namespace System
     /// While desktop CLR's origin is at 0001/01/01:00:00:00.000.
     /// There are 504911232000000000 ticks between them which we are subtracting.
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private const long _ticksAtOrigin = 504911232000000000;
+    private const long DateTimeAtOrigin = 504911232000000000;
 
     // Number of 100ns ticks per time unit
     private const long TicksPerMillisecond = 10000;
@@ -104,7 +104,7 @@ namespace System
     private const long UnixEpochSeconds = UnixEpochTicks / TicksPerSecond; // 62135596800
 
     // ticks value corresponding to 1601/01/01:00:00:00.000 (nanoFramework origin date time)
-    private const long MinTicks = _ticksAtOrigin;
+    private const long MinTicks = DateTimeAtOrigin;
     // ticks value corresponding to 3000/12/31:23:59:59.999 (nanoFramework maximum date time)
     private const long MaxTicks = 946708127999999999;
 
@@ -141,8 +141,6 @@ namespace System
     //   Bits 01-62: The value of 100-nanosecond ticks where 0 represents 1601/01/01:00:00:00.000, up until the value
     //               3000/12/31:23:59:59.999
     //   Bits 63-64: Ignored in .NET nanoFramework implementation.
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private ulong _ticks;
 
     // this enum is used to make the call to get date part
     // keep in sync with native 
@@ -172,12 +170,10 @@ namespace System
       }
 
       // need to subtract our ticks at origin
-      ticks -= _ticksAtOrigin;
+      ticks -= DateTimeAtOrigin;
 
-      _ticks = (ulong)ticks;
-
-      // allways UTC
-      _ticks |= _UTCMask;
+      // always UTC
+      CanFly.Runtime.SetDateTime((ulong) ticks | _UTCMask, ref this );
     }
 
     /// <summary>
@@ -238,7 +234,7 @@ namespace System
     /// <exception cref="ArgumentOutOfRangeException">Any parameter out of the accepted ranges</exception>
     public DateTime(int year, int month, int day, int hour, int minute, int second, int millisecond)
     {
-      _ticks = CanFly.Runtime.ToTicks(year, month, day, hour, minute, second, millisecond);
+      CanFly.Runtime.SetDateTime(CanFly.Runtime.ToTicks(year, month, day, hour, minute, second, millisecond), ref this);
     }
 
     /// <summary>
@@ -513,7 +509,7 @@ namespace System
       get { return new DateTime(CanFly.Runtime.UtcNow()); }
     }
 
-    private DateTime(ulong utcNow) { _ticks = utcNow; }
+    private DateTime(ulong utcNow) { CanFly.Runtime.SetDateTime(utcNow, ref this); }
 
     /// <summary>
     /// Gets the seconds component of the date represented by this instance.
@@ -534,7 +530,7 @@ namespace System
     /// </value>
     public long Ticks
     {
-      get { return (long)(_ticks & _tickMask) + _ticksAtOrigin; }
+      get { return (long)(CanFly.Runtime.ToDateTime(this) & _tickMask) + DateTimeAtOrigin; }
     }
 
     /// <summary>
@@ -587,7 +583,7 @@ namespace System
     /// <returns>An object that is equal to the date and time represented by this instance minus the time interval represented by <paramref name="val"/>.</returns>
     public DateTime Subtract(TimeSpan val)
     {
-      return new DateTime(Ticks - val._ticks);
+      return new DateTime(Ticks - CanFly.Runtime.ToTimeSpan(val));
     }
 
     /// <summary>
@@ -785,14 +781,14 @@ namespace System
     /// <returns>A 32-bit signed integer hash code.</returns>
     public override int GetHashCode()
     {
-      ulong internalTicks = _ticks;
+      ulong internalTicks = CanFly.Runtime.ToDateTime(this);
       return ((int)internalTicks) ^ ((int)(internalTicks >> 0x20));
 
     }
 
     private int GetDateTimePart(DateTimePart part)
     {
-      return CanFly.Runtime.GetDateTimePart(_ticks, (int)part);
+      return CanFly.Runtime.GetDateTimePart(CanFly.Runtime.ToDateTime(this), (int)part);
     }
   }
 }

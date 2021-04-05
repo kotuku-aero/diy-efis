@@ -46,9 +46,11 @@ namespace CanFly.Proton
     private ushort id;
     private short value;     // cancel value
 
-    public MenuItemCancel(LayoutWidget widget, uint key)
+    public MenuItemCancel(LayoutWidget widget, ushort key)
       : base(widget)
     {
+      if(!widget.TryRegGetUint16(key, "value", out id))
+        id = PhotonID.id_menu_cancel;
       /*
 static MenuItem item_cancel_load(LayoutWindow wnd, uint key)
   {

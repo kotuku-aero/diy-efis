@@ -14,8 +14,6 @@ namespace System
     [Serializable]
     public struct Int32
     {
-        internal int _value;
-
         /// <summary>
         /// Represents the largest possible value of an Int32. This field is constant.
         /// </summary>
@@ -34,7 +32,7 @@ namespace System
         /// is negative, and a sequence of digits ranging from 0 to 9 with no leading zeroes.</returns>
         public override String ToString()
         {
-            return Number.Format(_value, true, null);
+            return Number.Format(CanFly.Runtime.ToInt32(this), true, null);
         }
 
         /// <summary>
@@ -44,7 +42,7 @@ namespace System
         /// <returns>he string representation of the value of this instance as specified by format.</returns>
         public String ToString(String format)
         {
-            return Number.Format(_value, true, format);
+            return Number.Format(CanFly.Runtime.ToInt32(this), true, format);
         }
 
         /// <summary>

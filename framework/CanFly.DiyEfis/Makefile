@@ -2,7 +2,7 @@ NAME=Canfly.DiyEfis
 
 CSC=csc.exe
 MDP=../assemblies/CanFly.Build.exe
-FLAGS=-langversion:1 -nostdlib -target:library
+FLAGS=-langversion:1 -nostdlib -target:exe
 MDPFLAGS=-d $(NAME).pdb
 
 SRC= \
@@ -14,11 +14,11 @@ RM =rm -rf
 
 OUTPATH=../assemblies
 
-all: $(NAME)
+all: $(OUTPATH)/$(NAME).pe
 
-$(NAME) : $(SRC)
-	$(CSC) $(FLAGS) $(LIBS) $(SRC) -out:$(OUTPATH)/$(NAME).dll
-	$(MDP) -c $(OUTPATH)/$(NAME).dll -p $(OUTPATH)/$(NAME).pe
+$(OUTPATH)/$(NAME).pe : $(SRC)
+	$(CSC) $(FLAGS) $(LIBS) $(SRC) -out:$(OUTPATH)/$(NAME).exe
+	$(MDP) -c $(OUTPATH)/$(NAME).exe -p $(OUTPATH)/$(NAME).pe
 
 clean:
 

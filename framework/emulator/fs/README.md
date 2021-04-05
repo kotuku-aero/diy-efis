@@ -1,0 +1,1 @@
+This folder is the emulated flash file system for the CanFly Emulator

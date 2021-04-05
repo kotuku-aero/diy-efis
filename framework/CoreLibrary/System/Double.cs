@@ -18,14 +18,11 @@ namespace System
     internal const string _negativeInfinitySymbol = "-" + _positiveInfinitySymbol;
     internal const string _positiveInfinitySymbol = "Infinity";
 
-    // this field is required in the native end
-    internal double _value;
-
     /// <summary>
     /// Represents the smallest possible value of a Double. This field is constant.
     /// </summary>
     /// <remarks>The value of this constant is negative 1.7976931348623157E+308.</remarks>
-    public const double MinValue = -1.7976931348623157E+308;
+    /// public const double MinValue = -1.7976931348623157E+308;
     /// <summary>
     /// Represents the largest possible value of a Double. This field is constant.
     /// </summary>
@@ -148,7 +145,7 @@ namespace System
         return _naNSymbol;
       }
 
-      return Number.Format(_value, false, format);
+      return Number.Format(CanFly.Runtime.ToDouble(this), false, format);
     }
 
     /// <summary>
@@ -161,7 +158,8 @@ namespace System
     {
       result = 0.0;
 
-      if (s == null) return false;
+      if (s == null)
+        return false;
 
       try
       {

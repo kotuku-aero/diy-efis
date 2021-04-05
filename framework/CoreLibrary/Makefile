@@ -1,11 +1,11 @@
 NAME=mscorlib
 
-
+OUTPATH=../assemblies
 
 CSC=csc.exe
 MDP=../assemblies/CanFly.Build.exe
 FLAGS=-noconfig -target:library @coreAssembly.rsp
-MDPFLAGS=-d $(NAME).pdb
+MDPFLAGS=-d $(OUTPATH)/$(NAME).pdb
 
 SRC= \
 	CanFly/Runtime.cs \
@@ -60,7 +60,6 @@ SRC= \
     System/Convert.cs \
     System/DateTime.cs \
     System/DayOfWeek.cs \
-    System/DBNull.cs \
     System/Decimal.cs \
     System/Delegate.cs \
     System/Double.cs \
@@ -85,7 +84,7 @@ SRC= \
     System/InvalidCastException.cs \
     System/InvalidOperationException.cs \
     System/MarshalByRefObject.cs \
-    System/Math.cs \
+		System/Math.cs \
     System/MulticastDelegate.cs \
     System/NonSerializedAttribute.cs \
     System/NotImplementedException.cs \
@@ -126,13 +125,11 @@ SRC= \
 LIBS=
 RM =rm -rf
 
-OUTPATH=../assemblies
+all: $(OUTPATH)/$(NAME).pe
 
-all: $(NAME)
-
-$(NAME) : $(SRC)
+$(OUTPATH)/$(NAME).pe : $(SRC)
 	$(CSC) $(FLAGS) $(LIBS) $(SRC) -out:$(OUTPATH)/$(NAME).dll
-	$(MDP) -c $(OUTPATH)/$(NAME).dll -p $(OUTPATH)/$(NAME).pe -m
+	$(MDP) -c $(OUTPATH)/$(NAME).dll -p $(OUTPATH)/$(NAME).pe -m  -s ..\..\..\libs\ion\clr\mscorlib
 
 clean:
 

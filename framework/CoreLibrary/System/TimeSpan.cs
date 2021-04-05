@@ -15,8 +15,6 @@ namespace System
   [Serializable]
   public struct TimeSpan
   {
-    internal long _ticks;
-
     internal const long MaxMilliSeconds = Int64.MaxValue / TicksPerMillisecond;
     internal const long MinMilliSeconds = Int64.MinValue / TicksPerMillisecond;
 
@@ -70,7 +68,7 @@ namespace System
     /// <param name="ticks">A time period expressed in 100-nanosecond units.</param>
     public TimeSpan(long ticks)
     {
-      _ticks = ticks;
+      CanFly.Runtime.SetTimeSpan(ticks, ref this);
     }
 
     /// <summary>
@@ -81,7 +79,7 @@ namespace System
     /// <param name="seconds">Number of seconds.</param>
     public TimeSpan(int hours, int minutes, int seconds)
     {
-      _ticks = (TicksPerHour * hours) + (TicksPerMinute * minutes) + (TicksPerSecond * seconds);
+      CanFly.Runtime.SetTimeSpan((TicksPerHour * hours) + (TicksPerMinute * minutes) + (TicksPerSecond * seconds), ref this);
     }
 
     /// <summary>
@@ -93,10 +91,10 @@ namespace System
     /// <param name="seconds">Number of seconds.</param>
     public TimeSpan(int days, int hours, int minutes, int seconds)
     {
-      _ticks = (TicksPerDay * days) +
+      CanFly.Runtime.SetTimeSpan((TicksPerDay * days) +
         (TicksPerHour * hours) +
         (TicksPerMinute * minutes) +
-        (TicksPerSecond * seconds);
+        (TicksPerSecond * seconds), ref this);
     }
 
     /// <summary>
@@ -109,11 +107,11 @@ namespace System
     /// <param name="milliseconds">Number of milliseconds.</param>
     public TimeSpan(int days, int hours, int minutes, int seconds, int milliseconds)
     {
-      _ticks = (TicksPerDay * days) +
+      CanFly.Runtime.SetTimeSpan((TicksPerDay * days) +
         (TicksPerHour * hours) +
         (TicksPerMinute * minutes) +
         (TicksPerSecond * seconds) +
-        (TicksPerMillisecond * milliseconds);
+        (TicksPerMillisecond * milliseconds), ref this);
     }
 
     /// <summary>
@@ -122,7 +120,7 @@ namespace System
     /// <value>The number of ticks contained in this instance. </value>
     public long Ticks
     {
-      get { return _ticks; }
+      get { return CanFly.Runtime.ToTimeSpan(this); }
     }
 
     /// <summary>
@@ -131,7 +129,7 @@ namespace System
     /// <value>The day component of this instance. The return value can be positive or negative.</value>
     public int Days
     {
-      get { return (int)(_ticks / TicksPerDay); }
+      get { return (int)(CanFly.Runtime.ToTimeSpan(this) / TicksPerDay); }
     }
 
     /// <summary>
@@ -140,7 +138,7 @@ namespace System
     /// <value>The hour component of this instance. The return value ranges from -23 through 23.</value>
     public int Hours
     {
-      get { return (int)((_ticks / TicksPerHour) % 24); }
+      get { return (int)((CanFly.Runtime.ToTimeSpan(this) / TicksPerHour) % 24); }
     }
 
     /// <summary>
@@ -149,7 +147,7 @@ namespace System
     /// <value>The millisecond component of this instance.  The return value ranges from -999 through 999.</value>
     public int Milliseconds
     {
-      get { return (int)((_ticks / TicksPerMillisecond) % 1000); }
+      get { return (int)((CanFly.Runtime.ToTimeSpan(this) / TicksPerMillisecond) % 1000); }
     }
 
     /// <summary>
@@ -158,7 +156,7 @@ namespace System
     /// <value>The minute component of this instance. The return value ranges from -59 through 59.</value>
     public int Minutes
     {
-      get { return (int)((_ticks / TicksPerMinute) % 60); }
+      get { return (int)((CanFly.Runtime.ToTimeSpan(this) / TicksPerMinute) % 60); }
     }
      
 
@@ -168,7 +166,7 @@ namespace System
     /// <value>The second component of this instance. The return value ranges from -59 through 59.</value>
     public int Seconds 
     {
-      get { return (int)((_ticks / TicksPerSecond) % 60); }
+      get { return (int)((CanFly.Runtime.ToTimeSpan(this) / TicksPerSecond) % 60); }
     }
 
     /// <summary>
@@ -177,7 +175,7 @@ namespace System
     /// <value>The total number of days represented by this instance.</value>
     public double TotalDays 
     {
-      get { return (_ticks) * DaysPerTick; }
+      get { return (CanFly.Runtime.ToTimeSpan(this)) * DaysPerTick; }
     }
 
     /// <summary>
@@ -186,7 +184,7 @@ namespace System
     /// <value>The total number of hours represented by this instance.</value>
     public double TotalHours
     {
-      get { return  _ticks * HoursPerTick; }
+      get { return  CanFly.Runtime.ToTimeSpan(this) * HoursPerTick; }
     }
 
     /// <summary>
@@ -197,7 +195,7 @@ namespace System
     {
       get
       {
-        double temp = _ticks * MillisecondsPerTick;
+        double temp = CanFly.Runtime.ToTimeSpan(this) * MillisecondsPerTick;
         if (temp > MaxMilliSeconds)
           return MaxMilliSeconds;
 
@@ -214,7 +212,7 @@ namespace System
     /// <value>The total number of minutes represented by this instance.</value>
     public double TotalMinutes
     {
-      get { return _ticks * MinutesPerTick; }
+      get { return CanFly.Runtime.ToTimeSpan(this) * MinutesPerTick; }
     }
 
     /// <summary>
@@ -223,7 +221,7 @@ namespace System
     /// <value>The total number of seconds represented by this instance.</value>
     public double TotalSeconds
     {
-      get { return _ticks * SecondsPerTick; }
+      get { return CanFly.Runtime.ToTimeSpan(this) * SecondsPerTick; }
     }
 
     /// <summary>
@@ -233,7 +231,7 @@ namespace System
     /// <returns>A new object that represents the value of this instance plus the value of ts.</returns>
     public TimeSpan Add(TimeSpan ts)
     {
-       return new TimeSpan(_ticks + ts._ticks); 
+       return new TimeSpan(CanFly.Runtime.ToTimeSpan(this) + CanFly.Runtime.ToTimeSpan(ts)); 
     }
 
     /// <summary>
@@ -272,10 +270,10 @@ namespace System
     {
       long ticks = (long)(value);
 
-      if (_ticks < ticks)
+      if (CanFly.Runtime.ToTimeSpan(this) < ticks)
         return -1;
 
-      if (_ticks > ticks)
+      if (CanFly.Runtime.ToTimeSpan(this) > ticks)
         return 1;
 
       return 0;
@@ -287,7 +285,7 @@ namespace System
     /// <returns>A new object whose value is the absolute value of the current <see cref="TimeSpan"/> object.</returns>
     public TimeSpan Duration()
     {
-       return  new TimeSpan(_ticks >= 0 ? _ticks : -_ticks);
+       return  new TimeSpan(CanFly.Runtime.ToTimeSpan(this) >= 0 ? CanFly.Runtime.ToTimeSpan(this) : -CanFly.Runtime.ToTimeSpan(this));
     }
 
     /// <summary>
@@ -317,7 +315,7 @@ namespace System
     /// <returns>A new object with the same numeric value as this instance, but with the opposite sign.</returns>
     public TimeSpan Negate()
     {
-      return new TimeSpan(-_ticks);
+      return new TimeSpan(-CanFly.Runtime.ToTimeSpan(this));
     }
 
     /// <summary>
@@ -327,7 +325,7 @@ namespace System
     /// <returns>A new time interval whose value is the result of the value of this instance minus the value of ts.</returns>
     public TimeSpan Subtract(TimeSpan ts)
     {
-      return new TimeSpan(_ticks - ts._ticks);
+      return new TimeSpan(CanFly.Runtime.ToTimeSpan(this) - CanFly.Runtime.ToTimeSpan(ts));
     }
 
     /// <summary>
@@ -397,7 +395,7 @@ namespace System
     /// <remarks>The returned string is formatted with the "c" format specifier and has the following format: [-][d.]hh:mm:ss[.fffffff]</remarks>
     public override String ToString()
     {
-      if (_ticks < 0)
+      if (CanFly.Runtime.ToTimeSpan(this) < 0)
         return string.Format("-{0}.{1}:{2}:{3}.{4:3d}", Days, Hours, Minutes, Seconds, Milliseconds);
 
       return string.Format("{0}.{1}:{2}:{3}.{4:3d}", Days, Hours, Minutes, Seconds, Milliseconds);
@@ -410,7 +408,7 @@ namespace System
     /// <returns>An object that has the same numeric value as this instance, but the opposite sign.</returns>
     public static TimeSpan operator -(TimeSpan t)
     {
-      return new TimeSpan(-t._ticks);
+      return new TimeSpan(-CanFly.Runtime.ToTimeSpan(t));
     }
 
     /// <summary>
@@ -421,7 +419,7 @@ namespace System
     /// <returns>An object whose value is the result of the value of t1 minus the value of t2.</returns>
     public static TimeSpan operator -(TimeSpan t1, TimeSpan t2)
     {
-      return new TimeSpan(t1._ticks - t2._ticks);
+      return new TimeSpan(CanFly.Runtime.ToTimeSpan(t1) - CanFly.Runtime.ToTimeSpan(t2));
     }
 
     /// <summary>
@@ -442,7 +440,7 @@ namespace System
     /// <returns>An object whose value is the sum of the values of t1 and t2.</returns>
     public static TimeSpan operator +(TimeSpan t1, TimeSpan t2)
     {
-      return new TimeSpan(t1._ticks + t2._ticks);
+      return new TimeSpan(CanFly.Runtime.ToTimeSpan(t1) + CanFly.Runtime.ToTimeSpan(t2));
     }
 
     /// <summary>
@@ -453,7 +451,7 @@ namespace System
     /// <returns>true if the values of t1 and t2 are equal; otherwise, false.</returns>
     public static bool operator ==(TimeSpan t1, TimeSpan t2)
     {
-      return t1._ticks == t2._ticks;
+      return CanFly.Runtime.ToTimeSpan(t1) == CanFly.Runtime.ToTimeSpan(t2);
     }
 
     /// <summary>
@@ -464,7 +462,7 @@ namespace System
     /// <returns>true if the values of t1 and t2 are not equal; otherwise, false.</returns>
     public static bool operator !=(TimeSpan t1, TimeSpan t2)
     {
-      return t1._ticks != t2._ticks;
+      return CanFly.Runtime.ToTimeSpan(t1) != CanFly.Runtime.ToTimeSpan(t2);
     }
 
     /// <summary>
@@ -475,7 +473,7 @@ namespace System
     /// <returns>true if the value of t1 is less than the value of t2; otherwise, false.</returns>
     public static bool operator <(TimeSpan t1, TimeSpan t2)
     {
-      return t1._ticks < t2._ticks;
+      return CanFly.Runtime.ToTimeSpan(t1) < CanFly.Runtime.ToTimeSpan(t2);
     }
 
     /// <summary>
@@ -486,7 +484,7 @@ namespace System
     /// <returns>true if the value of t1 is less than or equal to the value of t2; otherwise, false.</returns>
     public static bool operator <=(TimeSpan t1, TimeSpan t2)
     {
-      return t1._ticks <= t2._ticks;
+      return CanFly.Runtime.ToTimeSpan(t1) <= CanFly.Runtime.ToTimeSpan(t2);
     }
 
     /// <summary>
@@ -497,7 +495,7 @@ namespace System
     /// <returns>true if the value of t1 is greater than the value of t2; otherwise, false.</returns>
     public static bool operator >(TimeSpan t1, TimeSpan t2)
     {
-      return t1._ticks > t2._ticks;
+      return CanFly.Runtime.ToTimeSpan(t1) > CanFly.Runtime.ToTimeSpan(t2);
     }
 
     /// <summary>
@@ -508,7 +506,7 @@ namespace System
     /// <returns>true if the value of t1 is greater than or equal to the value of t2; otherwise, false.</returns>
     public static bool operator >=(TimeSpan t1, TimeSpan t2)
     {
-      return t1._ticks >= t2._ticks;
+      return CanFly.Runtime.ToTimeSpan(t1) >= CanFly.Runtime.ToTimeSpan(t2);
     }
 
     /// <summary>
@@ -517,7 +515,7 @@ namespace System
     /// <returns>A 32-bit signed integer hash code.</returns>
     public override int GetHashCode()
     {
-      return (int)_ticks ^ (int)(_ticks >> 32);
+      return (int)CanFly.Runtime.ToTimeSpan(this) ^ (int)(CanFly.Runtime.ToTimeSpan(this) >> 32);
     }
   }
 }

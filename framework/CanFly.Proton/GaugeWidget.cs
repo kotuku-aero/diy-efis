@@ -94,7 +94,7 @@ namespace CanFly.Proton
     private string name;
     private uint name_color;
     private Font name_font;
-    private Point name_pt;
+    private Point name_pt = new Point();
     private bool draw_name;
 
     private uint background_color;
@@ -114,7 +114,7 @@ namespace CanFly.Proton
     private ushort reset_label;
     private ushort label;
 
-    private Point center;
+    private Point center = new Point();
     private int gauge_radii;
 
     private ushort arc_begin;
@@ -126,7 +126,7 @@ namespace CanFly.Proton
 
     private bool draw_value;         // draw the value
     private Font value_font;       // what font to draw a value in
-    private Rect value_rect;
+    private Rect value_rect = new Rect();
 
     private ArrayList steps;
     private ArrayList ticks;
@@ -277,7 +277,7 @@ namespace CanFly.Proton
           // this stops as soon as the first key is not found
           ushort child_key;
 
-          while (TryRegOpenKey(step_key, i.ToString(), out child_key))
+          if (TryRegOpenKey(step_key, i.ToString(), out child_key))
           {
             step_t new_step = new step_t();
 
@@ -288,6 +288,8 @@ namespace CanFly.Proton
 
             steps.Add(new_step);
           }
+          else
+            break;
         }
       }
 
@@ -299,7 +301,7 @@ namespace CanFly.Proton
         for (int i = 0; i < 99; i++)
         {
           ushort child_key;
-          while (TryRegOpenKey(ticks_key, i.ToString(), out child_key))
+          if (TryRegOpenKey(ticks_key, i.ToString(), out child_key))
           {
             // tick-0=650, 650
             // param1 . tick point
@@ -313,6 +315,8 @@ namespace CanFly.Proton
 
             ticks.Add(new_tick);
           }
+          else
+            break;
         }
       }
 
@@ -361,8 +365,8 @@ namespace CanFly.Proton
             {
               values[i] = float_value;
 
-              min_values[i] = Math.Min(min_values[i], values[i]);
-              max_values[i] = Math.Max(max_values[i], values[i]);
+              min_values[i] = (float) Math.Min(min_values[i], values[i]);
+              max_values[i] = (float) Math.Max(max_values[i], values[i]);
 
               InvalidateRect();
             }
@@ -534,8 +538,8 @@ namespace CanFly.Proton
         float min_range = first_step.value;
 
         float value = values[i];
-        value = Math.Max(value, min_range);
-        value = Math.Min(value, min_range + range);
+        value = (float) Math.Max(value, min_range);
+        value = (float) Math.Min(value, min_range + range);
 
         float relative_value = value - min_range;
         int position = (int)(-(relative_value * pixels_per_unit) - 8);

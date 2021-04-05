@@ -18,9 +18,9 @@ RM =rm -rf
 
 OUTPATH=../assemblies
 
-all: $(NAME)
+all: $(OUTPATH)/$(NAME).pe
 
-$(NAME) : $(SRC)
+$(OUTPATH)/$(NAME).pe : $(SRC)
 	$(CSC) $(FLAGS) $(LIBS) $(SRC) -out:$(OUTPATH)/$(NAME).dll
 	$(MDP) -c $(OUTPATH)/$(NAME).dll -p $(OUTPATH)/$(NAME).pe
 

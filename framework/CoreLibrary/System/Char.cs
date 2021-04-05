@@ -12,9 +12,6 @@ namespace System
     [Serializable]
     public struct Char
     {
-        // this field is required in the native end
-        private char _value;
-
         /// <summary>
         /// Represents the largest possible value of a Char. This field is constant.
         /// </summary>
@@ -30,7 +27,7 @@ namespace System
         /// <returns>The string representation of the value of this instance.</returns>
         public override String ToString()
         {
-            return new String(_value, 1);
+            return new String(CanFly.Runtime.ToChar(this), 1);
         }
 
         /// <summary>
@@ -39,12 +36,13 @@ namespace System
         /// <returns>The lower case character.</returns>
         public char ToLower()
         {
-            if ('A' <= _value && _value <= 'Z')
-            {
-                return (char)(_value - ('A' - 'a'));
-            }
+          char value = CanFly.Runtime.ToChar(this);
+          if ('A' <= value && value <= 'Z')
+          {
+            return (char)(value - ('A' - 'a'));
+          }
 
-            return _value;
+          return value;
         }
 
         /// <summary>
@@ -53,12 +51,13 @@ namespace System
         /// <returns>The upper case character.</returns>
         public char ToUpper()
         {
-            if ('a' <= _value && _value <= 'z')
-            {
-                return (char)(_value + ('A' - 'a'));
-            }
+          char value = CanFly.Runtime.ToChar(this);
+          if ('a' <= value && value <= 'z')
+          {
+            return (char)(value + ('A' - 'a'));
+          }
 
-            return _value;
+          return value;
         }
     }
 }

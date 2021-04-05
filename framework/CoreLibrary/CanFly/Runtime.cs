@@ -175,6 +175,54 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern int Max(int val1, int val2);
     [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern double Abs(double val);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern double Min(double val1, double val2);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern double Max(double val1, double val2);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern double Acos(double value);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern double Asin(double value);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern double Atan(double value);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern double Atan2(double x, double y);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern double Ceiling(double value);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern double Cos(double value);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern double Cosh(double value);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern double Floor(double value);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern double IEEERemainder(double x, double y);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern double Exp(double value);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern double Log(double value);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern double Log10(double value);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern double Pow(double x, double y);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern double Round(double d);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int Sign(double d);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern double Sin(double d);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern double Sinh(double d);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern double Sqrt(double d);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern double Tan(double d);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern double Tanh(double d);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern double Truncate(double d);
+    [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern bool Equals(MulticastDelegate d1, MulticastDelegate d2);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern bool NotEquals(MulticastDelegate d1, MulticastDelegate d2);
@@ -240,5 +288,61 @@ namespace CanFly
     internal static extern Object GetWeakReferenceTarget(WeakReference obj);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void SetWeakReferenceTarget(WeakReference obj, Object target);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern bool ToBoolean(Boolean obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void SetBoolean(bool value, ref Boolean obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern sbyte ToInt8(SByte obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void SetInt8(sbyte value, ref SByte obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern byte ToUInt8(Byte obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void SetUInt8(byte value, ref Byte obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern short ToInt16(Int16 obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void SetInt16(short value, ref Int16 obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern ushort ToUInt16(UInt16 obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void SetUInt16(ushort value, ref UInt16 obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int ToInt32(Int32 obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void SetInt32(int value, ref Int32 obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern uint ToUInt32(UInt32 obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void SetUInt32(uint value, ref UInt32 obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern long ToInt64(Int64 obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void SetInt64(long value, ref Int64 obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern ulong ToUInt64(UInt64 obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void SetUInt64(ulong value, ref UInt64 obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern float ToFloat(Single obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void SetFloat(float value, ref Single obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern double ToDouble(Double obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void SetDouble(double value, ref Double obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern char ToChar(Char obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void SetChar(char value, ref Char obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern ulong ToDateTime(DateTime obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void SetDateTime(ulong value, ref DateTime obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern long ToTimeSpan(TimeSpan obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void SetTimeSpan(long value, ref TimeSpan obj);
   }
 }

@@ -242,7 +242,7 @@ namespace System.Text
       if (capacity > maxCapacity) throw new ArgumentOutOfRangeException("capacity");
       if (maxCapacity < 1) throw new ArgumentOutOfRangeException("maxCapacity");
       if (capacity < 0) throw new ArgumentOutOfRangeException("capacity");
-      if (capacity == 0) capacity = MathInternal.Min(0x10, maxCapacity);
+      if (capacity == 0) capacity = Math.Min(0x10, maxCapacity);
       _maxCapacity = maxCapacity;
       _chunkChars = new char[capacity];
     }
@@ -787,8 +787,8 @@ namespace System.Text
 
       if (num3 >= 0)
       {
-        int index = MathInternal.Max(num4, 0);
-        int num6 = MathInternal.Min(chunkPrevious._chunkLength, num3);
+        int index = Math.Max(num4, 0);
+        int num6 = Math.Min(chunkPrevious._chunkLength, num3);
 
         while (index < num6)
         {
@@ -1034,7 +1034,7 @@ namespace System.Text
       while (true)
       {
         //int num = chunk.m_ChunkLength - indexInChunk;
-        int length = MathInternal.Min(chunk._chunkLength - indexInChunk, count);
+        int length = Math.Min(chunk._chunkLength - indexInChunk, count);
         //ThreadSafeCopy(value, ref valueIndex, chunk.m_ChunkChars, ref indexInChunk, num2);
         Array.Copy(value, valueIndex, chunk._chunkChars, indexInChunk, length);
         indexInChunk += length;
@@ -1073,9 +1073,9 @@ namespace System.Text
       }
       else
       {
-        StringBuilder builder = new StringBuilder(MathInternal.Max(count, 0x10), chunk._maxCapacity, chunk._chunkPrevious);
+        StringBuilder builder = new StringBuilder(Math.Max(count, 0x10), chunk._maxCapacity, chunk._chunkPrevious);
         builder._chunkLength = count;
-        int length = MathInternal.Min(count, indexInChunk);
+        int length = Math.Min(count, indexInChunk);
         if (length > 0)
         {
           Array.Copy(chunk._chunkChars, 0, builder._chunkChars, 0, length);
@@ -1118,7 +1118,7 @@ namespace System.Text
       if (minBlockCharCount + Length > _maxCapacity)
         throw new ArgumentOutOfRangeException("requiredLength");
 
-      int num = MathInternal.Max(minBlockCharCount, MathInternal.Min(Length, 0x1f40));
+      int num = Math.Max(minBlockCharCount, Math.Min(Length, 0x1f40));
       _chunkPrevious = new StringBuilder(this);
       _chunkOffset += _chunkLength;
       _chunkLength = 0;

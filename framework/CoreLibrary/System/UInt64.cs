@@ -14,8 +14,6 @@ namespace System
   [Serializable, CLSCompliant(false)]
   public struct UInt64
   {
-    private ulong _value;
-
     /// <summary>
     /// Represents the largest possible value of UInt64. This field is constant.
     /// </summary>
@@ -33,7 +31,7 @@ namespace System
     /// <returns>The string representation of the value of this instance, consisting of a sequence of digits ranging from 0 to 9, without a sign or leading zeroes.</returns>
     public override String ToString()
     {
-      return Number.Format(_value, true, "G");
+      return Number.Format(CanFly.Runtime.ToUInt64(this), true, "G");
     }
 
     /// <summary>
@@ -43,7 +41,7 @@ namespace System
     /// <returns>The string representation of the value of this instance as specified by format.</returns>
     public String ToString(String format)
     {
-      return Number.Format(_value, true, format);
+      return Number.Format(CanFly.Runtime.ToUInt64(this), true, format);
     }
 
     /// <summary>
