@@ -75,12 +75,9 @@ namespace CanFly.Tools.MetadataProcessor
 
                 // the document has a path, need to store the string table for tha path
                 string fileName = System.IO.Path.GetFileName(document.Url);
-                string path = System.IO.Path.GetDirectoryName(document.Url);
-
-                // TODO: make relative???
 
                 source.FilenameId = _context.StringTable.GetOrCreateStringId(fileName, false);
-                source.PathId = _context.StringTable.GetOrCreateStringId(path, false);
+                source.PathId = _context.StringTable.GetOrCreateStringId(document.Url, false);
               }
             }
           }
