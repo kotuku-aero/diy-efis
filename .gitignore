@@ -36,3 +36,5 @@
 *.ods#
 /packages
 /framework/emulator/fs/*.app
+/tools/vscode/out
+/tools/vscode/node_modules
