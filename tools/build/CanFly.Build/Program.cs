@@ -58,7 +58,7 @@ namespace CanFly
           new Dictionary<string, string>(StringComparer.Ordinal);
 
       private AssemblyDefinition _assemblyDefinition;
-      private nanoAssemblyBuilder _assemblyBuilder;
+      private AssemblyBuilder _assemblyBuilder;
 
       private List<string> _classNamesToExclude = new List<string>();
 
@@ -83,7 +83,11 @@ namespace CanFly
             System.Console.WriteLine("Parsing assembly...");
 
           _assemblyDefinition = AssemblyDefinition.ReadAssembly(fileName,
-              new ReaderParameters { AssemblyResolver = new LoadHintsAssemblyResolver(_loadHints) });
+              new ReaderParameters 
+              {
+                AssemblyResolver = new LoadHintsAssemblyResolver(_loadHints) ,
+                ReadSymbols = true
+              });
         }
         catch (Exception)
         {
@@ -102,7 +106,7 @@ namespace CanFly
           if (Verbose)
             System.Console.WriteLine("Compiling assembly...");
 
-          _assemblyBuilder = new nanoAssemblyBuilder(_assemblyDefinition, _classNamesToExclude, VerboseMinimize, isCoreLibrary);
+          _assemblyBuilder = new AssemblyBuilder(_assemblyDefinition, _classNamesToExclude, VerboseMinimize, isCoreLibrary);
 
           using (FileStream stream = File.Open(Path.ChangeExtension(fileName, "tmp"), FileMode.Create, FileAccess.ReadWrite))
           {
@@ -112,10 +116,11 @@ namespace CanFly
             }
           }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
           System.Console.Error.WriteLine(
               $"Unable to compile output assembly file '{fileName}' - check parse command results.");
+          System.Console.WriteLine($"Error is '{ex.Message}'");
           throw;
         }
 

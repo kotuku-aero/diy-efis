@@ -166,24 +166,6 @@ namespace CanFly.Tools.MetadataProcessor
 
       ResourceFileTable = new ResourceFileTable(this);
 
-      // build list of generic parameters belonging to method defs
-      List<GenericParameter> methodDefsGenericParameters = new List<GenericParameter>();
-
-      foreach (var m in methods)
-      {
-        if (m.HasGenericParameters)
-        {
-          methodDefsGenericParameters.AddRange(m.GenericParameters);
-        }
-      }
-
-      List<GenericParameter> generics = types
-                      .SelectMany(t => t.GenericParameters)
-                      .Concat(methodDefsGenericParameters)
-                      .ToList();
-
-      GenericParamsTable = new GenericParamTable(generics, this);
-
       // Pre-allocate strings from some tables
       AssemblyReferenceTable.AllocateStrings();
       TypeReferencesTable.AllocateStrings();
@@ -203,6 +185,8 @@ namespace CanFly.Tools.MetadataProcessor
           SignaturesTable.GetOrCreateSignatureId(methodReference);
         }
       }
+
+      DebugInformationTable = new DebugInformationTable(assemblyDefinition.Modules, this);
     }
 
     /// <summary>
@@ -234,8 +218,6 @@ namespace CanFly.Tools.MetadataProcessor
 
     public FieldReferenceTable FieldReferencesTable { get; private set; }
 
-    public GenericParamTable GenericParamsTable { get; private set; }
-
     public MethodReferenceTable MethodReferencesTable { get; private set; }
 
     public FieldDefinitionTable FieldsTable { get; private set; }
@@ -259,6 +241,8 @@ namespace CanFly.Tools.MetadataProcessor
     public ByteCodeTable ByteCodeTable { get; private set; }
 
     public ResourceFileTable ResourceFileTable { get; private set; }
+
+    public DebugInformationTable DebugInformationTable { get; private set; }
 
     public static List<string> ClassNamesToExclude { get; private set; }
     public bool MinimizeComplete { get; internal set; } = false;

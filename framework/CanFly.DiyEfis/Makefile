@@ -1,8 +1,8 @@
-NAME=Canfly.DiyEfis
+NAME=CanFly.DiyEfis
 
 CSC=csc.exe
 MDP=../assemblies/CanFly.Build.exe
-FLAGS=-langversion:1 -nostdlib -target:exe
+FLAGS=-langversion:1 -nostdlib -target:exe -debug:full
 MDPFLAGS=-d $(NAME).pdb
 
 SRC= \

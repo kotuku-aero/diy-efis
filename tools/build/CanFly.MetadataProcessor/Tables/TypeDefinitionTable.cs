@@ -116,7 +116,7 @@ namespace CanFly.Tools.MetadataProcessor
           {
             foreach (MethodDefinition method in item.Methods)
             {
-              var offsets = CodeWriter
+              List<Tuple<uint, uint>> offsets = CodeWriter
                   .PreProcessMethod(method, _context.ByteCodeTable.FakeStringTable)
                   .ToList();
 
@@ -127,7 +127,7 @@ namespace CanFly.Tools.MetadataProcessor
           {
             foreach (MethodDefinition method in nestedType.Methods)
             {
-              var offsets = CodeWriter
+              List<Tuple<uint, uint>> offsets = CodeWriter
                   .PreProcessMethod(method, _context.ByteCodeTable.FakeStringTable)
                   .ToList();
 

@@ -2,18 +2,33 @@
 	"name": "canfly",
 	"displayName": "canfly",
 	"description": "CanFly application development tools",
+  "publisher": "kotuku",
 	"version": "0.0.1",
 	"engines": {
-		"vscode": "^1.46.0"
+		"vscode": "^1.46.0",
+		"vscode-nls": "^5.0.0"
+	},
+  "author": {
+    "name" : "Kotuku Aerospace Limited"
+  },
+	"license": "MIT",
+  "repository": {
+		"type": "git",
+		"url": "https://github.com/kotuku-aero/diy-efis"
 	},
 	"categories": [
 		"Debuggers",
 		"Programming Languages"
 	],
 	"activationEvents": [
-		"onCommand:canfly.configureEmulator"
+		"onCommand:extension.canfly.configureEmulator",
+		"onCommand:extension.canfly.startSession"
 	],
 	"main": "./out/extension.js",
+	"dependencies": {
+		"vscode-debugprotocol": "^1.42.0",
+		"vscode-nls": "^5.0.0"
+	},
 	"contributes": {
 		"commands": [
 			{
@@ -27,6 +42,17 @@
 			{
 				"command": "canfly.connectCanFly",
 				"title": "Connect the emulator to a serial adapter"
+			}
+		],
+		"breakpoints": [
+			{
+				"language": "csharp"
+			}
+		],
+		"debuggers": [
+			{
+				"type": "canfly",
+				"program": "./framework/emulator/msh.exe"
 			}
 		],
 		"configuration": [
@@ -68,10 +94,10 @@
 						"default": "$HOME/.diy-efis.cdb",
 						"description": "Path to the configuration database"
 					},
-					"canfly.serial-port": {
+					"canfly.port": {
 						"type": "string",
-						"default": "",
-						"description": "Serial port to connect when the emulator starts"
+						"default": "4711",
+						"description": "TCP port to connect to"
 					}
 				}
 			}
@@ -95,7 +121,9 @@
 		"@typescript-eslint/parser": "^4.14.1",
 		"glob": "^7.1.6",
 		"mocha": "^8.2.1",
+		"vsce": "^1.81.1",
 		"typescript": "^4.1.3",
+		"vscode-nls-dev": "^3.3.2",
 		"vscode-test": "^1.5.0"
 	}
 }
