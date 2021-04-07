@@ -116,7 +116,8 @@ namespace CanFly.Tools.MetadataProcessor
     protected ushort GetOrCreateStringId(
         string value)
     {
-      return _context.StringTable.GetOrCreateStringId(value);
+      ushort id  = _context.StringTable.GetOrCreateStringId(value);
+      return id;
     }
 
     /// <summary>

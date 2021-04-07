@@ -116,14 +116,13 @@
     <Compile Include="Tables\TypeSpecificationsTable.cs" />
     <Compile Include="Utility\Crc32.cs" />
     <Compile Include="Utility\LoadHintsAssemblyResolver.cs" />
-    <Compile Include="Utility\nanoBitmapProcessor.cs" />
-    <Compile Include="Utility\nanoCLR_DataType.cs" />
-    <Compile Include="Utility\nanoDependencyGeneratorWriter.cs" />
-    <Compile Include="Utility\nanoFontProcessor.cs" />
-    <Compile Include="Utility\nanoPdbxFileWriter.cs" />
-    <Compile Include="Utility\nanoSerializationType.cs" />
-    <Compile Include="Utility\nanoStringsConstants.cs" />
-    <Compile Include="Utility\nanoTypeDefinitionFlags.cs" />
+    <Compile Include="Utility\BitmapProcessor.cs" />
+    <Compile Include="Utility\CLR_DataType.cs" />
+    <Compile Include="Utility\DependencyGeneratorWriter.cs" />
+    <Compile Include="Utility\FontProcessor.cs" />
+    <Compile Include="Utility\SerializationType.cs" />
+    <Compile Include="Utility\StringsConstants.cs" />
+    <Compile Include="Utility\TypeDefinitionFlags.cs" />
     <Compile Include="Utility\NativeMethodsCrc.cs" />
   </ItemGroup>
   <ItemGroup>

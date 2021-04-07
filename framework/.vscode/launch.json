@@ -6,7 +6,7 @@
     "configurations": [
       {
         "name": "Attach Application",
-        "request": "attach",
+        "request": "launch",
          "debugServer": 4711,
          "type": "canfly" 
       }

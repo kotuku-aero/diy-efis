@@ -143,11 +143,6 @@ namespace CanFly
             {
               _assemblyBuilder.Write(GetBinaryWriter(writer));
             }
-
-            using (var writer = XmlWriter.Create(Path.ChangeExtension(fileName, "pdbx")))
-            {
-              _assemblyBuilder.Write(writer);
-            }
           }
 
           if (DumpMetadata)

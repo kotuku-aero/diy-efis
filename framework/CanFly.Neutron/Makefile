@@ -2,7 +2,7 @@ NAME=CanFly.Neutron
 
 CSC=csc.exe
 MDP=../assemblies/CanFly.Build.exe
-FLAGS=-langversion:1 -nostdlib -target:library
+FLAGS=-langversion:1 -nostdlib -target:library -debug:full
 MDPFLAGS=-d $(NAME).pdb
 
 SRC= \

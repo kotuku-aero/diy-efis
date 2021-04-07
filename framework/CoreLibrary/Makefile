@@ -4,7 +4,7 @@ OUTPATH=../assemblies
 
 CSC=csc.exe
 MDP=../assemblies/CanFly.Build.exe
-FLAGS=-noconfig -target:library @coreAssembly.rsp
+FLAGS=-noconfig -target:library  -debug:full @coreAssembly.rsp
 MDPFLAGS=-d $(OUTPATH)/$(NAME).pdb
 
 SRC= \

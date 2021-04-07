@@ -194,13 +194,22 @@ namespace CanFly.Tools.MetadataProcessor
 
         foreach(Tuple<StatementDefinition, SequencePoint> tuple in doc.Value)
         {
-          ushort itemId = 0x7fff;
+          ushort itemId = 0x3fff;
+
+          // 0x00 = field_def
+          // 0x01 = method_def
+          // 0x02 = field_ref
+          // 0x03 = method_ref
+
           if (tuple.Item1.Method != null)
+          {
             _context.MethodDefinitionTable.TryGetMethodReferenceId(tuple.Item1.Method, out itemId);
-          else if(tuple.Item1.Field != null)
+            itemId |= 0x4000;
+          }
+          else if (tuple.Item1.Field != null)
           {
             _context.FieldsTable.TryGetFieldReferenceId(tuple.Item1.Field, false, out itemId);
-            itemId |= 0x8000;
+            itemId |= 0x0000;
           }
           writer.WriteUInt16(itemId);
 

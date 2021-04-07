@@ -63,7 +63,7 @@ namespace CanFly.Tools.MetadataProcessor
     }
 
     /// <summary>
-    /// Writes all .NET nanoFramework metadata into output stream.
+    /// Writes all .NET metadata into output stream.
     /// </summary>
     /// <param name="binaryWriter">Binary writer with correct endianness.</param>
     public void Write(CLRBinaryWriter binaryWriter)
@@ -77,7 +77,8 @@ namespace CanFly.Tools.MetadataProcessor
         table.Write(binaryWriter);
 
         long padding = (4 - ((binaryWriter.BaseStream.Position - tableBegin) % 4)) % 4;
-        binaryWriter.WriteBytes(new byte[padding]);
+        if(padding > 0)
+          binaryWriter.WriteBytes(new byte[padding]);
 
         header.UpdateTableOffset(binaryWriter, tableBegin, padding);
       }
@@ -979,12 +980,6 @@ namespace CanFly.Tools.MetadataProcessor
       }
 
       return output.ToString();
-    }
-
-    public void Write(XmlWriter xmlWriter)
-    {
-      var pdbxWriter = new nanoPdbxFileWriter(_tablesContext);
-      pdbxWriter.Write(xmlWriter);
     }
 
     private static IEnumerable<IAssemblyTable> GetTables(
