@@ -27,7 +27,7 @@ namespace CanFly.Tools.MetadataProcessor
       public MethodDefinition Method { get; set; }
       public FieldDefinition Field { get; set; }
       public ushort StatementStart { get; set; }
-      public ushort StatementEnd { get; set; }
+      public ushort NextStatement { get; set; }
     }
 
     private Dictionary<Source, List<Tuple<StatementDefinition, SequencePoint>>> _sources;
@@ -85,6 +85,19 @@ namespace CanFly.Tools.MetadataProcessor
       }
     }
 
+    private uint CalculateOffset(uint offset, List<Tuple<uint, uint>> offsetsTable)
+    {
+      foreach (Tuple<uint, uint> relocationAddr in offsetsTable)
+      {
+        if (relocationAddr.Item1 > offset)
+          break;
+
+        offset -= relocationAddr.Item2;
+      }
+
+      return offset;
+    }
+
     public void Write(CLRBinaryWriter writer)
     {
       if (!_context.MinimizeComplete)
@@ -121,32 +134,12 @@ namespace CanFly.Tools.MetadataProcessor
               StatementDefinition statement = new StatementDefinition();
               statement.Method = method;
 
-              // TODO: I think the relocations are cumulative so there needs
-              // to be an adjustment counter.
-
               // instruction start
               // find the mapping
-              statement.StatementStart = (ushort)instruction.Offset;
-
-              foreach (Tuple<uint, uint> relocationAddr in offsetsTable)
-              {
-                if (relocationAddr.Item1 > (uint)instruction.Offset)
-                  break;
-
-                statement.StatementStart -= (ushort)relocationAddr.Item2;
-              }
+              statement.StatementStart = (ushort) CalculateOffset((uint) instruction.Offset, offsetsTable);
 
               if (instruction.Next != null)
-              {
-                statement.StatementEnd = (ushort) instruction.Next.Offset;
-                foreach (Tuple<uint, uint> relocationAddr in offsetsTable)
-                {
-                  if (relocationAddr.Item1 > (uint)instruction.Next.Offset)
-                    break;
-
-                  statement.StatementEnd -= (ushort)relocationAddr.Item2;
-                }
-              }
+                statement.NextStatement = (ushort) CalculateOffset((uint) instruction.Next.Offset, offsetsTable);
 
               List<Tuple<StatementDefinition, SequencePoint>> pts = _sources[new Source(seqPt.Value.Document)];
 
@@ -168,13 +161,13 @@ namespace CanFly.Tools.MetadataProcessor
     } CLR_RECORD_SOURCE;
 
   typedef struct _CLR_RECORD_SYMBOL {
-    uint16_t symbolType;              // either a fieldDef if 0x8000 otherwise a methodDef
+    uint16_t symbolType;              // either a fieldDef if 0x4000 otherwise a methodDef
     uint16_t sourceLine;              // start line of the symbol
     uint16_t sourceColumn;            // start column of symbol
     uint16_t endLine;                 // end line of symbol
     uint16_t endColumn;               // end column of symbol
     uint16_t statementStart;          // if a methodDef then start IP of statement
-    uint16_t statementEnd;            // end of statement
+    uint16_t nextStatement;           // ip of next statement
     } CLR_RECORD_SYMBOL;
        */
       foreach(KeyValuePair<Source, List<Tuple<StatementDefinition, SequencePoint>>> doc in _sources)
@@ -216,7 +209,7 @@ namespace CanFly.Tools.MetadataProcessor
           writer.WriteUInt16((ushort)seqPt.EndLine);
           writer.WriteUInt16((ushort)seqPt.EndColumn);
           writer.WriteUInt16(tuple.Item1.StatementStart);
-          writer.WriteUInt16(tuple.Item1.StatementEnd);
+          writer.WriteUInt16(tuple.Item1.NextStatement);
         }
       }
     }
