@@ -2,6 +2,7 @@
 using Mono.Cecil.Cil;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace CanFly.Tools.MetadataProcessor
@@ -27,7 +28,6 @@ namespace CanFly.Tools.MetadataProcessor
       public MethodDefinition Method { get; set; }
       public FieldDefinition Field { get; set; }
       public ushort StatementStart { get; set; }
-      public ushort NextStatement { get; set; }
     }
 
     private Dictionary<Source, List<Tuple<StatementDefinition, SequencePoint>>> _sources;
@@ -85,18 +85,18 @@ namespace CanFly.Tools.MetadataProcessor
       }
     }
 
-    private uint CalculateOffset(uint offset, List<Tuple<uint, uint>> offsetsTable)
-    {
-      foreach (Tuple<uint, uint> relocationAddr in offsetsTable)
-      {
-        if (relocationAddr.Item1 > offset)
-          break;
+    //private uint CalculateOffset(uint offset, List<Tuple<uint, uint>> offsetsTable)
+    //{
+    //  foreach (Tuple<uint, uint> relocationAddr in offsetsTable)
+    //  {
+    //    if (relocationAddr.Item1 > offset)
+    //      break;
 
-        offset -= relocationAddr.Item2;
-      }
+    //    offset -= relocationAddr.Item2;
+    //  }
 
-      return offset;
-    }
+    //  return offset;
+    //}
 
     public void Write(CLRBinaryWriter writer)
     {
@@ -111,21 +111,27 @@ namespace CanFly.Tools.MetadataProcessor
         {
           foreach (MethodDefinition method in type.Methods)
           {
+            //Trace.TraceInformation("Process offsets for {0}::{1}", method.DeclaringType.FullName, method.Name);
             // get the offsets table.
-            List<Tuple<uint, uint>> offsetsTable = new List<Tuple<uint, uint>>();
+            //List<Tuple<uint, uint>> offsetsTable = new List<Tuple<uint, uint>>();
 
-            // adjust the table to match its use
-            uint cumulative = 0;
-            foreach(Tuple<uint, uint> tuple in _context.TypeDefinitionTable.GetByteCodeOffsets(method.MetadataToken.ToUInt32()))
-            {
-              uint diff = tuple.Item1 - tuple.Item2 - cumulative;
-              uint index = tuple.Item1;
+            //Trace.TraceInformation(" Relocation Table:");
 
-              cumulative += diff;
-              offsetsTable.Add(new Tuple<uint, uint>(index, diff));
-            }
+            //// adjust the table to match its use
+            //uint cumulative = 0;
+            //foreach(Tuple<uint, uint> tuple in _context.TypeDefinitionTable.GetByteCodeOffsets(method.MetadataToken.ToUInt32()))
+            //{
+            //  uint diff = tuple.Item1 - tuple.Item2 - cumulative;
+            //  uint index = tuple.Item1;
+            //  cumulative += diff;
+            //  offsetsTable.Add(new Tuple<uint, uint>(index, diff));
+
+            //  Trace.TraceInformation("  Cecil: {0} -> {1}  CanFly {2}", tuple.Item1, tuple.Item2, diff);
+            //}
 
             IDictionary<Instruction, SequencePoint> mapping = method.DebugInformation.GetSequencePointMapping();
+
+            //Trace.TraceInformation(" Method definition:");
 
             foreach (KeyValuePair<Instruction, SequencePoint> seqPt in mapping)
             {
@@ -136,10 +142,10 @@ namespace CanFly.Tools.MetadataProcessor
 
               // instruction start
               // find the mapping
-              statement.StatementStart = (ushort) CalculateOffset((uint) instruction.Offset, offsetsTable);
+              //statement.StatementStart = (ushort) CalculateOffset((uint) instruction.Offset, offsetsTable);
+              statement.StatementStart = (ushort)instruction.Offset;
 
-              if (instruction.Next != null)
-                statement.NextStatement = (ushort) CalculateOffset((uint) instruction.Next.Offset, offsetsTable);
+              //Trace.TraceInformation("  Emit Line {0}, Offset {1}, Relocated to, {2}", seqPt.Value.StartLine, instruction.Offset, statement.StatementStart);
 
               List<Tuple<StatementDefinition, SequencePoint>> pts = _sources[new Source(seqPt.Value.Document)];
 
@@ -167,7 +173,6 @@ namespace CanFly.Tools.MetadataProcessor
     uint16_t endLine;                 // end line of symbol
     uint16_t endColumn;               // end column of symbol
     uint16_t statementStart;          // if a methodDef then start IP of statement
-    uint16_t nextStatement;           // ip of next statement
     } CLR_RECORD_SYMBOL;
        */
       foreach(KeyValuePair<Source, List<Tuple<StatementDefinition, SequencePoint>>> doc in _sources)
@@ -209,7 +214,6 @@ namespace CanFly.Tools.MetadataProcessor
           writer.WriteUInt16((ushort)seqPt.EndLine);
           writer.WriteUInt16((ushort)seqPt.EndColumn);
           writer.WriteUInt16(tuple.Item1.StatementStart);
-          writer.WriteUInt16(tuple.Item1.NextStatement);
         }
       }
     }
