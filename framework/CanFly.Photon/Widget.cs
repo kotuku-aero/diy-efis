@@ -184,10 +184,8 @@ namespace CanFly
       return null;
     }
 
-    private void OnMessage(ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7)
+    private void OnMessage(CanFlyMsg msg)
     {
-      CanFlyMsg msg = new CanFlyMsg(flags, b0, b1, b2, b3, b4, b5, b6, b7);
-
       // find the handler for the message (if any)
       EventInfo handler = FindEvent(msg.CanID);
       if (handler != null)
@@ -240,17 +238,17 @@ namespace CanFly
 
     public void SendMessage(CanFlyMsg msg)
     {
-      Syscall.SendMessage(InternalHandle, msg.Flags, msg.Data0, msg.Data1, msg.Data2, msg.Data3, msg.Data4, msg.Data5, msg.Data6, msg.Data7);
+      Syscall.SendMessage(InternalHandle, msg);
     }
 
     public void PostMessage(CanFlyMsg msg, uint maxWait)
     {
-      Syscall.PostMessage(InternalHandle, maxWait, msg.Flags, msg.Data0, msg.Data1, msg.Data2, msg.Data3, msg.Data4, msg.Data5, msg.Data6, msg.Data7);
+      Syscall.PostMessage(InternalHandle, maxWait, msg);
     }
 
     public void PostMessage(CanFlyMsg msg)
     {
-      Syscall.PostMessage(InternalHandle, 0, msg.Flags, msg.Data0, msg.Data1, msg.Data2, msg.Data3, msg.Data4, msg.Data5, msg.Data6, msg.Data7);
+      Syscall.PostMessage(InternalHandle, 0, msg);
     }
 
     private Widget GetWidget(uint handle)

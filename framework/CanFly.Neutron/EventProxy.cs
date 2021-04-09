@@ -60,10 +60,9 @@ namespace CanFly
       Syscall.AddEvent(canId, OnMessage);
     }
 
-    private void OnMessage(ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7)
+    private void OnMessage(CanFlyMsg msg)
     {
-      CanFlyMsg msg = new CanFlyMsg(flags, b0, b1, b2, b3, b4, b5, b6, b7);
-      _callback(msg);
+       _callback(msg);
     }
 
     public void Dispose()

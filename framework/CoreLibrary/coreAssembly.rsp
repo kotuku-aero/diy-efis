@@ -2,4 +2,4 @@
 -RuntimeMetadataVersion:v4.0.30319
 -langversion:1
 -nostdlib
--nowarn:0659;3001;0661;3019;3002
+-nowarn:0659;3001;0661;3019;3002;3003;3005

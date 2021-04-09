@@ -134,8 +134,8 @@ namespace CanFly.Proton
     private float scale;
     private float offset;
 
-    public GaugeWidget(Widget parent, Rect bounds, ushort id, ushort key)
-  : base(parent, bounds, id)
+  public GaugeWidget(Widget parent, Rect bounds, ushort id, ushort key)
+    : base(parent, bounds, id)
     {
       Rect rect_wnd = WindowRect;
 

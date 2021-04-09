@@ -6,9 +6,8 @@ FLAGS=-langversion:1 -nostdlib -target:library -debug:full
 MDPFLAGS=-d $(NAME).pdb
 
 SRC= \
-	CanFlyMsg.cs \
 	DirectoryEnumerator.cs \
-	EventPRoxy.cs \
+	EventProxy.cs \
 	Stream.cs \
 	Thread.cs \
 	Properties/AssemblyInfo.cs

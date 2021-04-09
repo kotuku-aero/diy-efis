@@ -657,14 +657,14 @@ namespace CanFly.Proton
           if (type == "NODATA" ||
               !TryRegGetString(key, "can-value", out value))
           {
-            result = new CanFlyMsg(id, CanFlyDataType.NoData, 0);
+            result = new CanFlyMsg(id);
           }
           else
           {
             switch (type)
             {
               case "ERROR":
-                result = new CanFlyMsg(id, CanFlyDataType.Error, Convert.ToUInt32(value));
+                result = CanFlyMsg.CreateErrorMessage(id, Convert.ToUInt32(value));
                 break;
               case "FLOAT":
                 result = new CanFlyMsg(id, (float)Convert.ToDouble(value));
@@ -684,44 +684,47 @@ namespace CanFly.Proton
               case "CHAR":
                 result = new CanFlyMsg(id, value[0]);
                 break;
-              case "UCHAR":
+              case "SBYTE" :
+                result = new CanFlyMsg(id, (sbyte)DecodeHex(value));
+                break;
+              case "BYTE":
                 result = new CanFlyMsg(id, (byte)DecodeHex(value));
                 break;
-              case "CHAR2":
+              case "SBYTE2":
                 values = value.Split(',');
                 result = new CanFlyMsg(id,
-                  (char)(values.Length > 0 ? DecodeHex(values[0]) : 0),
-                  (char)(values.Length > 1 ? DecodeHex(values[1]) : 0));
+                  (sbyte)(values.Length > 0 ? DecodeHex(values[0]) : 0),
+                  (sbyte)(values.Length > 1 ? DecodeHex(values[1]) : 0));
                 break;
-              case "UCHAR2":
+              case "BYTE2":
                 values = value.Split(',');
                 result = new CanFlyMsg(id,
                   (byte)(values.Length > 0 ? DecodeHex(values[0]) : 0),
                   (byte)(values.Length > 1 ? DecodeHex(values[1]) : 0));
                 break;
-              case "CHAR3":
+              case "SBYTE3":
                 values = value.Split(',');
                 result = new CanFlyMsg(id,
-                  (char)(values.Length > 0 ? DecodeHex(values[0]) : 0),
-                  (char)(values.Length > 1 ? DecodeHex(values[1]) : 0),
-                  (char)(values.Length > 2 ? DecodeHex(values[2]) : 0));
+                  (sbyte)(values.Length > 0 ? DecodeHex(values[0]) : 0),
+                  (sbyte)(values.Length > 1 ? DecodeHex(values[1]) : 0),
+                  (sbyte)(values.Length > 2 ? DecodeHex(values[2]) : 0));
                 break;
-              case "UCHAR3":
+              case "BYTE3":
                 values = value.Split(',');
                 result = new CanFlyMsg(id,
                   (byte)(values.Length > 0 ? DecodeHex(values[0]) : 0),
                   (byte)(values.Length > 1 ? DecodeHex(values[1]) : 0),
                   (byte)(values.Length > 2 ? DecodeHex(values[2]) : 0));
                 break;
-              case "CHAR4":
+              case "SBYTE4":
                 values = value.Split(',');
                 result = new CanFlyMsg(id,
-                  (char)(values.Length > 0 ? DecodeHex(values[0]) : 0),
-                  (char)(values.Length > 1 ? DecodeHex(values[1]) : 0),
-                  (char)(values.Length > 2 ? DecodeHex(values[2]) : 0),
-                  (char)(values.Length > 3 ? DecodeHex(values[3]) : 0));
+                  (sbyte)(values.Length > 0 ? DecodeHex(values[0]) : 0),
+                  (sbyte)(values.Length > 1 ? DecodeHex(values[1]) : 0),
+                  (sbyte)(values.Length > 2 ? DecodeHex(values[2]) : 0),
+                  (sbyte)(values.Length > 3 ? DecodeHex(values[3]) : 0));
                 break;
-              case "UCHAR4":
+              case "BYTE4":
                 values = value.Split(',');
                 result = new CanFlyMsg(id,
                   (byte)(values.Length > 0 ? DecodeHex(values[0]) : 0),
@@ -742,7 +745,7 @@ namespace CanFly.Proton
                   (ushort)(values.Length > 1 ? DecodeHex(values[1]) : 0));
                 break;
               default:
-                result = new CanFlyMsg(id, CanFlyDataType.NoData, 0);
+                result = new CanFlyMsg(id);
                 break;
             }
           }

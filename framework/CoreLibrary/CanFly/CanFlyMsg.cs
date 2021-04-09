@@ -277,522 +277,314 @@ public enum CanFlyDataType
   UChar2 = 19,
   Char3 = 26,
   UChar3 = 27,
-  ReservedBegin = 32,
-  ReservedEnd = 99,
-  UserDefinedBegin = 100,
-  UserDefinedEnd = 255,
 };
 
 public sealed class CanFlyMsg
   {
-    // same coding as CanAerospace
-    // Bits 15:12 - Length
-    // Bit 11 - Reply
-    // bits 10-0 ID
-    private ushort _flags;
-    private byte _b0;
-    private byte _b1;
-    private byte _b2;
-    private byte _b3;
-    private byte _b4;
-    private byte _b5;
-    private byte _b6;
-    private byte _b7;
-
+    private static byte nodeId = 0;
+    /// <summary>
+    /// The global node id for the canfly application
+    /// </summary>
+    /// <value>Node ID</value>
+    public static byte NodeID
+    {
+      get { return nodeId; }
+      set { nodeId = value; }
+    }
     /// <summary>
     /// Flag for a reply message
     /// </summary>
     public bool Reply
     {
-      get { return (_flags & 0x0800) != 0; }
-      set { _flags |= 0x0800; }
+      get { return Syscall.GetReply(this); }
+      set { Syscall.SetReply(this, value); }
     }
-    /// <summary>
-    /// Length of the message
-    /// </summary>
-    public ushort Length
-    {
-      get { return (ushort)((_flags & 0xF000) >> 12); }
-    }
-
-    private void SetLength(ushort value)
-    {
-      _flags = (ushort)((_flags & 0xF000) | ((value & 0x0F) << 12));
-    }
-
     /// <summary>
     /// ID of the CAN message
     /// </summary>
     public ushort CanID
     {
-      get { return (ushort)(_flags & 0x07FF); }
-      set { _flags = (ushort)((_flags & 0xF800) | (value & 0x07FF)); }
-    }
-    internal ushort Flags {  get { return _flags; } }
-    internal byte Data0 { get { return _b0; } }
-    internal byte Data1 { get { return _b1; } }
-    internal byte Data2 { get { return _b2; } }
-    internal byte Data3 { get { return _b3; } }
-    internal byte Data4 { get { return _b4; } }
-    internal byte Data5 { get { return _b5; } }
-    internal byte Data6 { get { return _b6; } }
-    internal byte Data7 { get { return _b7; } }
-    /// <summary>
-    /// Return the message as a boxed value
-    /// </summary>
-    public object Value
-    {
-      get
-      {
-        switch(DataType)
-        {
-          case CanFlyDataType.Char:
-            return GetInt8();
-          case CanFlyDataType.Char2:
-          case CanFlyDataType.Char3:
-          case CanFlyDataType.Char4:
-          case CanFlyDataType.Error:
-            return "Error";
-          case CanFlyDataType.Float:
-            return GetFloat();
-          case CanFlyDataType.Int32:
-            return GetInt32();
-          case CanFlyDataType.NoData:
-            return null;
-          case CanFlyDataType.Short:
-            return GetInt16();
-          case CanFlyDataType.Short2:
-            return GetInt16Array();
-          case CanFlyDataType.UChar:
-            return GetUInt8();
-          case CanFlyDataType.UChar2:
-          case CanFlyDataType.UChar3:
-          case CanFlyDataType.UChar4:
-            return GetUInt8Array();
-          case CanFlyDataType.UInt32:
-            return GetUInt32();
-          case CanFlyDataType.UShort:
-            return GetUInt16();
-          case CanFlyDataType.UShort2:
-            return GetUInt16Array();
-          default:
-            return DataType.ToString();
-        }
-      }
-    }
-
-    /// <summary>
-    /// Create a new message with the requested datatype.  The value is set to default (0 for integers)
-    /// </summary>
-    /// <param name="id">canfly id to assign</param>
-    /// <param name="dataType">implementation datatype</param>
-    public CanFlyMsg(ushort id, CanFlyDataType dataType, uint rawData)
-    {
-      CanID = id;
-      SetLength(8);
-    }
-
-    internal CanFlyMsg(ushort flags, byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7)
-    {
-      _flags = flags;
-      _b0 = b0;
-      _b1 = b1;
-      _b2 = b2;
-      _b3 = b3;
-      _b4 = b4;
-      _b5 = b5;
-      _b6 = b6;
-      _b7 = b7;
+      get { return Syscall.GetCanID(this); }
+      set { Syscall.SetCanID(this, value); }
     }
     /// <summary>
     /// CanFly node id
     /// </summary>
     public byte NodeId 
     { 
-      get { return _b0; } 
-      set { _b0 = value; }
+      get { return Syscall.GetNodeID(this); } 
+      set { Syscall.SetNodeID(this, value); }
     }
     /// <summary>
     /// The type of data
     /// </summary>
     public CanFlyDataType DataType 
     {
-      get { return (CanFlyDataType) _b1; } 
-    }
-
-    private void SetDataType(CanFlyDataType value)
-    {
-       _b1 = (byte)value;
-    }
+      get { return Syscall.GetDataType(this); }
+     }
     /// <summary>
     /// The service code
     /// </summary>
     internal byte ServiceCode 
     {
-      get { return _b2; } 
-      set { _b2 = value; }
+      get { return Syscall.GetServiceCode(this); } 
+      set { Syscall.SetServiceCode(this, value); }
     }
     /// <summary>
     /// The message code
     /// </summary>
     internal byte MessageCode 
     {
-      get { return _b3; } 
-      set { _b3 = value; }
+      get { return Syscall.GetMessageCode(this); } 
+      set { Syscall.SetServiceCode(this, value); }
     }
-
     /// <summary>
-    /// Create a new datatype with a uint32
+    /// Create a message with the NoData type
     /// </summary>
-    /// <param name="id"></param>
-    /// <param name="v"></param>
+    /// <param name="id">Message ID</param>
+    public CanFlyMsg(ushort id)
+    {
+      Syscall.CreateMessage(this, nodeId, id);
+    }
+    private CanFlyMsg(ushort id, bool isError, uint error)
+    {
+      Syscall.CreateErrorMessage(this, nodeId, id, error);
+    }
+    /// <summary>
+    /// Create an error message
+    /// </summary>
+    /// <param name="id">Can ID of the message</param>
+    /// <param name="error">Value to report as an error</param>
+    /// <returns>Constructed message</returns>
+    public static CanFlyMsg CreateErrorMessage(ushort id, uint error)
+    {
+      return new CanFlyMsg(id, true, error);
+    }
+    /// <summary>
+    /// Create a new message
+    /// </summary>
+    /// <param name="id">Can ID</param>
+    /// <param name="v">value to assign</param>
     public CanFlyMsg(ushort id, uint value)
     {
-      SetLength(8);
-      CanID = id;
-      NodeId = 0;
-      SetDataType(CanFlyDataType.UInt32);
-      ServiceCode = 0;
-      MessageCode = 0;
-      Syscall.PackUInt32(value, ref _b4, ref _b5, ref _b6, ref _b7);
+      Syscall.CreateMessage(this, nodeId, id, value);
     }
-
+    /// <summary>
+    /// Create a new message
+    /// </summary>
+    /// <param name="id">Can ID</param>
+    /// <param name="v">value to assign</param>
     public CanFlyMsg(ushort id, int value)
     {
-      SetLength(8);
-      CanID = id;
-      NodeId = 0;
-      SetDataType(CanFlyDataType.Int32);
-      ServiceCode = 0;
-      MessageCode = 0;
-      Syscall.PackInt32(value, ref _b4, ref _b5, ref _b6, ref _b7);
+      Syscall.CreateMessage(this, nodeId, id, value);
     }
-
-
+    /// <summary>
+    /// Create a new message
+    /// </summary>
+    /// <param name="id">Can ID</param>
+    /// <param name="v">value to assign</param>
     public CanFlyMsg(ushort id, ushort value)
     {
-      SetLength(6);
-      CanID = id;
-      NodeId = 0;
-      SetDataType(CanFlyDataType.UShort);
-      ServiceCode = 0;
-      MessageCode = 0;
-      Syscall.PackUInt16(value, ref _b4, ref _b5);
-      _b6 = 0;
-      _b7 = 0;
+      Syscall.CreateMessage(this, nodeId, id, value);
     }
-
-
+    /// <summary>
+    /// Create a new message
+    /// </summary>
+    /// <param name="id">Can ID</param>
+    /// <param name="v">value to assign</param>
     public CanFlyMsg(ushort id, short value)
     {
-      SetLength(6);
-      CanID = id;
-      NodeId = 0;
-      SetDataType(CanFlyDataType.Short);
-      ServiceCode = 0;
-      MessageCode = 0;
-      Syscall.PackInt16(value, ref _b4, ref _b5);
-      _b6 = 0;
-      _b7 = 0;
+      Syscall.CreateMessage(this, nodeId, id, value);
     }
-
-
+    /// <summary>
+    /// Create a new message
+    /// </summary>
+    /// <param name="id">Can ID</param>
+    /// <param name="v1">value1 to send</param>
+    /// <param name="v2">value2 to send</param>
     public CanFlyMsg(ushort id, ushort v1, ushort v2)
     {
-      SetLength(8);
-      CanID = id;
-      NodeId = 0;
-      SetDataType(CanFlyDataType.UShort2);
-      ServiceCode = 0;
-      MessageCode = 0;
-      Syscall.PackUInt16(v1, ref _b4, ref _b5);
-      Syscall.PackUInt16(v2, ref _b6, ref _b7);
+      Syscall.CreateMessage(this, nodeId, id, v1, v2);
     }
-
-
+    /// <summary>
+    /// Create a new message
+    /// </summary>
+    /// <param name="id">Can ID</param>
+    /// <param name="v1">value1 to send</param>
+    /// <param name="v2">value2 to send</param>
     public CanFlyMsg(ushort id, short v1, short v2)
     {
-      SetLength(8);
-      CanID = id;
-      NodeId = 0;
-      SetDataType(CanFlyDataType.Short2);
-      ServiceCode = 0;
-      MessageCode = 0;
-      Syscall.PackInt16(v1, ref _b4, ref _b5);
-      Syscall.PackInt16(v2, ref _b6, ref _b7);
+       Syscall.CreateMessage(this, nodeId, id, v1, v2);
     }
-
-
+    /// <summary>
+    /// Create a new message
+    /// </summary>
+    /// <param name="id">Can ID</param>
+    /// <param name="v">value to assign</param>
     public CanFlyMsg(ushort id, float v)
     {
-      SetLength(8);
-      CanID = id;
-      NodeId = 0;
-      SetDataType(CanFlyDataType.Float);
-      ServiceCode = 0;
-      MessageCode = 0;
-      Syscall.PackFloat(v, ref _b4, ref _b5, ref _b6, ref _b7);
+      Syscall.CreateMessage(this, nodeId, id, v);
     }
-
-
-    public CanFlyMsg(ushort id, char c)
+    /// <summary>
+    /// Create a new message
+    /// </summary>
+    /// <param name="id">Can ID</param>
+    /// <param name="b0">value to assign</param>
+    public CanFlyMsg(ushort id, sbyte b0)
     {
-      SetLength(5);
-      CanID = id;
-      NodeId = 0;
-      SetDataType(CanFlyDataType.Char);
-      ServiceCode = 0;
-      MessageCode = 0;
-      _b4 = (byte) c;
-      _b5 = 0;
-      _b6 = 0;
-      _b7 = 0;
+      Syscall.CreateMessage(this, nodeId, id, b0);
     }
-
+    /// <summary>
+    /// Create a new message
+    /// </summary>
+    /// <param name="id">Can ID</param>
+    /// <param name="b0">value to assign</param>
     public CanFlyMsg(ushort id, byte b0)
     {
-      SetLength(5);
-      CanID = id;
-      NodeId = 0;
-      SetDataType(CanFlyDataType.UChar);
-      ServiceCode = 0;
-      MessageCode = 0;
-      _b4 = b0;
-      _b5 = 0;
-      _b6 = 0;
-      _b7 = 0;
+      Syscall.CreateMessage(this, nodeId, id, b0);
     }
-
+    /// <summary>
+    /// Create a new message
+    /// </summary>
+    /// <param name="id">Can ID</param>
+    /// <param name="b0">value to assign</param>
+    /// <param name="b1">value to assign</param>
     public CanFlyMsg(ushort id, byte b0, byte b1)
     {
-      SetLength(6);
-      CanID = id;
-      NodeId = 0;
-      SetDataType(CanFlyDataType.UChar2);
-      ServiceCode = 0;
-      MessageCode = 0;
-      _b4 = b0;
-      _b5 = b1;
-      _b6 = 0;
-      _b7 = 0;
+      Syscall.CreateMessage(this, nodeId, id, b0, b1);
     }
-
-
-    public CanFlyMsg(ushort id, char c0, char c1)
+    /// <summary>
+    /// Create a new message
+    /// </summary>
+    /// <param name="id">Can ID</param>
+    /// <param name="b0">value to assign</param>
+    /// <param name="b1">value to assign</param>
+    public CanFlyMsg(ushort id, sbyte b0, sbyte b1)
     {
-      SetLength(6);
-      CanID = id;
-      NodeId = 0;
-      SetDataType(CanFlyDataType.Char2);
-      ServiceCode = 0;
-      MessageCode = 0;
-      _b4 = (byte)c0;
-      _b5 = (byte)c1;
-      _b6 = 0;
-      _b7 = 0;
+      Syscall.CreateMessage(this, nodeId, id, b0, b1);
     }
-
-
+    /// <summary>
+    /// Create a new message
+    /// </summary>
+    /// <param name="id">Can ID</param>
+    /// <param name="b0">value to assign</param>
+    /// <param name="b1">value to assign</param>
+    /// <param name="b2">value to assign</param>
     public CanFlyMsg(ushort id, byte b0, byte b1, byte b2)
     {
-      SetLength(7);
-      CanID = id;
-      NodeId = 0;
-      SetDataType(CanFlyDataType.UChar3);
-      ServiceCode = 0;
-      MessageCode = 0;
-      _b4 = b0;
-      _b5 = b1;
-      _b6 = b2;
-      _b7 = 0;
+      Syscall.CreateMessage(this, nodeId, id, b0, b1, b2);
     }
-
-
-    public CanFlyMsg(ushort id, char c0, char c1, char c2)
+    /// <summary>
+    /// Create a new message
+    /// </summary>
+    /// <param name="id">Can ID</param>
+    /// <param name="b0">value to assign</param>
+    /// <param name="b1">value to assign</param>
+    /// <param name="b2">value to assign</param>
+    public CanFlyMsg(ushort id, sbyte b0, sbyte b1, sbyte b2)
     {
-      SetLength(7);
-      CanID = id;
-      NodeId = 0;
-      SetDataType(CanFlyDataType.Char3);
-      ServiceCode = 0;
-      MessageCode = 0;
-      _b4 = (byte)c0;
-      _b5 = (byte)c1;
-      _b6 = (byte)c2;
-      _b7 = 0;
+      Syscall.CreateMessage(this, nodeId, id, b0, b1, b2);
     }
-
-
+    /// <summary>
+    /// Create a new message
+    /// </summary>
+    /// <param name="id">Can ID</param>
+    /// <param name="b0">value to assign</param>
+    /// <param name="b1">value to assign</param>
+    /// <param name="b2">value to assign</param>
+    /// <param name="b3">value to assign</param>
     public CanFlyMsg(ushort id, byte b0, byte b1, byte b2, byte b3)
     {
-      SetLength(8);
-      CanID = id;
-      NodeId = 0;
-      SetDataType(CanFlyDataType.UChar4);
-      ServiceCode = 0;
-      MessageCode = 0;
-      _b4 = b0;
-      _b5 = b1;
-      _b6 = b2;
-      _b7 = b3;
+      Syscall.CreateMessage(this, nodeId, id, b0, b1, b2, b3);
     }
-
-
-    public CanFlyMsg(ushort id, char c0, char c1, char c2, char c3)
+    /// <summary>
+    /// Create a new message
+    /// </summary>
+    /// <param name="id">Can ID</param>
+    /// <param name="b0">value to assign</param>
+    /// <param name="b1">value to assign</param>
+    /// <param name="b2">value to assign</param>
+    /// <param name="b3">value to assign</param>
+    public CanFlyMsg(ushort id, sbyte b0, sbyte b1, sbyte b2, sbyte b3)
     {
-      SetLength(8);
-      CanID = id;
-      NodeId = 0;
-      SetDataType(CanFlyDataType.Char4);
-      ServiceCode = 0;
-      MessageCode = 0;
-      _b4 = (byte)c0;
-      _b5 = (byte)c1;
-      _b6 = (byte)c2;
-      _b7 = (byte)c3;
+      Syscall.CreateMessage(this, nodeId, id, b0, b1, b2, b3);
     }
-
+    /// <summary>
+    /// Get the float value encapsulated
+    /// </summary>
+    /// <returns>Value as a float</returns>
     public float GetFloat()
     {
-      if (DataType != CanFlyDataType.Float)
-        throw new InvalidCastException();
-
-      float value;
-      Syscall.GetFloat(_b4, _b5, _b6, _b7, out value);
-
-      return value;
+      return Syscall.GetFloat(this);
     }
-    
+    /// <summary>
+    /// Get the value as an int32
+    /// </summary>
+    /// <returns>Value as an Int32</returns>
     public int GetInt32()
     {
-      if (DataType != CanFlyDataType.Int32)
-        throw new InvalidCastException();
-
-      int value;
-      Syscall.GetInt32(_b4, _b5, _b6, _b7, out value);
-
-      return value;
+      return Syscall.GetInt32(this);
     }
-
-
+    /// <summary>
+    /// Get the value as a uint
+    /// </summary>
+    /// <returns>Value as an UInt32</returns>
     public uint GetUInt32()
     {
-      if (DataType != CanFlyDataType.UInt32)
-        throw new InvalidCastException();
-
-      uint value;
-      Syscall.GetUInt32(_b4, _b5, _b6, _b7, out value);
-
-      return value;
+      return Syscall.GetUInt32(this);
     }
-
-
+    /// <summary>
+    /// Gets the value as a short
+    /// </summary>
+    /// <returns>Value as a Int16</returns>
     public short GetInt16()
     {
-      if (DataType != CanFlyDataType.Short)
-        throw new InvalidCastException();
-
-      short value;
-      Syscall.GetInt16(_b4, _b5, out value);
-
-      return value;
+      return Syscall.GetInt16(this);
     }
-
-
+    /// <summary>
+    /// Gets the value as a ushort
+    /// </summary>
+    /// <returns>Value as a UInt16</returns>
     public ushort GetUInt16()
     {
-      if (DataType != CanFlyDataType.UShort)
-        throw new InvalidCastException();
-
-      ushort value;
-      Syscall.GetUInt16(_b4, _b5, out value);
-
-      return value;
+      return Syscall.GetUInt16(this);
     }
-
-    public sbyte GetInt8()
-    {
-      if(DataType != CanFlyDataType.Char)
-        throw new InvalidCastException();
-
-      return (sbyte) _b4;
-    }
-
-
-    public byte GetUInt8()
-    {
-      if (DataType != CanFlyDataType.Char)
-        throw new InvalidCastException();
-
-      return _b4;
-    }
-
-
-    public short[] GetInt16Array()
-    {
-      if (DataType != CanFlyDataType.Short2)
-        throw new InvalidCastException();
-
-      short[] value = new short[2];
-      Syscall.GetInt16(_b4, _b5, out value[0]);
-      Syscall.GetInt16(_b6, _b7, out value[1]);
-
-      return value;
-    }
-
-
-    public ushort[] GetUInt16Array()
-    {
-      if (DataType != CanFlyDataType.UShort2)
-        throw new InvalidCastException();
-
-      ushort[] value = new ushort[2];
-      Syscall.GetUInt16(_b4, _b5, out value[0]);
-      Syscall.GetUInt16(_b6, _b7, out value[1]);
-
-      return value;
-    }
-
-
+    /// <summary>
+    /// Return the value as a signed byte
+    /// </summary>
+    /// <returns>Value as a Int8</returns>
     public sbyte[] GetInt8Array()
     {
-      switch(DataType)
-      {
-        case CanFlyDataType.Char:
-          return new sbyte[] { (sbyte)_b4 };
-        case CanFlyDataType.Char2:
-          return new sbyte[] { (sbyte)_b4, (sbyte)_b5 };
-        case CanFlyDataType.Char3:
-          return new sbyte[] { (sbyte)_b4, (sbyte)_b5, (sbyte)_b6 };
-        case CanFlyDataType.Char4:
-          return new sbyte[] { (sbyte)_b4, (sbyte)_b5, (sbyte)_b6, (sbyte)_b7 };
-      }
-
-      throw new InvalidCastException();
+      return Syscall.GetInt8Array(this);
     }
-
-
+    /// <summary>
+    /// Return the value as a byte
+    /// </summary>
+    /// <returns>Value as a UInt7</returns>
     public byte[] GetUInt8Array()
     {
-      switch (DataType)
-      {
-        case CanFlyDataType.UChar:
-          return new byte[] { _b4 };
-        case CanFlyDataType.UChar2:
-          return new byte[] { _b4, _b5 };
-        case CanFlyDataType.UChar3:
-          return new byte[] { _b4, _b5, _b6 };
-        case CanFlyDataType.UChar4:
-          return new byte[] { _b4, _b5, _b6, _b7 };
-      }
-
-      throw new InvalidCastException();
+      return Syscall.GetUInt8Array(this);
     }
-
+    /// <summary>
+    /// Return the value as an array of Int16
+    /// </summary>
+    /// <returns>Values as an array of Int16</returns>
+    public short[] GetInt16Array()
+    {
+      return Syscall.GetInt16Array(this);
+    }
+    /// <summary>
+    /// Return the value as an array of ushorts
+    /// </summary>
+    /// <returns>Values as an array of UInt16</returns>
+    public ushort[] GetUInt16Array()
+    {
+      return Syscall.GetUInt16Array(this);
+    }
 
     public override string ToString()
     {
-      return string.Format("id={0}, dt={1}", CanID, DataType.ToString());
+      return Syscall.MessageToString(this);
     }
   }
 }
