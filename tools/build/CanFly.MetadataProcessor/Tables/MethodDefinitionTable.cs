@@ -11,8 +11,6 @@ namespace CanFly.Tools.MetadataProcessor
   /// </summary>
   public sealed class MethodDefinitionTable : ReferenceTableBase<MethodDefinition>
   {
-    private const int sizeOf_CLR_RECORD_METHODDEF = 16;
-
     /// <summary>
     /// Helper class for comparing two instances of <see cref="MethodDefinition"/> objects
     /// using <see cref="MethodDefinition.FullName"/> property as unique key for comparison.
@@ -59,13 +57,68 @@ namespace CanFly.Tools.MetadataProcessor
       return TryGetIdByValue(methodDefinition, out referenceId);
     }
 
-    /// <inheritdoc/>
+    /*
+ typedef struct _CLR_RECORD_METHODDEF
+  {
+#define MD_Scope_Mask 0x00000007
+#define MD_Scope_PrivateScope 0x00000000    // Member not referenceable.
+#define MD_Scope_Private 0x00000001    // Accessible only by the parent type.
+#define MD_Scope_FamANDAssem 0x00000002    // Accessible by sub-types only in this Assembly.
+#define MD_Scope_Assem 0x00000003    // Accessibly by anyone in the Assembly.
+#define MD_Scope_Family 0x00000004    // Accessible only by type and sub-types.
+#define MD_Scope_FamORAssem 0x00000005    // Accessibly by sub-types anywhere, plus anyone in assembly.
+#define MD_Scope_Public 0x00000006    // Accessibly by anyone who has visibility to this scope.
+
+#define MD_Static 0x00000010    // Defined on type, else per instance.
+#define MD_Final 0x00000020    // Method may not be overridden.
+#define MD_Virtual 0x00000040    // Method virtual.
+#define MD_HideBySig 0x00000080    // Method hides by name+sig, else just by name.
+
+#define MD_VtableLayoutMask 0x00000100//
+#define MD_ReuseSlot 0x00000000    // The default.
+#define MD_NewSlot 0x00000100    // Method always gets a new slot in the vtable.
+#define MD_Abstract 0x00000200    // Method does not provide an implementation.
+#define MD_SpecialName 0x00000400    // Method is special.  Name describes how.
+#define MD_NativeProfiled 0x00000800
+
+#define MD_Constructor 0x00001000
+#define MD_StaticConstructor 0x00002000
+#define MD_Finalizer 0x00004000
+
+#define MD_DelegateConstructor 0x00010000
+#define MD_DelegateInvoke 0x00020000
+#define MD_DelegateBeginInvoke 0x00040000
+#define MD_DelegateEndInvoke 0x00080000
+
+#define MD_EntryPoint 0x08000000
+#define MD_HasExceptionHandlers 0x40000000
+#define MD_HasAttributes 0x80000000
+
+  uint16_t name; // TBL_Strings
+  uint16_t RVA;
+  //
+  uint32_t flags;
+  //
+  uint8_t retVal;       // return type
+  uint8_t numArgs;      // number of arguments
+  uint8_t numLocals;    // number of locals
+  uint16_t sig;           // method signature
+  // Length is numArgs + numLocals
+  // note however the if the method is not static then
+  // the this pointer is NOT emited so numArgs = numArgs-1
+  //
+  uint8_t numArgumentNames;
+  uint8_t numLocalNames;
+  // CLR_RECORD_NAMED_VARIABLE[numArumentNames]   argument names
+  // CLR_RECORD_NAMED_VARIABLE[numLocals] local definitions
+  uint8_t variables[0];
+  } CLR_RECORD_METHODDEF;
+    */
+
     protected override void WriteSingleItem(
         CLRBinaryWriter writer,
         MethodDefinition item)
     {
-      var writerStartPosition = writer.BaseStream.Position;
-
       if (!_context.MinimizeComplete)
       {
         return;
@@ -76,56 +129,42 @@ namespace CanFly.Tools.MetadataProcessor
 
       writer.WriteUInt32(GetFlags(item));
 
-      var parametersCount = (byte)item.Parameters.Count;
-      if (!item.IsStatic)
-      {
-        ++parametersCount; // add implicit 'this' pointer into non-static methods
-      }
-
       _context.SignaturesTable.WriteDataType(item.ReturnType, writer, false, false, false);
-      if (item.ReturnType is TypeSpecification)
+
+      byte parametersCount = (byte)item.Parameters.Count;
+      writer.WriteByte(item.IsStatic ? parametersCount : (byte)(parametersCount +1));
+
+      // add a variable for the return type
+      writer.WriteByte((byte)(item.Body == null ? 0 : item.Body.Variables.Count));
+
+      // write the method signature
+      writer.WriteUInt16(_context.SignaturesTable.GetOrCreateSignatureId(item));
+
+      if (item.DebugInformation == null)
       {
-        // developer note
-        // This check is wrong. A TypeSpecification is showing when the return type it's an array which is OK.
-        // Requires further investigation to evaluate what's the correct condition required to add an entry to the Type Specifications Table
-
-        //if (!item.ReturnType.GetElementType().IsPrimitive &&
-        //    item.ReturnType.GetElementType().FullName != "System.Object")
-        //{
-        //    _context.TypeSpecificationsTable.GetOrCreateTypeSpecificationId(item.ReturnType);
-        //}
-      }
-
-      writer.WriteByte(parametersCount);
-      writer.WriteByte((byte)(item.HasBody ? item.Body.Variables.Count : 0));
-      writer.WriteByte(CodeWriter.CalculateStackSize(item.Body));
-
-      var methodSignature = _context.SignaturesTable.GetOrCreateSignatureId(item);
-
-      // locals signature
-      if (item.HasBody)
-      {
-        writer.WriteUInt16(_context.SignaturesTable.GetOrCreateSignatureId(item.Body.Variables));
+        writer.WriteByte(0);
+        writer.WriteByte(0);
       }
       else
       {
-        if (item.IsAbstract ||
-            item.IsRuntime ||
-            item.IsInternalCall)
+        // the 'this' pointer is not sent
+        writer.WriteByte(parametersCount);
+        writer.WriteByte((byte)(item.DebugInformation.Scope == null ? 0 : item.DebugInformation.Scope.Variables.Count));
+
+        for (byte paramNumber = 0; paramNumber < parametersCount; paramNumber++)
         {
-          writer.WriteUInt16(0x0000);
+          _context.SignaturesTable.WriteDataType(item.Parameters[paramNumber].ParameterType, writer, false, false, false);
+          WriteStringReference(writer, item.Parameters[paramNumber].Name);
         }
-        else
-        {
-          writer.WriteUInt16(0xFFFF);
-        }
+
+        if(item.DebugInformation.Scope != null)
+          for (byte variableNumber = 0; variableNumber < item.DebugInformation.Scope.Variables.Count; variableNumber++)
+          {
+            _context.SignaturesTable.WriteDataType(item.Body.Variables[variableNumber].VariableType, writer, false, false, false);
+            // get the name from the method
+            WriteStringReference(writer, item.DebugInformation.Scope.Variables[variableNumber].Name);
+          }
       }
-
-      writer.WriteUInt16(methodSignature);
-
-      var writerEndPosition = writer.BaseStream.Position;
-
-      Debug.Assert((writerEndPosition - writerStartPosition) == sizeOf_CLR_RECORD_METHODDEF);
     }
 
     public static uint GetFlags(MethodDefinition method)

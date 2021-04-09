@@ -110,10 +110,11 @@ namespace CanFly.Tools.MetadataProcessor
     public ushort GetOrCreateSignatureId(
         MethodDefinition methodDefinition)
     {
-      var sig = GetSignature(methodDefinition);
-      var sigId = GetOrCreateSignatureIdImpl(sig);
+      byte[] sig = GetSignature(methodDefinition);
+      ushort sigId = GetOrCreateSignatureIdImpl(sig);
 
-      if (_verbose) Console.WriteLine($"{methodDefinition.MetadataToken.ToInt32()} -> {sig.BufferToHexString()} -> {sigId.ToString("X4")}");
+      if (_verbose)
+        Console.WriteLine($"{methodDefinition.MetadataToken.ToInt32()} -> {sig.BufferToHexString()} -> {sigId.ToString("X4")}");
 
       return sigId;
     }
@@ -182,8 +183,7 @@ namespace CanFly.Tools.MetadataProcessor
     /// Gets existing or creates new singature identifier for list of class interfaces.
     /// </summary>
     /// <param name="interfaces">List of interfaes information in Mono.Cecil format.</param>
-    public ushort GetOrCreateSignatureId(
-        Collection<InterfaceImplementation> interfaces)
+    public ushort GetOrCreateSignatureId(Collection<InterfaceImplementation> interfaces)
     {
       if (interfaces == null || interfaces.Count == 0)
       {
@@ -197,8 +197,7 @@ namespace CanFly.Tools.MetadataProcessor
     /// Gets existing or creates new field default value (just writes value as is with size).
     /// </summary>
     /// <param name="defaultValue">Default field value in binary format.</param>
-    public ushort GetOrCreateSignatureId(
-        byte[] defaultValue)
+    public ushort GetOrCreateSignatureId(byte[] defaultValue)
     {
       if (defaultValue == null || defaultValue.Length == 0)
       {
@@ -212,13 +211,13 @@ namespace CanFly.Tools.MetadataProcessor
     /// Gets existing or creates new type reference signature (used for encoding type specification).
     /// </summary>
     /// <param name="interfaceImplementation">Interface implementation in Mono.Cecil format.</param>
-    public ushort GetOrCreateSignatureId(
-        InterfaceImplementation interfaceImplementation)
+    public ushort GetOrCreateSignatureId(InterfaceImplementation interfaceImplementation)
     {
-      var sig = GetSignature(interfaceImplementation, false);
-      var sigId = GetOrCreateSignatureIdImpl(sig);
+      byte[] sig = GetSignature(interfaceImplementation, false);
+      ushort sigId = GetOrCreateSignatureIdImpl(sig);
 
-      if (_verbose) Console.WriteLine($"{interfaceImplementation.MetadataToken.ToInt32()} -> {sig.BufferToHexString()} -> {sigId.ToString("X4")}");
+      if (_verbose)
+        Console.WriteLine($"{interfaceImplementation.MetadataToken.ToInt32()} -> {sig.BufferToHexString()} -> {sigId.ToString("X4")}");
 
       return sigId;
     }
@@ -255,7 +254,7 @@ namespace CanFly.Tools.MetadataProcessor
     /// <summary>
     /// Writes data type signature into ouput stream.
     /// </summary>
-    /// <param name="typeDefinition">Tzpe reference or definition in Mono.Cecil format.</param>
+    /// <param name="typeDefinition">Type reference or definition in Mono.Cecil format.</param>
     /// <param name="writer">Target binary writer for writing signature information.</param>
     /// <param name="alsoWriteSubType">If set to <c>true</c> also sub-type will be written.</param>
     /// <param name="expandEnumType">If set to <c>true</c> expand enum with base type.</param>
@@ -333,18 +332,9 @@ namespace CanFly.Tools.MetadataProcessor
       {
         writer.WriteByte((byte)nanoCLR_DataType.DATATYPE_SZARRAY);
 
-        var array = (ArrayType)typeDefinition;
-
-        if (array.ElementType.IsGenericParameter)
+        if (alsoWriteSubType)
         {
-          // ECMA 335 VI.B.4.3 Metadata
-          writer.WriteByte((byte)nanoCLR_DataType.DATATYPE_VAR);
-
-          writer.WriteByte((byte)(array.ElementType as GenericParameter).Position);
-        }
-        else if (alsoWriteSubType)
-        {
-
+          ArrayType array = (ArrayType)typeDefinition;
           WriteDataType(array.ElementType, writer, true, expandEnumType, isTypeDefinition);
         }
 
@@ -434,17 +424,11 @@ namespace CanFly.Tools.MetadataProcessor
 
         writer.Write(callingConvention);
 
-        // generic parameters count, if any
-        if (methodReference.CallingConvention == MethodCallingConvention.Generic)
-        {
-          writer.Write((byte)(methodReference as MethodReference).GenericParameters.Count);
-        }
-
         // regular parameter count
         writer.Write((byte)(methodReference.Parameters.Count));
 
         WriteTypeInfo(methodReference.ReturnType, binaryWriter);
-        foreach (var parameter in methodReference.Parameters)
+        foreach (ParameterDefinition parameter in methodReference.Parameters)
         {
           WriteTypeInfo(parameter.ParameterType, binaryWriter);
         }
