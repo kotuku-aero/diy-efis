@@ -354,7 +354,7 @@ public sealed class CanFlyMsg
     /// Create an error message
     /// </summary>
     /// <param name="id">Can ID of the message</param>
-    /// <param name="error">Value to report as an error</param>
+    /// <param name="value">Value to report as an error</param>
     /// <returns>Constructed message</returns>
     public static CanFlyMsg CreateErrorMessage(ushort id, uint error)
     {

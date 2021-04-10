@@ -74,15 +74,7 @@ namespace CanFly
     /// </summary>
     public Extent Extents
     {
-      get
-      {
-        int dx;
-        int dy;
-        ushort bpp;
-        Syscall.GetCanvasExtents(Handle, out bpp, out dx, out dy);
-
-        return new Extent(dx, dy);
-      }
+      get { return Syscall.GetCanvasExtents(Handle); }
     }
     /// <summary>
     /// Rectangle to clip drawing to
@@ -99,9 +91,7 @@ namespace CanFly
     /// <param name="points">points to draw</param>
     public void Polyline(Pen pen, params Point[] points)
     {
-      using (PointArray pts = new PointArray(points))
-        Syscall.Polyline(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom,
-          pen.Handle, pts.Handle);
+      Syscall.Polyline(Handle, ClipRect, pen, points);
     }
     /// <summary>
     /// Draw a line
@@ -111,8 +101,7 @@ namespace CanFly
     /// <param name="to">Point to draw to</param>
     public void Line(Pen pen, Point from, Point to)
     {
-      Syscall.Line(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom,
-        pen.Handle, from.X, from.Y, to.X, to.Y);
+      Syscall.Line(Handle, ClipRect, pen, from, to);
     }
     /// <summary>
     /// Draw a polyline
@@ -122,19 +111,7 @@ namespace CanFly
     /// <param name="points">points to draw</param>
     public void Polyline(Rect clipRect, Pen pen, params Point[] points)
     {
-      using (PointArray pts = new PointArray(points))
-        Syscall.Polyline(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom,
-          pen.Handle, pts.Handle);
-    }
-    /// <summary>
-    /// Draw a polyline
-    /// </summary>
-    /// <param name="pen">Pen to draw with</param>
-    /// <param name="pts">Array of points to use</param>
-    public void Polyline(Pen pen, PointArray pts)
-    {
-      Syscall.Polyline(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom,
-          pen.Handle, pts.Handle);
+        Syscall.Polyline(Handle, clipRect, pen, points);
     }
     /// <summary>
     /// Draw an ellipse
@@ -144,8 +121,7 @@ namespace CanFly
     /// <param name="area">area of the ellipse</param>
     public void Ellipse(Pen pen, uint color, Rect area)
     {
-      Syscall.Ellipse(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom,
-        Pen.SafeHandle(pen), color, area.Left, area.Top, area.Right, area.Bottom);
+      Syscall.Ellipse(Handle, ClipRect, pen, color, area);
     }
     /// <summary>
     /// Draw a polygon
@@ -155,18 +131,7 @@ namespace CanFly
     /// <param name="points">Points to draw</param>
     public void Polygon(Pen pen, uint color, params Point[] points)
     {
-      using(PointArray pts = new PointArray(points))
-        Syscall.Polygon(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, Pen.SafeHandle(pen), color, pts.Handle);
-    }
-    /// <summary>
-    /// Draw a polygon
-    /// </summary>
-    /// <param name="pen">Outline color</param>
-    /// <param name="color">Fill color</param>
-    /// <param name="pts">Points to draw</param>
-    public void Polygon(Pen pen, uint color, PointArray pts)
-    {
-      Syscall.Polygon(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, Pen.SafeHandle(pen), color, pts.Handle);
+      Syscall.Polygon(Handle, ClipRect, pen, color, points);
     }
     /// <summary>
     /// Draw a rectangle
@@ -177,8 +142,7 @@ namespace CanFly
     public void Rectangle(Pen pen, uint color, Rect area)
     {
 
-      Syscall.Rectangle(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, Pen.SafeHandle(pen), color, 
-        area.Left, area.Top, area.Right, area.Bottom);
+      Syscall.Rectangle(Handle, ClipRect, pen, color, area);
     }
     /// <summary>
     /// Draw a rectangle with rounded corners
@@ -187,10 +151,9 @@ namespace CanFly
     /// <param name="color">Fill color</param>
     /// <param name="area">Area to draw</param>
     /// <param name="radius">Radius of corners</param>
-    public void RoundRect(Pen pen, uint color, Rect area, int radius)
+    public void RoundRect(Pen pen, uint color, Rect area, ushort radius)
     {
-      Syscall.RoundRect(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, Pen.SafeHandle(pen), color, 
-        area.Left, area.Top, area.Right, area.Bottom, radius);
+      Syscall.RoundRect(Handle, ClipRect, pen, color, area, radius);
     }
     /// <summary>
     /// Bit transfer
@@ -200,11 +163,7 @@ namespace CanFly
     /// <param name="src_pt">Point on source to copy from</param>
     public void BitBlt(Rect dest_rect, GdiObject src_canvas, Point src_pt)
     {
-      Syscall.BitBlt(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom,
-        dest_rect.Left, dest_rect.Top, dest_rect.Right, dest_rect.Bottom,
-        src_canvas.Handle,
-        src_canvas.ClipRect.Left, src_canvas.ClipRect.Top, src_canvas.ClipRect.Right, src_canvas.ClipRect.Bottom,
-        src_pt.X, src_pt.Y);
+      Syscall.BitBlt(Handle, ClipRect, dest_rect, src_canvas.Handle, src_canvas.ClipRect, src_pt);
     }
     /// <summary>
     /// Return a pixel from the screen
@@ -213,17 +172,12 @@ namespace CanFly
     /// <returns>Color value</returns>
     public uint GetPixel(Point pt)
     {
-      uint color;
-      Syscall.GetPixel(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, pt.X, pt.Y, out color);
-      return color;
+      return Syscall.GetPixel(Handle, ClipRect, pt);
     }
 
     public uint SetPixel(Point pt, uint color)
     {
-      uint value;
-      Syscall.SetPixel(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, 
-        pt.X, pt.Y, color, out value);
-      return value;
+      return Syscall.SetPixel(Handle, ClipRect, pt, color);
     }
     /// <summary>
     /// Draw an Arc
@@ -235,9 +189,7 @@ namespace CanFly
     /// <param name="end">End angle</param>
     public void Arc(Pen pen, Point pt, int radius, int start, int end)
     {
-      Syscall.Arc(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom, 
-        Pen.SafeHandle(pen), pt.X, pt.Y,
-        radius, start, end);
+      Syscall.Arc(Handle, ClipRect, pen, pt, (ushort)radius, (ushort)start, (ushort) end);
     }
     /// <summary>
     /// Draw a filled arc
@@ -250,8 +202,7 @@ namespace CanFly
     /// <param name="inner">Inner arc radii</param>
     public void Pie(Pen pen, uint color, Point pt, int start, int end, int radii, int inner)
     {
-      Syscall.Pie(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom,
-        Pen.SafeHandle(pen), color, pt.X, pt.Y, start, end, radii, inner);
+      Syscall.Pie(Handle, ClipRect, pen, color, pt, (ushort)start, (ushort)end, (ushort)radii, (ushort)inner);
     }
     /// <summary>
     /// Draw a string
@@ -265,12 +216,7 @@ namespace CanFly
     /// <param name="format">Format flags</param>
     public void DrawText(Font font, uint fg, uint bg, string str, Point src_pt, Rect txt_clip_rect, TextOutStyle format)
     {
-      if (txt_clip_rect == null)
-        txt_clip_rect = ClipRect;
-
-      Syscall.DrawText(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom,
-        font.Handle, fg, bg, str, src_pt.X, src_pt.Y,
-        txt_clip_rect.Left, txt_clip_rect.Top, txt_clip_rect.Right, txt_clip_rect.Bottom, (ushort) format);
+      Syscall.DrawText(Handle, ClipRect, font, fg, bg, str, src_pt, txt_clip_rect, format);
     }
     /// <summary>
     /// Draw a string
@@ -283,12 +229,7 @@ namespace CanFly
     /// <param name="txt_clip_rect">Rectangle to clip to</param>
     public void DrawText(Font font, uint fg, uint bg, string str, Point src_pt, Rect txt_clip_rect)
     {
-      if (txt_clip_rect == null)
-        txt_clip_rect = ClipRect;
-
-      Syscall.DrawText(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom,
-        font.Handle, fg, bg, str, src_pt.X, src_pt.Y,
-        txt_clip_rect.Left, txt_clip_rect.Top, txt_clip_rect.Right, txt_clip_rect.Bottom, (ushort) TextOutStyle.Clipped);
+      Syscall.DrawText(Handle, ClipRect, font, fg, bg, str, src_pt, txt_clip_rect, TextOutStyle.Clipped);
     }
     /// <summary>
     /// Draw a string
@@ -302,9 +243,7 @@ namespace CanFly
     {
       Rect txt_clip_rect = ClipRect;
 
-      Syscall.DrawText(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom,
-        font.Handle, fg, bg, str, src_pt.X, src_pt.Y,
-        txt_clip_rect.Left, txt_clip_rect.Top, txt_clip_rect.Right, txt_clip_rect.Bottom, (ushort) TextOutStyle.Clipped);
+      Syscall.DrawText(Handle, ClipRect, font, fg, bg, str, src_pt, txt_clip_rect, TextOutStyle.Clipped);
     }
     /// <summary>
     /// Draw a string
@@ -319,9 +258,7 @@ namespace CanFly
     /// <param name="format">Format flags</param>
     public void DrawText(Rect clipRect, Font font, uint fg, uint bg, string str, Point src_pt, Rect txt_clip_rect, TextOutStyle format)
     {
-      Syscall.DrawText(Handle, ClipRect.Left, ClipRect.Top, ClipRect.Right, ClipRect.Bottom,
-        font.Handle, fg, bg, str, src_pt.X, src_pt.Y,
-        txt_clip_rect.Left, txt_clip_rect.Right, txt_clip_rect.Top, txt_clip_rect.Bottom, (ushort) format);
+      Syscall.DrawText(Handle, ClipRect, font, fg, bg, str, src_pt, txt_clip_rect, format);
     }
     /// <summary>
     /// Get the rendering extent of text
@@ -331,11 +268,7 @@ namespace CanFly
     /// <returns>Rendered text extents</returns>
     public Extent TextExtent(Font font, string str)
     {
-      int dx;
-      int dy;
-      Syscall.TextExtent(Handle, font.Handle, str, out dx, out dy);
-
-      return new Extent(dx, dy);
+      return Syscall.TextExtent(Handle, font, str);
     }
   }
 }

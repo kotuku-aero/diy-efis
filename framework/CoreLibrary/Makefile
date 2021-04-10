@@ -11,6 +11,14 @@ SRC= \
 	CanFly/CanFlyMsg.cs \
 	CanFly/Runtime.cs \
 	CanFly/Syscall.cs \
+	CanFly/Extent.cs \
+	CanFly/Pen.cs \
+	CanFly/Point.cs \
+	CanFly/Rect.cs \
+	CanFly/Font.cs \
+	CanFly/DirectoryEnumerator.cs \
+	CanFly/Stream.cs \
+	CanFly/Thread.cs \
 	System/Collections/ArrayList.cs \
 	System/Collections/ICollection.cs \
 	System/Collections/IComparer.cs \
@@ -42,14 +50,12 @@ SRC= \
 	System/Runtime/InteropServices/Attributes.cs \
 	System/Runtime/InteropServices/CharSet.cs \
 	System/Runtime/InteropServices/LayoutKind.cs \
-	System/AppDomainUnloadedException.cs \
 	System/ApplicationException.cs \
 	System/ArgumentException.cs \
 	System/ArgumentNullException.cs \
 	System/ArgumentOutOfRangeException.cs \
 	System/Array.cs \
 	System/AssemblyInfo.cs \
-	System/AsyncCallback.cs \
 	System/Attribute.cs \
 	System/AttributeTargets.cs \
 	System/AttributeUsageAttribute.cs \

@@ -62,10 +62,7 @@ namespace CanFly
     /// <returns>New Canvas</returns>
     public static Canvas Create(Extent extent)
     {
-      uint handle;
-      Syscall.CreateRectCanvas(extent.Dx, extent.Dy, out handle);
-
-      return new Canvas(handle);
+      return new Canvas(Syscall.CreateRectCanvas(extent));
     }
 
     /// <summary>
@@ -78,9 +75,7 @@ namespace CanFly
     /// </remarks>
     public static Canvas Create(Stream pngStream)
     {
-      uint handle;
-      Syscall.CreatePngCanvas(pngStream.Handle, out handle);
-      return new Canvas(handle);
+      return new Canvas(Syscall.CreatePngCanvas(pngStream));
     }
     /// <summary>
     /// Create a new canvas that will render a gis database
@@ -90,9 +85,7 @@ namespace CanFly
     /// <returns>Canvas that can be updated</returns>
     public static Canvas CreateGeospatial(Stream gisData, uint key)
     {
-      uint handle;
-      Syscall.CreateGeospatialCanvas(gisData.Handle, key, out handle);
-      return new Canvas(handle);
+      return new Canvas(Syscall.CreateGeospatialCanvas(gisData, key));
     }
     /// <summary>
     /// Render the canvas, applicable to Png and Spatial canvases

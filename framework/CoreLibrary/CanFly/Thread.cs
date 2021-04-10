@@ -53,7 +53,7 @@ namespace CanFly
     protected Thread(byte priority, string name)
     {
       // create the thread
-      CanFly.Syscall.CreateThread(priority, name, ThreadProc, this, out _handle);
+      _handle = CanFly.Syscall.CreateThread(priority, name, ThreadProc, this);
     }
 
     public void Dispose()

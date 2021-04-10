@@ -77,12 +77,9 @@ namespace CanFly
     /// true if the stream is at end of file
     /// </summary>
     /// <returns></returns>
-    public bool Eof()
+    public bool Eof
     {
-      bool isEof;
-      Syscall.StreamEof(Handle, out isEof);
-
-      return isEof;
+      get { return Syscall.StreamEof(Handle); }
     }
     /// <summary>
     /// Read bytes from the stream
@@ -91,10 +88,7 @@ namespace CanFly
     /// <returns>Data read</returns>
     public byte[] Read(ushort size)
     {
-      byte[] value;
-      Syscall.StreamRead(Handle, size, out value);
-
-      return value;
+      return Syscall.StreamRead(Handle, size);
     }
     /// <summary>
     /// Write bytes to the stream
@@ -109,13 +103,7 @@ namespace CanFly
     /// </summary>
     public uint Pos 
     {
-      get
-      {
-        uint pos;
-        Syscall.StreamGetPos(Handle, out pos);
-
-        return pos;
-      }
+      get { return Syscall.StreamGetPos(Handle); }
       set { Syscall.StreamSetPos(Handle, value); }
     }
     /// <summary>
@@ -123,12 +111,7 @@ namespace CanFly
     /// </summary>
     public uint Length
     {
-      get 
-      {
-        uint length;
-        Syscall.StreamLength(Handle, out length);
-        return length;
-      }
+      get { return Syscall.StreamLength(Handle); }
       set { Syscall.StreamTruncate(Handle, value); }
     }
     /// <summary>
@@ -146,40 +129,41 @@ namespace CanFly
     /// <returns>Filename of full path</returns>
     public string Path(bool full_path)
     {
-      string path;
-      Syscall.StreamPath(Handle, full_path, out path);
-
-      return path;
+      return Syscall.StreamPath(Handle, full_path);
     }
+  }
 
+  public sealed class ManifestStream : Stream
+  {
+    private ManifestStream(uint handle) : base(handle) {}
+
+    public static ManifestStream Open(string assemblyName, string manifestPath)
+    {
+      return new ManifestStream(Syscall.ManifestStreamOpen(assemblyName, manifestPath));
+    }
   }
 
   public sealed class FileStream : Stream
   {
     private FileStream(uint handle) : base(handle) { }
-
+    /// <summary>
+    /// Open a new stream using the path given
+    /// </summary>
+    /// <param name="path">Path to open</param>
+    /// <returns></returns>
     public static FileStream Open(string path)
     {
-      uint handle;
-      Syscall.FileStreamOpen(path, out handle);
-
-      return new FileStream(handle);
+      return new FileStream(Syscall.FileStreamOpen(path));
     }
 
     public static FileStream Create(string path)
     {
-      uint handle;
-      Syscall.FileStreamCreate(path, out handle);
-
-      return new FileStream(handle);
+      return new FileStream(Syscall.FileStreamCreate(path));
     }
 
     public DirectoryEnumerator EnumerateDirectory(string path)
     {
-      uint handle;
-      Syscall.GetDirectoryEnumerator(path, out handle);
-
-      return new DirectoryEnumerator(handle);
+      return new DirectoryEnumerator(Syscall.GetDirectoryEnumerator(path));
     }
   }
 
@@ -190,18 +174,12 @@ namespace CanFly
 
     public static RegistryStream Open(uint parent, string path)
     {
-      uint handle;
-      Syscall.RegStreamOpen(parent, path, out handle);
-
-      return new RegistryStream(handle);
+      return new RegistryStream(Syscall.RegStreamOpen(parent, path));
     }
 
     public static RegistryStream Create(uint parent, string path)
     {
-      uint handle;
-      Syscall.RegStreamCreate(parent, path, out handle);
-
-      return new RegistryStream(handle);
+      return new RegistryStream(Syscall.RegStreamCreate(parent, path));
     }
   }
 }

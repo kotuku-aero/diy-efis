@@ -21,7 +21,6 @@ SUBDIRS := \
 	System.Collections \
 	System.Math \
 	System.Text \
-	CanFly.Neutron \
 	CanFly.Photon \
 	CanFly.Proton \
 	CanFly.DiyEfis
@@ -35,7 +34,6 @@ all:
 	$(call SUBPROJ, CoreLibrary, all)
 	$(call SUBPROJ, System.Collections, all)
 	$(call SUBPROJ, System.Text, all)
-	$(call SUBPROJ, CanFly.Neutron, all)
 	$(call SUBPROJ, CanFly.Photon, all)
 	$(call SUBPROJ, CanFly.Proton, all)
 	$(call SUBPROJ, CanFly.DiyEfis, all)

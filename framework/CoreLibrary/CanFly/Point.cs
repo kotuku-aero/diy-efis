@@ -41,35 +41,23 @@ using System;
 
 namespace CanFly
 {
-  // we store values as an int as the compiler naturally promotes maths
-  // to an int, however the API uses shorts.  That is handled with the api call's
-  public class Point
+  public struct Point
   {
-    private int _x;
-    private int _y;
-
-    public Point()
-    {
-      X = 0;
-      Y = 0;
-    }
-
     public Point(int x, int y)
     {
-      X = x;
-      Y = y;
+      Syscall.CreatePoint(this, (short)x, (short)y);
     }
 
     public int X
     {
-      get { return _x; }
-      set { _x = value; }
+      get { return Syscall.GetPointX(this); }
+      set { Syscall.SetPointX(this, (short)value); }
     }
 
     public int Y
     {
-      get { return _y; }
-      set { _y = value; }
+      get { return Syscall.GetPointY(this); }
+      set { Syscall.SetPointY(this, (short)value); }
     }
   };
 }

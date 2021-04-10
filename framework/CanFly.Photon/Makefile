@@ -8,19 +8,13 @@ MDPFLAGS=-d $(NAME).pdb
 SRC= \
 	Canvas.cs \
 	Color.cs \
-	Extent.cs \
-	Font.cs \
 	GDIObject.cs \
-	Pen.cs \
 	Photon.cs \
-	Point.cs \
-	PointArray.cs \
-	Rect.cs \
 	Screen.cs \
 	Widget.cs \
 	Properties/AssemblyInfo.cs
 
-LIBS=-reference:../assemblies/mscorlib.dll;../assemblies/CanFly.Neutron.dll
+LIBS=-reference:../assemblies/mscorlib.dll
 RM =rm -rf
 
 OUTPATH=../assemblies

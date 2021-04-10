@@ -23,11 +23,7 @@ namespace System.Threading
     /// <returns>The incremented value.</returns>
     public static int Increment(ref int location)
     {
-      int old_value;
-
-      CanFly.Syscall.InterlockedIncrement(ref location, out old_value);
-
-      return old_value;
+      return CanFly.Syscall.InterlockedIncrement(ref location);
     }
 
     /// <summary>
@@ -37,11 +33,7 @@ namespace System.Threading
     /// <returns>The decremented value.</returns>
     public static int Decrement(ref int location)
     {
-      int old_value;
-
-      CanFly.Syscall.InterlockedDecrement(ref location, out old_value);
-
-      return old_value;
+      return CanFly.Syscall.InterlockedDecrement(ref location);
     }
   }
 }

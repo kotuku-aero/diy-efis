@@ -4,8 +4,15 @@ using System.Runtime.CompilerServices;
 namespace CanFly
 {
   public delegate void ThreadStart();
+  [Flags]
+  public enum TextOutStyle
+  {
+    Clipped = 0x02,
+    Opaque = 0x04
+  }
 
   public delegate void CanFlyEventHandler(CanFlyMsg msg);
+
   public class Syscall
   {
     /*******************************************************/
@@ -16,27 +23,27 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void SystemInformation(out ulong machine_id, out uint version);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void Ticks(out uint ticks);
+    internal static extern uint Ticks();
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void Yield();
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateThread(byte priority, string name, ThreadStart start, object arg, out uint id);
+    internal static extern uint CreateThread(byte priority, string name, ThreadStart start, object arg);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void ThreadGetArg(uint id, out object arg);
+    internal static extern object ThreadGetArg(uint id);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void ThreadGetCurrentId(out uint id);
+    internal static extern uint ThreadGetCurrentId();
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void ThreadSuspend(uint id);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void ThreadResume(uint id);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void GetThreadPriority(uint id, out byte priority);
+    internal static extern byte GetThreadPriority(uint id);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void SetThreadPriority(uint id, byte priority);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void ThreadSleep(uint id, uint millisecondsTimeout);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SemaphoreCreate(out uint handle);
+    internal static extern uint SemaphoreCreate();
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void SemaphoreClose(uint handle);
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -44,57 +51,57 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void SemaphoreWait(uint handle, uint milliseconds);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void InterlockedIncrement(ref int location, out int old_value);
+    internal static extern int InterlockedIncrement(ref int location);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void InterlockedDecrement(ref int location, out int old_value);
+    internal static extern int InterlockedDecrement(ref int location);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegCreateKey(ushort parent, string name, out ushort key);
+    public static extern ushort RegCreateKey(ushort parent, string name);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegOpenKey(ushort parent, string name, out ushort key);
+    public static extern ushort RegOpenKey(ushort parent, string name);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegGetInt8(ushort parent, string name, out sbyte value);
+    public static extern sbyte RegGetInt8(ushort parent, string name);
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void RegSetInt8(ushort parent, string name, sbyte value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegGetUint8(ushort parent, string name, out byte value);
+    public static extern byte RegGetUint8(ushort parent, string name);
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void RegSetUint8(ushort parent, string name, byte value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegGetInt16(ushort parent, string name, out short value);
+    public static extern short RegGetInt16(ushort parent, string name);
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void RegSetInt16(ushort parent, string name, short value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegGetUint16(ushort parent, string name, out ushort value);
+    public static extern ushort RegGetUint16(ushort parent, string name);
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void RegSetUint16(ushort parent, string name, ushort value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegGetInt32(ushort parent, string name, out int value);
+    public static extern int RegGetInt32(ushort parent, string name);
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void RegSetInt32(ushort parent, string name, int value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegGetUint32(ushort parent, string name, out uint value);
+    public static extern uint RegGetUint32(ushort parent, string name);
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void RegSetUint32(ushort parent, string name, uint value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegGetString(ushort parent, string name, out string value);
+    public static extern string RegGetString(ushort parent, string name);
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void RegSetString(ushort parent, string name, string value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegGetFloat(ushort parent, string name, out float value);
+    public static extern float RegGetFloat(ushort parent, string name);
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void RegSetFloat(ushort parent, string name, float value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void RegGetBool(ushort parent, string name, out bool value);
+    public static extern bool RegGetBool(ushort parent, string name);
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void RegSetBool(ushort parent, string name, bool value);
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void RegEnumKey(ushort key, ref ushort child, out string name);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void OpenScreen(ushort orientation, ushort id, out uint handle);
+    internal static extern uint OpenScreen(ushort orientation, ushort id);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateWindow(uint parent, int left, int top, int right, int bottom, ushort id, out uint handle);
+    internal static extern uint CreateWindow(uint parent, Rect rect, ushort id);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateChildWindow(uint parent, int left, int top, int right, int bottom, ushort id, out uint handle);
+    internal static extern uint CreateChildWindow(uint parent, Rect rect, ushort id);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void CloseWindow(uint hwnd);
     /// <summary>
@@ -104,33 +111,33 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void ProcessMessages(uint screen);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void GetWindowRect(uint window, out int left, out int top, out int right, out int bottom);
+    internal static extern Rect GetWindowRect(uint window);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void GetWindowPos(uint window, out int left, out int top, out int right, out int bottom);
+    internal static extern Rect GetWindowPos(uint window);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetWindowPos(uint window, int left, int top, int right, int bottom);
+    internal static extern void SetWindowPos(uint window, Rect rect);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void GetWindowData(uint window, out object widget);
+    internal static extern CanFlyEventHandler GetWindowData(uint window);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void SetWindowData(uint window, CanFlyEventHandler wndproc);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void AddWidgetEvent(uint window, ushort canId);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void GetParent(uint window, out uint parent);
+    internal static extern uint GetParent(uint window);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void GetWindowById(uint parent, ushort id, out uint handle);
+    internal static extern uint GetWindowById(uint parent, ushort id);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void GetFirstChild(uint parent, out uint child);
+    internal static extern uint GetFirstChild(uint parent);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void GetNextSibling(uint handle, out uint child);
+    internal static extern uint GetNextSibling(uint handle);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void GetPreviousSibling(uint handle, out uint child);
+    internal static extern uint GetPreviousSibling(uint handle);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void InsertBefore(uint handle, uint sibling);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void InsertAfter(uint handle, uint sibling);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void GetZOrder(uint handle, out byte z_order);
+    internal static extern byte GetZOrder(uint handle);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void SetZOrder(uint handle, byte z_order);
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -138,92 +145,107 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void CanvasRender(uint handle);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateRectCanvas(int dx, int dy, out uint handle);
+    internal static extern uint CreateRectCanvas(Extent extent);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreatePngCanvas(uint stream, out uint handle);
+    internal static extern uint CreatePngCanvas(Stream stream);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateGeospatialCanvas(uint stream, uint key, out uint handle);
+    internal static extern uint CreateGeospatialCanvas(Stream stream, uint key);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void LoadPng(uint canvas, uint stream, int x, int y);
+    internal static extern void LoadPng(uint canvas, Stream stream, int x, int y);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void GetCanvasExtents(uint canvas, out ushort bpp, out int dx, out int dy);
+    internal static extern Extent GetCanvasExtents(uint canvas);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void GetOrientation(uint hwnd, out ushort orientation);
+    internal static extern ushort GetOrientation(uint hwnd);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void SetOrientation(uint hwnd, ushort orientation);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreatePen(uint color, ushort width, ushort style, out uint handle);
+    internal static extern void CreatePen(Pen pen, uint color, ushort width, PenStyle style);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void GetPenColor(uint handle, out uint color);
+    internal static extern uint GetPenColor(Pen pen);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void GetPenWidth(uint handle, out ushort width);
+    internal static extern void SetPenColor(Pen pen, uint color);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void GetPenStyle(uint handle, out ushort style);
+    internal static extern ushort GetPenWidth(Pen pen);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void SetPenWidth(Pen pen, ushort width);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern PenStyle GetPenStyle(Pen pen);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void SetPenStyle(Pen pen, PenStyle style);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void DisposePen(uint handle);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void Polyline(uint canvas,
-      int clipLeft, int clipTop, int clipRight, int clipBottom,
-      uint penHandle, uint pointsHandle);
+    internal static extern void SetPointX(Point point, short x);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void Line(uint canvas, int clipLeft, int clipTop, int clipRight, int clipBottom,
-      uint penHandle, int from_x, int from_y, int to_x, int to_y);
+    internal static extern short GetPointX(Point point);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void Ellipse(uint canvas, int clipLeft, int clipTop, int clipRight, int clipBottom,
-      uint pen, uint color, int left, int top, int right, int bottom);
+    internal static extern void SetPointY(Point point, short y);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void Polygon(uint canvas, int clipLeft, int clipTop, int clipRight, int clipBottom, uint pen, uint color, uint points);
+    internal static extern short GetPointY(Point point);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void Rectangle(uint canvas, int clipLeft, int clipTop, int clipRight, int clipBottom, uint pen, uint color,
-      int left, int top, int right, int bottom);
+    internal static extern void CreatePoint(Point point, short x, short y);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void RoundRect(uint canvas, int clipLeft, int clipTop, int clipRight, int clipBottom, uint pen, uint color,
-      int left, int top, int right, int bottom, int radius);
+    internal static extern void SetExtentDX(Extent extent, short dx);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void BitBlt(uint canvas, int clipLeft, int clipTop, int clipRight, int clipBottom,
-      int dest_left, int dest_top, int dest_right, int dest_bottom,
-      uint src_canvas, int src_clip_left, int src_clip_top, int src_clip_right, int src_clip_bottom,
-      int src_pt_x, int src_pt_y);
+    internal static extern short GetExtentDX(Extent extent);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void GetPixel(uint canvas, int clipLeft, int clipTop, int clipRight, int clipBottom, int pt_x, int pt_y, out uint color);
+    internal static extern void SetExtentDY(Extent extent, short dy);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetPixel(uint canvas, int clipLeft, int clipTop, int clipRight, int clipBottom, int pt_x, int pt_y, uint c, out uint old_pixel);
+    internal static extern short GetExtentDY(Extent extent);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void Arc(uint canvas,
-                              int clipLeft, int clipTop, int clipRight, int clipBottom,
-                              uint pen,
-                              int pt_x, int pt_y,
-                              int radius,
-                              int start,
-                              int end);
+    internal static extern void CreateExtent(Extent extent, short dx, short dy);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void Pie(uint canvas,
-                              int clipLeft, int clipTop, int clipRight, int clipBottom,
-                              uint pen,
-                              uint color,
-                              int pt_x, int pt_y,
-                              int start,
-                              int end,
-                              int radii,
-                              int inner);
-
+    internal static extern void CreateRect(Rect rect, short left, short top, short right, short bottom);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void OpenFont(string name, ushort pixels, out uint handle);
+    internal static extern short GetRectLeft(Rect rect);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void DrawText(uint canvas, int clipLeft, int clipTop, int clipRight, int clipBottom,
-                                    uint font,
-                                    uint fg,
-                                    uint bg,
-                                    string str,
-                                    int pt_x, int pt_y,
-                                    int txt_clip_left, int txt_clip_top, int txt_clip_right, int txt_clip_bottom,
-                                    ushort format);
+    internal static extern void SetRectLeft(Rect rect, short value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void TextExtent(uint canvas, uint font, string str, out int dx, out int dy);
+    internal static extern short GetRectTop(Rect rect);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void InvalidateRect(uint hwnd, int left, int top, int right, int bottom);
+    internal static extern void SetRectTop(Rect rect, short value);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void IsInvalid(uint hwnd, out bool is_invalid);
+    internal static extern short GetRectRight(Rect rect);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void SetRectRight(Rect rect, short value);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern short GetRectBottom(Rect rect);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void SetRectBottom(Rect rect, short value);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern Point RotatePoint(Point center, Point pt, short degrees);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void Polyline(uint canvas, Rect clipRect, Pen pen, Point[] points);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void Line(uint canvas, Rect clipRect, Pen pen, Point from, Point to);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void Ellipse(uint canvas, Rect clipRect, Pen pen, uint fillColor, Rect rect);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void Polygon(uint canvas, Rect clipRect, Pen pen, uint fillColor, Point[] points);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void Rectangle(uint canvas, Rect clipRect, Pen pen, uint fillColor, Rect rect);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void RoundRect(uint canvas, Rect clipRect, Pen pen, uint fillColor, Rect rect, uint radius);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void BitBlt(uint canvas, Rect clipRect, Rect destRect, uint src_canvas, Rect srcClipRect, Point srcPoint);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern uint GetPixel(uint canvas, Rect clipRect, Point point);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern uint SetPixel(uint canvas, Rect clipRect, Point point, uint color);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void Arc(uint canvas, Rect clipRect, Pen pen, Point center, ushort radius, ushort start, ushort end);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void Pie(uint canvas, Rect clipRect, Pen pen, uint color, Point center, ushort start, ushort end, ushort radii, ushort inner);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void CreateFont(Font font, string name, ushort pixels);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void DrawText(uint canvas, Rect clipRect, Font font, uint fg, uint bg, string str, Point point, Rect textClipRect, TextOutStyle format);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern Extent TextExtent(uint canvas, Font font, string str);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void InvalidateRect(uint hwnd, Rect rect);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern bool IsInvalid(uint hwnd);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void BeginPaint(uint hwnd);
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -314,76 +336,52 @@ namespace CanFly
     internal static extern void PostMessage(uint hndl, uint maxWait, CanFlyMsg msg);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void Send(CanFlyMsg msg);
-
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void StreamEof(uint stream, out bool is_eof);
+    internal static extern bool StreamEof(uint stream);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void StreamRead(uint stream, ushort size, out byte[] value);
+    internal static extern byte[] StreamRead(uint stream, ushort size);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void StreamWrite(uint stream, byte[] buffer);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void StreamGetPos(uint stream, out uint pos);
+    internal static extern uint StreamGetPos(uint stream);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void StreamSetPos(uint stream, uint pos);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void StreamLength(uint stream, out uint lengt);
+    internal static extern uint StreamLength(uint stream);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void StreamTruncate(uint stream, uint length);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void StreamCopy(uint from, uint to);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void StreamPath(uint stream, bool full_path, out string path);
+    internal static extern string StreamPath(uint stream, bool full_path);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void StreamClose(uint stream);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void StreamDelete(uint stream);
-
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void CreateDirectory(string path);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void RemoveDirectory(string path);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void GetDirectoryEnumerator(string path, out uint handle);
+    internal static extern uint GetDirectoryEnumerator(string path);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void FileStreamOpen(string path, out uint handle);
+    internal static extern uint FileStreamOpen(string path);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void FileStreamCreate(string path, out uint handle);
+    internal static extern uint FileStreamCreate(string path);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void RegStreamOpen(uint parent, string path, out uint handle);
+    internal static extern uint RegStreamOpen(uint parent, string path);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void RegStreamCreate(uint parent, string path, out uint handle);
+    internal static extern uint RegStreamCreate(uint parent, string path);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern uint ManifestStreamOpen(string assemblyName, string manifestPath);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void GetDirectoryEntry(uint hndl, out string path, out string name, out bool isFile);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void RewindDirectoryEntry(uint hndl);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void GetFont(string fontName, ushort pointSize, out uint handle);
+    internal static extern Font GetFont(string fontName, ushort pointSize);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void ReleaseFont(uint hndl);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void LoadFont(uint streamHandle);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void PointArrayCreate(ushort numPoints, out uint handle);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void PointArrayRelease(uint handle);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void PointArraySetPoint(uint handle, ushort index, int x, int y);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void PointArrayClear(uint handle);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void PointArraySize(uint handle, out ushort size);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void PointArrayResize(uint handle, ushort size);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void PointArrayAppend(uint handle, int x, int y, out ushort new_size);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void PointArrayInsertAt(uint handle, ushort index, int x, int y);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void PointArrayGetPoint(uint handle, ushort index, out int x, out int y);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void PointArrayIndexOf(uint handle, int x, int y, out int index);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void PointArrayRemoveAt(uint handle, ushort index);
+    internal static extern void LoadFont(Stream streamHandle);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void AddEvent(ushort canId, CanFlyEventHandler handler);
     [MethodImpl(MethodImplOptions.InternalCall)]

@@ -41,33 +41,25 @@ using System;
 
 namespace CanFly
 {
-  /// <summary>
-  /// Generic callback for a CanFly message
-  /// </summary>
-  /// <param name="msg"></param>
-  public delegate void CanFlyMsgHandler(CanFlyMsg msg);
-  /// <summary>
-  /// Holder of a callback from the event system to the CLR
-  /// </summary>
-  public sealed class EventProxy : IDisposable
+  // we store values as an int as the compiler naturally promotes maths
+  // to an int, however the API uses shorts.  That is handled with the api call's
+  public struct Extent
   {
-    private ushort _canId;
-    private CanFlyMsgHandler _callback;
-    public EventProxy(ushort canId, CanFlyMsgHandler callback)
+  public Extent(int dx, int dy)
     {
-      _canId = canId;
-      _callback = callback;
-      Syscall.AddEvent(canId, OnMessage);
+      Syscall.CreateExtent(this, (short)dx, (short)dy);
     }
 
-    private void OnMessage(CanFlyMsg msg)
+    public int Dx
     {
-       _callback(msg);
+      get { return Syscall.GetExtentDX(this); }
+      set { Syscall.SetExtentDX(this, (short)value); }
     }
 
-    public void Dispose()
+    public int Dy
     {
-      Syscall.RemoveEvent(_canId, OnMessage);
+      get { return Syscall.GetExtentDY(this); }
+      set { Syscall.SetExtentDY(this, (short)value); }
     }
-  }
+  };
 }

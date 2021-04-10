@@ -1,4 +1,4 @@
-﻿/*
+/*
 diy-efis
 Copyright (C) 2021 Kotuku Aerospace Limited
 
@@ -41,73 +41,21 @@ using System;
 
 namespace CanFly
 {
-  public enum PenStyle
+  public sealed class Font
   {
-    Solid,
-    Dash,
-    Dot,
-    DashDot,
-    DashDotDot,
-    Null
-  };
-
-  public class Pen : IDisposable
-  {
-    private uint _handle;
-
-    public Pen(uint color, ushort width, PenStyle style)
-    {
-      Syscall.CreatePen(color, width, (ushort) style, out _handle);
-    }
-
     /// <summary>
-    /// Return the handle or 0 if null
+    /// Load a font from the font cache
     /// </summary>
-    /// <param name="pen"></param>
-    /// <returns></returns>
-    static public uint SafeHandle(Pen pen)
+    /// <param name="fontName">Name of the font to load</param>
+    /// <param name="pointSize">Size of the font requested</param>
+    public Font(string fontName, ushort pointSize)
     {
-      return pen == null ? 0 : pen.Handle;
+      CanFly.Syscall.CreateFont(this, fontName, pointSize);
     }
 
-    public void Dispose()
+    public static void LoadFont(Stream fontStream)
     {
-      Syscall.DisposePen(_handle);
+      CanFly.Syscall.LoadFont(fontStream);
     }
-
-    public uint Handle
-    {
-      get { return _handle; }
-    }
-
-    public ushort Width
-    {
-      get
-      {
-        ushort value;
-        Syscall.GetPenWidth(Handle, out value);
-        return value;
-      }
-    }
-
-    public uint Color
-    {
-      get
-      {
-        uint color;
-        Syscall.GetPenColor(Handle, out color);
-        return color;
-      }
-    }
-
-    public PenStyle Style
-    {
-      get 
-      {
-        ushort style;
-        Syscall.GetPenStyle(Handle, out style);
-        return (PenStyle)style;
-      }
-    }
-  };
+  }
 }

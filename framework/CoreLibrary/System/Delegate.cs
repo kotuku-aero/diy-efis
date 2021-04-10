@@ -72,5 +72,13 @@ namespace System
     {
       return !d1.Equals(d2);
     }
+    /// <summary>
+    /// Optional target of the delegate
+    /// </summary>
+    /// <value></value>
+    public Object Target
+    {
+      get { return CanFly.Runtime.DelegateTarget(this); }
+    }
   }
 }

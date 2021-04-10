@@ -196,8 +196,7 @@ namespace CanFly.Proton
           Extent size = TextExtent(_font, str);
 
           DrawText(_font, _textColor, _backgroundColor,
-            str, new Point(width - 20 - size.Dx, markerLine - (size.Dy >> 1)),
-            null, TextOutStyle.Clipped);
+            str, new Point(width - 20 - size.Dx, markerLine - (size.Dy >> 1)));
         }
 
         asiLine -= 25;

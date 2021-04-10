@@ -28,7 +28,7 @@ SRC= \
 	Pens.cs \
 	Properties/AssemblyInfo.cs
 
-LIBS=-reference:../assemblies/mscorlib.dll;../assemblies/CanFly.Neutron.dll;../assemblies/CanFly.Photon.dll;../assemblies/System.Collections.dll
+LIBS=-reference:../assemblies/mscorlib.dll;../assemblies/CanFly.Photon.dll;../assemblies/System.Collections.dll
 RM =rm -rf
 
 OUTPATH=../assemblies

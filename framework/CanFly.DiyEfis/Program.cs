@@ -43,18 +43,15 @@ namespace CanFly.DiyEfis
   {
     public static void Main()
     {
-      ushort protonKey = 0;
-      ushort layoutKey = 0;
-      ushort orientation;
-      string layoutName;
       // all except orientation are required
-      Syscall.RegOpenKey(0, "proton", out protonKey);
-      Syscall.RegGetString(protonKey, "layout", out layoutName);
-      Syscall.RegOpenKey(protonKey, layoutName, out layoutKey);
-      
+      ushort protonKey = Syscall.RegOpenKey(0, "proton");
+      string layoutName = Syscall.RegGetString(protonKey, "layout");
+      ushort layoutKey = Syscall.RegOpenKey(protonKey, layoutName);
+      ushort orientation;
+       
       try
       {
-        Syscall.RegGetUint16(protonKey, "orientation", out orientation);
+        orientation = Syscall.RegGetUint16(protonKey, "orientation");
       }
       catch
       {

@@ -1,4 +1,4 @@
-/*
+﻿/*
 diy-efis
 Copyright (C) 2021 Kotuku Aerospace Limited
 
@@ -41,40 +41,55 @@ using System;
 
 namespace CanFly
 {
-  public class Font : IDisposable
+  public enum PenStyle
   {
-    private uint _hndl;
+    Solid,
+    Dash,
+    Dot,
+    DashDot,
+    DashDotDot,
+    Null
+  };
 
-    internal uint Handle
+  /// <summary>
+  /// A pen is a value type, however the system will share definitions
+  /// of the pen
+  /// </summary>
+  public sealed class Pen
+  {
+    /// <summary>
+    /// Construct a new pen
+    /// </summary>
+    /// <param name="color">Color of the pen</param>
+    /// <param name="width">Width of the line drawn</param>
+    /// <param name="style">Style for the pen</param>
+    public Pen(uint color, ushort width, PenStyle style)
     {
-      get { return _hndl; }
-    }
-
-    public void Dispose()
-    {
-      CanFly.Syscall.ReleaseFont(_hndl);
-      _hndl = 0;
-    }
-    internal Font(uint hndl)
-    {
-      _hndl = hndl;
+      Syscall.CreatePen(this, color, width, style);
     }
     /// <summary>
-    /// Load a font from the font cache
+    /// Width of the pen
     /// </summary>
-    /// <param name="fontName">Name of the font to load</param>
-    /// <param name="pointSize">Size of the font requested</param>
-    public Font(string fontName, ushort pointSize)
+    /// <value>Pen width in pixels</value>
+    public ushort Width
     {
-      CanFly.Syscall.GetFont(fontName, pointSize, out _hndl);
-
-      if (_hndl == 0)
-        throw new InvalidOperationException();
+      get { return Syscall.GetPenWidth(this); }
     }
-
-    public static void LoadFont(Stream fontStream)
+    /// <summary>
+    /// Color of the pen
+    /// </summary>
+    /// <value>RGBA color</value>
+    public uint Color
     {
-      CanFly.Syscall.LoadFont(fontStream.Handle);
+      get { return Syscall.GetPenColor(this); }
     }
-  }
+    /// <summary>
+    /// Style of the pen
+    /// </summary>
+    /// <value>Style</value>
+    public PenStyle Style
+    {
+      get { return Syscall.GetPenStyle(this); }
+    }
+  };
 }

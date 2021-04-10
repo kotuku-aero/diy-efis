@@ -41,12 +41,6 @@ using System;
 
 namespace CanFly
 {
-  [Flags]
-  public enum TextOutStyle
-  {
-    Clipped = 0x02,
-    Opaque = 0x04
-  }
 
   public struct PhotonID
   {

@@ -41,33 +41,18 @@ using System;
 
 namespace CanFly
 {
-  public class Rect
+  public struct Rect
   {
-    private int _left;
-    private int _top;
-    private int _right;
-    private int _bottom;
-
-    public Rect()
-    {
-      _left = 0;
-      _top = 0;
-      _right = 0;
-      _bottom = 0;
-    }
-    /// <summary>
+     /// <summary>
     /// 
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
     /// <param name="top"></param>
     /// <param name="bottom"></param>
-    public Rect(int left, int top, int right, int bottom)
+   public Rect(int left, int top, int right, int bottom)
     {
-      _left = left;
-      _top = top;
-      _right = right;
-      _bottom = bottom;
+      Syscall.CreateRect(this, (short)left, (short)top, (short)right, (short)bottom);
     }
     /// <summary>
     /// 
@@ -76,10 +61,7 @@ namespace CanFly
     /// <param name="extent"></param>
     public Rect(Point pt, Extent extent)
     {
-      _left = pt.X;
-      _top = pt.Y;
-      _right = (int)(_left + extent.Dx);
-      _bottom = (int)(_left + extent.Dy);
+      Syscall.CreateRect(this, (short)pt.X, (short)pt.Y, (short)(pt.X + extent.Dx), (short)(pt.Y + extent.Dy));
     }
     /// <summary>
     /// 
@@ -88,62 +70,90 @@ namespace CanFly
     /// <param name="bottom_right"></param>
     public Rect(Point top_left, Point bottom_right)
     {
-      _left = top_left.X;
-      _top = top_left.Y;
-      _right = bottom_right.X;
-      _bottom = bottom_right.Y;
+      Syscall.SetRectLeft(this, (short)top_left.X);
+      Syscall.SetRectTop(this, (short)top_left.Y);
+      Syscall.SetRectRight(this,(short) bottom_right.X);
+      Syscall.SetRectBottom(this, (short)bottom_right.Y);
     }
-
-    public int Width
+    /// <summary>
+    /// Width of the rectangle
+    /// </summary>
+    /// <value></value>
+    public short Width
     {
-      get { return (int) Math.Abs(_right - _left); }
+      get { return (short) Math.Abs(Right - Left); }
     }
-
+    /// <summary>
+    /// Height of the rectangle
+    /// </summary>
+    /// <value></value>
     public int Height
     {
-      get { return (int) Math.Abs(_bottom - _top); }
+      get { return Math.Abs(Bottom - Height); }
     }
-
+    /// <summary>
+    /// Left position of the rectangle
+    /// </summary>
+    /// <value></value>
     public int Left
     {
-      get { return _left; }
-      set { _left = value; }
+      get { return Syscall.GetRectLeft(this); }
+      set { Syscall.SetRectLeft(this, (short)value); }
     }
-
+    /// <summary>
+    /// Top position of the rectangle
+    /// </summary>
+    /// <value></value>
     public int Top
     {
-      get { return _top; }
-      set { _top = value; }
+      get { return Syscall.GetRectTop(this); }
+      set { Syscall.SetRectTop(this, (short)value); }
     }
-
+    /// <summary>
+    /// Rightmost rectangle point
+    /// </summary>
+    /// <value></value>
     public int Right
     {
-      get { return _right; }
-      set { _right = value; }
+      get { return Syscall.GetRectRight(this); }
+      set { Syscall.SetRectRight(this, (short)value); }
     }
-
+    /// <summary>
+    /// Bottom position of the rectangle
+    /// </summary>
+    /// <value></value>
     public int Bottom
     {
-      get { return _bottom; }
-      set { _bottom = value; }
+      get { return Syscall.GetRectBottom(this); }
+      set { Syscall.SetRectBottom(this, (short)value); }
     }
 
     public Extent Extent
     {
       get
       {
-        return new Extent((int) Math.Abs(_right - _left), (int) Math.Abs(_bottom - _top));
+        return new Extent(Math.Abs(Right - Left), Math.Abs(Bottom - Top));
       }
     }
 
     public Point BottomRight
     {
-      get { return new Point(_right, _bottom); }
+      get { return new Point(Right, Bottom); }
     }
 
     public Point TopLeft
     {
-      get { return new Point(_right, _top); }
+      get { return new Point(Left, Top); }
+    }
+
+    public Point BottomLeft
+    {
+      get { return new Point(Left, Bottom); }
+    }
+
+    public Point TopRight
+    {
+      get { return new Point(Right, Top); }
     }
   };
 }

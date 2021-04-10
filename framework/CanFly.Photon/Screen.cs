@@ -67,10 +67,7 @@ namespace CanFly
       {
         if (_screen == null)
         {
-          uint handle;
-          Syscall.OpenScreen(0, 0, out handle);
-
-          _screen = new Screen(handle);
+          _screen = new Screen(Syscall.OpenScreen(0, 0));
         }
 
         return _screen;
