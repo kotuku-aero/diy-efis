@@ -189,7 +189,7 @@ namespace CanFly
           if (Verbose)
             System.Console.WriteLine("Generating skeleton files...");
 
-          var skeletonGenerator = new nanoSkeletonGenerator(
+          var skeletonGenerator = new canflySkeletonGenerator(
               _assemblyBuilder.TablesContext,
               skeletonPath,
               "mscorlib",

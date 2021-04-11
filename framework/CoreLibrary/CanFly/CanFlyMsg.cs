@@ -289,7 +289,6 @@ public sealed class CanFlyMsg
     public static byte NodeID
     {
       get { return nodeId; }
-      set { nodeId = value; }
     }
     /// <summary>
     /// Flag for a reply message
@@ -297,7 +296,6 @@ public sealed class CanFlyMsg
     public bool Reply
     {
       get { return Syscall.GetReply(this); }
-      set { Syscall.SetReply(this, value); }
     }
     /// <summary>
     /// ID of the CAN message
@@ -305,7 +303,6 @@ public sealed class CanFlyMsg
     public ushort CanID
     {
       get { return Syscall.GetCanID(this); }
-      set { Syscall.SetCanID(this, value); }
     }
     /// <summary>
     /// CanFly node id
@@ -313,7 +310,6 @@ public sealed class CanFlyMsg
     public byte NodeId 
     { 
       get { return Syscall.GetNodeID(this); } 
-      set { Syscall.SetNodeID(this, value); }
     }
     /// <summary>
     /// The type of data
@@ -328,7 +324,6 @@ public sealed class CanFlyMsg
     internal byte ServiceCode 
     {
       get { return Syscall.GetServiceCode(this); } 
-      set { Syscall.SetServiceCode(this, value); }
     }
     /// <summary>
     /// The message code
@@ -336,19 +331,14 @@ public sealed class CanFlyMsg
     internal byte MessageCode 
     {
       get { return Syscall.GetMessageCode(this); } 
-      set { Syscall.SetServiceCode(this, value); }
     }
     /// <summary>
     /// Create a message with the NoData type
     /// </summary>
     /// <param name="id">Message ID</param>
-    public CanFlyMsg(ushort id)
+    public static CanFlyMsg Create(ushort id)
     {
-      Syscall.CreateMessage(this, nodeId, id);
-    }
-    private CanFlyMsg(ushort id, bool isError, uint error)
-    {
-      Syscall.CreateErrorMessage(this, nodeId, id, error);
+      return Syscall.CreateMessage(nodeId, id);
     }
     /// <summary>
     /// Create an error message
@@ -358,43 +348,43 @@ public sealed class CanFlyMsg
     /// <returns>Constructed message</returns>
     public static CanFlyMsg CreateErrorMessage(ushort id, uint error)
     {
-      return new CanFlyMsg(id, true, error);
+      return Syscall.CreateErrorMessage(nodeId, id, error);
     }
     /// <summary>
     /// Create a new message
     /// </summary>
     /// <param name="id">Can ID</param>
     /// <param name="v">value to assign</param>
-    public CanFlyMsg(ushort id, uint value)
+    public static CanFlyMsg Create(ushort id, uint value)
     {
-      Syscall.CreateMessage(this, nodeId, id, value);
+      return Syscall.CreateMessage(nodeId, id, value);
     }
     /// <summary>
     /// Create a new message
     /// </summary>
     /// <param name="id">Can ID</param>
     /// <param name="v">value to assign</param>
-    public CanFlyMsg(ushort id, int value)
+    public static CanFlyMsg Create(ushort id, int value)
     {
-      Syscall.CreateMessage(this, nodeId, id, value);
+      return Syscall.CreateMessage(nodeId, id, value);
     }
     /// <summary>
     /// Create a new message
     /// </summary>
     /// <param name="id">Can ID</param>
     /// <param name="v">value to assign</param>
-    public CanFlyMsg(ushort id, ushort value)
+    public static CanFlyMsg Create(ushort id, ushort value)
     {
-      Syscall.CreateMessage(this, nodeId, id, value);
+      return Syscall.CreateMessage(nodeId, id, value);
     }
     /// <summary>
     /// Create a new message
     /// </summary>
     /// <param name="id">Can ID</param>
     /// <param name="v">value to assign</param>
-    public CanFlyMsg(ushort id, short value)
+    public static CanFlyMsg Create(ushort id, short value)
     {
-      Syscall.CreateMessage(this, nodeId, id, value);
+      return Syscall.CreateMessage(nodeId, id, value);
     }
     /// <summary>
     /// Create a new message
@@ -402,9 +392,9 @@ public sealed class CanFlyMsg
     /// <param name="id">Can ID</param>
     /// <param name="v1">value1 to send</param>
     /// <param name="v2">value2 to send</param>
-    public CanFlyMsg(ushort id, ushort v1, ushort v2)
+    public static CanFlyMsg Create(ushort id, ushort v1, ushort v2)
     {
-      Syscall.CreateMessage(this, nodeId, id, v1, v2);
+      return Syscall.CreateMessage(nodeId, id, v1, v2);
     }
     /// <summary>
     /// Create a new message
@@ -412,46 +402,36 @@ public sealed class CanFlyMsg
     /// <param name="id">Can ID</param>
     /// <param name="v1">value1 to send</param>
     /// <param name="v2">value2 to send</param>
-    public CanFlyMsg(ushort id, short v1, short v2)
+    public static CanFlyMsg Create(ushort id, short v1, short v2)
     {
-       Syscall.CreateMessage(this, nodeId, id, v1, v2);
+       return Syscall.CreateMessage(nodeId, id, v1, v2);
     }
     /// <summary>
     /// Create a new message
     /// </summary>
     /// <param name="id">Can ID</param>
     /// <param name="v">value to assign</param>
-    public CanFlyMsg(ushort id, float v)
+    public static CanFlyMsg Create(ushort id, float v)
     {
-      Syscall.CreateMessage(this, nodeId, id, v);
+      return Syscall.CreateMessage(nodeId, id, v);
     }
     /// <summary>
     /// Create a new message
     /// </summary>
     /// <param name="id">Can ID</param>
     /// <param name="b0">value to assign</param>
-    public CanFlyMsg(ushort id, sbyte b0)
+    public static CanFlyMsg Create(ushort id, sbyte b0)
     {
-      Syscall.CreateMessage(this, nodeId, id, b0);
+      return Syscall.CreateMessage(nodeId, id, b0);
     }
     /// <summary>
     /// Create a new message
     /// </summary>
     /// <param name="id">Can ID</param>
     /// <param name="b0">value to assign</param>
-    public CanFlyMsg(ushort id, byte b0)
+    public static CanFlyMsg Create(ushort id, byte b0)
     {
-      Syscall.CreateMessage(this, nodeId, id, b0);
-    }
-    /// <summary>
-    /// Create a new message
-    /// </summary>
-    /// <param name="id">Can ID</param>
-    /// <param name="b0">value to assign</param>
-    /// <param name="b1">value to assign</param>
-    public CanFlyMsg(ushort id, byte b0, byte b1)
-    {
-      Syscall.CreateMessage(this, nodeId, id, b0, b1);
+      return Syscall.CreateMessage(nodeId, id, b0);
     }
     /// <summary>
     /// Create a new message
@@ -459,9 +439,19 @@ public sealed class CanFlyMsg
     /// <param name="id">Can ID</param>
     /// <param name="b0">value to assign</param>
     /// <param name="b1">value to assign</param>
-    public CanFlyMsg(ushort id, sbyte b0, sbyte b1)
+    public static CanFlyMsg Create(ushort id, byte b0, byte b1)
     {
-      Syscall.CreateMessage(this, nodeId, id, b0, b1);
+      return Syscall.CreateMessage(nodeId, id, b0, b1);
+    }
+    /// <summary>
+    /// Create a new message
+    /// </summary>
+    /// <param name="id">Can ID</param>
+    /// <param name="b0">value to assign</param>
+    /// <param name="b1">value to assign</param>
+    public static CanFlyMsg Create(ushort id, sbyte b0, sbyte b1)
+    {
+      return Syscall.CreateMessage(nodeId, id, b0, b1);
     }
     /// <summary>
     /// Create a new message
@@ -470,9 +460,9 @@ public sealed class CanFlyMsg
     /// <param name="b0">value to assign</param>
     /// <param name="b1">value to assign</param>
     /// <param name="b2">value to assign</param>
-    public CanFlyMsg(ushort id, byte b0, byte b1, byte b2)
+    public static CanFlyMsg Create(ushort id, byte b0, byte b1, byte b2)
     {
-      Syscall.CreateMessage(this, nodeId, id, b0, b1, b2);
+      return Syscall.CreateMessage(nodeId, id, b0, b1, b2);
     }
     /// <summary>
     /// Create a new message
@@ -481,9 +471,9 @@ public sealed class CanFlyMsg
     /// <param name="b0">value to assign</param>
     /// <param name="b1">value to assign</param>
     /// <param name="b2">value to assign</param>
-    public CanFlyMsg(ushort id, sbyte b0, sbyte b1, sbyte b2)
+    public static CanFlyMsg Create(ushort id, sbyte b0, sbyte b1, sbyte b2)
     {
-      Syscall.CreateMessage(this, nodeId, id, b0, b1, b2);
+      return Syscall.CreateMessage(nodeId, id, b0, b1, b2);
     }
     /// <summary>
     /// Create a new message
@@ -493,9 +483,9 @@ public sealed class CanFlyMsg
     /// <param name="b1">value to assign</param>
     /// <param name="b2">value to assign</param>
     /// <param name="b3">value to assign</param>
-    public CanFlyMsg(ushort id, byte b0, byte b1, byte b2, byte b3)
+    public static CanFlyMsg Create(ushort id, byte b0, byte b1, byte b2, byte b3)
     {
-      Syscall.CreateMessage(this, nodeId, id, b0, b1, b2, b3);
+      return Syscall.CreateMessage(nodeId, id, b0, b1, b2, b3);
     }
     /// <summary>
     /// Create a new message
@@ -505,9 +495,9 @@ public sealed class CanFlyMsg
     /// <param name="b1">value to assign</param>
     /// <param name="b2">value to assign</param>
     /// <param name="b3">value to assign</param>
-    public CanFlyMsg(ushort id, sbyte b0, sbyte b1, sbyte b2, sbyte b3)
+    public static CanFlyMsg Create(ushort id, sbyte b0, sbyte b1, sbyte b2, sbyte b3)
     {
-      Syscall.CreateMessage(this, nodeId, id, b0, b1, b2, b3);
+      return Syscall.CreateMessage(nodeId, id, b0, b1, b2, b3);
     }
     /// <summary>
     /// Get the float value encapsulated

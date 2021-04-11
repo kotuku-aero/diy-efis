@@ -70,10 +70,10 @@ namespace CanFly
     /// <param name="bottom_right"></param>
     public Rect(Point top_left, Point bottom_right)
     {
-      Syscall.SetRectLeft(this, (short)top_left.X);
-      Syscall.SetRectTop(this, (short)top_left.Y);
-      Syscall.SetRectRight(this,(short) bottom_right.X);
-      Syscall.SetRectBottom(this, (short)bottom_right.Y);
+      Syscall.SetRectLeft(ref this, (short)top_left.X);
+      Syscall.SetRectTop(ref this, (short)top_left.Y);
+      Syscall.SetRectRight(ref this,(short) bottom_right.X);
+      Syscall.SetRectBottom(ref this, (short)bottom_right.Y);
     }
     /// <summary>
     /// Width of the rectangle
@@ -98,7 +98,7 @@ namespace CanFly
     public int Left
     {
       get { return Syscall.GetRectLeft(this); }
-      set { Syscall.SetRectLeft(this, (short)value); }
+      set { Syscall.SetRectLeft(ref this, (short)value); }
     }
     /// <summary>
     /// Top position of the rectangle
@@ -107,7 +107,7 @@ namespace CanFly
     public int Top
     {
       get { return Syscall.GetRectTop(this); }
-      set { Syscall.SetRectTop(this, (short)value); }
+      set { Syscall.SetRectTop(ref this, (short)value); }
     }
     /// <summary>
     /// Rightmost rectangle point
@@ -116,7 +116,7 @@ namespace CanFly
     public int Right
     {
       get { return Syscall.GetRectRight(this); }
-      set { Syscall.SetRectRight(this, (short)value); }
+      set { Syscall.SetRectRight(ref this, (short)value); }
     }
     /// <summary>
     /// Bottom position of the rectangle
@@ -125,7 +125,7 @@ namespace CanFly
     public int Bottom
     {
       get { return Syscall.GetRectBottom(this); }
-      set { Syscall.SetRectBottom(this, (short)value); }
+      set { Syscall.SetRectBottom(ref this, (short)value); }
     }
 
     public Extent Extent

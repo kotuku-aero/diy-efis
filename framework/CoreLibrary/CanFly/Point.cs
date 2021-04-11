@@ -51,13 +51,13 @@ namespace CanFly
     public int X
     {
       get { return Syscall.GetPointX(this); }
-      set { Syscall.SetPointX(this, (short)value); }
+      set { Syscall.SetPointX(ref this, (short)value); }
     }
 
     public int Y
     {
       get { return Syscall.GetPointY(this); }
-      set { Syscall.SetPointY(this, (short)value); }
+      set { Syscall.SetPointY(ref this, (short)value); }
     }
   };
 }

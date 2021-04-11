@@ -43,6 +43,7 @@ namespace CanFly
 {
   public sealed class Font
   {
+    private uint _handle;
     /// <summary>
     /// Load a font from the font cache
     /// </summary>
@@ -50,7 +51,7 @@ namespace CanFly
     /// <param name="pointSize">Size of the font requested</param>
     public Font(string fontName, ushort pointSize)
     {
-      CanFly.Syscall.CreateFont(this, fontName, pointSize);
+      _handle = CanFly.Syscall.OpenFont(fontName, pointSize);
     }
 
     public static void LoadFont(Stream fontStream)

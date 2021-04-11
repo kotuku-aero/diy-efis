@@ -18,7 +18,7 @@ namespace CanFly.Tools.MetadataProcessor.Core
   /// <summary>
   /// Generator of skeleton files from a .NET nanoFramework assembly.
   /// </summary>
-  public sealed class nanoSkeletonGenerator
+  public sealed class canflySkeletonGenerator
   {
     private readonly TablesContext _tablesContext;
     private readonly string _path;
@@ -30,7 +30,7 @@ namespace CanFly.Tools.MetadataProcessor.Core
 
     private string _safeProjectName => _project.Replace('.', '_');
 
-    public nanoSkeletonGenerator(
+    public canflySkeletonGenerator(
         TablesContext tablesContext,
         string path,
         string name,
@@ -321,10 +321,59 @@ namespace CanFly.Tools.MetadataProcessor.Core
       }
     }
 
+    private int AddOrFindSignature(List<byte[]> signatures, MethodDefinition methodReference)
+    {
+      byte[] signature = _tablesContext.SignaturesTable.GetSignature(methodReference);
+
+      int offset = 0;
+      for(int i = 0; i < signatures.Count; i++)
+      {
+        byte[] otherSig = signatures[i];
+
+        if (otherSig.Length != signature.Length)
+        {
+          offset += otherSig.Length;
+          continue;
+        }
+
+        bool found = true;
+        for(int j = 0; j < signature.Length; j++)
+        {
+          if(signature[j] != otherSig[j])
+          {
+            found = false;
+            break;
+          }
+        }
+
+        if (found)
+          return offset;
+
+        offset += otherSig.Length;
+      }
+
+      signatures.Add(signature);
+      return offset;
+    }
+
+    private int AddOrFindName(List<StringWrapper> names, string name)
+    {
+      int index = 0;
+      foreach(StringWrapper value in names)
+      {
+        if (value.Value == name)
+          return index;
+        index++;
+      }
+
+      names.Add(new StringWrapper() { Value = name });
+      return index;
+    }
+
     private void GenerateAssemblyLookup()
     {
       // grab native version from assembly attribute
-      var nativeVersionAttribute = _tablesContext.AssemblyDefinition.CustomAttributes.FirstOrDefault(a => a?.AttributeType?.Name == "AssemblyNativeVersionAttribute");
+      CustomAttribute nativeVersionAttribute = _tablesContext.AssemblyDefinition.CustomAttributes.FirstOrDefault(a => a?.AttributeType?.Name == "AssemblyNativeVersionAttribute");
 
       // check for existing AssemblyNativeVersionAttribute
       if (nativeVersionAttribute == null)
@@ -336,7 +385,7 @@ namespace CanFly.Tools.MetadataProcessor.Core
 
       Version nativeVersion = new Version((string)nativeVersionAttribute.ConstructorArguments[0].Value);
 
-      var assemblyLookup = new AssemblyLookupTable()
+      AssemblyLookupTable assemblyLookup = new AssemblyLookupTable()
       {
         IsCoreLib = _isCoreLib,
         Name = _assemblyName,
@@ -346,64 +395,66 @@ namespace CanFly.Tools.MetadataProcessor.Core
         NativeCRC32 = "0x" + _tablesContext.NativeMethodsCrc.CurrentCrc.ToString("X8")
       };
 
+      List<byte[]> signatures = new List<byte[]>();
 
-      foreach (var c in _tablesContext.TypeDefinitionTable.Items)
+      foreach (TypeDefinition type_def in _tablesContext.TypeDefinitionTable.Items)
       {
         // only care about types that have methods
-        if (c.HasMethods)
+        if (type_def.HasMethods)
         {
-          if (c.IncludeInStub())
+          if (type_def.IncludeInStub())
           {
-            var className = NativeMethodsCrc.GetClassName(c);
+            string className = NativeMethodsCrc.GetClassName(type_def);
 
-            foreach (var m in TablesContext.GetOrderedMethods(c.Methods))
+            foreach (MethodDefinition method_def in TablesContext.GetOrderedMethods(type_def.Methods))
             {
-              var rva = _tablesContext.ByteCodeTable.GetMethodRva(m);
+              ushort rva = _tablesContext.ByteCodeTable.GetMethodRva(method_def);
 
               // check method inclusion
               // method is not a native implementation (RVA 0xFFFF) and is not abstract
-              if ((rva == 0xFFFF &&
-                      !m.IsAbstract))
+              if ((rva == 0xFFFF && !method_def.IsAbstract))
               {
-                assemblyLookup.LookupTable.Add(new MethodStub()
+                MethodStub stub = new MethodStub()
                 {
-                  Declaration = $"Library_{_safeProjectName}_{className}::{NativeMethodsCrc.GetMethodName(m)}"
-                });
+                  Declaration = $"lib_{className}_{NativeMethodsCrc.GetMethodName(method_def)}",
+                  ClassStringIndex = AddOrFindName(assemblyLookup.StringTable, type_def.FullName),
+                  MethodStringIndex = AddOrFindName(assemblyLookup.StringTable, method_def.Name),
+                  MethodSignatureIndex = AddOrFindSignature(signatures, method_def)
+                };
+
+                assemblyLookup.LookupTable.Add(stub);
               }
-              else
-              {
-                // method won't be included, still
-                // need to add a NULL entry for it
-                assemblyLookup.LookupTable.Add(new MethodStub()
-                {
-                  Declaration = "NULL"
-                  //Declaration = $"**Library_{_safeProjectName}_{NativeMethodsCrc.GetClassName(c)}::{NativeMethodsCrc.GetMethodName(m)}"
-                });
-              }
-            }
-          }
-          else
-          {
-            // type won't be included, still
-            // need to add a NULL entry for each method 
-            foreach (var m in TablesContext.GetOrderedMethods(c.Methods))
-            {
-              assemblyLookup.LookupTable.Add(new MethodStub()
-              {
-                Declaration = "NULL"
-                //Declaration = $"**Library_{_safeProjectName}_{NativeMethodsCrc.GetClassName(c)}::{NativeMethodsCrc.GetMethodName(m)}"
-              });
             }
           }
         }
       }
 
+      // flatten the signatures to the output format.  These are c-style byte string as "0xnn, "
+      List<byte> bytes = new List<byte>();
+      foreach (byte[] sig in signatures)
+        bytes.AddRange(sig);
+
+      string tmp = "";
+      for(int i = 0; i < bytes.Count; i++)
+      {
+        tmp += String.Format("0x{0:X2}, ", bytes[i]);
+
+        if ((i % 16) == 15)
+        {
+          assemblyLookup.SignatureBytes.Add(new StringWrapper() { Value = tmp });
+          tmp = "";
+        }
+      }
+
+      if (!String.IsNullOrEmpty(tmp))
+        assemblyLookup.SignatureBytes.Add(new StringWrapper() { Value = tmp });
+
       FormatCompiler compiler = new FormatCompiler();
       Generator generator = compiler.Compile(SkeletonTemplates.AssemblyLookupTemplate);
 
-      using (var headerFile = File.CreateText(Path.Combine(_path, $"{_safeProjectName}.cpp")))
+      using (StreamWriter headerFile = File.CreateText(Path.Combine(_path, $"{_safeProjectName}.cpp")))
       {
-        var output = generator.Render(assemblyLookup);
+        string output = generator.Render(assemblyLookup);
         headerFile.Write(output);
       }
     }

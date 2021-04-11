@@ -7,14 +7,14 @@ using System.Collections.Generic;
 
 namespace CanFly.Tools.MetadataProcessor.Core
 {
-    public class AssemblyClassTable
-    {
-        public string AssemblyName;
-        public string HeaderFileName;
-        public string ProjectName;
-        public bool IsInterop;
+  public class AssemblyClassTable
+  {
+    public string AssemblyName;
+    public string HeaderFileName;
+    public string ProjectName;
+    public bool IsInterop;
 
-        public List<Class> Classes = new List<Class>();
-        public List<ClassWithStubs> ClassesWithStubs = new List<ClassWithStubs>();
-    }
+    public List<Class> Classes = new List<Class>();
+    public List<ClassWithStubs> ClassesWithStubs = new List<ClassWithStubs>();
+  }
 }

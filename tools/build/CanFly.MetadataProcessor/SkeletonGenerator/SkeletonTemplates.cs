@@ -32,59 +32,16 @@ namespace CanFly.Tools.MetadataProcessor
 {{/if}}
 {{#newline}}
 
-#ifndef _{{ShortNameUpper}}_H_{{#newline}}
-#define _{{ShortNameUpper}}_H_{{#newline}}
+#ifndef __{{ShortNameUpper}}_h__{{#newline}}
+#define __{{ShortNameUpper}}_h__{{#newline}}
 {{#newline}}
 
-#include <nanoCLR_Interop.h>{{#newline}}
-#include <nanoCLR_Runtime.h>{{#newline}}
-#include <nanoPackStruct.h>{{#newline}}
-{{#if IsCoreLib}}
-#include <corlib_native.h>{{#newline}}
-{{#else}}
-{{/if}}
+#include ""../ion_assembly.h""{{#newline}}
 {{#newline}}
 
-{{#each Enums}}
-typedef enum {{EnumName}}{{#newline}}
-{
+extern const native_assembly_data_t clr_native_methods_{{Name}};{{#newline}}
 {{#newline}}
-{{#each Items}}
-    {{Name}} = {{Value}},{{#newline}}
-{{/each}}
-
-} {{EnumName}};{{#newline}}
-{{#newline}}
-{{/each}}
-
-{{#each Classes}}
-struct Library_{{AssemblyName}}_{{Name}}{{#newline}}
-{{{#newline}}
-
-{{#each StaticFields}}
-    static const int FIELD_STATIC__{{Name}} = {{ReferenceIndex}};{{#newline}}
-{{/each}}
-{{#if StaticFields}}{{#newline}}{{/if}}
-
-{{#each InstanceFields}}
-{{#if FieldWarning}}{{FieldWarning}}{{/if}}
-    static const int FIELD__{{Name}} = {{ReferenceIndex}};{{#newline}}
-{{/each}}
-{{#if InstanceFields}}{{#newline}}{{/if}}
-
-{{#each Methods}}
-    NANOCLR_NATIVE_DECLARE({{Declaration}});{{#newline}}
-{{/each}}
-{{#if Methods}}{{#newline}}{{/if}}
-
-    //--//{{#newline}}
-{{#newline}}
-};{{#newline}}
-{{#newline}}
-{{/each}}
-extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_{{Name}};{{#newline}}
-{{#newline}}
-#endif  //_{{ShortNameUpper}}_H_{{#newline}}
+#endif{{#newline}}
 ";
 
         internal const string AssemblyLookupTemplate =
@@ -104,28 +61,45 @@ extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_{{Name}};{{#newline}
 #include ""{{HeaderFileName}}.h""{{#newline}}
 {{#newline}}
 
-// clang-format off{{#newline}}
-{{#newline}}
+{{#each LookupTable}}
+extern result_t {{Declaration}}(stack_ptr_t &stack, instruction_ptr_t &ip);{{#newline}}
+{{/each}}
 
-static const CLR_RT_MethodHandler method_lookup[] ={{#newline}}
+static const native_method_t method_lookup[] ={{#newline}}
 {{{#newline}}
 {{#each LookupTable}}
-    {{Declaration}},{{#newline}}
+    { {{ClassStringIndex}}, {{MethodStringIndex}}, {{MethodSignatureIndex}},  {{Declaration}} },{{#newline}}  
 {{/each}}
 };{{#newline}}
 {{#newline}}
 
-const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_{{Name}} ={{#newline}}
+static const uint8_t method_signatures[] ={{#newline}}
 {{{#newline}}
-    ""{{AssemblyName}}"",{{#newline}}
-    {{NativeCRC32}},{{#newline}}
-    method_lookup,{{#newline}}
-    { {{NativeVersion.Major}}, {{NativeVersion.Minor}}, {{NativeVersion.Build}}, {{NativeVersion.Revision}} }{{#newline}}
+{{#each SignatureBytes}}
+  {{Value}}{{#newline}}
+{{/each}}
+};{{#newline}}
+{{#newline}}
+
+static const char *string_table[] ={{#newline}}
+{{{#newline}}
+{{#each StringTable}}
+  ""{{Value}}"",{{#newline}}
+{{/each}}
+};{{#newline}}
+{{#newline}}
+
+const native_assembly_data_t clr_native_methods_{{Name}} ={{#newline}}
+{{{#newline}}
+  ""{{AssemblyName}}"",{{#newline}}
+  { {{NativeVersion.Major}}, {{NativeVersion.Minor}}, {{NativeVersion.Build}}, {{NativeVersion.Revision}} },{{#newline}}
+  method_lookup,{{#newline}}
+  numelements(method_lookup),{{#newline}}
+  method_signatures,{{#newline}}
+  string_table,{{#newline}}
 };{{#newline}}
 
 {{#newline}}
-// clang-format on{{#newline}}
-
 ";
 
         internal const string ClassWithoutInteropStubTemplate =

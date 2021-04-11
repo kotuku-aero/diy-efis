@@ -53,13 +53,13 @@ namespace CanFly
     public int Dx
     {
       get { return Syscall.GetExtentDX(this); }
-      set { Syscall.SetExtentDX(this, (short)value); }
+      set { Syscall.SetExtentDX(ref this, (short)value); }
     }
 
     public int Dy
     {
       get { return Syscall.GetExtentDY(this); }
-      set { Syscall.SetExtentDY(this, (short)value); }
+      set { Syscall.SetExtentDY(ref this, (short)value); }
     }
   };
 }

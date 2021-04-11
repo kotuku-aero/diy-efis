@@ -151,7 +151,7 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern uint CreateGeospatialCanvas(Stream stream, uint key);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void LoadPng(uint canvas, Stream stream, int x, int y);
+    internal static extern void LoadPng(uint canvas, Stream stream, Point pt);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern Extent GetCanvasExtents(uint canvas);
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -163,33 +163,25 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern uint GetPenColor(Pen pen);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetPenColor(Pen pen, uint color);
-    [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern ushort GetPenWidth(Pen pen);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetPenWidth(Pen pen, ushort width);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern PenStyle GetPenStyle(Pen pen);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetPenStyle(Pen pen, PenStyle style);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void DisposePen(uint handle);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetPointX(Point point, short x);
+    internal static extern void SetPointX(ref Point point, short x);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern short GetPointX(Point point);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetPointY(Point point, short y);
+    internal static extern void SetPointY(ref Point point, short y);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern short GetPointY(Point point);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void CreatePoint(Point point, short x, short y);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetExtentDX(Extent extent, short dx);
+    internal static extern void SetExtentDX(ref Extent extent, short dx);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern short GetExtentDX(Extent extent);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetExtentDY(Extent extent, short dy);
+    internal static extern void SetExtentDY(ref Extent extent, short dy);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern short GetExtentDY(Extent extent);
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -199,19 +191,19 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern short GetRectLeft(Rect rect);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetRectLeft(Rect rect, short value);
+    internal static extern void SetRectLeft(ref Rect rect, short value);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern short GetRectTop(Rect rect);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetRectTop(Rect rect, short value);
+    internal static extern void SetRectTop(ref Rect rect, short value);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern short GetRectRight(Rect rect);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetRectRight(Rect rect, short value);
+    internal static extern void SetRectRight(ref Rect rect, short value);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern short GetRectBottom(Rect rect);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetRectBottom(Rect rect, short value);
+    internal static extern void SetRectBottom(ref Rect rect, short value);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern Point RotatePoint(Point center, Point pt, short degrees);
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -237,11 +229,11 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void Pie(uint canvas, Rect clipRect, Pen pen, uint color, Point center, ushort start, ushort end, ushort radii, ushort inner);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateFont(Font font, string name, ushort pixels);
+    internal static extern uint OpenFont(string name, ushort pixels);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void DrawText(uint canvas, Rect clipRect, Font font, uint fg, uint bg, string str, Point point, Rect textClipRect, TextOutStyle format);
+    internal static extern void DrawText(uint canvas, Rect clipRect, uint font, uint fg, uint bg, string str, Point point, Rect textClipRect, TextOutStyle format);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern Extent TextExtent(uint canvas, Font font, string str);
+    internal static extern Extent TextExtent(uint canvas, uint font, string str);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void InvalidateRect(uint hwnd, Rect rect);
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -251,43 +243,39 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void EndPaint(uint hwnd);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateMessage(CanFlyMsg msg, byte nodeId, ushort id);
+    internal static extern CanFlyMsg CreateMessage(byte nodeId, ushort id);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateErrorMessage(CanFlyMsg msg, byte nodeId, ushort id, uint error);
+    internal static extern CanFlyMsg CreateErrorMessage(byte nodeId, ushort id, uint error);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateMessage(CanFlyMsg msg, byte nodeId, ushort id, byte b0);
+    internal static extern CanFlyMsg CreateMessage(byte nodeId, ushort id, byte b0);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateMessage(CanFlyMsg msg, byte nodeId, ushort id, byte b0, byte b1);
+    internal static extern CanFlyMsg CreateMessage(byte nodeId, ushort id, byte b0, byte b1);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateMessage(CanFlyMsg msg, byte nodeId, ushort id, byte b0, byte b1, byte b2);
+    internal static extern CanFlyMsg CreateMessage(byte nodeId, ushort id, byte b0, byte b1, byte b2);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateMessage(CanFlyMsg msg, byte nodeId, ushort id, byte b0, byte b1, byte b2, byte b3);
+    internal static extern CanFlyMsg CreateMessage(byte nodeId, ushort id, byte b0, byte b1, byte b2, byte b3);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateMessage(CanFlyMsg msg, byte nodeId, ushort id, sbyte c1);
+    internal static extern CanFlyMsg CreateMessage(byte nodeId, ushort id, sbyte c1);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateMessage(CanFlyMsg msg, byte nodeId, ushort id, sbyte c1, sbyte c2);
+    internal static extern CanFlyMsg CreateMessage(byte nodeId, ushort id, sbyte c1, sbyte c2);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateMessage(CanFlyMsg msg, byte nodeId, ushort id, sbyte c1, sbyte c2, sbyte c3);
+    internal static extern CanFlyMsg CreateMessage(byte nodeId, ushort id, sbyte c1, sbyte c2, sbyte c3);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateMessage(CanFlyMsg msg, byte nodeId, ushort id, sbyte c1, sbyte c2, sbyte c3, sbyte c4);
+    internal static extern CanFlyMsg CreateMessage(byte nodeId, ushort id, sbyte c1, sbyte c2, sbyte c3, sbyte c4);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateMessage(CanFlyMsg msg, byte nodeId, ushort id, ushort v1);
+    internal static extern CanFlyMsg CreateMessage(byte nodeId, ushort id, ushort v1);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateMessage(CanFlyMsg msg, byte nodeId, ushort id, ushort v1, ushort v2);
+    internal static extern CanFlyMsg CreateMessage(byte nodeId, ushort id, ushort v1, ushort v2);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateMessage(CanFlyMsg msg, byte nodeId, ushort id, short v1);
+    internal static extern CanFlyMsg CreateMessage(byte nodeId, ushort id, short v1);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateMessage(CanFlyMsg msg, byte nodeId, ushort id, short v1, short v2);
+    internal static extern CanFlyMsg CreateMessage(byte nodeId, ushort id, short v1, short v2);
      [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateMessage(CanFlyMsg msg, byte nodeId, ushort id, uint v1);
+    internal static extern CanFlyMsg CreateMessage(byte nodeId, ushort id, uint v1);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateMessage(CanFlyMsg msg, byte nodeId, ushort id, uint v1, uint v2);
+    internal static extern CanFlyMsg CreateMessage(byte nodeId, ushort id, int v1);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateMessage(CanFlyMsg msg, byte nodeId, ushort id, int v1);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateMessage(CanFlyMsg msg, byte nodeId, ushort id, int v1, int v2);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateMessage(CanFlyMsg msg, byte nodeId, ushort id, float v1);
+    internal static extern CanFlyMsg CreateMessage(byte nodeId, ushort id, float v1);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern string MessageToString(CanFlyMsg msg);
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -311,23 +299,13 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern bool GetReply(CanFlyMsg msg);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetReply(CanFlyMsg msg, bool isReply);
-    [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern ushort GetCanID(CanFlyMsg msg);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetCanID(CanFlyMsg msg, ushort id);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern byte GetNodeID(CanFlyMsg msg);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetNodeID(CanFlyMsg msg, byte id);
-    [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern byte GetServiceCode(CanFlyMsg msg);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetServiceCode(CanFlyMsg msg, byte id);
-    [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern byte GetMessageCode(CanFlyMsg msg);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetMessageCode(CanFlyMsg msg, byte id);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern CanFlyDataType GetDataType(CanFlyMsg msg);
     [MethodImpl(MethodImplOptions.InternalCall)]
