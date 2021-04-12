@@ -776,8 +776,6 @@ namespace CanFly
 
     public bool TryRegGetRect(ushort key, out Rect rect)
     {
-      rect = new Rect();
-
       short x;
       if (!TryRegGetInt16(key, "x", out x))
         x = 0;
