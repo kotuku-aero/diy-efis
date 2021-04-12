@@ -43,21 +43,34 @@ namespace CanFly
 {
   public struct Point
   {
-    public Point(int x, int y)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    public static Point Create(int x, int y)
     {
-      Syscall.CreatePoint(this, (short)x, (short)y);
+      return Syscall.CreatePoint((short)x, (short)y);
     }
 
     public int X
     {
       get { return Syscall.GetPointX(this); }
-      set { Syscall.SetPointX(ref this, (short)value); }
     }
 
     public int Y
     {
       get { return Syscall.GetPointY(this); }
-      set { Syscall.SetPointY(ref this, (short)value); }
+    }
+
+    public Point Add(int dx, int dy)
+    {
+      return Syscall.CreatePoint((short)(X + dx), (short)(Y + dy));
+    }
+
+    public Point Add(Extent ex)
+    {
+      return Syscall.CreatePoint((short)(X + ex.Dx), (short)(Y + ex.Dy));
     }
   };
 }

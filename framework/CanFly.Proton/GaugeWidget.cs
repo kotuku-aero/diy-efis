@@ -94,7 +94,7 @@ namespace CanFly.Proton
     private string name;
     private uint name_color;
     private Font name_font;
-    private Point name_pt = new Point();
+    private Point _namePt;
     private bool draw_name;
 
     private uint background_color;
@@ -114,7 +114,7 @@ namespace CanFly.Proton
     private ushort reset_label;
     private ushort label;
 
-    private Point center = new Point();
+    private Point center;
     private int gauge_radii;
 
     private ushort arc_begin;
@@ -126,7 +126,7 @@ namespace CanFly.Proton
 
     private bool draw_value;         // draw the value
     private Font value_font;       // what font to draw a value in
-    private Rect value_rect = new Rect();
+    private Rect value_rect;
 
     private ArrayList steps;
     private ArrayList ticks;
@@ -159,16 +159,15 @@ namespace CanFly.Proton
         // we always have the neo font.
         OpenFont("neo", 9, out font);
 
-      short int_value;
-      if (!TryRegGetInt16(key, "center-x", out int_value))
-        center.X = rect_wnd.Width >> 1;
-      else
-        center.X = int_value;
+      short x;
+      if (!TryRegGetInt16(key, "center-x", out x))
+        x = (short) (rect_wnd.Width >> 1);
 
-      if (!TryRegGetInt16(key, "center-y", out int_value))
-        center.Y = rect_wnd.Height >> 1;
-      else
-        center.Y = int_value;
+      short y;
+      if (!TryRegGetInt16(key, "center-y", out y))
+        y = (short)(rect_wnd.Height >> 1);
+
+      center = Point.Create(x, y);
 
       // get the details for the name
       if (!TryRegGetBool(key, "draw-name", out draw_name))
@@ -184,15 +183,13 @@ namespace CanFly.Proton
           // we always have the neo font.
           OpenFont("neo", 9, out name_font);
 
-        if (!TryRegGetInt16(key, "name-x", out int_value))
-          name_pt.X = center.X;
-        else
-          name_pt.X = int_value;
+        if (!TryRegGetInt16(key, "name-x", out x))
+          x = (short)center.X;
 
-        if (!TryRegGetInt16(key, "name-y", out int_value))
-          name_pt.Y = center.Y;
-        else
-          name_pt.Y = int_value;
+        if (!TryRegGetInt16(key, "name-y", out y))
+          y = (short)center.Y;
+
+        _namePt = Point.Create(x, y);
       }
 
       if (!TryRegGetUint16(key, "arc-begin", out arc_begin))
@@ -208,29 +205,26 @@ namespace CanFly.Proton
         draw_value = true;
 
       ushort uint_value;
-
+      short dx;
+      short dy;
       if (draw_value)
       {
         if (!LookupFont(key, "value-font", out value_font))
           OpenFont("neo", 9, out value_font);
 
-        // default values
-        value_rect.Bottom = rect_wnd.Bottom;
-        value_rect.Left = center.X + 2;
-        value_rect.Top = value_rect.Bottom - 25;
-        value_rect.Right = rect_wnd.Right;
+        if (TryRegGetInt16(key, "value-x", out x))
+          x = (short)(center.X + 2);
 
-        if (TryRegGetInt16(key, "value-x", out int_value))
-          value_rect.Left = (int)int_value;
+        if (TryRegGetInt16(key, "value-y", out y))
+          y = (short)(value_rect.Bottom - 25);
 
-        if (TryRegGetUint16(key, "value-y", out uint_value))
-          value_rect.Top = (int)uint_value;
+        if (TryRegGetInt16(key, "value-w", out dx))
+          dx = (short)(rect_wnd.Right - x);
 
-        if (TryRegGetUint16(key, "value-w", out uint_value))
-          value_rect.Right = (int)uint_value + value_rect.Left;
+        if (TryRegGetInt16(key, "value-h", out dy))
+          dy = 25;
 
-        if (TryRegGetUint16(key, "value-h", out uint_value))
-          value_rect.Bottom = (int)uint_value + value_rect.Top;
+        value_rect = Rect.Create(x, y, x + dx, y + dy);
       }
 
       if (!TryRegGetUint16(key, "can-id", out uint_value))
@@ -398,7 +392,7 @@ namespace CanFly.Proton
       Rect wnd_rect = WindowRect;
 
       // fill without a border
-      Rectangle(null, background_color, wnd_rect);
+      Rectangle(Pens.Hollow, background_color, wnd_rect);
 
       if (draw_border)
         RoundRect(border_pen, Colors.Hollow, wnd_rect, 12);
@@ -444,7 +438,7 @@ namespace CanFly.Proton
         return;
 
       Rect wnd_rect = WindowRect;
-      Rect graph = new Rect(wnd_rect.Left, wnd_rect.Top, wnd_rect.Left + 14, wnd_rect.Height);
+      Rect graph = Rect.Create(wnd_rect.Left, wnd_rect.Top, wnd_rect.Left + 14, wnd_rect.Height);
 
       for (uint i = 0; i < num_values; i++)
       {
@@ -456,7 +450,7 @@ namespace CanFly.Proton
         float pixels_per_unit = ((float)graph.Height - 12) / ((float)range);
 
         // so we now have the increment, just start at the bottom
-        Rect drawing_rect = new Rect(
+        Rect drawing_rect = Rect.Create(
           graph.Left + 8,
           graph.Top + 3,
           graph.Right - 2,
@@ -470,26 +464,24 @@ namespace CanFly.Proton
           first_step = last_step;
 
           float pixels = relative_value * pixels_per_unit;
-          drawing_rect.Top = drawing_rect.Bottom - (int)(pixels);
 
-          Rectangle(null, last_step.pen.Color, drawing_rect);
-          drawing_rect.Bottom = drawing_rect.Top;
+          drawing_rect = drawing_rect.Add(0, 0, 0, (int) -pixels);
+
+          Rectangle(Pens.Hollow, last_step.pen.Color, drawing_rect);
+
+          drawing_rect = Rect.Create(drawing_rect.Top, drawing_rect.Top, 
+            drawing_rect.Right, drawing_rect.Top);
         }
 
-        graph.Left += 14;
-        graph.Right += 14;
+        graph = graph.Add(14, 0, 14, 0);
       }
 
       if (draw_name)
       {
         Extent sz = TextExtent(font, name);
-        Point pt = wnd_rect.BottomRight;
 
-        pt.X -= 4;
-        pt.X -= sz.Dx;
-        pt.Y -= sz.Dy;
-
-        DrawText(font, name_color, background_color, name, pt);
+        DrawText(font, name_color, background_color, name, 
+          wnd_rect.BottomRight.Add(-(4 + sz.Dx), -sz.Dy));
       }
 
       int height = graph.Height - 12;
@@ -518,7 +510,7 @@ namespace CanFly.Proton
 
           float relative_value = value - first_tick.value;
           float pixels = relative_value * pixels_per_unit;
-          Point pt = new Point(graph.Left + 2, (graph.Bottom - (int)pixels) - 7 - (sz.Dy >> 1));
+          Point pt = Point.Create(graph.Left + 2, (graph.Bottom - (int)pixels) - 7 - (sz.Dy >> 1));
 
           DrawText(font, name_color, background_color, last_tick.text, pt);
         }
@@ -547,10 +539,10 @@ namespace CanFly.Proton
         position = Math.Max(position, 5);
 
         Polygon(Pens.LightbluePen, Colors.LightBlue,
-          new Point(offset, position + 5),
-          new Point(offset + 5, position),
-          new Point(offset, position - 5),
-          new Point(offset, position + 5));
+          Point.Create(offset, position + 5),
+          Point.Create(offset + 5, position),
+          Point.Create(offset, position - 5),
+          Point.Create(offset, position + 5));
 
         if (style == gauge_style.bgs_pointer_minmax || style == gauge_style.bgs_pointer_max)
         {
@@ -561,10 +553,10 @@ namespace CanFly.Proton
             position = Math.Max(position, 5);
 
             Polygon(Pens.LightbluePen, Colors.LightBlue,
-              new Point(offset, position + 5),
-              new Point(offset + 5, position),
-              new Point(offset, position - 5),
-              new Point(offset, position + 5));
+              Point.Create(offset, position + 5),
+              Point.Create(offset + 5, position),
+              Point.Create(offset, position - 5),
+              Point.Create(offset, position + 5));
 
           }
         }
@@ -578,10 +570,10 @@ namespace CanFly.Proton
             position = Math.Max(position, 5);
 
             Polygon(Pens.LightbluePen, Colors.Hollow,
-              new Point(offset, position + 5),
-              new Point(offset + 5, position),
-              new Point(offset, position - 5),
-              new Point(offset, position + 5));
+              Point.Create(offset, position + 5),
+              Point.Create(offset + 5, position),
+              Point.Create(offset, position - 5),
+              Point.Create(offset, position + 5));
           }
         }
         offset += 14;
@@ -595,10 +587,8 @@ namespace CanFly.Proton
       {
         Extent sz = TextExtent(name_font, name);
 
-        name_pt.X -= sz.Dx >> 1;
-        name_pt.Y -= sz.Dy >> 1;
-
-        DrawText(name_font, name_color, background_color, name, name_pt);
+        DrawText(name_font, name_color, background_color, name, 
+          _namePt.Add(-(sz.Dx >> 1), -(sz.Dy >> 1)));
       }
 
       short min_range = 0;
@@ -688,19 +678,18 @@ namespace CanFly.Proton
           arc_start += 180;
 
           Polyline(Pens.WhitePen,
-            RotatePoint(center, new Point(center.X, center.Y - line_start), (int)arc_start),
-          RotatePoint(center, new Point(center.X, center.Y - line_end), (int)arc_start));
+            RotatePoint(center, Point.Create(center.X, center.Y - line_start), (int)arc_start),
+          RotatePoint(center, Point.Create(center.X, center.Y - line_end), (int)arc_start));
 
-          if (tick.text != null && font != null)
+          if (tick.text != null)
           {
             // write the text at the point
             Extent size = TextExtent(font, tick.text);
 
             // the text is below the tick marks
-            Point top_left = RotatePoint(center, new Point(center.X, center.Y - line_end + (size.Dy >> 1)), (int)arc_start);
+            Point top_left = RotatePoint(center, Point.Create(center.X, center.Y - line_end + (size.Dy >> 1)), (int)arc_start);
 
-            top_left.X -= (size.Dx >> 1);
-            top_left.Y -= (size.Dy >> 1);
+            top_left.Add(-(size.Dx >> 1), -(size.Dy >> 1));
 
             DrawText(font, Colors.White, background_color, tick.text, top_left);
 
@@ -722,8 +711,8 @@ namespace CanFly.Proton
         case gauge_style.gs_pointer:
           rotation = CalculateRotation(values[0]);
           Polyline(CalculatePen(width, values[0]),
-            RotatePoint(center, new Point(center.X, center.Y - 5), rotation),
-            RotatePoint(center, new Point(center.X, center.Y - gauge_radii + 5), rotation));
+            RotatePoint(center, Point.Create(center.X, center.Y - 5), rotation),
+            RotatePoint(center, Point.Create(center.X, center.Y - gauge_radii + 5), rotation));
           break;
         case gauge_style.gs_sweep:
           Pie(CalculatePen(width, values[0]),
@@ -768,7 +757,7 @@ namespace CanFly.Proton
       }
 
       // draw the value of the gauge as a text string
-      if (draw_value && value_font != null)
+      if (draw_value)
       {
         string str = ((int)values[0]).ToString();
         Extent size = TextExtent(value_font, str);
@@ -777,7 +766,7 @@ namespace CanFly.Proton
         Rectangle(Pens.GrayPen, Colors.Black, value_rect);
 
         DrawText(value_font, Colors.LightBlue, Colors.Black, str,
-          new Point(value_rect.Right - (size.Dx + 2), value_rect.Top + 2), value_rect, TextOutStyle.Clipped);
+          Point.Create(value_rect.Right - (size.Dx + 2), value_rect.Top + 2), value_rect, TextOutStyle.Clipped);
       }
     }
 
@@ -791,10 +780,10 @@ namespace CanFly.Proton
     {
       int rotn = (int)DegressToRadians(rotation + 90);
       Polygon(outLine, outLine.Color,
-        RotatePoint(center, new Point(center.X, center.Y - gauge_radii + 5), rotn),
-        RotatePoint(center, new Point(center.X - 6, center.Y - gauge_radii + 11), rotn),
-        RotatePoint(center, new Point(center.X + 6, center.Y - gauge_radii + 11), rotn),
-        RotatePoint(center, new Point(center.X, center.Y - gauge_radii + 5), rotn));
+        RotatePoint(center, Point.Create(center.X, center.Y - gauge_radii + 5), rotn),
+        RotatePoint(center, Point.Create(center.X - 6, center.Y - gauge_radii + 11), rotn),
+        RotatePoint(center, Point.Create(center.X + 6, center.Y - gauge_radii + 11), rotn),
+        RotatePoint(center, Point.Create(center.X, center.Y - gauge_radii + 5), rotn));
     }
 
     private int CalculateRotation(double value)
@@ -820,7 +809,7 @@ namespace CanFly.Proton
     private Pen CalculatePen(ushort width, float value)
     {
       if (steps == null || steps.Count == 0)
-        return new Pen(Colors.Hollow, width, PenStyle.Solid);
+        return Pen.Create(Colors.Hollow, width, PenStyle.Solid);
 
       uint color = Colors.Hollow;
       // step 0 is only used to set the minimum value for the gauge
@@ -836,7 +825,7 @@ namespace CanFly.Proton
           break;
       }
 
-      return new Pen(color, width, PenStyle.Solid);
+      return Pen.Create(color, width, PenStyle.Solid);
     }
 
     private uint CalculateColor(float value)

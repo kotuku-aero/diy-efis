@@ -43,31 +43,32 @@ namespace CanFly.Proton
 {
   public class Pens
   {
-    public static readonly Pen BlackPen = new Pen(Colors.Black, 1, PenStyle.Solid);
-    public static readonly Pen GrayPen = new Pen(Colors.Gray, 1, PenStyle.Solid);
-    public static readonly Pen FadedBluePen = new Pen(Colors.FadedBlue, 1, PenStyle.Solid);
-    public static readonly Pen BrownPen = new Pen(Colors.Brown, 1, PenStyle.Solid);
-    public static readonly Pen RedPen = new Pen(Colors.Red, 1, PenStyle.Solid);
-    public static readonly Pen GreenPen = new Pen(Colors.Green, 1, PenStyle.Solid);
-    public static readonly Pen OrangePen = new Pen(Colors.Orange, 1, PenStyle.Solid);
-    public static readonly Pen LightbluePen = new Pen(Colors.LightBlue, 1, PenStyle.Solid);
-    public static readonly Pen MagentaPen = new Pen(Colors.Magenta, 1, PenStyle.Solid);
-    public static readonly Pen BluePen = new Pen(Colors.Blue, 1, PenStyle.Solid);
-    public static readonly Pen YellowPen = new Pen(Colors.Yellow, 1, PenStyle.Solid);
-    public static readonly Pen WhitePen = new Pen(Colors.White, 1, PenStyle.Solid);
-    public static readonly Pen LightGrayPen = new Pen(Colors.LightGray, 1, PenStyle.Solid);
-    public static readonly Pen LightGrayPen3 = new Pen(Colors.LightGray, 3, PenStyle.Solid);
-    public static readonly Pen WhitePen2 = new Pen(Colors.White, 2, PenStyle.Solid);
-    public static readonly Pen WhitePen3 = new Pen(Colors.White, 3, PenStyle.Solid);
-    public static readonly Pen GreenPen3 = new Pen(Colors.Green, 3, PenStyle.Solid);
-    public static readonly Pen RedPen3 = new Pen(Colors.Red, 3, PenStyle.Solid);
-    public static readonly Pen YellowPen3 = new Pen(Colors.Yellow, 3, PenStyle.Solid);
-    public static readonly Pen LightbluePen3 = new Pen(Colors.LightBlue, 3, PenStyle.Solid);
-    public static readonly Pen OrangePen3 = new Pen(Colors.Orange, 3, PenStyle.Solid);
-    public static readonly Pen LightbluePen5 = new Pen(Colors.LightBlue, 5, PenStyle.Solid);
-    public static readonly Pen RedPen5 = new Pen(Colors.Red, 5, PenStyle.Solid);
-    public static readonly Pen OrangePen5 = new Pen(Colors.Orange, 5, PenStyle.Solid);
-    public static readonly Pen WhitePen5 = new Pen(Colors.White, 5, PenStyle.Solid);
-    public static readonly Pen GreenPen5 = new Pen(Colors.Green, 5, PenStyle.Solid);
+    public static readonly Pen BlackPen = Pen.Create(Colors.Black, 1, PenStyle.Solid);
+    public static readonly Pen GrayPen = Pen.Create(Colors.Gray, 1, PenStyle.Solid);
+    public static readonly Pen FadedBluePen = Pen.Create(Colors.FadedBlue, 1, PenStyle.Solid);
+    public static readonly Pen BrownPen = Pen.Create(Colors.Brown, 1, PenStyle.Solid);
+    public static readonly Pen RedPen = Pen.Create(Colors.Red, 1, PenStyle.Solid);
+    public static readonly Pen GreenPen = Pen.Create(Colors.Green, 1, PenStyle.Solid);
+    public static readonly Pen OrangePen = Pen.Create(Colors.Orange, 1, PenStyle.Solid);
+    public static readonly Pen LightbluePen = Pen.Create(Colors.LightBlue, 1, PenStyle.Solid);
+    public static readonly Pen MagentaPen = Pen.Create(Colors.Magenta, 1, PenStyle.Solid);
+    public static readonly Pen BluePen = Pen.Create(Colors.Blue, 1, PenStyle.Solid);
+    public static readonly Pen YellowPen = Pen.Create(Colors.Yellow, 1, PenStyle.Solid);
+    public static readonly Pen WhitePen = Pen.Create(Colors.White, 1, PenStyle.Solid);
+    public static readonly Pen LightGrayPen = Pen.Create(Colors.LightGray, 1, PenStyle.Solid);
+    public static readonly Pen LightGrayPen3 = Pen.Create(Colors.LightGray, 3, PenStyle.Solid);
+    public static readonly Pen WhitePen2 = Pen.Create(Colors.White, 2, PenStyle.Solid);
+    public static readonly Pen WhitePen3 = Pen.Create(Colors.White, 3, PenStyle.Solid);
+    public static readonly Pen GreenPen3 = Pen.Create(Colors.Green, 3, PenStyle.Solid);
+    public static readonly Pen RedPen3 = Pen.Create(Colors.Red, 3, PenStyle.Solid);
+    public static readonly Pen YellowPen3 = Pen.Create(Colors.Yellow, 3, PenStyle.Solid);
+    public static readonly Pen LightbluePen3 = Pen.Create(Colors.LightBlue, 3, PenStyle.Solid);
+    public static readonly Pen OrangePen3 = Pen.Create(Colors.Orange, 3, PenStyle.Solid);
+    public static readonly Pen LightbluePen5 = Pen.Create(Colors.LightBlue, 5, PenStyle.Solid);
+    public static readonly Pen RedPen5 = Pen.Create(Colors.Red, 5, PenStyle.Solid);
+    public static readonly Pen OrangePen5 = Pen.Create(Colors.Orange, 5, PenStyle.Solid);
+    public static readonly Pen WhitePen5 = Pen.Create(Colors.White, 5, PenStyle.Solid);
+    public static readonly Pen GreenPen5 = Pen.Create(Colors.Green, 5, PenStyle.Solid);
+    public static readonly Pen Hollow = Pen.Create(Colors.Hollow, 0, PenStyle.Null);
   }
 }

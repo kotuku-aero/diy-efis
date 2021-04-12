@@ -132,7 +132,7 @@ namespace CanFly.Proton
         _textColor = Colors.White;
 
       if (!LookupPen(key, "pen", out _pen))
-        _pen = new Pen(Colors.White, 1, PenStyle.Solid);
+        _pen = Pen.Create(Colors.White, 1, PenStyle.Solid);
 
       // hook the canbus messages
       AddEventListener(CanFlyID.id_indicated_airspeed, OnIndicatedAirspeed);
@@ -165,7 +165,7 @@ namespace CanFly.Proton
       Rect wndRect = WindowRect;
       Extent ex = Extents;
 
-      Rectangle(null, _backgroundColor, new Rect(8, 8, ex.Dx - 9, ex.Dy - 8));
+      Rectangle(Pens.Hollow, _backgroundColor, Rect.Create(8, 8, ex.Dx - 9, ex.Dy - 8));
 
       int median = ex.Dy >> 1;
 
@@ -184,8 +184,8 @@ namespace CanFly.Proton
         // lines at 25 are shorter
         Point[] pts =
         {
-          new Point(asiLine == ((asiLine / 50) * 50) ? width - 20 : width - 18, markerLine),
-          new Point(width - 13, markerLine)
+          Point.Create(asiLine == ((asiLine / 50) * 50) ? width - 20 : width - 18, markerLine),
+          Point.Create(width - 13, markerLine)
         };
 
         Polyline(_pen, pts);
@@ -196,7 +196,7 @@ namespace CanFly.Proton
           Extent size = TextExtent(_font, str);
 
           DrawText(_font, _textColor, _backgroundColor,
-            str, new Point(width - 20 - size.Dx, markerLine - (size.Dy >> 1)));
+            str, Point.Create(width - 20 - size.Dx, markerLine - (size.Dy >> 1)));
         }
 
         asiLine -= 25;
@@ -224,49 +224,47 @@ namespace CanFly.Proton
 
       // draw vne exceeded
       if (vnePixels >= 8)
-        Rectangle(null, Colors.Red, new Rect(bar2, 8, bar2 + 4, Math.Min((int) ex.Dy - 8, vnePixels)));
+        Rectangle(Pens.Hollow, Colors.Red, Rect.Create(bar2, 8, bar2 + 4, Math.Min((int) ex.Dy - 8, vnePixels)));
 
       // draw vne->vno
       if (vnoPixels >= (int) 8 && vnePixels < (int) ex.Dy - 8)
-        Rectangle(null, Colors.Yellow,
-          new Rect(bar2, Math.Max((int) 8, vnePixels), bar2 + 4,
-            Math.Min((int) ex.Dy - 8, vnoPixels)));
+        Rectangle(Pens.Hollow, Colors.Yellow,
+          Rect.Create(bar2, Math.Max((int) 8, vnePixels), bar2 + 4, Math.Min((int) ex.Dy - 8, vnoPixels)));
 
       // draw vno->vs1
       if (vs1Pixels >= 8 && vnoPixels < 232)
-        Rectangle(null, Colors.Green,
-          new Rect(bar2, Math.Max((int) 8, vnoPixels),
-            bar2 + 4, Math.Min((int) ex.Dy - 8, vs1Pixels)));
+        Rectangle(Pens.Hollow, Colors.Green,
+          Rect.Create(bar2, Math.Max((int) 8, vnoPixels), bar2 + 4, Math.Min((int) ex.Dy - 8, vs1Pixels)));
 
       // draw vfe->vs0
       if (vs0Pixels >= 8 && vfePixels < 232)
-        Rectangle(null, Colors.White,
-          new Rect(bar1, Math.Max((int) 8, vfePixels),
+        Rectangle(Pens.Hollow, Colors.White,
+          Rect.Create(bar1, Math.Max((int) 8, vfePixels),
             bar1 + 4, Math.Min((int) ex.Dy - 8, vs0Pixels)));
 
       // draw vy -> vx
       if (vxPixels >= 8 && vyPixels < 232)
-        Rectangle(null, Colors.Blue,
-          new Rect(bar0, Math.Max((int) 8, vyPixels), bar0 + 4,
+        Rectangle(Pens.Hollow, Colors.Blue,
+          Rect.Create(bar0, Math.Max((int) 8, vyPixels), bar0 + 4,
             Math.Min((int) ex.Dy - 8, vxPixels)));
 
 
       Point[] roller =
       {
-        new Point(width - 13, median),
-        new Point(width - 20, median + 7),
-        new Point(width - 20, median + 20),
-        new Point(0, median + 20),
-        new Point(0, median - 20),
-        new Point(width - 20, median - 20),
-        new Point(width - 20, median - 7),
-        new Point(width - 13, median)
+        Point.Create(width - 13, median),
+        Point.Create(width - 20, median + 7),
+        Point.Create(width - 20, median + 20),
+        Point.Create(0, median + 20),
+        Point.Create(0, median - 20),
+        Point.Create(width - 20, median - 20),
+        Point.Create(width - 20, median - 7),
+        Point.Create(width - 13, median)
       };
 
       Polygon(Pens.WhitePen, Colors.Black, roller);
 
       // now we draw the roller
-      DisplayRoller(new Rect(1, median - 19, width - 20, median + 19),
+      DisplayRoller(Rect.Create(1, median - 19, width - 20, median + 19),
         _airspeed, 1, Colors.Black, Colors.White,
         _largeRoller, _smallRoller);
 

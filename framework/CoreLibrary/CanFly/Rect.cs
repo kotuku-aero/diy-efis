@@ -50,30 +50,27 @@ namespace CanFly
     /// <param name="right"></param>
     /// <param name="top"></param>
     /// <param name="bottom"></param>
-   public Rect(int left, int top, int right, int bottom)
+   public static Rect Create(int left, int top, int right, int bottom)
     {
-      Syscall.CreateRect(this, (short)left, (short)top, (short)right, (short)bottom);
+      return Syscall.CreateRect((short)left, (short)top, (short)right, (short)bottom);
     }
     /// <summary>
     /// 
     /// </summary>
     /// <param name="pt"></param>
     /// <param name="extent"></param>
-    public Rect(Point pt, Extent extent)
+    public static Rect Create(Point pt, Extent extent)
     {
-      Syscall.CreateRect(this, (short)pt.X, (short)pt.Y, (short)(pt.X + extent.Dx), (short)(pt.Y + extent.Dy));
+      return Syscall.CreateRect((short)pt.X, (short)pt.Y, (short)(pt.X + extent.Dx), (short)(pt.Y + extent.Dy));
     }
     /// <summary>
     /// 
     /// </summary>
     /// <param name="top_left"></param>
     /// <param name="bottom_right"></param>
-    public Rect(Point top_left, Point bottom_right)
+    public static Rect Create(Point top_left, Point bottom_right)
     {
-      Syscall.SetRectLeft(ref this, (short)top_left.X);
-      Syscall.SetRectTop(ref this, (short)top_left.Y);
-      Syscall.SetRectRight(ref this,(short) bottom_right.X);
-      Syscall.SetRectBottom(ref this, (short)bottom_right.Y);
+      return Syscall.CreateRect((short)top_left.X, (short)top_left.Y, (short)bottom_right.X, (short)bottom_right.Y);
     }
     /// <summary>
     /// Width of the rectangle
@@ -98,7 +95,6 @@ namespace CanFly
     public int Left
     {
       get { return Syscall.GetRectLeft(this); }
-      set { Syscall.SetRectLeft(ref this, (short)value); }
     }
     /// <summary>
     /// Top position of the rectangle
@@ -107,7 +103,6 @@ namespace CanFly
     public int Top
     {
       get { return Syscall.GetRectTop(this); }
-      set { Syscall.SetRectTop(ref this, (short)value); }
     }
     /// <summary>
     /// Rightmost rectangle point
@@ -116,7 +111,6 @@ namespace CanFly
     public int Right
     {
       get { return Syscall.GetRectRight(this); }
-      set { Syscall.SetRectRight(ref this, (short)value); }
     }
     /// <summary>
     /// Bottom position of the rectangle
@@ -125,35 +119,61 @@ namespace CanFly
     public int Bottom
     {
       get { return Syscall.GetRectBottom(this); }
-      set { Syscall.SetRectBottom(ref this, (short)value); }
     }
 
     public Extent Extent
     {
-      get
-      {
-        return new Extent(Math.Abs(Right - Left), Math.Abs(Bottom - Top));
-      }
+      get { return Extent.Create(Math.Abs(Right - Left), Math.Abs(Bottom - Top)); }
     }
 
     public Point BottomRight
     {
-      get { return new Point(Right, Bottom); }
+      get { return Point.Create(Right, Bottom); }
     }
 
     public Point TopLeft
     {
-      get { return new Point(Left, Top); }
+      get { return Point.Create(Left, Top); }
     }
 
     public Point BottomLeft
     {
-      get { return new Point(Left, Bottom); }
+      get { return Point.Create(Left, Bottom); }
     }
 
     public Point TopRight
     {
-      get { return new Point(Right, Top); }
+      get { return Point.Create(Right, Top); }
+    }
+
+    public Rect Add(Rect value)
+    {
+      return CanFly.Syscall.CreateRect((short)(Left + value.Left), (short)(Top + value.Top), (short)(Right + value.Right), (short)(Bottom + value.Bottom));
+    }
+
+    public Rect Add(int dl, int dt, int dr, int db)
+    {
+      return CanFly.Syscall.CreateRect((short)(Left + dl), (short)(Top + dt), (short)(Right + dr), (short)(Bottom + db));
+    }
+
+    public Rect Expand(Extent value)
+    {
+      return CanFly.Syscall.CreateRect((short)(Left), (short)(Top), (short)(Right + value.Dx), (short)(Bottom + value.Dy));
+    }
+
+    public Rect Expand(int dx, int dy)
+    {
+      return CanFly.Syscall.CreateRect((short)(Left), (short)(Top), (short)(Right + dx), (short)(Bottom + dy));
+    }
+
+    public Rect MoveTo(Point pt)
+    {
+      return CanFly.Syscall.CreateRect((short)(pt.X), (short)(pt.Y), (short)(pt.X + Width), (short)(pt.Y + Height));
+    }
+
+    public Rect MoveTo(int x, int y)
+    {
+      return CanFly.Syscall.CreateRect((short)(x), (short)(y), (short)(x + Width), (short)(y + Height));
     }
   };
 }

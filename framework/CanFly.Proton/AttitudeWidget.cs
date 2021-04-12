@@ -87,18 +87,16 @@ namespace CanFly.Proton
 
       Rect wnd_rect = WindowRect;
 
-      _widgetMedian = new Point();
 
-      short value;
-      if (TryRegGetInt16(key, "center-x", out value))
-        _widgetMedian.X = value;
-      else
-        _widgetMedian.X = wnd_rect.Width >> 1;
+      short x;
+      if (!TryRegGetInt16(key, "center-x", out x))
+        x = (short)(wnd_rect.Width >> 1);
 
-      if (TryRegGetInt16(key, "center-y", out value))
-        _widgetMedian.Y = value;
-      else
-        _widgetMedian.Y = wnd_rect.Height >> 1;
+      short y;
+      if (!TryRegGetInt16(key, "center-y", out y))
+        y = (short)(wnd_rect.Height >> 1);
+
+      _widgetMedian = Point.Create(x, y);
 
       if (!LookupFont(key, "font", out _font))
       {
@@ -201,20 +199,20 @@ namespace CanFly.Proton
       pitch *= 10;
 
       // draw the upper area
-      Polygon(null, Colors.LightBlue,
-        RotatePoint(_widgetMedian, new Point(-500, _widgetMedian.Y - 500 + pitch), _roll),
-        RotatePoint(_widgetMedian, new Point(500, _widgetMedian.Y - 500 + pitch), _roll),
-        RotatePoint(_widgetMedian, new Point(500, _widgetMedian.Y + pitch), _roll),
-        RotatePoint(_widgetMedian, new Point(-500, _widgetMedian.Y + pitch), _roll),
-        RotatePoint(_widgetMedian, new Point(-500, _widgetMedian.Y - 500 + pitch), _roll));
+      Polygon(Pens.Hollow, Colors.LightBlue,
+        RotatePoint(_widgetMedian, Point.Create(-500, _widgetMedian.Y - 500 + pitch), _roll),
+        RotatePoint(_widgetMedian, Point.Create(500, _widgetMedian.Y - 500 + pitch), _roll),
+        RotatePoint(_widgetMedian, Point.Create(500, _widgetMedian.Y + pitch), _roll),
+        RotatePoint(_widgetMedian, Point.Create(-500, _widgetMedian.Y + pitch), _roll),
+        RotatePoint(_widgetMedian, Point.Create(-500, _widgetMedian.Y - 500 + pitch), _roll));
 
       // draw the lower area
-      Polygon(null, Colors.Brown,
-        RotatePoint(_widgetMedian, new Point(-500, _widgetMedian.Y + pitch), _roll),
-        RotatePoint(_widgetMedian, new Point(500, _widgetMedian.Y + pitch), _roll),
-        RotatePoint(_widgetMedian, new Point(500, _widgetMedian.Y + pitch + 500), _roll),
-        RotatePoint(_widgetMedian, new Point(-500, _widgetMedian.Y + pitch + 500), _roll),
-        RotatePoint(_widgetMedian, new Point(-500, _widgetMedian.Y + pitch), _roll));
+      Polygon(Pens.Hollow, Colors.Brown,
+        RotatePoint(_widgetMedian, Point.Create(-500, _widgetMedian.Y + pitch), _roll),
+        RotatePoint(_widgetMedian, Point.Create(500, _widgetMedian.Y + pitch), _roll),
+        RotatePoint(_widgetMedian, Point.Create(500, _widgetMedian.Y + pitch + 500), _roll),
+        RotatePoint(_widgetMedian, Point.Create(-500, _widgetMedian.Y + pitch + 500), _roll),
+        RotatePoint(_widgetMedian, Point.Create(-500, _widgetMedian.Y + pitch), _roll));
 
       /////////////////////////////////////////////////////////////////////////////
       //	Draw the pitch indicator
@@ -224,15 +222,15 @@ namespace CanFly.Proton
 
       /////////////////////////////////////////////////////////////////////////////
       // we now draw the image of the bank angle marks
-      Line(Pens.GreenPen, RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 104, 60), _roll), RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 94, 66), _roll));
-      Line(Pens.GreenPen, RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 60, 17), _roll), RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 54, 27), _roll));
-      Line(Pens.GreenPen, RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 40, 11), _roll), RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 37, 19), _roll));
-      Line(Pens.GreenPen, RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 20, 6), _roll), RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 18, 14), _roll));
-      Line(Pens.GreenPen, RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 20, 6), _roll), RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 18, 14), _roll));
-      Line(Pens.GreenPen, RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 39, 11), _roll), RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 36, 19), _roll));
-      Line(Pens.GreenPen, RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 59, 17), _roll), RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 53, 27), _roll));
-      Line(Pens.GreenPen, RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 103, 60), _roll), RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 93, 66), _roll));
-      Line(Pens.GreenPen3, RotatePoint(_widgetMedian, new Point(_widgetMedian.X, 0), _roll), RotatePoint(_widgetMedian, new Point(_widgetMedian.X, 12), _roll));
+      Line(Pens.GreenPen, RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 104, 60), _roll), RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 94, 66), _roll));
+      Line(Pens.GreenPen, RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 60, 17), _roll), RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 54, 27), _roll));
+      Line(Pens.GreenPen, RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 40, 11), _roll), RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 37, 19), _roll));
+      Line(Pens.GreenPen, RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 20, 6), _roll), RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 18, 14), _roll));
+      Line(Pens.GreenPen, RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 20, 6), _roll), RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 18, 14), _roll));
+      Line(Pens.GreenPen, RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 39, 11), _roll), RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 36, 19), _roll));
+      Line(Pens.GreenPen, RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 59, 17), _roll), RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 53, 27), _roll));
+      Line(Pens.GreenPen, RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 103, 60), _roll), RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 93, 66), _roll));
+      Line(Pens.GreenPen3, RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X, 0), _roll), RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X, 12), _roll));
 
       /////////////////////////////////////////////////////////////////////////////
       //	Draw the rotated roll/pitch indicator
@@ -262,8 +260,8 @@ namespace CanFly.Proton
         else if ((pitch_angle % 100) == 0)
         {
           Polyline(Pens.WhitePen,
-            RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 40, line), _roll),
-          RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 40, line), _roll));
+            RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 40, line), _roll),
+          RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 40, line), _roll));
 
           // we have a bitmap which is the text to draw.  We then select the bitmap
           // from the text angle and the rotation angle.
@@ -276,12 +274,12 @@ namespace CanFly.Proton
           if (text_angle > 0)
           {
             // calc the left/right center point
-            Point pt_left = RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 48, line), _roll);
-            Point pt_right = RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 47, line), _roll);
+            Point pt_left = RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 48, line), _roll);
+            Point pt_right = RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 47, line), _roll);
 
             // we now calc the left and right points to write the text to
-            pt_left.X -= 9; pt_left.Y -= 9;
-            pt_right.X -= 9; pt_right.Y -= 9;
+            pt_left = Point.Create(pt_left.X - 9, pt_left.Y - 9);
+            pt_right = Point.Create(pt_right.X - 9, pt_right.Y - 9);
 
             string txt = text_angle.ToString();
             DrawText(_font, Colors.White, Colors.Hollow, txt, pt_left, wnd_rect, TextOutStyle.Clipped);
@@ -293,8 +291,8 @@ namespace CanFly.Proton
         else if ((pitch_angle % 50) == 0)
         {
           Polyline(Pens.WhitePen,
-            RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 26, line), _roll),
-            RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 25, line), _roll));
+            RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 26, line), _roll),
+            RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 25, line), _roll));
 
           pitch_angle -= 25;
           line += 20;
@@ -302,8 +300,8 @@ namespace CanFly.Proton
         else
         {
           Polyline(Pens.WhitePen,
-            RotatePoint(_widgetMedian, new Point(_widgetMedian.X - 12, line), _roll),
-            RotatePoint(_widgetMedian, new Point(_widgetMedian.X + 12, line), _roll));
+            RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 12, line), _roll),
+            RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 12, line), _roll));
 
           pitch_angle -= 25;
           line += 20;
@@ -332,21 +330,21 @@ namespace CanFly.Proton
           {
             // draw red chevron.
             Polyline(Pens.RedPen3,
-              new Point(_widgetMedian.X - 15, pixels + _widgetMedian.Y - offset),
-              new Point(_widgetMedian.X, pixels + _widgetMedian.Y - offset + 4),
-              new Point(_widgetMedian.X + 15, pixels + _widgetMedian.Y - offset));
+              Point.Create(_widgetMedian.X - 15, pixels + _widgetMedian.Y - offset),
+              Point.Create(_widgetMedian.X, pixels + _widgetMedian.Y - offset + 4),
+              Point.Create(_widgetMedian.X + 15, pixels + _widgetMedian.Y - offset));
           }
           else if (aoa_marker > _climbAOA)
           {
             Polyline(Pens.YellowPen3,
-              new Point(_widgetMedian.X - 15, pixels + _widgetMedian.Y - offset),
-              new Point(_widgetMedian.X + 15, pixels + _widgetMedian.Y - offset));
+              Point.Create(_widgetMedian.X - 15, pixels + _widgetMedian.Y - offset),
+              Point.Create(_widgetMedian.X + 15, pixels + _widgetMedian.Y - offset));
           }
           else
           {
             Polyline(Pens.GreenPen3,
-              new Point(_widgetMedian.X - 15, pixels + _widgetMedian.Y - offset),
-              new Point(_widgetMedian.X + 15, pixels + _widgetMedian.Y - offset));
+              Point.Create(_widgetMedian.X - 15, pixels + _widgetMedian.Y - offset),
+              Point.Create(_widgetMedian.X + 15, pixels + _widgetMedian.Y - offset));
 
             aoa_marker -= _AOADegreesPerMark;
           }
@@ -355,19 +353,19 @@ namespace CanFly.Proton
         /////////////////////////////////////////////////////////////////////////////
         // draw the aircraft image
         Polyline(Pens.WhitePen,
-          new Point(_widgetMedian.X - 7, _widgetMedian.Y),
-          new Point(_widgetMedian.X - 22, _widgetMedian.Y));
+          Point.Create(_widgetMedian.X - 7, _widgetMedian.Y),
+          Point.Create(_widgetMedian.X - 22, _widgetMedian.Y));
 
         Polyline(Pens.WhitePen,
-          new Point(_widgetMedian.X + 7, _widgetMedian.Y),
-          new Point(_widgetMedian.X + 22, _widgetMedian.Y));
+          Point.Create(_widgetMedian.X + 7, _widgetMedian.Y),
+          Point.Create(_widgetMedian.X + 22, _widgetMedian.Y));
 
         Polyline(Pens.WhitePen,
-          new Point(_widgetMedian.X, _widgetMedian.Y - 7),
-          new Point(_widgetMedian.X, _widgetMedian.Y - 15));
+          Point.Create(_widgetMedian.X, _widgetMedian.Y - 7),
+          Point.Create(_widgetMedian.X, _widgetMedian.Y - 15));
 
         Ellipse(Pens.WhitePen, Colors.Hollow,
-          new Rect(_widgetMedian.X - 7, _widgetMedian.Y - 7, _widgetMedian.X + 7, _widgetMedian.Y + 7));
+          Rect.Create(_widgetMedian.X - 7, _widgetMedian.Y - 7, _widgetMedian.X + 7, _widgetMedian.Y + 7));
 
         /////////////////////////////////////////////////////////////////////////////
         // draw the glide slope and localizer indicators
@@ -381,19 +379,19 @@ namespace CanFly.Proton
           pixels += 120;
 
           Polyline(Pens.WhitePen,
-            new Point(wnd_rect.Right - 12, _widgetMedian.Y),
-            new Point(wnd_rect.Right, _widgetMedian.Y));
+            Point.Create(wnd_rect.Right - 12, _widgetMedian.Y),
+            Point.Create(wnd_rect.Right, _widgetMedian.Y));
 
 
           // rest are hollow
-          Ellipse(Pens.WhitePen, Colors.Hollow, new Rect(230, 57, 238, 65));
-          Ellipse(Pens.WhitePen, Colors.Hollow, new Rect(230, 86, 238, 94));
-          Ellipse(Pens.WhitePen, Colors.Hollow, new Rect(230, 146, 238, 154));
-          Ellipse(Pens.WhitePen, Colors.Hollow, new Rect(230, 175, 238, 183));
+          Ellipse(Pens.WhitePen, Colors.Hollow, Rect.Create(230, 57, 238, 65));
+          Ellipse(Pens.WhitePen, Colors.Hollow, Rect.Create(230, 86, 238, 94));
+          Ellipse(Pens.WhitePen, Colors.Hollow, Rect.Create(230, 146, 238, 154));
+          Ellipse(Pens.WhitePen, Colors.Hollow, Rect.Create(230, 175, 238, 183));
 
           // black filled ellipse
           Ellipse(Pens.WhitePen, Colors.Black,
-            new Rect(230, pixels - 4, 238, pixels + 4));
+            Rect.Create(230, pixels - 4, 238, pixels + 4));
 
         }
 
@@ -407,18 +405,18 @@ namespace CanFly.Proton
           pixels += _widgetMedian.X;
 
           Polyline(Pens.WhitePen3,
-            new Point(_widgetMedian.X, _widgetMedian.Y - 15),
-            new Point(_widgetMedian.X, _widgetMedian.Y));
+            Point.Create(_widgetMedian.X, _widgetMedian.Y - 15),
+            Point.Create(_widgetMedian.X, _widgetMedian.Y));
 
           // rest are hollow
-          Ellipse(Pens.WhitePen, Colors.Hollow, new Rect(57, 230, 65, 238));
-          Ellipse(Pens.WhitePen, Colors.Hollow, new Rect(86, 230, 94, 238));
-          Ellipse(Pens.WhitePen, Colors.Hollow, new Rect(146, 230, 154, 238));
-          Ellipse(Pens.WhitePen, Colors.Hollow, new Rect(175, 230, 183, 238));
+          Ellipse(Pens.WhitePen, Colors.Hollow, Rect.Create(57, 230, 65, 238));
+          Ellipse(Pens.WhitePen, Colors.Hollow, Rect.Create(86, 230, 94, 238));
+          Ellipse(Pens.WhitePen, Colors.Hollow, Rect.Create(146, 230, 154, 238));
+          Ellipse(Pens.WhitePen, Colors.Hollow, Rect.Create(175, 230, 183, 238));
 
           // black filled ellipse
           Ellipse(Pens.WhitePen, Colors.Black,
-            new Rect(pixels - 4, 230, pixels + 4, 238));
+            Rect.Create(pixels - 4, 230, pixels + 4, 238));
 
         }
 
@@ -430,17 +428,17 @@ namespace CanFly.Proton
         offset = Math.Min(_yawMax, Math.Max(-_yawMax, _yaw << 1));
 
         Polygon(Pens.WhitePen, Colors.Hollow,
-          new Point(_widgetMedian.X + offset, 12),
-          new Point(_widgetMedian.X + offset - 6, 23),
-          new Point(_widgetMedian.X + offset + 6, 23),
-          new Point(_widgetMedian.X + offset, 12));
+          Point.Create(_widgetMedian.X + offset, 12),
+          Point.Create(_widgetMedian.X + offset - 6, 23),
+          Point.Create(_widgetMedian.X + offset + 6, 23),
+          Point.Create(_widgetMedian.X + offset, 12));
 
         Polygon(Pens.WhitePen, Colors.Hollow,
-          new Point(_widgetMedian.X - 6, 23),
-          new Point(_widgetMedian.X + 6, 23),
-          new Point(_widgetMedian.X + 9, 27),
-          new Point(_widgetMedian.X - 9, 27),
-          new Point(_widgetMedian.X - 6, 23));
+          Point.Create(_widgetMedian.X - 6, 23),
+          Point.Create(_widgetMedian.X + 6, 23),
+          Point.Create(_widgetMedian.X + 9, 27),
+          Point.Create(_widgetMedian.X - 9, 27),
+          Point.Create(_widgetMedian.X - 6, 23));
       }
 
       EndPaint();

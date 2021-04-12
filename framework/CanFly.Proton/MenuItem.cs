@@ -81,7 +81,7 @@ namespace CanFly.Proton
 
     public virtual void Paint(Rect area, bool isHighlighted)
     {
-      Point center_pt = new Point(
+      Point center_pt = Point.Create(
         (area.Width >> 1) + area.Left,
         (area.Height >> 1) + area.Top);
 
@@ -91,16 +91,11 @@ namespace CanFly.Proton
       // calculate the text extents
       Extent ex = _widget.TextExtent(_widget.Font, _caption);
 
-      center_pt.X -= ex.Dx >> 1;
-      center_pt.Y -= ex.Dy >> 1;
-
       _widget.DrawText(_widget.Font,
         Selected ? _widget.SelectedColor : _widget.TextColor,
         _widget.BackgroundColor,
-        _caption, center_pt, area, TextOutStyle.Clipped);
-
+        _caption, Point.Create(center_pt.X - (ex.Dx >> 1), center_pt.Y - (ex.Dy >> 1)), area, TextOutStyle.Clipped);
     }
-
 
     public abstract MenuItemActionResult Evaluate(CanFlyMsg msg);
 

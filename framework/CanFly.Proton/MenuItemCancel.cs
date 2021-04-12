@@ -74,7 +74,7 @@ static MenuItem item_cancel_load(LayoutWindow wnd, uint key)
     public override MenuItemActionResult Evaluate(CanFlyMsg msg)
     {
       if(id != 0)
-        LayoutWidget.SendMessage(new CanFlyMsg(id, value));
+        LayoutWidget.SendMessage(CanFlyMsg.Create(id, value));
 
       return MenuItemActionResult.MiaCancel;
     }

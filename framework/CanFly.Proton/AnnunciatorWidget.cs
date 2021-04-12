@@ -53,11 +53,11 @@ namespace CanFly.Proton
     private Font small_font;
     private Font large_font;
 
-    private Point clock_pt = new Point(1, 10 );
-    private Point hrs_pt = new Point(1, 55 );
-    private Point qnh_pt = new Point(1, 100 );
-    private Point oat_pt = new Point(1, 145 );
-    private Point cas_pt = new Point(1, 190 );
+    private Point clock_pt = Point.Create(1, 10 );
+    private Point hrs_pt = Point.Create(1, 55 );
+    private Point qnh_pt = Point.Create(1, 100 );
+    private Point oat_pt = Point.Create(1, 145 );
+    private Point cas_pt = Point.Create(1, 190 );
 
     private readonly string hours_value = "TTS";
     private readonly string qnh_value = "QNH";
@@ -168,7 +168,7 @@ namespace CanFly.Proton
     private void DrawAnnunciator(Rect wnd_rect, Point pt, string label, string value)
     {
       // calculate the size of the label
-      Rect clip_rect = new Rect(pt.X, pt.Y, pt.X + 75, pt.Y + 50 );
+      Rect clip_rect = Rect.Create(pt.X, pt.Y, pt.X + 75, pt.Y + 50 );
 
       Extent label_size = TextExtent(small_font, label);
 
@@ -176,26 +176,26 @@ namespace CanFly.Proton
       int text_start = pt.X + width - (label_size.Dx + 3);
       int right = pt.X + width;
 
-      Rectangle(null, Colors.Gray, new Rect(pt.X, pt.Y + 1, right, pt.Y + 4));
-      Rectangle(null, Colors.Gray, new Rect(pt.X, pt.Y + 4, pt.X + 3, pt.Y + 28));
-      Rectangle(null, Colors.Gray, new Rect(right - 3, pt.Y + 4, right, pt.Y + 45));
-      Rectangle(null, Colors.Gray, new Rect(pt.X, pt.Y + 28, right, pt.Y + 31));
-      Rectangle(null, Colors.Gray, new Rect(text_start - 6, pt.Y + 31, right, pt.Y + 45));
+      Rectangle(Pens.Hollow, Colors.Gray, Rect.Create(pt.X, pt.Y + 1, right, pt.Y + 4));
+      Rectangle(Pens.Hollow, Colors.Gray, Rect.Create(pt.X, pt.Y + 4, pt.X + 3, pt.Y + 28));
+      Rectangle(Pens.Hollow, Colors.Gray, Rect.Create(right - 3, pt.Y + 4, right, pt.Y + 45));
+      Rectangle(Pens.Hollow, Colors.Gray, Rect.Create(pt.X, pt.Y + 28, right, pt.Y + 31));
+      Rectangle(Pens.Hollow, Colors.Gray, Rect.Create(text_start - 6, pt.Y + 31, right, pt.Y + 45));
 
-      Rectangle(null, Colors.Black, new Rect(pt.X + 3, pt.Y + 4, right - 3, pt.Y + 28));
+      Rectangle(Pens.Hollow, Colors.Black, Rect.Create(pt.X + 3, pt.Y + 4, right - 3, pt.Y + 28));
 
-      Point label_origin = new Point(text_start, pt.Y + 30 );
+      Point label_origin = Point.Create(text_start, pt.Y + 30 );
 
-      Rect txtRect = new Rect(text_start, pt.Y + 30, text_start + label_size.Dx, pt.Y + 30 + label_size.Dy);
+      Rect txtRect = Rect.Create(text_start, pt.Y + 30, text_start + label_size.Dx, pt.Y + 30 + label_size.Dy);
 
       DrawText(small_font, Colors.White, Colors.Black, label, label_origin, txtRect, TextOutStyle.Clipped);
 
       Extent text_size = TextExtent(large_font, value);
 
       // center of the text is 37, 16
-      Point origin = new Point(pt.X + 37 - (text_size.Dx >> 1), pt.Y + 16 - (text_size.Dy >> 1));
+      Point origin = Point.Create(pt.X + 37 - (text_size.Dx >> 1), pt.Y + 16 - (text_size.Dy >> 1));
 
-      txtRect = new Rect(origin, text_size);
+      txtRect = Rect.Create(origin, text_size);
 
       DrawText(large_font, Colors.White, Colors.Hollow, value, origin, txtRect, TextOutStyle.Clipped);
     }

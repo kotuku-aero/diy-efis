@@ -343,32 +343,31 @@ namespace CanFly
 
       Extent size_medium = TextExtent(small_font, "00");
 
-      Point pt = new Point((short)(
-        bounds.Right - (digits == 1 ? size_medium.Dx >>= 1 : size_medium.Dx)),
-        bounds.Top);
-
-      pt.Y += (short)((bounds.Bottom - bounds.Top) >> 1);
-      pt.Y -= (short)(size_medium.Dy >> 1);
+      int top = bounds.Top;
+      top += (bounds.Bottom - bounds.Top) >> 1;
+      top -= (short)(size_medium.Dy >> 1);
+      // calc the interval / pixel ratio
+      top += (short)((value % 10) * (size_medium.Dy / 10.0));
 
       if (digits == 1)
         value *= 10;
 
-      // calc the interval / pixel ratio
-      pt.Y += (short)((value % 10) * (size_medium.Dy / 10.0));
       int minor = (value / 10) * 10;
 
       int large_value = minor / 100;
       minor %= 100;
 
-      while (pt.Y > bounds.Top)
+      while (top > bounds.Top)
       {
-        pt.Y -= size_medium.Dy;
+        top -= size_medium.Dy;
         minor += 10;
       }
 
       string str;
 
-      while (pt.Y <= bounds.Bottom)
+      int left = bounds.Right - (digits == 1 ? size_medium.Dx >> 1 : size_medium.Dx);
+
+      while (top <= bounds.Bottom)
       {
         // draw the text + digits first
         minor %= 100;
@@ -382,11 +381,11 @@ namespace CanFly
           else
             str = ((int)minor).ToString("d2");
 
-          DrawText(small_font, fg_color, bg_color, str, pt, bounds, TextOutStyle.Clipped);
+          DrawText(small_font, fg_color, bg_color, str, Point.Create(left, top), bounds, TextOutStyle.Clipped);
         }
 
         minor -= 10;
-        pt.Y += size_medium.Dy;
+        top += size_medium.Dy;
       }
 
       // now the larger value
@@ -396,12 +395,13 @@ namespace CanFly
       //cv.font(&arial_15_font);
       Extent large_size = TextExtent(large_font, str);
       
-      pt.X -= large_size.Dx;
-      pt.Y = bounds.Top;
-      pt.Y += (short)((bounds.Bottom - bounds.Top) >> 1);
-      pt.Y -= (short)(large_size.Dy >> 1);
+      left -= large_size.Dx;
 
-      DrawText(large_font, fg_color, bg_color, str, pt, bounds, TextOutStyle.Clipped);
+      top = bounds.Top;
+      top += (bounds.Bottom - bounds.Top) >> 1;
+      top -= large_size.Dy >> 1;
+
+      DrawText(large_font, fg_color, bg_color, str, Point.Create(left, top), bounds, TextOutStyle.Clipped);
 
     }
     /// <summary>
@@ -413,12 +413,11 @@ namespace CanFly
     /// <returns>true if the font was defined</returns>
     public bool LookupFont(ushort key, string name, out Font font)
     {
-      font = null;
       try
       {
         ushort fontKey =CanFly.Syscall.RegOpenKey(key, name);
 
-        font = new Font(
+        font = Font.Open(
           CanFly.Syscall.RegGetString(fontKey, "name"),
           CanFly.Syscall.RegGetUint16(fontKey, "size"));
 
@@ -553,8 +552,6 @@ namespace CanFly
 
     public bool LookupPen(ushort key, string name, out Pen pen)
     {
-      pen = null;
-
       try
       {
         ushort penKey = CanFly.Syscall.RegOpenKey(key, name);
@@ -589,7 +586,7 @@ namespace CanFly
         }
 
 
-        pen = new Pen(color, width, theStyle);
+        pen = Pen.Create(color, width, theStyle);
       }
       catch
       {
@@ -601,11 +598,9 @@ namespace CanFly
 
     public bool OpenFont(string name, ushort size, out Font font)
     {
-      font = null;
-
       try
       {
-        font = new Font(name, size);
+        font = Font.Open(name, size);
       }
       catch
       {
@@ -632,10 +627,9 @@ namespace CanFly
 
     public bool TryOpenFont(string name, ushort pixels, out Font font)
     {
-      font = null;
       try
       {
-        font = new Font(name, pixels);
+        font = Font.Open(name, pixels);
       }
       catch
       {
@@ -784,26 +778,23 @@ namespace CanFly
     {
       rect = new Rect();
 
-      short value;
-      if (!TryRegGetInt16(key, "x", out value))
-        value = 0;
+      short x;
+      if (!TryRegGetInt16(key, "x", out x))
+        x = 0;
 
-      rect.Left = value;
+      short y;
+      if (!TryRegGetInt16(key, "y", out y))
+        y = 0;
 
-      if (!TryRegGetInt16(key, "y", out value))
-        value = 0;
+      short dx;
+      if (!TryRegGetInt16(key, "width", out dx))
+        dx = 0;
 
-      rect.Top = value;
+      short dy;
+      if (!TryRegGetInt16(key, "height", out dy))
+        dy = 0;
 
-      if (!TryRegGetInt16(key, "width", out value))
-        value = 0;
-
-      rect.Right = (short)(value + rect.Left);
-
-      if (!TryRegGetInt16(key, "height", out value))
-        value = 0;
-
-      rect.Bottom = (short)(value + rect.Top);
+      rect = Rect.Create(x, y, x + dx, y + dy);
 
       return true;
     }

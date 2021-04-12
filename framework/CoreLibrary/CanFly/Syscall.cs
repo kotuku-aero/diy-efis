@@ -17,9 +17,6 @@ namespace CanFly
   {
     /*******************************************************/
     // CanFly operating system routines
-    //
-    // These are simple wrappers around the canfly calls.  the uint returned
-    // is a CanFly error code.
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void SystemInformation(out ulong machine_id, out uint version);
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -159,7 +156,7 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void SetOrientation(uint hwnd, ushort orientation);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreatePen(Pen pen, uint color, ushort width, PenStyle style);
+    internal static extern Pen CreatePen(uint color, ushort width, PenStyle style);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern uint GetPenColor(Pen pen);
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -167,43 +164,27 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern PenStyle GetPenStyle(Pen pen);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetPointX(ref Point point, short x);
-    [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern short GetPointX(Point point);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetPointY(ref Point point, short y);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern short GetPointY(Point point);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreatePoint(Point point, short x, short y);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetExtentDX(ref Extent extent, short dx);
+    internal static extern Point CreatePoint(short x, short y);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern short GetExtentDX(Extent extent);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetExtentDY(ref Extent extent, short dy);
-    [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern short GetExtentDY(Extent extent);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateExtent(Extent extent, short dx, short dy);
+    internal static extern Extent CreateExtent(short dx, short dy);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void CreateRect(Rect rect, short left, short top, short right, short bottom);
+    internal static extern Rect CreateRect(short left, short top, short right, short bottom);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern short GetRectLeft(Rect rect);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetRectLeft(ref Rect rect, short value);
-    [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern short GetRectTop(Rect rect);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetRectTop(ref Rect rect, short value);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern short GetRectRight(Rect rect);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetRectRight(ref Rect rect, short value);
-    [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern short GetRectBottom(Rect rect);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void SetRectBottom(ref Rect rect, short value);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern Point RotatePoint(Point center, Point pt, short degrees);
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -229,11 +210,15 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void Pie(uint canvas, Rect clipRect, Pen pen, uint color, Point center, ushort start, ushort end, ushort radii, ushort inner);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern uint OpenFont(string name, ushort pixels);
+    internal static extern Font OpenFont(string name, ushort pixels);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void DrawText(uint canvas, Rect clipRect, uint font, uint fg, uint bg, string str, Point point, Rect textClipRect, TextOutStyle format);
+    internal static extern ushort GetFontSize(Font font);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern Extent TextExtent(uint canvas, uint font, string str);
+    internal static extern string GetFontName(Font font);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void DrawText(uint canvas, Rect clipRect, Font font, uint fg, uint bg, string str, Point point, Rect textClipRect, TextOutStyle format);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern Extent TextExtent(uint canvas, Font font, string str);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void InvalidateRect(uint hwnd, Rect rect);
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -357,9 +342,7 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void RewindDirectoryEntry(uint hndl);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern Font GetFont(string fontName, ushort pointSize);
-    [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void LoadFont(Stream streamHandle);
+    internal static extern void LoadFont(uint streamHandle);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void AddEvent(ushort canId, CanFlyEventHandler handler);
     [MethodImpl(MethodImplOptions.InternalCall)]

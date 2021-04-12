@@ -120,7 +120,7 @@ namespace CanFly.Proton
         Rect bounds;
 
         if (!TryRegGetRect(child, out bounds))
-          bounds = new Rect(WindowRect.TopLeft, new Extent(0, 0));
+          bounds = Rect.Create(WindowRect.TopLeft, Extent.Create(0, 0));
 
         // this window lays out the windows, but the screen owns the children.
         Widget widget = CreateWidget(parent, child, widgetType, bounds, widgetId);
@@ -657,7 +657,7 @@ namespace CanFly.Proton
           if (type == "NODATA" ||
               !TryRegGetString(key, "can-value", out value))
           {
-            result = new CanFlyMsg(id);
+            result = CanFlyMsg.Create(id);
           }
           else
           {
@@ -667,58 +667,58 @@ namespace CanFly.Proton
                 result = CanFlyMsg.CreateErrorMessage(id, Convert.ToUInt32(value));
                 break;
               case "FLOAT":
-                result = new CanFlyMsg(id, (float)Convert.ToDouble(value));
+                result = CanFlyMsg.Create(id, (float)Convert.ToDouble(value));
                 break;
               case "LONG":
-                result = new CanFlyMsg(id, Convert.ToInt32(value));
+                result = CanFlyMsg.Create(id, Convert.ToInt32(value));
                 break;
               case "ULONG":
-                result = new CanFlyMsg(id, Convert.ToUInt32(value));
+                result = CanFlyMsg.Create(id, Convert.ToUInt32(value));
                 break;
               case "SHORT":
-                result = new CanFlyMsg(id, Convert.ToInt16(value));
+                result = CanFlyMsg.Create(id, Convert.ToInt16(value));
                 break;
               case "USHORT":
-                result = new CanFlyMsg(id, Convert.ToUInt16(value));
+                result = CanFlyMsg.Create(id, Convert.ToUInt16(value));
                 break;
               case "CHAR":
-                result = new CanFlyMsg(id, value[0]);
+                result = CanFlyMsg.Create(id, value[0]);
                 break;
               case "SBYTE" :
-                result = new CanFlyMsg(id, (sbyte)DecodeHex(value));
+                result = CanFlyMsg.Create(id, (sbyte)DecodeHex(value));
                 break;
               case "BYTE":
-                result = new CanFlyMsg(id, (byte)DecodeHex(value));
+                result = CanFlyMsg.Create(id, (byte)DecodeHex(value));
                 break;
               case "SBYTE2":
                 values = value.Split(',');
-                result = new CanFlyMsg(id,
+                result = CanFlyMsg.Create(id,
                   (sbyte)(values.Length > 0 ? DecodeHex(values[0]) : 0),
                   (sbyte)(values.Length > 1 ? DecodeHex(values[1]) : 0));
                 break;
               case "BYTE2":
                 values = value.Split(',');
-                result = new CanFlyMsg(id,
+                result = CanFlyMsg.Create(id,
                   (byte)(values.Length > 0 ? DecodeHex(values[0]) : 0),
                   (byte)(values.Length > 1 ? DecodeHex(values[1]) : 0));
                 break;
               case "SBYTE3":
                 values = value.Split(',');
-                result = new CanFlyMsg(id,
+                result = CanFlyMsg.Create(id,
                   (sbyte)(values.Length > 0 ? DecodeHex(values[0]) : 0),
                   (sbyte)(values.Length > 1 ? DecodeHex(values[1]) : 0),
                   (sbyte)(values.Length > 2 ? DecodeHex(values[2]) : 0));
                 break;
               case "BYTE3":
                 values = value.Split(',');
-                result = new CanFlyMsg(id,
+                result = CanFlyMsg.Create(id,
                   (byte)(values.Length > 0 ? DecodeHex(values[0]) : 0),
                   (byte)(values.Length > 1 ? DecodeHex(values[1]) : 0),
                   (byte)(values.Length > 2 ? DecodeHex(values[2]) : 0));
                 break;
               case "SBYTE4":
                 values = value.Split(',');
-                result = new CanFlyMsg(id,
+                result = CanFlyMsg.Create(id,
                   (sbyte)(values.Length > 0 ? DecodeHex(values[0]) : 0),
                   (sbyte)(values.Length > 1 ? DecodeHex(values[1]) : 0),
                   (sbyte)(values.Length > 2 ? DecodeHex(values[2]) : 0),
@@ -726,7 +726,7 @@ namespace CanFly.Proton
                 break;
               case "BYTE4":
                 values = value.Split(',');
-                result = new CanFlyMsg(id,
+                result = CanFlyMsg.Create(id,
                   (byte)(values.Length > 0 ? DecodeHex(values[0]) : 0),
                   (byte)(values.Length > 1 ? DecodeHex(values[1]) : 0),
                   (byte)(values.Length > 2 ? DecodeHex(values[2]) : 0),
@@ -734,18 +734,18 @@ namespace CanFly.Proton
                 break;
               case "SHORT2":
                 values = value.Split(',');
-                result = new CanFlyMsg(id,
+                result = CanFlyMsg.Create(id,
                   (short)(values.Length > 0 ? DecodeHex(values[0]) : 0),
                   (short)(values.Length > 1 ? DecodeHex(values[1]) : 0));
                 break;
               case "USHORT2":
                 values = value.Split(',');
-                result = new CanFlyMsg(id,
+                result = CanFlyMsg.Create(id,
                   (ushort)(values.Length > 0 ? DecodeHex(values[0]) : 0),
                   (ushort)(values.Length > 1 ? DecodeHex(values[1]) : 0));
                 break;
               default:
-                result = new CanFlyMsg(id);
+                result = CanFlyMsg.Create(id);
                 break;
             }
           }
@@ -769,15 +769,14 @@ namespace CanFly.Proton
       if (_currentMenu != null)
       {
         // draw the root menu
-        Point menuPt = new Point(_menuStartX, _menuStartY);
+        Point menuPt = Point.Create(_menuStartX, _menuStartY);
         int itemWidth = wndRect.Width / 3;
         int itemHeight = 20;
 
-        Extent itemExtents = new Extent(itemWidth, itemHeight);
+        Extent itemExtents = Extent.Create(itemWidth, itemHeight);
 
         // see if we are displaying a popup menu
-        menuPt.X = _menuStartX;
-        menuPt.Y -= itemHeight;
+        menuPt = menuPt.Add(0, -itemHeight);
 
         // determine how menu items to draw from the item
         int itemsAvail = _menuStartY / itemHeight;
@@ -793,16 +792,16 @@ namespace CanFly.Proton
         for (; index < numItems && drawingItem < itemsAvail; drawingItem++, index++)
         {
           MenuItem item = (MenuItem)_currentMenu.MenuItems[index];
-          item.Paint(new Rect(menuPt.X, menuPt.Y, menuPt.X + itemExtents.Dx, menuPt.Y + itemExtents.Dy),
+          item.Paint(Rect.Create(menuPt.X, menuPt.Y, menuPt.X + itemExtents.Dx, menuPt.Y + itemExtents.Dy),
             index == _currentMenu.SelectedIndex);
 
           // now ask the item to draw if it is selected
           if (item.Selected)
-            item.Paint(new Rect(menuPt.X, menuPt.Y, menuPt.X + 80, menuPt.Y + 20), true);
+            item.Paint(Rect.Create(menuPt.X, menuPt.Y, menuPt.X + 80, menuPt.Y + 20), true);
 
 
           // skip up one.
-          menuPt.Y -= itemHeight;
+          menuPt = menuPt.Add(0, -itemHeight);
         }
       }
     }

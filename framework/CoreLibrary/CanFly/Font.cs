@@ -41,22 +41,37 @@ using System;
 
 namespace CanFly
 {
-  public sealed class Font
+  public struct Font
   {
-    private uint _handle;
     /// <summary>
     /// Load a font from the font cache
     /// </summary>
     /// <param name="fontName">Name of the font to load</param>
     /// <param name="pointSize">Size of the font requested</param>
-    public Font(string fontName, ushort pointSize)
+    public static Font Open(string fontName, ushort pointSize)
     {
-      _handle = CanFly.Syscall.OpenFont(fontName, pointSize);
+      return CanFly.Syscall.OpenFont(fontName, pointSize);
+    }
+    /// <summary>
+    /// Return the size of the font in pixels
+    /// </summary>
+    /// <value>Font size</value>
+    public ushort Size
+    {
+      get { return CanFly.Syscall.GetFontSize(this); }
+    }
+    /// <summary>
+    /// Get the name of the font
+    /// </summary>
+    /// <value>Font name</value>
+    public string Name
+    {
+      get { return CanFly.Syscall.GetFontName(this); }
     }
 
     public static void LoadFont(Stream fontStream)
     {
-      CanFly.Syscall.LoadFont(fontStream);
+      CanFly.Syscall.LoadFont(fontStream.Handle);
     }
   }
 }

@@ -110,7 +110,7 @@ namespace CanFly.Proton
 
       qnh = 1013;
 
-      AddEventListener(CanFlyID.id_baro_corrected_altitude, on_baro_corrected_altitude);
+      AddEventListener(CanFlyID.id_baro_corrected_altitude, OnBaroCorrectedAltitude);
       AddEventListener(CanFlyID.id_altitude_rate, on_altitude_rate);
       AddEventListener(CanFlyID.id_qnh, on_qnh);
 
@@ -130,7 +130,7 @@ namespace CanFly.Proton
 
       int median_y = ex.Dy >> 1;
 
-      Rectangle(null, background_color, new Rect(8, 8, ex.Dx - 8, ex.Dy - 8));
+      Rectangle(Pens.Hollow, background_color, Rect.Create(8, 8, ex.Dx - 8, ex.Dy - 8));
 
       int i;
 
@@ -147,11 +147,11 @@ namespace CanFly.Proton
       {
         size = TextExtent(font, marks[i].text);
         DrawText(font, Colors.Yellow, background_color, marks[i].text,
-                 new Point(ex.Dx - 9 - size.Dx, marks[i].pos - (size.Dy >> 1)),
+                 Point.Create(ex.Dx - 9 - size.Dx, marks[i].pos - (size.Dy >> 1)),
                  wnd_rect, TextOutStyle.Clipped);
       }
 
-      Rect paint_area = new Rect(8, 8, ex.Dx - 8, ex.Dy - 8);
+      Rect paint_area = Rect.Create(8, 8, ex.Dx - 8, ex.Dy - 8);
 
       // the vertical tape displays 250 ft = 20 pixels
       int num_pixels = paint_area.Height >> 1;
@@ -175,7 +175,7 @@ namespace CanFly.Proton
           marker_line < (ex.Dy - 8); marker_line += 20)
       {
         // draw a line from 10 pixels to 20 pixels then the text
-        Point[] pts = { new Point(10, marker_line), new Point(20, marker_line) };
+        Point[] pts = { Point.Create(10, marker_line), Point.Create(20, marker_line) };
 
         Polyline(paint_area, pen, pts);
 
@@ -183,7 +183,7 @@ namespace CanFly.Proton
         {
           string altStr = line_altitude.ToString();
           size = TextExtent(font, altStr);
-          DrawText(font, text_color, background_color, altStr, new Point(23, marker_line - (size.Dy >> 1)), paint_area, TextOutStyle.Clipped);
+          DrawText(font, text_color, background_color, altStr, Point.Create(23, marker_line - (size.Dy >> 1)), paint_area, TextOutStyle.Clipped);
         }
 
         line_altitude -= 250;
@@ -196,20 +196,20 @@ namespace CanFly.Proton
 
       Point[] roller =
         {
-    new Point( 23,  median_y ),
-    new Point( 35,  median_y+12 ),
-    new Point( 35,  median_y+20 ),
-    new Point( ex.Dx-8,   median_y+20 ),
-    new Point( ex.Dx-8,   median_y-20 ),
-    new Point( 35,  median_y-20 ),
-    new Point( 35,  median_y-12 ),
-    new Point( 23,  median_y )
+    Point.Create( 23,  median_y ),
+    Point.Create( 35,  median_y+12 ),
+    Point.Create( 35,  median_y+20 ),
+    Point.Create( ex.Dx-8,   median_y+20 ),
+    Point.Create( ex.Dx-8,   median_y-20 ),
+    Point.Create( 35,  median_y-20 ),
+    Point.Create( 35,  median_y-12 ),
+    Point.Create( 23,  median_y )
     };
 
       Polygon(Pens.WhitePen, Colors.Black, roller);
 
-      Rect text_rect = new Rect(36, median_y - 19, 88, median_y + 19);
-      DisplayRoller(new Rect(36, median_y - 19, ex.Dx - 8, median_y + 19),
+      Rect text_rect = Rect.Create(36, median_y - 19, 88, median_y + 19);
+      DisplayRoller(Rect.Create(36, median_y - 19, ex.Dx - 8, median_y + 19),
                      altitude, 2, Colors.Black, text_color, large_roller, small_roller);
 
       /////////////////////////////////////////////////////////////////////////////
@@ -223,7 +223,7 @@ namespace CanFly.Proton
         vs = median_y - ((int)((double)(vertical_speed) * (48.0 / 1000.0)));
       else
       {
-        vs = Math.Min((short)3000, Math.Max((short)-3000, vertical_speed));
+        vs = Math.Min(3000, Math.Max(-3000, vertical_speed));
 
         // make absolute
         vs = Math.Abs(vs);
@@ -252,18 +252,14 @@ namespace CanFly.Proton
         vs_base = tmp;
       }
 
-      Rectangle(null, Colors.White,
-                new Rect(ex.Dx - 8, vs, ex.Dx - 1, vs_base));
+      Rectangle(Pens.Hollow, Colors.White, Rect.Create(ex.Dx - 8, vs, ex.Dx - 1, vs_base));
 
       // draw the text at the top of the VSI
-      Rect vsi_rect = new Rect(23, 0, ex.Dx - 8, 18);
+      Rect vsi_rect = Rect.Create(23, 0, ex.Dx - 8, 18);
 
       Rectangle(Pens.WhitePen, Colors.Black, vsi_rect);
 
-      vsi_rect.Left++;
-      vsi_rect.Top++;
-      vsi_rect.Right--;
-      vsi_rect.Bottom--;
+      vsi_rect = Rect.Create(vsi_rect.Left + 1, vsi_rect.Top + 1, vsi_rect.Right - 1, vsi_rect.Bottom - 1);
 
       // Math.Round the vs to 10 feet
       vs = vertical_speed;
@@ -277,30 +273,27 @@ namespace CanFly.Proton
       size = TextExtent(font, vsStr);
 
       DrawText(vsi_rect, font, Colors.Green, Colors.Black, vsStr,
-               new Point(vsi_rect.Left + (vsi_rect.Width >> 1) - (size.Dx >> 1),
+               Point.Create(vsi_rect.Left + (vsi_rect.Width >> 1) - (size.Dx >> 1),
                    vsi_rect.Top + 1), vsi_rect, TextOutStyle.Clipped);
 
       // draw the current QNH
-      vsi_rect = new Rect(23, ex.Dy - 19, ex.Dx - 8, ex.Dy - 1);
+      vsi_rect = Rect.Create(23, ex.Dy - 19, ex.Dx - 8, ex.Dy - 1);
 
       Rectangle(Pens.WhitePen, Colors.Black, vsi_rect);
 
-      vsi_rect.Left++;
-      vsi_rect.Top++;
-      vsi_rect.Right--;
-      vsi_rect.Bottom--;
+      vsi_rect = Rect.Create(vsi_rect.Left + 1, vsi_rect.Top + 1, vsi_rect.Right - 1, vsi_rect.Bottom - 1);
 
       string qnhStr = qnh.ToString();
       size = TextExtent(font, qnhStr);
 
       DrawText(vsi_rect, font, Colors.Green, Colors.Black, qnhStr,
-               new Point(vsi_rect.Left + (vsi_rect.Width >> 1) - (size.Dx >> 1),
+               Point.Create(vsi_rect.Left + (vsi_rect.Width >> 1) - (size.Dx >> 1),
                    vsi_rect.Top + 1), vsi_rect, TextOutStyle.Clipped);
 
       EndPaint();
     }
 
-    private void on_baro_corrected_altitude(CanFlyMsg msg)
+    private void OnBaroCorrectedAltitude(CanFlyMsg msg)
     {
       try
       {

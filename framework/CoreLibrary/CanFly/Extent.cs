@@ -45,21 +45,19 @@ namespace CanFly
   // to an int, however the API uses shorts.  That is handled with the api call's
   public struct Extent
   {
-  public Extent(int dx, int dy)
+    public static Extent Create(int dx, int dy)
     {
-      Syscall.CreateExtent(this, (short)dx, (short)dy);
+      return Syscall.CreateExtent((short)dx, (short)dy);
     }
 
     public int Dx
     {
       get { return Syscall.GetExtentDX(this); }
-      set { Syscall.SetExtentDX(ref this, (short)value); }
     }
 
     public int Dy
     {
       get { return Syscall.GetExtentDY(this); }
-      set { Syscall.SetExtentDY(ref this, (short)value); }
     }
   };
 }

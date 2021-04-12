@@ -55,7 +55,7 @@ namespace CanFly
   /// A pen is a value type, however the system will share definitions
   /// of the pen
   /// </summary>
-  public sealed class Pen
+  public struct Pen
   {
     /// <summary>
     /// Construct a new pen
@@ -63,9 +63,9 @@ namespace CanFly
     /// <param name="color">Color of the pen</param>
     /// <param name="width">Width of the line drawn</param>
     /// <param name="style">Style for the pen</param>
-    public Pen(uint color, ushort width, PenStyle style)
+    public static Pen Create(uint color, ushort width, PenStyle style)
     {
-      Syscall.CreatePen(this, color, width, style);
+      return Syscall.CreatePen(color, width, style);
     }
     /// <summary>
     /// Width of the pen

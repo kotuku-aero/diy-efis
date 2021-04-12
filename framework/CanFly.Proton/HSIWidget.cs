@@ -43,7 +43,7 @@ namespace CanFly.Proton
 {
   public sealed class HSIWidget : Widget
   {
-    private Pen track_pen = new Pen(Colors.Gray, 1, PenStyle.Dot );
+    private Pen track_pen = Pen.Create(Colors.Gray, 1, PenStyle.Dot );
 
     enum HSIMode {
       ds_course,
@@ -219,7 +219,7 @@ namespace CanFly.Proton
       Rect wnd_rect = WindowRect;
       Extent ex = wnd_rect.Extent;
 
-      Rectangle(null, background_color, WindowRect);
+      Rectangle(Pens.Hollow, background_color, WindowRect);
 
       if (draw_border)
         RoundRect(Pens.GrayPen, Colors.Hollow, WindowRect, 12);
@@ -234,7 +234,7 @@ namespace CanFly.Proton
       int window_x = ex.Dx;
       int window_y = ex.Dy;
       int pixels_per_nm_cdi = 6;
-      Point median = new Point( center_x, center_y);
+      Point median = Point.Create( center_x, center_y);
       int major_mark = mark_start + 16;
       int minor_mark = mark_start + 8;
       int font_x_y = 19;
@@ -254,26 +254,26 @@ namespace CanFly.Proton
 
         // draw the marker
         Polyline(Pens.WhitePen, 
-          RotatePoint(median, new Point(center_x, mark_start), index), 
-          RotatePoint(median, new Point(center_x, major_mark), index));
+          RotatePoint(median, Point.Create(center_x, mark_start), index), 
+          RotatePoint(median, Point.Create(center_x, major_mark), index));
 
         bool do_minor_mark = false;
         short minor_index;
         for (minor_index = 0; minor_index < 30; minor_index += 5)
         {
           Polyline(Pens.WhitePen,
-            RotatePoint(median, new Point(center_x, mark_start), index + minor_index),
-            RotatePoint(median, new Point(center_x, do_minor_mark ? minor_mark : major_mark), index + minor_index));
+            RotatePoint(median, Point.Create(center_x, mark_start), index + minor_index),
+            RotatePoint(median, Point.Create(center_x, do_minor_mark ? minor_mark : major_mark), index + minor_index));
 
           do_minor_mark = !do_minor_mark;
         }
 
         // we now draw the text onto the canvas.  The text has a 23x23 pixel
         // block so the center is 12, 12.
-        Point fontPt = RotatePoint(median, new Point(center_x, font_ordinal), (index < 0) ? index + 360 : index);
+        Point fontPt = RotatePoint(median, Point.Create(center_x, font_ordinal), (index < 0) ? index + 360 : index);
 
         DrawText(font, Colors.White, Colors.Black, i.ToString(),
-          new Point(fontPt.X - font_center, fontPt.Y - font_center));
+          Point.Create(fontPt.X - font_center, fontPt.Y - font_center));
       }
 
       ///////////////////////////////////////////////////////////////////////////
@@ -283,14 +283,14 @@ namespace CanFly.Proton
 
       // the marker is a dashed line
       Polygon(Pens.GrayPen, Colors.Hollow,
-        RotatePoint(median, new Point(center_x, center_y - 88), rotation),
-        RotatePoint(median, new Point(center_x - 7, center_y - 95), rotation),
-        RotatePoint(median, new Point(center_x + 7, center_y - 95), rotation),
-        RotatePoint(median, new Point(center_x, center_y - 88), rotation));
+        RotatePoint(median, Point.Create(center_x, center_y - 88), rotation),
+        RotatePoint(median, Point.Create(center_x - 7, center_y - 95), rotation),
+        RotatePoint(median, Point.Create(center_x + 7, center_y - 95), rotation),
+        RotatePoint(median, Point.Create(center_x, center_y - 88), rotation));
 
       Polyline(track_pen,
-        RotatePoint(median, new Point(center_x, center_y - 88), rotation),
-        RotatePoint(median, new Point(median.X, median.Y), rotation));
+        RotatePoint(median, Point.Create(center_x, center_y - 88), rotation),
+        RotatePoint(median, Point.Create(median.X, median.Y), rotation));
 
       ///////////////////////////////////////////////////////////////////////////
       // Draw the CDI
@@ -304,18 +304,18 @@ namespace CanFly.Proton
           continue;
 
         Polyline(Pens.GreenPen3,
-          RotatePoint(median, new Point(center_x + (pixels_per_nm_cdi * dist), center_y - 5), rotation),
-          RotatePoint(median, new Point(center_x + (pixels_per_nm_cdi * dist), center_y + 5), rotation));
+          RotatePoint(median, Point.Create(center_x + (pixels_per_nm_cdi * dist), center_y - 5), rotation),
+          RotatePoint(median, Point.Create(center_x + (pixels_per_nm_cdi * dist), center_y + 5), rotation));
       }
 
-      //RotatePoint(median, new Point(), rotation)
+      //RotatePoint(median, Point.Create(), rotation)
 
       // draw the CDI Marker head next
-      Polygon(null, Colors.Green,
-        RotatePoint(median, new Point(center_x, center_y - 97), rotation),
-        RotatePoint(median, new Point(center_x - 6, center_y - 88), rotation),
-        RotatePoint(median, new Point(center_x + 6, center_y - 88), rotation),
-        RotatePoint(median, new Point(center_x, center_y - 97), rotation));
+      Polygon(Pens.Hollow, Colors.Green,
+        RotatePoint(median, Point.Create(center_x, center_y - 97), rotation),
+        RotatePoint(median, Point.Create(center_x - 6, center_y - 88), rotation),
+        RotatePoint(median, Point.Create(center_x + 6, center_y - 88), rotation),
+        RotatePoint(median, Point.Create(center_x, center_y - 97), rotation));
 
       // we now convert the deviation to pixels.
       // 1 degree = 24 pixels
@@ -324,16 +324,16 @@ namespace CanFly.Proton
       int cdi = (int)Math.Max(-66, Math.Min(66, Math.Round(cdi_var)));
 
       Polyline(Pens.GreenPen3,
-        RotatePoint(median, new Point(center_x, center_y - 98), rotation),
-        RotatePoint(median, new Point(center_x, center_y - 50), rotation));
+        RotatePoint(median, Point.Create(center_x, center_y - 98), rotation),
+        RotatePoint(median, Point.Create(center_x, center_y - 50), rotation));
 
       Polyline(Pens.GreenPen3,
-        RotatePoint(median, new Point(center_x, center_y + 50), rotation),
-        RotatePoint(median, new Point(center_x, center_y + 98), rotation));
+        RotatePoint(median, Point.Create(center_x, center_y + 50), rotation),
+        RotatePoint(median, Point.Create(center_x, center_y + 98), rotation));
 
       Polyline(Pens.GreenPen3,
-        RotatePoint(median, new Point(center_x + cdi, center_y - 48), rotation),
-        RotatePoint(median, new Point(center_x + cdi, center_y + 48), rotation));
+        RotatePoint(median, Point.Create(center_x + cdi, center_y - 48), rotation),
+        RotatePoint(median, Point.Create(center_x + cdi, center_y + 48), rotation));
 
       /////////////////////////////////////////////////////////////////////////////
       //	Draw the heading bug.
@@ -341,20 +341,20 @@ namespace CanFly.Proton
       int hdg = heading - _direction;
 
       Polyline(Pens.MagentaPen,
-        RotatePoint(median, new Point(center_x - 15, 3), rotation),
-        RotatePoint(median, new Point(center_x - 5, 3), rotation),
-        RotatePoint(median, new Point(center_x, 10), rotation),
-        RotatePoint(median, new Point(center_x + 5, 3), rotation),
-        RotatePoint(median, new Point(center_x + 15, 3), rotation),
-        RotatePoint(median, new Point(center_x + 15, 12), rotation),
-        RotatePoint(median, new Point(center_x - 15, 12), rotation),
-        RotatePoint(median, new Point(center_x - 15, 3), rotation));
+        RotatePoint(median, Point.Create(center_x - 15, 3), rotation),
+        RotatePoint(median, Point.Create(center_x - 5, 3), rotation),
+        RotatePoint(median, Point.Create(center_x, 10), rotation),
+        RotatePoint(median, Point.Create(center_x + 5, 3), rotation),
+        RotatePoint(median, Point.Create(center_x + 15, 3), rotation),
+        RotatePoint(median, Point.Create(center_x + 15, 12), rotation),
+        RotatePoint(median, Point.Create(center_x - 15, 12), rotation),
+        RotatePoint(median, Point.Create(center_x - 15, 3), rotation));
 
       Polygon(Pens.WhitePen, Colors.White,
-        new Point(center_x - 5, 0),
-        new Point(center_x + 5, 0),
-        new Point(center_x, 10),
-        new Point(center_x - 5, 0));
+        Point.Create(center_x - 5, 0),
+        Point.Create(center_x + 5, 0),
+        Point.Create(center_x, 10),
+        Point.Create(center_x - 5, 0));
 
       /////////////////////////////////////////////////////////////////////////////
       // Draw the wind direction indicator.
@@ -374,10 +374,10 @@ namespace CanFly.Proton
 
       // draw the wind first
       Polyline(Pens.YellowPen,
-        RotatePoint(median, new Point(center_x - 15, 2), relative_wind),
-        RotatePoint(median, new Point(center_x + 15, 2), relative_wind),
-        RotatePoint(median, new Point(center_x, 12), relative_wind),
-        RotatePoint(median, new Point(center_x - 15, 2), relative_wind));
+        RotatePoint(median, Point.Create(center_x - 15, 2), relative_wind),
+        RotatePoint(median, Point.Create(center_x + 15, 2), relative_wind),
+        RotatePoint(median, Point.Create(center_x, 12), relative_wind),
+        RotatePoint(median, Point.Create(center_x - 15, 2), relative_wind));
 
       // now the text in upper left
 
@@ -385,28 +385,28 @@ namespace CanFly.Proton
 
       Extent pixels = TextExtent(font, msg);
 
-      DrawText(font, Colors.Yellow, Colors.Hollow, msg, new Point(25 - (pixels.Dx >> 1), 2));
+      DrawText(font, Colors.Yellow, Colors.Hollow, msg, Point.Create(25 - (pixels.Dx >> 1), 2));
 
       msg = wind_speed.ToString();
       pixels = TextExtent(font, msg);
 
-      DrawText(font, Colors.Yellow, Colors.Hollow, msg, new Point(25 - (pixels.Dx >> 1), 13));
+      DrawText(font, Colors.Yellow, Colors.Hollow, msg, Point.Create(25 - (pixels.Dx >> 1), 13));
 
       /////////////////////////////////////////////////////////////////////////////
       // Draw the estimated time to waypoint.
       // drawn in top right as distance/time
       msg = distance_to_waypoint.ToString();
       pixels = TextExtent(font, msg);
-      DrawText(font, Colors.Yellow, Colors.Hollow, msg, new Point(window_x - 25 - (pixels.Dx >> 1), 2));
+      DrawText(font, Colors.Yellow, Colors.Hollow, msg, Point.Create(window_x - 25 - (pixels.Dx >> 1), 2));
 
       msg = string.Format("{0:2d}:{1:2d}", time_to_waypoint / 60, time_to_waypoint % 60);
       pixels = TextExtent(font, msg);
-      DrawText(font, Colors.Yellow, Colors.Hollow, msg, new Point(window_x - 25 - (pixels.Dx >> 1), 13));
+      DrawText(font, Colors.Yellow, Colors.Hollow, msg, Point.Create(window_x - 25 - (pixels.Dx >> 1), 13));
 
       if (waypoint_name != null)
       {
         pixels = TextExtent(font, waypoint_name);
-        DrawText(font, Colors.Yellow, Colors.Hollow, waypoint_name, new Point(window_x - 25 - (pixels.Dx >> 1), 24));
+        DrawText(font, Colors.Yellow, Colors.Hollow, waypoint_name, Point.Create(window_x - 25 - (pixels.Dx >> 1), 24));
       }
     }
   }

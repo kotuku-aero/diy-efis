@@ -57,7 +57,7 @@ namespace CanFly
     protected GdiObject(uint handle)
     {
       _hndl = handle;
-      _clip_rect = new Rect(new Point(0, 0), Extents);
+      _clip_rect = Rect.Create(Point.Create(0, 0), Extents);
     }
 
     protected uint Handle
