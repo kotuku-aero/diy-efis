@@ -11,8 +11,6 @@ The goal of DIY-EFIS is to provide a reference implementation of an open-source 
 
 The key display technology is based on a [Raspberry-PI](https://www.raspberrypi.org/) and a 3D printed case and a power supply with a PIC processor implementing the CanFly protocol
 
-[Case](/resources/case.jpg][Stack](/resources/stack.jpg)
-
 The simplest way to try the code is to build on Microsoft Windows.  This is not a supported platform for the actual device but will allow you to easily test the devices.
 
 * If you don't have Visual Studio Code you will need to download it.
