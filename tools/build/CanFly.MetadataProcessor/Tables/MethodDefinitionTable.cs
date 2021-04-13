@@ -103,15 +103,6 @@ namespace CanFly.Tools.MetadataProcessor
   uint8_t numArgs;      // number of arguments
   uint8_t numLocals;    // number of locals
   uint16_t sig;           // method signature
-  // Length is numArgs + numLocals
-  // note however the if the method is not static then
-  // the this pointer is NOT emited so numArgs = numArgs-1
-  //
-  uint8_t numArgumentNames;
-  uint8_t numLocalNames;
-  // CLR_RECORD_NAMED_VARIABLE[numArumentNames]   argument names
-  // CLR_RECORD_NAMED_VARIABLE[numLocals] local definitions
-  uint8_t variables[0];
   } CLR_RECORD_METHODDEF;
     */
 
@@ -139,32 +130,6 @@ namespace CanFly.Tools.MetadataProcessor
 
       // write the method signature
       writer.WriteUInt16(_context.SignaturesTable.GetOrCreateSignatureId(item));
-
-      if (item.DebugInformation == null)
-      {
-        writer.WriteByte(0);
-        writer.WriteByte(0);
-      }
-      else
-      {
-        // the 'this' pointer is not sent
-        writer.WriteByte(parametersCount);
-        writer.WriteByte((byte)(item.DebugInformation.Scope == null ? 0 : item.DebugInformation.Scope.Variables.Count));
-
-        for (byte paramNumber = 0; paramNumber < parametersCount; paramNumber++)
-        {
-          _context.SignaturesTable.WriteDataType(item.Parameters[paramNumber].ParameterType, writer, false, false, false);
-          WriteStringReference(writer, item.Parameters[paramNumber].Name);
-        }
-
-        if(item.DebugInformation.Scope != null)
-          for (byte variableNumber = 0; variableNumber < item.DebugInformation.Scope.Variables.Count; variableNumber++)
-          {
-            _context.SignaturesTable.WriteDataType(item.Body.Variables[variableNumber].VariableType, writer, false, false, false);
-            // get the name from the method
-            WriteStringReference(writer, item.DebugInformation.Scope.Variables[variableNumber].Name);
-          }
-      }
     }
 
     public static uint GetFlags(MethodDefinition method)

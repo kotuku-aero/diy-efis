@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 
 namespace CanFly.Tools.MetadataProcessor
 {
@@ -51,6 +52,8 @@ namespace CanFly.Tools.MetadataProcessor
       _context = context;
       _sources = new Dictionary<Source, List<Tuple<StatementDefinition, SequencePoint>>>(new SourceComparer());
       _modules = modules;
+
+      GetOrCreateStringId(string.Empty);
     }
 
     // first pass, create all of the sources
@@ -68,7 +71,7 @@ namespace CanFly.Tools.MetadataProcessor
             {
               Source source = new Source(seqPt.Value.Document);
               if (!_sources.ContainsKey(source))
-               {
+              {
                 Document document = seqPt.Value.Document;
 
                 _sources.Add(source, new List<Tuple<StatementDefinition, SequencePoint>>());
@@ -76,8 +79,8 @@ namespace CanFly.Tools.MetadataProcessor
                 // the document has a path, need to store the string table for tha path
                 string fileName = System.IO.Path.GetFileName(document.Url);
 
-                source.FilenameId = _context.StringTable.GetOrCreateStringId(fileName, false);
-                source.PathId = _context.StringTable.GetOrCreateStringId(document.Url, false);
+                source.FilenameId = GetOrCreateStringId(fileName, false);
+                source.PathId = GetOrCreateStringId(document.Url, false);
               }
             }
           }
@@ -105,12 +108,15 @@ namespace CanFly.Tools.MetadataProcessor
         return;
       }
 
+      List<MethodDefinition> methods = new List<MethodDefinition>();
+
       foreach (ModuleDefinition definition in _modules)
       {
         foreach (TypeDefinition type in definition.GetTypes())
         {
           foreach (MethodDefinition method in type.Methods)
           {
+            methods.Add(method);
             //Trace.TraceInformation("Process offsets for {0}::{1}", method.DeclaringType.FullName, method.Name);
             // get the offsets table.
             //List<Tuple<uint, uint>> offsetsTable = new List<Tuple<uint, uint>>();
@@ -155,29 +161,22 @@ namespace CanFly.Tools.MetadataProcessor
         }
       }
 
-      /* emit the table.  This is the format: 
-
-  typedef struct _CLR_RECORD_SOURCE {
-    uint16_t path;                    // index to string table for the path to the directory
-                                      // relative to the project root.  All filenames with
-                                      // the same path share this
-    uint16_t fileName;                // index to string table for name of the file
-    uint16_t numSymbols;              // number of symbols in the source
-    CLR_RECORD_SYMBOL symbols[0];     // variable number of symbols
-    } CLR_RECORD_SOURCE;
-
-  typedef struct _CLR_RECORD_SYMBOL {
-    uint16_t symbolType;              // either a fieldDef if 0x4000 otherwise a methodDef
-    uint16_t sourceLine;              // start line of the symbol
-    uint16_t sourceColumn;            // start column of symbol
-    uint16_t endLine;                 // end line of symbol
-    uint16_t endColumn;               // end column of symbol
-    uint16_t statementStart;          // if a methodDef then start IP of statement
-    } CLR_RECORD_SYMBOL;
+      /*
+      uint16_t stringTableLength
+       uint16_t numSources;
+       uint16_t numMethods;
+       char stringTable[stringTableLength];
+        CLR_RECORD_SOURCE sources[numSources];
+        CLR_RECORD_METHOD_DEBUG methods[numMethods]
        */
-      foreach(KeyValuePair<Source, List<Tuple<StatementDefinition, SequencePoint>>> doc in _sources)
+      writer.WriteUInt16(_lastAvailableId);
+      writer.WriteUInt16((ushort)_sources.Count);
+      writer.WriteUInt16((ushort)methods.Count);
+
+      // emit the sources
+      foreach (KeyValuePair<Source, List<Tuple<StatementDefinition, SequencePoint>>> doc in _sources)
       {
-        if(doc.Value.Count > 65535)
+        if (doc.Value.Count > 65535)
         {
           Console.WriteLine($"Cannot process a source '{doc.Key.Document.Url}' that has more than 65535 sequence points.  Will not have debug information.");
           continue;
@@ -185,9 +184,9 @@ namespace CanFly.Tools.MetadataProcessor
 
         writer.WriteUInt16(doc.Key.PathId);
         writer.WriteUInt16(doc.Key.FilenameId);
-        writer.WriteUInt16((ushort) doc.Value.Count);
+        writer.WriteUInt16((ushort)doc.Value.Count);
 
-        foreach(Tuple<StatementDefinition, SequencePoint> tuple in doc.Value)
+        foreach (Tuple<StatementDefinition, SequencePoint> tuple in doc.Value)
         {
           ushort itemId = 0x3fff;
 
@@ -209,13 +208,118 @@ namespace CanFly.Tools.MetadataProcessor
           writer.WriteUInt16(itemId);
 
           SequencePoint seqPt = tuple.Item2;
-          writer.WriteUInt16((ushort) seqPt.StartLine);
+          writer.WriteUInt16((ushort)seqPt.StartLine);
           writer.WriteUInt16((ushort)seqPt.StartColumn);
           writer.WriteUInt16((ushort)seqPt.EndLine);
           writer.WriteUInt16((ushort)seqPt.EndColumn);
           writer.WriteUInt16(tuple.Item1.StatementStart);
         }
       }
+
+      // emit the methods
+      foreach (MethodDefinition method in methods)
+      {
+        WriteStringReference(writer, method.DeclaringType.FullName);
+        WriteStringReference(writer, method.Name);
+        writer.WriteUInt16(_context.SignaturesTable.GetOrCreateSignatureId(method));
+
+        byte parametersCount = (byte) method.Parameters.Count;
+
+        // the 'this' pointer is not sent
+        writer.WriteByte(parametersCount);
+
+        IEnumerable<Mono.Cecil.Cil.ScopeDebugInformation> scopes = method.DebugInformation.GetScopes();
+        byte numScopes = 0;
+        foreach (Mono.Cecil.Cil.ScopeDebugInformation scope in scopes)
+          numScopes++;
+
+        writer.WriteByte(numScopes);
+
+        if(parametersCount > 0)
+          for (byte paramNumber = 0; paramNumber < parametersCount; paramNumber++)
+          {
+            _context.SignaturesTable.WriteDataType(method.Parameters[paramNumber].ParameterType, writer, false, false, false);
+            WriteStringReference(writer, method.Parameters[paramNumber].Name);
+            writer.WriteUInt16(paramNumber);
+          }
+
+        if (numScopes > 0)
+        {
+          foreach (Mono.Cecil.Cil.ScopeDebugInformation scope in scopes)
+          {
+            WriteScope(writer, method, scope);
+          }
+        }
+
+        // write length of the string table
+        foreach (var item in _idsByStrings.OrderBy(item => item.Value).Select(item => item.Key))
+        {
+          writer.WriteString(item);
+        }
+
+      }
     }
+
+    private void WriteScope(CLRBinaryWriter writer, MethodDefinition item, Mono.Cecil.Cil.ScopeDebugInformation scope)
+    {
+      writer.WriteByte((byte)(scope.HasVariables ? scope.Variables.Count : 0));
+      writer.WriteByte((byte)(scope.HasScopes ? scope.Scopes.Count : 0));
+      writer.WriteUInt16((ushort)scope.Start.Offset);
+      writer.WriteUInt16((ushort)(scope.End.IsEndOfMethod ? item.Body.CodeSize : scope.End.Offset));
+
+      // write local variables
+      foreach (Mono.Cecil.Cil.VariableDebugInformation defn in scope.Variables)
+      {
+        _context.SignaturesTable.WriteDataType(item.Body.Variables[defn.Index].VariableType, writer, false, false, false);
+        // get the name from the method
+        WriteStringReference(writer, defn.Name);
+        writer.WriteUInt16((ushort) defn.Index);
+      }
+
+      // write scopes
+      foreach (Mono.Cecil.Cil.ScopeDebugInformation childScope in scope.Scopes)
+      {
+        WriteScope(writer, item, childScope);
+      }
+    }
+
+    /// <summary>
+    /// Writes string reference ID related to passed string value into output stream.
+    /// </summary>
+    /// <param name="writer">Target binary writer for writing reference ID.</param>
+    /// <param name="value">String value for obtaining reference and writing.</param>
+    private void WriteStringReference(CLRBinaryWriter writer, string value)
+    {
+      writer.WriteUInt16(GetOrCreateStringId(value));
+    }
+
+    /// <summary>
+    /// Gets existing or creates new string reference ID for provided string value.
+    /// </summary>
+    /// <param name="value">String value for lookup in string literals table.</param>
+    /// <returns>String reference ID which can be used for filling metadata and byte code.</returns>
+    private ushort GetOrCreateStringId(string value)
+    {
+      ushort id = GetOrCreateStringId(value);
+      return id;
+    }
+
+    private Dictionary<string, ushort> _idsByStrings =
+        new Dictionary<string, ushort>(StringComparer.Ordinal);
+    private ushort _lastAvailableId = 0;
+    public ushort GetOrCreateStringId(string value, bool useConstantsTable = true)
+    {
+      ushort id;
+      
+      if(!_idsByStrings.TryGetValue(value, out id))
+      {
+        id = _lastAvailableId;
+        _idsByStrings.Add(value, id);
+        int length = Encoding.UTF8.GetBytes(value).Length + 1;
+        _lastAvailableId += (ushort)(length);
+      }
+      return id;
+    }
+
   }
 }
