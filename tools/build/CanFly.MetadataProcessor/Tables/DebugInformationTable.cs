@@ -289,7 +289,8 @@ namespace CanFly.Tools.MetadataProcessor
       if (writer != null)
       {
         writer.WriteByte((byte)(scope.HasVariables ? scope.Variables.Count : 0));
-        writer.WriteByte((byte)(scope.HasScopes ? scope.Scopes.Count : 0));
+        //writer.WriteByte((byte)(scope.HasScopes ? scope.Scopes.Count : 0));
+        writer.WriteByte(0);
         writer.WriteUInt16((ushort)scope.Start.Offset);
         writer.WriteUInt16((ushort)(scope.End.IsEndOfMethod ? item.Body.CodeSize : scope.End.Offset));
       }
@@ -308,10 +309,10 @@ namespace CanFly.Tools.MetadataProcessor
       }
 
       // write scopes
-      foreach (Mono.Cecil.Cil.ScopeDebugInformation childScope in scope.Scopes)
-      {
-        WriteScope(writer, item, childScope);
-      }
+      //foreach (Mono.Cecil.Cil.ScopeDebugInformation childScope in scope.Scopes)
+      //{
+      //  WriteScope(writer, item, childScope);
+      //}
     }
 
     /// <summary>

@@ -86,7 +86,7 @@ namespace CanFly
     /// <value></value>
     public int Height
     {
-      get { return Math.Abs(Bottom - Height); }
+      get { return Math.Abs(Bottom - Top); }
     }
     /// <summary>
     /// Left position of the rectangle
