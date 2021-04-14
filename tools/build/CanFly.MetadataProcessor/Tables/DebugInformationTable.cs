@@ -59,6 +59,9 @@ namespace CanFly.Tools.MetadataProcessor
     // first pass, create all of the sources
     public void GenerateSources()
     {
+      if (!_context.DebugInformation)
+        return;
+
       foreach (ModuleDefinition definition in _modules)
       {
         foreach (TypeDefinition type in definition.GetTypes())
@@ -79,31 +82,44 @@ namespace CanFly.Tools.MetadataProcessor
                 // the document has a path, need to store the string table for tha path
                 string fileName = System.IO.Path.GetFileName(document.Url);
 
-                source.FilenameId = GetOrCreateStringId(fileName, false);
-                source.PathId = GetOrCreateStringId(document.Url, false);
+                source.FilenameId = GetOrCreateStringId(fileName);
+                source.PathId = GetOrCreateStringId(document.Url);
               }
             }
+
+            // make sure the string mappings exist
+            WriteStringReference(null, method.DeclaringType.FullName);
+            WriteStringReference(null, method.Name);
+
+            byte parametersCount = (byte)method.Parameters.Count;
+
+            IEnumerable<Mono.Cecil.Cil.ScopeDebugInformation> scopes = method.DebugInformation.GetScopes();
+            byte numScopes = 0;
+            foreach (Mono.Cecil.Cil.ScopeDebugInformation scope in scopes)
+              numScopes++;
+
+            if (parametersCount > 0)
+              for (byte paramNumber = 0; paramNumber < parametersCount; paramNumber++)
+              {
+                WriteStringReference(null, method.Parameters[paramNumber].Name);
+              }
+
+            if (numScopes > 0)
+            {
+              foreach (Mono.Cecil.Cil.ScopeDebugInformation scope in scopes)
+              {
+                WriteScope(null, method, scope);
+              }
+            }
+
           }
         }
       }
     }
 
-    //private uint CalculateOffset(uint offset, List<Tuple<uint, uint>> offsetsTable)
-    //{
-    //  foreach (Tuple<uint, uint> relocationAddr in offsetsTable)
-    //  {
-    //    if (relocationAddr.Item1 > offset)
-    //      break;
-
-    //    offset -= relocationAddr.Item2;
-    //  }
-
-    //  return offset;
-    //}
-
     public void Write(CLRBinaryWriter writer)
     {
-      if (!_context.MinimizeComplete)
+      if (!_context.DebugInformation || !_context.MinimizeComplete)
       {
         return;
       }
@@ -114,6 +130,9 @@ namespace CanFly.Tools.MetadataProcessor
       {
         foreach (TypeDefinition type in definition.GetTypes())
         {
+          if (!_context.TypeDefinitionTable.Items.Contains(type))
+            continue;         // ignore un-used types
+
           foreach (MethodDefinition method in type.Methods)
           {
             methods.Add(method);
@@ -161,17 +180,29 @@ namespace CanFly.Tools.MetadataProcessor
         }
       }
 
-      /*
-      uint16_t stringTableLength
-       uint16_t numSources;
-       uint16_t numMethods;
-       char stringTable[stringTableLength];
-        CLR_RECORD_SOURCE sources[numSources];
-        CLR_RECORD_METHOD_DEBUG methods[numMethods]
-       */
-      writer.WriteUInt16(_lastAvailableId);
+      // emit the binary information
+      //
+      //  uint16_t stringTableLength
+      //  uint16_t numSources;
+      //  uint16_t numMethods;
+      //  char stringTable[stringTableLength];
+      //  CLR_RECORD_SOURCE sources[numSources];
+      // CLR_RECORD_METHOD_DEBUG methods[numMethods]
+      if (_lastAvailableId > 65535)
+      {
+        Console.WriteLine("Warning: Cannot generate the debug information, string table length > 65535 bytes\n");
+        return;
+      }
+
+      writer.WriteUInt16(_lastAvailableId);         // string table is first and can only be 65535 bytes
       writer.WriteUInt16((ushort)_sources.Count);
       writer.WriteUInt16((ushort)methods.Count);
+
+      // write length of the string table
+      foreach (string item in _idsByStrings.OrderBy(item => item.Value).Select(item => item.Key))
+      {
+        writer.WriteString(item);
+      }
 
       // emit the sources
       foreach (KeyValuePair<Source, List<Tuple<StatementDefinition, SequencePoint>>> doc in _sources)
@@ -250,30 +281,30 @@ namespace CanFly.Tools.MetadataProcessor
             WriteScope(writer, method, scope);
           }
         }
-
-        // write length of the string table
-        foreach (var item in _idsByStrings.OrderBy(item => item.Value).Select(item => item.Key))
-        {
-          writer.WriteString(item);
-        }
-
       }
     }
 
     private void WriteScope(CLRBinaryWriter writer, MethodDefinition item, Mono.Cecil.Cil.ScopeDebugInformation scope)
     {
-      writer.WriteByte((byte)(scope.HasVariables ? scope.Variables.Count : 0));
-      writer.WriteByte((byte)(scope.HasScopes ? scope.Scopes.Count : 0));
-      writer.WriteUInt16((ushort)scope.Start.Offset);
-      writer.WriteUInt16((ushort)(scope.End.IsEndOfMethod ? item.Body.CodeSize : scope.End.Offset));
+      if (writer != null)
+      {
+        writer.WriteByte((byte)(scope.HasVariables ? scope.Variables.Count : 0));
+        writer.WriteByte((byte)(scope.HasScopes ? scope.Scopes.Count : 0));
+        writer.WriteUInt16((ushort)scope.Start.Offset);
+        writer.WriteUInt16((ushort)(scope.End.IsEndOfMethod ? item.Body.CodeSize : scope.End.Offset));
+      }
 
       // write local variables
       foreach (Mono.Cecil.Cil.VariableDebugInformation defn in scope.Variables)
       {
-        _context.SignaturesTable.WriteDataType(item.Body.Variables[defn.Index].VariableType, writer, false, false, false);
+        if (writer != null)
+          _context.SignaturesTable.WriteDataType(item.Body.Variables[defn.Index].VariableType, writer, false, false, false);
+
         // get the name from the method
         WriteStringReference(writer, defn.Name);
-        writer.WriteUInt16((ushort) defn.Index);
+
+        if(writer != null)
+          writer.WriteUInt16((ushort) defn.Index);
       }
 
       // write scopes
@@ -290,24 +321,17 @@ namespace CanFly.Tools.MetadataProcessor
     /// <param name="value">String value for obtaining reference and writing.</param>
     private void WriteStringReference(CLRBinaryWriter writer, string value)
     {
-      writer.WriteUInt16(GetOrCreateStringId(value));
-    }
-
-    /// <summary>
-    /// Gets existing or creates new string reference ID for provided string value.
-    /// </summary>
-    /// <param name="value">String value for lookup in string literals table.</param>
-    /// <returns>String reference ID which can be used for filling metadata and byte code.</returns>
-    private ushort GetOrCreateStringId(string value)
-    {
       ushort id = GetOrCreateStringId(value);
-      return id;
+
+      if(writer != null)
+        writer.WriteUInt16(id);
     }
 
+    
     private Dictionary<string, ushort> _idsByStrings =
         new Dictionary<string, ushort>(StringComparer.Ordinal);
     private ushort _lastAvailableId = 0;
-    public ushort GetOrCreateStringId(string value, bool useConstantsTable = true)
+    public ushort GetOrCreateStringId(string value)
     {
       ushort id;
       

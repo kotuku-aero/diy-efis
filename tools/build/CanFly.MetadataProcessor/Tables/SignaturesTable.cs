@@ -628,7 +628,7 @@ namespace CanFly.Tools.MetadataProcessor
         return id;
       }
 
-      var fullSignatures = GetFullSignaturesArray();
+      byte[] fullSignatures = GetFullSignaturesArray();
       for (var i = 0; i <= fullSignatures.Length - signature.Length; ++i)
       {
         if (signature.SequenceEqual(fullSignatures.Skip(i).Take(signature.Length)))

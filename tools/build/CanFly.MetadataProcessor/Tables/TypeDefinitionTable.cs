@@ -423,8 +423,7 @@ namespace CanFly.Tools.MetadataProcessor
       // build a collection of the current items that are present in the used items set
       List<TypeDefinition> usedItems = new List<TypeDefinition>();
 
-      foreach (TypeDefinition item in TypeDefinitions
-                              .Where(item => set.Contains(item.MetadataToken)))
+      foreach (TypeDefinition item in TypeDefinitions.Where(item => set.Contains(item.MetadataToken)))
       {
         usedItems.Add(item);
       }

@@ -5,7 +5,7 @@ OUTPATH=../assemblies
 CSC=csc.exe
 MDP=../assemblies/CanFly.Build.exe
 FLAGS=-noconfig -target:library  -debug:full @coreAssembly.rsp
-MDPFLAGS=-d $(OUTPATH)/$(NAME).pdb
+MDPFLAGS=-d 
 
 SRC= \
 	CanFly/CanFlyMsg.cs \
@@ -136,7 +136,7 @@ all: $(OUTPATH)/$(NAME).pe
 
 $(OUTPATH)/$(NAME).pe : $(SRC)
 	$(CSC) $(FLAGS) $(LIBS) $(SRC) -out:$(OUTPATH)/$(NAME).dll
-	$(MDP) -c $(OUTPATH)/$(NAME).dll -p $(OUTPATH)/$(NAME).pe -m  -s ..\..\..\libs\ion\clr\mscorlib
+	$(MDP) -c $(OUTPATH)/$(NAME).dll -p $(OUTPATH)/$(NAME).pe  $(MDPFLAGS) -m  -s ..\..\..\libs\ion\clr\mscorlib
 
 clean:
 

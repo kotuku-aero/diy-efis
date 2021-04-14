@@ -44,7 +44,8 @@ namespace CanFly.Tools.MetadataProcessor
         AssemblyDefinition assemblyDefinition,
         List<string> classNamesToExclude,
         bool verbose,
-        bool isCoreLibrary = false,
+        bool isCoreLibrary,
+        bool debugInformation,
         List<string> explicitTypesOrder = null,
         ICustomStringSorter stringSorter = null,
         bool applyAttributesCompression = false)
@@ -56,7 +57,8 @@ namespace CanFly.Tools.MetadataProcessor
           stringSorter,
           applyAttributesCompression,
           verbose,
-          isCoreLibrary);
+          isCoreLibrary,
+          debugInformation);
 
       _verbose = verbose;
       _isCoreLibrary = isCoreLibrary;

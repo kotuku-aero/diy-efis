@@ -3,7 +3,7 @@ NAME=CanFly.Photon
 CSC=csc.exe
 MDP=../assemblies/CanFly.Build.exe
 FLAGS=-langversion:1 -nostdlib -target:library -debug:full
-MDPFLAGS=-d $(NAME).pdb
+MDPFLAGS=-d
 
 SRC= \
 	Canvas.cs \
@@ -23,7 +23,7 @@ all: $(OUTPATH)/$(NAME).pe
 
 $(OUTPATH)/$(NAME).pe : $(SRC)
 	$(CSC) $(FLAGS) $(LIBS) $(SRC) -out:$(OUTPATH)/$(NAME).dll
-	$(MDP) -c $(OUTPATH)/$(NAME).dll -p $(OUTPATH)/$(NAME).pe
+	$(MDP) -c $(OUTPATH)/$(NAME).dll -p $(OUTPATH)/$(NAME).pe  $(MDPFLAGS)
 
 clean:
 

@@ -13,6 +13,7 @@ namespace CanFly.Tools.MetadataProcessor
 {
   public sealed class TablesContext
   {
+    public bool DebugInformation { get; private set; }
     internal static HashSet<string> IgnoringAttributes { get; } = new HashSet<string>(StringComparer.Ordinal)
             {
                 // Assembly-level attributes
@@ -68,8 +69,11 @@ namespace CanFly.Tools.MetadataProcessor
         ICustomStringSorter stringSorter,
         bool applyAttributesCompression,
         bool verbose,
-        bool isCoreLibrary)
+        bool isCoreLibrary,
+        bool debugInformation)
     {
+      DebugInformation = debugInformation;
+
       AssemblyDefinition = assemblyDefinition;
 
       ClassNamesToExclude = classNamesToExclude;

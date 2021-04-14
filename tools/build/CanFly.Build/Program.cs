@@ -97,16 +97,14 @@ namespace CanFly
         }
       }
 
-      public void Compile(
-          string fileName,
-          bool isCoreLibrary)
+      public void Compile(string fileName, bool isCoreLibrary)
       {
         try
         {
           if (Verbose)
             System.Console.WriteLine("Compiling assembly...");
 
-          _assemblyBuilder = new AssemblyBuilder(_assemblyDefinition, _classNamesToExclude, VerboseMinimize, isCoreLibrary);
+          _assemblyBuilder = new AssemblyBuilder(_assemblyDefinition, _classNamesToExclude, VerboseMinimize, isCoreLibrary, DebugInformation);
 
           using (FileStream stream = File.Open(Path.ChangeExtension(fileName, "tmp"), FileMode.Create, FileAccess.ReadWrite))
           {
@@ -164,9 +162,7 @@ namespace CanFly
         return CLRBinaryWriter.CreateLittleEndianBinaryWriter(writer);
       }
 
-      public void AddLoadHint(
-          string assemblyName,
-          string assemblyFileName)
+      public void AddLoadHint(string assemblyName, string assemblyFileName)
       {
         _loadHints[assemblyName] = assemblyFileName;
       }

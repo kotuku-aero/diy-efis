@@ -3,7 +3,7 @@ NAME=CanFly.DiyEfis
 CSC=csc.exe
 MDP=../assemblies/CanFly.Build.exe
 FLAGS=-langversion:1 -nostdlib -target:exe -debug:full
-MDPFLAGS=-d $(NAME).pdb
+MDPFLAGS=-d
 
 SRC= \
 	Program.cs \
@@ -18,7 +18,7 @@ all: $(OUTPATH)/$(NAME).pe
 
 $(OUTPATH)/$(NAME).pe : $(SRC)
 	$(CSC) $(FLAGS) $(LIBS) $(SRC) -out:$(OUTPATH)/$(NAME).exe
-	$(MDP) -c $(OUTPATH)/$(NAME).exe -p $(OUTPATH)/$(NAME).pe
+	$(MDP) -c $(OUTPATH)/$(NAME).exe -p $(OUTPATH)/$(NAME).pe $(MDPFLAGS)
 
 clean:
 
