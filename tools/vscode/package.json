@@ -52,7 +52,14 @@
 		"debuggers": [
 			{
 				"type": "canfly",
-				"program": "./framework/emulator/msh.exe"
+				"program": "${extension.canfly.emulator}",
+        "args": [
+          "-x ${extension.canfly.screen-x}",
+          "-y ${extension.canfly.screen-y}",
+          "-f ${extension.canfly.flash-path}",
+          "-p ${extension.canfly.port}",
+          "${extension.canfly.config-path}"
+        ]
 			}
 		],
 		"configuration": [
@@ -64,6 +71,11 @@
 						"default": true,
 						"description": "Enable the CanFly Extension"
 					},
+          "canfly.emulator": {
+            "type": "string",
+            "default": "$HOME/framework/emulator/msh.exe",
+            "description": "Relative path to the emulator"
+          },
 					"canfly.screen-x": {
 						"type": "number",
 						"default": 320,
@@ -86,12 +98,12 @@
 					},
 					"canfly.flash-path": {
 						"type": "string",
-						"default": "$HOME/.flash",
+						"default": "$HOME/framework/emulator/flash",
 						"description": "Folder for the emulated flash file system, all generated apps are placed here"
 					},
 					"canfly.config-path": {
 						"type": "string",
-						"default": "$HOME/.diy-efis.cdb",
+						"default": "$HOME/framework/emulator/diy-efis.cdb",
 						"description": "Path to the configuration database"
 					},
 					"canfly.port": {
