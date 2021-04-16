@@ -9,6 +9,12 @@
         "request": "attach",
          "debugServer": 4711,
          "type": "canfly" 
+      },
+      {
+        "name": "Launch Application",
+        "request": "launch",
+         "debugServer": 4711,
+         "type": "canfly",
       }
     ]
 }

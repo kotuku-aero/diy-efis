@@ -16,6 +16,7 @@
 		"type": "git",
 		"url": "https://github.com/kotuku-aero/diy-efis"
 	},
+  "icon" : "$HOME/resources/LogoSq.png",
 	"categories": [
 		"Debuggers",
 		"Programming Languages"
@@ -52,7 +53,9 @@
 		"debuggers": [
 			{
 				"type": "canfly",
-				"program": "${extension.canfly.emulator}",
+        "windows" : {
+          "program" : "./out/msh.exe"
+        },
         "args": [
           "-x ${extension.canfly.screen-x}",
           "-y ${extension.canfly.screen-y}",
@@ -71,12 +74,7 @@
 						"default": true,
 						"description": "Enable the CanFly Extension"
 					},
-          "canfly.emulator": {
-            "type": "string",
-            "default": "$HOME/framework/emulator/msh.exe",
-            "description": "Relative path to the emulator"
-          },
-					"canfly.screen-x": {
+ 					"canfly.screen-x": {
 						"type": "number",
 						"default": 320,
 						"description": "Width of the emulator screen"
