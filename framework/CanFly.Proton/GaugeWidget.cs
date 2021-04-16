@@ -644,7 +644,9 @@ namespace CanFly.Proton
             arc_angles[1] = 360;
           }
 
-          Arc(last_step.pen, center, gauge_radii, arc_angles[0], arc_angles[1]);
+          CanFly.Pen pen = last_step.pen;
+
+          Arc(pen, center, gauge_radii, arc_angles[0], arc_angles[1]);
 
           if (arc_angles[2] >= 0)
             Arc(last_step.pen, center, gauge_radii, 0, arc_angles[2]);
