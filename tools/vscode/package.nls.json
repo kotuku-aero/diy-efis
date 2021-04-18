@@ -1,0 +1,32 @@
+{
+	"configure.exceptions.command": "Configure Exceptions",
+
+	"configuration.title": "CanFly Debug",
+	"configuration.exceptionOptions.description": "Configure when exceptions should break (never, always, unhandled). Add more as needed.",
+	"configuration.exceptionOptions.description2": "When should this thrown exception break?",
+
+	"configure.exceptions": "Configure Exceptions",
+	"breakMode.never": "never breaks",
+	"breakMode.always": "breaks when exception handled or unhandled",
+	"breakMode.unhandled": "breaks when exception unhandled",
+
+
+	"canfly.launch.config.name": "Launch",
+	"canfly.attach.config.name": "Attach",
+
+	"canfly.launch.program.description": "Absolute path to the program.",
+	"canfly.launch.args.description": "Command line arguments passed to the program.",
+	"canfly.launch.cwd.description": "Absolute path to the working directory of the program being debugged.",
+	"canfly.launch.runtimeExecutable.description": "Absolute path to the runtime executable to be used. Default is the runtime executable on the PATH.",
+	"canfly.launch.runtimeArgs.description": "Optional arguments passed to the runtime executable.",
+	"canfly.launch.passDebugOptionsViaEnvironmentVariable.description": "Use the canfly_ENV_OPTIONS environment variable to pass the canfly debugger options when launching a program. This is useful if you're embedding canfly in a custom executable.",
+	"canfly.launch.env.description": "Environment variables passed to the program.",
+	"canfly.launch.externalConsole.deprecationMessage": "Attribute 'externalConsole' is deprecated, use 'console' instead.",
+	"canfly.launch.console.description": "Where to launch the debug target.",
+	"canfly.launch.console.internalConsole.description": "VS Code Debug Console (which doesn't support to read input from a program)",
+	"canfly.launch.console.integratedTerminal.description": "VS Code's integrated terminal",
+	"canfly.launch.console.externalTerminal.description": "external terminal that can be configured via user settings",
+
+	"canfly.attach.port.description": "Debug port to attach to.",
+	"canfly.attach.address.description": "TCP/IP address. Default is \"localhost\"."
+}

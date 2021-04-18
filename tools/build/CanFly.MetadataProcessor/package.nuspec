@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>CanFlyFramework.Tools.MetadataProcessor.Core</id>
+    <title>CanFlyFramework.Tools.MetadataProcessor.Core</title>
+    <version>$version$</version>
+    <authors>nanoFramework project contributors, Kotuku Aerospace</authors>
+    <owners>nanoFramework project contributors, Kotuku Aerospace</owners>
+    <description>
+      Metadata Processor tool to be used internally by the CanFLyFramework extension.
+    </description>
+    <releaseNotes>
+    </releaseNotes>
+    <projectUrl>https://github.com/kotuku-aero/diy-efis</projectUrl>
+    <icon>images\nf-logo.png</icon>
+    <license type="file">LICENSE.md</license>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <repository type="git" url="https://github.com/kotuku-aero/diy-efis" commit="$commit$" />
+    <copyright>Copyright (c) .NET Foundation and Contributors, Copyright (c) Kotuku Aerospace Limited</copyright>
+    <references></references>
+    <tags>CanFly</tags>
+    <dependencies>
+      <dependency id="Mono.Cecil" version="0.11.3" />
+      <dependency id="mustache-sharp" version="1.0.0" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\Release\CanFly.Tools.MetadataProcessor.Core.dll" target="lib/net472" />
+    <file src="..\diy-efis.png" target="images\" />
+    <file src="..\LICENSE.md" target="" />
+  </files>
+</package>

@@ -1,0 +1,190 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5DEA2811-2FFA-4959-830B-CAD3ACACABEB}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CanFly.CommandLine</RootNamespace>
+    <AssemblyName>CanFly.CommandLine</AssemblyName>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+    <ReleaseVersion>18.11</ReleaseVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>0</WarningLevel>
+    <DocumentationFile>bin\Debug\CanFly.CommandLine.xml</DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>
+    </DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>0</WarningLevel>
+    <DocumentationFile>bin\Release\CanFly.CommandLine.xml</DocumentationFile>
+    <GenerateDocumentation>true</GenerateDocumentation>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Abstractions\Converters.cs" />
+    <Compile Include="Abstractions\DirectoryBase.cs" />
+    <Compile Include="Abstractions\DirectoryInfoBase.cs" />
+    <Compile Include="Abstractions\DirectoryInfoFactory.cs" />
+    <Compile Include="Abstractions\DirectoryInfoWrapper.cs" />
+    <Compile Include="Abstractions\DirectoryWrapper.cs" />
+    <Compile Include="Abstractions\DriveInfoBase.cs" />
+    <Compile Include="Abstractions\DriveInfoFactory.cs" />
+    <Compile Include="Abstractions\DriveInfoWrapper.cs" />
+    <Compile Include="Abstractions\FileBase.Async.cs" />
+    <Compile Include="Abstractions\FileBase.cs" />
+    <Compile Include="Abstractions\FileInfoBase.cs" />
+    <Compile Include="Abstractions\FileInfoFactory.cs" />
+    <Compile Include="Abstractions\FileInfoWrapper.cs" />
+    <Compile Include="Abstractions\FileStreamFactory.cs" />
+    <Compile Include="Abstractions\FileSystem.cs" />
+    <Compile Include="Abstractions\FileSystemInfoBase.cs" />
+    <Compile Include="Abstractions\FileSystemWatcherBase.cs" />
+    <Compile Include="Abstractions\FileSystemWatcherFactory.cs" />
+    <Compile Include="Abstractions\FileSystemWatcherWrapper.cs" />
+    <Compile Include="Abstractions\FileWrapper.Async.cs" />
+    <Compile Include="Abstractions\FileWrapper.cs" />
+    <Compile Include="Abstractions\IDirectory.cs" />
+    <Compile Include="Abstractions\IDirectoryInfo.cs" />
+    <Compile Include="Abstractions\IDirectoryInfoFactory.cs" />
+    <Compile Include="Abstractions\IDriveInfo.cs" />
+    <Compile Include="Abstractions\IDriveInfoFactory.cs" />
+    <Compile Include="Abstractions\IFile.Async.cs" />
+    <Compile Include="Abstractions\IFile.cs" />
+    <Compile Include="Abstractions\IFileInfo.cs" />
+    <Compile Include="Abstractions\IFileInfoFactory.cs" />
+    <Compile Include="Abstractions\IFileStreamFactory.cs" />
+    <Compile Include="Abstractions\IFileSystem.cs" />
+    <Compile Include="Abstractions\IFileSystemInfo.cs" />
+    <Compile Include="Abstractions\IFileSystemWatcher.cs" />
+    <Compile Include="Abstractions\IFileSystemWatcherFactory.cs" />
+    <Compile Include="Abstractions\IPath.cs" />
+    <Compile Include="Abstractions\PathBase.cs" />
+    <Compile Include="Abstractions\PathWrapper.cs" />
+    <Compile Include="Attributes\BaseOptionAttribute.cs" />
+    <Compile Include="Attributes\OptionAttribute.cs" />
+    <Compile Include="Attributes\OptionArrayAttribute.cs" />
+    <Compile Include="Attributes\HelpOptionAttribute.cs" />
+    <Compile Include="Attributes\OptionListAttribute.cs" />
+    <Compile Include="Attributes\ParserStateAttribute.cs" />
+    <Compile Include="Attributes\ValueListAttribute.cs" />
+    <Compile Include="Attributes\ValueOptionAttribute.cs" />
+    <Compile Include="Extensions\CharExtensions.cs" />
+    <Compile Include="Glob.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Infrastructure\PopsicleSetter.cs" />
+    <Compile Include="Infrastructure\SR.strings.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SR.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Parsing\PropertyWriter.cs" />
+    <Compile Include="Infrastructure\Assumes.cs" />
+    <Compile Include="Infrastructure\ReflectionCache.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Infrastructure\ReflectionHelper.cs" />
+    <Compile Include="Infrastructure\Pair.cs" />
+    <Compile Include="Parsing\TargetCapabilitiesExtensions.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parsing\ValueMapper.cs" />
+    <Compile Include="Parsing\LongOptionParser.cs" />
+    <Compile Include="Parsing\OptionGroupParser.cs" />
+    <Compile Include="Parsing\OptionInfo.cs" />
+    <Compile Include="Parsing\OptionMap.cs" />
+    <Compile Include="Parsing\OneCharStringEnumerator.cs" />
+    <Compile Include="Parsing\StringArrayEnumerator.cs" />
+    <Compile Include="Parsing\ArgumentParser.cs" />
+    <Compile Include="Parsing\IArgumentEnumerator.cs" />
+    <Compile Include="Parsing\PresentParserState.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Text\HelpText.cs" />
+    <Compile Include="Text\BaseSentenceBuilder.cs" />
+    <Compile Include="Text\EnglishSentenceBuilder.cs" />
+    <Compile Include="Text\CopyrightInfo.cs" />
+    <Compile Include="Text\HeadingInfo.cs" />
+    <Compile Include="Attributes\MultiLineTextAttribute.cs" />
+    <Compile Include="Attributes\AssemblyLicenseAttribute.cs" />
+    <Compile Include="Attributes\AssemblyUsageAttribute.cs" />
+    <Compile Include="Text\FormatOptionHelpTextEventArgs.cs" />
+    <Compile Include="Attributes\HelpVerbOptionAttribute.cs" />
+    <Compile Include="Attributes\VerbOptionAttribute.cs" />
+    <Compile Include="BadOptionInfo.cs" />
+    <Compile Include="Parser.cs" />
+    <Compile Include="ParserException.cs" />
+    <Compile Include="ParserSettings.cs" />
+    <Compile Include="IParserState.cs" />
+    <Compile Include="ParserState.cs" />
+    <Compile Include="ParsingError.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ItemGroup>
+    <None Include="Infrastructure\SR.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>SR.strings.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CodeAnalysisDictionary Include="CustomDictionary.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+</Project>
