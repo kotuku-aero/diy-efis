@@ -9,7 +9,18 @@ The Oshkosh 2019 presentation is available [Here](/presentations/Oshkosh2019.pdf
 
 The goal of DIY-EFIS is to provide a reference implementation of an open-source avionics stack based on [Can-Aerospace](http://www.stockflightsystems.com/canaerospace.html)
 
-The key display technology is based on a [Raspberry-PI](https://www.raspberrypi.org/) and a 3D printed case and a power supply with a PIC processor implementing the CanFly protocol
+The key display technology is based on a [Raspberry-PI](https://www.raspberrypi.org/) and a 3D printed case and a power supply with a PIC processor implementing the CanFly protocol.
+
+This is the 2021 version which has changed dramatically from the code presented in 2019.  Breaking changes are:
+
+* The 'C' code base for the EFIS has all been converted to C#.  Still work to be done, but the basics are there.
+* The designs and operating system code is removed as they were not really being used or maintained.
+* Kotuku is having low cost displays and instruments made that will run a C# interpreter similar to the [nanoFramework](https://www.nanoframework.net/).
+* The diy-efis uses different guiding prinicpals to the nanoFramework and so the tools are cloned and modified in this repository.
+* There is documentation on porting diy-efis to other .net frameworks, although Kotuku won't be doing this.
+* VSCode is the editor and development environment for diy-efis.
+* Kotuku will be releasing 2 free images for the Raspberry Pi, one for the Adafruit 3.5" display, the other for the official 7" display.
+* The code for building CanFly app's is here and is free.
 
 The simplest way to try the code is to build on Microsoft Windows.  This is not a supported platform for the actual device but will allow you to easily test the devices.
 
