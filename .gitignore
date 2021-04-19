@@ -38,3 +38,4 @@
 /framework/emulator/fs/*.app
 /tools/vscode/out
 /tools/vscode/node_modules
+/framework/assemblies/CanFly.DiyEfis.exe

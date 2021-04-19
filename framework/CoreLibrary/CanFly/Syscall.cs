@@ -156,9 +156,21 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void SetOrientation(uint hwnd, ushort orientation);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern Pen CreatePen(uint color, ushort width, PenStyle style);
+    internal static extern Color CreateColor(byte red, byte green, byte blue, byte alpha);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern uint GetPenColor(Pen pen);
+    internal static extern Color CreateEncodedColor(uint encoded);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern byte GetRed(Color color);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern byte GetGreen(Color color);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern byte GetBlue(Color color);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern byte GetAlpha(Color color);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern Pen CreatePen(Color color, ushort width, PenStyle style);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern Color GetPenColor(Pen pen);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern ushort GetPenWidth(Pen pen);
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -186,29 +198,61 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern short GetRectBottom(Rect rect);
     [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern Euler CreateEuler(float x, float y, float z);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern float GetEulerX(Euler e);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern float GetEulerY(Euler e);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern float GetEulerZ(Euler e);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern Euler AddEuler(Euler e1, Euler e2);
+     [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern Euler SubtractEuler(Euler e1, Euler e2);
+   [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern Euler MultiplyEuler(Euler e1, Euler e2);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern Euler DivideEuler(Euler e1, Euler e2);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern Euler TransformEuler(Euler e1, Euler[] matrix);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern Position CreatePosition(float lat, float lng, float elev);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern float GetLat(Position pos);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern float GetLng(Position pos);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern float GetElev(Position pos);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern float Distance(Position p1, Position p2);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern float Bearing(Position p1, Position p2);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern float MagneticVariation(Position p1);
+    [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern Point RotatePoint(Point center, Point pt, short degrees);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void Polyline(uint canvas, Rect clipRect, Pen pen, Point[] points);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void Line(uint canvas, Rect clipRect, Pen pen, Point from, Point to);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void Ellipse(uint canvas, Rect clipRect, Pen pen, uint fillColor, Rect rect);
+    internal static extern void Ellipse(uint canvas, Rect clipRect, Pen pen, Color fillColor, Rect rect);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void Polygon(uint canvas, Rect clipRect, Pen pen, uint fillColor, Point[] points);
+    internal static extern void Polygon(uint canvas, Rect clipRect, Pen pen, Color fillColor, Point[] points);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void Rectangle(uint canvas, Rect clipRect, Pen pen, uint fillColor, Rect rect);
+    internal static extern void Rectangle(uint canvas, Rect clipRect, Pen pen, Color fillColor, Rect rect);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void RoundRect(uint canvas, Rect clipRect, Pen pen, uint fillColor, Rect rect, uint radius);
+    internal static extern void RoundRect(uint canvas, Rect clipRect, Pen pen, Color fillColor, Rect rect, uint radius);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void BitBlt(uint canvas, Rect clipRect, Rect destRect, uint src_canvas, Rect srcClipRect, Point srcPoint);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern uint GetPixel(uint canvas, Rect clipRect, Point point);
+    internal static extern Color GetPixel(uint canvas, Rect clipRect, Point point);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern uint SetPixel(uint canvas, Rect clipRect, Point point, uint color);
+    internal static extern Color SetPixel(uint canvas, Rect clipRect, Point point, Color color);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void Arc(uint canvas, Rect clipRect, Pen pen, Point center, ushort radius, ushort start, ushort end);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void Pie(uint canvas, Rect clipRect, Pen pen, uint color, Point center, ushort start, ushort end, ushort radii, ushort inner);
+    internal static extern void Pie(uint canvas, Rect clipRect, Pen pen, Color color, Point center, ushort start, ushort end, ushort radii, ushort inner);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern Font OpenFont(string name, ushort pixels);
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -216,7 +260,7 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern string GetFontName(Font font);
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void DrawText(uint canvas, Rect clipRect, Font font, uint fg, uint bg, string str, Point point, Rect textClipRect, TextOutStyle format);
+    internal static extern void DrawText(uint canvas, Rect clipRect, Font font, Color fg, Color bg, string str, Point point, Rect textClipRect, TextOutStyle format);
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern Extent TextExtent(uint canvas, Font font, string str);
     [MethodImpl(MethodImplOptions.InternalCall)]

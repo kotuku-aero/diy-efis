@@ -82,7 +82,7 @@ namespace CanFly.Proton
     {
       public short value;
       public Pen pen;
-      public uint gauge_color;
+      public Color gauge_color;
     };
 
     internal class tick_mark_t
@@ -92,12 +92,12 @@ namespace CanFly.Proton
     };
 
     private string name;
-    private uint name_color;
+    private Color name_color;
     private Font name_font;
     private Point _namePt;
     private bool draw_name;
 
-    private uint background_color;
+    private Color background_color;
     private Pen border_pen;
     private bool draw_border;
     private Font font;
@@ -813,7 +813,7 @@ namespace CanFly.Proton
       if (steps == null || steps.Count == 0)
         return Pen.Create(Colors.Hollow, width, PenStyle.Solid);
 
-      uint color = Colors.Hollow;
+      Color color = Colors.Hollow;
       // step 0 is only used to set the minimum value for the gauge
       // so it is ignored
       for (int i = 1; i < steps.Count; i++)
@@ -830,9 +830,9 @@ namespace CanFly.Proton
       return Pen.Create(color, width, PenStyle.Solid);
     }
 
-    private uint CalculateColor(float value)
+    private Color CalculateColor(float value)
     {
-      uint fill_color = Colors.LightBlue;
+      Color fill_color = Colors.LightBlue;
 
       if (steps == null || steps.Count == 0)
         return fill_color;

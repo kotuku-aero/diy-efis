@@ -337,7 +337,7 @@ namespace CanFly
     }
 
     public void DisplayRoller(Rect bounds, int value, int digits,
-      uint bg_color, uint fg_color, Font  large_font, Font  small_font)
+      Color bg_color, Color fg_color, Font  large_font, Font  small_font)
     {
       // we need to work out the size of the roller digits first
 
@@ -429,7 +429,7 @@ namespace CanFly
       }
     }
 
-    public bool LookupColor(ushort key, string name, out uint color)
+    public bool LookupColor(ushort key, string name, out Color color)
     {
       color = Colors.Black;
       try
@@ -440,9 +440,9 @@ namespace CanFly
         {
           // parse number
           if (color_str[1] == 'x')
-            color = Convert.ToUInt32(color_str.Substring(2), 16);
+            color = Color.Create(Convert.ToUInt32(color_str.Substring(2), 16));
           else
-            color = Convert.ToUInt32(color_str);
+            color = Color.Create(Convert.ToUInt32(color_str));
         }
         else
         {
@@ -540,7 +540,7 @@ namespace CanFly
               break;
 
           }
-}
+        }
       }
       catch
       {
@@ -558,7 +558,7 @@ namespace CanFly
 
         ushort width = CanFly.Syscall.RegGetUint16(penKey, "width");
         string style = CanFly.Syscall.RegGetString(penKey, "style");
-        uint color;
+        Color color;
         LookupColor(penKey, "color", out color);
 
 

@@ -63,7 +63,7 @@ namespace CanFly
     /// <param name="color">Color of the pen</param>
     /// <param name="width">Width of the line drawn</param>
     /// <param name="style">Style for the pen</param>
-    public static Pen Create(uint color, ushort width, PenStyle style)
+    public static Pen Create(Color color, ushort width, PenStyle style)
     {
       return Syscall.CreatePen(color, width, style);
     }
@@ -79,7 +79,7 @@ namespace CanFly
     /// Color of the pen
     /// </summary>
     /// <value>RGBA color</value>
-    public uint Color
+    public Color Color
     {
       get { return Syscall.GetPenColor(this); }
     }

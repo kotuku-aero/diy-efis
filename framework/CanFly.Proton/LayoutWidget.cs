@@ -84,11 +84,11 @@ namespace CanFly.Proton
     // if a controlling variable changed
     private ArrayList _menuItems;
 
-    private uint _backgroundColor;
-    private uint _selectedBackgroundColor;
-    private uint _textColor; // text color
-    private uint _borderColor;
-    private uint _selectedColor;
+    private Color _backgroundColor;
+    private Color _selectedBackgroundColor;
+    private Color _textColor; // text color
+    private Color _borderColor;
+    private Color _selectedColor;
     private Pen _borderPen;
     private Font _font;
 
@@ -469,31 +469,31 @@ namespace CanFly.Proton
       set { _borderPen = value; }
     }
 
-    public uint BorderColor
+    public Color BorderColor
     {
       get { return _borderColor; }
       set { _borderColor = value; }
     }
 
-    public uint BackgroundColor
+    public Color BackgroundColor
     {
       get { return _backgroundColor; }
       set { _backgroundColor = value; }
     }
 
-    public uint SelectedBackgroundColor
+    public Color SelectedBackgroundColor
     {
       get { return _selectedBackgroundColor; }
       set { _selectedBackgroundColor = value; }
     }
 
-    public uint TextColor
+    public Color TextColor
     {
       get { return _textColor; }
       set { _textColor = value; }
     }
 
-    public uint SelectedColor
+    public Color SelectedColor
     {
       get { return _selectedColor; }
       set { _selectedColor = value; }

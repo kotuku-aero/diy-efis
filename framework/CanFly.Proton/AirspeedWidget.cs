@@ -60,8 +60,8 @@ namespace CanFly.Proton
     // this is updated on each window message
     private int _airspeed;
   
-    private uint _backgroundColor;
-    private uint _textColor;
+    private Color _backgroundColor;
+    private Color _textColor;
     private Pen _pen;
     Font  _font;
     bool _drawBorder;

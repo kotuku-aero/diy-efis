@@ -11,10 +11,25 @@
          "type": "canfly" 
       },
       {
-        "name": "Launch Application",
+        "name": "Launch MFD3 Application",
         "request": "launch",
-         "debugServer": 4711,
-         "type": "canfly",
+        "type": "canfly.mfd3",
+        "application": "diy-efis.app",
+        "fs_path": "${workspaceFolder}/emulator/fs"
+      },
+      {
+        "name": "Launch MFD5 Application",
+        "request": "launch",
+        "type": "canfly.mfd5",
+        "application": "diy-efis.app",
+        "fs_path": "${workspaceFolder}/emulator/fs"
+      },
+      {
+        "name": "Launch MFD10 Application",
+        "request": "launch",
+        "type": "canfly.mfd10",
+        "application": "diy-efis.app",
+        "fs_path": "${workspaceFolder}/emulator/fs"
       }
     ]
 }

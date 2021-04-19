@@ -3,12 +3,15 @@ NAME=mscorlib
 OUTPATH=../assemblies
 
 CSC=csc.exe
-MDP=../assemblies/CanFly.Build.exe
+MDP=../../tools/CanFly.Build.exe
 FLAGS=-noconfig -target:library  -debug:full @coreAssembly.rsp
 MDPFLAGS=-d 
 
 SRC= \
 	CanFly/CanFlyMsg.cs \
+	CanFly/Color.cs \
+	CanFly/Euler.cs \
+	CanFly/Position.cs \
 	CanFly/Runtime.cs \
 	CanFly/Syscall.cs \
 	CanFly/Extent.cs \

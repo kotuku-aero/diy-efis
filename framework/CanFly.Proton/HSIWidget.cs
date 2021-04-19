@@ -61,7 +61,7 @@ namespace CanFly.Proton
     private short wind_speed;
     private short heading_bug;
     private short heading;
-    private uint background_color;
+    private Color background_color;
     private bool draw_border;
     private Font font;
     private string waypoint_name;
