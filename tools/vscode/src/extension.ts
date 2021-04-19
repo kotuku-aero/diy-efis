@@ -3,6 +3,8 @@
 import * as vscode from 'vscode';
 import * as nls from 'vscode-nls';
 import { DebugProtocol } from 'vscode-debugprotocol';
+import { WorkspaceFolder, DebugConfiguration, ProviderResult, CancellationToken } from 'vscode';
+
 const localize = nls.config()();
 const configuration = vscode.workspace.getConfiguration('canfly');
 
@@ -11,7 +13,8 @@ const configuration = vscode.workspace.getConfiguration('canfly');
 export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand('extension.canfly.configureExceptions', () => configureExceptions()));
 	context.subscriptions.push(vscode.commands.registerCommand('extension.canfly.startSession', config => startSession(config)));
-}
+ }
+
 
 // this method is called when your extension is deactivated
 export function deactivate()

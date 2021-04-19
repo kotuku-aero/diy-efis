@@ -11,21 +11,14 @@
 	"breakMode.unhandled": "breaks when exception unhandled",
 
 
-	"canfly.launch.config.name": "Launch",
+	"canfly.launch.mfd3.config.name": "Launch MFD3 320x240",
+	"canfly.launch.mfd5.config.name": "Launch MFD5 800x480",
+	"canfly.launch.mfd10.config.name": "Launch MFD3 1024x600",
 	"canfly.attach.config.name": "Attach",
 
 	"canfly.launch.program.description": "Absolute path to the program.",
-	"canfly.launch.args.description": "Command line arguments passed to the program.",
-	"canfly.launch.cwd.description": "Absolute path to the working directory of the program being debugged.",
-	"canfly.launch.runtimeExecutable.description": "Absolute path to the runtime executable to be used. Default is the runtime executable on the PATH.",
-	"canfly.launch.runtimeArgs.description": "Optional arguments passed to the runtime executable.",
-	"canfly.launch.passDebugOptionsViaEnvironmentVariable.description": "Use the canfly_ENV_OPTIONS environment variable to pass the canfly debugger options when launching a program. This is useful if you're embedding canfly in a custom executable.",
-	"canfly.launch.env.description": "Environment variables passed to the program.",
-	"canfly.launch.externalConsole.deprecationMessage": "Attribute 'externalConsole' is deprecated, use 'console' instead.",
-	"canfly.launch.console.description": "Where to launch the debug target.",
-	"canfly.launch.console.internalConsole.description": "VS Code Debug Console (which doesn't support to read input from a program)",
-	"canfly.launch.console.integratedTerminal.description": "VS Code's integrated terminal",
-	"canfly.launch.console.externalTerminal.description": "external terminal that can be configured via user settings",
+	"canfly.launch.fs_path.description": "Absolute path to the working directory of the program being debugged.",
+  "canfly.launch.stop.description": "Stop the application before any code is run",
 
 	"canfly.attach.port.description": "Debug port to attach to.",
 	"canfly.attach.address.description": "TCP/IP address. Default is \"localhost\"."
