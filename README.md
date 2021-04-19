@@ -14,13 +14,21 @@ The key display technology is based on a [Raspberry-PI](https://www.raspberrypi.
 The simplest way to try the code is to build on Microsoft Windows.  This is not a supported platform for the actual device but will allow you to easily test the devices.
 
 * If you don't have Visual Studio Code you will need to download it.
-* I use [TortoiseGit](https://tortoisegit.org/) to do the checkout of the DIY-EFIS repository.  Remember to select the RELEASE_2021 branch after checking out.
-* The shell used to test the applications is located at /framework/assemblies/msh.exe this is a win32 binary and is the same code that is embedded into Kotuku prducts
+* If you don't have Visual Studio 2019 installed you can install the [Roslyn Compiler](https://www.microsoft.com/en-US/download/details.aspx?id=48159) which is required.
+* I use [TortoiseGit](https://tortoisegit.org/) to do the checkout of the DIY-EFIS repository.
 * Run VSCode and open the root folder of <path to the clone>/framework
 * We use a Makefile for building, you need to have the makefile build extension installed.
-* In the <path to the clone>/framework there is a debugger extension called diyefis.vsix that will add the debugger extension for diy-efis to vscode.
-* Build dit-efis.  This creates an application called diy-efis.app in the <path to clone>/emulator/fs directory
-* There is also a provided confi database called diy-efis.reg that has configs for a pfd and a basic edu.
+* In the <path to the clone>/rolls/vscode there is a debugger extension called canfly-0.0.1.vsix that will add the debugger extension for diy-efis to vscode.
+* Build diy-efis.  This creates an application called diy-efis.app in the <path to the diy-efis project>/emulator/fs directory
+* There is also a provided config database called diy-efis.cdb that has configs for a pfd and a basic edu.
+
+At the present time, when debugging within vscode the configuration console is not displayed.  To enable this you need to launch the emulator launched from vscode from the home directory.  This is at <Your home directory>\.vscode\extensions\kotuku.canfly-0.0.1\out which is where the integrated debugger sets the home directory to.
+
+Change to that directory within a command prompt and type msg -x 320 -y 240 -f <path to the diy-efis project>\framework\emulator\fs diy-efis.cdb
+  
+Replace the <path to the diy-efis project> and <Your home directory> with the correct paths for your system.
+  
+The next release of the emulator will use the embedded console in VSCode to expose the configuration tool and this won't be needed.
 
 We are writing a couple of howto pages.
 
