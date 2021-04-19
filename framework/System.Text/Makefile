@@ -1,7 +1,7 @@
 NAME=System.Text
 
 CSC=csc.exe
-MDP=../assemblies/CanFly.Build.exe
+MDP=../../tools/CanFly.Build.exe
 FLAGS=-langversion:1 -nostdlib -target:library -debug:full
 MDPFLAGS=-d
 

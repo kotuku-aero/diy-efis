@@ -71,8 +71,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy $(TargetPath) $(SolutionDir)..\..\framework\assemblies
-copy $(TargetDir)*.dll $(SolutionDir)..\..\framework\assemblies
+    <PostBuildEvent>copy $(TargetPath) $(SolutionDir)..
+copy $(TargetDir)*.dll $(SolutionDir)..
 </PostBuildEvent>
   </PropertyGroup>
 </Project>

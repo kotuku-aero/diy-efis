@@ -119,7 +119,7 @@ namespace CanFly
     /// <param name="pen">pen to draw ellipse with</param>
     /// <param name="color">color to fill ellipse with</param>
     /// <param name="area">area of the ellipse</param>
-    public void Ellipse(Pen pen, uint color, Rect area)
+    public void Ellipse(Pen pen, Color color, Rect area)
     {
       Syscall.Ellipse(Handle, ClipRect, pen, color, area);
     }
@@ -129,7 +129,7 @@ namespace CanFly
     /// <param name="pen">Outline color</param>
     /// <param name="color">Fill color</param>
     /// <param name="points">Points to draw</param>
-    public void Polygon(Pen pen, uint color, params Point[] points)
+    public void Polygon(Pen pen, Color color, params Point[] points)
     {
       Syscall.Polygon(Handle, ClipRect, pen, color, points);
     }
@@ -139,7 +139,7 @@ namespace CanFly
     /// <param name="pen">Pen to draw border with</param>
     /// <param name="color">Fill color</param>
     /// <param name="area">Area to draw</param>
-    public void Rectangle(Pen pen, uint color, Rect area)
+    public void Rectangle(Pen pen, Color color, Rect area)
     {
 
       Syscall.Rectangle(Handle, ClipRect, pen, color, area);
@@ -151,7 +151,7 @@ namespace CanFly
     /// <param name="color">Fill color</param>
     /// <param name="area">Area to draw</param>
     /// <param name="radius">Radius of corners</param>
-    public void RoundRect(Pen pen, uint color, Rect area, ushort radius)
+    public void RoundRect(Pen pen, Color color, Rect area, ushort radius)
     {
       Syscall.RoundRect(Handle, ClipRect, pen, color, area, radius);
     }
@@ -170,12 +170,12 @@ namespace CanFly
     /// </summary>
     /// <param name="pt">Point to get</param>
     /// <returns>Color value</returns>
-    public uint GetPixel(Point pt)
+    public Color GetPixel(Point pt)
     {
       return Syscall.GetPixel(Handle, ClipRect, pt);
     }
 
-    public uint SetPixel(Point pt, uint color)
+    public Color SetPixel(Point pt, Color color)
     {
       return Syscall.SetPixel(Handle, ClipRect, pt, color);
     }
@@ -200,7 +200,7 @@ namespace CanFly
     /// <param name="end">End angle</param>
     /// <param name="radii">Outer arc radii</param>
     /// <param name="inner">Inner arc radii</param>
-    public void Pie(Pen pen, uint color, Point pt, int start, int end, int radii, int inner)
+    public void Pie(Pen pen, Color color, Point pt, int start, int end, int radii, int inner)
     {
       Syscall.Pie(Handle, ClipRect, pen, color, pt, (ushort)start, (ushort)end, (ushort)radii, (ushort)inner);
     }
@@ -214,7 +214,7 @@ namespace CanFly
     /// <param name="src_pt">Orgin on canvas</param>
     /// <param name="txt_clip_rect">Rectangle to clip to</param>
     /// <param name="format">Format flags</param>
-    public void DrawText(Font font, uint fg, uint bg, string str, Point src_pt, Rect txt_clip_rect, TextOutStyle format)
+    public void DrawText(Font font, Color fg, Color bg, string str, Point src_pt, Rect txt_clip_rect, TextOutStyle format)
     {
       Syscall.DrawText(Handle, ClipRect, font, fg, bg, str, src_pt, txt_clip_rect, format);
     }
@@ -227,7 +227,7 @@ namespace CanFly
     /// <param name="str">Text to render</param>
     /// <param name="src_pt">Orgin on canvas</param>
     /// <param name="txt_clip_rect">Rectangle to clip to</param>
-    public void DrawText(Font font, uint fg, uint bg, string str, Point src_pt, Rect txt_clip_rect)
+    public void DrawText(Font font, Color fg, Color bg, string str, Point src_pt, Rect txt_clip_rect)
     {
       Syscall.DrawText(Handle, ClipRect, font, fg, bg, str, src_pt, txt_clip_rect, TextOutStyle.Clipped);
     }
@@ -239,7 +239,7 @@ namespace CanFly
     /// <param name="bg">Background color</param>
     /// <param name="str">Text to render</param>
     /// <param name="src_pt">Orgin on canvas</param>
-    public void DrawText(Font font, uint fg, uint bg, string str, Point src_pt)
+    public void DrawText(Font font, Color fg, Color bg, string str, Point src_pt)
     {
       Rect txt_clip_rect = ClipRect;
 
@@ -256,7 +256,7 @@ namespace CanFly
     /// <param name="src_pt">Orgin on canvas</param>
     /// <param name="txt_clip_rect">Rectangle to clip to</param>
     /// <param name="format">Format flags</param>
-    public void DrawText(Rect clipRect, Font font, uint fg, uint bg, string str, Point src_pt, Rect txt_clip_rect, TextOutStyle format)
+    public void DrawText(Rect clipRect, Font font, Color fg, Color bg, string str, Point src_pt, Rect txt_clip_rect, TextOutStyle format)
     {
       Syscall.DrawText(Handle, ClipRect, font, fg, bg, str, src_pt, txt_clip_rect, format);
     }

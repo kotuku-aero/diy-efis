@@ -337,7 +337,7 @@ namespace CanFly
     }
 
     public void DisplayRoller(Rect bounds, int value, int digits,
-      uint bg_color, uint fg_color, Font  large_font, Font  small_font)
+      Color bg_color, Color fg_color, Font  large_font, Font  small_font)
     {
       // we need to work out the size of the roller digits first
 
@@ -429,7 +429,7 @@ namespace CanFly
       }
     }
 
-    public bool LookupColor(ushort key, string name, out uint color)
+    public bool LookupColor(ushort key, string name, out Color color)
     {
       color = Colors.Black;
       try
@@ -440,9 +440,9 @@ namespace CanFly
         {
           // parse number
           if (color_str[1] == 'x')
-            color = Convert.ToUInt32(color_str.Substring(2), 16);
+            color = Color.Create(Convert.ToUInt32(color_str.Substring(2), 16));
           else
-            color = Convert.ToUInt32(color_str);
+            color = Color.Create(Convert.ToUInt32(color_str));
         }
         else
         {
@@ -457,10 +457,10 @@ namespace CanFly
             case "gray":
               color = Colors.Gray;
               break;
-            case "light-gray":
+            case "lightgray":
               color = Colors.LightGray;
               break;
-            case "dark-gray":
+            case "darkgray":
               color = Colors.DarkGray;
               break;
             case "red":
@@ -475,7 +475,7 @@ namespace CanFly
             case "green":
               color = Colors.Green;
               break;
-            case "light-green":
+            case "lightgreen":
               color = Colors.LightGreen;
               break;
             case "yellow":
@@ -487,19 +487,19 @@ namespace CanFly
             case "cyan":
               color = Colors.Cyan;
               break;
-            case "pale-yellow":
+            case "paleyellow":
               color = Colors.PaleYellow;
               break;
-            case "light-yellow":
+            case "lightyellow":
               color = Colors.LightYellow;
               break;
-            case "lime-green":
+            case "limegreen":
               color = Colors.White;
               break;
             case "teal":
               color = Colors.Teal;
               break;
-            case "dark-green":
+            case "darkgreen":
               color = Colors.DarkGreen;
               break;
             case "maroon":
@@ -523,16 +523,16 @@ namespace CanFly
             case "navy":
               color = Colors.Navy;
               break;
-            case "light-blue":
+            case "lightblue":
               color = Colors.LightBlue;
               break;
-            case "faded-blue":
+            case "fadedblue":
               color = Colors.FadedBlue;
               break;
-            case "light-grey":
+            case "lightgrey":
               color = Colors.LightGrey;
               break;
-            case "dark-grey":
+            case "darkgrey":
               color = Colors.DarkGray;
               break;
             case "hollow":
@@ -540,7 +540,7 @@ namespace CanFly
               break;
 
           }
-}
+        }
       }
       catch
       {
@@ -558,7 +558,8 @@ namespace CanFly
 
         ushort width = CanFly.Syscall.RegGetUint16(penKey, "width");
         string style = CanFly.Syscall.RegGetString(penKey, "style");
-        uint color = CanFly.Syscall.RegGetUint32(penKey, "color");
+        Color color;
+        LookupColor(penKey, "color", out color);
 
 
         PenStyle theStyle = PenStyle.Solid;
@@ -593,7 +594,7 @@ namespace CanFly
         return false;
       }
 
-      return false;
+      return true;
     }
 
     public bool OpenFont(string name, ushort size, out Font font)

@@ -68,8 +68,6 @@ namespace CanFly.Tools.MetadataProcessor
       PrimitiveTypes.Add(typeof(object).FullName, nanoCLR_DataType.DATATYPE_OBJECT);
       PrimitiveTypes.Add(typeof(IntPtr).FullName, nanoCLR_DataType.DATATYPE_I4);
       PrimitiveTypes.Add(typeof(UIntPtr).FullName, nanoCLR_DataType.DATATYPE_U4);
-
-      PrimitiveTypes.Add(typeof(WeakReference).FullName, nanoCLR_DataType.DATATYPE_WEAKCLASS);
     }
 
     /// <summary>
@@ -315,19 +313,6 @@ namespace CanFly.Tools.MetadataProcessor
         return;
       }
 
-      if (typeDefinition.MetadataType == MetadataType.Var)
-      {
-        writer.WriteByte((byte)nanoCLR_DataType.DATATYPE_MVAR);
-
-        if (alsoWriteSubType)
-        {
-          // following ECMA-335 VI.B.4.3 Metadata
-          writer.WriteByte((byte)(typeDefinition as GenericParameter).Position);
-        }
-
-        return;
-      }
-
       if (typeDefinition.IsArray)
       {
         writer.WriteByte((byte)nanoCLR_DataType.DATATYPE_SZARRAY);
@@ -350,25 +335,6 @@ namespace CanFly.Tools.MetadataProcessor
           var resolvedType = typeDefinition.Resolve();
 
           WriteDataType(resolvedType, writer, false, expandEnumType, isTypeDefinition);
-        }
-
-        return;
-      }
-
-      if (typeDefinition.IsGenericInstance)
-      {
-        // following ECMA-335 VI.B.4.3 Metadata
-        writer.WriteByte((byte)nanoCLR_DataType.DATATYPE_GENERICINST);
-
-        var genericType = (GenericInstanceType)typeDefinition;
-
-        WriteDataType(genericType.ElementType, writer, false, expandEnumType, isTypeDefinition);
-
-        writer.WriteByte((byte)genericType.GenericArguments.Count);
-
-        foreach (var a in genericType.GenericArguments)
-        {
-          WriteDataType(a, writer, true, expandEnumType, isTypeDefinition);
         }
 
         return;

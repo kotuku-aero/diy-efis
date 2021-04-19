@@ -61,8 +61,8 @@ namespace CanFly.Proton
     private float offset;
 
     private ushort qnh;
-    private uint background_color;
-    private uint text_color;
+    private Color background_color;
+    private Color text_color;
     private Pen pen;
     private Font font;      // 9 pixel
     private Font small_roller;  // 12 pixel

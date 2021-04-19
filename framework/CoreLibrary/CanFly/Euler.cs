@@ -1,4 +1,4 @@
-﻿/*
+/*
 diy-efis
 Copyright (C) 2021 Kotuku Aerospace Limited
 
@@ -41,55 +41,64 @@ using System;
 
 namespace CanFly
 {
-  public enum PenStyle
-  {
-    Solid,
-    Dash,
-    Dot,
-    DashDot,
-    DashDotDot,
-    Null
-  };
-
   /// <summary>
-  /// A pen is a value type, however the system will share definitions
-  /// of the pen
+  /// Encapsulates euler angles as 3 components of x, y, z
   /// </summary>
-  public struct Pen
+  public struct Euler
   {
     /// <summary>
-    /// Construct a new pen
+    /// Create a new Euler angle
     /// </summary>
-    /// <param name="color">Color of the pen</param>
-    /// <param name="width">Width of the line drawn</param>
-    /// <param name="style">Style for the pen</param>
-    public static Pen Create(Color color, ushort width, PenStyle style)
+    /// <param name="x">x component</param>
+    /// <param name="y">y component</param>
+    /// <param name="z">z component</param>
+    /// <returns>New Euler angle</returns>
+    public static Euler Create(float x, float y, float z)
     {
-      return Syscall.CreatePen(color, width, style);
+      return Syscall.CreateEuler(x, y, y);
     }
+
+    public static Euler Zero = Create(0, 0, 0);
+    public static Euler One = Create(1, 1, 0);
+
+    public static Euler[] IdentityMatrix = new Euler[] { Create(1, 0, 0), Create(0, 1, 0), Create(0, 0, 1) };
+
+    public float X { get { return Syscall.GetEulerX(this); } }
+    public float Y { get { return Syscall.GetEulerY(this); } }
+    public float Z { get { return Syscall.GetEulerZ(this); } }
     /// <summary>
-    /// Width of the pen
+    /// Perform a transform
     /// </summary>
-    /// <value>Pen width in pixels</value>
-    public ushort Width
-    {
-      get { return Syscall.GetPenWidth(this); }
-    }
+    /// <param name="matrix">Must be a Euler[3] matrix</param>
+    /// <returns>Tranformed Euler angle</returns>
+    public Euler Transform(Euler[] matrix) { return Syscall.TransformEuler(this, matrix); }
     /// <summary>
-    /// Color of the pen
+    /// Add 2 euler points
     /// </summary>
-    /// <value>RGBA color</value>
-    public Color Color
-    {
-      get { return Syscall.GetPenColor(this); }
-    }
+    /// <param name="e1">First point</param>
+    /// <param name="e2">Second point</param>
+    /// <returns></returns>
+    public static Euler operator +(Euler e1, Euler e2) { return Syscall.AddEuler(e1, e2); }
     /// <summary>
-    /// Style of the pen
+    /// subtract 2 euler points
     /// </summary>
-    /// <value>Style</value>
-    public PenStyle Style
-    {
-      get { return Syscall.GetPenStyle(this); }
-    }
-  };
+    /// <param name="e1">First point</param>
+    /// <param name="e2">Second point</param>
+    /// <returns></returns>
+    public static Euler operator -(Euler e1, Euler e2) { return Syscall.SubtractEuler(e1, e2); }
+    /// <summary>
+    /// Multiply 2 euler points
+    /// </summary>
+    /// <param name="e1">First point</param>
+    /// <param name="e2">Second point</param>
+    /// <returns></returns>
+    public static Euler operator *(Euler e1, Euler e2) { return Syscall.MultiplyEuler(e1, e2); }
+    /// <summary>
+    /// Divide 2 euler points
+    /// </summary>
+    /// <param name="e1">First point</param>
+    /// <param name="e2">Second point</param>
+    /// <returns></returns>
+    public static Euler operator /(Euler e1, Euler e2) { return Syscall.DivideEuler(e1, e2); }
+  }
 }

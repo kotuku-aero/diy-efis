@@ -16,11 +16,13 @@
 		"type": "git",
 		"url": "https://github.com/kotuku-aero/diy-efis"
 	},
+  "icon" : "images/LogoSq.png",
 	"categories": [
 		"Debuggers",
 		"Programming Languages"
 	],
 	"activationEvents": [
+    "*",
 		"onCommand:extension.canfly.configureEmulator",
 		"onCommand:extension.canfly.startSession"
 	],
@@ -50,59 +52,166 @@
 			}
 		],
 		"debuggers": [
-			{
-				"type": "canfly",
-				"program": "./framework/emulator/msh.exe"
-			}
-		],
-		"configuration": [
-			{
-				"title": "CanFly",
-				"properties": {
-					"canfly.enable": {
-						"type": "boolean",
-						"default": true,
-						"description": "Enable the CanFly Extension"
-					},
-					"canfly.screen-x": {
-						"type": "number",
-						"default": 320,
-						"description": "Width of the emulator screen"
-					},
-					"canfly.screen-y": {
-						"type": "number",
-						"default": 240,
-						"description": "Hight of the emulator screen"
-					},
-					"canfly.num-spin": {
-						"type": "number",
-						"default": 1,
-						"description": "Number of spin buttons to emulate, max 2"
-					},
-					"canfly.num-action": {
-						"type": "number",
-						"default": 1,
-						"description": "Number of action buttons to emulate, max 6"
-					},
-					"canfly.flash-path": {
-						"type": "string",
-						"default": "$HOME/.flash",
-						"description": "Folder for the emulated flash file system, all generated apps are placed here"
-					},
-					"canfly.config-path": {
-						"type": "string",
-						"default": "$HOME/.diy-efis.cdb",
-						"description": "Path to the configuration database"
-					},
-					"canfly.port": {
-						"type": "string",
-						"default": "4711",
-						"description": "TCP port to connect to"
-					}
-				}
+      {
+        "type": "canfly",
+        "label": "Kotuku Emulator",
+        "configurationAttributes": {
+          "attach": {
+						"required": [
+							"port"
+						],
+						"properties": {
+							"port": {
+								"type": "number",
+								"description": "%canfly.attach.port.description%",
+								"default": 4711
+							},
+							"address": {
+								"type": "string",
+								"description": "%canfly.attach.address.description%",
+								"default": "undefined"
+							}
+            }
+          }
+        },
+        "initialConfigurations": [
+          {
+						"name": "%canfly.attach.config.name%",
+						"type": "canfly",
+						"request": "attach",
+						"address": "localhost",
+						"port": 4711
+          }
+        ]
+      },
+      {
+				"type": "canfly.mfd3",
+        "label": "Kotuku MFD3 Emulator",
+        "program" : "./out/msh.exe",
+        "args": [
+          "-x 320 ",
+          "-y 240 ",
+          "diy-efis.cdb"
+        ],
+        "configurationAttributes": {
+          "launch": {
+            "required": ["application", "fs_path" ],
+            "properties": 
+            {
+              "application": {
+                "type": "string",
+                "description": "%canfly.launch.program.description%",
+                "default": "${command:AskForProgramName}"
+              },
+              "fs_path": {
+                "type": "string",
+                "description": "%canfly.launch.fs_path.description%",
+                "default": "${workspaceFolder}/emulator/fs"
+              },
+              "stopOnEntry": {
+                "type": "boolean",
+                "description": "%canfly.launch.stop.description%",
+                "default": true
+              }
+            }
+         }
+        },
+        "initialConfigurations": [
+          {
+            "name": "canfly.launch.mfd3.config.name",
+            "type": "canfly.mfd3",
+            "request": "launch",
+            "application": "${command:AskForProgramName}",
+            "stopOnEntry": true
+          }
+        ]
+			},
+      {
+				"type": "canfly.mfd5",
+        "label": "Kotuku MFD5 Emulator",
+        "program" : "./out/msh.exe",
+        "args": [
+          "-x 800 ",
+          "-y 480 ",
+          "diy-efis.cdb"
+        ],
+        "configurationAttributes": {
+          "launch": {
+            "required": ["application", "fs_path" ],
+            "properties": 
+            {
+              "application": {
+                "type": "string",
+                "description": "%canfly.launch.program.description%",
+                "default": "${command:AskForProgramName}"
+              },
+              "fs_path": {
+                "type": "string",
+                "description": "%canfly.launch.fs_path.description%",
+                "default": "${workspaceFolder}/emulator/fs"
+              },
+              "stopOnEntry": {
+                "type": "boolean",
+                "description": "%canfly.launch.stop.description%",
+                "default": true
+              }
+            }
+         }
+        },
+        "initialConfigurations": [
+          {
+            "name": "canfly.launch.mfd5.config.name",
+            "type": "canfly.mfd5",
+            "request": "launch",
+            "application": "${command:AskForProgramName}",
+            "stopOnEntry": true
+          }
+        ]
+			},
+      {
+				"type": "canfly.mfd10",
+        "label": "Kotuku MFD10 Emulator",
+        "program" : "./out/msh.exe",
+        "args": [
+          "-x 1024 ",
+          "-y 600 ",
+          "diy-efis.cdb"
+        ],
+        "configurationAttributes": {
+          "launch": {
+            "required": ["application", "fs_path" ],
+            "properties": 
+            {
+              "application": {
+                "type": "string",
+                "description": "%canfly.launch.program.description%",
+                "default": "${command:AskForProgramName}"
+              },
+              "fs_path": {
+                "type": "string",
+                "description": "%canfly.launch.fs_path.description%",
+                "default": "${workspaceFolder}/emulator/fs"
+              },
+              "stopOnEntry": {
+                "type": "boolean",
+                "description": "%canfly.launch.stop.description%",
+                "default": true
+              }
+            }
+         }
+        },
+        "initialConfigurations": [
+          {
+            "name": "canfly.launch.mfd10.config.name",
+            "type": "canfly.mfd10",
+            "request": "launch",
+            "application": "${command:AskForProgramName}",
+            "stopOnEntry": true
+          }
+        ]
 			}
 		]
-	},
+ 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
 		"compile": "tsc -p ./",

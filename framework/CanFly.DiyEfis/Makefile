@@ -1,7 +1,7 @@
 NAME=CanFly.DiyEfis
 
 CSC=csc.exe
-MDP=../assemblies/CanFly.Build.exe
+MDP=../../tools/CanFly.Build.exe
 FLAGS=-langversion:1 -nostdlib -target:exe -debug:full
 MDPFLAGS=-d
 

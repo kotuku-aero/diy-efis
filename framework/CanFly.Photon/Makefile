@@ -1,13 +1,12 @@
 NAME=CanFly.Photon
 
 CSC=csc.exe
-MDP=../assemblies/CanFly.Build.exe
+MDP=../../tools/CanFly.Build.exe
 FLAGS=-langversion:1 -nostdlib -target:library -debug:full
 MDPFLAGS=-d
 
 SRC= \
 	Canvas.cs \
-	Color.cs \
 	GDIObject.cs \
 	Photon.cs \
 	Screen.cs \
