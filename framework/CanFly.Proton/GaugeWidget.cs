@@ -660,7 +660,6 @@ namespace CanFly.Proton
         int num_ticks = ticks.Count;
 
         // we now draw the tick marks.  They are a line from the point 5 pixels long.
-
         // we create a white pen for this
         //pen(&white_pen_2);
 
