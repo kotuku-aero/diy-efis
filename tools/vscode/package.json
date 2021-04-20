@@ -91,6 +91,7 @@
         "args": [
           "-x 320 ",
           "-y 240 ",
+          "-m 1066",
           "diy-efis.cdb"
         ],
         "configurationAttributes": {
@@ -133,6 +134,7 @@
         "args": [
           "-x 800 ",
           "-y 480 ",
+          "-m 1066",
           "diy-efis.cdb"
         ],
         "configurationAttributes": {
@@ -175,6 +177,7 @@
         "args": [
           "-x 1024 ",
           "-y 600 ",
+          "-m 1066",
           "diy-efis.cdb"
         ],
         "configurationAttributes": {
