@@ -33,18 +33,12 @@ The simplest way to try the code is to build on Microsoft Windows.  This is not 
 * Build diy-efis.  This creates an application called diy-efis.app in the <path to the diy-efis project>/emulator/fs directory
 * There is also a provided config database called diy-efis.cdb that has configs for a pfd and a basic edu.
 
-At the present time, when debugging within vscode the configuration console is not displayed.  To enable this you need to launch the emulator launched from vscode from the home directory.  This is at {Your home directory}\.vscode\extensions\kotuku.canfly-0.0.1\out which is where the integrated debugger sets the home directory to.
 
-Change to that directory within a command prompt and type msg -x 320 -y 240 -f <path to the diy-efis project>\framework\emulator\fs diy-efis.cdb
-  
-Replace the {path to the diy-efis project} and {Your home directory} with the correct paths for your system.
-  
-The next release of the emulator will use the embedded console in VSCode to expose the configuration tool and this won't be needed.
 
 We are writing a couple of howto pages.
 
-* [Porting DiyEfis] describes how to port diy-efis to other .net applications.
-* [Configuration of DiyEfis] describes the shell and how to make the layout engine work for you.
+* [Porting DiyEfis](https://github.com/kotuku-aero/diy-efis/wiki/Porting-Diy-Efis) describes how to port diy-efis to other .net applications.
+* [Configuration of DiyEfis](https://github.com/kotuku-aero/diy-efis/wiki/Configuring-diy-efis) describes the shell and how to make the layout engine work for you.
 * [Creating a new .app] describes how to fork the repository and add your own widgets to the project.
 * [Vision for DiyEfis] explains what this repository really is and how the open source project works.
 
