@@ -1,11 +1,5 @@
 NAME=diy-efis
 
-CC=csc.exe
-FLAGS=
-LIBS=
-RM =rm -rf
-
-
 ASSEMBLIES := \
 	./assemblies/mscorlib.pe \
 	./assemblies/System.Collections.pe \
@@ -29,14 +23,27 @@ define SUBPROJ
 	$(MAKE) -C $(1) $(2)
 endef
 
-.PHONY: all
-all:
-	$(call SUBPROJ, CoreLibrary, all)
-	$(call SUBPROJ, System.Collections, all)
-	$(call SUBPROJ, System.Text, all)
-	$(call SUBPROJ, CanFly.Photon, all)
-	$(call SUBPROJ, CanFly.Proton, all)
-	$(call SUBPROJ, CanFly.DiyEfis, all)
+.PHONY: debug
+debug:
+	$(call SUBPROJ, CoreLibrary, debug)
+	$(call SUBPROJ, System.Collections, debug)
+	$(call SUBPROJ, System.Text, debug)
+	$(call SUBPROJ, CanFly.Photon, debug)
+	$(call SUBPROJ, CanFly.Proton, debug)
+	$(call SUBPROJ, CanFly.DiyEfis, debug)
+	rm -f emulator/fs/diy-efis.zip
+	rm -f emulator/fs/diy-efis.app
+	PowerShell Compress-Archive assemblies/*.pe emulator/fs/diy-efis.zip
+	mv emulator/fs/diy-efis.zip emulator/fs/diy-efis.app
+
+.PHONY: release
+release:
+	$(call SUBPROJ, CoreLibrary, release)
+	$(call SUBPROJ, System.Collections, release)
+	$(call SUBPROJ, System.Text, release)
+	$(call SUBPROJ, CanFly.Photon, release)
+	$(call SUBPROJ, CanFly.Proton, release)
+	$(call SUBPROJ, CanFly.DiyEfis, release)
 	rm -f emulator/fs/diy-efis.zip
 	rm -f emulator/fs/diy-efis.app
 	PowerShell Compress-Archive assemblies/*.pe emulator/fs/diy-efis.zip
@@ -46,9 +53,9 @@ all:
 clean:
 	$(call SUBPROJ, CoreLibrary, clean)
 	$(call SUBPROJ, System.Collections, clean)
-	$(call SUBPROJ, System.Math, clean)
 	$(call SUBPROJ, System.Text, clean)
-	$(call SUBPROJ, CanFly.Neutron, clean)
 	$(call SUBPROJ, CanFly.Photon, clean)
 	$(call SUBPROJ, CanFly.Proton, clean)
 	$(call SUBPROJ, CanFly.DiyEfis, clean)
+	rm -f emulator/fs/diy-efis.zip
+	rm -f emulator/fs/diy-efis.app

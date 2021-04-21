@@ -3,7 +3,7 @@ NAME=System.Text
 CSC=csc.exe
 MDP=../../tools/CanFly.Build.exe
 FLAGS=-langversion:1 -nostdlib -target:library -debug:full
-MDPFLAGS=-d
+MDPFLAGS=
 
 SRC= \
 	Decoder.cs \
@@ -19,6 +19,12 @@ RM =rm -rf
 OUTPATH=../assemblies
 
 all: $(OUTPATH)/$(NAME).pe
+
+debug: MDPFLAGS += -d
+debug: $(OUTPATH)/$(NAME).pe
+
+release: $(OUTPATH)/$(NAME).pe
+release: FLAGS += -optimize
 
 $(OUTPATH)/$(NAME).pe : $(SRC)
 	$(CSC) $(FLAGS) $(LIBS) $(SRC) -out:$(OUTPATH)/$(NAME).dll
