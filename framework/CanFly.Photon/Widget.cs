@@ -164,7 +164,11 @@ namespace CanFly
       if (eventInfo != null)
         eventInfo.Handler -= eventListener;
     }
- 
+    /// <summary>
+    /// Find a event handler
+    /// </summary>
+    /// <param name="eventID"></param>
+    /// <returns></returns>
     private EventInfo FindEvent(ushort eventID)
     {
       foreach (EventInfo theHandler in eventInfoTable)
@@ -175,7 +179,10 @@ namespace CanFly
 
       return null;
     }
-
+    /// <summary>
+    /// Called when queued messages are received
+    /// </summary>
+    /// <param name="msg"></param>
     private void OnMessage(CanFlyMsg msg)
     {
       // find the handler for the message (if any)
@@ -190,6 +197,24 @@ namespace CanFly
         {
         }
       }
+    }
+    /// <summary>
+    /// Add a listener for an event from the CanFly bus
+    /// </summary>
+    /// <param name="message_id">Can ID to listen for</param>
+    /// <param name="eventListener">Callback</param>
+    protected void AddCanFlyEvent(ushort message_id, CanFlyEventHandler eventListener)
+    {
+      Syscall.AddEvent(message_id, eventListener);
+    }
+    /// <summary>
+    /// Remove a previous message subscription
+    /// </summary>
+    /// <param name="message_id"></param>
+    /// <param name="eventListener"></param>
+    protected void RemoveCanFlyEvent(ushort message_id, CanFlyEventHandler eventListener)
+    {
+      Syscall.RemoveEvent(message_id, eventListener);
     }
     /// <summary>
     /// 

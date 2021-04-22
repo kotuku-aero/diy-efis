@@ -80,11 +80,11 @@ namespace CanFly.Proton
         OpenFont("neo", 15, out large_font);
       }
 
-      AddEventListener(CanFlyID.id_def_utc, OnDefUtc);
-      AddEventListener(CanFlyID.id_qnh, OnQnh);
-      AddEventListener(CanFlyID.id_true_airspeed, OnTrueAirspeed);
-      AddEventListener(CanFlyID.id_outside_air_temperature, OnOutsideAirTemperature);
-      AddEventListener(CanFlyID.id_air_time, OnAirTime);
+      AddCanFlyEvent(CanFlyID.id_def_utc, OnDefUtc);
+      AddCanFlyEvent(CanFlyID.id_qnh, OnQnh);
+      AddCanFlyEvent(CanFlyID.id_true_airspeed, OnTrueAirspeed);
+      AddCanFlyEvent(CanFlyID.id_outside_air_temperature, OnOutsideAirTemperature);
+      AddCanFlyEvent(CanFlyID.id_air_time, OnAirTime);
     }
 
     private void OnAirTime(CanFlyMsg e)

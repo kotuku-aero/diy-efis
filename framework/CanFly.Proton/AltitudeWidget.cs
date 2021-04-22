@@ -110,9 +110,9 @@ namespace CanFly.Proton
 
       qnh = 1013;
 
-      AddEventListener(CanFlyID.id_baro_corrected_altitude, OnBaroCorrectedAltitude);
-      AddEventListener(CanFlyID.id_altitude_rate, on_altitude_rate);
-      AddEventListener(CanFlyID.id_qnh, on_qnh);
+      AddCanFlyEvent(CanFlyID.id_baro_corrected_altitude, OnBaroCorrectedAltitude);
+      AddCanFlyEvent(CanFlyID.id_altitude_rate, on_altitude_rate);
+      AddCanFlyEvent(CanFlyID.id_qnh, on_qnh);
 
       InvalidateRect();
     }

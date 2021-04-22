@@ -104,9 +104,9 @@ namespace CanFly.Proton
         OpenFont("neo", 9, out _font);
       }
 
-      AddEventListener(CanFlyID.id_yaw_angle, OnYawAngle);
-      AddEventListener(CanFlyID.id_roll_angle, OnRollAngle);
-      AddEventListener(CanFlyID.id_pitch_angle, OnPitchAngle);
+      AddCanFlyEvent(CanFlyID.id_yaw_angle, OnYawAngle);
+      AddCanFlyEvent(CanFlyID.id_roll_angle, OnRollAngle);
+      AddCanFlyEvent(CanFlyID.id_pitch_angle, OnPitchAngle);
     }
 
     private void OnPitchAngle(CanFlyMsg e)

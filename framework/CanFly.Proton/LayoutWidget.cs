@@ -174,22 +174,22 @@ namespace CanFly.Proton
       }
 
       Screen.Instance.AfterPaint += Instance_AfterPaint;
-      AddEventListener(PhotonID.id_key0, OnKey0);
-      AddEventListener(PhotonID.id_key1, OnKey1);
-      AddEventListener(PhotonID.id_key2, OnKey2);
-      AddEventListener(PhotonID.id_key3, OnKey3);
-      AddEventListener(PhotonID.id_key4, OnKey4);
-      AddEventListener(PhotonID.id_key5, OnKey5);
-      AddEventListener(PhotonID.id_key6, OnKey6);
-      AddEventListener(PhotonID.id_key7, OnKey7);
-      AddEventListener(PhotonID.id_decka, OnDeckA);
-      AddEventListener(PhotonID.id_deckb, OnDeckB);
-      AddEventListener(PhotonID.id_menu_left, OnMenuLeft);
-      AddEventListener(PhotonID.id_menu_right, OnMenuRight);
-      AddEventListener(PhotonID.id_menu_up, OnMenuUp);
-      AddEventListener(PhotonID.id_menu_dn, OnMenuDown);
-      AddEventListener(PhotonID.id_menu_cancel, OnMenuCancel);
-      AddEventListener(PhotonID.id_menu_ok, OnMenuOk);
+      AddCanFlyEvent(PhotonID.id_key0, OnKey0);
+      AddCanFlyEvent(PhotonID.id_key1, OnKey1);
+      AddCanFlyEvent(PhotonID.id_key2, OnKey2);
+      AddCanFlyEvent(PhotonID.id_key3, OnKey3);
+      AddCanFlyEvent(PhotonID.id_key4, OnKey4);
+      AddCanFlyEvent(PhotonID.id_key5, OnKey5);
+      AddCanFlyEvent(PhotonID.id_key6, OnKey6);
+      AddCanFlyEvent(PhotonID.id_key7, OnKey7);
+      AddCanFlyEvent(PhotonID.id_decka, OnDeckA);
+      AddCanFlyEvent(PhotonID.id_deckb, OnDeckB);
+      AddCanFlyEvent(PhotonID.id_menu_left, OnMenuLeft);
+      AddCanFlyEvent(PhotonID.id_menu_right, OnMenuRight);
+      AddCanFlyEvent(PhotonID.id_menu_up, OnMenuUp);
+      AddCanFlyEvent(PhotonID.id_menu_dn, OnMenuDown);
+      AddCanFlyEvent(PhotonID.id_menu_cancel, OnMenuCancel);
+      AddCanFlyEvent(PhotonID.id_menu_ok, OnMenuOk);
     }
 
     private bool TryRegEnumKey(ushort key, ref ushort child, out string name)

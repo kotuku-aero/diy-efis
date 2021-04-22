@@ -135,7 +135,7 @@ namespace CanFly.Proton
         _pen = Pen.Create(Colors.White, 1, PenStyle.Solid);
 
       // hook the canbus messages
-      AddEventListener(CanFlyID.id_indicated_airspeed, OnIndicatedAirspeed);
+      AddCanFlyEvent(CanFlyID.id_indicated_airspeed, OnIndicatedAirspeed);
       
       InvalidateRect();
     }

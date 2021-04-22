@@ -324,10 +324,10 @@ namespace CanFly.Proton
 
 
       if (reset_label != 0)
-        AddEventListener(reset_label, OnResetLabel);
+        AddCanFlyEvent(reset_label, OnResetLabel);
 
       for (int i = 0; i < num_values; i++)
-        AddEventListener(labels[i], OnValueLabel);
+        AddCanFlyEvent(labels[i], OnValueLabel);
 
       InvalidateRect();
     }

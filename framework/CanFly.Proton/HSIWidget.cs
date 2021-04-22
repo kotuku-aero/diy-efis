@@ -77,17 +77,17 @@ namespace CanFly.Proton
       if (!LookupFont(key, "font", out font))
         OpenFont("neo", 9, out font);
 
-      AddEventListener(CanFlyID.id_magnetic_heading, OnMagneticHeading);
-      AddEventListener(CanFlyID.id_heading, OnHeading);
-      AddEventListener(CanFlyID.id_heading_angle, OnHeadingAngle);
-      AddEventListener(CanFlyID.id_deviation, OnDeviation);
-      AddEventListener(CanFlyID.id_selected_course, OnSelectedCourse);
-      AddEventListener(CanFlyID.id_track, OnTrack);
-      AddEventListener(CanFlyID.id_wind_speed, OnWindSpeed);
-      AddEventListener(CanFlyID.id_wind_direction, OnWindDirection);
-      AddEventListener(CanFlyID.id_distance_to_next, OnDistanceToNext);
-      AddEventListener(CanFlyID.id_magnetic_variation, OnMagneticVariation);
-      AddEventListener(CanFlyID.id_estimated_time_to_next, OnEstimatedTimeToNext);
+      AddCanFlyEvent(CanFlyID.id_magnetic_heading, OnMagneticHeading);
+      AddCanFlyEvent(CanFlyID.id_heading, OnHeading);
+      AddCanFlyEvent(CanFlyID.id_heading_angle, OnHeadingAngle);
+      AddCanFlyEvent(CanFlyID.id_deviation, OnDeviation);
+      AddCanFlyEvent(CanFlyID.id_selected_course, OnSelectedCourse);
+      AddCanFlyEvent(CanFlyID.id_track, OnTrack);
+      AddCanFlyEvent(CanFlyID.id_wind_speed, OnWindSpeed);
+      AddCanFlyEvent(CanFlyID.id_wind_direction, OnWindDirection);
+      AddCanFlyEvent(CanFlyID.id_distance_to_next, OnDistanceToNext);
+      AddCanFlyEvent(CanFlyID.id_magnetic_variation, OnMagneticVariation);
+      AddCanFlyEvent(CanFlyID.id_estimated_time_to_next, OnEstimatedTimeToNext);
 
       InvalidateRect();
     }
