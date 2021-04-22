@@ -9,6 +9,7 @@ MDPFLAGS=
 
 SRC= \
 	CanFly/CanFlyMsg.cs \
+	CanFly/CanFlyID.cs \
 	CanFly/Color.cs \
 	CanFly/Euler.cs \
 	CanFly/Position.cs \

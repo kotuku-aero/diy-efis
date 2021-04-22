@@ -99,7 +99,7 @@ namespace CanFly.Proton
       _vy *= _pixelsPerUnit;
   
       // this conversion factor is for knots
-      if (TryRegGetFloat(key, "scale", out _scale))
+      if (!TryRegGetFloat(key, "scale", out _scale))
         _scale = 0.5144444445610519f;
 
       _scale = 1 / _scale;
