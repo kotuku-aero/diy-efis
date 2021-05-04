@@ -8,7 +8,7 @@
         "name": "Attach Application",
         "request": "attach",
          "debugServer": 4711,
-         "type": "canfly" 
+         "type": "canfly",
       },
       {
         "name": "Launch MFD3 Application",

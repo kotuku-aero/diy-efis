@@ -175,7 +175,6 @@ namespace CanFly.Proton
 
       if (_drawName && TryRegGetString(key, "name", out _name))
       {
-
         if (!LookupColor(key, "name-color", out _nameColor))
           _nameColor = Colors.White;
 
@@ -332,10 +331,15 @@ namespace CanFly.Proton
       InvalidateRect();
     }
 
-    private bool LookupEnum(uint key, string name, string[] values, out int index)
+    private bool LookupEnum(ushort key, string name, string[] values, out int index)
     {
+      index = -1;
+      string value;
+      if(!TryRegGetString(key, name, out value))
+        return false;
+
       for (index = 0; index < values.Length; index++)
-        if (values[index] == name)
+        if (values[index] == value)
           return true;
 
       return false;
@@ -739,13 +743,25 @@ namespace CanFly.Proton
             arc_angles[1] = 360;
           }
 
-          int radii = _gaugeRadii - (_width >> 1);
+          int offset = _width >> 1;
+          int radii = _gaugeRadii - offset;
           radii -= outlinePen.Width >> 1;
 
-          Arc(outlinePen, _center, radii, arc_angles[0], arc_angles[1]);
+          if(arc_angles[0] == arc_angles[1] && arc_angles[2] == -1)
+          {
+            Point pt = RotatePoint(_center, Point.Create(_center.X + radii, _center.Y), arc_angles[0]);
+            // draw a dot
+            Rect ellipse = Rect.Create(pt.X - offset,  pt.Y - offset, pt.X + offset, pt.Y + offset);
+            
+            Ellipse(Pens.Hollow, outlinePen.Color, ellipse);
+          }
+          else
+          {
+            Arc(outlinePen, _center, radii, arc_angles[0], arc_angles[1]);
 
-          if (arc_angles[2] > 0)
-            Arc(outlinePen, _center, radii, 0, arc_angles[2]);
+            if (arc_angles[2] > 0)
+              Arc(outlinePen, _center, radii, 0, arc_angles[2]);
+          }
           break;
         case GaugeStyle.gs_point_minmax:
           DrawPoint(wnd_rect, CalculatePen(1, _minValues[0]), CalculateRotation(_minValues[0]));
@@ -779,12 +795,11 @@ namespace CanFly.Proton
 
     private void DrawPoint(Rect rect, Pen outLine, int rotation)
     {
-      int rotn = (int)DegressToRadians(rotation + 90);
       Polygon(outLine, outLine.Color,
-        RotatePoint(_center, Point.Create(_center.X, _center.Y - _gaugeRadii + 5), rotn),
-        RotatePoint(_center, Point.Create(_center.X - 6, _center.Y - _gaugeRadii + 11), rotn),
-        RotatePoint(_center, Point.Create(_center.X + 6, _center.Y - _gaugeRadii + 11), rotn),
-        RotatePoint(_center, Point.Create(_center.X, _center.Y - _gaugeRadii + 5), rotn));
+        RotatePoint(_center, Point.Create(_center.X, _center.Y + _gaugeRadii - 5), rotation),
+        RotatePoint(_center, Point.Create(_center.X - 6, _center.Y + _gaugeRadii - 11), rotation),
+        RotatePoint(_center, Point.Create(_center.X + 6, _center.Y + _gaugeRadii - 11), rotation),
+        RotatePoint(_center, Point.Create(_center.X, _center.Y + _gaugeRadii - 5), rotation));
     }
 
     private int CalculateRotation(double value)
@@ -803,7 +818,7 @@ namespace CanFly.Proton
       // get the percent that the gauge is displaying
       double percent = (Math.Max(Math.Min(value, max_range), min_range) - min_range) / (max_range - min_range);
 
-      return (int)(_arcBegin + (_arcRange * percent) + 180);
+      return (int)(_arcBegin + (_arcRange * percent));
     }
 
     private Pen CalculatePen(ushort width, float value)
