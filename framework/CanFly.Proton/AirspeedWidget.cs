@@ -139,6 +139,23 @@ namespace CanFly.Proton
       
       InvalidateRect();
     }
+    /// <summary>
+    /// Constructor that does not set any defaults.
+    /// </summary>
+    /// <param name="parent"></param>
+    /// <param name="bounds"></param>
+    /// <param name="id"></param>
+    public AirspeedWidget(Widget parent, Rect bounds, ushort id) 
+      : base(parent, bounds, id)
+      {
+      _pixelsPerUnit = 10;
+
+      // hook the canbus messages
+      AddCanFlyEvent(CanFlyID.id_indicated_airspeed, OnIndicatedAirspeed);
+      
+      InvalidateRect();
+      }
+
 
     private void OnIndicatedAirspeed(CanFlyMsg msg)
     {
@@ -270,49 +287,73 @@ namespace CanFly.Proton
 
       EndPaint();
     }
-
+    /// <summary>
+    /// Speed in knots to display as vs0
+    /// </summary>
+    /// <value></value>
     public ushort Vs0
     {
       get { return _vs0; }
       set { _vs0 = value; }
     }
-
+    /// <summary>
+    /// Speed in knots to display as vs1
+    /// </summary>
+    /// <value></value>
     public ushort Vs1
     {
       get { return _vs1; }
       set { _vs1 = value; }
     }
-
+    /// <summary>
+    /// Speed to display in knots as Vfe
+    /// </summary>
+    /// <value></value>
     public ushort Vfe
     {
       get { return _vfe; }
       set { _vfe = value; }
     }
-
+    /// <summary>
+    /// Speed to display in knots as Vno
+    /// </summary>
+    /// <value></value>
     public ushort Vno
     {
       get { return _vno; }
       set { _vno = value; }
     }
-
+    /// <summary>
+    /// Speed to display in knots as Vne
+    /// </summary>
+    /// <value></value>
     public ushort Vne
     {
       get { return _vne; }
       set { _vne = value; }
     }
-
+    /// <summary>
+    /// Speed to display in knots as Va
+    /// </summary>
+    /// <value></value>
     public ushort Va
     {
       get { return _va; }
       set { _va = value; }
     }
-
+    /// <summary>
+    /// Speed to display in knots as Vx
+    /// </summary>
+    /// <value></value>
     public ushort Vx
     {
       get { return _vx; }
       set { _vx = value; }
     }
-
+    /// <summary>
+    /// Speed to display in knots as Vy
+    /// </summary>
+    /// <value></value>
     public ushort Vy
     {
       get { return _vy; }

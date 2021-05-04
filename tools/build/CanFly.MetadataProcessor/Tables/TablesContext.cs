@@ -13,7 +13,6 @@ namespace CanFly.Tools.MetadataProcessor
 {
   public sealed class TablesContext
   {
-    public bool DebugInformation { get; private set; }
     internal static HashSet<string> IgnoringAttributes { get; } = new HashSet<string>(StringComparer.Ordinal)
             {
                 // Assembly-level attributes
@@ -170,6 +169,22 @@ namespace CanFly.Tools.MetadataProcessor
 
       ResourceFileTable = new ResourceFileTable(this);
 
+      // build list of generic parameters belonging to method defs
+      List<GenericParameter> methodDefsGenericParameters = new List<GenericParameter>();
+
+      foreach (var m in methods)
+      {
+        if (m.HasGenericParameters)
+        {
+          methodDefsGenericParameters.AddRange(m.GenericParameters);
+        }
+      }
+
+      List<GenericParameter> generics = types.SelectMany(t => t.GenericParameters)
+        .Concat(methodDefsGenericParameters).ToList();
+
+      GenericParamsTable = new GenericParamTable(generics, this);
+
       // Pre-allocate strings from some tables
       AssemblyReferenceTable.AllocateStrings();
       TypeReferencesTable.AllocateStrings();
@@ -211,6 +226,7 @@ namespace CanFly.Tools.MetadataProcessor
       }
       return referenceId;
     }
+    public bool DebugInformation { get; private set; }
 
     public AssemblyDefinition AssemblyDefinition { get; private set; }
 
@@ -247,6 +263,8 @@ namespace CanFly.Tools.MetadataProcessor
     public ResourceFileTable ResourceFileTable { get; private set; }
 
     public DebugInformationTable DebugInformationTable { get; private set; }
+
+    public GenericParamTable GenericParamsTable { get; private set; }
 
     public static List<string> ClassNamesToExclude { get; private set; }
     public bool MinimizeComplete { get; internal set; } = false;

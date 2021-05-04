@@ -42,9 +42,12 @@ using System.Collections;
 
 namespace CanFly.Proton
 {
+  /// <summary>
+  /// A Menu is a collection of Items. there can be only 1 active item
+  /// </summary>
   public class Menu
   {
-    // a list of items in the menu.  is a vector.
+    // a list of items in the menu.
     private ArrayList _menuItems;
 
     private string _name; // name of the menu
@@ -60,9 +63,24 @@ namespace CanFly.Proton
     // if there is a popup active, this is keys handler
     private Keys _keys;
 
-    public Menu()
+    public Menu(LayoutWidget layoutWidget, ushort key)
     {
       _menuItems = new ArrayList();
+      ushort child = 0;
+      string itemName;
+      while (Widget.TryRegEnumKey(key, ref child, out itemName))
+      {
+        // the protocol assumes all child keys are menu items
+        MenuItem item = MenuItem.Parse(layoutWidget, child);
+
+        if (item != null)
+          _menuItems.Add(item);
+      }
+
+      // we now load the keys
+      string keys;
+      if (Widget.TryRegGetString(key, "keys", out keys))
+        Keys = layoutWidget.LoadKeys(keys);
     }
 
     public MenuItem this[int index]

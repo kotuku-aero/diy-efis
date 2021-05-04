@@ -27,33 +27,33 @@ namespace CanFly.Tools.MetadataProcessor.Core.Extensions
         return "U";
       }
 
-      nanoCLR_DataType dataType;
+      CLR_DataType dataType;
       if (SignaturesTable.PrimitiveTypes.TryGetValue(type.FullName, out dataType))
       {
         switch (dataType)
         {
-          case nanoCLR_DataType.DATATYPE_VOID:
-          case nanoCLR_DataType.DATATYPE_BOOLEAN:
-          case nanoCLR_DataType.DATATYPE_CHAR:
-          case nanoCLR_DataType.DATATYPE_I1:
-          case nanoCLR_DataType.DATATYPE_U1:
-          case nanoCLR_DataType.DATATYPE_I2:
-          case nanoCLR_DataType.DATATYPE_U2:
-          case nanoCLR_DataType.DATATYPE_I4:
-          case nanoCLR_DataType.DATATYPE_U4:
-          case nanoCLR_DataType.DATATYPE_I8:
-          case nanoCLR_DataType.DATATYPE_U8:
-          case nanoCLR_DataType.DATATYPE_R4:
-          case nanoCLR_DataType.DATATYPE_COLOR:
-          case nanoCLR_DataType.DATATYPE_EULER:
-          case nanoCLR_DataType.DATATYPE_EXTENT:
-          case nanoCLR_DataType.DATATYPE_FONT:
-          case nanoCLR_DataType.DATATYPE_PEN:
-          case nanoCLR_DataType.DATATYPE_POINT:
-          case nanoCLR_DataType.DATATYPE_POS:
-          case nanoCLR_DataType.DATATYPE_RECT:
-          case nanoCLR_DataType.DATATYPE_BYREF:
-          case nanoCLR_DataType.DATATYPE_OBJECT:
+          case CLR_DataType.DATATYPE_VOID:
+          case CLR_DataType.DATATYPE_BOOLEAN:
+          case CLR_DataType.DATATYPE_CHAR:
+          case CLR_DataType.DATATYPE_I1:
+          case CLR_DataType.DATATYPE_U1:
+          case CLR_DataType.DATATYPE_I2:
+          case CLR_DataType.DATATYPE_U2:
+          case CLR_DataType.DATATYPE_I4:
+          case CLR_DataType.DATATYPE_U4:
+          case CLR_DataType.DATATYPE_I8:
+          case CLR_DataType.DATATYPE_U8:
+          case CLR_DataType.DATATYPE_R4:
+          case CLR_DataType.DATATYPE_COLOR:
+          case CLR_DataType.DATATYPE_EULER:
+          case CLR_DataType.DATATYPE_EXTENT:
+          case CLR_DataType.DATATYPE_FONT:
+          case CLR_DataType.DATATYPE_PEN:
+          case CLR_DataType.DATATYPE_POINT:
+          case CLR_DataType.DATATYPE_POS:
+          case CLR_DataType.DATATYPE_RECT:
+          case CLR_DataType.DATATYPE_BYREF:
+          case CLR_DataType.DATATYPE_OBJECT:
             return dataType.ToString().Replace("DATATYPE_", "");
         }
       }
@@ -103,56 +103,56 @@ namespace CanFly.Tools.MetadataProcessor.Core.Extensions
 
     public static string ToNativeTypeAsString(this TypeReference type)
     {
-      nanoCLR_DataType dataType;
+      CLR_DataType dataType;
       if (SignaturesTable.PrimitiveTypes.TryGetValue(type.FullName, out dataType))
       {
         switch (dataType)
         {
-          case nanoCLR_DataType.DATATYPE_VOID:
+          case CLR_DataType.DATATYPE_VOID:
             return "void";
-          case nanoCLR_DataType.DATATYPE_BOOLEAN:
+          case CLR_DataType.DATATYPE_BOOLEAN:
             return "bool";
-          case nanoCLR_DataType.DATATYPE_CHAR:
+          case CLR_DataType.DATATYPE_CHAR:
             return "char";
-          case nanoCLR_DataType.DATATYPE_I1:
+          case CLR_DataType.DATATYPE_I1:
             return "int8_t";
-          case nanoCLR_DataType.DATATYPE_U1:
+          case CLR_DataType.DATATYPE_U1:
             return "uint8_t";
-          case nanoCLR_DataType.DATATYPE_I2:
+          case CLR_DataType.DATATYPE_I2:
             return "int16_t";
-          case nanoCLR_DataType.DATATYPE_U2:
+          case CLR_DataType.DATATYPE_U2:
             return "uint16_t";
-          case nanoCLR_DataType.DATATYPE_I4:
+          case CLR_DataType.DATATYPE_I4:
             return "signed int";
-          case nanoCLR_DataType.DATATYPE_U4:
+          case CLR_DataType.DATATYPE_U4:
             return "unsigned int";
-          case nanoCLR_DataType.DATATYPE_I8:
+          case CLR_DataType.DATATYPE_I8:
             return "int64_t";
-          case nanoCLR_DataType.DATATYPE_U8:
+          case CLR_DataType.DATATYPE_U8:
             return "uint64_t";
-          case nanoCLR_DataType.DATATYPE_R4:
+          case CLR_DataType.DATATYPE_R4:
             return "float";
-          case nanoCLR_DataType.DATATYPE_BYREF:
+          case CLR_DataType.DATATYPE_BYREF:
             return "";
-          case nanoCLR_DataType.DATATYPE_R8:
+          case CLR_DataType.DATATYPE_R8:
             return "double";
-          case nanoCLR_DataType.DATATYPE_STRING:
+          case CLR_DataType.DATATYPE_STRING:
             return "const char*";
-          case nanoCLR_DataType.DATATYPE_COLOR:
+          case CLR_DataType.DATATYPE_COLOR:
             return "color_t";
-          case nanoCLR_DataType.DATATYPE_EULER:
+          case CLR_DataType.DATATYPE_EULER:
             return "xyz_t";
-          case nanoCLR_DataType.DATATYPE_EXTENT:
+          case CLR_DataType.DATATYPE_EXTENT:
             return "extent_t";
-          case nanoCLR_DataType.DATATYPE_FONT:
+          case CLR_DataType.DATATYPE_FONT:
             return "font_t";
-          case nanoCLR_DataType.DATATYPE_PEN:
+          case CLR_DataType.DATATYPE_PEN:
             return "pen_t";
-          case nanoCLR_DataType.DATATYPE_POINT:
+          case CLR_DataType.DATATYPE_POINT:
             return "point_t";
-          case nanoCLR_DataType.DATATYPE_POS:
+          case CLR_DataType.DATATYPE_POS:
             return "lla_t";
-          case nanoCLR_DataType.DATATYPE_RECT:
+          case CLR_DataType.DATATYPE_RECT:
             return "rect_t";
           default:
             return "UNSUPPORTED";
@@ -186,38 +186,38 @@ namespace CanFly.Tools.MetadataProcessor.Core.Extensions
 
     public static string ToCLRTypeAsString(this TypeReference type)
     {
-      nanoCLR_DataType dataType;
+      CLR_DataType dataType;
       if (SignaturesTable.PrimitiveTypes.TryGetValue(type.FullName, out dataType))
       {
         switch (dataType)
         {
-          case nanoCLR_DataType.DATATYPE_VOID:
+          case CLR_DataType.DATATYPE_VOID:
             return "void";
-          case nanoCLR_DataType.DATATYPE_BOOLEAN:
+          case CLR_DataType.DATATYPE_BOOLEAN:
             return "bool";
-          case nanoCLR_DataType.DATATYPE_CHAR:
+          case CLR_DataType.DATATYPE_CHAR:
             return "CHAR";
-          case nanoCLR_DataType.DATATYPE_I1:
+          case CLR_DataType.DATATYPE_I1:
             return "INT8";
-          case nanoCLR_DataType.DATATYPE_U1:
+          case CLR_DataType.DATATYPE_U1:
             return "UINT8";
-          case nanoCLR_DataType.DATATYPE_I2:
+          case CLR_DataType.DATATYPE_I2:
             return "INT16";
-          case nanoCLR_DataType.DATATYPE_U2:
+          case CLR_DataType.DATATYPE_U2:
             return "UINT16";
-          case nanoCLR_DataType.DATATYPE_I4:
+          case CLR_DataType.DATATYPE_I4:
             return "INT32";
-          case nanoCLR_DataType.DATATYPE_U4:
+          case CLR_DataType.DATATYPE_U4:
             return "UINT32";
-          case nanoCLR_DataType.DATATYPE_I8:
+          case CLR_DataType.DATATYPE_I8:
             return "INT64";
-          case nanoCLR_DataType.DATATYPE_U8:
+          case CLR_DataType.DATATYPE_U8:
             return "UINT64";
-          case nanoCLR_DataType.DATATYPE_R4:
+          case CLR_DataType.DATATYPE_R4:
             return "float";
-          case nanoCLR_DataType.DATATYPE_BYREF:
+          case CLR_DataType.DATATYPE_BYREF:
             return "NONE";
-          case nanoCLR_DataType.DATATYPE_STRING:
+          case CLR_DataType.DATATYPE_STRING:
             return "LPCSTR";
           default:
             return "UNSUPPORTED";
@@ -251,45 +251,15 @@ namespace CanFly.Tools.MetadataProcessor.Core.Extensions
       return "";
     }
 
-    public static nanoSerializationType ToSerializationType(this TypeReference value)
+    public static CLR_DataType ToSerializationType(this TypeReference value)
     {
-      nanoCLR_DataType dataType;
+      CLR_DataType dataType;
       if (SignaturesTable.PrimitiveTypes.TryGetValue(value.FullName, out dataType))
       {
-        switch (dataType)
-        {
-          case nanoCLR_DataType.DATATYPE_BOOLEAN:
-            return nanoSerializationType.ELEMENT_TYPE_BOOLEAN;
-          case nanoCLR_DataType.DATATYPE_I1:
-            return nanoSerializationType.ELEMENT_TYPE_I1;
-          case nanoCLR_DataType.DATATYPE_U1:
-            return nanoSerializationType.ELEMENT_TYPE_U1;
-          case nanoCLR_DataType.DATATYPE_I2:
-            return nanoSerializationType.ELEMENT_TYPE_I2;
-          case nanoCLR_DataType.DATATYPE_U2:
-            return nanoSerializationType.ELEMENT_TYPE_U2;
-          case nanoCLR_DataType.DATATYPE_I4:
-            return nanoSerializationType.ELEMENT_TYPE_I4;
-          case nanoCLR_DataType.DATATYPE_U4:
-            return nanoSerializationType.ELEMENT_TYPE_U4;
-          case nanoCLR_DataType.DATATYPE_I8:
-            return nanoSerializationType.ELEMENT_TYPE_I8;
-          case nanoCLR_DataType.DATATYPE_U8:
-            return nanoSerializationType.ELEMENT_TYPE_U8;
-          case nanoCLR_DataType.DATATYPE_R4:
-            return nanoSerializationType.ELEMENT_TYPE_R4;
-          case nanoCLR_DataType.DATATYPE_R8:
-            return nanoSerializationType.ELEMENT_TYPE_R8;
-          case nanoCLR_DataType.DATATYPE_CHAR:
-            return nanoSerializationType.ELEMENT_TYPE_CHAR;
-          case nanoCLR_DataType.DATATYPE_STRING:
-            return nanoSerializationType.ELEMENT_TYPE_STRING;
-          default:
-            return 0;
-        }
+        return dataType;
       }
 
-      return 0;
+      return CLR_DataType.DATATYPE_END;
     }
 
   }

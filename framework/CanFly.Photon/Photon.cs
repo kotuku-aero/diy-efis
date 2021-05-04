@@ -66,5 +66,6 @@ namespace CanFly
     public static readonly ushort id_menu_select = 1771;
     public static readonly ushort id_buttonpress = 1772;
     public static readonly ushort id_cancel = 1773;
+    public static readonly ushort id_last = 1774;
   }
 }

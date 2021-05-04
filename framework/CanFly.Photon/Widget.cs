@@ -247,6 +247,21 @@ namespace CanFly
       Syscall.PostMessage(InternalHandle, 0, msg);
     }
 
+    public static void Send(CanFlyMsg msg)
+    {
+      Syscall.Send(msg);
+    }
+
+    public static void AddEvent(ushort canId, CanFlyEventHandler handler)
+    {
+      Syscall.AddEvent(canId, handler);
+    }
+
+    public static void RemoveEvent(ushort canId, CanFlyEventHandler handler)
+    {
+      Syscall.RemoveEvent(canId, handler);
+    }
+
     private Widget GetWidget(uint handle)
     {
       if (handle == 0)
@@ -436,7 +451,7 @@ namespace CanFly
     /// <param name="name">Name of the Font definition registry key</param>
     /// <param name="font">Handle to the font</param>
     /// <returns>true if the font was defined</returns>
-    public bool LookupFont(ushort key, string name, out Font font)
+    public static  bool LookupFont(ushort key, string name, out Font font)
     {
       try
       {
@@ -454,7 +469,7 @@ namespace CanFly
       }
     }
 
-    public bool LookupColor(ushort key, string name, out Color color)
+    public static  bool LookupColor(ushort key, string name, out Color color)
     {
       color = Colors.Black;
       try
@@ -575,7 +590,7 @@ namespace CanFly
       return true;
     }
 
-    public bool LookupPen(ushort key, string name, out Pen pen)
+    public static  bool LookupPen(ushort key, string name, out Pen pen)
     {
       try
       {
@@ -622,7 +637,7 @@ namespace CanFly
       return true;
     }
 
-    public bool OpenFont(string name, ushort size, out Font font)
+    public static  bool OpenFont(string name, ushort size, out Font font)
     {
       try
       {
@@ -636,7 +651,7 @@ namespace CanFly
       return true;
     }
 
-    public bool TryRegGetString(ushort key, string name, out string value)
+    public static  bool TryRegGetString(ushort key, string name, out string value)
     {
       value = null;
       try
@@ -651,7 +666,7 @@ namespace CanFly
       return true;
     }
 
-    public bool TryOpenFont(string name, ushort pixels, out Font font)
+    public static  bool TryOpenFont(string name, ushort pixels, out Font font)
     {
       try
       {
@@ -665,7 +680,7 @@ namespace CanFly
       return true;
     }
 
-    public bool TryRegGetBool(ushort key, string name, out bool value)
+    public static  bool TryRegGetBool(ushort key, string name, out bool value)
     {
       value = false;
       try
@@ -680,7 +695,7 @@ namespace CanFly
       return true;
     }
 
-    public bool TryRegGetFloat(ushort key, string name, out float value)
+    public static  bool TryRegGetFloat(ushort key, string name, out float value)
     {
       value = 0;
       try
@@ -695,7 +710,7 @@ namespace CanFly
       return true;
     }
 
-    public bool TryRegGetUint8(ushort key, string name, out byte value)
+    public static bool TryRegGetUint8(ushort key, string name, out byte value)
     {
       value = 0;
       try
@@ -710,7 +725,7 @@ namespace CanFly
       return true;
     }
     
-    public bool TryRegGetUint16(ushort key, string name, out ushort value)
+    public static bool TryRegGetUint16(ushort key, string name, out ushort value)
     {
       value = 0;
       try
@@ -725,7 +740,7 @@ namespace CanFly
       return true;
     }
     
-    public bool TryRegGetUint32(ushort key, string name, out uint value)
+    public static bool TryRegGetUint32(ushort key, string name, out uint value)
     {
       value = 0;
       try
@@ -740,7 +755,7 @@ namespace CanFly
       return true;
     }
 
-    public bool TryRegGetInt8(ushort key, string name, out sbyte value)
+    public static bool TryRegGetInt8(ushort key, string name, out sbyte value)
     {
       value = 0;
       try
@@ -755,7 +770,7 @@ namespace CanFly
       return true;
     }
     
-    public bool TryRegGetInt16(ushort key, string name, out short value)
+    public static bool TryRegGetInt16(ushort key, string name, out short value)
     {
       value = 0;
       try
@@ -770,7 +785,7 @@ namespace CanFly
       return true;
     }
    
-    public bool TryRegGetUInt16(ushort key, string name, out ushort value)
+    public static bool TryRegGetUInt16(ushort key, string name, out ushort value)
     {
       value = 0;
       try
@@ -785,7 +800,7 @@ namespace CanFly
       return true;
     }
     
-    public bool TryRegGetInt32(ushort key, string name, out int value)
+    public static bool TryRegGetInt32(ushort key, string name, out int value)
     {
       value = 0;
       try
@@ -800,7 +815,7 @@ namespace CanFly
       return true;
     }
 
-    public bool TryRegGetRect(ushort key, out Rect rect)
+    public static bool TryRegGetRect(ushort key, out Rect rect)
     {
       short x;
       if (!TryRegGetInt16(key, "x", out x))
@@ -823,12 +838,27 @@ namespace CanFly
       return true;
     }
 
-    public bool TryRegOpenKey(ushort key, string name, out ushort child)
+    public static bool TryRegOpenKey(ushort key, string name, out ushort child)
     {
       child = 0;
       try
       {
         child = Syscall.RegOpenKey(key, name);
+      }
+      catch
+      {
+        return false;
+      }
+
+      return true;
+    }
+
+    public static bool TryRegEnumKey(ushort key, ref ushort child, out string name)
+    {
+      name = null;
+      try
+      {
+        Syscall.RegEnumKey(key, ref child, out name);
       }
       catch
       {
@@ -845,27 +875,27 @@ namespace CanFly
     /// <param name="pt">The point to rotate</param>
     /// <param name="degrees">Degrees to rotate</param>
     /// <returns>the rotated point</returns>
-    public Point RotatePoint(Point center, Point pt, int degrees)
+    public static Point RotatePoint(Point center, Point pt, int degrees)
     {
       return Syscall.RotatePoint(center, pt, (short) degrees);
     }
 
-    public double RadiansToDegrees(double radians)
+    public static double RadiansToDegrees(double radians)
     {
       return radians * 0.3183098; // n * (1/ Math.PI);
     }
 
-    public double DegressToRadians(double degrees)
+    public static double DegressToRadians(double degrees)
     {
       return degrees * 0.0174533; //(Math.PI / 180);
     }
 
-    public double MetersToNM(double meters)
+    public static double MetersToNM(double meters)
     {
       return meters * 0.000539957; // meters / 1852
     }
 
-    public double MetersPerSecondToKnots(double value)
+    public static double MetersPerSecondToKnots(double value)
     {
       return value * 1.94384;
     }

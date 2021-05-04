@@ -3,7 +3,6 @@ NAME=diy-efis
 ASSEMBLIES := \
 	./assemblies/mscorlib.pe \
 	./assemblies/System.Collections.pe \
-	./assemblies/System.Math.pe \
 	./assemblies/System.Text.pe \
 	./assemblies/CanFly.Neutron.pe \
 	./assemblies/CanFly.Photon.pe \
@@ -13,7 +12,6 @@ ASSEMBLIES := \
 SUBDIRS := \
 	CoreLibrary \
 	System.Collections \
-	System.Math \
 	System.Text \
 	CanFly.Photon \
 	CanFly.Proton \

@@ -37,14 +37,15 @@ then the original copyright notice is to be respected.
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
+using System;
+
 namespace CanFly.Proton
 {
   public enum MenuItemActionResult
   {
     MiaNothing, // no change to menu state
-    MiaCancel, // event causes a cancel
-    MiaEnter, // event causes a done, all menu close
-    MiaCloseItem, // either a popup or edit is closed
+    MiaCancel, // event causes a cancel, will close an editor and not evalute the result
+    MiaClose, // event causes a done, all menu close
   };
 
   public delegate void MenuItemMsgHandler(MenuItem menuItem, CanFlyMsg msg);
@@ -52,11 +53,8 @@ namespace CanFly.Proton
   public abstract class MenuItem
   {
     private string _caption;
-
-    private string _enableRegex;
     private string _enableFormat;
-
-    private ushort _controllingParam;
+    private ushort _controllingMessageID;
     private CanFlyMsg _controllingVariable;
 
     // set by parent menu so the item will highlight itself
@@ -66,12 +64,65 @@ namespace CanFly.Proton
     //private Regex _patBuff;
     private LayoutWidget _widget;
 
-    private MenuItemMsgHandler msgHandler;
+    private MenuItemMsgHandler _msgHandler;
 
+    private System.Text.RegularExpressions.Regex _enableRegex;
 
-    protected MenuItem(LayoutWidget widget)
+    private void DefaultMsgHandler(CanFlyMsg msg)
+    {
+      SetControllingVariable(msg);
+    }
+
+    protected MenuItem(LayoutWidget widget, ushort key)
     {
       _widget = widget;
+
+      if (!Widget.TryRegGetString(key, "caption", out _caption))
+        _caption = string.Empty;
+
+      string strValue;
+      ushort ushortValue;
+      Widget.TryRegGetString(key, "caption", out strValue);
+      Caption = strValue;
+
+      ushort enable_key;
+      if (Widget.TryRegOpenKey(key, "enable", out enable_key))
+      {
+        if (Widget.TryRegGetUint16(enable_key, "id", out ushortValue))
+          ControllingMessageID = ushortValue;
+
+        if (Widget.TryRegGetString(enable_key, "regex", out strValue))
+          EnableRegex = new System.Text.RegularExpressions.Regex(strValue);
+
+        if (Widget.TryRegGetString(enable_key, "format", out strValue))
+          EnableFormat = strValue;
+      }
+    }
+
+    public static MenuItem Parse(LayoutWidget layoutWidget, ushort key)
+    {
+      string itemType;
+      if (!Widget.TryRegGetString(key, "type", out itemType))
+        return null;
+
+      MenuItem item = null;
+      switch (itemType)
+      {
+        case "event":
+          item = new MenuItemEvent(layoutWidget, key);
+          break;
+        case "edit":
+          item = new MenuItemEdit(layoutWidget, key);
+          break;
+        case "checklist":
+          item = new MenuItemChecklist(layoutWidget, key);
+          break;
+        case "popup":
+          item = new MenuItemPopup(layoutWidget, key);
+          break;
+      }
+
+      return item;
     }
 
     public LayoutWidget LayoutWidget
@@ -106,19 +157,14 @@ namespace CanFly.Proton
 
     public virtual bool Enabled(CanFlyMsg msg)
     {
-      if (ControllingParam == 0 ||
+      if (ControllingMessageID == 0 ||
           EnableRegex == null)
         return true;
 
       // build an enabler from the format string
 
       // we now determine a match against the controlling regular expression
-      return Match(string.Format(EnableFormat, ControllingVariable.ToString()));
-    }
-
-    public void EventHandler(MenuItemMsgHandler handler)
-    {
-      msgHandler = handler;
+      return EnableRegex.Match(string.Format(EnableFormat, ControllingVariable.ToString())).Success;
     }
 
     public string Caption
@@ -126,29 +172,55 @@ namespace CanFly.Proton
       get { return _caption; }
       set { _caption = value; }
     }
-
-    public string EnableRegex
+    /// <summary>
+    /// Regular expression to match for the item to be enabled
+    /// </summary>
+    /// <value></value>
+    public System.Text.RegularExpressions.Regex EnableRegex
     {
       get { return _enableRegex; }
       set { _enableRegex = value; }
     }
-
+    /// <summary>
+    /// Format string to be applied to the controlling message
+    /// </summary>
+    /// <value></value>
     public string EnableFormat
     {
       get { return _enableFormat; }
       set { _enableFormat = value; }
     }
-
-    public ushort ControllingParam
+    /// <summary>
+    /// ID to listen for
+    /// </summary>
+    /// <value></value>
+    public ushort ControllingMessageID
     {
-      get { return _controllingParam; }
-      set { _controllingParam = value; }
-    }
+      get { return _controllingMessageID; }
+      set
+      {
+        if (_controllingMessageID != 0)
+          Widget.RemoveEvent(_controllingMessageID, DefaultMsgHandler);
 
+        _controllingMessageID = value;
+
+        if (value != 0)
+          Widget.AddEvent(value, DefaultMsgHandler);
+      }
+    }
+    /// <summary>
+    /// This is the message that the menu item listens for. This holds
+    /// the last received message
+    /// </summary>
+    /// <value></value>
     public CanFlyMsg ControllingVariable
     {
       get { return _controllingVariable; }
-      set { _controllingVariable = value; }
+    }
+
+    private void SetControllingVariable(CanFlyMsg value)
+    {
+      _controllingVariable = value;
     }
 
     public bool Selected
@@ -162,11 +234,119 @@ namespace CanFly.Proton
       get { return _editorOpen; }
       set { _editorOpen = value; }
     }
-
-    public bool Match(string value)
+    
+    protected CanFlyMsg LoadCanMessage(ushort key)
     {
-      return false;
-      // return _patBuff.Match(value).Success;
+      CanFlyMsg result = null;
+      ushort id;
+      if (Widget.TryRegGetUint16(key, "can-id", out id))
+      {
+        string type;
+        if (Widget.TryRegGetString(key, "can-type", out type))
+        {
+          string value;
+          string[] values;
+          // decode the message
+          if (type == "NODATA" ||
+              !Widget.TryRegGetString(key, "can-value", out value))
+          {
+            result = CanFlyMsg.Create(id);
+          }
+          else
+          {
+            switch (type)
+            {
+              case "ERROR":
+                result = CanFlyMsg.CreateErrorMessage(id, Convert.ToUInt32(value));
+                break;
+              case "FLOAT":
+                result = CanFlyMsg.Create(id, (float)Convert.ToDouble(value));
+                break;
+              case "LONG":
+                result = CanFlyMsg.Create(id, Convert.ToInt32(value));
+                break;
+              case "ULONG":
+                result = CanFlyMsg.Create(id, Convert.ToUInt32(value));
+                break;
+              case "SHORT":
+                result = CanFlyMsg.Create(id, Convert.ToInt16(value));
+                break;
+              case "USHORT":
+                result = CanFlyMsg.Create(id, Convert.ToUInt16(value));
+                break;
+              case "CHAR":
+                result = CanFlyMsg.Create(id, value[0]);
+                break;
+              case "SBYTE" :
+                result = CanFlyMsg.Create(id, (sbyte)byte.Parse(value));
+                break;
+              case "BYTE":
+                result = CanFlyMsg.Create(id, (byte)byte.Parse(value));
+                break;
+              case "SBYTE2":
+                values = value.Split(',');
+                result = CanFlyMsg.Create(id,
+                  (sbyte)(values.Length > 0 ? byte.Parse(values[0]) : 0),
+                  (sbyte)(values.Length > 1 ? byte.Parse(values[1]) : 0));
+                break;
+              case "BYTE2":
+                values = value.Split(',');
+                result = CanFlyMsg.Create(id,
+                  (byte)(values.Length > 0 ? byte.Parse(values[0]) : 0),
+                  (byte)(values.Length > 1 ? byte.Parse(values[1]) : 0));
+                break;
+              case "SBYTE3":
+                values = value.Split(',');
+                result = CanFlyMsg.Create(id,
+                  (sbyte)(values.Length > 0 ? byte.Parse(values[0]) : 0),
+                  (sbyte)(values.Length > 1 ? byte.Parse(values[1]) : 0),
+                  (sbyte)(values.Length > 2 ? byte.Parse(values[2]) : 0));
+                break;
+              case "BYTE3":
+                values = value.Split(',');
+                result = CanFlyMsg.Create(id,
+                  (byte)(values.Length > 0 ? byte.Parse(values[0]) : 0),
+                  (byte)(values.Length > 1 ? byte.Parse(values[1]) : 0),
+                  (byte)(values.Length > 2 ? byte.Parse(values[2]) : 0));
+                break;
+              case "SBYTE4":
+                values = value.Split(',');
+                result = CanFlyMsg.Create(id,
+                  (sbyte)(values.Length > 0 ? byte.Parse(values[0]) : 0),
+                  (sbyte)(values.Length > 1 ? byte.Parse(values[1]) : 0),
+                  (sbyte)(values.Length > 2 ? byte.Parse(values[2]) : 0),
+                  (sbyte)(values.Length > 3 ? byte.Parse(values[3]) : 0));
+                break;
+              case "BYTE4":
+                values = value.Split(',');
+                result = CanFlyMsg.Create(id,
+                  (byte)(values.Length > 0 ? byte.Parse(values[0]) : 0),
+                  (byte)(values.Length > 1 ? byte.Parse(values[1]) : 0),
+                  (byte)(values.Length > 2 ? byte.Parse(values[2]) : 0),
+                  (byte)(values.Length > 3 ? byte.Parse(values[3]) : 0));
+                break;
+              case "SHORT2":
+                values = value.Split(',');
+                result = CanFlyMsg.Create(id,
+                  (short)(values.Length > 0 ? byte.Parse(values[0]) : 0),
+                  (short)(values.Length > 1 ? byte.Parse(values[1]) : 0));
+                break;
+              case "USHORT2":
+                values = value.Split(',');
+                result = CanFlyMsg.Create(id,
+                  (ushort)(values.Length > 0 ? byte.Parse(values[0]) : 0),
+                  (ushort)(values.Length > 1 ? byte.Parse(values[1]) : 0));
+                break;
+              default:
+                result = CanFlyMsg.Create(id);
+                break;
+            }
+          }
+        }
+      }
+
+      return result;
     }
+
   }
 }

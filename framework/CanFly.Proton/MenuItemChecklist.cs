@@ -46,14 +46,23 @@ namespace CanFly.Proton
   // to be displayed as the popup menu selected item
   public sealed class MenuItemChecklist : MenuItem
   {
-    CanFlyMsg value;
+    CanFlyMsg _deselectValue;
+    ushort _isSelectedID;
+    System.Text.RegularExpressions.Regex _isSelectedRegex;
 
     // item that is selected in the list.
-    short selected_item;
-
-    public MenuItemChecklist(LayoutWidget widget, uint key)
-      : base(widget)
+    int _selectedItem;
+  
+    /// <summary>
+    /// A checklist is a menu that holds a sub-menu but only 1 value is ever
+    /// selected.
+    /// </summary>
+    /// <param name="widget"></param>
+    /// <param name="key"></param>
+    public MenuItemChecklist(LayoutWidget widget, ushort key)
+      : base(widget, key)
     {
+      _selectedItem = -1;
       /*
 static MenuItem item_checklist_load(LayoutWindow wnd,
   uint key)
@@ -81,6 +90,13 @@ static MenuItem item_checklist_load(LayoutWindow wnd,
 
     public override MenuItemActionResult Evaluate(CanFlyMsg msg)
     {
+      // see which menu item is selected.
+           // first send de-select
+      if(_selectedItem > -1)
+        Widget.Send(CanFlyMsg.Create(_isSelectedID, (ushort)_selectedItem));
+
+      // _selectedItem = index;
+
       /*
 static void item_checklist_event(LayoutWindow wnd, MenuItem item, CanFlyMsg msg)
   {

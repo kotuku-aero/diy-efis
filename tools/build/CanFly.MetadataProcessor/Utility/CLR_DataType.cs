@@ -6,9 +6,10 @@
 
 namespace CanFly.Tools.MetadataProcessor
 {
-  public enum nanoCLR_DataType : byte
+  public enum CLR_DataType : byte
   {
-    // these where defined @ enum CLR_DataType
+    // this needs to match the interpreter.
+    // used to overlap the serialization type.
 
     DATATYPE_VOID, // 0 bytes
 
@@ -45,6 +46,25 @@ namespace CanFly.Tools.MetadataProcessor
     DATATYPE_FONT,        // handle to a font
     DATATYPE_EULER,       // x, y, z
     DATATYPE_POS,         // lat, lng, alt
+    DATATYPE_CANMSG,
+    DATATYPE_ASSEMBLY,
+    /// <summary>
+    /// Generic parameter in a generic type definition, represented as number
+    /// </summary>
+    DATATYPE_VAR,
+
+    /// <summary>
+    /// Generic type instantiation
+    /// </summary>
+    DATATYPE_GENERICINST,
+
+    /// <summary>
+    /// Generic parameter in a generic method definition, represented as number
+    /// </summary>
+    DATATYPE_MVAR,
+
+    DATATYPE_FIELD,       // marker for a field
+    DATATYPE_PROPERTY,    // marker for a property
 
     // This is the last type that doesn't need to be relocated
     DATATYPE_LAST_NONPOINTER = DATATYPE_POS,
@@ -55,6 +75,6 @@ namespace CanFly.Tools.MetadataProcessor
 
 
 
-    DATATYPE_FIRST_INVALID,
+    DATATYPE_END = 0xFF
   }
 }

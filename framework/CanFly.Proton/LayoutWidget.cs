@@ -42,6 +42,10 @@ using System.Collections;
 
 namespace CanFly.Proton
 {
+  /// <summary>
+  /// A layout widget will load a screen design from the rgistry and
+  /// also load a menu to associated with the layout
+  /// </summary>
   public sealed class LayoutWidget : Widget
   {
     //
@@ -138,20 +142,23 @@ namespace CanFly.Proton
         _menuItems = new ArrayList();
 
         if (!TryRegGetInt16(menu, "menu-rect-x", out _menuRectX))
-          _menuRectX = 0;
+          MenuRectX = 0;
 
         if (!TryRegGetInt16(menu, "menu-rect-y", out _menuRectY))
-          _menuRectY = (short) WindowRect.Bottom;
+          MenuRectY = (short) WindowRect.Bottom;
 
         if (!TryRegGetInt16(menu, "menu-start-x", out _menuStartX))
-          _menuStartX = 0;
+          MenuStartX = 0;
 
         if (!TryRegGetInt16(menu, "menu-start-y", out _menuStartY))
-          _menuStartY = (short)WindowRect.Bottom;
+          MenuStartY = (short)WindowRect.Bottom;
 
-        if (FindKeys(menu, "root-keys", out _activeKeys))
-          _menuTimer = 0;
-
+        string rootKeysName;
+        if(TryRegGetString(menu, "root-keys", out rootKeysName))
+        {
+          _rootKeys = LoadKeys(rootKeysName);
+          _activeKeys = _rootKeys;
+        }
 
         if (LookupColor(menu, "bk-color", out _backgroundColor))
           _backgroundColor = Colors.Black;
@@ -190,21 +197,6 @@ namespace CanFly.Proton
       AddCanFlyEvent(PhotonID.id_menu_dn, OnMenuDown);
       AddCanFlyEvent(PhotonID.id_menu_cancel, OnMenuCancel);
       AddCanFlyEvent(PhotonID.id_menu_ok, OnMenuOk);
-    }
-
-    private bool TryRegEnumKey(ushort key, ref ushort child, out string name)
-    {
-      name = null;
-      try
-      {
-        Syscall.RegEnumKey(key, ref child, out name);
-      }
-      catch
-      {
-        return false;
-      }
-
-      return true;
     }
 
     public delegate Widget CreateCustomWidget(Widget parent, ushort hive, string widgetType, Rect bounds, ushort id);
@@ -246,26 +238,12 @@ namespace CanFly.Proton
       return null;
     }
 
-    private bool FindKeys(ushort menu, string keys_name, out Keys activeKeys)
-    {
-      activeKeys = null;
-      ushort hive;
-      if(TryRegOpenKey(menu, keys_name, out hive))
-      {
-        // open the key
-        LoadFromRegistry(keys_name, hive);
-        return true;
-      }
-
-      return false;
-    }
-
     private void OnMenuOk(CanFlyMsg msg)
     {
       // this is sent when an item is selected.  Only ever one
-      if (_currentMenu != null)
+      if (CurrentMenu != null)
       {
-        MenuItem item = _currentMenu[_currentMenu.SelectedIndex];
+        MenuItem item = CurrentMenu[CurrentMenu.SelectedIndex];
         if (item != null)
           item.Evaluate(msg);
       }
@@ -278,25 +256,25 @@ namespace CanFly.Proton
 
     private void OnMenuDown(CanFlyMsg msg)
     {
-      if (_currentMenu != null && _currentMenu.SelectedIndex > 0)
+      if (CurrentMenu != null && CurrentMenu.SelectedIndex > 0)
       {
-        _currentMenu.SelectedIndex--;
+        CurrentMenu.SelectedIndex--;
         InvalidateRect();
       }
     }
 
     private void OnMenuUp(CanFlyMsg msg)
     {
-      if (_currentMenu != null && _currentMenu.SelectedIndex < _currentMenu.MenuItems.Count - 1)
+      if (CurrentMenu != null && CurrentMenu.SelectedIndex < CurrentMenu.MenuItems.Count - 1)
       {
-        _currentMenu.SelectedIndex++;
+        CurrentMenu.SelectedIndex++;
         InvalidateRect();
       }
     }
 
     private void OnMenuLeft(CanFlyMsg msg)
     {
-      if (_currentMenu != null)
+      if (CurrentMenu != null)
       {
         CloseMenu();
         InvalidateRect();
@@ -305,12 +283,12 @@ namespace CanFly.Proton
 
     private void OnMenuRight(CanFlyMsg msg)
     {
-      if (_currentMenu != null)
+      if (CurrentMenu != null)
       {
-        MenuItem item = _currentMenu[_currentMenu.SelectedIndex];
-        if (item is MenuItemMenu)
+        MenuItem item = CurrentMenu[CurrentMenu.SelectedIndex];
+        if (item is MenuItemPopup)
         {
-          MenuItemMenu mi = item as MenuItemMenu;
+          MenuItemPopup mi = item as MenuItemPopup;
           ShowMenu(mi.Menu);
         }
         else if (item is MenuItemEdit)
@@ -324,7 +302,7 @@ namespace CanFly.Proton
 
     private void OnDeckB(CanFlyMsg msg)
     {
-      Keys handler = _activeKeys ?? _rootKeys;
+      Keys handler = ActiveKeys ?? RootKeys;
       short value = msg.GetInt16();
 
       if (value > 0)
@@ -332,7 +310,7 @@ namespace CanFly.Proton
         if (handler.DeckbUp != null && handler.DeckbUp.Enabled(msg))
         {
           if (_menuTimer != 0)
-            _menuTimer = menuTimeout;
+            _menuTimer = MenuTimeout;
 
           handler.DeckbUp.Evaluate(msg);
           InvalidateRect();
@@ -343,7 +321,7 @@ namespace CanFly.Proton
         if (handler.DeckbDn != null && handler.DeckbDn.Enabled(msg))
         {
           if (_menuTimer != 0)
-            _menuTimer = menuTimeout;
+            _menuTimer = MenuTimeout;
 
           handler.DeckbDn.Evaluate(msg);
           InvalidateRect();
@@ -353,7 +331,7 @@ namespace CanFly.Proton
 
     private void OnDeckA(CanFlyMsg msg)
     {
-      Keys handler = _activeKeys ?? _rootKeys;
+      Keys handler = ActiveKeys ?? RootKeys;
       short value = msg.GetInt16();
 
       if (value > 0)
@@ -361,7 +339,7 @@ namespace CanFly.Proton
         if (handler.DeckaUp != null && handler.DeckaUp.Enabled(msg))
         {
           if (_menuTimer != 0)
-            _menuTimer = menuTimeout;
+            _menuTimer = MenuTimeout;
 
           handler.DeckaUp.Evaluate(msg);
           InvalidateRect();
@@ -372,7 +350,7 @@ namespace CanFly.Proton
         if (handler.DeckaDn != null && handler.DeckaDn.Enabled(msg))
         {
           if (_menuTimer != 0)
-            _menuTimer = menuTimeout;
+            _menuTimer = MenuTimeout;
 
           handler.DeckaDn.Evaluate(msg);
           InvalidateRect();
@@ -382,43 +360,43 @@ namespace CanFly.Proton
 
     private void OnKey7(CanFlyMsg msg)
     {
-      HandleKey(msg, _activeKeys == null ? null : _activeKeys.Key7);
+      HandleKey(msg, ActiveKeys == null ? null : ActiveKeys.Key7);
     }
 
     private void OnKey6(CanFlyMsg msg)
     {
-      HandleKey(msg, _activeKeys == null ? null : _activeKeys.Key6);
+      HandleKey(msg, ActiveKeys == null ? null : ActiveKeys.Key6);
     }
 
     private void OnKey5(CanFlyMsg msg)
     {
-      HandleKey(msg, _activeKeys == null ? null : _activeKeys.Key5);
+      HandleKey(msg, ActiveKeys == null ? null : ActiveKeys.Key5);
     }
 
     private void OnKey4(CanFlyMsg msg)
     {
-      HandleKey(msg, _activeKeys == null ? null : _activeKeys.Key4);
+      HandleKey(msg, ActiveKeys == null ? null : ActiveKeys.Key4);
     }
 
     private void OnKey3(CanFlyMsg msg)
     {
-      HandleKey(msg, _activeKeys == null ? null : _activeKeys.Key3);
+      HandleKey(msg, ActiveKeys == null ? null : ActiveKeys.Key3);
     }
 
     private void OnKey2(CanFlyMsg msg)
     {
-      HandleKey(msg, _activeKeys == null ? null : _activeKeys.Key2);
+      HandleKey(msg, ActiveKeys == null ? null : ActiveKeys.Key2);
     }
 
 
     private void OnKey1(CanFlyMsg msg)
     {
-      HandleKey(msg, _activeKeys == null ? null : _activeKeys.Key1);
+      HandleKey(msg, ActiveKeys == null ? null : ActiveKeys.Key1);
     }
 
     private void OnKey0(CanFlyMsg msg)
     {
-      HandleKey(msg, _activeKeys == null ? null : _activeKeys.Key0);
+      HandleKey(msg, ActiveKeys == null ? null : ActiveKeys.Key0);
     }
 
     private void HandleKey(CanFlyMsg msg, MenuItem key)
@@ -431,12 +409,12 @@ namespace CanFly.Proton
           if (_menuTimer != 0)
             key.Evaluate(msg);
 
-          _menuTimer = menuTimeout;
+          _menuTimer = MenuTimeout;
         }
       }
       else
       {
-        _activeKeys = _rootKeys;
+        _activeKeys = RootKeys;
         _menuTimer = 0;
       }
 
@@ -505,14 +483,44 @@ namespace CanFly.Proton
       set { _font = value; }
     }
 
-    /// <summary>
-    /// Assign the expression that is used to test if this menu item is enabled
-    /// </summary>
-    /// <param name="item">Item to assign to</param>
-    /// <param name="expr">expression in the form <param>:<expression></param>
-    private void item_assign_enabler(MenuItem item, string expr)
+    public Keys RootKeys
     {
+      get { return _rootKeys; }
+      set { _rootKeys = value; }
+    }
+    public short MenuTimeout 
+    {
+       get { return menuTimeout; } 
+    }
+    public Keys ActiveKeys
+    {
+      get { return _activeKeys; }
+    }
 
+    public Menu CurrentMenu
+    {
+      get { return _currentMenu; }
+    }
+
+    public short MenuRectX
+    {
+      get { return _menuRectX; }
+      set { _menuRectX = value; }
+    }
+    public short MenuRectY
+    {
+      get { return _menuRectY; }
+      set { _menuRectY = value; }
+    }
+    public short MenuStartX
+    {
+      get { return _menuStartX; }
+      set { _menuStartX = value; }
+    }
+    public short MenuStartY
+    {
+      get { return _menuStartY; }
+      set { _menuStartY = value; }
     }
 
     /// <summary>
@@ -531,27 +539,25 @@ namespace CanFly.Proton
       ShowMenu(prevMenu);
     }
 
-    //
-    // Close all menu's.  Called by the cancel: menu item
-    //
+    /// <summary>
+    /// Close all menu's.  Called by the cancel: menu item
+    /// </summary>
     private void CloseMenu()
     {
-      if (_currentMenu != null)
-        _currentMenu.SelectedIndex = 0;
+      if (CurrentMenu != null)
+        CurrentMenu.SelectedIndex = 0;
 
       _activeKeys = null;
       _currentMenu = null;
       _menuTimer = 0;
 
-      _activeKeys = _rootKeys;
-
+      // assign the root keys as none can be active
+      _activeKeys = RootKeys;
     }
-
-    //
-    // Show a popup menu at the left of the menu window.
-    // @param Popup           menu to display
-    // @param option_selected Option that is selected. Will be the bottom option
-    //
+    /// <summary>
+    /// Show a popup menu at the left of the menu window.
+    /// </summary>
+    /// <param name="menu">menu to display</param>
     private void ShowMenu(Menu menu)
     {
       // assign the menu
@@ -585,26 +591,6 @@ namespace CanFly.Proton
     private void ShowItemEditor(MenuItem item)
     {
       item.Edit(null);
-    }
-
-    /// <summary>
-    /// Load a menu from the registry and cache it
-    /// </summary>
-    /// <param name="name"></param>
-    /// <param name="menu"></param>
-    private void FindKeys(string name, uint menu)
-    {
-
-    }
-
-    /// <summary>
-    /// Find a popup menu id that matches the name given
-    /// </summary>
-    /// <param name="name">Name of the popup menu</param>
-    /// <param name="menu"></param>
-    private uint FindMenu(string name, Menu menu)
-    {
-      return 0;
     }
 
     private class DatatypeLookup
@@ -642,134 +628,16 @@ namespace CanFly.Proton
       new DatatypeLookup("FLOAT", CanFlyDataType.Float, 4),
     };
 
-    private CanFlyMsg LoadCanMessage(ushort key)
-    {
-      CanFlyMsg result = null;
-      ushort id;
-      if (TryRegGetUint16(key, "can-id", out id))
-      {
-        string type;
-        if (TryRegGetString(key, "can-type", out type))
-        {
-          string value;
-          string[] values;
-          // decode the message
-          if (type == "NODATA" ||
-              !TryRegGetString(key, "can-value", out value))
-          {
-            result = CanFlyMsg.Create(id);
-          }
-          else
-          {
-            switch (type)
-            {
-              case "ERROR":
-                result = CanFlyMsg.CreateErrorMessage(id, Convert.ToUInt32(value));
-                break;
-              case "FLOAT":
-                result = CanFlyMsg.Create(id, (float)Convert.ToDouble(value));
-                break;
-              case "LONG":
-                result = CanFlyMsg.Create(id, Convert.ToInt32(value));
-                break;
-              case "ULONG":
-                result = CanFlyMsg.Create(id, Convert.ToUInt32(value));
-                break;
-              case "SHORT":
-                result = CanFlyMsg.Create(id, Convert.ToInt16(value));
-                break;
-              case "USHORT":
-                result = CanFlyMsg.Create(id, Convert.ToUInt16(value));
-                break;
-              case "CHAR":
-                result = CanFlyMsg.Create(id, value[0]);
-                break;
-              case "SBYTE" :
-                result = CanFlyMsg.Create(id, (sbyte)DecodeHex(value));
-                break;
-              case "BYTE":
-                result = CanFlyMsg.Create(id, (byte)DecodeHex(value));
-                break;
-              case "SBYTE2":
-                values = value.Split(',');
-                result = CanFlyMsg.Create(id,
-                  (sbyte)(values.Length > 0 ? DecodeHex(values[0]) : 0),
-                  (sbyte)(values.Length > 1 ? DecodeHex(values[1]) : 0));
-                break;
-              case "BYTE2":
-                values = value.Split(',');
-                result = CanFlyMsg.Create(id,
-                  (byte)(values.Length > 0 ? DecodeHex(values[0]) : 0),
-                  (byte)(values.Length > 1 ? DecodeHex(values[1]) : 0));
-                break;
-              case "SBYTE3":
-                values = value.Split(',');
-                result = CanFlyMsg.Create(id,
-                  (sbyte)(values.Length > 0 ? DecodeHex(values[0]) : 0),
-                  (sbyte)(values.Length > 1 ? DecodeHex(values[1]) : 0),
-                  (sbyte)(values.Length > 2 ? DecodeHex(values[2]) : 0));
-                break;
-              case "BYTE3":
-                values = value.Split(',');
-                result = CanFlyMsg.Create(id,
-                  (byte)(values.Length > 0 ? DecodeHex(values[0]) : 0),
-                  (byte)(values.Length > 1 ? DecodeHex(values[1]) : 0),
-                  (byte)(values.Length > 2 ? DecodeHex(values[2]) : 0));
-                break;
-              case "SBYTE4":
-                values = value.Split(',');
-                result = CanFlyMsg.Create(id,
-                  (sbyte)(values.Length > 0 ? DecodeHex(values[0]) : 0),
-                  (sbyte)(values.Length > 1 ? DecodeHex(values[1]) : 0),
-                  (sbyte)(values.Length > 2 ? DecodeHex(values[2]) : 0),
-                  (sbyte)(values.Length > 3 ? DecodeHex(values[3]) : 0));
-                break;
-              case "BYTE4":
-                values = value.Split(',');
-                result = CanFlyMsg.Create(id,
-                  (byte)(values.Length > 0 ? DecodeHex(values[0]) : 0),
-                  (byte)(values.Length > 1 ? DecodeHex(values[1]) : 0),
-                  (byte)(values.Length > 2 ? DecodeHex(values[2]) : 0),
-                  (byte)(values.Length > 3 ? DecodeHex(values[3]) : 0));
-                break;
-              case "SHORT2":
-                values = value.Split(',');
-                result = CanFlyMsg.Create(id,
-                  (short)(values.Length > 0 ? DecodeHex(values[0]) : 0),
-                  (short)(values.Length > 1 ? DecodeHex(values[1]) : 0));
-                break;
-              case "USHORT2":
-                values = value.Split(',');
-                result = CanFlyMsg.Create(id,
-                  (ushort)(values.Length > 0 ? DecodeHex(values[0]) : 0),
-                  (ushort)(values.Length > 1 ? DecodeHex(values[1]) : 0));
-                break;
-              default:
-                result = CanFlyMsg.Create(id);
-                break;
-            }
-          }
-        }
-      }
-
-      return result;
-    }
-
-    private byte DecodeHex(string value)
-    {
-      return 0;
-    }
-
     private void UpdateWindow()
     {
       Rect wndRect = WindowRect;
 
       Extent ex = wndRect.Extent;
 
-      if (_currentMenu != null)
+      if (CurrentMenu != null)
       {
         // draw the root menu
-        Point menuPt = Point.Create(_menuStartX, _menuStartY);
+        Point menuPt = Point.Create(MenuStartX, MenuStartY);
         int itemWidth = wndRect.Width / 3;
         int itemHeight = 20;
 
@@ -779,21 +647,21 @@ namespace CanFly.Proton
         menuPt = menuPt.Add(0, -itemHeight);
 
         // determine how menu items to draw from the item
-        int itemsAvail = _menuStartY / itemHeight;
+        int itemsAvail = MenuStartY / itemHeight;
 
-        int numItems = _currentMenu.MenuItems.Count;
+        int numItems = CurrentMenu.MenuItems.Count;
         int drawingItem = 0;
         int index = 0;
 
         if (numItems > itemsAvail)
-          index = _currentMenu.SelectedIndex;  // start drawing at the selected index
+          index = CurrentMenu.SelectedIndex;  // start drawing at the selected index
 
         // draw the visible items
         for (; index < numItems && drawingItem < itemsAvail; drawingItem++, index++)
         {
-          MenuItem item = (MenuItem)_currentMenu.MenuItems[index];
+          MenuItem item = (MenuItem)CurrentMenu.MenuItems[index];
           item.Paint(Rect.Create(menuPt.X, menuPt.Y, menuPt.X + itemExtents.Dx, menuPt.Y + itemExtents.Dy),
-            index == _currentMenu.SelectedIndex);
+            index == CurrentMenu.SelectedIndex);
 
           // now ask the item to draw if it is selected
           if (item.Selected)
@@ -808,35 +676,6 @@ namespace CanFly.Proton
 
     protected override void OnPaint(CanFlyMsg msg)
     {
-    }
-
-    private void DefaultMsgHandler(MenuItem menuItem, CanFlyMsg msg)
-    {
-      if (menuItem.ControllingParam == msg.CanID)
-        menuItem.ControllingVariable = msg;
-    }
-
-    private void LoadItemDefaults(ushort key, MenuItem menuItem)
-    {
-      menuItem.EventHandler(DefaultMsgHandler);
-
-      string strValue;
-      ushort ushortValue;
-      TryRegGetString(key, "caption", out strValue);
-      menuItem.Caption = strValue;
-
-      ushort enable_key;
-      if (TryRegOpenKey(key, "enable", out enable_key))
-      {
-        if (TryRegGetUint16(enable_key, "id", out ushortValue))
-          menuItem.ControllingParam = ushortValue;
-
-        if (TryRegGetString(enable_key, "regex", out strValue))
-          menuItem.EnableRegex = strValue;
-
-        if (TryRegGetString(enable_key, "format", out strValue))
-          menuItem.EnableFormat = strValue;
-      }
     }
 
     private MenuItem MenuItemAt(Menu menu, ushort index)
@@ -859,143 +698,12 @@ static MenuItem MenuItemAt(Menu menu, ushort index)
       return menu.MenuItems.Count;
     }
 
-    internal MenuItem ParseItem(ushort key)
-    {
-      string itemType;
-      if (!TryRegGetString(key, "type", out itemType))
-        return null;
-
-      switch(itemType)
-      {
-        case "menu":
-          return LoadMenuItem(key);
-        case "cancel":
-          return LoadMenuCancel(key);
-        case "enter":
-          return LoadMenuEnter(key);
-        case "event":
-          return LoadMenuEvent(key);
-        case "edit":
-          return LoadMenuEdit(key);
-        case "checklist":
-          return LoadMenuChecklist(key);
-        case "popup":
-          return LoadMenuPopup(key);
-      }
-
-      return null;
-    }
-
-    internal MenuItem LoadMenuPopup(ushort key)
-    {
-      MenuItemPopup result = new MenuItemPopup(this, key);
-      LoadItemDefaults(key, result);
-
-      string menuName;
-      if (TryRegGetString(key, "popup", out menuName))
-        result.PopupMenu = FindMenu(menuName);
-
-      return result;
-    }
-
-    internal MenuItem LoadMenuChecklist(ushort key)
-    {
-      MenuItemChecklist result = new MenuItemChecklist(this, key);
-      LoadItemDefaults(key, result);
-
-      return result;
-    }
-
-    internal MenuItem LoadMenuEdit(ushort key)
-    {
-      MenuItemEdit result = new MenuItemEdit(this, key);
-      LoadItemDefaults(key, result);
-
-      return result;
-    }
-
-    internal MenuItem LoadMenuEvent(ushort key)
-    {
-      MenuItemEvent result = new MenuItemEvent(this, key);
-      LoadItemDefaults(key, result);
-
-      return result;
-    }
-
-    internal MenuItem LoadMenuEnter(ushort key)
-    {
-      MenuItemEnter result = new MenuItemEnter(this, key);
-      LoadItemDefaults(key, result);
-
-      return result;
-    }
-
-    internal MenuItem LoadMenuCancel(ushort key)
-    {
-      MenuItemCancel result = new MenuItemCancel(this, key);
-      LoadItemDefaults(key, result);
-
-      return result;
-    }
-
-    internal MenuItem LoadMenuItem(ushort key)
-    {
-      MenuItemItem result = new MenuItemItem(this, key);
-      LoadItemDefaults(key, result);
-
-      return result;
-    }
-
-    private Keys LoadFromRegistry(string name, ushort keys_key)
-    {
-      Keys theKeys = new Keys();
-      _keyMappings.Add(name, theKeys);
-
-
-      // must be done before we load any items so if they recurse we don't get
-      // created more than once!
-
-      ushort child;
-      if (TryRegOpenKey(keys_key, "key0", out child))
-        theKeys.Key0 = ParseItem(child);
-
-      if (TryRegOpenKey(keys_key, "key1", out child))
-        theKeys.Key1 = ParseItem(child);
-
-      if (TryRegOpenKey(keys_key, "key2", out child))
-        theKeys.Key2 = ParseItem(child);
-
-      if (TryRegOpenKey(keys_key, "key3", out child))
-        theKeys.Key3 = ParseItem(child);
-
-      if (TryRegOpenKey(keys_key, "key4", out child))
-        theKeys.Key4 = ParseItem(child);
-
-      if (TryRegOpenKey(keys_key, "key5", out child))
-        theKeys.Key5 = ParseItem(child);
-
-      if (TryRegOpenKey(keys_key, "key6", out child))
-        theKeys.Key6 = ParseItem(child);
-
-      if (TryRegOpenKey(keys_key, "key7", out child))
-        theKeys.Key7 = ParseItem(child);
-
-      if (TryRegOpenKey(keys_key, "decka-up", out child))
-        theKeys.DeckaUp = ParseItem(child);
-
-      if (TryRegOpenKey(keys_key, "decka-dn", out child))
-        theKeys.DeckaDn = ParseItem(child);
-
-      if (TryRegOpenKey(keys_key, "deckb-up", out child))
-        theKeys.DeckbUp = ParseItem(child);
-
-      if (TryRegOpenKey(keys_key, "deckb-dn", out child))
-        theKeys.DeckbDn = ParseItem(child);
-
-      return theKeys;
-    }
-
-    private Keys LoadKeys(string name)
+    /// <summary>
+    /// Load a set of keys, if it exists then returned cached version
+    /// </summary>
+    /// <param name="name">Key mapping to load</param>
+    /// <returns>Set of keys</returns>
+    public Keys LoadKeys(string name)
     {
       Keys theKeys = null;
       if (_keyMappings.Contains(name))
@@ -1003,17 +711,24 @@ static MenuItem MenuItemAt(Menu menu, ushort index)
       else
       {
         // see if the key is found
-        ushort keys_key;
-        if (!TryRegOpenKey(_key, name, out keys_key))
+        ushort key;
+        if (!TryRegOpenKey(_key, name, out key))
           return null;
 
-        theKeys = LoadFromRegistry(name, keys_key);
+        theKeys = Keys.Parse(this, key);
+      
+        _keyMappings.Add(name, theKeys);
       }
 
       return theKeys;
     }
 
-    private Menu FindMenu(string name)
+    /// <summary>
+    /// Load a menu, by name.
+    /// </summary>
+    /// <param name="name">Menu name</param>
+    /// <returns>Locaded or cached menu</returns>
+    public Menu LoadMenu(string name)
     {
       Menu popup;
 
@@ -1025,24 +740,10 @@ static MenuItem MenuItemAt(Menu menu, ushort index)
         if (!TryRegOpenKey(_key, name, out key))
           return null;
 
-        popup = new Menu();
+        popup = new Menu(this, key);
 
+        // store the cached menu
         _menus.Add(name, popup);
-
-        ushort child = 0;
-        string itemName;
-        while (TryRegEnumKey(key, ref child, out itemName))
-        {
-          // the protocol assumes all child keys are menu items
-          MenuItem item = ParseItem(child);
-          if (item != null)
-            popup.MenuItems.Add(item);
-        }
-
-        // we now load the keys
-        string keys;
-        if (TryRegGetString(key, "keys", out keys))
-          popup.Keys = LoadKeys(keys);
       }
 
       return popup;

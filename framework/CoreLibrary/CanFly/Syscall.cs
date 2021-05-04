@@ -52,6 +52,10 @@ namespace CanFly
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern int InterlockedDecrement(ref int location);
     [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Enter(Object obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Exit(Object obj);
+    [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern ushort RegCreateKey(ushort parent, string name);
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern ushort RegOpenKey(ushort parent, string name);
