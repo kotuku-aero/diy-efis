@@ -63,7 +63,7 @@ namespace CanFly.Proton
     /// Load a key set from a registry key
     /// </summary>
     /// <param name="key">Registry key to load</param>
-    public static Keys Parse(LayoutWidget layoutWidget, ushort key)
+    public static Keys Parse(MenuWidget widget, ushort key)
     {
       // must be done before we load any items so if they recurse we don't get
       // created more than once!
@@ -71,40 +71,40 @@ namespace CanFly.Proton
 
       ushort child;
       if (Widget.TryRegOpenKey(key, "key0", out child))
-        theKeys.Key0 = MenuItem.Parse(layoutWidget, child);
+        theKeys.Key0 = MenuItem.LoadMenu(widget, child);
 
       if (Widget.TryRegOpenKey(key, "key1", out child))
-        theKeys.Key1 = MenuItem.Parse(layoutWidget, child);
+        theKeys.Key1 = MenuItem.LoadMenu(widget, child);
 
       if (Widget.TryRegOpenKey(key, "key2", out child))
-        theKeys.Key2 = MenuItem.Parse(layoutWidget, child);
+        theKeys.Key2 = MenuItem.LoadMenu(widget, child);
 
       if (Widget.TryRegOpenKey(key, "key3", out child))
-        theKeys.Key3 = MenuItem.Parse(layoutWidget, child);
+        theKeys.Key3 = MenuItem.LoadMenu(widget, child);
 
       if (Widget.TryRegOpenKey(key, "key4", out child))
-        theKeys.Key4 = MenuItem.Parse(layoutWidget, child);
+        theKeys.Key4 = MenuItem.LoadMenu(widget, child);
 
       if (Widget.TryRegOpenKey(key, "key5", out child))
-        theKeys.Key5 = MenuItem.Parse(layoutWidget, child);
+        theKeys.Key5 = MenuItem.LoadMenu(widget, child);
 
       if (Widget.TryRegOpenKey(key, "key6", out child))
-        theKeys.Key6 = MenuItem.Parse(layoutWidget, child);
+        theKeys.Key6 = MenuItem.LoadMenu(widget, child);
 
       if (Widget.TryRegOpenKey(key, "key7", out child))
-        theKeys.Key7 = MenuItem.Parse(layoutWidget, child);
+        theKeys.Key7 = MenuItem.LoadMenu(widget, child);
 
       if (Widget.TryRegOpenKey(key, "decka-up", out child))
-        theKeys.DeckaUp = MenuItem.Parse(layoutWidget, child);
+        theKeys.DeckaUp = MenuItem.LoadMenu(widget, child);
 
       if (Widget.TryRegOpenKey(key, "decka-dn", out child))
-        theKeys.DeckaDn = MenuItem.Parse(layoutWidget, child);
+        theKeys.DeckaDn = MenuItem.LoadMenu(widget, child);
 
       if (Widget.TryRegOpenKey(key, "deckb-up", out child))
-        theKeys.DeckbUp = MenuItem.Parse(layoutWidget, child);
+        theKeys.DeckbUp = MenuItem.LoadMenu(widget, child);
 
       if (Widget.TryRegOpenKey(key, "deckb-dn", out child))
-        theKeys.DeckbDn = MenuItem.Parse(layoutWidget, child);
+        theKeys.DeckbDn = MenuItem.LoadMenu(widget, child);
 
       return theKeys;
     }

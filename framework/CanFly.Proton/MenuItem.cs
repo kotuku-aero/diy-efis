@@ -60,9 +60,8 @@ namespace CanFly.Proton
     // set by parent menu so the item will highlight itself
     private bool _selected;
     private bool _editorOpen; // if true the popup menu editor is active
-
     //private Regex _patBuff;
-    private LayoutWidget _widget;
+    private MenuWidget _widget;
 
     private MenuItemMsgHandler _msgHandler;
 
@@ -73,10 +72,41 @@ namespace CanFly.Proton
       SetControllingVariable(msg);
     }
 
-    protected MenuItem(LayoutWidget widget, ushort key)
+    protected MenuItem(MenuWidget widget)
     {
       _widget = widget;
+    }
 
+    public static MenuItem LoadMenu(MenuWidget widget, ushort key)
+    {
+      string itemType;
+      if (!Widget.TryRegGetString(key, "type", out itemType))
+        return null;
+
+      MenuItem item = null;
+      switch (itemType)
+      {
+        case "event":
+          item = new MenuItemEvent(widget);
+          break;
+        case "edit":
+          item = new MenuItemEdit(widget);
+          break;
+        case "checklist":
+          item = new MenuItemChecklist(widget);
+          break;
+        case "popup":
+          item = new MenuItemPopup(widget);
+          break;
+      }
+
+      item.Parse(key);
+
+      return item;
+    }
+
+    public virtual void Parse(ushort key)
+    {
       if (!Widget.TryRegGetString(key, "caption", out _caption))
         _caption = string.Empty;
 
@@ -99,33 +129,7 @@ namespace CanFly.Proton
       }
     }
 
-    public static MenuItem Parse(LayoutWidget layoutWidget, ushort key)
-    {
-      string itemType;
-      if (!Widget.TryRegGetString(key, "type", out itemType))
-        return null;
-
-      MenuItem item = null;
-      switch (itemType)
-      {
-        case "event":
-          item = new MenuItemEvent(layoutWidget, key);
-          break;
-        case "edit":
-          item = new MenuItemEdit(layoutWidget, key);
-          break;
-        case "checklist":
-          item = new MenuItemChecklist(layoutWidget, key);
-          break;
-        case "popup":
-          item = new MenuItemPopup(layoutWidget, key);
-          break;
-      }
-
-      return item;
-    }
-
-    public LayoutWidget LayoutWidget
+    public MenuWidget MenuWidget
     {
       get { return _widget; }
     }

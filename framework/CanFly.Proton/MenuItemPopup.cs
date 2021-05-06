@@ -45,12 +45,17 @@ namespace CanFly.Proton
   {
     private Menu _popupMenu;
 
-    public MenuItemPopup(LayoutWidget layoutWidget, ushort key)
-    : base(layoutWidget, key)
+    public MenuItemPopup(MenuWidget widget)
+    : base(widget)
     {
+    }
+
+    public override void Parse(ushort key)
+    {
+      base.Parse(key);
       string menuName;
       if (Widget.TryRegGetString(key, "popup", out menuName))
-        _popupMenu = layoutWidget.LoadMenu(menuName);
+        _popupMenu = MenuWidget.LoadMenu(menuName);
     }
 
     public override MenuItemActionResult Evaluate(CanFlyMsg msg)

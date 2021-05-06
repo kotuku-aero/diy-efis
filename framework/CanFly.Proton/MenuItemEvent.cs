@@ -44,20 +44,29 @@ namespace CanFly.Proton
   public sealed class MenuItemEvent : MenuItem
   {
     private CanFlyMsg _msg;
-    public MenuItemEvent(LayoutWidget widget, ushort key)
-      : base(widget, key)
+    public MenuItemEvent(MenuWidget widget)
+      : base(widget)
     {
+    }
+
+    public override void Parse(ushort key)
+    {
+      base.Parse(key);
       // decode the key to create the message to be sent when this
       // item is selected
       _msg = LoadCanMessage(key);
+
     }
 
     public override MenuItemActionResult Evaluate(CanFlyMsg msg)
     {
+      if(_msg == null)
+        return MenuItemActionResult.MiaNothing;
+        
       // if the message to be sent is internal then send the message to a window
       // otherwise send to the can bus
       if(_msg.CanID >= PhotonID.id_photon && _msg.CanID < PhotonID.id_last)
-        LayoutWidget.SendMessage(_msg);
+        MenuWidget.SendMessage(_msg);
       else
         Widget.Send(_msg);
 

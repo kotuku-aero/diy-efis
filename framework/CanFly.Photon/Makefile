@@ -13,7 +13,7 @@ SRC= \
 	Widget.cs \
 	Properties/AssemblyInfo.cs
 
-LIBS=-reference:../assemblies/mscorlib.dll
+LIBS=-reference:../assemblies/mscorlib.dll;../assemblies/System.Collections.dll
 RM =rm -rf
 
 OUTPATH=../assemblies

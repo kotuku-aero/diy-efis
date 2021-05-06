@@ -42,7 +42,20 @@ using System.Collections;
 
 namespace CanFly.Proton
 {
-  public sealed class GaugeWidget : Widget
+    public class Step
+    {
+      public short value;
+      public Pen pen;
+      public Color gauge_color;
+    };
+
+    public class TickMark
+    {
+      public short value;
+      public string text;
+    };
+
+  public class GaugeWidget : Widget
   {
     public enum GaugeStyle
     {
@@ -52,13 +65,14 @@ namespace CanFly.Proton
       gs_point,           // simple-pointer
       gs_pointer_minmax,  // a pointer with min-max markers
       gs_point_minmax,    // simple-pointer with min-max markers
-      gs_hbar,            // small horizonatal bar
-                          // bar graph styles
-      bgs_point, // simple-pointer
-      bgs_pointer_minmax, // a pointer with min-max markers
-      bgs_pointer_max, // simple-pointer with max markers
-      bgs_pointer_min,
-      bgs_small,            // vertical bars with tick marks
+      bgvs_point, // simple-pointer
+      bgvs_pointer_minmax, // a pointer with min-max markers
+      bgvs_pointer_max, // simple-pointer with max markers
+      bgvs_pointer_min,
+      bghs_point,            // small horizonatal bar
+      bghs_pointer_minmax, // a pointer with min-max markers
+      bghs_pointer_max, // simple-pointer with max markers
+      bghs_pointer_min,
     };
 
     // needs to be same order as above
@@ -70,25 +84,14 @@ namespace CanFly.Proton
       "gs_point",
       "gs_pointer_minmax",
       "gs_point_minmax",
-      "gs_hbar",
       "bgs_point",
       "bgs_pointer_minmax",
       "bgs_pointer_max",
       "bgs_pointer_min",
-      "bgs_small"
-    };
-
-    internal class Step
-    {
-      public short value;
-      public Pen pen;
-      public Color gauge_color;
-    };
-
-    internal class TickMark
-    {
-      public short value;
-      public string text;
+      "bghs_point",
+      "bghs_pointer_minmax",
+      "bghs_pointer_max",
+      "bghs_pointer_min"
     };
 
     private string _name;
@@ -96,20 +99,12 @@ namespace CanFly.Proton
     private Font _nameFont;
     private Point _namePt;
     private bool _drawName;
-
     private Color _backgroundColor;
     private Pen _borderPen;
     private bool _drawBorder;
     private Font _font;
 
-    private ushort num_values;
-
-    // a gauge supports up to 4 values
-    // this is updated on each window message
-    private float[] _values = new float[4];
-    private float[] _minValues = new float[4];
-    private float[] _maxValues = new float[4];
-    private ushort[] _labels = new ushort[4];
+    private ushort _numValues;
 
     private ushort _resetLabel;
     private ushort _label;
@@ -133,6 +128,12 @@ namespace CanFly.Proton
 
     private float _scale;
     private float _offset;
+    private ushort[] _labels;
+    // a gauge supports up to 6 values
+    // this is updated on each window message
+    private float[] _values;
+    private float[] _minValues;
+    private float[] _maxValues;
 
   public GaugeWidget(Widget parent, Rect bounds, ushort id, ushort key)
     : base(parent, bounds, id)
@@ -147,9 +148,9 @@ namespace CanFly.Proton
 
       int enumValue;
       if (!LookupEnum(key, "style", GaugeStyleValues, out enumValue))
-        _style = GaugeStyle.gs_pointer;
+        Style = GaugeStyle.gs_pointer;
       else
-        _style = (GaugeStyle)enumValue;
+        Style = (GaugeStyle)enumValue;
 
       // get the ID's of the reset can msg
       TryRegGetUint16(key, "reset-id", out _resetLabel);
@@ -167,55 +168,55 @@ namespace CanFly.Proton
       if (!TryRegGetInt16(key, "center-y", out y))
         y = (short)(rect_wnd.Height >> 1);
 
-      _center = Point.Create(x, y);
+      Center = Point.Create(x, y);
 
       // get the details for the name
       if (!TryRegGetBool(key, "draw-name", out _drawName))
-        _drawName = true;
+        DrawName = true;
 
-      if (_drawName && TryRegGetString(key, "name", out _name))
+      if (DrawName && TryRegGetString(key, "name", out _name))
       {
         if (!LookupColor(key, "name-color", out _nameColor))
-          _nameColor = Colors.White;
+          NameColor = Colors.White;
 
         if (!LookupFont(key, "name-font", out _nameFont))
           // we always have the neo font.
           OpenFont("neo", 9, out _nameFont);
 
         if (!TryRegGetInt16(key, "name-x", out x))
-          x = (short)_center.X;
+          x = (short)Center.X;
 
         if (!TryRegGetInt16(key, "name-y", out y))
-          y = (short)_center.Y;
+          y = (short)Center.Y;
 
-        _namePt = Point.Create(x, y);
+        NamePt = Point.Create(x, y);
       }
 
       if (!TryRegGetUint16(key, "arc-begin", out _arcBegin))
-        _arcBegin = 120;
+        ArcBegin = 120;
 
       if (!TryRegGetUint16(key, "arc-range", out _arcRange))
-        _arcRange = 270;
+        ArcRange = 270;
 
       if (!TryRegGetUint16(key, "width", out _width))
-        _width = 7;
+        Width = 7;
 
       if (!TryRegGetBool(key, "draw-value", out _drawValue))
-        _drawValue = true;
+        DrawValue = true;
 
       ushort uint_value;
       short dx;
       short dy;
-      if (_drawValue)
+      if (DrawValue)
       {
         if (!LookupFont(key, "value-font", out _valueFont))
           OpenFont("neo", 9, out _valueFont);
 
         if (TryRegGetInt16(key, "value-x", out x))
-          x = (short)(_center.X + 2);
+          x = (short)(Center.X + 2);
 
         if (TryRegGetInt16(key, "value-y", out y))
-          y = (short)(_valueRect.Bottom - 25);
+          y = (short)(ValueRect.Bottom - 25);
 
         if (TryRegGetInt16(key, "value-w", out dx))
           dx = (short)(rect_wnd.Right - x);
@@ -223,38 +224,32 @@ namespace CanFly.Proton
         if (TryRegGetInt16(key, "value-h", out dy))
           dy = 25;
 
-        _valueRect = Rect.Create(x, y, x + dx, y + dy);
+        ValueRect = Rect.Create(x, y, x + dx, y + dy);
       }
 
       if (!TryRegGetUint16(key, "can-id", out uint_value))
       {
         // could be can value 0..3
-        for (num_values = 0; num_values < 4; num_values++)
+        for (_numValues = 0; _numValues < 6; _numValues++)
         {
-          string temp_name = string.Format("can-id-{0}", num_values);
+          string temp_name = string.Format("can-id-{0}", _numValues);
 
           if (!TryRegGetUint16(key, temp_name, out uint_value))
             break;
 
-          _labels[num_values] = uint_value;
-          _values[num_values] = _resetValue;
-          _minValues[num_values] = _resetValue;
-          _maxValues[num_values] = _resetValue;
-        }
+          Labels[_numValues] = uint_value;
+         }
       }
       else
       {
-        _labels[0] = uint_value;
-        _values[0] = _resetValue;
-        _minValues[0] = _resetValue;
-        _maxValues[0] = _resetValue;
-        num_values = 1;
+        Labels[0] = uint_value;
+        _numValues = 1;
       }
 
       if (!TryRegGetUint16(key, "radii", out uint_value))
         uint_value = (ushort)((rect_wnd.Width >> 1) - 5);
 
-      _gaugeRadii = uint_value;
+      GaugeRadii = uint_value;
 
       // open a step key
       ushort step_key;
@@ -321,12 +316,47 @@ namespace CanFly.Proton
       if (!LookupPen(key, "border-pen", out _borderPen))
         _borderPen = Pens.GrayPen;
 
+      Initialize(0);
+    }
+    /// <summary>
+    /// Construct a gauge widget with no settings
+    /// </summary>
+    /// <param name="parent">Parent widget</param>
+    /// <param name="bounds">Position of the widget relative to the parent</param>
+    /// <param name="id">Id of the widget</param>
+    public GaugeWidget(Widget parent, Rect bounds, ushort id)
+      : base(parent, bounds, id)
+    {
+    }
+    /// <summary>
+    /// After all of the widget parameters are set, initialize the constructed widget
+    /// </summary>
+    /// <param name="numValues"></param>
+    public void Initialize(ushort numValues)
+    {
+      if (numValues > 0)
+      {
+        _numValues = numValues;
+        _labels = new ushort[numValues];
+      }
 
-      if (_resetLabel != 0)
-        AddCanFlyEvent(_resetLabel, OnResetLabel);
+      _values = new float[_numValues];
+      _minValues = new float[_numValues];
+      _maxValues = new float[_numValues];
 
-      for (int i = 0; i < num_values; i++)
-        AddCanFlyEvent(_labels[i], OnValueLabel);
+      float resetValue = ResetValue;
+      for (ushort i = 0; i < NumValues; i++)
+      {
+        _values[i] = resetValue;
+        _minValues[i] = resetValue;
+        _maxValues[i] = resetValue;
+      }
+
+      if (ResetLabel != 0)
+        AddCanFlyEvent(ResetLabel, OnResetLabel);
+
+      for (int i = 0; i < NumValues; i++)
+        AddCanFlyEvent(Labels[i], OnValueLabel);
 
       InvalidateRect();
     }
@@ -351,13 +381,12 @@ namespace CanFly.Proton
       {
         float float_value = msg.GetFloat();
 
-        for (int i = 0; i < num_values; i++)
+        for (int i = 0; i < NumValues; i++)
         {
-          if (msg.CanID == _labels[i])
+          if (msg.CanID == Labels[i])
           {
-
-            float_value *= _scale;
-            float_value += _offset;
+            float_value *= Scale;
+            float_value += Offset;
 
             if (_values[i] != float_value)
             {
@@ -380,10 +409,10 @@ namespace CanFly.Proton
 
     private void OnResetLabel(CanFlyMsg e)
     {
-      for (int i = 0; i < num_values; i++)
+      for (int i = 0; i < _numValues; i++)
       {
-        _minValues[i] = _resetValue;
-        _maxValues[i] = _resetValue;
+        _minValues[i] = ResetValue;
+        _maxValues[i] = ResetValue;
       }
 
       InvalidateRect();
@@ -396,20 +425,27 @@ namespace CanFly.Proton
       Rect wnd_rect = WindowRect;
 
       // fill without a border
-      Rectangle(Pens.Hollow, _backgroundColor, wnd_rect);
+      Rectangle(Pens.Hollow, BackgroundColor, wnd_rect);
 
-      if (_drawBorder)
-        RoundRect(_borderPen, Colors.Hollow, wnd_rect, 12);
+      if (DrawBorder)
+        RoundRect(BorderPen, Colors.Hollow, wnd_rect, 12);
 
-      if (IsBarStyle)
-        UpdateBarGauge();
+      if (IsVerticalBarStyle)
+        UpdateVerticalBarGauge();
+      if(IsHorizontalBarStyle)
+        UpdateHorizontalBarGauge();
       else
         UpdateDialGauge();
 
       EndPaint();
     }
 
-    private void UpdateBarGauge()
+    private void UpdateHorizontalBarGauge()
+    {
+      
+    }
+
+    private void UpdateVerticalBarGauge()
     {
       // we support up to 4 ID's.
 
@@ -438,16 +474,18 @@ namespace CanFly.Proton
       //  +---------------- 1 Pixel
       //
       //
-      if (_steps == null || _steps.Count < 2)
+      Step[] steps = Steps;
+
+      if(steps == null || steps.Length < 2)
         return;
 
       Rect wnd_rect = WindowRect;
       Rect graph = Rect.Create(wnd_rect.Left, wnd_rect.Top, wnd_rect.Left + 14, wnd_rect.Height);
 
-      for (uint i = 0; i < num_values; i++)
+      for (uint i = 0; i < _numValues; i++)
       {
-        Step first_step = (Step)_steps[0];
-        Step last_step = (Step)_steps[_steps.Count - 1];
+        Step first_step = steps[0];
+        Step last_step = steps[steps.Length - 1];
 
         long range = last_step.value - first_step.value;
 
@@ -460,9 +498,9 @@ namespace CanFly.Proton
           graph.Right - 2,
           graph.Bottom - 7);
 
-        for (int step = 1; step < _steps.Count; step++)
+        for (int step = 1; step < steps.Length; step++)
         {
-          last_step = (Step)_steps[step];
+          last_step = steps[step];
 
           float relative_value = last_step.value - first_step.value;
           first_step = last_step;
@@ -480,52 +518,53 @@ namespace CanFly.Proton
         graph = graph.Add(14, 0, 14, 0);
       }
 
-      if (_drawName)
+      if (DrawName)
       {
         Extent sz = TextExtent(_font, _name);
 
-        DrawText(_font, _nameColor, _backgroundColor, _name, 
+        DrawText(Font, NameColor, BackgroundColor, Name, 
           wnd_rect.BottomRight.Add(-(4 + sz.Dx), -sz.Dy));
       }
 
       int height = graph.Height - 12;
 
-      if (_ticks != null)
+      TickMark[] ticks = Ticks;
+
+      if (ticks != null)
       {
-        int num_ticks = _ticks.Count;
+        int num_ticks = ticks.Length;
 
-
-        TickMark first_tick = (TickMark)_ticks[0];
-        TickMark last_tick = (TickMark)_ticks[num_ticks - 1];
+        TickMark first_tick = ticks[0];
+        TickMark last_tick = ticks[num_ticks - 1];
 
         int range = last_tick.value - first_tick.value;
         float pixels_per_unit = ((float)height) / ((float)range);
 
         for (int i = 0; i < num_ticks; i++)
         {
-          last_tick = (TickMark)_ticks[i];
+          last_tick = ticks[i];
 
           if (last_tick.text == null)
             continue;
 
           short value = last_tick.value;
 
-          Extent sz = TextExtent(_font, last_tick.text);
+          Extent sz = TextExtent(Font, last_tick.text);
 
           float relative_value = value - first_tick.value;
           float pixels = relative_value * pixels_per_unit;
           Point pt = Point.Create(graph.Left + 2, (graph.Bottom - (int)pixels) - 7 - (sz.Dy >> 1));
 
-          DrawText(_font, _nameColor, _backgroundColor, last_tick.text, pt);
+          DrawText(Font, NameColor, BackgroundColor, last_tick.text, pt);
         }
       }
 
       int offset = 1;
 
-      for (int i = 0; i < num_values; i++)
+      for (int i = 0; i < _numValues; i++)
       {
-        Step first_step = (Step)_steps[0];
-        Step last_step = (Step)_steps[_steps.Count - 1];
+        Step first_step = steps[0];
+        Step last_step = steps[steps.Length - 1];
 
         int drawingHeight = wnd_rect.Height - 12;
         int range = last_step.value - first_step.value;
@@ -548,7 +587,7 @@ namespace CanFly.Proton
           Point.Create(offset, position - 5),
           Point.Create(offset, position + 5));
 
-        if (_style == GaugeStyle.bgs_pointer_minmax || _style == GaugeStyle.bgs_pointer_max)
+        if (_style == GaugeStyle.bgvs_pointer_minmax || _style == GaugeStyle.bgvs_pointer_max)
         {
           relative_value = _maxValues[i] - min_range;
           if (relative_value >= 0.0)
@@ -565,7 +604,7 @@ namespace CanFly.Proton
           }
         }
 
-        if (_style == GaugeStyle.bgs_pointer_minmax || _style == GaugeStyle.bgs_pointer_min)
+        if (Style == GaugeStyle.bgvs_pointer_minmax || Style == GaugeStyle.bgvs_pointer_min)
         {
           relative_value = _minValues[i] - min_range;
           if (relative_value >= 0.0)
@@ -587,27 +626,29 @@ namespace CanFly.Proton
     private void UpdateDialGauge()
     {
       Rect wnd_rect = WindowRect;
-      if (_drawName)
+      if (DrawName)
       {
-        Extent sz = TextExtent(_nameFont, _name);
+        Extent sz = TextExtent(NameFont, Name);
 
-        DrawText(_nameFont, _nameColor, _backgroundColor, _name, 
-          _namePt.Add(-(sz.Dx >> 1), -(sz.Dy >> 1)));
+        DrawText(NameFont, NameColor, BackgroundColor, Name, 
+          NamePt.Add(-(sz.Dx >> 1), -(sz.Dy >> 1)));
       }
 
       short min_range = 0;
       short max_range = 0;
       float degrees_per_unit = 1.0f;
 
+      Step[] steps = Steps;
+
       // we now draw an arc.  The range is the last value in the arc
       // minus the first value.  Note that the values can be -
       // the range of the gauge is gauge_y - 360 degrees
-      if (_steps != null)
+      if (steps != null)
       {
-        int num_steps = _steps.Count;
+        int num_steps = steps.Length;
 
-        Step first_step = (Step)_steps[0];
-        Step last_step = (Step)_steps[num_steps - 1];
+        Step first_step = steps[0];
+        Step last_step = steps[num_steps - 1];
 
         min_range = first_step.value;
         max_range = last_step.value;
@@ -616,7 +657,7 @@ namespace CanFly.Proton
 
         degrees_per_unit = ((float)_arcRange) / steps_range;
 
-        float arc_start = _arcBegin;
+        float arc_start = ArcBegin;
         ushort i;
 
         //    font(_font);
@@ -625,11 +666,11 @@ namespace CanFly.Proton
         //
         for (i = 1; i < num_steps; i++)
         {
-          last_step = (Step)_steps[i];
+          last_step = steps[i];
 
           // the arc angle is the step end
           float arc_end = (last_step.value - min_range) * degrees_per_unit;
-          arc_end += _arcBegin;
+          arc_end += ArcBegin;
 
           // the arc starts a point(0, -1) which is 0 degrees
           // so ranges from 0..270 are 90.360 and needs to
@@ -650,53 +691,54 @@ namespace CanFly.Proton
 
           CanFly.Pen pen = last_step.pen;
 
-          Arc(pen, _center, _gaugeRadii, arc_angles[0], arc_angles[1]);
+          Arc(pen, Center, GaugeRadii, arc_angles[0], arc_angles[1]);
 
           if (arc_angles[2] >= 0)
-            Arc(last_step.pen, _center, _gaugeRadii, 0, arc_angles[2]);
+            Arc(last_step.pen, Center, GaugeRadii, 0, arc_angles[2]);
 
           arc_start = arc_end;
         }
       }
 
-      if (_ticks != null)
+      TickMark[] ticks = Ticks;
+      if (ticks != null)
       {
-        int num_ticks = _ticks.Count;
+        int num_ticks = ticks.Length;
 
         // we now draw the tick marks.  They are a line from the point 5 pixels long.
         // we create a white pen for this
         //pen(&white_pen_2);
 
-        int line_start = _gaugeRadii;
-        line_start += _width >> 1;              // add the line half width
+        int line_start = GaugeRadii;
+        line_start += Width >> 1;              // add the line half width
 
-        int line_end = line_start - _width - 5;
+        int line_end = line_start - Width - 5;
         float arc_start;
 
         for (int i = 0; i < num_ticks; i++)
         {
-          TickMark tick = (TickMark)_ticks[i];
+          TickMark tick = ticks[i];
 
           arc_start = (tick.value - min_range) * degrees_per_unit;
-          arc_start += _arcBegin;
+          arc_start += ArcBegin;
           // make it point to correct spot....
           arc_start += 180;
 
           Polyline(Pens.WhitePen,
-            RotatePoint(_center, Point.Create(_center.X, _center.Y - line_start), (int)arc_start),
-          RotatePoint(_center, Point.Create(_center.X, _center.Y - line_end), (int)arc_start));
+            RotatePoint(Center, Point.Create(Center.X, Center.Y - line_start), (int)arc_start),
+          RotatePoint(Center, Point.Create(Center.X, Center.Y - line_end), (int)arc_start));
 
           if (tick.text != null)
           {
             // write the text at the point
-            Extent size = TextExtent(_font, tick.text);
+            Extent size = TextExtent(Font, tick.text);
 
             // the text is below the tick marks
-            Point top_left = RotatePoint(_center, Point.Create(_center.X, _center.Y - line_end + (size.Dy >> 1)), (int)arc_start);
+            Point top_left = RotatePoint(Center, Point.Create(Center.X, Center.Y - line_end + (size.Dy >> 1)), (int)arc_start);
 
             top_left.Add(-(size.Dx >> 1), -(size.Dy >> 1));
 
-            DrawText(_font, Colors.White, _backgroundColor, tick.text, top_left);
+            DrawText(Font, Colors.White, BackgroundColor, tick.text, top_left);
 
           }
         }
@@ -710,24 +752,22 @@ namespace CanFly.Proton
       switch (_style)
       {
         case GaugeStyle.gs_pointer_minmax:
-          DrawPoint(wnd_rect, CalculatePen(_width, _minValues[0]), CalculateRotation(_minValues[0]));
+          DrawPoint(wnd_rect, CalculatePen(Width, _minValues[0]), CalculateRotation(_minValues[0]));
           DrawPoint(wnd_rect, CalculatePen(1, _maxValues[0]), CalculateRotation(_maxValues[0]));
           break;
         case GaugeStyle.gs_pointer:
           rotation = CalculateRotation(_values[0]);
-          Polyline(CalculatePen(_width, _values[0]),
-            RotatePoint(_center, Point.Create(_center.X, _center.Y - 5), rotation),
-            RotatePoint(_center, Point.Create(_center.X, _center.Y - _gaugeRadii + 5), rotation));
+          Polyline(CalculatePen(Width, _values[0]),
+            RotatePoint(Center, Point.Create(Center.X, Center.Y - 5), rotation),
+            RotatePoint(Center, Point.Create(Center.X, Center.Y - GaugeRadii + 5), rotation));
           break;
         case GaugeStyle.gs_sweep:
-          Pie(CalculatePen(_width, _values[0]),
-            CalculateColor(_values[0]),
-            _center, _arcBegin + 90,
-            CalculateRotation(_values[0]) + 90,
-            _center.Y - _gaugeRadii + 5, 5);
+          Pie(CalculatePen(Width, _values[0]),
+            CalculateColor(_values[0]), Center, ArcBegin + 90,
+            CalculateRotation(_values[0]) + 90, Center.Y - GaugeRadii + 5, 5);
           break;
         case GaugeStyle.gs_bar:
-          Pen outlinePen = CalculatePen(_width, _values[0]);
+          Pen outlinePen = CalculatePen(Width, _values[0]);
           rotation = CalculateRotation(_values[0]);
 
           int[] arc_angles = new int[3] { _arcBegin + 90, rotation + 90, -1 };
@@ -749,7 +789,7 @@ namespace CanFly.Proton
 
           if(arc_angles[0] == arc_angles[1] && arc_angles[2] == -1)
           {
-            Point pt = RotatePoint(_center, Point.Create(_center.X + radii, _center.Y), arc_angles[0]);
+            Point pt = RotatePoint(Center, Point.Create(Center.X + radii, Center.Y), arc_angles[0]);
             // draw a dot
             Rect ellipse = Rect.Create(pt.X - offset,  pt.Y - offset, pt.X + offset, pt.Y + offset);
             
@@ -757,10 +797,10 @@ namespace CanFly.Proton
           }
           else
           {
-            Arc(outlinePen, _center, radii, arc_angles[0], arc_angles[1]);
+            Arc(outlinePen, Center, radii, arc_angles[0], arc_angles[1]);
 
             if (arc_angles[2] > 0)
-              Arc(outlinePen, _center, radii, 0, arc_angles[2]);
+              Arc(outlinePen, Center, radii, 0, arc_angles[2]);
           }
           break;
         case GaugeStyle.gs_point_minmax:
@@ -777,19 +817,34 @@ namespace CanFly.Proton
       if (_drawValue)
       {
         string str = ((int)_values[0]).ToString();
-        Extent size = TextExtent(_valueFont, str);
+        Extent size = TextExtent(ValueFont, str);
 
         // draw a rectangle around the text
-        Rectangle(Pens.GrayPen, Colors.Black, _valueRect);
+        Rectangle(Pens.GrayPen, Colors.Black, ValueRect);
 
-        DrawText(_valueFont, Colors.LightBlue, Colors.Black, str,
-          Point.Create(_valueRect.Right - (size.Dx + 2), _valueRect.Top + 2), _valueRect, TextOutStyle.Clipped);
+        DrawText(ValueFont, Colors.LightBlue, Colors.Black, str,
+          Point.Create(ValueRect.Right - (size.Dx + 2), ValueRect.Top + 2), ValueRect, TextOutStyle.Clipped);
       }
     }
 
-    private bool IsBarStyle
+    private bool IsVerticalBarStyle
     {
-      get { return (int)_style >= (int)GaugeStyle.bgs_point; }
+      get 
+      {
+        int value = (int)Style;
+
+        return value >= (int)GaugeStyle.bgvs_point && value < (int)GaugeStyle.bghs_point; 
+      }
+    }
+
+    private bool IsHorizontalBarStyle
+    {
+      get 
+      {
+        int value = (int)Style;
+
+        return value >= (int)GaugeStyle.bghs_point; 
+      }
     }
 
 
@@ -863,6 +918,188 @@ namespace CanFly.Proton
       }
 
       return fill_color;
+    }
+
+    public ushort NumValues
+    {
+      get { return _numValues; }
+    }
+
+    public string Name
+    {
+      get { return _name; }
+      set { _name = value; }
+    }
+
+    public Color NameColor
+    {
+      get { return _nameColor; }
+      set { _nameColor = value; }
+    }
+    public Font NameFont
+    {
+      get { return _nameFont; }
+      set { _nameFont = value; }
+    }
+    public Point NamePt
+    {
+      get { return _namePt; }
+      set { _namePt = value; }
+    }
+    public bool DrawName
+    {
+      get { return _drawName; }
+      set { _drawName = value; }
+    }
+    public Color BackgroundColor
+    {
+      get { return _backgroundColor; }
+      set { _backgroundColor = value; }
+    }
+    public Pen BorderPen
+    {
+      get { return _borderPen; }
+      set { _borderPen = value; }
+    }
+    public bool DrawBorder
+    {
+      get { return _drawBorder; }
+      set { _drawBorder = value; }
+    }
+    public Font Font
+    {
+      get { return _font; }
+      set { _font = value; }
+    }
+    public ushort ResetLabel
+    {
+      get { return _resetLabel; }
+      set { _resetLabel = value; }
+    }
+    public ushort Label
+    {
+      get { return _label; }
+      set { _label = value; }
+    }
+    public Point Center
+    {
+      get { return _center; }
+      set { _center = value; }
+    }
+    public int GaugeRadii
+    {
+      get { return _gaugeRadii; }
+      set { _gaugeRadii = value; }
+    }
+    public ushort ArcBegin
+    {
+      get { return _arcBegin; }
+      set { _arcBegin = value; }
+    }
+    public ushort ArcRange
+    {
+      get { return _arcRange; }
+      set { _arcRange = value; }
+    }
+    public float ResetValue
+    {
+      get { return _resetValue; }
+      set { _resetValue = value; }
+    }
+    public GaugeStyle Style
+    {
+      get { return _style; }
+      set { _style = value; }
+    }
+    public ushort Width
+    {
+      get { return _width; }
+      set { _width = value; }
+    }
+    public bool DrawValue
+    {
+      get { return _drawValue; }
+      set { _drawValue = value; }
+    }
+    public Font ValueFont
+    {
+      get { return _valueFont; }
+      set { _valueFont = value; }
+    }
+    public Rect ValueRect
+    {
+      get { return _valueRect; }
+      set { _valueRect = value; }
+    }
+    public Step[] Steps 
+    {
+      get
+      { 
+        if(_steps == null)
+          return null;
+
+        Step[] result = new Step[_steps.Count];
+
+        for (int i = 0; i < _steps.Count; i++)
+          result[i] = (Step)_steps[i];
+
+        return result;
+      } 
+    }
+
+    public void AddStep(Step step)
+    {
+      if(_steps == null)
+        _steps = new ArrayList();
+
+      _steps.Add(step);
+    }
+
+    public TickMark[] Ticks 
+    {
+      get
+      {
+        if(_ticks == null)
+          return null;
+
+        TickMark[] result = new TickMark[_ticks.Count];
+
+        for (int i = 0; i < _ticks.Count; i++)
+          result[i] = (TickMark) _ticks[i];
+
+        return result;
+      } 
+    }
+
+    public void AddTick(TickMark tick)
+    {
+      if(_ticks == null)
+        _ticks = new ArrayList();
+
+      _ticks.Add(tick);
+    }
+
+    public float Scale
+    {
+      get { return _scale; }
+      set { _scale = value; }
+    }
+    public float Offset
+    {
+      get { return _offset; }
+      set { _offset = value; }
+    }
+    public ushort[] Labels 
+    {
+       get { return _labels; }
+    }
+
+    public void SetLabel(ushort offset, ushort value)
+    {
+      if(offset >= _numValues)
+        throw new IndexOutOfRangeException();
+
+      _labels[offset] = value;
     }
   }
 }

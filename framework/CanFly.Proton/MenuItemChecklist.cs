@@ -59,10 +59,15 @@ namespace CanFly.Proton
     /// </summary>
     /// <param name="widget"></param>
     /// <param name="key"></param>
-    public MenuItemChecklist(LayoutWidget widget, ushort key)
-      : base(widget, key)
+    public MenuItemChecklist(MenuWidget widget)
+      : base(widget)
     {
       _selectedItem = -1;
+    }
+
+    public override void Parse(ushort key)
+    {
+      base.Parse(key);
       /*
 static MenuItem item_checklist_load(LayoutWindow wnd,
   uint key)

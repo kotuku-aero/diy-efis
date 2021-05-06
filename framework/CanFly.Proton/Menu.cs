@@ -62,16 +62,23 @@ namespace CanFly.Proton
 
     // if there is a popup active, this is keys handler
     private Keys _keys;
+    private MenuWidget _widget;
 
-    public Menu(LayoutWidget layoutWidget, ushort key)
+    public Menu(MenuWidget widget)
     {
       _menuItems = new ArrayList();
+      _widget = widget;
+    }
+
+    public void LoadMenu(ushort key)
+    {
       ushort child = 0;
       string itemName;
       while (Widget.TryRegEnumKey(key, ref child, out itemName))
       {
         // the protocol assumes all child keys are menu items
-        MenuItem item = MenuItem.Parse(layoutWidget, child);
+        
+        MenuItem item = MenuItem.LoadMenu(_widget, child);
 
         if (item != null)
           _menuItems.Add(item);
@@ -80,7 +87,7 @@ namespace CanFly.Proton
       // we now load the keys
       string keys;
       if (Widget.TryRegGetString(key, "keys", out keys))
-        Keys = layoutWidget.LoadKeys(keys);
+        Keys = _widget.LoadKeys(keys);
     }
 
     public MenuItem this[int index]

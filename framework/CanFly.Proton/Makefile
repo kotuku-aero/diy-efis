@@ -13,14 +13,15 @@ SRC= \
 	GaugeWidget.cs \
 	GpsWidget.cs \
 	HSIWidget.cs \
-	Keys.cs \
 	LayoutWidget.cs \
+	Keys.cs \
 	Menu.cs \
 	MenuItem.cs \
 	MenuItemChecklist.cs \
 	MenuItemEdit.cs \
 	MenuItemEvent.cs \
 	MenuItemPopup.cs \
+	MenuWidget.cs \
 	Pens.cs \
 	Properties/AssemblyInfo.cs
 

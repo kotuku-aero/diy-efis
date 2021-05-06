@@ -71,9 +71,15 @@ namespace CanFly.Proton
     private ushort _precision;
     private ushort _digits;
 
-    public MenuItemEdit(LayoutWidget widget, ushort key)
-      : base(widget, key)
+    public MenuItemEdit(MenuWidget widget)
+      : base(widget)
     {
+    }
+
+    public override void Parse(ushort key)
+    {
+      base.Parse(key);
+
       if(!Widget.TryRegGetUint16(key, "value-id", out _valueId) ||
       !Widget.TryRegGetUint16(key, "set-id", out _setId) ||
       !Widget.TryRegGetBool(key, "send-short", out _integerType) ||
