@@ -124,60 +124,6 @@ namespace CanFly.Proton
       AddCanFlyEvent(PhotonID.id_menu_cancel, OnMenuCancel);
       AddCanFlyEvent(PhotonID.id_menu_ok, OnMenuOk);
     }
-
-    public void Parse(ushort hive)
-    {
-      // the hive must have series of hives that form windows
-
-      ushort menu;
-      if (TryRegOpenKey(hive, "menu", out menu))
-      {
-        // this stores a cache of loaded keys.
-        _keyMappings = new Hashtable();
-        _menuStack = new ArrayList();
-        _menus = new Hashtable();
-        _menuItems = new ArrayList();
-
-        if (!TryRegGetInt16(menu, "menu-rect-x", out _menuRectX))
-          MenuRectX = 0;
-
-        if (!TryRegGetInt16(menu, "menu-rect-y", out _menuRectY))
-          MenuRectY = (short)WindowRect.Bottom;
-
-        if (!TryRegGetInt16(menu, "menu-start-x", out _menuStartX))
-          MenuStartX = 0;
-
-        if (!TryRegGetInt16(menu, "menu-start-y", out _menuStartY))
-          MenuStartY = (short)WindowRect.Bottom;
-
-        string rootKeysName;
-        if (TryRegGetString(menu, "root-keys", out rootKeysName))
-        {
-          _rootKeys = LoadKeys(rootKeysName);
-          _activeKeys = _rootKeys;
-        }
-
-        if (LookupColor(menu, "bk-color", out _backgroundColor))
-          _backgroundColor = Colors.Black;
-
-        if (LookupColor(menu, "bk-selected", out _selectedBackgroundColor))
-          _selectedBackgroundColor = Colors.White;
-
-        if (LookupColor(menu, "selected-color", out _selectedColor))
-          _selectedColor = Colors.Magenta;
-
-        if (LookupColor(menu, "text-color", out _textColor))
-          _textColor = Colors.Green;
-
-        if (!LookupPen(menu, "pen", out _borderPen))
-          _borderPen = Pens.LightGrayPen;
-
-        // check for the font
-        if (!LookupFont(menu, "font", out _font))
-          OpenFont("neo", 9, out _font);
-      }
-    }
-
     private void OnMenuOk(CanFlyMsg msg)
     {
       // this is sent when an item is selected.  Only ever one

@@ -37,42 +37,27 @@ then the original copyright notice is to be respected.
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
-using System;
-
-namespace CanFly
+namespace CanFly.Proton
 {
-  public struct Color
+  public class Step
   {
-    /// <summary>
-    /// Create a color
-    /// </summary>
-    /// <param name="red">Red intensity</param>
-    /// <param name="green">Green inensity</param>
-    /// <param name="blue">Blue intensity</param>
-    /// <param name="alpha">Saturation</param>
-    /// <returns>New Color</returns>
-    public static Color Create(byte red, byte green, byte blue, byte alpha)
-    {
-      return Syscall.CreateColor(red, green, blue, alpha);
-    }
-    /// <summary>
-    /// Create a color, with 100% saturation
-    /// </summary>
-    /// <param name="red">Red intensity</param>
-    /// <param name="green">Green inensity</param>
-    /// <param name="blue">Blue intensity</param>
-    /// <returns>New Color</returns>
-    public static Color Create(byte red, byte green, byte blue) { return Syscall.CreateColor(red, green, blue, 0xff); }
-    /// <summary>
-    /// Create a color from an ecoded rgba value
-    /// </summary>
-    /// <param name="encoded">RGBA encoded value</param>
-    /// <returns>New color</returns>
-    public static Color Create(uint encoded) { return Syscall.CreateEncodedColor(encoded); }
+    private short _value;
+    private Pen _pen;
+    private Color _indicatorColor;
+    private Pen _indicatorPen;
 
-    public byte Red { get { return Syscall.GetRed(this); } }
-    public byte Green { get { return Syscall.GetGreen(this); } }
-    public byte Blue { get { return Syscall.GetBlue(this); } }
-    public byte Alpha { get { return Syscall.GetAlpha(this); } }
+    public Step(short value, Pen pen, Color indicatorColor, Pen indicatorPen)
+    {
+      _value = value;
+      _pen = pen;
+      _indicatorColor = indicatorColor;
+      _indicatorPen = indicatorPen;
+    }
+
+    public short Value { get { return _value; } }
+    public Pen Pen { get { return _pen; } }
+    public Color IndicatorColor { get { return _indicatorColor; } }
+    public Pen IndicatorPen { get { return _indicatorPen; } }
   }
+
 }

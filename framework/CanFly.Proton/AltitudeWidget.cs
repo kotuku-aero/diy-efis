@@ -45,70 +45,102 @@ namespace CanFly.Proton
   {
     private struct VsiMarkers
     {
-      public string text;
-      public int pos;
+      private string _text;
 
-      public VsiMarkers(string _text, int _pos)
+      private int _pos;
+
+      public string Text { get { return _text; } }
+      public int Pos { get { return _pos; } }
+
+      public VsiMarkers(string text, int pos)
       {
-        text = _text;
-        pos = _pos;
+        _text = text;
+        _pos = pos;
       }
-    };
+    }
 
-    private short altitude;
-    private short vertical_speed;
-    private float scale;
-    private float offset;
+    private short _altitude;
+    private short _verticalSpeed;
+    private float _scale;
+    private float _offset;
 
-    private ushort qnh;
-    private Color background_color;
-    private Color text_color;
-    private Pen pen;
-    private Font font;      // 9 pixel
-    private Font small_roller;  // 12 pixel
-    private Font large_roller;  // 15 pixel
+    private ushort _qnh;
+    private Color _backgroundColor;
+    private Color _textColor;
+    private Pen _pen;
+    private Font _font;      // 9 pixel
+    private Font _smallRoller;  // 12 pixel
+    private Font _largeRoller;  // 15 pixel
 
+    public short Altitude { get { return _altitude; } }
+    public short VerticalSpeed { get { return _verticalSpeed; } }
+    public float Scale
+    {
+      get { return _scale; }
+      set { _scale = value; }
+    }
+    public float Offset
+    {
+      get { return _offset; }
+      set { _offset = value; }
+    }
+    public ushort Qnh { get { return _qnh; } }
+    public Color BackgroundColor
+    {
+      get { return _backgroundColor; }
+      set { _backgroundColor = value; }
+    }
+    public Color TextColor
+    {
+      get { return _textColor; }
+      set { _textColor = value; }
+    }
+    public Pen Pen
+    {
+      get { return _pen; }
+      set { _pen = value; }
+    }
+    public Font Font
+    {
+      get { return _font; }
+      set { _font = value; }
+    }
+    public Font SmallRollerFont
+    {
+      get { return _smallRoller; }
+      set { _smallRoller = value; }
+    }
+    public Font LargeRollerFont
+    {
+      get { return _largeRoller; }
+      set { _largeRoller = value; }
+    }
 
-    internal AltitudeWidget(Widget parent, Rect bounds, ushort id, ushort key)
+    public AltitudeWidget(Widget parent, Rect bounds, ushort id)
       : base(parent, bounds, id)
     {
-      if (!TryRegGetFloat(key, "scale", out scale))
-        scale = 1.0f;
+      _scale = 1.0f;
+      _offset = 0.0f;
 
-      if (!TryRegGetFloat(key, "offset", out offset))
-        offset = 0.0f;
+      // we always have the neo font.
+      if (!OpenFont("neo", 9, out _font))
+        throw new ApplicationException();
 
-      if (!LookupFont(key, "font", out font))
-      {
-        // we always have the neo font.
-        if (!OpenFont("neo", 9, out font))
-          throw new ApplicationException();
-      }
+      // we always have the neo font.
+      if (!OpenFont("neo", 12, out _largeRoller))
+        throw new ApplicationException();
 
-      if (!LookupFont(key, "large-font", out large_roller))
-      {
-        // we always have the neo font.
-        if (!OpenFont("neo", 12, out large_roller))
-          throw new ApplicationException();
-      }
+      // we always have the neo font.
+      if (!OpenFont("neo", 9, out _smallRoller))
+        throw new ApplicationException();
 
-      if (!LookupFont(key, "small-font", out small_roller))
-      {
-        // we always have the neo font.
-        if (!OpenFont("neo", 9, out small_roller))
-          throw new ApplicationException();
-      }
+      _backgroundColor = Colors.Black;
 
-      if (!LookupColor(key, "back-color", out background_color))
-        background_color = Colors.Black;
+      _textColor = Colors.White;
 
-      if (!LookupColor(key, "text-color", out text_color))
-        text_color = Colors.White;
+      _pen = Pens.WhitePen;
 
-      if (!LookupPen(key, "pen", out pen))
-        pen = Pens.WhitePen;
-
-      qnh = 1013;
+      _qnh = 1013;
 
       AddCanFlyEvent(CanFlyID.id_baro_corrected_altitude, OnBaroCorrectedAltitude);
       AddCanFlyEvent(CanFlyID.id_altitude_rate, on_altitude_rate);
@@ -130,7 +162,7 @@ namespace CanFly.Proton
 
       int median_y = ex.Dy >> 1;
 
-      Rectangle(Pens.Hollow, background_color, Rect.Create(8, 8, ex.Dx - 8, ex.Dy - 8));
+      Rectangle(Pens.Hollow, BackgroundColor, Rect.Create(8, 8, ex.Dx - 8, ex.Dy - 8));
 
       int i;
 
@@ -145,9 +177,9 @@ namespace CanFly.Proton
 
       for (i = 0; i < 6; i++)
       {
-        size = TextExtent(font, marks[i].text);
-        DrawText(font, Colors.Yellow, background_color, marks[i].text,
-                 Point.Create(ex.Dx - 9 - size.Dx, marks[i].pos - (size.Dy >> 1)),
+        size = TextExtent(Font, marks[i].Text);
+        DrawText(Font, Colors.Yellow, BackgroundColor, marks[i].Text,
+                 Point.Create(ex.Dx - 9 - size.Dx, marks[i].Pos - (size.Dy >> 1)),
                  wnd_rect, TextOutStyle.Clipped);
       }
 
@@ -160,7 +192,7 @@ namespace CanFly.Proton
 
       num_grads += 8;
 
-      int top_altitude = altitude + (int)num_grads;
+      int top_altitude = Altitude + (int)num_grads;
 
       // Math.Round the height to 10 pixels
       top_altitude = (top_altitude - ((top_altitude / 10) * 10)) > 5
@@ -177,13 +209,13 @@ namespace CanFly.Proton
         // draw a line from 10 pixels to 20 pixels then the text
         Point[] pts = { Point.Create(10, marker_line), Point.Create(20, marker_line) };
 
-        Polyline(paint_area, pen, pts);
+        Polyline(paint_area, Pen, pts);
 
         if (line_altitude == ((line_altitude / 500) * 500))
         {
           string altStr = line_altitude.ToString();
-          size = TextExtent(font, altStr);
-          DrawText(font, text_color, background_color, altStr, Point.Create(23, marker_line - (size.Dy >> 1)), paint_area, TextOutStyle.Clipped);
+          size = TextExtent(Font, altStr);
+          DrawText(Font, TextColor, BackgroundColor, altStr, Point.Create(23, marker_line - (size.Dy >> 1)), paint_area, TextOutStyle.Clipped);
         }
 
         line_altitude -= 250;
@@ -210,7 +242,7 @@ namespace CanFly.Proton
 
       Rect text_rect = Rect.Create(36, median_y - 19, 88, median_y + 19);
       DisplayRoller(Rect.Create(36, median_y - 19, ex.Dx - 8, median_y + 19),
-                     altitude, 2, Colors.Black, text_color, large_roller, small_roller);
+                     Altitude, 2, Colors.Black, TextColor, LargeRollerFont, SmallRollerFont);
 
       /////////////////////////////////////////////////////////////////////////////
       //
@@ -218,12 +250,12 @@ namespace CanFly.Proton
       //
       int vs;
       // draw the marker.  There is a non-linear scale
-      if (vertical_speed < 1000 && vertical_speed > -1000)
+      if (VerticalSpeed < 1000 && VerticalSpeed > -1000)
         // +/- 48 pixels
-        vs = median_y - ((int)((double)(vertical_speed) * (48.0 / 1000.0)));
+        vs = median_y - ((int)((double)(VerticalSpeed) * (48.0 / 1000.0)));
       else
       {
-        vs = Math.Min(3000, Math.Max(-3000, vertical_speed));
+        vs = Math.Min(3000, Math.Max(-3000, VerticalSpeed));
 
         // make absolute
         vs = Math.Abs(vs);
@@ -232,7 +264,7 @@ namespace CanFly.Proton
         vs /= 50;         // 40 pixels = 2000 ft
         vs += 48;         // add the 1000 ft marks
 
-        if (vertical_speed < 0)
+        if (VerticalSpeed < 0)
           vs *= -1;
 
         vs = median_y - vs;        // add the base marker
@@ -262,7 +294,7 @@ namespace CanFly.Proton
       vsi_rect = Rect.Create(vsi_rect.Left + 1, vsi_rect.Top + 1, vsi_rect.Right - 1, vsi_rect.Bottom - 1);
 
       // Math.Round the vs to 10 feet
-      vs = vertical_speed;
+      vs = VerticalSpeed;
       if (Math.Abs((vs / 5) % 5) == 1)
         vs = ((vs / 10) * 10) + (vs < 0 ? -10 : 10);
       else
@@ -270,9 +302,9 @@ namespace CanFly.Proton
 
       string vsStr = vs.ToString();
 
-      size = TextExtent(font, vsStr);
+      size = TextExtent(Font, vsStr);
 
-      DrawText(vsi_rect, font, Colors.Green, Colors.Black, vsStr,
+      DrawText(vsi_rect, Font, Colors.Green, Colors.Black, vsStr,
                Point.Create(vsi_rect.Left + (vsi_rect.Width >> 1) - (size.Dx >> 1),
                    vsi_rect.Top + 1), vsi_rect, TextOutStyle.Clipped);
 
@@ -283,10 +315,10 @@ namespace CanFly.Proton
 
       vsi_rect = Rect.Create(vsi_rect.Left + 1, vsi_rect.Top + 1, vsi_rect.Right - 1, vsi_rect.Bottom - 1);
 
-      string qnhStr = qnh.ToString();
-      size = TextExtent(font, qnhStr);
+      string qnhStr = Qnh.ToString();
+      size = TextExtent(Font, qnhStr);
 
-      DrawText(vsi_rect, font, Colors.Green, Colors.Black, qnhStr,
+      DrawText(vsi_rect, Font, Colors.Green, Colors.Black, qnhStr,
                Point.Create(vsi_rect.Left + (vsi_rect.Width >> 1) - (size.Dx >> 1),
                    vsi_rect.Top + 1), vsi_rect, TextOutStyle.Clipped);
 
@@ -301,13 +333,13 @@ namespace CanFly.Proton
 
         float v = msg.GetFloat();
 
-        v *= scale;
-        v += offset;
+        v *= Scale;
+        v += Offset;
 
         short value = (short)Math.Round(v);
 
-        changed = altitude != value;
-        altitude = value;
+        changed = _altitude != value;
+        _altitude = value;
 
         if (changed)
           InvalidateRect();
@@ -326,12 +358,12 @@ namespace CanFly.Proton
 
         float v = msg.GetFloat();
 
-        v *= scale / 60;
-        v += offset;
+        v *= Scale / 60;
+        v += Offset;
 
         short value = (short)Math.Round(v);
-        changed = vertical_speed != value;
-        vertical_speed = value;
+        changed = _verticalSpeed != value;
+        _verticalSpeed = value;
 
         if (changed)
           InvalidateRect();
@@ -350,8 +382,8 @@ namespace CanFly.Proton
 
         ushort value = msg.GetUInt16();
 
-        changed = qnh != value;
-        qnh = value;
+        changed = _qnh != value;
+        _qnh = value;
 
         if (changed)
           InvalidateRect(); ;

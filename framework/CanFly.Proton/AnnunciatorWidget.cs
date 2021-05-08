@@ -43,43 +43,83 @@ namespace CanFly.Proton
 {
   public sealed class AnnunciatorWidget : Widget
   {
-    private bool draw_border;
-    private uint hours; // hobbs hours, stored in AHRS as hours * 100
-    private ushort qnh; // qnh, stored in AHRS
-    private ushort clock;
-    private short oat;
-    private ushort cas;
+    private bool _drawBorder;
+    private uint _hours; // hobbs hours, stored in AHRS as hours * 100
+    private ushort _qnh; // qnh, stored in AHRS
+    private ushort _clock;
+    private short _oat;
+    private ushort _cas;
 
-    private Font small_font;
-    private Font large_font;
+    private Font _smallFont;
+    private Font _largeFont;
 
-    private Point clock_pt = Point.Create(1, 10 );
-    private Point hrs_pt = Point.Create(1, 55 );
-    private Point qnh_pt = Point.Create(1, 100 );
-    private Point oat_pt = Point.Create(1, 145 );
-    private Point cas_pt = Point.Create(1, 190 );
+    private Point _clockPt = Point.Create(1, 10 );
+    private Point _hrsPt = Point.Create(1, 55 );
+    private Point _qnhPt = Point.Create(1, 100 );
+    private Point _oatPt = Point.Create(1, 145 );
+    private Point _casPt = Point.Create(1, 190 );
 
     private readonly string hours_value = "TTS";
     private readonly string qnh_value = "QNH";
 
-    public AnnunciatorWidget(Widget parent, Rect bounds, ushort id, ushort key)
+    public bool DrawBorder
+    {
+      get { return _drawBorder; }
+      set { _drawBorder = value; }
+    }
+    public uint Hours
+    {
+      get { return _hours; }
+    }
+    public ushort Qnh
+    {
+      get { return _qnh; }
+    }
+    public ushort Clock
+    {
+      get { return _clock; }
+    }
+    public short Oat { get { return _oat; } }
+    public ushort Cas { get { return _cas; } }
+    public Font SmallFont
+    {
+      get { return _smallFont; }
+      set { _smallFont = value; }
+    }
+    public Font LargeFont
+    {
+      get { return _largeFont; }
+      set { _largeFont = value; }
+    }
+    public Point ClockPt
+    {
+      get { return _clockPt; }
+      set { _clockPt = value; }
+    }
+    public Point HrsPt
+    {
+      get { return _hrsPt; }
+      set { _hrsPt = value; }
+    }
+    public Point QnhPt
+    {
+      get { return _qnhPt; }
+      set { _qnhPt = value; }
+    }
+    public Point OatPt
+    {
+      get { return _oatPt; }
+      set { _oatPt = value; }
+    }
+    public Point CasPt
+    {
+      get { return _casPt; }
+      set { _casPt = value; }
+    }
+
+    public AnnunciatorWidget(Widget parent, Rect bounds, ushort id)
   : base(parent, bounds, id)
     {
-      if (!TryRegGetBool(key, "draw-border", out draw_border))
-        draw_border = true;
-
-      if (!LookupFont(key, "small-font", out small_font))
-      {
-        // we always have the neo font.
-        OpenFont("neo", 9, out small_font);
-      }
-
-      if (!LookupFont(key, "large-font", out large_font))
-      {
-        // we always have the neo font.
-        OpenFont("neo", 15, out large_font);
-      }
-
       AddCanFlyEvent(CanFlyID.id_def_utc, OnDefUtc);
       AddCanFlyEvent(CanFlyID.id_qnh, OnQnh);
       AddCanFlyEvent(CanFlyID.id_true_airspeed, OnTrueAirspeed);
@@ -91,9 +131,9 @@ namespace CanFly.Proton
     {
       uint value = e.GetUInt32();
 
-      if(hours != value)
+      if(_hours != value)
       {
-        hours = value;
+        _hours = value;
         InvalidateRect();
       }
     }
@@ -102,9 +142,9 @@ namespace CanFly.Proton
     {
       short value = e.GetInt16();
 
-      if(oat != value)
+      if(_oat != value)
       {
-        oat = value;
+        _oat = value;
         InvalidateRect();
       }
     }
@@ -112,9 +152,9 @@ namespace CanFly.Proton
     private void OnTrueAirspeed(CanFlyMsg e)
     {
       ushort value = e.GetUInt16();
-      if(cas != value)
+      if(_cas != value)
       {
-        cas = value;
+        _cas = value;
         InvalidateRect();
       }
     }
@@ -123,9 +163,9 @@ namespace CanFly.Proton
     {
       ushort value = e.GetUInt16();
 
-      if(qnh != value)
+      if(_qnh != value)
       {
-        qnh = value;
+        _qnh = value;
         InvalidateRect();
       }
     }
@@ -139,9 +179,9 @@ namespace CanFly.Proton
         minutes += (ushort)(values[0] * 60);
         minutes += (ushort)(values[1]);
 
-        if(clock != minutes)
+        if(_clock != minutes)
         {
-          clock = minutes;
+          _clock = minutes;
           InvalidateRect();
         }
       }
@@ -153,14 +193,14 @@ namespace CanFly.Proton
 
       Rect wnd_rect = WindowRect;
 
-      if (draw_border)
+      if (DrawBorder)
         RoundRect(Pens.WhitePen, Colors.Hollow, wnd_rect, 12);
 
-      DrawAnnunciator(wnd_rect, clock_pt, "UTC", string.Format("{0:d2}:{1:d2}", clock / 60, clock % 60));
-      DrawAnnunciator(wnd_rect, hrs_pt, "Hrs", string.Format("{0:f6.1", ((double)hours) / 100));
-      DrawAnnunciator(wnd_rect, qnh_pt, "QNH", string.Format("{0:d}", qnh));
-      DrawAnnunciator(wnd_rect, oat_pt, "OAT", string.Format("{0:d}", oat));
-      DrawAnnunciator(wnd_rect, cas_pt, "CAS", string.Format("{0:d}", cas));
+      DrawAnnunciator(wnd_rect, ClockPt, "UTC", string.Format("{0:d2}:{1:d2}", Clock / 60, Clock % 60));
+      DrawAnnunciator(wnd_rect, HrsPt, "Hrs", string.Format("{0:f6.1", ((double)Hours) / 100));
+      DrawAnnunciator(wnd_rect, QnhPt, "QNH", string.Format("{0:d}", Qnh));
+      DrawAnnunciator(wnd_rect, OatPt, "OAT", string.Format("{0:d}", Oat));
+      DrawAnnunciator(wnd_rect, CasPt, "CAS", string.Format("{0:d}", Cas));
 
       EndPaint();
     }
@@ -170,7 +210,7 @@ namespace CanFly.Proton
       // calculate the size of the label
       Rect clip_rect = Rect.Create(pt.X, pt.Y, pt.X + 75, pt.Y + 50 );
 
-      Extent label_size = TextExtent(small_font, label);
+      Extent label_size = TextExtent(SmallFont, label);
 
       int width = wnd_rect.Width;
       int text_start = pt.X + width - (label_size.Dx + 3);
@@ -188,16 +228,16 @@ namespace CanFly.Proton
 
       Rect txtRect = Rect.Create(text_start, pt.Y + 30, text_start + label_size.Dx, pt.Y + 30 + label_size.Dy);
 
-      DrawText(small_font, Colors.White, Colors.Black, label, label_origin, txtRect, TextOutStyle.Clipped);
+      DrawText(SmallFont, Colors.White, Colors.Black, label, label_origin, txtRect, TextOutStyle.Clipped);
 
-      Extent text_size = TextExtent(large_font, value);
+      Extent text_size = TextExtent(LargeFont, value);
 
       // center of the text is 37, 16
       Point origin = Point.Create(pt.X + 37 - (text_size.Dx >> 1), pt.Y + 16 - (text_size.Dy >> 1));
 
       txtRect = Rect.Create(origin, text_size);
 
-      DrawText(large_font, Colors.White, Colors.Hollow, value, origin, txtRect, TextOutStyle.Clipped);
+      DrawText(LargeFont, Colors.White, Colors.Hollow, value, origin, txtRect, TextOutStyle.Clipped);
     }
   }
 }

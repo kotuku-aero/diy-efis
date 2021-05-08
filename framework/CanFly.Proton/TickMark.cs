@@ -37,42 +37,25 @@ then the original copyright notice is to be respected.
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
-using System;
-
-namespace CanFly
+namespace CanFly.Proton
 {
-  public struct Color
+  public class TickMark
   {
-    /// <summary>
-    /// Create a color
-    /// </summary>
-    /// <param name="red">Red intensity</param>
-    /// <param name="green">Green inensity</param>
-    /// <param name="blue">Blue intensity</param>
-    /// <param name="alpha">Saturation</param>
-    /// <returns>New Color</returns>
-    public static Color Create(byte red, byte green, byte blue, byte alpha)
-    {
-      return Syscall.CreateColor(red, green, blue, alpha);
-    }
-    /// <summary>
-    /// Create a color, with 100% saturation
-    /// </summary>
-    /// <param name="red">Red intensity</param>
-    /// <param name="green">Green inensity</param>
-    /// <param name="blue">Blue intensity</param>
-    /// <returns>New Color</returns>
-    public static Color Create(byte red, byte green, byte blue) { return Syscall.CreateColor(red, green, blue, 0xff); }
-    /// <summary>
-    /// Create a color from an ecoded rgba value
-    /// </summary>
-    /// <param name="encoded">RGBA encoded value</param>
-    /// <returns>New color</returns>
-    public static Color Create(uint encoded) { return Syscall.CreateEncodedColor(encoded); }
+    private short _value;
+    private string _text;
 
-    public byte Red { get { return Syscall.GetRed(this); } }
-    public byte Green { get { return Syscall.GetGreen(this); } }
-    public byte Blue { get { return Syscall.GetBlue(this); } }
-    public byte Alpha { get { return Syscall.GetAlpha(this); } }
+    public int _length;
+
+    public TickMark(short value, string text, int length)
+    {
+      _value = value;
+      _text = text;
+      _length = length;
+    }
+
+    public short Value { get { return _value; } }
+    public string Text { get { return _text; } }
+    public int Length { get { return _length; } }
   }
+
 }

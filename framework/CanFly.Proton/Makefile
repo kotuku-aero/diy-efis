@@ -10,10 +10,12 @@ SRC= \
 	AltitudeWidget.cs \
 	AnnunciatorWidget.cs \
 	AttitudeWidget.cs \
+	Colors.cs \
 	GaugeWidget.cs \
+	DialWidget.cs \
+	VerticalBarWidget.cs \
 	GpsWidget.cs \
 	HSIWidget.cs \
-	LayoutWidget.cs \
 	Keys.cs \
 	Menu.cs \
 	MenuItem.cs \
@@ -23,6 +25,8 @@ SRC= \
 	MenuItemPopup.cs \
 	MenuWidget.cs \
 	Pens.cs \
+	Step.cs \
+	TickMark.cs \
 	Properties/AssemblyInfo.cs
 
 LIBS=-reference:../assemblies/mscorlib.dll;../assemblies/CanFly.Photon.dll;../assemblies/System.Collections.dll;../assemblies/System.Text.dll
