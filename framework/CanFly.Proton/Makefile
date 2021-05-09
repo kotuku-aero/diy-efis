@@ -2,7 +2,7 @@ NAME=CanFly.Proton
 
 CSC=csc.exe
 MDP=../../tools/CanFly.Build.exe
-FLAGS=-langversion:1 -nostdlib -target:library -debug:full
+FLAGS=-langversion:1 -nostdlib -noconfig  -target:library -debug:full
 MDPFLAGS=
 
 SRC= \
@@ -10,25 +10,26 @@ SRC= \
 	AltitudeWidget.cs \
 	AnnunciatorWidget.cs \
 	AttitudeWidget.cs \
+	Colors.cs \
 	GaugeWidget.cs \
+	DialWidget.cs \
+	VerticalBarWidget.cs \
 	GpsWidget.cs \
 	HSIWidget.cs \
 	Keys.cs \
-	LayoutWidget.cs \
 	Menu.cs \
 	MenuItem.cs \
-	MenuItemCancel.cs \
 	MenuItemChecklist.cs \
 	MenuItemEdit.cs \
-	MenuItemEnter.cs \
 	MenuItemEvent.cs \
-	MenuItemItem.cs \
-	MenuItemMenu.cs \
 	MenuItemPopup.cs \
+	MenuWidget.cs \
 	Pens.cs \
+	Step.cs \
+	TickMark.cs \
 	Properties/AssemblyInfo.cs
 
-LIBS=-reference:../assemblies/mscorlib.dll;../assemblies/CanFly.Photon.dll;../assemblies/System.Collections.dll
+LIBS=-reference:../assemblies/mscorlib.dll;../assemblies/CanFly.Photon.dll;../assemblies/System.Collections.dll;../assemblies/System.Text.dll
 RM =rm -rf
 
 OUTPATH=../assemblies

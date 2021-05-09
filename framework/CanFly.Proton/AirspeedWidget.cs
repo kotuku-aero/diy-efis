@@ -65,80 +65,28 @@ namespace CanFly.Proton
     private Pen _pen;
     Font  _font;
     bool _drawBorder;
-    Font _largeRoller;
-    Font _smallRoller;
-    
+    Font _largeRollerFont;
+    Font _smallRollerFont;
+
     /// <summary>
-    /// Construct an airspeed window
+    /// Constructor that does not set any defaults.
     /// </summary>
-    /// <param name="parent">Parent window</param>
-    /// <param name="bounds">Area to draw relative to parent</param>
-    /// <param name="id">id of this window</param>
-    /// <param name="key">registry key with settings in</param>
-    public AirspeedWidget(Widget parent, Rect bounds, ushort id, ushort key) 
+    /// <param name="parent"></param>
+    /// <param name="bounds"></param>
+    /// <param name="id"></param>
+    public AirspeedWidget(Widget parent, Rect bounds, ushort id) 
       : base(parent, bounds, id)
-    {
-      if (!TryRegGetUint16(key, "pix-per-unit", out _pixelsPerUnit))
-        _pixelsPerUnit = 10;
-
-      TryRegGetUint16(key, "vs0", out _vs0);
-      _vs0 *= _pixelsPerUnit;
-      TryRegGetUint16(key, "vs1", out _vs1);
-      _vs1 *= _pixelsPerUnit;
-      TryRegGetUint16(key, "vfe", out _vfe);
-      _vfe *= _pixelsPerUnit;
-      TryRegGetUint16(key, "vno", out _vno);
-      _vno *= _pixelsPerUnit;
-      TryRegGetUint16(key, "vne", out _vne);
-      _vne *= _pixelsPerUnit;
-      TryRegGetUint16(key, "va", out _va);
-      _va *= _pixelsPerUnit;
-      TryRegGetUint16(key, "vx", out _vx);
-      _vx *= _pixelsPerUnit;
-      TryRegGetUint16(key, "vy", out _vy);
-      _vy *= _pixelsPerUnit;
-  
-      // this conversion factor is for knots
-      if (!TryRegGetFloat(key, "scale", out _scale))
-        _scale = 0.5144444445610519f;
-
-      _scale = 1 / _scale;
-
-      if (!TryRegGetFloat(key, "offset", out _offset))
-        _offset = 0;
-
-      if (!LookupFont(key, "font", out _font))
       {
-        // we always have the neo font.
-        OpenFont("neo", 9, out _font);
-      }
+      _pixelsPerUnit = 10;
 
-      if (!LookupFont(key, "large-font", out _largeRoller))
-      {
-        // we always have the neo font.
-        OpenFont("neo", 12, out _largeRoller);
-      }
-
-      if (!LookupFont(key, "small-font", out _smallRoller))
-      {
-        // we always have the neo font.
-        OpenFont("neo", 9, out _smallRoller);
-      }
-      
-      if (!LookupColor(key, "back-color", out _backgroundColor))
-        _backgroundColor = Colors.Black;
-
-      if (!LookupColor(key, "text-color", out _textColor))
-        _textColor = Colors.White;
-
-      if (!LookupPen(key, "pen", out _pen))
-        _pen = Pen.Create(Colors.White, 1, PenStyle.Solid);
+      Scale = 0.5144444445610519f;
 
       // hook the canbus messages
       AddCanFlyEvent(CanFlyID.id_indicated_airspeed, OnIndicatedAirspeed);
       
       InvalidateRect();
-    }
+      }
+
 
     private void OnIndicatedAirspeed(CanFlyMsg msg)
     {
@@ -146,8 +94,8 @@ namespace CanFly.Proton
       // airspeed is in m/s convert to display value (knots, km, m/h etc.)
       float v = msg.GetFloat();
       
-      float airspeed = v * _scale;
-      airspeed += _offset;
+      float airspeed = v / Scale;
+      airspeed += Offset;
       
       int value = (int)(Math.Round(airspeed));
 
@@ -266,57 +214,141 @@ namespace CanFly.Proton
       // now we draw the roller
       DisplayRoller(Rect.Create(1, median - 19, width - 20, median + 19),
         _airspeed, 1, Colors.Black, Colors.White,
-        _largeRoller, _smallRoller);
+        _largeRollerFont, _smallRollerFont);
 
       EndPaint();
     }
-
+    /// <summary>
+    /// Speed in knots to display as vs0
+    /// </summary>
+    /// <value></value>
     public ushort Vs0
     {
       get { return _vs0; }
       set { _vs0 = value; }
     }
-
+    /// <summary>
+    /// Speed in knots to display as vs1
+    /// </summary>
+    /// <value></value>
     public ushort Vs1
     {
       get { return _vs1; }
       set { _vs1 = value; }
     }
-
+    /// <summary>
+    /// Speed to display in knots as Vfe
+    /// </summary>
+    /// <value></value>
     public ushort Vfe
     {
       get { return _vfe; }
       set { _vfe = value; }
     }
-
+    /// <summary>
+    /// Speed to display in knots as Vno
+    /// </summary>
+    /// <value></value>
     public ushort Vno
     {
       get { return _vno; }
       set { _vno = value; }
     }
-
+    /// <summary>
+    /// Speed to display in knots as Vne
+    /// </summary>
+    /// <value></value>
     public ushort Vne
     {
       get { return _vne; }
       set { _vne = value; }
     }
-
+    /// <summary>
+    /// Speed to display in knots as Va
+    /// </summary>
+    /// <value></value>
     public ushort Va
     {
       get { return _va; }
       set { _va = value; }
     }
-
+    /// <summary>
+    /// Speed to display in knots as Vx
+    /// </summary>
+    /// <value></value>
     public ushort Vx
     {
       get { return _vx; }
       set { _vx = value; }
     }
-
+    /// <summary>
+    /// Speed to display in knots as Vy
+    /// </summary>
+    /// <value></value>
     public ushort Vy
     {
       get { return _vy; }
       set { _vy = value; }
+    }
+    /// <summary>
+    /// Scale to adjust the airspeed by.
+    /// </summary>
+    /// <value></value>
+    public float Scale
+    {
+      get { return _scale; }
+      set { _scale = value; }
+    }
+    /// <summary>
+    /// Scale to offset the airspeed by
+    /// </summary>
+    /// <value></value>
+    public float Offset
+    {
+      get { return _offset; }
+      set { _offset = value; }
+    }
+
+    public Color BackgroundColor
+    {
+      get { return _backgroundColor; }
+      set { _backgroundColor = value; }
+    }
+
+    public Color TextColor
+    {
+      get { return _textColor; }
+      set { _textColor = value; }
+    }
+
+    public Pen Pen
+    {
+      get { return _pen; }
+      set { _pen = value; }
+    }
+
+    public Font Font
+    {
+      get { return _font; }
+      set { _font = value; }
+    }
+
+    public bool DrawBorder
+    {
+      get { return _drawBorder; }
+      set { _drawBorder = value; }
+    }
+
+    public Font LargeRollerFont
+    {
+      get { return _largeRollerFont; }
+      set { _largeRollerFont = value; }
+    }
+
+    public Font SmallRollerFont
+    {
+      get { return _smallRollerFont; }
+      set { _smallRollerFont = value; }
     }
   }
 }

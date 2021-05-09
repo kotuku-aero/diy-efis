@@ -39,3 +39,5 @@
 /tools/vscode/out
 /tools/vscode/node_modules
 /framework/assemblies/CanFly.DiyEfis.exe
+/framework/assemblies/Kotuku.Efi.exe
+/framework/assemblies/Kotuku.Pfd.exe

@@ -118,18 +118,18 @@ namespace CanFly.Tools.MetadataProcessor
             // special processing for arrays
             if(parameterType.IsArray)
             {
-                typeName += nanoCLR_DataType.DATATYPE_SZARRAY + "_" + GetParameterType(parameterType.GetElementType());
+                typeName += CLR_DataType.DATATYPE_SZARRAY + "_" + GetParameterType(parameterType.GetElementType());
                 continueProcessing = false;
             }
             else if (parameterType.IsByReference)
             {
                 var elementType = ((TypeSpecification)parameterType).ElementType;
 
-                typeName += nanoCLR_DataType.DATATYPE_BYREF + "_";
+                typeName += CLR_DataType.DATATYPE_BYREF + "_";
 
                 if (elementType.IsArray)
                 {
-                    typeName += nanoCLR_DataType.DATATYPE_SZARRAY + "_" + GetParameterType(((TypeSpecification)elementType).ElementType);
+                    typeName += CLR_DataType.DATATYPE_SZARRAY + "_" + GetParameterType(((TypeSpecification)elementType).ElementType);
                 }
                 else
                 {
@@ -157,22 +157,22 @@ namespace CanFly.Tools.MetadataProcessor
         {
             // try getting primitive type
 
-            nanoCLR_DataType myType;
+            CLR_DataType myType;
             if(SignaturesTable.PrimitiveTypes.TryGetValue(parameterType.FullName, out myType))
             {
-                if (myType == nanoCLR_DataType.DATATYPE_LAST_PRIMITIVE)
+                if (myType == CLR_DataType.DATATYPE_LAST_PRIMITIVE)
                 {
                     return "DATATYPE_STRING";
                 }
-                else if (myType == nanoCLR_DataType.DATATYPE_LAST_NONPOINTER)
+                else if (myType == CLR_DataType.DATATYPE_LAST_NONPOINTER)
                 {
                     return "DATATYPE_TIMESPAN";
                 }
-                else if (myType == nanoCLR_DataType.DATATYPE_LAST_PRIMITIVE_TO_MARSHAL)
+                else if (myType == CLR_DataType.DATATYPE_LAST_PRIMITIVE_TO_MARSHAL)
                 {
                     return "DATATYPE_TIMESPAN";
                 }
-                else if (myType == nanoCLR_DataType.DATATYPE_LAST_PRIMITIVE_TO_PRESERVE)
+                else if (myType == CLR_DataType.DATATYPE_LAST_PRIMITIVE_TO_PRESERVE)
                 {
                     return "DATATYPE_R8";
                 }

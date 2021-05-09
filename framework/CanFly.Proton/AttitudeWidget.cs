@@ -65,48 +65,85 @@ namespace CanFly.Proton
     private bool _localizerAquired;
     private Font _font;
 
-    public AttitudeWidget(Widget parent, Rect bounds, ushort id, ushort key)
+    public AttitudeWidget(Widget parent, Rect bounds, ushort id)
   : base(parent, bounds, id)
     {
-      TryRegGetUint16(key, "critical-aoa", out _criticalAOA);
-      TryRegGetUint16(key, "approach-aoa",  out _approachAOA);
-      TryRegGetUint16(key, "climb-aoa", out _climbAOA);
-      TryRegGetUint16(key, "cruise-aoa", out _cruiseAOA);
-
-      if (!TryRegGetUint16(key, "yaw-max", out _yawMax))
-        _yawMax = 45;
-
-      TryRegGetBool(key, "show-aoa", out _showAOA);
-      TryRegGetBool(key, "show-gs", out _showGlideslope);
-
-      _AOADegrees = _cruiseAOA;
-
       // aoa is 40 pixels
-      _AOAPixelsPerDegree = (float) 40.0 / (_criticalAOA - _cruiseAOA);
-      _AOADegreesPerMark = (float)((_criticalAOA - _cruiseAOA) / 8.0);
-
       Rect wnd_rect = WindowRect;
+      short x = (short)(wnd_rect.Width >> 1);
 
-
-      short x;
-      if (!TryRegGetInt16(key, "center-x", out x))
-        x = (short)(wnd_rect.Width >> 1);
-
-      short y;
-      if (!TryRegGetInt16(key, "center-y", out y))
-        y = (short)(wnd_rect.Height >> 1);
+      short y = (short)(wnd_rect.Height >> 1);
 
       _widgetMedian = Point.Create(x, y);
 
-      if (!LookupFont(key, "font", out _font))
-      {
-        // we always have the neo font.
-        OpenFont("neo", 9, out _font);
-      }
+      // we always have the neo font.
+      OpenFont("neo", 9, out _font);
 
       AddCanFlyEvent(CanFlyID.id_yaw_angle, OnYawAngle);
       AddCanFlyEvent(CanFlyID.id_roll_angle, OnRollAngle);
       AddCanFlyEvent(CanFlyID.id_pitch_angle, OnPitchAngle);
+    }
+
+    private void UpdateAOAParams()
+    {
+      _AOAPixelsPerDegree = (float)40.0 / (CriticalAOA - CruiseAOA);
+      _AOADegreesPerMark = (float)((CriticalAOA - CruiseAOA) / 8.0);
+    }
+
+    public int Pitch { get { return _pitch; } }
+    public int Roll { get { return _roll; } }
+    public int Yaw { get { return _yaw; } }
+    public short Glideslope { get { return _glideslope; } }
+    public short Localizer { get { return _localizer; } }
+    public bool GlideslopeAquired { get { return _glideslopeAquired; } }
+    public ushort CriticalAOA
+    {
+      get { return _criticalAOA; }
+      set
+      {
+        _criticalAOA = value;
+        UpdateAOAParams();
+      }
+    }
+    public ushort ApproachAOA
+    {
+      get { return _approachAOA; }
+      set { _approachAOA = value; }
+    }
+    public ushort ClimbAOA
+    {
+      get { return _climbAOA; }
+      set { _climbAOA = value; }
+    }
+    public ushort CruiseAOA
+    {
+      get { return _cruiseAOA; }
+      set
+      {
+        _cruiseAOA = value;
+        UpdateAOAParams();
+      }
+    }
+    public ushort YawMax
+    {
+      get { return _yawMax; }
+      set { _yawMax = value; }
+    }
+    public bool ShowAOA
+    {
+      get { return _showAOA; }
+      set { _showAOA = value; }
+    }
+    public bool ShowGlideslope
+    {
+      get { return _showGlideslope; }
+      set { _showGlideslope = value; }
+    }
+    public bool LocalizerAquired { get { return _localizerAquired; } }
+    public Font Font
+    {
+      get { return _font; }
+      set { _font = value; }
     }
 
     private void OnPitchAngle(CanFlyMsg e)
@@ -128,11 +165,11 @@ namespace CanFly.Proton
       else if (angle < -90)
         angle = -180 - angle;
 
-      if(_pitch != angle)
+      if (_pitch != angle)
       {
         _pitch = angle;
         InvalidateRect();
-      }  
+      }
     }
 
     private void OnRollAngle(CanFlyMsg e)
@@ -172,7 +209,7 @@ namespace CanFly.Proton
       while (value < -180)
         value += 360;
 
-      if(_yaw != value)
+      if (_yaw != value)
       {
         _yaw = value;
         InvalidateRect();
@@ -189,7 +226,7 @@ namespace CanFly.Proton
 
       // the display is +/- 21.2132 degrees so we round to +/- 20 degrees
       // or 400 pixels
-      int pitch = _pitch;
+      int pitch = Pitch;
 
       // pitch is now +/- 90
       // limit to 25 degrees as we don't need any more than that
@@ -200,19 +237,19 @@ namespace CanFly.Proton
 
       // draw the upper area
       Polygon(Pens.Hollow, Colors.LightBlue,
-        RotatePoint(_widgetMedian, Point.Create(-500, _widgetMedian.Y - 500 + pitch), _roll),
-        RotatePoint(_widgetMedian, Point.Create(500, _widgetMedian.Y - 500 + pitch), _roll),
-        RotatePoint(_widgetMedian, Point.Create(500, _widgetMedian.Y + pitch), _roll),
-        RotatePoint(_widgetMedian, Point.Create(-500, _widgetMedian.Y + pitch), _roll),
-        RotatePoint(_widgetMedian, Point.Create(-500, _widgetMedian.Y - 500 + pitch), _roll));
+        RotatePoint(_widgetMedian, Point.Create(-500, _widgetMedian.Y - 500 + pitch), Roll),
+        RotatePoint(_widgetMedian, Point.Create(500, _widgetMedian.Y - 500 + pitch), Roll),
+        RotatePoint(_widgetMedian, Point.Create(500, _widgetMedian.Y + pitch), Roll),
+        RotatePoint(_widgetMedian, Point.Create(-500, _widgetMedian.Y + pitch), Roll),
+        RotatePoint(_widgetMedian, Point.Create(-500, _widgetMedian.Y - 500 + pitch), Roll));
 
       // draw the lower area
       Polygon(Pens.Hollow, Colors.Brown,
-        RotatePoint(_widgetMedian, Point.Create(-500, _widgetMedian.Y + pitch), _roll),
-        RotatePoint(_widgetMedian, Point.Create(500, _widgetMedian.Y + pitch), _roll),
-        RotatePoint(_widgetMedian, Point.Create(500, _widgetMedian.Y + pitch + 500), _roll),
-        RotatePoint(_widgetMedian, Point.Create(-500, _widgetMedian.Y + pitch + 500), _roll),
-        RotatePoint(_widgetMedian, Point.Create(-500, _widgetMedian.Y + pitch), _roll));
+        RotatePoint(_widgetMedian, Point.Create(-500, _widgetMedian.Y + pitch), Roll),
+        RotatePoint(_widgetMedian, Point.Create(500, _widgetMedian.Y + pitch), Roll),
+        RotatePoint(_widgetMedian, Point.Create(500, _widgetMedian.Y + pitch + 500), Roll),
+        RotatePoint(_widgetMedian, Point.Create(-500, _widgetMedian.Y + pitch + 500), Roll),
+        RotatePoint(_widgetMedian, Point.Create(-500, _widgetMedian.Y + pitch), Roll));
 
       /////////////////////////////////////////////////////////////////////////////
       //	Draw the pitch indicator
@@ -222,15 +259,15 @@ namespace CanFly.Proton
 
       /////////////////////////////////////////////////////////////////////////////
       // we now draw the image of the bank angle marks
-      Line(Pens.GreenPen, RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 104, 60), _roll), RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 94, 66), _roll));
-      Line(Pens.GreenPen, RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 60, 17), _roll), RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 54, 27), _roll));
-      Line(Pens.GreenPen, RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 40, 11), _roll), RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 37, 19), _roll));
-      Line(Pens.GreenPen, RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 20, 6), _roll), RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 18, 14), _roll));
-      Line(Pens.GreenPen, RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 20, 6), _roll), RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 18, 14), _roll));
-      Line(Pens.GreenPen, RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 39, 11), _roll), RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 36, 19), _roll));
-      Line(Pens.GreenPen, RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 59, 17), _roll), RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 53, 27), _roll));
-      Line(Pens.GreenPen, RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 103, 60), _roll), RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 93, 66), _roll));
-      Line(Pens.GreenPen3, RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X, 0), _roll), RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X, 12), _roll));
+      Line(Pens.GreenPen, RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 104, 60), Roll), RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 94, 66), Roll));
+      Line(Pens.GreenPen, RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 60, 17), Roll), RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 54, 27), Roll));
+      Line(Pens.GreenPen, RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 40, 11), Roll), RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 37, 19), Roll));
+      Line(Pens.GreenPen, RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 20, 6), Roll), RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 18, 14), Roll));
+      Line(Pens.GreenPen, RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 20, 6), Roll), RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 18, 14), Roll));
+      Line(Pens.GreenPen, RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 39, 11), Roll), RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 36, 19), Roll));
+      Line(Pens.GreenPen, RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 59, 17), Roll), RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 53, 27), Roll));
+      Line(Pens.GreenPen, RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 103, 60), Roll), RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 93, 66), Roll));
+      Line(Pens.GreenPen3, RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X, 0), Roll), RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X, 12), Roll));
 
       /////////////////////////////////////////////////////////////////////////////
       //	Draw the rotated roll/pitch indicator
@@ -260,8 +297,8 @@ namespace CanFly.Proton
         else if ((pitch_angle % 100) == 0)
         {
           Polyline(Pens.WhitePen,
-            RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 40, line), _roll),
-          RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 40, line), _roll));
+            RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 40, line), Roll),
+          RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 40, line), Roll));
 
           // we have a bitmap which is the text to draw.  We then select the bitmap
           // from the text angle and the rotation angle.
@@ -274,16 +311,16 @@ namespace CanFly.Proton
           if (text_angle > 0)
           {
             // calc the left/right center point
-            Point pt_left = RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 48, line), _roll);
-            Point pt_right = RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 47, line), _roll);
+            Point pt_left = RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 48, line), Roll);
+            Point pt_right = RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 47, line), Roll);
 
             // we now calc the left and right points to write the text to
             pt_left = Point.Create(pt_left.X - 9, pt_left.Y - 9);
             pt_right = Point.Create(pt_right.X - 9, pt_right.Y - 9);
 
             string txt = text_angle.ToString();
-            DrawText(_font, Colors.White, Colors.Hollow, txt, pt_left, wnd_rect, TextOutStyle.Clipped);
-            DrawText(_font, Colors.White, Colors.Hollow, txt, pt_right, wnd_rect, TextOutStyle.Clipped);
+            DrawText(Font, Colors.White, Colors.Hollow, txt, pt_left, wnd_rect, TextOutStyle.Clipped);
+            DrawText(Font, Colors.White, Colors.Hollow, txt, pt_right, wnd_rect, TextOutStyle.Clipped);
           }
           pitch_angle -= 25;
           line += 20;
@@ -291,8 +328,8 @@ namespace CanFly.Proton
         else if ((pitch_angle % 50) == 0)
         {
           Polyline(Pens.WhitePen,
-            RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 26, line), _roll),
-            RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 25, line), _roll));
+            RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 26, line), Roll),
+            RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 25, line), Roll));
 
           pitch_angle -= 25;
           line += 20;
@@ -300,8 +337,8 @@ namespace CanFly.Proton
         else
         {
           Polyline(Pens.WhitePen,
-            RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 12, line), _roll),
-            RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 12, line), _roll));
+            RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X - 12, line), Roll),
+            RotatePoint(_widgetMedian, Point.Create(_widgetMedian.X + 12, line), Roll));
 
           pitch_angle -= 25;
           line += 20;
@@ -316,17 +353,17 @@ namespace CanFly.Proton
       //
       // this is 40 pixels up/down
 
-      if (_showAOA)
+      if (ShowAOA)
       {
         // calc the effective AOA
-        int aoa = Math.Min(_criticalAOA, Math.Max(_cruiseAOA, _AOADegrees));
-        aoa -= _cruiseAOA;
+        int aoa = Math.Min(CriticalAOA, Math.Max(CruiseAOA, _AOADegrees));
+        aoa -= CruiseAOA;
         pixels = (int)(aoa * _AOAPixelsPerDegree);
 
-        float aoa_marker = _criticalAOA;
+        float aoa_marker = CriticalAOA;
         for (offset = 60; offset > 0; offset -= 6)
         {
-          if (aoa_marker > _approachAOA)
+          if (aoa_marker > ApproachAOA)
           {
             // draw red chevron.
             Polyline(Pens.RedPen3,
@@ -334,7 +371,7 @@ namespace CanFly.Proton
               Point.Create(_widgetMedian.X, pixels + _widgetMedian.Y - offset + 4),
               Point.Create(_widgetMedian.X + 15, pixels + _widgetMedian.Y - offset));
           }
-          else if (aoa_marker > _climbAOA)
+          else if (aoa_marker > ClimbAOA)
           {
             Polyline(Pens.YellowPen3,
               Point.Create(_widgetMedian.X - 15, pixels + _widgetMedian.Y - offset),
@@ -369,10 +406,10 @@ namespace CanFly.Proton
 
         /////////////////////////////////////////////////////////////////////////////
         // draw the glide slope and localizer indicators
-        if (_glideslopeAquired && _showGlideslope)
+        if (GlideslopeAquired && ShowGlideslope)
         {
           // draw the marker, 0.7 degrees = 59 pixels
-          double deviation = Math.Max(-1.2, Math.Min(1.2, _glideslope / 100.0));
+          double deviation = Math.Max(-1.2, Math.Min(1.2, Glideslope / 100.0));
 
           pixels = (int)(deviation / (1.0 / pixels_per_degree));
 
@@ -395,10 +432,10 @@ namespace CanFly.Proton
 
         }
 
-        if (_localizerAquired && _showGlideslope)
+        if (LocalizerAquired && ShowGlideslope)
         {
           // draw the marker, 1.0 degrees = 74 pixels
-          double deviation = Math.Max(-1.2, Math.Min(1.2, _localizer / 100.0));
+          double deviation = Math.Max(-1.2, Math.Min(1.2, Localizer / 100.0));
 
           pixels = (int)(deviation / (1.0 / pixels_per_degree));
 
@@ -425,7 +462,7 @@ namespace CanFly.Proton
         // Draw the aircraft pointer at the top of the window.
 
         // the roll indicator is shifted left/right by the yaw angle,  1degree = 2pix
-        offset = Math.Min(_yawMax, Math.Max(-_yawMax, _yaw << 1));
+        offset = Math.Min(YawMax, Math.Max(-YawMax, Yaw << 1));
 
         Polygon(Pens.WhitePen, Colors.Hollow,
           Point.Create(_widgetMedian.X + offset, 12),

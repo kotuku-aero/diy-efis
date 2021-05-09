@@ -41,33 +41,33 @@ namespace CanFly.Tools.MetadataProcessor
       }
     }
 
-    internal static readonly IDictionary<string, nanoCLR_DataType> PrimitiveTypes =
-        new Dictionary<string, nanoCLR_DataType>(StringComparer.Ordinal);
+    internal static readonly IDictionary<string, CLR_DataType> PrimitiveTypes =
+        new Dictionary<string, CLR_DataType>(StringComparer.Ordinal);
 
     static SignaturesTable()
     {
-      PrimitiveTypes.Add(typeof(void).FullName, nanoCLR_DataType.DATATYPE_VOID);
+      PrimitiveTypes.Add(typeof(void).FullName, CLR_DataType.DATATYPE_VOID);
 
-      PrimitiveTypes.Add(typeof(sbyte).FullName, nanoCLR_DataType.DATATYPE_I1);
-      PrimitiveTypes.Add(typeof(short).FullName, nanoCLR_DataType.DATATYPE_I2);
-      PrimitiveTypes.Add(typeof(int).FullName, nanoCLR_DataType.DATATYPE_I4);
-      PrimitiveTypes.Add(typeof(long).FullName, nanoCLR_DataType.DATATYPE_I8);
+      PrimitiveTypes.Add(typeof(sbyte).FullName, CLR_DataType.DATATYPE_I1);
+      PrimitiveTypes.Add(typeof(short).FullName, CLR_DataType.DATATYPE_I2);
+      PrimitiveTypes.Add(typeof(int).FullName, CLR_DataType.DATATYPE_I4);
+      PrimitiveTypes.Add(typeof(long).FullName, CLR_DataType.DATATYPE_I8);
 
-      PrimitiveTypes.Add(typeof(byte).FullName, nanoCLR_DataType.DATATYPE_U1);
-      PrimitiveTypes.Add(typeof(ushort).FullName, nanoCLR_DataType.DATATYPE_U2);
-      PrimitiveTypes.Add(typeof(uint).FullName, nanoCLR_DataType.DATATYPE_U4);
-      PrimitiveTypes.Add(typeof(ulong).FullName, nanoCLR_DataType.DATATYPE_U8);
+      PrimitiveTypes.Add(typeof(byte).FullName, CLR_DataType.DATATYPE_U1);
+      PrimitiveTypes.Add(typeof(ushort).FullName, CLR_DataType.DATATYPE_U2);
+      PrimitiveTypes.Add(typeof(uint).FullName, CLR_DataType.DATATYPE_U4);
+      PrimitiveTypes.Add(typeof(ulong).FullName, CLR_DataType.DATATYPE_U8);
 
-      PrimitiveTypes.Add(typeof(float).FullName, nanoCLR_DataType.DATATYPE_R4);
-      PrimitiveTypes.Add(typeof(double).FullName, nanoCLR_DataType.DATATYPE_R8);
+      PrimitiveTypes.Add(typeof(float).FullName, CLR_DataType.DATATYPE_R4);
+      PrimitiveTypes.Add(typeof(double).FullName, CLR_DataType.DATATYPE_R8);
 
-      PrimitiveTypes.Add(typeof(char).FullName, nanoCLR_DataType.DATATYPE_CHAR);
-      PrimitiveTypes.Add(typeof(string).FullName, nanoCLR_DataType.DATATYPE_STRING);
-      PrimitiveTypes.Add(typeof(bool).FullName, nanoCLR_DataType.DATATYPE_BOOLEAN);
+      PrimitiveTypes.Add(typeof(char).FullName, CLR_DataType.DATATYPE_CHAR);
+      PrimitiveTypes.Add(typeof(string).FullName, CLR_DataType.DATATYPE_STRING);
+      PrimitiveTypes.Add(typeof(bool).FullName, CLR_DataType.DATATYPE_BOOLEAN);
 
-      PrimitiveTypes.Add(typeof(object).FullName, nanoCLR_DataType.DATATYPE_OBJECT);
-      PrimitiveTypes.Add(typeof(IntPtr).FullName, nanoCLR_DataType.DATATYPE_I4);
-      PrimitiveTypes.Add(typeof(UIntPtr).FullName, nanoCLR_DataType.DATATYPE_U4);
+      PrimitiveTypes.Add(typeof(object).FullName, CLR_DataType.DATATYPE_OBJECT);
+      PrimitiveTypes.Add(typeof(IntPtr).FullName, CLR_DataType.DATATYPE_I4);
+      PrimitiveTypes.Add(typeof(UIntPtr).FullName, CLR_DataType.DATATYPE_U4);
     }
 
     /// <summary>
@@ -227,8 +227,8 @@ namespace CanFly.Tools.MetadataProcessor
     public ushort GetOrCreateSignatureId(
         TypeReference typeReference)
     {
-      var sig = GetSignature(typeReference, false);
-      var sigId = GetOrCreateSignatureIdImpl(sig);
+      byte[] sig = GetSignature(typeReference, false);
+      ushort sigId = GetOrCreateSignatureIdImpl(sig);
 
       if (_verbose) Console.WriteLine($"{typeReference.MetadataToken.ToInt32()} -> {sig.BufferToHexString()} -> {sigId.ToString("X4")}");
 
@@ -266,11 +266,11 @@ namespace CanFly.Tools.MetadataProcessor
       if (isTypeDefinition &&
           typeDefinition.MetadataType == MetadataType.Object)
       {
-        writer.WriteByte((byte)nanoCLR_DataType.DATATYPE_CLASS);
+        writer.WriteByte((byte)CLR_DataType.DATATYPE_CLASS);
         return;
       }
 
-      nanoCLR_DataType dataType;
+      CLR_DataType dataType;
       if (PrimitiveTypes.TryGetValue(typeDefinition.FullName, out dataType))
       {
         writer.WriteByte((byte)dataType);
@@ -284,7 +284,7 @@ namespace CanFly.Tools.MetadataProcessor
 
       if (typeDefinition.MetadataType == MetadataType.Class)
       {
-        writer.WriteByte((byte)nanoCLR_DataType.DATATYPE_CLASS);
+        writer.WriteByte((byte)CLR_DataType.DATATYPE_CLASS);
         if (alsoWriteSubType)
         {
           WriteSubTypeInfo(typeDefinition, writer);
@@ -305,7 +305,7 @@ namespace CanFly.Tools.MetadataProcessor
           }
         }
 
-        writer.WriteByte((byte)nanoCLR_DataType.DATATYPE_VALUETYPE);
+        writer.WriteByte((byte)CLR_DataType.DATATYPE_VALUETYPE);
         if (alsoWriteSubType)
         {
           WriteSubTypeInfo(typeDefinition, writer);
@@ -315,7 +315,7 @@ namespace CanFly.Tools.MetadataProcessor
 
       if (typeDefinition.IsArray)
       {
-        writer.WriteByte((byte)nanoCLR_DataType.DATATYPE_SZARRAY);
+        writer.WriteByte((byte)CLR_DataType.DATATYPE_SZARRAY);
 
         if (alsoWriteSubType)
         {
@@ -328,7 +328,7 @@ namespace CanFly.Tools.MetadataProcessor
 
       if (typeDefinition.IsByReference)
       {
-        writer.WriteByte((byte)nanoCLR_DataType.DATATYPE_BYREF);
+        writer.WriteByte((byte)CLR_DataType.DATATYPE_BYREF);
 
         if (alsoWriteSubType)
         {
@@ -444,7 +444,7 @@ namespace CanFly.Tools.MetadataProcessor
       using (var buffer = new MemoryStream())
       using (var writer = new BinaryWriter(buffer)) // Only Write(Byte) will be used
       {
-        var binaryWriter = CLRBinaryWriter.CreateBigEndianBinaryWriter(writer);
+        CLRBinaryWriter binaryWriter = CLRBinaryWriter.CreateBigEndianBinaryWriter(writer);
 
         if (isFieldSignature)
         {
@@ -496,14 +496,14 @@ namespace CanFly.Tools.MetadataProcessor
 
         foreach (var namedArgument in customAttribute.Fields.OrderBy(item => item.Name))
         {
-          writer.Write((byte)nanoSerializationType.SERIALIZATION_TYPE_FIELD);
+          writer.Write((byte)CLR_DataType.DATATYPE_FIELD);
           writer.Write(_context.StringTable.GetOrCreateStringId(namedArgument.Name));
           WriteAttributeArgumentValue(writer, namedArgument.Argument);
         }
 
         foreach (var namedArgument in customAttribute.Properties.OrderBy(item => item.Name))
         {
-          writer.Write((byte)nanoSerializationType.SERIALIZATION_TYPE_PROPERTY);
+          writer.Write((byte)CLR_DataType.DATATYPE_PROPERTY);
           writer.Write(_context.StringTable.GetOrCreateStringId(namedArgument.Name));
           WriteAttributeArgumentValue(writer, namedArgument.Argument);
         }
@@ -516,61 +516,61 @@ namespace CanFly.Tools.MetadataProcessor
         BinaryWriter writer,
         CustomAttributeArgument argument)
     {
-      nanoCLR_DataType dataType;
+      CLR_DataType dataType;
       if (PrimitiveTypes.TryGetValue(argument.Type.FullName, out dataType))
       {
         switch (dataType)
         {
-          case nanoCLR_DataType.DATATYPE_BOOLEAN:
-            writer.Write((byte)nanoSerializationType.ELEMENT_TYPE_BOOLEAN);
+          case CLR_DataType.DATATYPE_BOOLEAN:
+            writer.Write((byte)CLR_DataType.DATATYPE_BOOLEAN);
             writer.Write((byte)((bool)argument.Value ? 1 : 0));
             break;
-          case nanoCLR_DataType.DATATYPE_I1:
-            writer.Write((byte)nanoSerializationType.ELEMENT_TYPE_I1);
+          case CLR_DataType.DATATYPE_I1:
+            writer.Write((byte)CLR_DataType.DATATYPE_I1);
             writer.Write((sbyte)argument.Value);
             break;
-          case nanoCLR_DataType.DATATYPE_U1:
-            writer.Write((byte)nanoSerializationType.ELEMENT_TYPE_U1);
+          case CLR_DataType.DATATYPE_U1:
+            writer.Write((byte)CLR_DataType.DATATYPE_U1);
             writer.Write((byte)argument.Value);
             break;
-          case nanoCLR_DataType.DATATYPE_I2:
-            writer.Write((byte)nanoSerializationType.ELEMENT_TYPE_I2);
+          case CLR_DataType.DATATYPE_I2:
+            writer.Write((byte)CLR_DataType.DATATYPE_I2);
             writer.Write((short)argument.Value);
             break;
-          case nanoCLR_DataType.DATATYPE_U2:
-            writer.Write((byte)nanoSerializationType.ELEMENT_TYPE_U2);
+          case CLR_DataType.DATATYPE_U2:
+            writer.Write((byte)CLR_DataType.DATATYPE_U2);
             writer.Write((ushort)argument.Value);
             break;
-          case nanoCLR_DataType.DATATYPE_I4:
-            writer.Write((byte)nanoSerializationType.ELEMENT_TYPE_I4);
+          case CLR_DataType.DATATYPE_I4:
+            writer.Write((byte)CLR_DataType.DATATYPE_I4);
             writer.Write((int)argument.Value);
             break;
-          case nanoCLR_DataType.DATATYPE_U4:
-            writer.Write((byte)nanoSerializationType.ELEMENT_TYPE_U4);
+          case CLR_DataType.DATATYPE_U4:
+            writer.Write((byte)CLR_DataType.DATATYPE_U4);
             writer.Write((uint)argument.Value);
             break;
-          case nanoCLR_DataType.DATATYPE_I8:
-            writer.Write((byte)nanoSerializationType.ELEMENT_TYPE_I8);
+          case CLR_DataType.DATATYPE_I8:
+            writer.Write((byte)CLR_DataType.DATATYPE_I8);
             writer.Write((long)argument.Value);
             break;
-          case nanoCLR_DataType.DATATYPE_U8:
-            writer.Write((byte)nanoSerializationType.ELEMENT_TYPE_U8);
+          case CLR_DataType.DATATYPE_U8:
+            writer.Write((byte)CLR_DataType.DATATYPE_U8);
             writer.Write((ulong)argument.Value);
             break;
-          case nanoCLR_DataType.DATATYPE_R4:
-            writer.Write((byte)nanoSerializationType.ELEMENT_TYPE_R4);
+          case CLR_DataType.DATATYPE_R4:
+            writer.Write((byte)CLR_DataType.DATATYPE_R4);
             writer.Write((float)argument.Value);
             break;
-          case nanoCLR_DataType.DATATYPE_R8:
-            writer.Write((byte)nanoSerializationType.ELEMENT_TYPE_R8);
+          case CLR_DataType.DATATYPE_R8:
+            writer.Write((byte)CLR_DataType.DATATYPE_R8);
             writer.Write((double)argument.Value);
             break;
-          case nanoCLR_DataType.DATATYPE_CHAR:
-            writer.Write((byte)nanoSerializationType.ELEMENT_TYPE_CHAR);
+          case CLR_DataType.DATATYPE_CHAR:
+            writer.Write((byte)CLR_DataType.DATATYPE_CHAR);
             writer.Write((char)argument.Value);
             break;
-          case nanoCLR_DataType.DATATYPE_STRING:
-            writer.Write((byte)nanoSerializationType.ELEMENT_TYPE_STRING);
+          case CLR_DataType.DATATYPE_STRING:
+            writer.Write((byte)CLR_DataType.DATATYPE_STRING);
             writer.Write(_context.StringTable.GetOrCreateStringId((string)argument.Value));
             break;
           default:
@@ -580,7 +580,7 @@ namespace CanFly.Tools.MetadataProcessor
       }
       if (argument.Type.FullName == "System.Type")
       {
-        writer.Write((byte)nanoSerializationType.ELEMENT_TYPE_STRING);
+        writer.Write((byte)CLR_DataType.DATATYPE_STRING);
         writer.Write(_context.StringTable.GetOrCreateStringId(((TypeReference)argument.Value).FullName));
       }
     }
@@ -624,7 +624,7 @@ namespace CanFly.Tools.MetadataProcessor
       var byReference = typeReference as ByReferenceType;
       if (byReference != null)
       {
-        writer.WriteByte((byte)nanoCLR_DataType.DATATYPE_BYREF);
+        writer.WriteByte((byte)CLR_DataType.DATATYPE_BYREF);
         WriteDataType(byReference.ElementType, writer, true, false, false);
       }
       else

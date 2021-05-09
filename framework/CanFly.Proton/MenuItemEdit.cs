@@ -60,56 +60,131 @@ namespace CanFly.Proton
 
   class MenuItemEdit : MenuItem
   {
-    private ushort value_id;
+    private ushort _valueId;
+    private ushort _setId;
+    private bool _integerType;
+    private float _minValue;
+    private float _maxValue;
+    private bool _circular;
+    private float _deckaIncrement;
+    private float _deckbIncrement;
+    private ushort _precision;
+    private ushort _digits;
 
-    private ushort set_id;
-
-
-    private float min_value;
-    private float max_value;
-    private float decka_increment;
-    private float deckb_increment;
-
-    public MenuItemEdit(LayoutWidget widget, uint key)
+    public MenuItemEdit(MenuWidget widget)
       : base(widget)
     {
-      /*
-static MenuItem item_edit_load(LayoutWindow wnd,
-  uint key)
-  {
-  menu_item_edit_t *item = (menu_item_edit_t *)neutron_malloc(sizeof(menu_item_edit_t));
-  memset(item, 0, sizeof(menu_item_edit_t));
+    }
 
-  item.item.item_type = MenuItemType.MiEdit;
+    public override void Parse(ushort key)
+    {
+      base.Parse(key);
 
-  load_item_defaults(wnd, &item.item, key);
-  item.item.paint = item_edit_paint;
-  item.item.evaluate = item_edit_evaluate;
-  item.item.edit = item_edit_edit;
-  item.item.event = item_edit_event;
+      if(!Widget.TryRegGetUint16(key, "value-id", out _valueId) ||
+      !Widget.TryRegGetUint16(key, "set-id", out _setId) ||
+      !Widget.TryRegGetBool(key, "send-short", out _integerType) ||
+      !Widget.TryRegGetFloat(key, "min-value", out _minValue) ||
+      !Widget.TryRegGetFloat(key, "max-value", out _maxValue) ||
+      !Widget.TryRegGetFloat(key, "decka-incr", out _deckaIncrement) ||
+      !Widget.TryRegGetFloat(key, "deckb-incr", out _deckbIncrement))
+        throw new ApplicationException("Edit item is not well defined");
 
-  reg_get_uint16(key, "value-id", &item.value_id);
+      if(!Widget.TryRegGetUint16(key, "precision", out _precision))
+        Precision = 5;
 
-  // load the set-value message
-  reg_get_uint16(key, "set-id", &item.set_id);
-
-  // get the float point flag
-  reg_get_bool(key, "send-short", &item.integer_type);
-
-  // get the values
-  reg_get_float(key, "min-value", &item.min_value);
-  reg_get_float(key, "max-value", &item.max_value);
-  reg_get_float(key, "decka-incr", &item.decka_increment);
-  reg_get_float(key, "deckb-incr", &item.deckb_increment);
-
-  reg_get_uint16(key, "precision", &item.precision);
-  reg_get_uint16(key, "digits", &item.digits);
-
-  // save the new item
-  vector_push_back(menu_items, &item);
-  return &item.item;
-  }
-       */
+      if(!Widget.TryRegGetUint16(key, "digits", out _digits))
+        Digits = 0;
+    }
+    /// <summary>
+    /// Message ID to send
+    /// </summary>
+    /// <value></value>
+    public ushort ValueId
+    {
+      get { return _valueId; }
+      set { _valueId = value; }
+    }
+    /// <summary>
+    /// Message ID to set the value
+    /// </summary>
+    /// <value></value>
+    public ushort SetId
+    {
+      get { return _setId; }
+      set { _setId = value; }
+    }
+    /// <summary>
+    /// If true this is an integer type, otherwise a floating point
+    /// </summary>
+    /// <value></value>
+    public bool IntegerType
+    {
+      get { return _integerType; }
+      set { _integerType = value; }
+    }
+    /// <summary>
+    /// Minimum value to send
+    /// </summary>
+    /// <value></value>
+    public float MinValue
+    {
+      get { return _minValue; }
+      set { _minValue = value; }
+    }
+    /// <summary>
+    /// Maximum valuue to send
+    /// </summary>
+    /// <value></value>
+    public float MaxValue
+    {
+      get { return _maxValue; }
+      set { _maxValue = value; }
+    }
+    /// <summary>
+    /// Increment to add/subtract on each deck-b signal
+    /// </summary>
+    /// <value></value>
+    public float DeckaIncrement
+    {
+      get { return _deckaIncrement; }
+      set { _deckaIncrement = value; }
+    }
+    /// <summary>
+    /// Increment to add/subtract on each deck-b signal
+    /// </summary>
+    /// <value></value>
+    public float DeckbIncrement
+    {
+      get { return _deckbIncrement; }
+      set { _deckbIncrement = value; }
+    }
+    /// <summary>
+    /// Max digits before wrap
+    /// </summary>
+    /// <value></value>
+    public ushort Precision
+    {
+      get { return _precision; }
+      set { _precision = value; }
+    }
+    /// <summary>
+    /// Floating point digits to wrap at
+    /// </summary>
+    /// <value></value>
+    public ushort Digits
+    {
+      get { return _digits; }
+      set { _digits = value; }
+    }
+    /// <summary>
+    /// If set then the control will overflow to min value or max value when the
+    /// value reaches the end
+    /// </summary>
+    /// <value>True to enable auto-wrap</value>
+    public bool Circular
+    {
+      get { return _circular; }
+      set { _circular = value; }
     }
 
     public override void Paint(Rect area, bool isHighlighted)

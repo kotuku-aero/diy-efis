@@ -75,38 +75,4 @@ namespace CanFly
     public byte Blue { get { return Syscall.GetBlue(this); } }
     public byte Alpha { get { return Syscall.GetAlpha(this); } }
   }
-
-  public struct Colors {
-    public static readonly Color White = Color.Create(255, 255, 255);
-    public static readonly Color Black = Color.Create(0, 0, 0);
-    public static readonly Color Gray = Color.Create(128, 128, 128);
-    public static readonly Color LightGray = Color.Create(192, 192, 192);
-    public static readonly Color DarkGray = Color.Create(64, 64, 64);
-    public static readonly Color Red = Color.Create(255, 0, 0);
-    public static readonly Color Pink = Color.Create(255, 128, 128);
-    public static readonly Color Blue = Color.Create(0, 0, 255);
-    public static readonly Color Green = Color.Create(0, 255, 0);
-    public static readonly Color LightGreen = Color.Create(0, 192, 0);
-    public static readonly Color Yellow = Color.Create(255, 255, 64);
-    public static readonly Color Magenta = Color.Create(255, 0, 255);
-    public static readonly Color Cyan = Color.Create(0, 255, 255);
-    public static readonly Color PaleYellow = Color.Create(255, 255, 208);
-    public static readonly Color LightYellow = Color.Create(255, 255, 128);
-    public static readonly Color LimeGreen = Color.Create(192, 220, 192);
-    public static readonly Color Teal = Color.Create(64, 128, 128);
-    public static readonly Color DarkGreen = Color.Create(0, 128, 0);
-    public static readonly Color Maroon = Color.Create(128, 0, 0);
-    public static readonly Color Purple = Color.Create(128, 0, 128);
-    public static readonly Color Orange = Color.Create(255, 192, 64);
-    public static readonly Color Khaki = Color.Create(167, 151, 107);
-    public static readonly Color Olive = Color.Create(128, 128, 0);
-    public static readonly Color Brown = Color.Create(192, 128, 32);
-    public static readonly Color Navy = Color.Create(0, 64, 128);
-    public static readonly Color LightBlue = Color.Create(128, 128, 255);
-    public static readonly Color FadedBlue = Color.Create(192, 192, 255);
-    public static readonly Color LightGrey = Color.Create(192, 192, 192);
-    public static readonly Color DarkGrey = Color.Create(64, 64, 64);
-    public static readonly Color Hollow = Color.Create(0, 0, 0, 0);
-
-  }
 }

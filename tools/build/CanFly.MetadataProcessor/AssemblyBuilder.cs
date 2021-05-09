@@ -170,6 +170,7 @@ namespace CanFly.Tools.MetadataProcessor
       _tablesContext.AssemblyReferenceTable.RemoveUnusedItems(set);
       _tablesContext.TypeReferencesTable.RemoveUnusedItems(set);
       _tablesContext.FieldsTable.RemoveUnusedItems(set);
+      _tablesContext.GenericParamsTable.RemoveUnusedItems(set);
       _tablesContext.FieldReferencesTable.RemoveUnusedItems(set);
       _tablesContext.MethodDefinitionTable.RemoveUnusedItems(set);
       _tablesContext.MethodReferencesTable.RemoveUnusedItems(set);
@@ -876,6 +877,26 @@ namespace CanFly.Tools.MetadataProcessor
 
           output.Append(fd.Name);
           break;
+
+        case TokenType.GenericParam:
+          var gp = _tablesContext.GenericParamsTable.Items.FirstOrDefault(g => g.MetadataToken == token);
+
+          output.Append($"[GenericParam 0x{token.ToUInt32().ToString("X8")}]");
+
+          if (gp.DeclaringType != null)
+          {
+            output.Append(TokenToString(gp.DeclaringType.MetadataToken));
+            output.Append("::");
+          }
+          else if (gp.DeclaringMethod != null)
+          {
+            output.Append(TokenToString(gp.DeclaringMethod.MetadataToken));
+            output.Append("::");
+          }
+
+          output.Append(gp.Name);
+
+          break;
         case TokenType.Method:
           var md = _tablesContext.MethodDefinitionTable.Items.FirstOrDefault(i => i.MetadataToken == token);
 
@@ -931,6 +952,17 @@ namespace CanFly.Tools.MetadataProcessor
             {
               typeRef = fr.DeclaringType;
               typeName = fr.Name;
+            }
+            else
+            {
+              // try now with generic parameters
+              var gr = _tablesContext.GenericParamsTable.Items.FirstOrDefault(g => g.MetadataToken == token);
+
+              if (gr != null)
+              {
+                typeRef = gr.DeclaringType;
+                typeName = gr.Name;
+              }
             }
           }
 

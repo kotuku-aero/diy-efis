@@ -247,6 +247,21 @@ namespace CanFly
       Syscall.PostMessage(InternalHandle, 0, msg);
     }
 
+    public static void Send(CanFlyMsg msg)
+    {
+      Syscall.Send(msg);
+    }
+
+    public static void AddEvent(ushort canId, CanFlyEventHandler handler)
+    {
+      Syscall.AddEvent(canId, handler);
+    }
+
+    public static void RemoveEvent(ushort canId, CanFlyEventHandler handler)
+    {
+      Syscall.RemoveEvent(canId, handler);
+    }
+
     private Widget GetWidget(uint handle)
     {
       if (handle == 0)
@@ -429,200 +444,8 @@ namespace CanFly
       DrawText(large_font, fg_color, bg_color, str, Point.Create(left, top), bounds, TextOutStyle.Clipped);
 
     }
-    /// <summary>
-    /// Lookup a font definition based on settings in a config hive
-    /// </summary>
-    /// <param name="key">Configuration hive to look for font settings</param>
-    /// <param name="name">Name of the Font definition registry key</param>
-    /// <param name="font">Handle to the font</param>
-    /// <returns>true if the font was defined</returns>
-    public bool LookupFont(ushort key, string name, out Font font)
-    {
-      try
-      {
-        ushort fontKey =CanFly.Syscall.RegOpenKey(key, name);
 
-        font = Font.Open(
-          CanFly.Syscall.RegGetString(fontKey, "name"),
-          CanFly.Syscall.RegGetUint16(fontKey, "size"));
-
-        return true;
-      }
-      catch
-      {
-        return false;
-      }
-    }
-
-    public bool LookupColor(ushort key, string name, out Color color)
-    {
-      color = Colors.Black;
-      try
-      {
-        string color_str = CanFly.Syscall.RegGetString(key, name);
-
-        if(color_str[0] == '0')
-        {
-          // parse number
-          if (color_str[1] == 'x')
-            color = Color.Create(Convert.ToUInt32(color_str.Substring(2), 16));
-          else
-            color = Color.Create(Convert.ToUInt32(color_str));
-        }
-        else
-        {
-          switch(color_str.ToLower())
-          {
-            case "white":
-              color = Colors.White;
-              break;
-            case "black":
-              color = Colors.Black;
-              break;
-            case "gray":
-              color = Colors.Gray;
-              break;
-            case "lightgray":
-              color = Colors.LightGray;
-              break;
-            case "darkgray":
-              color = Colors.DarkGray;
-              break;
-            case "red":
-              color = Colors.Red;
-              break;
-            case "pink":
-              color = Colors.Pink;
-              break;
-            case "blue":
-              color = Colors.Blue;
-              break;
-            case "green":
-              color = Colors.Green;
-              break;
-            case "lightgreen":
-              color = Colors.LightGreen;
-              break;
-            case "yellow":
-              color = Colors.Yellow;
-              break;
-            case "magenta":
-              color = Colors.Magenta;
-              break;
-            case "cyan":
-              color = Colors.Cyan;
-              break;
-            case "paleyellow":
-              color = Colors.PaleYellow;
-              break;
-            case "lightyellow":
-              color = Colors.LightYellow;
-              break;
-            case "limegreen":
-              color = Colors.White;
-              break;
-            case "teal":
-              color = Colors.Teal;
-              break;
-            case "darkgreen":
-              color = Colors.DarkGreen;
-              break;
-            case "maroon":
-              color = Colors.Maroon;
-              break;
-            case "purple":
-              color = Colors.Purple;
-              break;
-            case "orange":
-              color = Colors.Orange;
-              break;
-            case "khaki":
-              color = Colors.Khaki;
-              break;
-            case "olive":
-              color = Colors.Olive;
-              break;
-            case "brown":
-              color = Colors.Brown;
-              break;
-            case "navy":
-              color = Colors.Navy;
-              break;
-            case "lightblue":
-              color = Colors.LightBlue;
-              break;
-            case "fadedblue":
-              color = Colors.FadedBlue;
-              break;
-            case "lightgrey":
-              color = Colors.LightGrey;
-              break;
-            case "darkgrey":
-              color = Colors.DarkGray;
-              break;
-            case "hollow":
-              color = Colors.Hollow;
-              break;
-
-          }
-        }
-      }
-      catch
-      {
-        return false;
-      }
-
-      return true;
-    }
-
-    public bool LookupPen(ushort key, string name, out Pen pen)
-    {
-      try
-      {
-        ushort penKey = CanFly.Syscall.RegOpenKey(key, name);
-
-        ushort width = CanFly.Syscall.RegGetUint16(penKey, "width");
-        string style = CanFly.Syscall.RegGetString(penKey, "style");
-        Color color;
-        LookupColor(penKey, "color", out color);
-
-
-        PenStyle theStyle = PenStyle.Solid;
-
-        switch (style)
-        {
-          case "solid":
-            theStyle = PenStyle.Solid;
-            break;
-          case "dash":
-            theStyle = PenStyle.Dash;
-            break;
-          case "dot":
-            theStyle = PenStyle.Dot;
-            break;
-          case "dash_dot":
-            theStyle = PenStyle.DashDot;
-            break;
-          case "dash_dot_dot":
-            theStyle = PenStyle.DashDotDot;
-            break;
-          case "null":
-            theStyle = PenStyle.Null;
-            break;
-        }
-
-
-        pen = Pen.Create(color, width, theStyle);
-      }
-      catch
-      {
-        return false;
-      }
-
-      return true;
-    }
-
-    public bool OpenFont(string name, ushort size, out Font font)
+    public static  bool OpenFont(string name, ushort size, out Font font)
     {
       try
       {
@@ -636,7 +459,7 @@ namespace CanFly
       return true;
     }
 
-    public bool TryRegGetString(ushort key, string name, out string value)
+    public static  bool TryRegGetString(ushort key, string name, out string value)
     {
       value = null;
       try
@@ -651,7 +474,7 @@ namespace CanFly
       return true;
     }
 
-    public bool TryOpenFont(string name, ushort pixels, out Font font)
+    public static  bool TryOpenFont(string name, ushort pixels, out Font font)
     {
       try
       {
@@ -665,7 +488,7 @@ namespace CanFly
       return true;
     }
 
-    public bool TryRegGetBool(ushort key, string name, out bool value)
+    public static  bool TryRegGetBool(ushort key, string name, out bool value)
     {
       value = false;
       try
@@ -680,7 +503,7 @@ namespace CanFly
       return true;
     }
 
-    public bool TryRegGetFloat(ushort key, string name, out float value)
+    public static  bool TryRegGetFloat(ushort key, string name, out float value)
     {
       value = 0;
       try
@@ -695,7 +518,7 @@ namespace CanFly
       return true;
     }
 
-    public bool TryRegGetUint8(ushort key, string name, out byte value)
+    public static bool TryRegGetUint8(ushort key, string name, out byte value)
     {
       value = 0;
       try
@@ -710,7 +533,7 @@ namespace CanFly
       return true;
     }
     
-    public bool TryRegGetUint16(ushort key, string name, out ushort value)
+    public static bool TryRegGetUint16(ushort key, string name, out ushort value)
     {
       value = 0;
       try
@@ -725,7 +548,7 @@ namespace CanFly
       return true;
     }
     
-    public bool TryRegGetUint32(ushort key, string name, out uint value)
+    public static bool TryRegGetUint32(ushort key, string name, out uint value)
     {
       value = 0;
       try
@@ -740,7 +563,7 @@ namespace CanFly
       return true;
     }
 
-    public bool TryRegGetInt8(ushort key, string name, out sbyte value)
+    public static bool TryRegGetInt8(ushort key, string name, out sbyte value)
     {
       value = 0;
       try
@@ -755,7 +578,7 @@ namespace CanFly
       return true;
     }
     
-    public bool TryRegGetInt16(ushort key, string name, out short value)
+    public static bool TryRegGetInt16(ushort key, string name, out short value)
     {
       value = 0;
       try
@@ -770,7 +593,7 @@ namespace CanFly
       return true;
     }
    
-    public bool TryRegGetUInt16(ushort key, string name, out ushort value)
+    public static bool TryRegGetUInt16(ushort key, string name, out ushort value)
     {
       value = 0;
       try
@@ -785,7 +608,7 @@ namespace CanFly
       return true;
     }
     
-    public bool TryRegGetInt32(ushort key, string name, out int value)
+    public static bool TryRegGetInt32(ushort key, string name, out int value)
     {
       value = 0;
       try
@@ -800,7 +623,7 @@ namespace CanFly
       return true;
     }
 
-    public bool TryRegGetRect(ushort key, out Rect rect)
+    public static bool TryRegGetRect(ushort key, out Rect rect)
     {
       short x;
       if (!TryRegGetInt16(key, "x", out x))
@@ -823,12 +646,27 @@ namespace CanFly
       return true;
     }
 
-    public bool TryRegOpenKey(ushort key, string name, out ushort child)
+    public static bool TryRegOpenKey(ushort key, string name, out ushort child)
     {
       child = 0;
       try
       {
         child = Syscall.RegOpenKey(key, name);
+      }
+      catch
+      {
+        return false;
+      }
+
+      return true;
+    }
+
+    public static bool TryRegEnumKey(ushort key, ref ushort child, out string name)
+    {
+      name = null;
+      try
+      {
+        Syscall.RegEnumKey(key, ref child, out name);
       }
       catch
       {
@@ -845,27 +683,27 @@ namespace CanFly
     /// <param name="pt">The point to rotate</param>
     /// <param name="degrees">Degrees to rotate</param>
     /// <returns>the rotated point</returns>
-    public Point RotatePoint(Point center, Point pt, int degrees)
+    public static Point RotatePoint(Point center, Point pt, int degrees)
     {
       return Syscall.RotatePoint(center, pt, (short) degrees);
     }
 
-    public double RadiansToDegrees(double radians)
+    public static double RadiansToDegrees(double radians)
     {
       return radians * 0.3183098; // n * (1/ Math.PI);
     }
 
-    public double DegressToRadians(double degrees)
+    public static double DegressToRadians(double degrees)
     {
       return degrees * 0.0174533; //(Math.PI / 180);
     }
 
-    public double MetersToNM(double meters)
+    public static double MetersToNM(double meters)
     {
       return meters * 0.000539957; // meters / 1852
     }
 
-    public double MetersPerSecondToKnots(double value)
+    public static double MetersPerSecondToKnots(double value)
     {
       return value * 1.94384;
     }

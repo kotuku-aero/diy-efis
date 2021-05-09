@@ -138,11 +138,11 @@ namespace CanFly.Tools.MetadataProcessor.Core
 
       switch (serializationType)
       {
-        case nanoSerializationType.ELEMENT_TYPE_BOOLEAN:
+        case CLR_DataType.DATATYPE_BOOLEAN:
           newArg.Numeric = ((bool)value.Value) ? 1.ToString("X16") : 0.ToString("X16");
           break;
 
-        case nanoSerializationType.ELEMENT_TYPE_STRING:
+        case CLR_DataType.DATATYPE_STRING:
           newArg.Text = (string)value.Value;
           break;
 

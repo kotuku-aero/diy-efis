@@ -1,4 +1,4 @@
-﻿/*
+/*
 diy-efis
 Copyright (C) 2021 Kotuku Aerospace Limited
 
@@ -37,46 +37,25 @@ then the original copyright notice is to be respected.
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
-using System;
-
 namespace CanFly.Proton
 {
-  internal sealed class MenuItemCancel : MenuItem
+  public class TickMark
   {
-    private ushort id;
-    private short value;     // cancel value
+    private short _value;
+    private string _text;
 
-    public MenuItemCancel(LayoutWidget widget, ushort key)
-      : base(widget)
+    public int _length;
+
+    public TickMark(short value, string text, int length)
     {
-      if(!widget.TryRegGetUint16(key, "value", out id))
-        id = PhotonID.id_menu_cancel;
-      /*
-static MenuItem item_cancel_load(LayoutWindow wnd, uint key)
-  {
-  menu_item_cancel_t *item = (menu_item_cancel_t *)neutron_malloc(sizeof(menu_item_cancel_t));
-  memset(item, 0, sizeof(menu_item_cancel_t));
-  item.item.item_type = mi_cancel;
-
-  load_item_defaults(wnd, &item.item, key);
-  item.item.evaluate = item_cancel_evaluate;
-
-  if (failed(reg_get_uint16(key, "value", &item.value)))
-    item.value = id_menu_cancel;
-
-  // save the new item
-  vector_push_back(menu_items, &item);
-  return &item.item;
-  }
-       */
+      _value = value;
+      _text = text;
+      _length = length;
     }
 
-    public override MenuItemActionResult Evaluate(CanFlyMsg msg)
-    {
-      if(id != 0)
-        LayoutWidget.SendMessage(CanFlyMsg.Create(id, value));
-
-      return MenuItemActionResult.MiaCancel;
-    }
+    public short Value { get { return _value; } }
+    public string Text { get { return _text; } }
+    public int Length { get { return _length; } }
   }
+
 }

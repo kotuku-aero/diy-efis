@@ -51,31 +51,59 @@ namespace CanFly.Proton
     };
 
     private short _direction;
-    private short course;
-    private short deviation;
-    private short track;
-    private short distance_to_waypoint;
-    private short time_to_waypoint;
-    private short wind_direction; // always true
-    private short magnetic_variation;
-    private short wind_speed;
-    private short heading_bug;
-    private short heading;
-    private Color background_color;
-    private bool draw_border;
-    private Font font;
-    private string waypoint_name;
+    private short _course;
+    private short _deviation;
+    private short _track;
+    private short _distanceToWaypoint;
+    private short _timeToWaypoint;
+    private short _windDirection; // always true
+    private short _magneticVariation;
+    private short _windSpeed;
+    private short _headingBug;
+    private short _heading;
+    private Color _backgroundColor;
+    private bool _drawBorder;
+    private Font _font;
+    private string _waypointName;
 
-    internal HSIWidget(Widget parent, Rect bounds, ushort id, ushort key)
+    public short Direction { get { return _direction; } }
+    public short Course { get { return _course; } }
+    public short Deviation { get { return _deviation; } }
+    public short Track { get { return _track; } }
+    public short DistanceToWaypoint { get { return _distanceToWaypoint; } }
+    public short MagneticVariation { get { return _magneticVariation; } }
+    public short WindSpeed { get { return _windSpeed; } }
+    public short HeadingBug { get { return _headingBug; } }
+    public short Heading { get { return _heading; } }
+    public Color BackgroundColor
+    {
+      get { return _backgroundColor; }
+      set { _backgroundColor = value; }
+    }
+    public bool DrawBorder
+    {
+      get { return _drawBorder; }
+      set { _drawBorder = value; }
+    }
+    public Font Font
+    {
+      get { return _font; }
+      set { _font = value; }
+    }
+    public string WaypointName
+    {
+      get { return _waypointName; }
+      set { _waypointName = value; }
+    }
+
+    public short WindDirection { get { return _windDirection; } }
+
+    internal HSIWidget(Widget parent, Rect bounds, ushort id)
     : base(parent, bounds, id)
     {
-      if (!LookupColor(key, "background-color", out background_color))
-        background_color = Colors.Black;
-
-      TryRegGetBool(key, "draw-border", out draw_border);
-
-      if (!LookupFont(key, "font", out font))
-        OpenFont("neo", 9, out font);
+      BackgroundColor = Colors.Black;
+      DrawBorder = true;
+      OpenFont("neo", 9, out _font);
 
       AddCanFlyEvent(CanFlyID.id_magnetic_heading, OnMagneticHeading);
       AddCanFlyEvent(CanFlyID.id_heading, OnHeading);
@@ -95,9 +123,9 @@ namespace CanFly.Proton
     private void OnEstimatedTimeToNext(CanFlyMsg e)
     {
       short value = e.GetInt16();
-      if (time_to_waypoint != value)
+      if (_timeToWaypoint != value)
       {
-        time_to_waypoint = value;
+        _timeToWaypoint = value;
         InvalidateRect();
       }
     }
@@ -106,9 +134,9 @@ namespace CanFly.Proton
     {
       float v = e.GetFloat();
       short value = (short)RadiansToDegrees(v);
-      if (magnetic_variation != value)
+      if (_magneticVariation != value)
       {
-        magnetic_variation = value;
+        _magneticVariation = value;
         InvalidateRect();
       }
     }
@@ -118,9 +146,9 @@ namespace CanFly.Proton
       float v = e.GetFloat();
       
       short value = (short)MetersToNM(v);
-      if (distance_to_waypoint != value)
+      if (_distanceToWaypoint != value)
       {
-        distance_to_waypoint = value;
+        _distanceToWaypoint = value;
         InvalidateRect();
       }
     }
@@ -129,9 +157,9 @@ namespace CanFly.Proton
     {
       float v = e.GetFloat();
       short value = (short)RadiansToDegrees(v);
-      if (wind_direction != value)
+      if (_windDirection != value)
       {
-        wind_direction = value;
+        _windDirection = value;
         InvalidateRect();
       }
     }
@@ -140,9 +168,9 @@ namespace CanFly.Proton
     {
       float v = e.GetFloat();
       short value = (short)MetersPerSecondToKnots(v);
-      if (wind_speed != value)
+      if (_windSpeed != value)
       {
-        wind_speed = value;
+        _windSpeed = value;
         InvalidateRect();
       }
     }
@@ -150,9 +178,9 @@ namespace CanFly.Proton
     private void OnTrack(CanFlyMsg e)
     {
       short value = e.GetInt16();
-      if (track != value)
+      if (_track != value)
       {
-        track = value;
+        _track = value;
         InvalidateRect();
       }
     }
@@ -160,9 +188,9 @@ namespace CanFly.Proton
     private void OnSelectedCourse(CanFlyMsg e)
     {
       short value = e.GetInt16();
-      if (course != value)
+      if (_course != value)
       {
-        course = value;
+        _course = value;
         InvalidateRect();
       }
     }
@@ -170,9 +198,9 @@ namespace CanFly.Proton
     private void OnDeviation(CanFlyMsg e)
     {
       short value = e.GetInt16();
-      if (deviation != value)
+      if (_deviation != value)
       {
-        deviation = value;
+        _deviation = value;
         // the deviation is +/- * 10
         InvalidateRect();
       }
@@ -181,9 +209,9 @@ namespace CanFly.Proton
     private void OnHeadingAngle(CanFlyMsg e)
     {
       short value = e.GetInt16();
-      if (heading != value)
+      if (_heading != value)
       {
-        heading = value;
+        _heading = value;
         InvalidateRect();
       }
     }
@@ -191,9 +219,9 @@ namespace CanFly.Proton
     private void OnHeading(CanFlyMsg e)
     {
       short value = e.GetInt16();
-      if (heading_bug != value)
+      if (_headingBug != value)
       {
-        heading_bug = value;
+        _headingBug = value;
         InvalidateRect();
       }
     }
@@ -219,9 +247,9 @@ namespace CanFly.Proton
       Rect wnd_rect = WindowRect;
       Extent ex = wnd_rect.Extent;
 
-      Rectangle(Pens.Hollow, background_color, WindowRect);
+      Rectangle(Pens.Hollow, BackgroundColor, WindowRect);
 
-      if (draw_border)
+      if (DrawBorder)
         RoundRect(Pens.GrayPen, Colors.Hollow, WindowRect, 12);
 
       /////////////////////////////////////////////////////////////////////////////
@@ -244,7 +272,7 @@ namespace CanFly.Proton
       // start at 0
       int i = 0;
       int index;
-      for (index = -_direction; i < 12; index += 30, i++)
+      for (index = -Direction; i < 12; index += 30, i++)
       {
         while (index > 359)
           index -= 360;
@@ -272,14 +300,14 @@ namespace CanFly.Proton
         // block so the center is 12, 12.
         Point fontPt = RotatePoint(median, Point.Create(center_x, font_ordinal), (index < 0) ? index + 360 : index);
 
-        DrawText(font, Colors.White, Colors.Black, i.ToString(),
+        DrawText(Font, Colors.White, Colors.Black, i.ToString(),
           Point.Create(fontPt.X - font_center, fontPt.Y - font_center));
       }
 
       ///////////////////////////////////////////////////////////////////////////
       // Draw the Track
 
-      int rotation = track - _direction;
+      int rotation = Track - Direction;
 
       // the marker is a dashed line
       Polygon(Pens.GrayPen, Colors.Hollow,
@@ -295,7 +323,7 @@ namespace CanFly.Proton
       ///////////////////////////////////////////////////////////////////////////
       // Draw the CDI
 
-      rotation = course - _direction;
+      rotation = Course - Direction;
 
       int dist;
       for (dist = -10; dist < 11; dist += 2)
@@ -319,7 +347,7 @@ namespace CanFly.Proton
 
       // we now convert the deviation to pixels.
       // 1 degree = 24 pixels
-      double cdi_var = pixels_per_nm_cdi * ((double)deviation / 10);
+      double cdi_var = pixels_per_nm_cdi * ((double)Deviation / 10);
 
       int cdi = (int)Math.Max(-66, Math.Min(66, Math.Round(cdi_var)));
 
@@ -338,7 +366,7 @@ namespace CanFly.Proton
       /////////////////////////////////////////////////////////////////////////////
       //	Draw the heading bug.
 
-      int hdg = heading - _direction;
+      int hdg = Heading - Direction;
 
       Polyline(Pens.MagentaPen,
         RotatePoint(median, Point.Create(center_x - 15, 3), rotation),
@@ -368,7 +396,7 @@ namespace CanFly.Proton
       // the text allows for 3 characters with an maximum width of 23 pixels each
       // so the allowance is 69 by 64 pixels
 
-      int relative_wind = _direction + magnetic_variation - _direction;
+      int relative_wind = Direction + MagneticVariation - Direction;
       while (relative_wind < 0)
         relative_wind += 360;
 
@@ -381,32 +409,32 @@ namespace CanFly.Proton
 
       // now the text in upper left
 
-      string msg = string.Format("{0:3d", _direction + magnetic_variation);
+      string msg = string.Format("{0:3d", Direction + MagneticVariation);
 
-      Extent pixels = TextExtent(font, msg);
+      Extent pixels = TextExtent(Font, msg);
 
-      DrawText(font, Colors.Yellow, Colors.Hollow, msg, Point.Create(25 - (pixels.Dx >> 1), 2));
+      DrawText(Font, Colors.Yellow, Colors.Hollow, msg, Point.Create(25 - (pixels.Dx >> 1), 2));
 
-      msg = wind_speed.ToString();
-      pixels = TextExtent(font, msg);
+      msg = WindSpeed.ToString();
+      pixels = TextExtent(Font, msg);
 
-      DrawText(font, Colors.Yellow, Colors.Hollow, msg, Point.Create(25 - (pixels.Dx >> 1), 13));
+      DrawText(Font, Colors.Yellow, Colors.Hollow, msg, Point.Create(25 - (pixels.Dx >> 1), 13));
 
       /////////////////////////////////////////////////////////////////////////////
       // Draw the estimated time to waypoint.
       // drawn in top right as distance/time
-      msg = distance_to_waypoint.ToString();
-      pixels = TextExtent(font, msg);
-      DrawText(font, Colors.Yellow, Colors.Hollow, msg, Point.Create(window_x - 25 - (pixels.Dx >> 1), 2));
+      msg = DistanceToWaypoint.ToString();
+      pixels = TextExtent(Font, msg);
+      DrawText(Font, Colors.Yellow, Colors.Hollow, msg, Point.Create(window_x - 25 - (pixels.Dx >> 1), 2));
 
-      msg = string.Format("{0:2d}:{1:2d}", time_to_waypoint / 60, time_to_waypoint % 60);
-      pixels = TextExtent(font, msg);
-      DrawText(font, Colors.Yellow, Colors.Hollow, msg, Point.Create(window_x - 25 - (pixels.Dx >> 1), 13));
+      msg = string.Format("{0:2d}:{1:2d}", _timeToWaypoint / 60, _timeToWaypoint % 60);
+      pixels = TextExtent(Font, msg);
+      DrawText(Font, Colors.Yellow, Colors.Hollow, msg, Point.Create(window_x - 25 - (pixels.Dx >> 1), 13));
 
-      if (waypoint_name != null)
+      if (WaypointName != null)
       {
-        pixels = TextExtent(font, waypoint_name);
-        DrawText(font, Colors.Yellow, Colors.Hollow, waypoint_name, Point.Create(window_x - 25 - (pixels.Dx >> 1), 24));
+        pixels = TextExtent(Font, WaypointName);
+        DrawText(Font, Colors.Yellow, Colors.Hollow, WaypointName, Point.Create(window_x - 25 - (pixels.Dx >> 1), 24));
       }
     }
   }

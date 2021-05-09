@@ -120,7 +120,8 @@ SRC= \
 	System/SystemException.cs \
 	System/TargetFrameworkAttribute.cs \
 	System/ThreadAttributes.cs \
-	System/Threading\Interlocked.cs \
+	System/Threading/Interlocked.cs \
+	System/Threading/Monitor.cs \
 	System/TimeSpan.cs \
 	System/TypeCode.cs \
 	System/TypedReference.cs \

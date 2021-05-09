@@ -43,21 +43,31 @@ namespace CanFly.Proton
 {
   public sealed class MenuItemPopup : MenuItem
   {
-    private Menu popupMenu;
-    public MenuItemPopup(LayoutWidget widget, uint key)
-          : base(widget)
+    private Menu _popupMenu;
+
+    public MenuItemPopup(MenuWidget widget)
+    : base(widget)
     {
+    }
+
+    public override void Parse(ushort key)
+    {
+      base.Parse(key);
+      string menuName;
+      if (Widget.TryRegGetString(key, "popup", out menuName))
+        _popupMenu = MenuWidget.LoadMenu(menuName);
     }
 
     public override MenuItemActionResult Evaluate(CanFlyMsg msg)
     {
+      
       return MenuItemActionResult.MiaNothing;
     }
 
-    public Menu PopupMenu
+    public Menu Menu
     {
-      get { return popupMenu; }
-      set { popupMenu = value; }
+      get { return _popupMenu; }
+      set { _popupMenu = value; }
     }
   }
 }
