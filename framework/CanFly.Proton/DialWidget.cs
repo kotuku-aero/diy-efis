@@ -42,7 +42,7 @@ using System.Collections;
 
 namespace CanFly.Proton
 {
-  public sealed class DialWidget : GaugeWidget
+  public class DialWidget : GaugeWidget
   {
     public enum Style
     {
@@ -83,7 +83,8 @@ namespace CanFly.Proton
       if (resetLabel != 0)
         AddCanFlyEvent(resetLabel, OnResetLabel);
 
-      AddCanFlyEvent(label, OnValueLabel);
+      if (label != 0)
+        AddCanFlyEvent(label, OnValueLabel);
     }
     /// <summary>
     /// Called after all of the gauge properties are set.
@@ -123,7 +124,10 @@ namespace CanFly.Proton
 
       }
     }
-
+    /// <summary>
+    /// Called when a reset event is received.
+    /// </summary>
+    /// <param name="e"></param>
     private void OnResetLabel(CanFlyMsg e)
     {
       _minValue = ResetValue;
@@ -138,7 +142,7 @@ namespace CanFly.Proton
     protected override void PaintBackground(Canvas backgroundCanvas)
     {
       Rect wnd_rect = WindowRect;
-  
+
       short min_range = 0;
       short max_range = 0;
       float degrees_per_unit = 1.0f;
@@ -246,6 +250,20 @@ namespace CanFly.Proton
         }
       }
     }
+    public virtual float Value
+    {
+      get { return _value; }
+    }
+
+    public virtual float MinValue
+    {
+      get { return _minValue; }
+    }
+
+    public virtual float MaxValue
+    {
+      get { return _maxValue; }
+    }
 
     protected override void PaintWidget()
     {
@@ -254,16 +272,23 @@ namespace CanFly.Proton
       // of the gauge.
       int rotation;
 
-      Step valueStep = CalculateStep(_value);
+      float value = Value;
+
+      Step valueStep = CalculateStep(value);
 
       switch (_style)
       {
         case Style.PointerMinMax:
-          DrawPoint(CalculateStep(_minValue), false, CalculateRotation(_minValue));
-          DrawPoint(CalculateStep(_maxValue), false, CalculateRotation(_maxValue));
+          {
+            float maxValue = MaxValue;
+            float minValue = MinValue;
+
+            DrawPoint(CalculateStep(minValue), false, CalculateRotation(minValue));
+            DrawPoint(CalculateStep(maxValue), false, CalculateRotation(maxValue));
+          }
           break;
         case Style.Pointer:
-          rotation = CalculateRotation(_value);
+          rotation = CalculateRotation(value);
           Polyline(valueStep.IndicatorPen,
             RotatePoint(Center, Point.Create(Center.X, Center.Y - 5), rotation),
             RotatePoint(Center, Point.Create(Center.X, Center.Y - GaugeRadii + 5), rotation));
@@ -271,11 +296,11 @@ namespace CanFly.Proton
         case Style.Sweep:
           Pie(valueStep.IndicatorPen,
             valueStep.IndicatorColor, Center, ArcBegin + 90,
-            CalculateRotation(_value), Center.Y - GaugeRadii + 5, 5);
+            CalculateRotation(value), Center.Y - GaugeRadii + 5, 5);
           break;
         case Style.Bar:
           Pen outlinePen = valueStep.IndicatorPen;
-          rotation = CalculateRotation(_value);
+          rotation = CalculateRotation(value);
 
           int[] arc_angles = new int[3] { _arcBegin, rotation, -1 };
 
@@ -311,23 +336,28 @@ namespace CanFly.Proton
           }
           break;
         case Style.PointMinMax:
-          DrawPoint(CalculateStep(_minValue), false, CalculateRotation(_minValue));
-          DrawPoint(CalculateStep(_maxValue), false, CalculateRotation(_maxValue));
-          DrawPoint(valueStep, true, CalculateRotation(_value));
+          {
+            float maxValue = MaxValue;
+            float minValue = MinValue;
+
+            DrawPoint(CalculateStep(minValue), false, CalculateRotation(minValue));
+            DrawPoint(CalculateStep(maxValue), false, CalculateRotation(maxValue));
+            DrawPoint(valueStep, true, CalculateRotation(value));
+          }
           break;
         case Style.Point:
-          DrawPoint(valueStep, true, CalculateRotation(_value));
+          DrawPoint(valueStep, true, CalculateRotation(value));
           break;
       }
     }
 
     private void DrawPoint(Step selectedStep, bool fillPoint, int rotation)
     {
-      Polygon(selectedStep.IndicatorPen, 
+      Polygon(selectedStep.IndicatorPen,
         fillPoint ? selectedStep.IndicatorColor : Colors.Hollow,
         RotatePoint(_center, Point.Create(_center.X + _gaugeRadii, _center.Y), rotation),
-        RotatePoint(_center, Point.Create(_center.X + _gaugeRadii - 7, _center.Y-4), rotation),
-        RotatePoint(_center, Point.Create(_center.X + _gaugeRadii - 7, _center.Y+4), rotation),
+        RotatePoint(_center, Point.Create(_center.X + _gaugeRadii - 7, _center.Y - 4), rotation),
+        RotatePoint(_center, Point.Create(_center.X + _gaugeRadii - 7, _center.Y + 4), rotation),
         RotatePoint(_center, Point.Create(_center.X + _gaugeRadii, _center.Y), rotation));
     }
 
