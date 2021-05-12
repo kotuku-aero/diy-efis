@@ -38,6 +38,7 @@ If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
 using System;
+using CanFly;
 using System.Collections;
 
 namespace CanFly.Proton
@@ -51,16 +52,6 @@ namespace CanFly.Proton
       PointerMax, // simple-pointer with max markers
       PointerMin,
     };
-
-    private string _name;
-    private Color _nameColor;
-    private Font _nameFont;
-    private Point _namePt;
-    private bool _drawName;
-    private Color _backgroundColor;
-    private Pen _borderPen;
-    private bool _drawBorder;
-    private Font _font;
 
     private ushort _numValues;
 
@@ -87,6 +78,7 @@ namespace CanFly.Proton
 
     private float _scale;
     private float _offset;
+
     private ushort[] _labels;
     // a gauge supports up to 6 values
     // this is updated on each window message
@@ -105,7 +97,7 @@ namespace CanFly.Proton
       _valueAlign = ValueOutStyle.RightAlign;
       _valueBoxVisible = true;
 
-      _numValues = (ushort) labels.Length;
+      _numValues = (ushort)labels.Length;
       _labels = labels;
 
       _values = new float[_numValues];
@@ -121,7 +113,7 @@ namespace CanFly.Proton
     public override void Initialize()
     {
       base.Initialize();
-      
+
       float resetValue = ResetValue;
       for (ushort i = 0; i < NumValues; i++)
       {
@@ -182,31 +174,31 @@ namespace CanFly.Proton
       InvalidateRect();
     }
 
-      // each bar is drawn with the following dimensions:
-      //
-      //  *****************
-      //                5 pixels
-      //        ********
-      //        *      *
-      //        *      *
-      //   +    *      *
-      //   |\   *      *
-      //   | \  *      *
-      //   |  * *      *
-      //   | /  *      *
-      //   |/   *      *
-      //   +    *      *
-      //        ********
-      //                5 pixels
-      //  *****************
-      //  ^ ^  ^    ^    ^
-      //  | |  |    |    +- 2 Pixels
-      //  | |  |    +------ 6 Pixels
-      //  | |  +----------- 1 Pixel
-      //  | +-------------- 5 Pixels
-      //  +---------------- 1 Pixel
-      //
-      //
+    // each bar is drawn with the following dimensions:
+    //
+    //  *****************
+    //                5 pixels
+    //        ********
+    //        *      *
+    //        *      *
+    //   +    *      *
+    //   |\   *      *
+    //   | \  *      *
+    //   |  * *      *
+    //   | /  *      *
+    //   |/   *      *
+    //   +    *      *
+    //        ********
+    //                5 pixels
+    //  *****************
+    //  ^ ^  ^    ^    ^
+    //  | |  |    |    +- 2 Pixels
+    //  | |  |    +------ 6 Pixels
+    //  | |  +----------- 1 Pixel
+    //  | +-------------- 5 Pixels
+    //  +---------------- 1 Pixel
+    //
+    //
 
     protected override void PaintBackground(Canvas backgroundCanvas)
     {

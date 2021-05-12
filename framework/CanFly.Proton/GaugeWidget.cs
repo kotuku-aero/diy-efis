@@ -95,7 +95,7 @@ namespace CanFly.Proton
     /// Return the value to display, if the value box is visible
     /// </summary>
     /// <returns></returns>
-    protected virtual int Value
+    public virtual short Value
     {
       get { return 0; }
     }
@@ -179,7 +179,7 @@ namespace CanFly.Proton
       EndPaint();
     }
 
-    protected Step CalculateStep(float value)
+    protected Step CalculateStep(short value)
     {
       if (_steps == null || _steps.Count == 0)
         return null;
@@ -200,7 +200,7 @@ namespace CanFly.Proton
       return step;
     }
 
-    protected Color CalculateColor(float value)
+    protected Color CalculateColor(short value)
     {
       Color fill_color = Colors.LightBlue;
 

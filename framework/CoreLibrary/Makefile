@@ -147,7 +147,7 @@ release: FLAGS += -optimize
 
 $(OUTPATH)/$(NAME).pe : $(SRC)
 	$(CSC) $(FLAGS) $(LIBS) $(SRC) -out:$(OUTPATH)/$(NAME).dll
-	$(MDP) -c $(OUTPATH)/$(NAME).dll -p $(OUTPATH)/$(NAME).pe  $(MDPFLAGS) -m  -s ..\..\..\libs\ion\clr\mscorlib
+	$(MDP) -c $(OUTPATH)/$(NAME).dll -p $(OUTPATH)/$(NAME).pe  $(MDPFLAGS) -m  -s ..\..\libs\ion\clr\mscorlib
 
 clean:
 

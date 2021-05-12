@@ -48,7 +48,9 @@ namespace CanFly.Proton
     public static readonly Pen FadedBluePen = Pen.Create(Colors.FadedBlue, 1, PenStyle.Solid);
     public static readonly Pen BrownPen = Pen.Create(Colors.Brown, 1, PenStyle.Solid);
     public static readonly Pen RedPen = Pen.Create(Colors.Red, 1, PenStyle.Solid);
+    public static readonly Pen LightRedPen = Pen.Create(Colors.LightRed, 1, PenStyle.Solid);
     public static readonly Pen GreenPen = Pen.Create(Colors.Green, 1, PenStyle.Solid);
+    public static readonly Pen LightGreenPen = Pen.Create(Colors.LightGreen, 1, PenStyle.Solid);
     public static readonly Pen OrangePen = Pen.Create(Colors.Orange, 1, PenStyle.Solid);
     public static readonly Pen LightbluePen = Pen.Create(Colors.LightBlue, 1, PenStyle.Solid);
     public static readonly Pen MagentaPen = Pen.Create(Colors.Magenta, 1, PenStyle.Solid);

@@ -203,7 +203,7 @@ namespace CanFly
     /// </summary>
     /// <param name="message_id">Can ID to listen for</param>
     /// <param name="eventListener">Callback</param>
-    protected void AddCanFlyEvent(ushort message_id, CanFlyEventHandler eventListener)
+    public static void AddCanFlyEvent(ushort message_id, CanFlyEventHandler eventListener)
     {
       Syscall.AddEvent(message_id, eventListener);
     }
@@ -212,7 +212,7 @@ namespace CanFly
     /// </summary>
     /// <param name="message_id"></param>
     /// <param name="eventListener"></param>
-    protected void RemoveCanFlyEvent(ushort message_id, CanFlyEventHandler eventListener)
+    public static void RemoveCanFlyEvent(ushort message_id, CanFlyEventHandler eventListener)
     {
       Syscall.RemoveEvent(message_id, eventListener);
     }

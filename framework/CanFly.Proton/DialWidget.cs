@@ -59,16 +59,16 @@ namespace CanFly.Proton
 
     private ushort _arcBegin;
     private ushort _arcRange;
-    private float _resetValue;
 
     private Style _style;
     private ushort _width;          // pointer or sweep width
 
     private float _scale;
     private float _offset;
-    private float _value;
-    private float _minValue;
-    private float _maxValue;
+    private short _resetValue;
+    private short _value;
+    private short _minValue;
+    private short _maxValue;
     /// <summary>
     /// Construct a gauge widget with no settings
     /// </summary>
@@ -100,24 +100,33 @@ namespace CanFly.Proton
       InvalidateRect();
     }
 
+    protected void SetValue(short value)
+    {
+      float valueF = (float)value;
+      valueF *= Scale;
+      valueF += Offset;
+
+      value = (short)valueF;
+
+      if (_value != value)
+      {
+        _value = value;
+
+        if(_minValue > value)
+          _minValue = value;
+
+        if(_maxValue < value)
+          _maxValue = value;
+
+        InvalidateRect();
+      }
+    }
+
     private void OnValueLabel(CanFlyMsg msg)
     {
       try
       {
-        float float_value = msg.GetFloat();
-
-        float_value *= Scale;
-        float_value += Offset;
-
-        if (_value != float_value)
-        {
-          _value = float_value;
-
-          _minValue = (float)Math.Min(_minValue, _value);
-          _maxValue = (float)Math.Max(_maxValue, _value);
-
-          InvalidateRect();
-        }
+        SetValue(msg.GetInt16());
       }
       catch
       {
@@ -250,17 +259,18 @@ namespace CanFly.Proton
         }
       }
     }
-    public virtual float Value
+
+    public override short Value
     {
       get { return _value; }
     }
 
-    public virtual float MinValue
+    public virtual short MinValue
     {
       get { return _minValue; }
     }
 
-    public virtual float MaxValue
+    public virtual short MaxValue
     {
       get { return _maxValue; }
     }
@@ -272,7 +282,7 @@ namespace CanFly.Proton
       // of the gauge.
       int rotation;
 
-      float value = Value;
+      short value = Value;
 
       Step valueStep = CalculateStep(value);
 
@@ -280,8 +290,8 @@ namespace CanFly.Proton
       {
         case Style.PointerMinMax:
           {
-            float maxValue = MaxValue;
-            float minValue = MinValue;
+            short maxValue = MaxValue;
+            short minValue = MinValue;
 
             DrawPoint(CalculateStep(minValue), false, CalculateRotation(minValue));
             DrawPoint(CalculateStep(maxValue), false, CalculateRotation(maxValue));
@@ -337,8 +347,8 @@ namespace CanFly.Proton
           break;
         case Style.PointMinMax:
           {
-            float maxValue = MaxValue;
-            float minValue = MinValue;
+            short maxValue = MaxValue;
+            short minValue = MinValue;
 
             DrawPoint(CalculateStep(minValue), false, CalculateRotation(minValue));
             DrawPoint(CalculateStep(maxValue), false, CalculateRotation(maxValue));
@@ -403,7 +413,7 @@ namespace CanFly.Proton
       set { _arcRange = value; }
     }
 
-    public float ResetValue
+    public short ResetValue
     {
       get { return _resetValue; }
       set { _resetValue = value; }
