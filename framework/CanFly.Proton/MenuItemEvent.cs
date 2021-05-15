@@ -65,7 +65,7 @@ namespace CanFly.Proton
         
       // if the message to be sent is internal then send the message to a window
       // otherwise send to the can bus
-      if(_msg.CanID >= PhotonID.id_photon && _msg.CanID < PhotonID.id_last)
+      if(_msg.CanID >= PhotonID.id_photon && _msg.CanID < PhotonID.IdLast)
         MenuWidget.SendMessage(_msg);
       else
         Widget.Send(_msg);

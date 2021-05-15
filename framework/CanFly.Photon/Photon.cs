@@ -65,11 +65,12 @@ namespace CanFly
     public static readonly ushort id_menu_cancel = 1770;
     public static readonly ushort id_menu_select = 1771;
     public static readonly ushort id_buttonpress = 1772;
-    public static readonly ushort id_cancel = 1773;
+    public static readonly ushort IdCancel = 1773;
     /// <summary>
     /// Sent every 10msec to each window
     /// </summary>
     public static readonly ushort Timer = 1774;
-    public static readonly ushort id_last = 1775;
+    public static readonly ushort FuelTotal = 1775;
+    public static readonly ushort IdLast = 1776;
   }
 }

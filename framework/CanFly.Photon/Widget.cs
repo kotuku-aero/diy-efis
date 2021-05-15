@@ -503,6 +503,11 @@ namespace CanFly
       return true;
     }
 
+    public static void RegSetBool(ushort key, string name, bool value)
+    {
+      Syscall.RegSetBool(key, name, value);
+    }
+
     public static  bool TryRegGetFloat(ushort key, string name, out float value)
     {
       value = 0;
@@ -516,6 +521,11 @@ namespace CanFly
       }
 
       return true;
+    }
+
+    public static void RegSetFloat(ushort key, string name, float value)
+    {
+      Syscall.RegSetFloat(key, name, value);
     }
 
     public static bool TryRegGetUint8(ushort key, string name, out byte value)
@@ -533,6 +543,11 @@ namespace CanFly
       return true;
     }
     
+    public static void RegSetUint8(ushort key, string name, byte value)
+    {
+      Syscall.RegSetUint8(key, name, value);
+    }
+
     public static bool TryRegGetUint16(ushort key, string name, out ushort value)
     {
       value = 0;
@@ -548,6 +563,11 @@ namespace CanFly
       return true;
     }
     
+    public static void RegSetUint16(ushort key, string name, ushort value)
+    {
+      Syscall.RegSetUint16(key, name, value);
+    }
+
     public static bool TryRegGetUint32(ushort key, string name, out uint value)
     {
       value = 0;
@@ -561,6 +581,11 @@ namespace CanFly
       }
 
       return true;
+    }
+
+    public static void RegSetUint32(ushort key, string name, uint value)
+    {
+      Syscall.RegSetUint32(key, name, value);
     }
 
     public static bool TryRegGetInt8(ushort key, string name, out sbyte value)
@@ -578,6 +603,11 @@ namespace CanFly
       return true;
     }
     
+    public static void RegSetInt8(ushort key, string name, sbyte value)
+    {
+      Syscall.RegSetInt8(key, name, value);
+    }
+
     public static bool TryRegGetInt16(ushort key, string name, out short value)
     {
       value = 0;
@@ -593,21 +623,11 @@ namespace CanFly
       return true;
     }
    
-    public static bool TryRegGetUInt16(ushort key, string name, out ushort value)
+    public static void RegSetInt16(ushort key, string name, short value)
     {
-      value = 0;
-      try
-      {
-        value = Syscall.RegGetUint16(key, name);
-      }
-      catch
-      {
-        return false;
-      }
-
-      return true;
+      Syscall.RegSetInt16(key, name, value);
     }
-    
+
     public static bool TryRegGetInt32(ushort key, string name, out int value)
     {
       value = 0;
@@ -621,6 +641,11 @@ namespace CanFly
       }
 
       return true;
+    }
+
+    public static void RegSetInt32(ushort key, string name, int value)
+    {
+      Syscall.RegSetInt32(key, name, value);
     }
 
     public static bool TryRegGetRect(ushort key, out Rect rect)
@@ -706,6 +731,14 @@ namespace CanFly
     public static double MetersPerSecondToKnots(double value)
     {
       return value * 1.94384;
+    }
+    /// <summary>
+    /// Current system ticks
+    /// </summary>
+    /// <value></value>
+    public static uint SystemTicks
+    {
+      get { return Syscall.Ticks(); }
     }
   }
 }
