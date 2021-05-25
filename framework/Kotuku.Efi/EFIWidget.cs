@@ -1,3 +1,42 @@
+/*
+diy-efis
+Copyright (C) 2021 Kotuku Aerospace Limited
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+If a file does not contain a copyright header, either because it is incomplete
+or a binary file then the above copyright notice will apply.
+
+Portions of this repository may have further copyright notices that may be
+identified in the respective files.  In those cases the above copyright notice is
+subservient to that copyright notice.
+
+Portions of this repository contain code fragments from the following
+providers.
+
+If any file has a copyright notice or portions of code have been used
+and the original copyright notice is not yet transcribed to the repository
+then the original copyright notice is to be respected.
+
+If any material is included in the repository that is not open source
+it must be removed as soon as possible after the code fragment is identified.
+*/
 using CanFly;
 using CanFly.Proton;
 
@@ -15,6 +54,7 @@ namespace Kotuku.Efi
     private SliderGauge _fuelf;
     private SliderGauge _leftf;
     private SliderGauge _rightf;
+    private AnnunciatorWidget _annunciators;
 
     private OverlayWidget _overlay;
 
@@ -121,7 +161,8 @@ namespace Kotuku.Efi
       _fuelp.ZOrder = 10;
       _fuelp.Initialize();
 
-      _fuelf = new SliderGauge(this, Rect.Create(220, 120, 320, 160), 106, CanFlyID.id_fuel_flow_rate, 1.0f, 0);
+      // fuel flow is l/h * 100
+      _fuelf = new SliderGauge(this, Rect.Create(220, 120, 320, 160), 106, CanFlyID.id_fuel_flow_rate, 0.01f, 0);
       _fuelf.DrawBorder = false;
       _fuelf.ValueFont = fontNeo9;
       _fuelf.ValueBoxVisible = false;
@@ -163,7 +204,14 @@ namespace Kotuku.Efi
       _rightf.ZOrder = 10;
       _rightf.Initialize();
 
-      _overlay = new OverlayWidget(this, WindowRect, 108);
+      _annunciators = new AnnunciatorWidget(this, Rect.Create(140, 200, 220, 240), 108, 0);
+      _annunciators.ValueFont = fontNeo9;
+      _annunciators.ValueColor = Colors.White;
+      _annunciators.NameFont = fontNeo9;
+      _annunciators.NameColor = Colors.Magenta;
+      _annunciators.BackgroundColor = Colors.Black;
+
+      _overlay = new OverlayWidget(this, WindowRect, 109);
       _overlay.ZOrder = 100;
 
 
@@ -286,6 +334,8 @@ namespace Kotuku.Efi
       Line(Pens.WhitePen, Point.Create(220, 0), Point.Create(220, 240));
       Line(Pens.WhitePen, Point.Create(220, 160), Point.Create(320, 160));
       Line(Pens.WhitePen, Point.Create(0, 200), Point.Create(220, 200));
+      Line(Pens.WhitePen, Point.Create(140, 200), Point.Create(140, 240));
+
       EndPaint();
     }
   }

@@ -71,6 +71,7 @@ namespace CanFly.Proton
     private bool _valueBoxVisible;
     private ValueOutStyle _valueAlign;    // draw the value centered in the box, otherwise right
     private Font _valueFont;       // what font to draw a value in
+    private Color _valueColor;    // color for the value
     private Rect _valueRect;
 
     private Canvas _backgroundCanvas;
@@ -289,6 +290,7 @@ namespace CanFly.Proton
       get { return _valueFont; }
       set { _valueFont = value; }
     }
+
     public Rect ValueRect
     {
       get { return _valueRect; }
