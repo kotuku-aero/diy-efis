@@ -532,9 +532,7 @@ namespace System
       string output = Empty;
 
       if (format == null)
-      {
         throw new ArgumentNullException("format can't be null");
-      }
 
       for (int i = 0; i < len; i++)
       {
@@ -544,9 +542,7 @@ namespace System
         if (chr == '{')
         {
           if (i + 1 == len)
-          {
             throw new ArgumentException("Format error: no closed brace, column " + i);
-          }
 
           if (format[i + 1] == '{')
           {
@@ -564,27 +560,17 @@ namespace System
               chr = format[i];
 
               if (chr >= '0' && chr <= '9')
-              {
                 token += chr;
-              }
               else if (chr == ',' || chr == ':' || chr == '}')
-              {
                 break;
-              }
               else
-              {
                 throw new ArgumentException("Format error: wrong symbol at {}, column " + i);
-              }
             }
 
             if (token.Length > 0)
-            {
               index = int.Parse(token);
-            }
             else
-            {
               throw new ArgumentException("Format error: empty {}, column " + i);
-            }
 
             if (chr == ',')
             {
@@ -594,36 +580,24 @@ namespace System
                 i++;
               }
               else
-              {
                 token = Empty;
-              }
 
               for (i++; i < len; i++)
               {
                 chr = format[i];
 
                 if (chr >= '0' && chr <= '9')
-                {
                   token += chr;
-                }
                 else if (chr == ':' || chr == '}')
-                {
                   break;
-                }
                 else
-                {
                   throw new ArgumentException("Format error: wrong symbol at alignment, column " + i);
-                }
               }
 
               if (token.Length > 0)
-              {
                 alignment = int.Parse(token);
-              }
               else
-              {
                 throw new ArgumentException("Format error: empty alignment, column " + i);
-              }
             }
 
             if (chr == ':')
@@ -634,67 +608,51 @@ namespace System
                 chr = format[i];
 
                 if (chr == '}')
-                {
                   break;
-                }
                 else
-                {
                   token += chr;
-                }
               }
 
               if (token.Length > 0)
-              {
                 fmt = token;
-              }
               else
-              {
                 throw new ArgumentException("Format error: empty format after ':', column " + i);
-              }
             }
           }
 
           if (chr != '}')
-          {
             throw new ArgumentException("Format error: no closed brace, column " + i);
-          }
 
+          /*
+          Big comment.  The standard .Net framework allows the use of reflection
+          at this point to resolve the Object.ToString(format)
+          which is not support on the CanFly system as it is closer to C++
+          than C#.
+          The base System.Object has a method called ToString with 3
+          overloads.
+          The first is ToString() which converts the type to a string,
+          the second if ToString(String) Which is a type specific
+          format string.
+          The last is ToString(IFormatProvider) which calls the IFormatProvider
+          to format the object.  This last one is not used in this
+          case
+          */
           if (fmt.Length > 0)
-          {
-#if NANOCLR_REFLECTION
-                        var method = args[index].GetType().GetMethod("ToString", new Type[] { typeof(string) });
-                        token = (method is null)
-                            ? args[index].ToString()
-                            : method.Invoke(args[index], new object[] { token }).ToString();
-#else
-            throw new NotImplementedException();
-#endif // NANOCLR_REFLECTION
-
-          }
+            token = args[index].ToString(fmt);      // format string
           else
-          {
-            token = args[index].ToString();
-          }
+            token = args[index].ToString();         // else just convert default
 
           if (alignment > 0)
-          {
             output += token.PadLeft(alignment);
-          }
           else if (alignment < 0)
-          {
             output += token.PadRight(Math.Abs(alignment));
-          }
           else
-          {
             output += token;
-          }
         }
         else if (chr == '}')
         {
           if (i + 1 == len)
-          {
             throw new ArgumentException("Format error: no closed brace, column " + i);
-          }
 
           if (format[i + 1] == '}')
           {
@@ -702,9 +660,7 @@ namespace System
             i++;
           }
           else
-          {
             throw new ArgumentException("Format error: no closed brace, column " + i);
-          }
         }
         else
         {

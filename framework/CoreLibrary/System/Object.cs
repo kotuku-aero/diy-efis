@@ -28,7 +28,28 @@ namespace System
     {
       throw new NotImplementedException();
     }
+    /// <summary>
+    /// Format the entity based on the provided format string
+    /// </summary>
+    /// <param name="format">Type specific format</param>
+    /// <returns>String as formatted</returns>
+    public virtual String ToString(String format)
+    {
+      return ToString(format, null);
+    }
+    /// <summary>
+    /// Format the object using the provided format provider
+    /// </summary>
+    /// <param name="provider"></param>
+    /// <returns></returns>
+    public virtual String ToString(String format, IFormatProvider provider)
+    {
+      IFormattable thisFormatable = (IFormattable)this;
+      if(thisFormatable == null)
+        throw new InvalidOperationException("Object is not a formattable type");
 
+      return thisFormatable.ToString(format, provider);
+    }
     /// <summary>
     /// Determines whether the specified object is equal to the current object.
     /// </summary>

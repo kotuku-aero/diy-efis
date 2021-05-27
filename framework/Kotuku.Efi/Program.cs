@@ -1,4 +1,4 @@
-﻿/*
+/*
 diy-efis
 Copyright (C) 2021 Kotuku Aerospace Limited
 
@@ -37,40 +37,20 @@ then the original copyright notice is to be respected.
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
 */
-using System;
+using CanFly;
 
-namespace CanFly.Proton
+namespace Kotuku.Efi
 {
-  public sealed class MenuItemEvent : MenuItem
+  public class Program
   {
-    private CanFlyMsg _msg;
-    public MenuItemEvent(MenuWidget widget)
-      : base(widget)
+    public static void Main()
     {
-    }
+     
+      // load the main window
+      EFIWidget backgroundWidget = new EFIWidget(Screen.Instance, 0, 0);
 
-    public override void Parse(ushort key)
-    {
-      base.Parse(key);
-      // decode the key to create the message to be sent when this
-      // item is selected
-      _msg = LoadCanMessage(key);
-
-    }
-
-    public override MenuItemActionResult Evaluate(CanFlyMsg msg)
-    {
-      if(_msg == null)
-        return MenuItemActionResult.MiaNothing;
-        
-      // if the message to be sent is internal then send the message to a window
-      // otherwise send to the can bus
-      if(_msg.CanID >= PhotonID.id_photon && _msg.CanID < PhotonID.IdLast)
-        MenuWidget.SendMessage(_msg);
-      else
-        Widget.Send(_msg);
-
-      return MenuItemActionResult.MiaClose;
+      // this never returns, unless a reboot is requested.
+      Screen.Instance.ProcessMessages();
     }
   }
 }
