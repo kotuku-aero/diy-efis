@@ -1,0 +1,14 @@
+**/nbproject/private
+**/build
+**/dist
+**/nbproject/Makefile*
+**/nbproject/Package*
+**/x64
+**/.vs
+**/*.user
+.metadata
+**/Release
+**/Debug
+**/bin
+**/obj
+/tools/msh/diy-efis.reg

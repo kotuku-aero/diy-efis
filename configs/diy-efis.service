@@ -1,0 +1,11 @@
+[Unit]
+Description=DIY EFIS display
+After=getty.target
+
+[Service]
+ExecStart=/usr/diy-efis/diy-efis /usr/diy-efis/diy-efis.reg
+Restart=Always
+
+[Install]
+WantedBy=multi-user.Target
+

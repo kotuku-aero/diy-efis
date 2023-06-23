@@ -1,0 +1,296 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\diy-efis\diyefis_cli.c" />
+    <ClCompile Include="..\..\diy-efis\main.c" />
+    <ClCompile Include="..\..\diy-efis\shell.c" />
+    <ClCompile Include="..\..\..\libs\electron\comm_device.c">
+      <Filter>electron</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\electron\console.c">
+      <Filter>electron</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\electron\deque.c">
+      <Filter>electron</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\electron\fb.c">
+      <Filter>electron</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\electron\tasks.c">
+      <Filter>electron</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\ion\duktape.c">
+      <Filter>ion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\ion\ion_cli_impl.c">
+      <Filter>ion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\ion\ion_interactive.c">
+      <Filter>ion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\ion\ion_lib.c">
+      <Filter>ion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\ion\ion_runner.c">
+      <Filter>ion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\muon\cansend.c">
+      <Filter>muon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\muon\cli.c">
+      <Filter>muon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\muon\cli_enumerations.c">
+      <Filter>muon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\muon\cli_fsm.c">
+      <Filter>muon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\muon\cli_io_nuetron.c">
+      <Filter>muon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\muon\cli_line.c">
+      <Filter>muon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\muon\cli_publisher.c">
+      <Filter>muon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\muon\cli_regedit.c">
+      <Filter>muon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\muon\cli_script.c">
+      <Filter>muon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\muon\cli_string.c">
+      <Filter>muon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\muon\cli_token.c">
+      <Filter>muon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\muon\cli_token_tbl.c">
+      <Filter>muon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\muon\edit.c">
+      <Filter>muon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\muon\neutron_cli_impl.c">
+      <Filter>muon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\neutron\can_aerospace.c">
+      <Filter>neutron</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\neutron\decompress.c">
+      <Filter>neutron</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\neutron\manifest.c">
+      <Filter>neutron</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\neutron\map.c">
+      <Filter>neutron</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\neutron\neutron.c">
+      <Filter>neutron</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\neutron\registry.c">
+      <Filter>neutron</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\neutron\regstream.c">
+      <Filter>neutron</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\neutron\slcan.c">
+      <Filter>neutron</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\neutron\stream.c">
+      <Filter>neutron</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\neutron\stream_printf.c">
+      <Filter>neutron</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\neutron\strstream.c">
+      <Filter>neutron</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\neutron\vector.c">
+      <Filter>neutron</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\photon\font.c">
+      <Filter>photon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\photon\lib_photon.c">
+      <Filter>photon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\photon\photon.c">
+      <Filter>photon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\photon\png_canvas.c">
+      <Filter>photon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\photon\widget.c">
+      <Filter>photon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\photon\window.c">
+      <Filter>photon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\proton\airspeed_window.c">
+      <Filter>proton</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\proton\altitude_window.c">
+      <Filter>proton</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\proton\annunciator_window.c">
+      <Filter>proton</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\proton\attitude_window.c">
+      <Filter>proton</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\proton\gauge_window.c">
+      <Filter>proton</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\proton\gps_window.c">
+      <Filter>proton</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\proton\hsi_window.c">
+      <Filter>proton</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\proton\layout_window.c">
+      <Filter>proton</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\proton\neo.c">
+      <Filter>proton</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\proton\pens.c">
+      <Filter>proton</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\proton\proton.c">
+      <Filter>proton</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\proton\regex.c">
+      <Filter>proton</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\electron\init.c">
+      <Filter>electron</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\diy-efis\splash.c" />
+    <ClCompile Include="..\..\..\libs\neutron\publisher.c">
+      <Filter>neutron</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libs\electron\i2c.c">
+      <Filter>electron</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\diy-efis\diyefis_cli.h" />
+    <ClInclude Include="..\..\..\libs\electron\console.h">
+      <Filter>electron</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\electron\electron.h">
+      <Filter>electron</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\ion\duk_config.h">
+      <Filter>ion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\ion\duktape.h">
+      <Filter>ion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\ion\interpreter.h">
+      <Filter>ion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\ion\ion.h">
+      <Filter>ion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\ion\ion_cli.h">
+      <Filter>ion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\ion\ion_cli_impl.h">
+      <Filter>ion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\muon\cli.h">
+      <Filter>muon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\muon\muon.h">
+      <Filter>muon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\muon\neutron_cli.h">
+      <Filter>muon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\muon\neutron_cli_impl.h">
+      <Filter>muon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\neutron\bsp.h">
+      <Filter>neutron</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\neutron\neutron.h">
+      <Filter>neutron</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\neutron\registry.h">
+      <Filter>neutron</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\neutron\slcan.h">
+      <Filter>neutron</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\neutron\stream.h">
+      <Filter>neutron</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\photon\photon.h">
+      <Filter>photon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\photon\widget.h">
+      <Filter>photon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\photon\window.h">
+      <Filter>photon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\proton\pens.h">
+      <Filter>proton</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\proton\proton.h">
+      <Filter>proton</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\proton\regex.h">
+      <Filter>proton</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\proton\spatial.h">
+      <Filter>proton</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\electron\i2c.h">
+      <Filter>electron</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libs\electron\deque.h">
+      <Filter>electron</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\diy-efis\diyefis.cli" />
+    <None Include="..\..\..\libs\ion\duk_source_meta.json">
+      <Filter>ion</Filter>
+    </None>
+    <None Include="..\..\..\libs\ion\ion.cli">
+      <Filter>ion</Filter>
+    </None>
+    <None Include="..\..\..\libs\muon\neutron.cli">
+      <Filter>muon</Filter>
+    </None>
+    <None Include="..\..\..\libs\proton\proton.cli">
+      <Filter>proton</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="electron">
+      <UniqueIdentifier>{46b3e466-2e3d-4cc6-8da7-460a138bce77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ion">
+      <UniqueIdentifier>{61c99050-0e30-4a9e-bc25-245c5ca0a199}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="muon">
+      <UniqueIdentifier>{9967cee6-6c92-4870-9ff2-8f6888a6f39a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="neutron">
+      <UniqueIdentifier>{16f48e4e-e6ce-4fd1-994e-5652a564e0eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="photon">
+      <UniqueIdentifier>{f5b02e1e-7621-425a-aa7a-b9654e99f98b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="proton">
+      <UniqueIdentifier>{f8775fab-e58a-4846-b635-3c35c3524984}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

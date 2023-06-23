@@ -1,0 +1,5 @@
+#!/bin/bash
+PI=$(echo "scale=10; 4*a(1)" | bc -l)
+rads=$(echo "$1*($PI/180)" | bc -l)
+hexdbl=$(canasend 313 FLOAT $rads)
+cansend can0 $hexdbl

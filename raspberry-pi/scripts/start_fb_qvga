@@ -1,0 +1,6 @@
+#!/bin/sh
+if [ -f /tmp/fb0 ]
+then 
+	rm /tmp/fb0 
+fi
+../fb_emulator/Release/fb_emulator /tmp/fb0 320 240 &
