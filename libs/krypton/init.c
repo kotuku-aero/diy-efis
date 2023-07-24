@@ -106,6 +106,12 @@ extern const char *i2c_device_s;
 extern const char *screen_x_s;
 extern const char *screen_y_s;
 
+// typical for windows:
+// -c 32768 -x 320 -y 240 -d COM4 diy-efis.reg
+// 
+// then
+// -x 320 -y 240 -d COM4 diy-efis.reg
+
 result_t krypton_init(int argc, char **argv)
   {
   result_t result;
@@ -117,6 +123,7 @@ result_t krypton_init(int argc, char **argv)
   const char *fb_size = "32768";
   const char *width = "320";
   const char *height = "240";
+  const char *device = 0;
 
   int opt;
   while ((opt = getopt(argc, argv, "hc:f:x:y:d:")) != -1)
@@ -135,6 +142,9 @@ result_t krypton_init(int argc, char **argv)
         break;
       case 'y':
         height = optarg;
+        break;
+      case 'd':
+        device = optarg;
         break;
       default:
         return print_error(help, s_false);

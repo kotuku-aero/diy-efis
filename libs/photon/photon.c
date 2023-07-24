@@ -722,10 +722,13 @@ static const quadrants_t quadrants[4] =
         }
   };
 
+#ifndef _WIN32
+
 float roundf(float value)
   {
   return (float) (value < 0.0 ? ceil(value - 0.5) : floor(value + 0.5));
   }
+#endif
 
 double round(double value)
   {

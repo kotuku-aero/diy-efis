@@ -51,7 +51,7 @@ it must be removed as soon as possible after the code fragment is identified.
 #include <termios.h>
 #include <sys/stat.h>
 #else
-extern result_t krypton_init(const char *reg_path, bool factory_reset);
+#include "../../libs/krypton/krypton.h"
 #include <Windows.h>
 #endif
 
@@ -381,31 +381,11 @@ static void shell_run_ion(void *parg)
 
 int main(int argc, char **argv)
   {
+  bool factory_reset;
 #ifdef __linux__
-    if(failed(electron_init(argc, argv)))
-    {
-        printf("Unable to initialize the krypton library.");
-        return -1;
-    }
-
+  factory_reset = electron_init(argc, argv);
 #else
-    // The command line can pass in the name of the registry used to set us up.  In any
-  // case we need to implement some code
-  const char *ini_path;
-  if(argc > 1)
-    ini_path = argv[1];
-  else
-    ini_path = "diy-efis.reg";
-
-
-  // TODO: handle this better
-  bool factory_reset = false;
-
-  if(failed(krypton_init(ini_path, factory_reset)))
-    {
-    printf("Unable to initialize the krypton library.");
-    return -1;
-    }
+  factory_reset = krypton_init(argc, argv);
 #endif
 
   uint16_t node_id;
