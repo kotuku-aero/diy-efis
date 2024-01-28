@@ -1,6 +1,6 @@
 /*
 diy-efis
-Copyright (C) 2016 Kotuku Aerospace Limited
+Copyright (C) 2016-2022 Kotuku Aerospace Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,19 +28,22 @@ providers.
 
 If any file has a copyright notice or portions of code have been used
 and the original copyright notice is not yet transcribed to the repository
-then the origional copyright notice is to be respected.
+then the original copyright notice is to be respected.
 
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
-*/
-/*
- * stream_printf.c
- *
- *  Created on: 8/06/2017
- *      Author: petern
- */
 
+If you wish to use any of this code in a commercial application then
+you must obtain a licence from the copyright holder.  Contact
+support@kotuku.aero for information on the commercial licences.
+*/
 #include "neutron.h"
+
+#include <math.h>
+
+#ifdef _WIN32
+#define finite isfinite
+#endif
 
 static void ftoa_fixed(char *buffer, float value);
 static void ftoa_sci(char *buffer, float value);
@@ -74,7 +77,7 @@ static char *neutron_itoa(int64_t i, char *buf, uint16_t len)
     while (len > 1 && n > 0)
       {
       int64_t digit = i / n;
-      *p++ = '0' + digit;
+      *p++ = (char)('0' + digit);
       i -= digit * n;
       len--;
       n /= 10;
@@ -115,23 +118,24 @@ static char *neutron_itox(uint32_t value, char *buf, int len)
   return buf;
 }
 
-result_t stream_printf(stream_p stream, char const *fmt, ...)
+/*
+result_t stream_printf(handle_t stream, char const *fmt, ...)
   {
   va_list va;
   va_start(va, fmt);
 
   return stream_vprintf(stream, fmt, va);
-  }
+  } */
 
 static char *ensure_buffer(char **buffer)
   {
   if(*buffer == 0)
-    *buffer = (char *) neutron_malloc(64);
+    neutron_malloc(64, (void **)buffer);
   
   return *buffer;
   }
 
-result_t stream_vprintf(stream_p stream, const char *fmt, va_list ap)
+result_t stream_vprintf(handle_t stream, const char *fmt, va_list ap)
   {
   bool is_long = false;
   bool is_unsigned = false;
@@ -208,7 +212,7 @@ result_t stream_vprintf(stream_p stream, const char *fmt, va_list ap)
   return s_ok;
   }
 
-result_t stream_printf_cb(stream_p stream, const char *fmt, get_arg_fn cb, void *argv)
+result_t stream_printf_cb(handle_t stream, const char *fmt, get_arg_fn cb, void *argv)
   {
 
   int16_t int16_temp;
@@ -322,7 +326,7 @@ result_t stream_printf_cb(stream_p stream, const char *fmt, get_arg_fn cb, void 
   return s_ok;
    }
 
-result_t stream_scanf_cb(stream_p stream, const char *format, get_arg_fn cb, void *argv)
+result_t stream_scanf_cb(handle_t stream, const char *format, get_arg_fn cb, void *argv)
   {
   return e_not_implemented;
   }
@@ -361,6 +365,18 @@ static void ftoa_fixed(char *buffer, float value)
   int places = 0;
   static const int width = 4;
 
+  if (!finite(value))
+    {
+    strcpy(buffer, "INF");
+    return;
+    }
+
+  if (isnan(value))
+    {
+    strcpy(buffer, "NaN");
+    return;
+    }
+
   if (value == 0.0)
     {
     buffer[0] = '0';
@@ -378,7 +394,7 @@ static void ftoa_fixed(char *buffer, float value)
 
   while (exponent > 0)
     {
-    int digit = value * 10;
+    int digit = (int)(value * 10);
     *buffer++ = digit + '0';
     value = value * 10 - digit;
     ++places;
@@ -399,9 +415,9 @@ static void ftoa_fixed(char *buffer, float value)
 
   while (places < width)
     {
-    int digit = value * 10.0;
+    int digit = (int)(value * 10.0);
     *buffer++ = digit + '0';
-    value = value * 10.0 - digit;
+    value = (float)(value * 10.0 - digit);
     ++places;
     }
   *buffer = '\0';
@@ -428,9 +444,9 @@ static void ftoa_sci(char *buffer, float value)
 
   exponent = normalize(&value);
 
-  int digit = value * 10.0;
+  int digit = (int)(value * 10.0);
   *buffer++ = digit + '0';
-  value = value * 10.0 - digit;
+  value = (float)(value * 10.0 - digit);
   --exponent;
 
   *buffer++ = '.';
@@ -438,9 +454,9 @@ static void ftoa_sci(char *buffer, float value)
   int i;
   for (i = 0; i < width; i++)
     {
-    int digit = value * 10.0;
+    int digit = (int)(value * 10.0);
     *buffer++ = digit + '0';
-    value = value * 10.0 - digit;
+    value = (float)(value * 10.0 - digit);
     }
 
   *buffer++ = 'e';

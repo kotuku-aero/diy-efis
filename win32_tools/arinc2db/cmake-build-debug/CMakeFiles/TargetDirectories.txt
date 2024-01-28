@@ -1,0 +1,3 @@
+D:/canfly/win32_tools/arinc2db/cmake-build-debug/CMakeFiles/arinc2db.dir
+D:/canfly/win32_tools/arinc2db/cmake-build-debug/CMakeFiles/edit_cache.dir
+D:/canfly/win32_tools/arinc2db/cmake-build-debug/CMakeFiles/rebuild_cache.dir

@@ -1,6 +1,6 @@
 /*
 diy-efis
-Copyright (C) 2016 Kotuku Aerospace Limited
+Copyright (C) 2016-2022 Kotuku Aerospace Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,10 +28,14 @@ providers.
 
 If any file has a copyright notice or portions of code have been used
 and the original copyright notice is not yet transcribed to the repository
-then the origional copyright notice is to be respected.
+then the original copyright notice is to be respected.
 
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
+
+If you wish to use any of this code in a commercial application then
+you must obtain a licence from the copyright holder.  Contact
+support@kotuku.aero for information on the commercial licences.
 */
 #include <string.h>
 #include <ctype.h>
@@ -41,7 +45,7 @@ it must be removed as soon as possible after the code fragment is identified.
 
 #include "cli.h"
 
-result_t match_path(cli_t *context, const char * path, bool ignore_wildcard, memid_t *key, vector_p *matches)
+result_t match_path(cli_t *context, const char * path, bool ignore_wildcard, memid_t *key, charps_t **matches)
   {
   result_t result;
   if (matches == 0)
@@ -82,14 +86,9 @@ result_t match_path(cli_t *context, const char * path, bool ignore_wildcard, mem
     search_dir = 0;         // absolute path
 
   // split the path into directories
-  vector_p directories = string_split(path, '/');
+  charps_t * directories = string_split(path, '/');
 
-  uint16_t num_dirs;
-  if (failed(result = vector_count(directories, &num_dirs)))
-    {
-    kfree_split(directories);
-    return result;
-    }
+  uint16_t num_dirs = charps_count(directories);
 
   // if empty string then we are done.
   if (num_dirs == 0)
@@ -108,12 +107,7 @@ result_t match_path(cli_t *context, const char * path, bool ignore_wildcard, mem
   uint16_t dir_num;
   for (dir_num = 0; dir_num < num_dirs - 1; dir_num++)
     {
-    const char * dirname;
-    if (failed(vector_at(directories, dir_num, &dirname)))
-      {
-      kfree_split(directories);
-      return result;
-      }
+    const char * dirname = charps_begin(directories)[dir_num];
 
     if (strcmp(dirname, ".") == 0)
       continue;
@@ -121,13 +115,13 @@ result_t match_path(cli_t *context, const char * path, bool ignore_wildcard, mem
       {
       if (failed(result = reg_query_memid(search_dir, 0, 0, 0, &search_dir)))
         {
-        kfree_split(directories);
+        close_and_free_charps(directories);
         return result;
         }
       }
     else if (failed(result = reg_open_key(search_dir, dirname, &search_dir)))
       {
-      kfree_split(directories);
+      close_and_free_charps(directories);
       return result;
       }
 
@@ -135,17 +129,12 @@ result_t match_path(cli_t *context, const char * path, bool ignore_wildcard, mem
       *key = search_dir;
     }
 
-  const char * fname;
-  if (failed(vector_at(directories, dir_num, &fname)))
-    {
-    kfree_split(directories);
-    return result;
-    }
+  const char * fname = charps_begin(directories)[dir_num];
 
   char name[REG_NAME_MAX + 1];
   memid_t child = 0;
   field_datatype dt = field_none;
-  uint16_t fname_length = strlen(fname);
+  uint16_t fname_length  = (uint16_t) strlen(fname);
 
   do
     {
@@ -175,20 +164,21 @@ result_t match_path(cli_t *context, const char * path, bool ignore_wildcard, mem
       {
       if (*matches == 0)
         {
-        if (failed(result = vector_create(sizeof(char *), matches)))
+        if (failed(result = charps_create(matches)))
           {
-          kfree_split(directories);
+          close_and_free_charps(directories);
           return result;
           }
         }
 
       // add the string.
-      char *new_name = (char *)neutron_malloc(strlen(name) +1);
+      char *new_name;
+      neutron_malloc(strlen(name) + 1, (void **)&new_name);
       strcpy(new_name, name);
 
-      if (failed(vector_push_back(*matches, &new_name)))
+      if (failed(charps_push_back(*matches, new_name)))
         {
-        kfree_split(directories);
+        close_and_free_charps(directories);
         return result;
         }
       }
@@ -198,7 +188,7 @@ result_t match_path(cli_t *context, const char * path, bool ignore_wildcard, mem
     } while (child != 0);
   
   // release the arrays
-  kfree_split(directories);
+  close_and_free_charps(directories);
   return s_ok;
   }
 
@@ -264,6 +254,8 @@ result_t cli_match_enum(cli_t *context, cli_token_t *token, cli_node_t *node, bo
   uint16_t len = token->token_length;
   const enum_t *cp;
   uint16_t kw_len;
+  const enum_t *best_match = 0;
+  uint16_t best_match_len = 0;
 
   for (cp = (const enum_t *)node->param; cp->name != 0; cp++)
     {
@@ -273,13 +265,24 @@ result_t cli_match_enum(cli_t *context, cli_token_t *token, cli_node_t *node, bo
 
     if (strncmp(token->token_buffer, cp->name, len) == 0)
       {
-      *is_complete = (kw_len == len);
-      return s_ok;
+      if (kw_len == len)
+        {
+        *is_complete = true;
+        return s_ok;
+        }
+
+      // there could be a shorter exact match, so search for it
+      if (kw_len > best_match_len)
+        {
+        best_match = cp;
+        best_match_len = kw_len;
+        }
       }
     }
 
   *is_complete = false;
-  return e_unexpected;
+  
+  return best_match != 0 ? s_ok : e_unexpected;
   }
 
 /*
@@ -292,13 +295,13 @@ result_t cli_match_string(cli_t *context, cli_token_t *token, cli_node_t *node, 
   *is_complete = 1;
   uint16_t len = token->token_length;
 
-  return len < REG_STRING_MAX ? s_ok : e_unexpected;
+  return len < 256 ? s_ok : e_unexpected;
   }
 
 result_t cli_match_path(cli_t *context, cli_token_t *token, cli_node_t *node, bool *is_complete)
   {
   memid_t dir;
-  vector_p matched_filenames = 0;
+  charps_t *matched_filenames = 0;
   result_t result;
     
   if (failed(result = match_path(context, token->token_buffer, true, &dir, &matched_filenames)))
@@ -308,29 +311,15 @@ result_t cli_match_path(cli_t *context, cli_token_t *token, cli_node_t *node, bo
     *is_complete = true;
   else
     {
-    uint16_t num_matches;
-    if (failed(result = vector_count(matched_filenames, &num_matches)))
-      {
-      kfree_split(matched_filenames);
-      return result;
-      }
+    uint16_t num_matches = charps_count(matched_filenames);
 
     if (num_matches == 1)
-      {
-      const char * str;
-      if(failed(result = vector_at(matched_filenames, 0, &str)))
-        {
-        kfree_split(matched_filenames);
-        return result;
-        }
-
-      *is_complete = strcmp(str, token->token_buffer) == 0;
-      }
+      *is_complete = strcmp(charps_begin(matched_filenames)[0], token->token_buffer) == 0;
     else
       *is_complete = false;
     }
 
-  kfree_split(matched_filenames);
+  close_and_free_charps(matched_filenames);
   return s_ok;
   }
 
@@ -572,7 +561,7 @@ static result_t match_float(const char **_str, const char *terms)
   }
 
 /*
- * cli_match_float - Token matching function for double precision floating
+ * cli_match_float - Token matching function for float precision floating
  *     point value.
  */
 result_t cli_match_float(cli_t *context, cli_token_t *token, cli_node_t *node, bool *is_complete)
@@ -737,61 +726,40 @@ result_t cli_complete_path(cli_t *context, const cli_node_t *node, cli_token_t *
   const char * match_name = 0;
 
   // match the path name to the first found name
-  vector_p matched_paths = 0;
+  charps_t *matched_paths = 0;
   if (failed(result = match_path(context, token->token_buffer, false, &memid, &matched_paths)))
     {
     return result;      // not sure how we got here, just bail...
     }
 
   // find the last part of the path
-  vector_p directories = string_split(token->token_buffer, '/');
-  uint16_t num_matches;
-  if (failed(result = vector_count(directories, &num_matches)))
-    {
-    kfree_split(directories);
-    kfree_split(matched_paths);
-    return result;
-    }
+  charps_t *directories = string_split(token->token_buffer, '/');
+  uint16_t num_matches = charps_count(directories);
 
-  const char * last_path = 0;
-  const char * empty_str = 0;
+  const char * last_path = charps_begin(directories)[num_matches - 1];
+  // signify the string is taken
+  charps_begin(directories)[num_matches - 1] = 0;
 
-  if (failed(result = vector_at(directories, num_matches - 1, &last_path)) ||
-      failed(result = vector_set(directories, num_matches -1, &empty_str)))
-    {
-    kfree_split(directories);
-    kfree_split(matched_paths);
-    return result;
-    }
 
-  kfree_split(directories);
+  close_and_free_charps(directories);
   directories = 0;
-  uint16_t len = strlen(last_path);
+  uint16_t len = (uint16_t) strlen(last_path);
 
-  if (failed(result = vector_count(matched_paths, &num_matches)))
-    {
-    neutron_free((void *)last_path);
-    kfree_split(matched_paths);
-    return result;
-    }
+  num_matches = charps_count(matched_paths);
 
   uint16_t match_num;
   // find the best match for the string
   for (match_num = 0; match_num < num_matches; match_num++)
     {
-    if(failed(result = vector_at(matched_paths, match_num, &name)))
-      {
-      neutron_free((void *)last_path);
-      kfree_split(matched_paths);
-      return result;
-      }
+    name = charps_begin(matched_paths)[match_num];
+
     if (strncmp(name, last_path, len) == 0)
       {
       /* Prefix matches. See what is the longest suffix */
       if (match_len == -1)
         {
         /* First match. Cover the whole thing */
-        match_len = strlen(name);
+        match_len = (uint16_t) strlen(name);
 
         match_name = name;
         }
@@ -813,7 +781,7 @@ result_t cli_complete_path(cli_t *context, const cli_node_t *node, cli_token_t *
   if (match_name == 0)
     {
     neutron_free((void *)last_path);
-    kfree_split(matched_paths);
+    close_and_free_charps(matched_paths);
     return e_unexpected;
     }
 
@@ -822,7 +790,7 @@ result_t cli_complete_path(cli_t *context, const cli_node_t *node, cli_token_t *
       return result;
 
   neutron_free((void *)last_path);
-  kfree_split(matched_paths);
+  close_and_free_charps(matched_paths);
 
   return s_ok;
   }
@@ -834,7 +802,7 @@ result_t cli_complete_enum(cli_t *parser, const cli_node_t *node, cli_token_t *t
   int16_t n;
   uint16_t len = token->token_length;
   const enum_t *id;
-  const enum_t *match_id;
+  const enum_t *match_id = 0;
 
   // find the best match for the string
   for (id = (const enum_t *)node->param; id->name != 0; id++)
@@ -845,7 +813,7 @@ result_t cli_complete_enum(cli_t *parser, const cli_node_t *node, cli_token_t *t
       if (match_len == -1)
         {
         /* First match. Cover the whole thing */
-        match_len = strlen(id->name);
+        match_len = (int16_t) strlen(id->name);
 
         match_id = id;
         }
@@ -912,7 +880,8 @@ result_t cli_get_path(const cli_token_t *token, const char * *value)
   return s_ok;
   }
 
-result_t convert_string_to_enum(const const char * token, const enum_t *enums, uint16_t *value)
+  /*
+result_t convert_string_to_enum(const char * token, const enum_t *enums, uint16_t *value)
   {
   if (token == 0 || value == 0)
     return e_bad_parameter;
@@ -920,7 +889,7 @@ result_t convert_string_to_enum(const const char * token, const enum_t *enums, u
   if (strlen(token) == 0)
     {
     *value = 0;
-    return e_unexpected; /* optional argument wasn't provided */
+    return e_unexpected; // optional argument wasn't provided
     }
 
   if (isdigit(*token))
@@ -951,6 +920,7 @@ result_t convert_string_to_enum(const const char * token, const enum_t *enums, u
     }
   return e_not_found;
   }
+*/
 
 result_t cli_get_enum(const cli_token_t *token, const enum_t *enums, uint16_t *value)
   {
@@ -979,7 +949,6 @@ result_t cli_get_bool(const cli_token_t *token, const enum_t *enums, bool *value
  */
 result_t cli_get_uint16(const cli_token_t *token, uint16_t *value)
   {
-  result_t result;
   if(token == 0 || value == 0)
     return e_bad_parameter;
 
@@ -1036,8 +1005,6 @@ result_t cli_get_uint32(const cli_token_t *token, uint32_t *value)
  */
 result_t cli_get_int16(const cli_token_t *token, int16_t *value)
   {
-  result_t result;
-
   if(token == 0 || value == 0)
     return e_bad_parameter;
 
@@ -1072,8 +1039,6 @@ result_t cli_get_int16(const cli_token_t *token, int16_t *value)
  */
 result_t cli_get_int32(const cli_token_t *token, int32_t *value)
   {
-  result_t result;
-
   if(token == 0 || value == 0)
     return e_bad_parameter;
 
@@ -1108,7 +1073,7 @@ result_t cli_get_float(const cli_token_t *token, float *value)
   if (len == 0)
     return e_unexpected; /* optional argument wasn't provided */
 
-  double val;
+  float val;
 
   if (1 != sscanf(str, "%lf", &val))
     {
@@ -1147,7 +1112,7 @@ result_t cli_get_matrix(const cli_token_t *token, matrix_t *value)
   if (len == 0)
     return e_unexpected; /* optional argument wasn't provided */
 
-  double v00, v01, v02, v10, v11, v12, v20, v21, v22;
+  float v00, v01, v02, v10, v11, v12, v20, v21, v22;
 
   if (9 != sscanf(str, "[%lf,%lf,%lf][%lf,%lf,%lf][%lf,%lf,%lf]",
                   &v00, &v01, &v02,
@@ -1183,7 +1148,7 @@ result_t cli_get_xyz(const cli_token_t *token, xyz_t *value)
   if (len == 0)
     return e_unexpected; /* optional argument wasn't provided */
 
-  double x, y, z;
+  float x, y, z;
 
   if (3 != sscanf(str, "[%lf,%lf,%lf]", &x, &y, &z))
     {

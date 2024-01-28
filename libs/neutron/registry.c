@@ -1,39 +1,4 @@
-/*
-diy-efis
-Copyright (C) 2016 Kotuku Aerospace Limited
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-If a file does not contain a copyright header, either because it is incomplete
-or a binary file then the above copyright notice will apply.
-
-Portions of this repository may have further copyright notices that may be
-identified in the respective files.  In those cases the above copyright notice and
-the GPL3 are subservient to that copyright notice.
-
-Portions of this repository contain code fragments from the following
-providers.
-
-
-If any file has a copyright notice or portions of code have been used
-and the original copyright notice is not yet transcribed to the repository
-then the origional copyright notice is to be respected.
-
-If any material is included in the repository that is not open source
-it must be removed as soon as possible after the code fragment is identified.
-*/
-#include "bsp.h"
+#include "neutron.h"
 #include "registry.h"
 
 // a page is 64k bytes
@@ -44,7 +9,7 @@ static uint16_t page_size;
 
 // semaphore used to ensure only 1 thread is using the registry
 // at a time.
-static semaphore_p mutex;
+static handle_t mutex;
 
 void enter_registry()
   {
@@ -58,10 +23,12 @@ result_t exit_registry(result_t exit_code)
   return exit_code;
   }
 
+#define REG_BLOCK_SIZE 128
+
 // this is the header written to the start of the eeprom
 typedef struct _eeprom_root_t {
   field_key_t hdr;
-  byte_t bitmap[];                // bitmap blocks
+  uint8_t bitmap[];                // bitmap blocks
   } eeprom_root_t;
 
 static eeprom_root_t *root;        // this is dynamically allocated
@@ -70,6 +37,247 @@ static uint32_t max_offset = 0;
 static inline uint32_t get_block_offset(memid_t memid)
   {
   return ((uint32_t)memid) << BLOCK_SHIFT;
+  }
+
+/* CACHE read/write helpers
+*/
+
+typedef struct _cache_buffer_t cache_buffer_t;
+
+typedef struct _cache_buffer_t
+  {
+  cache_buffer_t *next;
+  cache_buffer_t *previous;
+  uint32_t offset;
+  uint8_t buffer[REG_BLOCK_SIZE];
+  } cache_buffer_t;
+
+static uint32_t reg_address_start;
+static uint32_t reg_address_end;
+
+#define NUM_CACHE_BLOCKS 64
+
+static cache_buffer_t cache[NUM_CACHE_BLOCKS];
+cache_buffer_t *head = 0;
+cache_buffer_t *tail = 0;
+
+#ifdef _WIN32
+uint32_t cache_hit = 0;
+uint32_t cache_read = 0;
+uint32_t cache_miss = 0;
+#endif
+
+static void link_as_head(cache_buffer_t *buffer)
+  {
+  if (head == buffer)
+    return;
+
+  buffer->next = head;
+  head->previous = buffer;
+  buffer->previous = 0;
+  head = buffer;
+  }
+
+static void link_as_tail(cache_buffer_t *buffer)
+  {
+  if (tail == buffer)
+    return;
+
+  if (head == 0)
+    head = buffer;
+
+  if (tail != 0)
+    tail->next = buffer;
+
+  buffer->previous = tail;
+  buffer->next = 0;
+  tail = buffer;
+  }
+
+static void unlink(cache_buffer_t *link)
+  {
+  if (link == head)
+    {
+    head = link->next;
+    head->previous = 0;     // new head
+    }
+  else if (link == tail)
+    {
+    tail = tail->previous;
+    tail->next = 0;         // new tail
+    }
+  else
+    {
+    if (link->previous != 0)
+      link->previous->next = link->next;
+
+    if (link->next != 0)
+      link->next->previous = link->previous;
+    }
+
+  link->previous = 0;
+  link->next = 0;
+  }
+
+static result_t cache_init(uint32_t max_read_address, uint32_t min_read_address)
+  {
+  reg_address_end = max_read_address;
+  reg_address_start = min_read_address;
+
+  memset(cache, 0, sizeof(cache));
+
+  // create a linked-list in reverse order for the cache blocks
+  for (uint32_t i = 0; i < NUM_CACHE_BLOCKS; i++)
+    {
+    cache_buffer_t *link = &cache[i];
+    link_as_tail(link);
+    }
+
+  return s_ok;
+  }
+
+static result_t cache_reg_read_block(uint32_t offset, uint16_t bytes_to_read, void *dest)
+  {
+  result_t result = s_ok;
+  // if reading bitmap just skip as this is startup
+  if(offset < reg_address_start)
+    return bsp_reg_read_block(offset, bytes_to_read, dest);
+
+  // fill the cache where possible.  First get the first block
+  uint32_t sector = offset & ~BLOCK_MASK;
+  // initial setting
+  uint32_t read_start = offset & BLOCK_MASK;
+
+  uint8_t *u8_dest = (uint8_t *)dest;
+
+  do
+    {
+    cache_buffer_t *found_sector = 0;
+    cache_buffer_t *cache_buffer = head;
+
+    // scan the cache (most frequent at head)
+    while (cache_buffer != 0)
+      {
+      if (cache_buffer->offset == sector)
+        {
+        if (cache_buffer != head)
+          {
+          // found a block
+          unlink(cache_buffer);
+          link_as_head(cache_buffer);
+          }
+        found_sector = cache_buffer;
+#ifdef _WIN32
+        cache_hit++;
+#endif
+        break;
+        }
+
+      cache_buffer = cache_buffer->next;
+      }
+
+    if (found_sector == 0)
+      {
+#ifdef _WIN32
+      cache_read++;
+#endif
+
+      // read the next block and cache it
+      found_sector = tail;      // get last block
+      unlink(found_sector);
+      link_as_head(found_sector);
+
+#ifdef _WIN32
+      if (found_sector->offset != 0)
+        cache_miss++;
+#endif
+
+      found_sector->offset = sector;
+
+      if (failed(result = bsp_reg_read_block(sector, SECTOR_SIZE, found_sector->buffer)))
+        {
+        found_sector->offset = 0;
+        return result;
+        }
+      }
+
+    // we have a block, copy it
+    uint16_t num_bytes = SECTOR_SIZE - read_start;
+    if (num_bytes > bytes_to_read)
+      num_bytes = bytes_to_read;
+
+    memcpy(u8_dest, &found_sector->buffer[read_start], num_bytes);
+    u8_dest += num_bytes;
+    bytes_to_read -= num_bytes;
+    read_start = 0;
+    sector++;
+
+    } while (bytes_to_read > 0);
+    
+  return result;
+  }
+
+static result_t cache_reg_write_block(uint32_t offset, uint16_t bytes_to_write, const void *src)
+  {
+  if (offset < reg_address_start)
+    return bsp_reg_write_block(offset, bytes_to_write, src);
+
+  result_t result = s_ok;
+
+  // fill the cache where possible.  First get the first block
+  uint32_t sector = offset & ~BLOCK_MASK;
+  // initial setting
+  uint32_t write_start = offset & BLOCK_MASK;
+
+  const uint8_t *u8_src = (const uint8_t *)src;
+
+  do
+    {
+    cache_buffer_t *found_sector = 0;
+    cache_buffer_t *cache_buffer = head;
+
+    // scan the cache (most frequent at head)
+    while (cache_buffer != 0)
+      {
+      if (cache_buffer->offset == sector)
+        {
+        if (cache_buffer != head)
+          {
+          // found a block
+          unlink(cache_buffer);
+          link_as_head(cache_buffer);
+          }
+
+        found_sector = cache_buffer;
+
+        break;
+        }
+
+      cache_buffer = cache_buffer->next;
+      if (cache_buffer == 0)
+        break;
+      }
+
+    // we have a block, copy it
+    uint16_t num_bytes = SECTOR_SIZE - write_start;
+    if (num_bytes > bytes_to_write)
+      num_bytes = bytes_to_write;
+
+    // update lookaside cache.
+    if (found_sector != 0)
+      memcpy(&found_sector->buffer[write_start], u8_src, num_bytes);
+
+    if (failed(result = bsp_reg_write_block(sector + write_start, num_bytes, u8_src)))
+      return result;
+
+    u8_src += num_bytes;
+    bytes_to_write -= num_bytes;
+    write_start = 0;
+    sector++;
+
+    } while (bytes_to_write > 0);
+
+    return result;
   }
 
 result_t reg_read_bytes(uint32_t byte_offset,
@@ -82,8 +290,8 @@ result_t reg_read_bytes(uint32_t byte_offset,
      (byte_offset + bytes_to_read) > max_offset)
     return e_bad_parameter;
 
-  // calculate the first block to write.
-  uint16_t read_size = 128 - (byte_offset & 0x7f);
+  // calculate the first block to read.
+  uint16_t read_size = REG_BLOCK_SIZE - (byte_offset & 0x7f);
  
   while(bytes_to_read > 0)
     {
@@ -97,16 +305,14 @@ result_t reg_read_bytes(uint32_t byte_offset,
       last_read = true;
       }
 
-    // last block is on a 128 byte page
-    if(failed(result = bsp_reg_read_block(byte_offset,
-                                          read_size,
-                                          buffer)))
+    // last block is on a REG_BLOCK_SIZE byte page
+    if(failed(result = cache_reg_read_block(byte_offset, read_size, buffer)))
       return result;
 
     if(last_read)
       return result;
 
-    buffer = ((byte_t *)buffer) + read_size;
+    buffer = ((uint8_t *)buffer) + read_size;
     byte_offset += read_size;
     bytes_to_read -= read_size;
 
@@ -144,14 +350,14 @@ result_t reg_write_bytes(uint32_t byte_offset,
       last_write = true;
       }
 
-    // last block is on a 128 byte page
-    if(failed(result = bsp_reg_write_block(byte_offset, write_size, buffer)))
+    // last block is on a REG_BLOCK_SIZE byte page
+    if(failed(result = cache_reg_write_block(byte_offset, write_size, buffer)))
       return result;
 
     if(last_write)
       return result;
 
-    buffer = ((byte_t *)buffer) + write_size;
+    buffer = ((uint8_t *)buffer) + write_size;
     byte_offset += write_size;
     bytes_to_write -= write_size;
 
@@ -162,34 +368,50 @@ result_t reg_write_bytes(uint32_t byte_offset,
   return s_ok;
   }
 
-result_t bsp_reg_init(bool factory_reset, uint16_t _size, uint16_t _page_size)
+result_t bsp_reg_init(bool factory_reset, uint16_t num_blocks, uint16_t _page_size)
   {
   result_t result;
-  
+
   // create the semaphore that stops access to the registry
   // by more than 1 thread
   semaphore_create(&mutex);
   semaphore_signal(mutex);
   
-  max_offset = get_block_offset(_size);
+  max_offset = get_block_offset(num_blocks);
 
-  num_bitmap_bytes = _size >> 3;  // this is the number of bytes that make a bitmap
-  if (_size == 0)
-    num_bitmap_bytes = 8192;              // special case for 1mbit
-
+  num_bitmap_bytes = num_blocks >> 3;  // this is the number of bytes that make a bitmap
   page_size = _page_size;
 
-  eeprom_root_t root_blk;       // prototype root
+  uint16_t num_reserved = num_bitmap_bytes >> BLOCK_SHIFT;    // blocks in the bitmap, excludes the root block
+
+  if (failed(result = cache_init(num_blocks << BLOCKS_PER_SECTOR_SHIFT, (num_reserved +1) << BLOCK_SHIFT)))
+    return result;
+  
+  // read the root block.
+  if(failed(result = neutron_malloc(num_bitmap_bytes + sizeof(eeprom_root_t), (void **)&root)))
+    return result;
 
   // read the blocks from the eeprom
   // Check for a valid eeprom
   if(factory_reset ||
-     failed(reg_read_bytes(0, sizeof(eeprom_root_t), &root_blk)) ||
-     root_blk.hdr.hdr.length != num_bitmap_bytes + sizeof(eeprom_root_t))
+     failed(reg_read_bytes(0, sizeof(eeprom_root_t), root)) ||    // initially just read the root block
+     root->hdr.hdr.length != num_bitmap_bytes + sizeof(eeprom_root_t))
+    factory_reset = true;     // something wrong with eeprom
+  else
     {
-    uint16_t num_reserved = num_bitmap_bytes >> BLOCK_SHIFT;    // blocks in the bitmap
-
-    root = (eeprom_root_t *)neutron_malloc(num_bitmap_bytes + sizeof(eeprom_root_t));
+    // not a factory reset, so read the block and the bitmap
+    if(failed(result = reg_read_bytes(0, num_bitmap_bytes + sizeof(eeprom_root_t), root)))
+      return result;
+    
+    // see if there is a init_db key, in that case same as a factory_reset
+    bool init_db;
+    if(succeeded(reg_get_bool(0, "init-db", &init_db)) &&
+       init_db == true)
+      factory_reset = true;     // this wastes the reg read above but not very often
+    }
+  
+  if(factory_reset)
+    {
     // clear out root blocks.
     memset(root, 0, num_bitmap_bytes + sizeof(eeprom_root_t));
 
@@ -206,17 +428,14 @@ result_t bsp_reg_init(bool factory_reset, uint16_t _size, uint16_t _page_size)
     return e_not_initialized;
     }
 
-  // read the root block.
-  root = (eeprom_root_t *)neutron_malloc(num_bitmap_bytes + sizeof(eeprom_root_t));
-
-  return reg_read_bytes(0, num_bitmap_bytes + sizeof(eeprom_root_t), root);
+  return s_ok;
   }
 
 static void allocate_blocks(uint16_t first_block,
 														uint16_t num_blocks)
 	{
 	// point to the first byte to allocate
-  byte_t *base = root->bitmap;
+  uint8_t *base = root->bitmap;
   base += first_block >> 3;
 
 	// calculate the number of bits to set in the first byte
@@ -257,8 +476,8 @@ static void allocate_blocks(uint16_t first_block,
 static void release_block(uint16_t first_block,
 													uint16_t num_blocks)
 	{
-	// point to the first byte to neutron_malloc
-  byte_t *base = root->bitmap;
+	// point to the first byte to allocate
+  uint8_t *base = root->bitmap;
 	base += first_block >> 3;
 
   uint16_t num_bits = 8 - (first_block & 7);
@@ -412,9 +631,12 @@ result_t release_memid(memid_t memid, uint16_t memid_size)
 static result_t reg_open_first_child(memid_t parent,
                                      memid_t *memid)
   {
+  result_t result;
   // load the parent memid
   field_key_t parent_key;
-  reg_read_bytes(get_block_offset(parent), sizeof(field_key_t), &parent_key);
+  if(failed(result = reg_read_bytes(get_block_offset(parent), 
+                                    sizeof(field_key_t), &parent_key)))
+    return result;
 
   if(parent_key.hdr.data_type != field_key)
     return e_invalid_operation;
@@ -688,7 +910,7 @@ result_t reg_enum_key(memid_t parent,
   while(read_next)
     {
     if(defn.key_f.hdr.next == 0)
-      return exit_registry(e_not_found);
+      return exit_registry(e_no_more_information);
 
     if(failed(result = reg_read_bytes(get_block_offset(defn.key_f.hdr.next), sizeof(field_definition_t), &defn)))
       return exit_registry(result);
@@ -723,7 +945,7 @@ result_t reg_enum_key(memid_t parent,
       if(failed(result = reg_read_bytes(get_block_offset(*child), defn.key_f.hdr.length, &defn)))
         return exit_registry(result);
 
-      memcpy(data, ((byte_t *)&defn)+sizeof(field_definition_t), data_length);
+      memcpy(data, ((uint8_t *)&defn)+sizeof(field_definition_t), data_length);
       *length = data_length;
       }
     }
@@ -754,6 +976,12 @@ result_t reg_set_value(memid_t parent,
     {
     default :
       return e_bad_parameter;
+    case field_uint8 :
+      len = sizeof(field_uint8_t);
+      break;
+    case field_int8 :
+      len = sizeof(field_int8_t);
+      break;
     case field_bool :
       len = sizeof(field_bool_t);
       break;
@@ -853,6 +1081,12 @@ result_t reg_set_value(memid_t parent,
     {
     default :
       return e_bad_parameter;
+    case field_uint8 :
+      defn.uint8_f.value = *((const uint8_t *)data);
+      break;
+    case field_int8 :
+      defn.int8_f.value = *((const int8_t *)data);
+      break;
     case field_bool :
       defn.bool_f.value = *((const bool *)data);
       break;
@@ -970,6 +1204,11 @@ result_t reg_get_value(memid_t parent,
   }
 
 result_t reg_rename_value(memid_t parent, const char *name, const char *new_name)
+  {
+  return e_not_implemented;
+  }
+
+result_t reg_rename_key(memid_t key, const char *new_name)
   {
   return e_not_implemented;
   }
@@ -1132,6 +1371,59 @@ result_t reg_delete_value(memid_t memid, const char *name)
   return exit_registry(reg_delete_value_impl(memid, name));
   }
 
+result_t reg_get_int8(memid_t parent, const char *name, int8_t *value)
+  {
+  result_t result;
+  if (value == 0)
+    return e_bad_parameter;
+
+  uint8_t data_type = field_int8;
+  uint16_t buffer_len = sizeof(field_int8_t);
+
+  field_int8_t field;
+
+  enter_registry();
+  if (failed(result = reg_get_value(parent, name, &data_type, 0, 0, &buffer_len, &field)))
+    return exit_registry(result);
+
+  exit_registry(result);
+
+  *value = field.value;
+  return s_ok;
+  }
+
+result_t reg_set_int8(memid_t parent, const char *name, int8_t value)
+  {
+  enter_registry();
+  return exit_registry(reg_set_value(parent, name, field_int8, sizeof(int8_t), &value, 0));
+  }
+
+result_t reg_get_uint8(memid_t parent, const char *name, uint8_t *value)
+  {
+  result_t result;
+  if (value == 0)
+    return e_bad_parameter;
+
+  uint8_t data_type = field_uint8;
+  uint16_t buffer_len = sizeof(field_uint8_t);
+
+  field_uint8_t field;
+
+  enter_registry();
+  if (failed(result = reg_get_value(parent, name, &data_type, 0, 0, &buffer_len, &field)))
+    return exit_registry(result);
+
+  exit_registry(result);
+
+  *value = field.value;
+  return s_ok;
+  }
+
+result_t reg_set_uint8(memid_t parent, const char *name, uint8_t value)
+  {
+  enter_registry();
+  return exit_registry(reg_set_value(parent, name, field_uint8, sizeof(uint8_t), &value, 0));
+  }
 
 result_t reg_get_int16(memid_t parent, const char *name, int16_t *value)
   {
@@ -1352,9 +1644,6 @@ result_t reg_set_matrix(memid_t parent, const char *name, matrix_t *value)
 result_t reg_get_string(memid_t parent, const char *name, char *value, uint16_t *length)
   {
   result_t result;
-  uint16_t temp_length = REG_STRING_MAX;
-  if(length == 0)
-    length = &temp_length;
 
   uint8_t data_type = field_string;
   uint16_t buffer_len = sizeof(field_string_t);
@@ -1366,21 +1655,31 @@ result_t reg_get_string(memid_t parent, const char *name, char *value, uint16_t 
     return exit_registry(result);
   
   exit_registry(result);
+  
+  uint16_t max_len = sizeof(field.value);
+  
+  if(length != 0)
+    max_len = min(max_len, *length);
 
   // calculate actual length
-  int i;
-  for(i = 0; i < sizeof(field.value); i++)
+  uint16_t i = 0;
+  while(i < max_len-1)
+    {
+    if(value != 0)
+      {
+      // put string term
+      value[i+1] = 0;
+      value[i] = field.value[i];
+      }
+   
     if(field.value[i]== 0)
       break;
-
-  if(value != 0)
-    {
-    strncpy(value, field.value, *length < i ? *length : i);
-    if(*length > i)
-      value[i] = 0;
+    
+    i++;
     }
 
-  *length = i;
+  if(length != 0)
+    *length = i;
 
   return s_ok;
   }

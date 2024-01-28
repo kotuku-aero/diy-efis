@@ -1,6 +1,6 @@
 /*
 diy-efis
-Copyright (C) 2016 Kotuku Aerospace Limited
+Copyright (C) 2016-2022 Kotuku Aerospace Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,10 +28,14 @@ providers.
 
 If any file has a copyright notice or portions of code have been used
 and the original copyright notice is not yet transcribed to the repository
-then the origional copyright notice is to be respected.
+then the original copyright notice is to be respected.
 
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
+
+If you wish to use any of this code in a commercial application then
+you must obtain a licence from the copyright holder.  Contact
+support@kotuku.aero for information on the commercial licences.
 */
 #include <stdbool.h>
 #include <string.h>
@@ -40,16 +44,16 @@ it must be removed as soon as possible after the code fragment is identified.
 
 #include "neutron_cli.h"
 
+
 result_t open_key(memid_t current, const char *path, bool create, memid_t *memid)
   {
   result_t result;
   if (path == 0 || memid == 0)
     return e_bad_parameter;
 
-  vector_p parts = string_split(path, '/');
+  charps_t *parts = string_split(path, '/');
 
-  uint16_t num_parts;
-  vector_count(parts, &num_parts);
+  uint16_t num_parts = charps_count(parts);
 
   if (num_parts == 0)
     {
@@ -57,12 +61,7 @@ result_t open_key(memid_t current, const char *path, bool create, memid_t *memid
     return s_ok;
     }
 
-  const char * s;
-  if (failed(result = vector_at(parts, 0, &s)))
-    {
-    kfree_split(parts);
-    return result;
-    }
+  const char * s = charps_begin(parts)[0];
 
   if (strlen(s) == 0)
     current = 0;        // start from the root as the part starts with /
@@ -70,12 +69,7 @@ result_t open_key(memid_t current, const char *path, bool create, memid_t *memid
   uint16_t i;
   for (i = 0; i < num_parts; i++)
     {
-    if (failed(result = vector_at(parts, i, &s)))
-      {
-      kfree_split(parts);
-
-      return result;
-      }
+    s = charps_begin(parts)[i];
 
     // handle special cases
     if (strcmp(s, ".") == 0)      // means current
@@ -102,57 +96,9 @@ result_t open_key(memid_t current, const char *path, bool create, memid_t *memid
     current = *memid;
     }
 
-  kfree_split(parts);
+  close_and_free_charps(parts);
 
   return result;
-  }
-
-char * get_full_path(memid_t key)
-  {
-  char name[REG_NAME_MAX+1];
-  char * path = 0;
-  memid_t parent;
-  if (failed(reg_query_memid(key, 0, name, 0, &parent)))
-    return 0;
-
-  if (parent != 0)
-    path = get_full_path(parent);
-
-  uint16_t path_length = (path != 0) ? strlen(path) : 0;
-  uint16_t name_length = strlen(name) + 1;    // assume a trailing '/'
-
-  char *result = (char *)neutron_malloc(path_length + name_length + 1);
-
-  if (path != 0)
-    {
-    strcpy(result, path);
-
-    if (path_length > 0 &&
-      (path_length > 1 || strcmp(path, "/") != 0))
-      strcat(result, "/");
-
-    neutron_free(path);
-    }
-  else
-    result[0] = 0;
-
-  strcat(result, name);
-
-  return result;
-  }
-
-result_t edit_script(cli_t *context, const char *title, handle_t stream)
-  {
-  // get the stream
-  result_t result;
-
-  if (failed(result = muon_edit(context->cfg.console_in, context->cfg.console_out, title, stream)))
-    {
-    stream_close(stream);
-    return result;
-    }
-
-  return stream_close(stream);
   }
 
 result_t find_enum_name(const enum_t *enums, uint16_t value, const enum_t **name)
@@ -243,7 +189,7 @@ result_t show_value(handle_t dest, memid_t key, field_datatype type, const char 
       float value;
       reg_get_float(key, name, &value);
       do_indent(dest, *indent);
-      stream_printf(dest, "float  %s %f\r\n", name, (double)value);
+      stream_printf(dest, "float  %s %f\r\n", name, (float)value);
       }
       break;
     case field_xyz:
@@ -251,7 +197,7 @@ result_t show_value(handle_t dest, memid_t key, field_datatype type, const char 
       xyz_t value;
       reg_get_xyz(key, name, &value);
       do_indent(dest, *indent);
-      stream_printf(dest, "xyz    %s [%f,%f,%f]\r\n", name, (double)value.x, (double)value.y, (double)value.z);
+      stream_printf(dest, "xyz    %s [%f,%f,%f]\r\n", name, (float)value.x, (float)value.y, (float)value.z);
       }
       break;
     case field_matrix:
@@ -260,9 +206,9 @@ result_t show_value(handle_t dest, memid_t key, field_datatype type, const char 
       reg_get_matrix(key, name, &value);
       do_indent(dest, *indent);
       stream_printf(dest, "matrix %s [%f,%f,%f][%f,%f,%f][%f,%f,%f]\r\n", name,
-        (double)value.v[0][0], (double)value.v[0][1], (double)value.v[0][2],
-        (double)value.v[1][0], (double)value.v[1][1], (double)value.v[1][2],
-        (double)value.v[2][0], (double)value.v[2][1], (double)value.v[2][2]);
+        (float)value.v[0][0], (float)value.v[0][1], (float)value.v[0][2],
+        (float)value.v[1][0], (float)value.v[1][1], (float)value.v[1][2],
+        (float)value.v[2][0], (float)value.v[2][1], (float)value.v[2][2]);
       }
       break;
     case field_string:
@@ -278,7 +224,7 @@ result_t show_value(handle_t dest, memid_t key, field_datatype type, const char 
       qtn_t value;
       reg_get_qtn(key, name, &value);
       do_indent(dest, *indent);
-      stream_printf(dest, "qtn    %s [%f,%f,%f,%f]\r\n", name, (double)value.q0, (double)value.q1, (double)value.q2, (double)value.q3);
+      stream_printf(dest, "qtn    %s [%f,%f,%f,%f]\r\n", name, (float)value.w, (float)value.x, (float)value.y, (float)value.z);
       }
       break;
     case field_lla:
@@ -286,13 +232,13 @@ result_t show_value(handle_t dest, memid_t key, field_datatype type, const char 
     lla_t value;
     reg_get_lla(key, name, &value);
     do_indent(dest, *indent);
-    stream_printf(dest, "lla    %s [%f,%f,%f]\r\n", name, (double)value.lat, (double)value.lng, (double)value.alt);
+    stream_printf(dest, "lla    %s [%f,%f,%f]\r\n", name, (float)value.lat, (float)value.lng, (float)value.alt);
     }
     break;
     case field_stream:
       do_indent(dest, *indent);
       // TODO: handle this..
-      stream_printf(dest, "script %s\r\n", name);
+      stream_printf(dest, "stream %s\r\n", name);
       break;
     }
 

@@ -1,6 +1,6 @@
 /*
 diy-efis
-Copyright (C) 2016 Kotuku Aerospace Limited
+Copyright (C) 2016-2022 Kotuku Aerospace Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,10 +28,14 @@ providers.
 
 If any file has a copyright notice or portions of code have been used
 and the original copyright notice is not yet transcribed to the repository
-then the origional copyright notice is to be respected.
+then the original copyright notice is to be respected.
 
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
+
+If you wish to use any of this code in a commercial application then
+you must obtain a licence from the copyright holder.  Contact
+support@kotuku.aero for information on the commercial licences.
 */
 #include "neutron_cli_impl.h"
 
@@ -161,7 +165,7 @@ static result_t show_published_id(handle_t dest, memid_t key, uint16_t key_id)
               coeff = 0;
 
             // now dump it...
-            stream_printf(dest, "    coeff %d %f\r\n", v_uint16, (double)coeff);
+            stream_printf(dest, "    coeff %d %f\r\n", v_uint16, (float)coeff);
             }
           }
         }
@@ -309,7 +313,7 @@ result_t neutron_rm_id_action(cli_t *context, uint16_t id_)
   return e_not_implemented;
   }
 
-// can_aerospace.c has these
+// canfly.c has these
 result_t neutron_publish_id_rate_rate_action(cli_t *context, uint16_t rate_)
   {
   return reg_set_uint16(get_context(context), s_rate_value, rate_);

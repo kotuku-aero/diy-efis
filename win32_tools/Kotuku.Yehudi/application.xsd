@@ -1,0 +1,642 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified"
+           xmlns="http://kotuku.aero/schema/kotuku.xsd"
+           targetNamespace="http://kotuku.aero/schema/kotuku.xsd">
+  <xs:simpleType name="action-result">
+    <xs:restriction base="xs:int">
+      <xs:enumeration id="mia_nothing" value ="0"/>
+      <xs:enumeration id="mia_show" value="1"/>
+      <xs:enumeration id="mia_cancel" value="2"/>
+      <xs:enumeration id="mia_enter" value="3"/>
+      <xs:enumeration id="mia_close_item" value="4"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="menu-item-type">
+    <xs:restriction base="xs:int">
+      <xs:enumeration id="mi_menu" value="0"/>
+      <xs:enumeration id="mi_cancel" value="1"/>
+      <xs:enumeration id="mi_enter" value="2"/>
+      <xs:enumeration id="mi_event" value="3"/>
+      <xs:enumeration id="mi_edit" value="4"/>
+      <xs:enumeration id="mi_checklist" value="5"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="converter">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="to_display_temperature"/>
+      <xs:enumeration value="to_display_airspeed"/>
+      <xs:enumeration value="to_display_volume"/>
+      <xs:enumeration value="to_display_flow"/>
+      <xs:enumeration value="to_display_kg"/>
+      <xs:enumeration value="to_display_meters"/>
+      <xs:enumeration value="to_display_alt"/>
+      <xs:enumeration value="to_display_map"/>
+      <xs:enumeration value="to_display_qnh"/>
+      <xs:enumeration value="to_display_pressure"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="step">
+    <xs:attribute name="value" type="xs:int" use="required"/>
+    <xs:attribute name="pen" type="xs:string" use="required"/>
+    <xs:attribute name="color" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="tick-mark">
+    <xs:attribute name="value" type="xs:int" use="required"/>
+    <xs:attribute name="text" type="xs:string" use="optional"/>
+  </xs:complexType>
+
+  <xs:complexType name="action">
+    <xs:attribute name="caption" type="xs:string" use="optional"/>
+    <xs:attribute name="enable-regex" type="xs:string" use="optional" />
+    <xs:attribute name="enable-format" type="xs:string" use="optional" />
+    <xs:attribute name="controlling-param" type="xs:string" use="optional"/>
+  </xs:complexType>
+
+  <xs:simpleType name="value-type">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="v_bool"/>
+      <xs:enumeration value="v_uint8"/>
+      <xs:enumeration value="v_uint16"/>
+      <xs:enumeration value="v_uint32"/>
+      <xs:enumeration value="v_int8"/>
+      <xs:enumeration value="v_int16"/>
+      <xs:enumeration value="v_int32"/>
+      <xs:enumeration value="v_float"/>
+      <xs:enumeration value="v_utc"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="event-action">
+    <xs:complexContent>
+      <xs:extension base="action">
+        <xs:attribute name="can-id" type="xs:string" use="required"/>
+        <xs:attribute name="value-type" type="value-type" use="required"/>
+        <xs:attribute name="value" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="popup-action" >
+    <xs:complexContent>
+      <xs:extension base="action">
+        <xs:attribute name="menu" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="checklist-action">
+    <xs:complexContent>
+      <xs:extension base="action">
+        <xs:attribute name="get-index" type="xs:string" use="required">
+          <xs:annotation>
+            <xs:documentation>
+              method used to get the selected index.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="popup" type="xs:string" use="required">
+          <xs:annotation>
+            <xs:documentation>
+              This is the menu that is displayed showing which item
+              is selected.  The menu should be a series of events
+              that will select the item.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="spin-edit-action">
+    <xs:complexContent>
+      <xs:extension base="action">
+        <xs:attribute name="get-method" type="xs:string" use="required">
+          <xs:annotation>
+            <xs:documentation>
+              method called to get the intial value
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="set-method" type="xs:string" use="required">
+          <xs:annotation>
+            <xs:documentation>
+              method called when the value has been edited
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="min-value" type="xs:int" use="required"/>
+        <xs:attribute name="max-value" type="xs:int" use="required"/>
+        <xs:attribute name="digits" type="xs:unsignedInt" use="optional"/>
+        <xs:attribute name="circular" type="xs:boolean" use="optional"/>
+        <xs:attribute name="keys" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="menu">
+    <xs:choice minOccurs="1" maxOccurs="unbounded">
+      <xs:element name="popup-action" type="popup-action"/>
+      <xs:element name="event-action" type="event-action"/>
+      <xs:element name="checklist-action" type="checklist-action"/>
+      <xs:element name="spin-edit-action" type="spin-edit-action"/>
+    </xs:choice>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="caption" type="xs:string" use="required" />
+    <xs:attribute name="keys" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="key-action">
+    <xs:choice>
+      <xs:element name="event-action" type="event-action"/>
+      <xs:element name="popup-action" type="popup-action" />
+      <xs:element name="checklist-action" type="checklist-action"/>
+    </xs:choice>
+  </xs:complexType>
+
+  <xs:complexType name="keymap">
+    <xs:sequence>
+      <xs:element name="key0" type="key-action" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="key1" type="key-action" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="key2" type="key-action" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="key3" type="key-action" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="key4" type="key-action" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="key5" type="key-action" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="key6" type="key-action" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="key7" type="key-action" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="decka-up" type="key-action" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="decka-dn" type="key-action" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="deckb-up" type="key-action" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="deckb-dn" type="key-action" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="decka-press-up" type="key-action" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="decka-press-dn" type="key-action" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="deckb-press-up" type="key-action" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="deckb-press-dn" type="key-action" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="point">
+    <xs:attribute name="x" type="xs:int" use="required"/>
+    <xs:attribute name="y" type="xs:int" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="rect">
+    <xs:attribute name="left" type="xs:int" use="required"/>
+    <xs:attribute name="top" type="xs:int" use="required"/>
+    <xs:attribute name="width" type="xs:int" use="required"/>
+    <xs:attribute name="height" type="xs:int" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="widget">
+    <xs:sequence>
+      <xs:element name="rect" type="rect" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="name-pt" type="point" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="optional"/>
+    <xs:attribute name="draw-name" type="xs:boolean" use="optional"/>
+    <xs:attribute name="fill-background" type="xs:boolean" use="optional"/>
+    <xs:attribute name="border-left" type="xs:boolean" default="false"/>
+    <xs:attribute name="border-top" type="xs:boolean" default="false"/>
+    <xs:attribute name="border-right" type="xs:boolean" default="false"/>
+    <xs:attribute name="border-bottom" type="xs:boolean" default="false"/>
+    <xs:attribute name="name-color" type="xs:string" use="optional"/>
+    <xs:attribute name="name-font" type="xs:string" use="optional"/>
+    <xs:attribute name="border-color" type="xs:string" use="optional"/>
+    <xs:attribute name="background-color" type="xs:string" use="optional"/>
+    <xs:attribute name="z-order" type="xs:unsignedByte" use="optional"/>
+    <xs:attribute name="id" type="xs:string" use="optional"/>
+    <xs:attribute name="on-paint" type="xs:string" use="optional"/>
+    <xs:attribute name="on-paint-background" type="xs:string" use="optional"/>
+    <xs:attribute name="on-message" type="xs:string" use="optional"/>
+    <xs:attribute name="on-create" type="xs:string" use="optional"/>
+    <xs:attribute name="status-timeout" type="xs:unsignedInt" default="10000"/>
+    <xs:attribute name="alarm-id" type="xs:string" use="optional"/>
+    <xs:attribute name="alarm-color" type="xs:string" use="optional"/>
+  </xs:complexType>
+
+  <xs:complexType name="menu-widget">
+    <xs:complexContent>
+      <xs:extension base="widget">
+        <xs:sequence>
+          <xs:element name="menu-rect" type="point" minOccurs="1" maxOccurs="1"/>
+          <xs:element name="menu-start" type="point" minOccurs="1" maxOccurs="1"/>
+          <xs:choice minOccurs="1" maxOccurs="unbounded">
+            <xs:element name="menu" type="menu" />
+            <xs:element name="keys" type="keymap" />
+          </xs:choice>
+        </xs:sequence>
+        <xs:attribute name="font" type="xs:string" use="required"/>
+        <xs:attribute name="selected-background-color" type="xs:string" default="color_white"/>
+        <xs:attribute name="selected-color" type="xs:string" default="color_magenta"/>
+        <xs:attribute name="text-color" type="xs:string" default="color_green"/>
+        <xs:attribute name="menu-timeout" type="xs:unsignedInt" default="25"/>
+        <xs:attribute name="root-keys" type="xs:string" use="required"/>
+        <xs:attribute name="alarm-keys" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:simpleType name="on-message-fn">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="on-paint-fn">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  
+  <xs:simpleType name="application_id">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="text-horizontal-alignment">
+    <xs:restriction base="xs:string" >
+      <xs:enumeration value="left"/>
+      <xs:enumeration value="right" />
+      <xs:enumeration value="center"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="text-vertical-alignment">
+    <xs:restriction base="xs:string" >
+      <xs:enumeration value="top"/>
+      <xs:enumeration value="middle" />
+      <xs:enumeration value="bottom"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="alarm">
+    <xs:sequence>
+      <xs:element name="alarm-id" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="priority" type="xs:int" use="required"/>
+    <xs:attribute name="message" type="xs:string" use="required"/>
+    <xs:attribute name="can-park" type="xs:boolean" default="false" />
+  </xs:complexType>
+
+  <xs:complexType name="airspeed-widget">
+    <xs:complexContent>
+      <xs:extension base="widget">
+        <xs:attribute name="text-color" type="xs:string" use="required"/>
+        <xs:attribute name="pen-color" type="xs:string" use="required"/>
+        <xs:attribute name="font" type="xs:string" use="required"/>
+        <xs:attribute name="large-roller-font" type="xs:string" use="required"/>
+        <xs:attribute name="small-roller-font" type="xs:string" use="required"/>
+        <xs:attribute name="pixels-per-unit" type="xs:int" default="10"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="altitude-widget">
+    <xs:complexContent>
+      <xs:extension base="widget">
+        <xs:attribute name="text-color" type="xs:string" use="required"/>
+        <xs:attribute name="pen-color" type="xs:string" use="required"/>
+        <xs:attribute name="font" type="xs:string" use="required"/>
+        <xs:attribute name="large-roller-font" type="xs:string" use="required"/>
+        <xs:attribute name="small-roller-font" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="annunciator">
+    <xs:complexContent>
+      <xs:extension base="widget">
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="text-annunciator">
+    <xs:complexContent>
+      <xs:extension base="annunciator">
+        <xs:attribute name="can-id" type="xs:string" use="required"/>
+        <xs:attribute name="label-color" type="xs:string" use="required"/>
+        <xs:attribute name="text-color" type="xs:string" use="required"/>
+        <xs:attribute name="small-font" type="xs:string" use="required"/>
+        <xs:attribute name="label-offset" type="xs:int" use="required"/>
+        <xs:attribute name="text-offset" type="xs:int" use="required"/>
+        <xs:attribute name="format" type="xs:string" use="required"/>
+        <xs:attribute name="value-type" type="value-type" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="auto-annunciator">
+    <xs:complexContent>
+      <xs:extension base="text-annunciator">
+        <xs:attribute name="converter" type="converter" use="optional"/>
+        <xs:attribute name="value-type" type="value-type" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="utc-annunciator">
+    <xs:complexContent>
+      <xs:extension base="text-annunciator">
+
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="hours-annunciator">
+    <xs:complexContent>
+      <xs:extension base="text-annunciator">
+
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="hp-annunciator">
+    <xs:complexContent>
+      <xs:extension base="text-annunciator">
+
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="ecu-annunciator">
+    <xs:complexContent>
+      <xs:extension base="text-annunciator">
+
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="hobbs-annunciator">
+    <xs:complexContent>
+      <xs:extension base="text-annunciator">
+
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="ap-widget">
+    <xs:complexContent>
+      <xs:extension base="widget">
+        <xs:attribute name="height" type="xs:unsignedInt" use="required"/>
+        <xs:attribute name="gutter" type="xs:unsignedInt" use="required"/>
+        <xs:attribute name="button-height" type="xs:unsignedInt" use="required"/>
+        <xs:attribute name="active-color" type="xs:string" use="required"/>
+        <xs:attribute name="info-color" type="xs:string" use="required"/>
+        <xs:attribute name="standby-color" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="attitude-widget">
+    <xs:complexContent>
+      <xs:extension base="widget">
+        <xs:sequence>
+          <xs:element name="median" type="point" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="show-aoa" type="xs:boolean" default="false"/>
+        <xs:attribute name="show-glideslope" type="xs:boolean" default="false"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="hsi-widget">
+    <xs:complexContent>
+      <xs:extension base="widget">
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="edu-bar">
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="can-id" type="xs:string" use="required"/>
+    <xs:attribute name="color" type="xs:string" use="required"/>
+    <xs:attribute name="alarm-id" type="xs:string" use="required"/>
+    <xs:attribute name="alarm-color" type="xs:string" use="required"/>
+    <xs:attribute name="sensor-id" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="edu-temp-widget">
+    <xs:complexContent>
+      <xs:extension base="widget">
+        <xs:sequence>
+          <xs:element name="egt" type="edu-bar" minOccurs="4" maxOccurs="6"/>
+          <xs:element name="cht" type="edu-bar" minOccurs="4" maxOccurs="6"/>
+        </xs:sequence>
+        <xs:attribute name="num-cyl" type="xs:unsignedInt" use="required"/>
+        <xs:attribute name="left-gutter" type="xs:unsignedInt" use="required"/>
+        <xs:attribute name="right-gutter" type="xs:unsignedInt" use="required"/>
+        <xs:attribute name="cylinder-draw-width" type="xs:unsignedInt" use="required"/>
+        <xs:attribute name="egt-color" type="xs:string" use="required"/>
+        <xs:attribute name="cht-color" type="xs:string" use="required"/>
+        <xs:attribute name="egt-line" type="xs:unsignedInt" use="required"/>
+        <xs:attribute name="cht-line" type="xs:unsignedInt" use="required"/>
+        <xs:attribute name="bar-top" type="xs:unsignedInt" use="required"/>
+        <xs:attribute name="bar-bottom" type="xs:unsignedInt" use="required"/>
+        <xs:attribute name="status-top" type="xs:unsignedInt" use="required" />
+        <xs:attribute name="egt-redline" type="xs:unsignedShort" use="required"/>
+        <xs:attribute name="egt-min" type="xs:unsignedShort" use="required"/>
+        <xs:attribute name="cht-redline" type="xs:unsignedShort" use="required"/>
+        <xs:attribute name="cht-min" type="xs:unsignedShort" use="required"/>
+        <xs:attribute name="cht-redline-pos" type="xs:unsignedInt" use="required"/>
+        <xs:attribute name="font" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:simpleType name="gauge-style">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="pointer"/>
+      <xs:enumeration value="sweep"/>
+      <xs:enumeration value="bar"/>
+      <xs:enumeration value="point"/>
+      <xs:enumeration value="pointer_minmax"/>
+      <xs:enumeration value="point_minmax"/>
+      <xs:enumeration value="hbar"/>
+      <xs:enumeration value="small"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="gauge-widget">
+    <xs:complexContent>
+      <xs:extension base="widget">
+        <xs:sequence>
+          <xs:element name="center" type="point" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="value-rect" type="rect" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="step" type="step" minOccurs="2" maxOccurs="unbounded"/>
+          <xs:element name="tick" type="tick-mark" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="style" type="gauge-style" use="required"/>
+        <xs:attribute name="font" type="xs:string" use="required"/>
+        <xs:attribute name="can-id" type="xs:string" use="required"/>
+        <xs:attribute name="reset-id" type="xs:string" use="optional"/>
+        <xs:attribute name="sensor-id" type="xs:string" use="optional"/>
+        <xs:attribute name="radii" type="xs:int" use="optional"/>
+        <xs:attribute name="bar-width" type="xs:unsignedInt" use="optional"/>
+        <xs:attribute name="arc-width" type="xs:unsignedInt" use="optional"/>
+        <xs:attribute name="arc-begin" type="xs:unsignedShort" use="optional"/>
+        <xs:attribute name="arc-range" type="xs:unsignedShort" use="optional"/>
+        <xs:attribute name="reset-value" type="xs:float" use="optional"/>
+        <xs:attribute name="pointer-width" type="xs:unsignedShort" use="optional"/>
+        <xs:attribute name="draw-value" type="xs:boolean" use="optional"/>
+        <xs:attribute name="value-font" type="xs:string" use="optional"/>
+        <xs:attribute name="draw-value-box" type="xs:boolean" use="optional"/>
+        <xs:attribute name="converter" type="converter" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="hsi">
+    <xs:complexContent>
+      <xs:extension  base="widget">
+
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="hypsometric-theme">
+    <xs:attribute name="elevation" type="xs:int" use="required"/>
+    <xs:attribute name="color" type="xs:string" use="required"/>
+    <xs:attribute name="contour_color" type="xs:string" use="optional"/>
+  </xs:complexType>
+
+  <xs:complexType name="config-element">
+    <xs:attribute name="config-path"/>
+  </xs:complexType>
+
+  <xs:complexType name="theme">
+    <xs:complexContent>
+      <xs:extension base="config-element">
+        <xs:sequence>
+          <xs:element name="contour" type="hypsometric-theme" minOccurs="20" maxOccurs="20"/>
+        </xs:sequence>
+        <xs:attribute name="alarm-color" type="xs:string" use="required"/>
+        <xs:attribute name="warning-color" type="xs:string" use="required"/>
+        <xs:attribute name="water-color" type="xs:string" use="required"/>
+        <xs:attribute name="land-color" type="xs:string" use="required"/>
+        <xs:attribute name="coastline-color" type="xs:string" use="required"/>
+        <xs:attribute name="residential-street" type="xs:string" use="required"/>
+        <xs:attribute name="residential-area" type="xs:string" use="required"/>
+        <xs:attribute name="big-road" type="xs:string" use="required"/>
+        <xs:attribute name="major-road" type="xs:string" use="required"/>
+        <xs:attribute name="highway" type="xs:string" use="required"/>
+        <xs:attribute name="class-a-airspace" type="xs:string" use="required"/>
+        <xs:attribute name="class-b-airspace" type="xs:string" use="required"/>
+        <xs:attribute name="class-c-airspace" type="xs:string" use="required"/>
+        <xs:attribute name="class-d-airspace" type="xs:string" use="required"/>
+        <xs:attribute name="class-e-airspace" type="xs:string" use="required"/>
+        <xs:attribute name="class-f-airspace" type="xs:string" use="required"/>
+        <xs:attribute name="class-g-airspace" type="xs:string" use="required"/>
+        <xs:attribute name="class-m-airspace" type="xs:string" use="required"/>
+        <xs:attribute name="cfz-airspace" type="xs:string" use="required"/>
+        <xs:attribute name="mbz-airspace" type="xs:string" use="required"/>
+        <xs:attribute name="danger-area" type="xs:string" use="required"/>
+        <xs:attribute name="restricted-area" type="xs:string" use="required"/>
+        <xs:attribute name="grass-runway-outline" type="xs:string" use="required"/>
+        <xs:attribute name="grass-runway-fill" type="xs:string" use="required"/>
+        <xs:attribute name="grass-runway-extension" type="xs:string" use="required"/>
+        <xs:attribute name="runway-outline" type="xs:string" use="required"/>
+        <xs:attribute name="runway-fill" type="xs:string" use="required"/>
+        <xs:attribute name="runway-extension" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="map-widget">
+    <xs:complexContent>
+      <xs:extension base="widget">
+        <xs:sequence>
+          <xs:element name="day-theme" type="theme" minOccurs="1" maxOccurs="1"/>
+          <xs:element name="night-theme" type="theme" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="font" type="xs:string" use="required" />
+        <xs:attribute name="show-terrain" type="xs:boolean" default="false"/>
+        <xs:attribute name="show-contours" type="xs:boolean" default =" true"/>
+        <xs:attribute name="show-cities" type="xs:boolean" default="true"/>
+        <xs:attribute name="show-water" type="xs:boolean" default="true"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="pancake-widget">
+    <xs:complexContent>
+      <xs:extension base="widget">
+        <xs:sequence>
+          <xs:element name="value-rect" type="rect" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="indicator-rect" type="rect" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="can-id" type="xs:string" use="required"/>
+        <xs:attribute name="horizontal" type="xs:boolean" use="required"/>
+        <xs:attribute name="outline-color" type="xs:string" use="required"/>
+        <xs:attribute name="indicator-color" type="xs:string" use="required"/>
+        <xs:attribute name="converter" type="converter" use="optional"/>
+        <xs:attribute name="width" type="xs:unsignedShort" use="required"/>
+        <xs:attribute name="height" type="xs:unsignedShort" use="required"/>
+        <xs:attribute name="gutter" type="xs:unsignedShort" use="required"/>
+        <xs:attribute name="draw-value" type="xs:boolean" use="optional"/>
+        <xs:attribute name="value-font" type="xs:string" use="optional"/>
+        <xs:attribute name="draw-value-box" type="xs:boolean" use="optional"/>
+        <xs:attribute name="min-value" type="xs:int" use="required"/>
+        <xs:attribute name="max-value" type="xs:int" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="marquee-widget">
+    <xs:complexContent>
+      <xs:extension base="widget">
+        <xs:sequence>
+          <xs:choice minOccurs ="1" maxOccurs="unbounded">
+            <xs:element name="text" type="text-annunciator"/>
+            <xs:element name="auto" type="auto-annunciator"/>
+            <xs:element name="utc" type="utc-annunciator"/>
+            <xs:element name="hours" type="hours-annunciator"/>
+            <xs:element name="hp" type="hp-annunciator"/>
+            <xs:element name="hobbs" type="hobbs-annunciator"/>
+          </xs:choice>
+          <xs:element name="alarm" type="alarm" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="base-id" type="xs:unsignedShort" use="required"/>
+        <xs:attribute name="base-alarm-id" type="xs:unsignedShort" use="required"/>
+        <xs:attribute name="alarm-background" type="xs:string" use="required"/>
+        <xs:attribute name="alarm-text" type="xs:string" use="required"/>
+        <xs:attribute name="font" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="layout">
+    <xs:choice minOccurs="1" maxOccurs="unbounded">
+      <xs:element name="airspeed" type="airspeed-widget"/>
+      <xs:element name="altitude" type="altitude-widget"/>
+      <xs:element name="hsi" type="hsi-widget"/>
+      <xs:element name="text" type="text-annunciator"/>
+      <xs:element name="auto" type="auto-annunciator"/>
+      <xs:element name="utc" type="utc-annunciator"/>
+      <xs:element name="hours" type="hours-annunciator"/>
+      <xs:element name="hp" type="hp-annunciator"/>
+      <xs:element name="ecu" type="ecu-annunciator"/>
+      <xs:element name="hobbs" type="hobbs-annunciator"/>
+      <xs:element name="attitude" type="attitude-widget"/>
+      <xs:element name="edu-temps" type="edu-temp-widget"/>
+      <xs:element name="gauge" type="gauge-widget"/>
+      <xs:element name="map" type="map-widget"/>
+      <xs:element name="pancake" type="pancake-widget"/>
+      <xs:element name="marquee" type="marquee-widget"/>
+      <xs:element name="autopilot" type="ap-widget"/>
+    </xs:choice>
+  </xs:complexType>
+
+  <xs:element name="application">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="id" type="application_id" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="resource" type="application_id" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="on-message" type="on-message-fn" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="on-paint" type="on-paint-fn" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="menu" type="menu-widget" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="layout" type="layout" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

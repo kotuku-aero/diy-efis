@@ -1,6 +1,6 @@
 /*
 diy-efis
-Copyright (C) 2016 Kotuku Aerospace Limited
+Copyright (C) 2016-2022 Kotuku Aerospace Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,10 +28,14 @@ providers.
 
 If any file has a copyright notice or portions of code have been used
 and the original copyright notice is not yet transcribed to the repository
-then the origional copyright notice is to be respected.
+then the original copyright notice is to be respected.
 
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
+
+If you wish to use any of this code in a commercial application then
+you must obtain a licence from the copyright holder.  Contact
+support@kotuku.aero for information on the commercial licences.
 */
 #include <string.h>
 #include <ctype.h>
@@ -58,8 +62,8 @@ void cli_print_prompt(const cli_t *parser)
  * \param    add_lf     1 to add LF before printing the node; 0 otherwise.
  * \param    print_desc 1 to print the description of the node; 0 otherwise.
  */
-static void cli_help_print_node(cli_t *parser, cli_node_t *node,
-                                bool add_lf, bool print_desc)
+static void cli_help_print_node(cli_t *parser, const cli_node_t *node,
+  bool add_lf, bool print_desc)
   {
 
   if (add_lf)
@@ -72,16 +76,16 @@ static void cli_help_print_node(cli_t *parser, cli_node_t *node,
     case CLI_NODE_END:
       stream_puts(parser->cfg.console_out, "\r\n");
       break;
-    case CLI_NODE_ENUM :
+    case CLI_NODE_ENUM:
       {
       const enum_t *lnode = (const enum_t *)node->param;
       const char * token = CUR_TOKEN(parser)->token_buffer;
-      uint16_t len = token != 0 ? strlen(token) : 0;
+      uint16_t len = token != 0 ? (uint16_t) strlen(token) : 0;
 
       while (lnode->name != 0)
         {
         // try to match it
-        if(strncmp(lnode->name, token, len) == 0)
+        if (strncmp(lnode->name, token, len) == 0)
           {
           stream_puts(parser->cfg.console_out, lnode->name);
           stream_puts(parser->cfg.console_out, "\r\n");
@@ -90,31 +94,25 @@ static void cli_help_print_node(cli_t *parser, cli_node_t *node,
         }
       }
       break;
-    case CLI_NODE_PATH :
+    case CLI_NODE_PATH:
       {
-      vector_p matches = 0;
+      charps_t *matches = 0;
       if (succeeded(match_path(parser, CUR_TOKEN(parser)->token_buffer, false, 0, &matches)))
         {
-        uint16_t len;
-        if (succeeded(vector_count(matches, &len)))
+        uint16_t len = charps_count(matches);
+        uint16_t i;
+        for (i = 0; i < len; i++)
           {
-          uint16_t i;
-          for (i = 0; i < len; i++)
-            {
-            const char * option;
+          const char * option = charps_begin(matches)[i];
 
-            if (succeeded(vector_at(matches, i, &option)))
-              {
-              stream_puts(parser->cfg.console_out, option);
-              stream_puts(parser->cfg.console_out, "\r\n");
-              }
-            }
+          stream_puts(parser->cfg.console_out, option);
+          stream_puts(parser->cfg.console_out, "\r\n");
           }
-        }
-      if (matches != 0)
-        kfree_split(matches);
       }
-      break;
+    if (matches != 0)
+      close_and_free_charps(matches);
+    }
+    break;
     default:
       stream_puts(parser->cfg.console_out, node->param);
       if (print_desc && node->desc)
@@ -140,7 +138,7 @@ static void cli_print_error(cli_t *parser, const char *msg)
 
   stream_puts(parser->cfg.console_out, "\r\n");
 
-  m = strlen(parser->prompt[parser->root_level]) + 1;
+  m = strlen(parser->prompt[parser->root_level]) + 2;
 
   for (n = 0; n < m + parser->last_good; n++)
     stream_putc(parser->cfg.console_out, ' ');
@@ -199,14 +197,14 @@ static result_t cli_execute_cmd(cli_t *parser)
    * Enter a command.
    */
   if ((CLI_STATE_TOKEN == parser->state) ||
-      (CLI_STATE_WHITESPACE == parser->state))
+    (CLI_STATE_WHITESPACE == parser->state))
     {
-    cli_node_t *child;
+    const cli_node_t *child;
 
     if (CLI_STATE_TOKEN == parser->state)
       {
       cli_token_t *token;
-      cli_node_t *match;
+      const cli_node_t *match;
       bool is_complete;
 
       token = CUR_TOKEN(parser);
@@ -237,11 +235,11 @@ static result_t cli_execute_cmd(cli_t *parser)
 
     // if this is an optional node, all other nodes are
     // also optional so just skip to end
-    if((child->flags & CLI_NODE_FLAGS_OPT_START)!= 0)
+    if ((child->flags & CLI_NODE_FLAGS_OPT_START) != 0)
       {
       // move to the end state
       while (child != 0 &&
-          child->type != CLI_NODE_END)
+        child->type != CLI_NODE_END)
         {
         // skip down the list of completed
         child = child->children;
@@ -286,11 +284,11 @@ static result_t cli_execute_cmd(cli_t *parser)
   }
 
 static result_t cli_match_prefix(cli_t *parser, cli_token_t *token,
-                                 const cli_node_t *parent,
-                                 const char ch, const int offset)
+  const cli_node_t *parent,
+  const char ch, const int offset)
   {
   bool local_is_complete;
-  cli_node_t *child;
+  const cli_node_t *child;
   result_t rc;
 
   for (child = parent->children; 0 != child; child = child->sibling)
@@ -306,7 +304,7 @@ static result_t cli_match_prefix(cli_t *parser, cli_token_t *token,
       }
 
     /* There is a match. Make sure that it is part of this node as well */
-    if (*((char *) child->param + offset) != ch)
+    if (*((char *)child->param + offset) != ch)
       {
       return e_unexpected;
       }
@@ -321,7 +319,7 @@ static result_t cli_match_prefix(cli_t *parser, cli_token_t *token,
  */
 static result_t cli_help(cli_t *parser)
   {
-  cli_node_t *node;
+  const cli_node_t *node;
   cli_token_t *token;
   bool local_is_complete;
 
@@ -329,7 +327,7 @@ static result_t cli_help(cli_t *parser)
     {
     /* Just print out every children */
     for (node = parser->cur_node->children; 0 != node;
-         node = node->sibling)
+      node = node->sibling)
       {
       cli_help_print_node(parser, node, true, true);
       }
@@ -342,7 +340,7 @@ static result_t cli_help(cli_t *parser)
      */
     cli_print_error(parser, "Last known good parse point.");
     for (node = parser->cur_node->children; 0 != node;
-         node = node->sibling)
+      node = node->sibling)
       {
       cli_help_print_node(parser, node, true, true);
       }
@@ -353,7 +351,7 @@ static result_t cli_help(cli_t *parser)
     node = parser->cur_node->children;
     token = CUR_TOKEN(parser);
     for (node = parser->cur_node->children; 0 != node;
-         node = node->sibling)
+      node = node->sibling)
       {
       if (succeeded(cli_match_fn_tbl[node->type](parser, token, node, &local_is_complete)))
         {
@@ -376,7 +374,7 @@ static result_t cli_help(cli_t *parser)
 static int cli_complete_one_level(cli_t *parser)
   {
   cli_token_t *token;
-  cli_node_t *match;
+  const cli_node_t *match;
   bool is_complete = false;
   int num_matches;
   bool keep_going = false;
@@ -390,8 +388,8 @@ static int cli_complete_one_level(cli_t *parser)
       break;
     case CLI_STATE_WHITESPACE:
       if (parser->cur_node && parser->cur_node->children &&
-          !parser->cur_node->children->sibling &&
-          (CLI_NODE_KEYWORD == parser->cur_node->children->type))
+        !parser->cur_node->children->sibling &&
+        (CLI_NODE_KEYWORD == parser->cur_node->children->type))
         {
         ch_ptr = parser->cur_node->children->param;
         while (*ch_ptr)
@@ -412,56 +410,56 @@ static int cli_complete_one_level(cli_t *parser)
       break;
     case CLI_STATE_TOKEN:
     {
-      /* Complete a command */
-      token = CUR_TOKEN(parser);
-      num_matches = cli_match(parser, token, parser->cur_node, &match, &is_complete);
-      if (num_matches == 1)
+    /* Complete a command */
+    token = CUR_TOKEN(parser);
+    num_matches = cli_match(parser, token, parser->cur_node, &match, &is_complete);
+    if (num_matches == 1)
+      {
+      cli_complete_fn fn = cli_complete_fn_tbl[match->type];
+      /*
+       * If the only matched node is a keyword, we feel the rest of
+       * keyword in. Otherwise, we assume this parameter is complete
+       * and just insert a space.
+       */
+      if (fn)
         {
-        cli_complete_fn fn = cli_complete_fn_tbl[match->type];
-        /*
-         * If the only matched node is a keyword, we feel the rest of
-         * keyword in. Otherwise, we assume this parameter is complete
-         * and just insert a space.
-         */
-        if (fn)
-          {
-          fn(parser, match, token);
-          }
-        cli_input(parser, ' ', CLI_CHAR_REGULAR);
-
-        keep_going = 1;
+        fn(parser, match, token);
         }
-      else
+      cli_input(parser, ' ', CLI_CHAR_REGULAR);
+
+      keep_going = 1;
+      }
+    else
+      {
+      int offset, orig_offset;
+      /*
+       * If we have more than one match, we should try to complete
+       * as much as possible. To do that, we grab the node in the
+       * (first) matched node and check that the next character
+       * from it is common among all matched nodes. If it is common
+       * to all matched nodes, we continue to feed them into the
+       * parser. However, this is only useful for keywords. If there
+       * is a parameter token in the match, we automatically abort.
+       */
+      uint16_t len = token->token_length;
+      offset = orig_offset = len;
+      ch_ptr = ((char *)match->param) + len;
+      while (('\0' != *ch_ptr) &&
+        (s_ok ==
+          cli_match_prefix(parser, token, parser->cur_node, *ch_ptr, offset)))
         {
-        int offset, orig_offset;
-        /*
-         * If we have more than one match, we should try to complete
-         * as much as possible. To do that, we grab the node in the
-         * (first) matched node and check that the next character
-         * from it is common among all matched nodes. If it is common
-         * to all matched nodes, we continue to feed them into the
-         * parser. However, this is only useful for keywords. If there
-         * is a parameter token in the match, we automatically abort.
-         */
-        uint16_t len = token->token_length;
-        offset = orig_offset = len;
-        ch_ptr = ((char *)match->param) + len;
-        while (('\0' != *ch_ptr) &&
-               (s_ok ==
-                cli_match_prefix(parser, token, parser->cur_node, *ch_ptr, offset)))
-          {
-          cli_input(parser, *ch_ptr, CLI_CHAR_REGULAR);
+        cli_input(parser, *ch_ptr, CLI_CHAR_REGULAR);
 
-          ch_ptr++;
-          offset++;
-          }
-        if (orig_offset == offset)
-          {
-          /* If there is no common prefix at all, just display help */
-          cli_help(parser);
-          }
+        ch_ptr++;
+        offset++;
         }
-      break;
+      if (orig_offset == offset)
+        {
+        /* If there is no common prefix at all, just display help */
+        cli_help(parser);
+        }
+      }
+    break;
     }
     default:
       return false;
@@ -488,21 +486,18 @@ result_t cli_input(cli_t *parser, char ch, cli_char_t ch_type)
     if (CLI_CHAR_REGULAR != ch_type)
       return s_ok;
 
-    char *str;
-    vector_begin(parser->user_buf, (void **) &str);
-    uint16_t len;
-    vector_count(parser->user_buf, &len);
+    uint16_t len = chars_count(parser->user_buf);
 
     if ('\n' == ch)
       {
       // check for a line that has continuation characters
-      if(len > 0 &&
-         str[len-1] != '\\')
+      if (len > 0 &&
+        chars_begin(parser->user_buf)[len - 1] != '\\')
         {
         // We have a complete input. Call the callback.
-        vector_push_back(parser->user_buf,  &eol);
+        chars_push_back(parser->user_buf, eol);
 
-        if(parser->user_input_cb != 0)
+        if (parser->user_input_cb != 0)
           rc = parser->user_input_cb(parser, parser->stream, parser->user_buf);
 
         cli_input_reset(parser);
@@ -511,24 +506,24 @@ result_t cli_input(cli_t *parser, char ch, cli_char_t ch_type)
         }
 
       // otherwise remove the trailing \ as this indicates a line continuation
-      vector_pop_back(parser->user_buf, 0);
+      chars_pop_back(parser->user_buf, 0);
       len--;
       len--;
-      while(len-- > 0 && isspace(str[len]))
-        vector_pop_back(parser->user_buf, 0);     // remove the trailing white space
+      while (len-- > 0 && isspace(chars_begin(parser->user_buf)[len]))
+        chars_pop_back(parser->user_buf, 0);     // remove the trailing white space
       }
 
     if ((parser->cfg.ch_erase == ch) || (parser->cfg.ch_del == ch))
       {
-      if(len > 0)
-        vector_pop_back(parser->user_buf, 0);
+      if (len > 0)
+        chars_pop_back(parser->user_buf, 0);
 
       if (parser->user_do_echo)
         stream_putc(parser->cfg.console_out, '\b');
       }
     else
       {
-      vector_push_back(parser->user_buf, &ch);
+      chars_push_back(parser->user_buf, ch);
 
       if (parser->user_do_echo)
         stream_putc(parser->cfg.console_out, ch);
@@ -540,114 +535,112 @@ result_t cli_input(cli_t *parser, char ch, cli_char_t ch_type)
     {
     case CLI_CHAR_REGULAR:
     {
-      if ((parser->cfg.ch_complete == ch) ||
-          (parser->cfg.ch_help == ch))
-        {
-        /*
-         * Completion and help character do not go into the line
-         * buffer. So, do nothing.
-         */
-        break;
-        }
-
-      if ((parser->cfg.ch_erase == ch) || (parser->cfg.ch_del == ch))
-        {
-        rc = cli_line_delete(parser);
-        if (failed(rc))
-          return rc;
-        }
-      else if ('\n' == ch)
-        {
-        /* Put the rest of the line into parser FSM */
-        for (n = cli_line_current(parser);
-             n < cli_line_last(parser); n++)
-          {
-          rc = cli_fsm_input(parser, cli_line_char(parser, n));
-          }
-        }
-      else
-        {
-        cli_line_insert(parser, ch);
-        }
+    if ((parser->cfg.ch_complete == ch) ||
+      (parser->cfg.ch_help == ch))
+      {
+      /*
+       * Completion and help character do not go into the line
+       * buffer. So, do nothing.
+       */
       break;
+      }
+
+    if ((parser->cfg.ch_erase == ch) || (parser->cfg.ch_del == ch))
+      {
+      rc = cli_line_delete(parser);
+      if (failed(rc))
+        return rc;
+      }
+    else if ('\n' == ch || '\r' == ch)
+      {
+      /* Put the rest of the line into parser FSM */
+      for (n = cli_line_current(parser);
+        n < cli_line_last(parser); n++)
+        {
+        rc = cli_fsm_input(parser, cli_line_char(parser, n));
+        }
+      }
+    else
+      {
+      cli_line_insert(parser, ch);
+      }
+    break;
     }
     case CLI_CHAR_UP_ARROW:
     {
-      rc = cli_line_prev_line(parser);
+    rc = cli_line_prev_line(parser);
 
-      /* Reset the token stack and re-enter the command */
-      cli_fsm_reset(parser);
-      for (n = 0; n < cli_line_current(parser); n++)
-        {
-        rc = cli_fsm_input(parser, cli_line_char(parser, n));
-        }
+    /* Reset the token stack and re-enter the command */
+    cli_fsm_reset(parser);
+    for (n = 0; n < cli_line_current(parser); n++)
+      {
+      rc = cli_fsm_input(parser, cli_line_char(parser, n));
+      }
 
-      return s_ok;
+    return s_ok;
     }
     case CLI_CHAR_DOWN_ARROW:
     {
-      rc = cli_line_next_line(parser);
+    rc = cli_line_next_line(parser);
 
-      /* Reset the token stack and re-enter the command */
-      cli_fsm_reset(parser);
-      for (n = 0; n < cli_line_current(parser); n++)
-        {
-        rc = cli_fsm_input(parser, cli_line_char(parser, n));
-        }
+    /* Reset the token stack and re-enter the command */
+    cli_fsm_reset(parser);
+    for (n = 0; n < cli_line_current(parser); n++)
+      {
+      rc = cli_fsm_input(parser, cli_line_char(parser, n));
+      }
 
-      return s_ok;
+    return s_ok;
     }
     case CLI_CHAR_LEFT_ARROW:
     {
-      ch = cli_line_prev_char(parser);
-      if (!ch)
-        {
-        stream_putc(parser->cfg.console_out, '\a');
-        return s_ok;
-        }
-      break;
+    ch = cli_line_prev_char(parser);
+    if (!ch)
+      {
+      stream_putc(parser->cfg.console_out, '\a');
+      return s_ok;
+      }
+    break;
     }
     case CLI_CHAR_RIGHT_ARROW:
     {
-      ch = cli_line_next_char(parser);
-      if (!ch)
-        {
-        stream_putc(parser->cfg.console_out, '\a');
-        return s_ok;
-        }
-      break;
+    ch = cli_line_next_char(parser);
+    if (!ch)
+      {
+      stream_putc(parser->cfg.console_out, '\a');
+      return s_ok;
+      }
+    break;
     }
     case CLI_CHAR_FIRST:
     {
-      do
+    do
+      {
+      ch = cli_line_prev_char(parser);
+      if (ch)
         {
-        ch = cli_line_prev_char(parser);
-        if (ch)
-          {
-          cli_fsm_input(parser, ch);
-          }
+        cli_fsm_input(parser, ch);
         }
-      while (ch);
+      } while (ch);
       return s_ok;
     }
     case CLI_CHAR_LAST:
     {
-      do
+    do
+      {
+      ch = cli_line_next_char(parser);
+      if (ch)
         {
-        ch = cli_line_next_char(parser);
-        if (ch)
-          {
-          cli_fsm_input(parser, ch);
-          }
+        cli_fsm_input(parser, ch);
         }
-      while (ch);
+      } while (ch);
       return s_ok;
     }
     default:
     {
-      /* An unknown character. Alert and continue */
-      stream_putc(parser->cfg.console_out, '\a');
-      return e_unexpected;
+    /* An unknown character. Alert and continue */
+    stream_putc(parser->cfg.console_out, '\a');
+    return e_unexpected;
     }
     } /* switch (ch_type) */
 
@@ -663,14 +656,30 @@ result_t cli_input(cli_t *parser, char ch, cli_char_t ch_type)
     cli_help(parser);
     return s_ok;
     }
-  else if ('\n' == ch)
+  else if ('\n' == ch || '\r' == ch)
     {
     rc = cli_execute_cmd(parser);
     cli_line_advance(parser);
     return rc;
     }
 
-  return cli_fsm_input(parser, (char) ch);
+  return cli_fsm_input(parser, (char)ch);
+  }
+
+result_t cli_abort(cli_t *parser)
+  {
+  // terminate the parser
+  parser->done = 1;
+
+  const char *term_str = "x";
+  // send a char to the parser that is sure to make it stop
+  (parser->cfg.receive_char)(parser->cfg.console_in, term_str, 1);
+
+  semaphore_wait(parser->terminated_event, INDEFINITE_WAIT);
+
+  close_handle(parser->terminated_event);
+
+  return s_ok;
   }
 
 result_t cli_run(cli_t *parser)
@@ -687,6 +696,9 @@ result_t cli_run(cli_t *parser)
   while (!parser->done)
     {
     stream_getc(parser->cfg.console_in, &ch);
+    if ((ch & 0x80) != 0)
+      continue;
+
     if ('\x1B' == ch)
       {
       stream_getc(parser->cfg.console_in, &ch);
@@ -711,11 +723,11 @@ result_t cli_run(cli_t *parser)
         }
       }
     else if (isalnum(ch) || ('\n' == ch) ||
-             ispunct(ch) || (' ' == ch) ||
-             (ch == parser->cfg.ch_erase) ||
-             (ch == parser->cfg.ch_del) ||
-             (ch == parser->cfg.ch_help) ||
-             (ch == parser->cfg.ch_complete))
+      ispunct(ch) || (' ' == ch) ||
+      (ch == parser->cfg.ch_erase) ||
+      (ch == parser->cfg.ch_del) ||
+      (ch == parser->cfg.ch_help) ||
+      (ch == parser->cfg.ch_complete))
       {
       ch_type = CLI_CHAR_REGULAR;
       }
@@ -723,12 +735,15 @@ result_t cli_run(cli_t *parser)
     cli_input(parser, ch, ch_type);
     } /* while not done */
 
+  semaphore_signal(parser->terminated_event);
+
   return s_ok;
   }
 
 result_t cli_init(cli_cfg_t *cfg, cli_t *parser)
   {
   int n;
+  result_t result;
 
   if (!parser || !cfg || !cfg->root || !cfg->ch_erase)
     {
@@ -737,6 +752,9 @@ result_t cli_init(cli_cfg_t *cfg, cli_t *parser)
 
   parser->cfg = *cfg;
 
+  if (failed(result = semaphore_create(&parser->terminated_event)))
+    return result;
+
   /* Initialize sub-mode states */
   parser->root_level = 0;
 
@@ -744,7 +762,7 @@ result_t cli_init(cli_cfg_t *cfg, cli_t *parser)
   strncpy(parser->prompt[0], "/", MAX_PROMPT_LENGTH);   // root prompt
   parser->current[0] = 0;                   // root memid in the registry
 
-  for(n = 1; n < CLI_MAX_NESTED_LEVELS; n++)
+  for (n = 1; n < CLI_MAX_NESTED_LEVELS; n++)
     parser->prompt[n][0] = 0;
 
   /* Initialize line buffering states */
@@ -755,10 +773,9 @@ result_t cli_init(cli_cfg_t *cfg, cli_t *parser)
   for (n = 0; n < CLI_MAX_LINES; n++)
     cli_line_init(&parser->lines[n]);
 
-  for (n = 0; n < CLI_MAX_NUM_TOKENS; n++)
-    memset(&parser->tokens[n], 0, sizeof(cli_token_t));
+  memset(parser->tokens, 0, sizeof(cli_token_t) * CLI_MAX_NUM_TOKENS);
 
-    /* Initialize parser FSM state */
+  /* Initialize parser FSM state */
   cli_fsm_reset(parser);
 
   /* Clear the user input state */
@@ -773,7 +790,7 @@ void cli_cleanup(cli_t *parser)
 
   for (n = 0; n < CLI_MAX_LINES; n++)
     {
-    if(parser->lines[n].buffer != 0)
+    if (parser->lines[n].buffer != 0)
       neutron_free(parser->lines[n].buffer);
 
     parser->lines[n].buffer = 0;
@@ -781,7 +798,7 @@ void cli_cleanup(cli_t *parser)
 
   for (n = 0; n < CLI_MAX_NUM_TOKENS; n++)
     {
-    if(parser->tokens[n].token_buffer != 0)
+    if (parser->tokens[n].token_buffer != 0)
       neutron_free(parser->tokens[n].token_buffer);
 
     memset(&parser->tokens[n], 0, sizeof(cli_token_t));
@@ -791,16 +808,15 @@ void cli_cleanup(cli_t *parser)
 result_t cli_quit(cli_t *parser)
   {
   if (!parser)
-    {
     return e_bad_parameter;
-    }
+
   parser->done = 1;
   return s_ok;
   }
 
 result_t cli_submode_enter(cli_t *parser, memid_t key, const char * prompt)
   {
-  cli_node_t *new_root;
+  const cli_node_t *new_root;
 
   if (!parser)
     return e_bad_parameter;
@@ -836,12 +852,12 @@ result_t cli_submode_exit(cli_t *parser)
   return s_ok;
   }
 
-static result_t cli_walk_internal(cli_t *parser, cli_node_t *node,
-                  cli_walker_fn pre_fn, cli_walker_fn post_fn,
-                  void *cookie)
+static result_t cli_walk_internal(cli_t *parser, const cli_node_t *node,
+  cli_walker_fn pre_fn, cli_walker_fn post_fn,
+  void *cookie)
   {
   result_t rc;
-  cli_node_t *cur_node;
+  const cli_node_t *cur_node;
 
   if (pre_fn)
     {
@@ -875,7 +891,7 @@ static result_t cli_walk_internal(cli_t *parser, cli_node_t *node,
   }
 
 result_t cli_walk(cli_t *parser, cli_walker_fn pre_fn,
-         cli_walker_fn post_fn, void *cookie)
+  cli_walker_fn post_fn, void *cookie)
   {
   if (!VALID_PARSER(parser) || (!pre_fn && !post_fn))
     {
@@ -883,14 +899,14 @@ result_t cli_walk(cli_t *parser, cli_walker_fn pre_fn,
     }
 
   return cli_walk_internal(parser, parser->root[parser->root_level],
-                           pre_fn, post_fn, cookie);
+    pre_fn, post_fn, cookie);
   }
 
 typedef struct help_stack_
   {
   char *filter;
   int tos;
-  cli_node_t *nodes[CLI_MAX_NUM_TOKENS + 2];
+  const cli_node_t *nodes[CLI_MAX_NUM_TOKENS + 2];
   } help_stack_t;
 
 /**
@@ -904,9 +920,9 @@ typedef struct help_stack_
  *
  * \return   Return s_ok always.
  */
-static result_t cli_help_pre_walker(cli_t *parser, cli_node_t *node, void *cookie)
+static result_t cli_help_pre_walker(cli_t *parser, const cli_node_t *node, void *cookie)
   {
-  help_stack_t *hs = (help_stack_t *) cookie;
+  help_stack_t *hs = (help_stack_t *)cookie;
 
   hs->nodes[hs->tos] = node;
   hs->tos++;
@@ -925,13 +941,13 @@ static result_t cli_help_pre_walker(cli_t *parser, cli_node_t *node, void *cooki
  *
  * \return   Return s_ok always.
  */
-static result_t cli_help_post_walker(cli_t *parser, cli_node_t *node, void *cookie)
+static result_t cli_help_post_walker(cli_t *parser, const cli_node_t *node, void *cookie)
   {
-  help_stack_t *hs = (help_stack_t *) cookie;
+  help_stack_t *hs = (help_stack_t *)cookie;
   int n, do_print;
 
   if ((CLI_NODE_END == node->type) &&
-      (!(node->flags & CLI_NODE_FLAGS_OPT_PARTIAL)))
+    (!(node->flags & CLI_NODE_FLAGS_OPT_PARTIAL)))
     {
     do_print = 0;
     if (hs->filter)
@@ -941,7 +957,7 @@ static result_t cli_help_post_walker(cli_t *parser, cli_node_t *node, void *cook
         {
         if (CLI_NODE_ENUM == hs->nodes[n]->type)
           {
-          const enum_t *lnode = (const enum_t *) hs->nodes[n]->param;
+          const enum_t *lnode = (const enum_t *)hs->nodes[n]->param;
 
           while (lnode->name != 0)
             {
@@ -973,7 +989,7 @@ static result_t cli_help_post_walker(cli_t *parser, cli_node_t *node, void *cook
 
     if (do_print)
       {
-      cli_node_t *cur_node;
+      const cli_node_t *cur_node;
       int m, num_braces = 0;
 
       if (node->desc)
@@ -989,7 +1005,7 @@ static result_t cli_help_post_walker(cli_t *parser, cli_node_t *node, void *cook
         {
         cur_node = hs->nodes[n];
         if ((CLI_NODE_ROOT == cur_node->type) ||
-            (CLI_NODE_END == cur_node->type))
+          (CLI_NODE_END == cur_node->type))
           {
           continue;
           }
@@ -1021,14 +1037,14 @@ result_t cli_help_cmd(cli_t *parser, char *str)
   {
   help_stack_t help_stack;
 
-  memset(&help_stack, 0, sizeof (help_stack));
+  memset(&help_stack, 0, sizeof(help_stack));
   help_stack.filter = str;
   return cli_walk(parser, cli_help_pre_walker,
-                  cli_help_post_walker, &help_stack);
+    cli_help_post_walker, &help_stack);
   }
 
 result_t cli_user_input(cli_t *parser, const char *prompt,
-  bool do_echo, stream_p stream, vector_p buffer, cli_input_cb cb)
+  bool do_echo, handle_t stream, handle_t buffer, cli_input_cb cb)
   {
   bool tmp_do_echo;
 

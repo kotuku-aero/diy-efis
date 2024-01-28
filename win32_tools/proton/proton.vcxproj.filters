@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\libs\proton\airspeed_widget.c" />
+    <ClCompile Include="..\..\libs\proton\altitude_widget.c" />
+    <ClCompile Include="..\..\libs\proton\annunciator_widget.c" />
+    <ClCompile Include="..\..\libs\proton\attitude_widget.c" />
+    <ClCompile Include="..\..\libs\proton\converters.c" />
+    <ClCompile Include="..\..\libs\proton\edutemp_widget.c" />
+    <ClCompile Include="..\..\libs\proton\gauge_widget.c" />
+    <ClCompile Include="..\..\libs\proton\ap_widget.c" />
+    <ClCompile Include="..\..\libs\proton\hsi_widget.c" />
+    <ClCompile Include="..\..\libs\proton\marquee_widget.c" />
+    <ClCompile Include="..\..\libs\proton\menu_window.c" />
+    <ClCompile Include="..\..\libs\proton\proton.c" />
+    <ClCompile Include="..\..\libs\proton\regex.c" />
+    <ClCompile Include="..\..\libs\proton\carousel_widget.c" />
+    <ClCompile Include="..\..\libs\proton\softkey_widget.c" />
+    <ClCompile Include="..\..\libs\proton\pancake_indicator_widget.c" />
+    <ClCompile Include="..\..\libs\proton\comm_widget.c" />
+    <ClCompile Include="..\..\libs\proton\map_widget.c" />
+    <ClCompile Include="..\..\libs\proton\widget.c" />
+    <ClCompile Include="..\..\libs\proton\neo_9.c" />
+    <ClCompile Include="..\..\libs\proton\neo_12.c" />
+    <ClCompile Include="..\..\libs\proton\neo_15.c" />
+    <ClCompile Include="..\..\libs\proton\neo_18.c" />
+    <ClCompile Include="..\..\libs\proton\map_aircraft.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\libs\proton\airspeed_widget.h" />
+    <ClInclude Include="..\..\libs\proton\altitude_widget.h" />
+    <ClInclude Include="..\..\libs\proton\annunciator_widget.h" />
+    <ClInclude Include="..\..\libs\proton\attitude_widget.h" />
+    <ClInclude Include="..\..\libs\proton\converters.h" />
+    <ClInclude Include="..\..\libs\proton\edutemp_widget.h" />
+    <ClInclude Include="..\..\libs\proton\gauge_widget.h" />
+    <ClInclude Include="..\..\libs\proton\ap_widget.h" />
+    <ClInclude Include="..\..\libs\proton\hsi_widget.h" />
+    <ClInclude Include="..\..\libs\proton\marquee_widget.h" />
+    <ClInclude Include="..\..\libs\proton\menu_window.h" />
+    <ClInclude Include="..\..\libs\proton\proton.h" />
+    <ClInclude Include="..\..\libs\proton\regex.h" />
+    <ClInclude Include="..\..\libs\proton\widget.h" />
+    <ClInclude Include="..\..\libs\proton\carousel_widget.h" />
+    <ClInclude Include="..\..\libs\proton\softkey_widget.h" />
+    <ClInclude Include="..\..\libs\proton\pancake_indicator_widget.h" />
+    <ClInclude Include="..\..\libs\proton\comm_widget.h" />
+    <ClInclude Include="..\..\libs\proton\map_widget.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\libs\proton\proton.cli" />
+  </ItemGroup>
+</Project>

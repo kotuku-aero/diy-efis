@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="directive.c" />
+    <ClCompile Include="eval.c" />
+    <ClCompile Include="expand.c" />
+    <ClCompile Include="main.c" />
+    <ClCompile Include="mbchar.c" />
+    <ClCompile Include="preproc.c" />
+    <ClCompile Include="support.c" />
+    <ClCompile Include="system.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="mcpp_lib.def" />
+    <None Include="set_mcpp.sh" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="configed.H" />
+    <ClInclude Include="internal.H" />
+    <ClInclude Include="mcpp_lib.h" />
+    <ClInclude Include="mcpp_out.h" />
+    <ClInclude Include="noconfig.H" />
+    <ClInclude Include="system.H" />
+  </ItemGroup>
+</Project>

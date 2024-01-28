@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\libs\fixedpoint\fix16.c" />
+    <ClCompile Include="..\..\libs\fixedpoint\fix16_exp.c" />
+    <ClCompile Include="..\..\libs\fixedpoint\fix16_fft.c" />
+    <ClCompile Include="..\..\libs\fixedpoint\fix16_sqrt.c" />
+    <ClCompile Include="..\..\libs\fixedpoint\fix16_str.c" />
+    <ClCompile Include="..\..\libs\fixedpoint\fix16_trig.c" />
+    <ClCompile Include="..\..\libs\fixedpoint\fract32.c" />
+    <ClCompile Include="..\..\libs\fixedpoint\uint32.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\libs\fixedpoint\fix16.h" />
+    <ClInclude Include="..\..\libs\fixedpoint\fix16.hpp" />
+    <ClInclude Include="..\..\libs\fixedpoint\fix16_trig_sin_lut.h" />
+    <ClInclude Include="..\..\libs\fixedpoint\fixmath.h" />
+    <ClInclude Include="..\..\libs\fixedpoint\fract32.h" />
+    <ClInclude Include="..\..\libs\fixedpoint\int64.h" />
+    <ClInclude Include="..\..\libs\fixedpoint\uint32.h" />
+  </ItemGroup>
+</Project>

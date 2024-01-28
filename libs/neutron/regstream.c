@@ -1,6 +1,6 @@
 /*
 diy-efis
-Copyright (C) 2016 Kotuku Aerospace Limited
+Copyright (C) 2016-2022 Kotuku Aerospace Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,67 +28,71 @@ providers.
 
 If any file has a copyright notice or portions of code have been used
 and the original copyright notice is not yet transcribed to the repository
-then the origional copyright notice is to be respected.
+then the original copyright notice is to be respected.
 
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
+
+If you wish to use any of this code in a commercial application then
+you must obtain a licence from the copyright holder.  Contact
+support@kotuku.aero for information on the commercial licences.
 */
 #include "registry.h"
 #include "stream.h"
 #include <string.h>
 #include <stdlib.h>
 
-typedef struct _regstream_handle_t
+typedef struct _regstream_t
   {
-  stream_handle_t stream;
+  stream_t stream;
   field_stream_t field;     // descriptor in the registry
   uint32_t offset;          // current offset in the stream.
   memid_t cluster[16];      // cached cluster.
   memid_t cluster_id;       // if of cached cluster
-  } regstream_handle_t;
+  uint32_t flags;           // open flags
+  } regstream_t;
 
-static result_t check_handle(handle_t hndl)
+
+result_t reg_stream_close(handle_t hndl)
   {
-  if(hndl == 0)
-    return e_bad_parameter;
-
-  stream_handle_t *stream = (stream_handle_t *) hndl;
-  if (stream->version != sizeof (regstream_handle_t))
-    return e_bad_parameter;
+  // we only have to release the memory as the state is persisted
+  neutron_free(hndl);
 
   return s_ok;
   }
 
-static result_t regstream_eof(stream_handle_t *stream);
-static result_t regstream_read(stream_handle_t *stream, void *buffer, uint16_t size, uint16_t *read);
-static result_t regstream_write(stream_handle_t *stream, const void *buffer, uint16_t size);
-static result_t regstream_getpos(stream_handle_t *stream, uint32_t *pos);
-static result_t regstream_setpos(stream_handle_t *stream, uint32_t pos);
-static result_t regstream_length(stream_handle_t *stream, uint32_t *length);
-static result_t regstream_truncate(stream_handle_t *stream, uint32_t length);
-static result_t regstream_close(stream_handle_t *stream);
-static result_t regstream_delete(stream_handle_t *stream);
-static result_t regstream_path(stream_handle_t *hndl, bool full_path, uint16_t len, char *path);
-
-static void init_stream(regstream_handle_t *stream)
+static const typeid_t regstream_type =
   {
-  memset(stream, 0, sizeof (regstream_handle_t));
+  .name = "regstream_t",
+  .etherealize = reg_stream_close,
+  .base = &stream_type 
+  };
+
+static result_t regstream_eof(handle_t stream);
+static result_t regstream_read(handle_t stream, void *buffer, uint32_t size, uint32_t *read);
+static result_t regstream_write(handle_t stream, const void *buffer, uint32_t size);
+static result_t regstream_getpos(handle_t stream, uint32_t *pos);
+static result_t regstream_setpos(handle_t stream, int32_t pos, uint32_t whence);
+static result_t regstream_length(handle_t stream, uint32_t *length);
+static result_t regstream_truncate(handle_t stream, uint32_t length);
+
+static void init_stream(regstream_t *stream)
+  {
+  memset(stream, 0, sizeof (regstream_t));
 
   // set up the callbacks
-  stream->stream.version = sizeof(regstream_handle_t);
-  stream->stream.stream_eof = regstream_eof;
-  stream->stream.stream_getpos = regstream_getpos;
-  stream->stream.stream_length = regstream_length;
-  stream->stream.stream_read = regstream_read;
-  stream->stream.stream_setpos = regstream_setpos;
-  stream->stream.stream_truncate = regstream_truncate;
-  stream->stream.stream_write = regstream_write;
-  stream->stream.stream_delete = regstream_delete;
-  stream->stream.stream_path = regstream_path;
-  stream->stream.stream_close = regstream_close;
+  stream->stream.base.type = &regstream_type;
+
+  stream->stream.eof = regstream_eof;
+  stream->stream.getpos = regstream_getpos;
+  stream->stream.length = regstream_length;
+  stream->stream.read = regstream_read;
+  stream->stream.setpos = regstream_setpos;
+  stream->stream.truncate = regstream_truncate;
+  stream->stream.write = regstream_write;
   }
 
-static result_t create_handle(memid_t parent, const char *name, bool create, stream_p *stream)
+static result_t create_handle(memid_t parent, const char *name, uint32_t flags, handle_t *stream)
   {
   result_t result;
   uint8_t datatype = 0;
@@ -99,15 +103,17 @@ static result_t create_handle(memid_t parent, const char *name, bool create, str
 
   result = reg_get_value(parent, name, &datatype, &length, &stream_memid, 0, 0);
 
-  regstream_handle_t *new_stream = 0;
+  regstream_t *new_stream = 0;
 
   if (failed(result))
     {
-    if (!create)
+    if ((flags & STREAM_O_CREAT) == 0)
       return exit_registry(e_path_not_found);
 
     // create the stream
-    new_stream = (regstream_handle_t *) neutron_malloc(sizeof (regstream_handle_t));
+    if (failed(result = neutron_malloc(sizeof(regstream_t), (void **)&new_stream)))
+      return result;
+
     init_stream(new_stream);
 
     // and create the key.
@@ -126,7 +132,7 @@ static result_t create_handle(memid_t parent, const char *name, bool create, str
   else
     {
     // can't create if it exists
-    if (create)
+    if ((flags & STREAM_O_EXCL)!= 0)
       return exit_registry(e_exists);
 
     if (datatype != field_stream)
@@ -136,7 +142,9 @@ static result_t create_handle(memid_t parent, const char *name, bool create, str
       return exit_registry(e_wrong_type);
 
     // create a stream
-    new_stream = (regstream_handle_t *) neutron_malloc(sizeof (regstream_handle_t));
+    if (failed(result = neutron_malloc(sizeof(regstream_t), (void **)&new_stream)))
+      return result;
+
     init_stream(new_stream);
     // read the values  (TODO: check this!!!!)
     if (failed(result = reg_get_value(parent, name, &datatype, &length, &stream_memid, &length, &new_stream->field)))
@@ -146,23 +154,35 @@ static result_t create_handle(memid_t parent, const char *name, bool create, str
       }
     }
 
-  *stream = (stream_p)new_stream;
+    if((flags & STREAM_O_WR) != 0)
+    {
+    if ((flags & STREAM_O_TRUNC) != 0)
+      new_stream->field.length = 0;
+
+    if ((flags & STREAM_O_APPEND) != 0)
+      new_stream->offset = new_stream->field.length;
+    }
+
+  *stream = (handle_t)new_stream;
   return exit_registry(s_ok);
   }
 
-result_t stream_open(memid_t parent, const char *path, stream_p *stream)
+result_t reg_stream_open(memid_t parent, const char *path, uint32_t flags, handle_t *stream)
   {
   return create_handle(parent, path, false, stream);
   }
 
-result_t stream_create(memid_t parent, const char *path, stream_p *stream)
+result_t reg_stream_create(memid_t parent, const char *path, uint32_t flags, handle_t *stream)
   {
   return create_handle(parent, path, true, stream);
   }
 
-static result_t regstream_eof(stream_handle_t *hndl)
+static result_t regstream_eof(handle_t hndl)
   {
-  regstream_handle_t *stream = (regstream_handle_t *)hndl;
+  result_t result;
+  regstream_t *stream;
+  if (failed(result = is_typeof(hndl, &regstream_type, (void **)&stream)))
+    return result;
 
    return stream->offset >= stream->field.length ? s_ok : s_false;
   }
@@ -173,17 +193,19 @@ static result_t regstream_eof(stream_handle_t *hndl)
  * @param size        size requested
  * @return s_ok if the stream is expaneded as requested
  */
-static result_t ensure_stream(regstream_handle_t *stream, uint32_t size)
+static result_t ensure_stream(regstream_t *stream, uint32_t size)
   {
   result_t result;
   // this will allocate blocks if needed
   if (stream->field.length > size)
     return s_ok;
+  
+  if(size > MAX_REGSTREAM_LENGTH)
+    return e_no_space;
 
   uint32_t alloc_size = ((size - 1) | (SECTOR_SIZE - 1)) + 1;
   
-  if(stream->field.extent <= CLUSTER_SIZE &&
-     alloc_size <= CLUSTER_SIZE)
+  if(stream->field.extent <= CLUSTER_SIZE && alloc_size <= CLUSTER_SIZE)
     {
     // stream is a level0 stream so we just allocated memid's till the cluster is full
     uint32_t i;
@@ -203,7 +225,7 @@ static result_t ensure_stream(regstream_handle_t *stream, uint32_t size)
     return reg_set_value(stream->field.hdr.parent,
       stream->field.hdr.name,
       field_stream,
-      sizeof(regstream_handle_t) - sizeof(field_definition_t),
+      sizeof(regstream_t) - sizeof(field_definition_t),
       &stream->field.length, 0);
     }
 
@@ -233,7 +255,7 @@ static result_t ensure_stream(regstream_handle_t *stream, uint32_t size)
     if (failed(result = reg_set_value(stream->field.hdr.parent,
       stream->field.hdr.name,
       field_stream,
-      sizeof(regstream_handle_t) - sizeof(field_definition_t),
+      sizeof(regstream_t) - sizeof(field_definition_t),
       &stream->field.length, 0)))
       return result;
     }
@@ -260,7 +282,7 @@ static result_t ensure_stream(regstream_handle_t *stream, uint32_t size)
       // write the updated sector allocation next...
       // just so we keep the system correct if the next step fails
       if (failed(result = reg_set_value(stream->field.hdr.parent,
-        stream->field.hdr.name, field_stream, sizeof(regstream_handle_t) - sizeof(field_definition_t), &stream->field.length, 0)))
+        stream->field.hdr.name, field_stream, sizeof(regstream_t) - sizeof(field_definition_t), &stream->field.length, 0)))
         return result;
 
       // save the cluster which is 0 bytes
@@ -302,7 +324,7 @@ static result_t ensure_stream(regstream_handle_t *stream, uint32_t size)
     if (failed(result = reg_set_value(stream->field.hdr.parent,
       stream->field.hdr.name,
       field_stream,
-      sizeof(regstream_handle_t) - sizeof(field_definition_t),
+      sizeof(regstream_t) - sizeof(field_definition_t),
       &stream->field.length, 0)))
       return result;
     }
@@ -315,7 +337,7 @@ static result_t ensure_stream(regstream_handle_t *stream, uint32_t size)
  * @param stream    stream to save
  * @return s_ok if stored ok
  */
-static result_t save_stream(regstream_handle_t *stream)
+static result_t save_stream(regstream_t *stream)
   {
   // TODO:
   return s_ok;
@@ -331,7 +353,7 @@ static result_t save_stream(regstream_handle_t *stream)
  * if the next cluster is co-incident then this can be > SECTOR size
  * @return
  */
-static result_t calculate_memid(regstream_handle_t *stream, uint32_t offset, memid_t *memid, uint16_t *max_xfer)
+static result_t calculate_memid(regstream_t *stream, uint32_t offset, memid_t *memid, uint16_t *max_xfer)
   {
   result_t result;
   if (memid == 0 || max_xfer == 0)
@@ -367,7 +389,7 @@ static result_t calculate_memid(regstream_handle_t *stream, uint32_t offset, mem
     }
   else
     {
-    // calculate whicj cluster to read
+    // calculate which cluster to read
     uint32_t cluster = sector >> CLUSTER_SHIFT;
     memid_t cluster_id = stream->field.sectors[cluster];
     if (stream->cluster_id != cluster_id)
@@ -403,10 +425,12 @@ static result_t calculate_memid(regstream_handle_t *stream, uint32_t offset, mem
   return s_ok;
   }
 
-static result_t regstream_read(stream_handle_t *hndl, void *buffer, uint16_t size, uint16_t *read)
+static result_t regstream_read(handle_t hndl, void *buffer, uint32_t size, uint32_t *read)
   {
   result_t result;
-  regstream_handle_t *stream = (regstream_handle_t *)hndl;
+  regstream_t *stream;
+  if (failed(result = is_typeof(hndl, &regstream_type, (void **)&stream)))
+    return result;
 
   memid_t read_memid;
   uint16_t bytes_available;
@@ -467,10 +491,12 @@ static result_t regstream_read(stream_handle_t *hndl, void *buffer, uint16_t siz
   return exit_registry(s_ok);
   }
 
-static result_t regstream_write(stream_handle_t *hndl, const void *buffer, uint16_t size)
+static result_t regstream_write(handle_t hndl, const void *buffer, uint32_t size)
   {
   result_t result;
-  regstream_handle_t *stream = (regstream_handle_t *)hndl;
+  regstream_t *stream;
+  if (failed(result = is_typeof(hndl, &regstream_type, (void **)&stream)))
+    return result;
 
   memid_t memid;
   uint16_t byte_offset;
@@ -511,56 +537,70 @@ static result_t regstream_write(stream_handle_t *hndl, const void *buffer, uint1
     }
 
   return exit_registry(reg_set_value(stream->field.hdr.parent, stream->field.hdr.name, field_stream,
-    sizeof(regstream_handle_t) - sizeof(field_definition_t), &stream->field.length, 0));
+    sizeof(regstream_t) - sizeof(field_definition_t), &stream->field.length, 0));
   }
 
-static result_t regstream_getpos(stream_handle_t *hndl, uint32_t *pos)
+static result_t regstream_getpos(handle_t hndl, uint32_t *pos)
   {
-  regstream_handle_t *stream = (regstream_handle_t *)hndl;
+  result_t result;
+  regstream_t *stream;
+  if (failed(result = is_typeof(hndl, &regstream_type, (void **)&stream)))
+    return result;
 
   *pos = stream->offset;
   return s_ok;
   }
 
-static result_t regstream_setpos(stream_handle_t *hndl, uint32_t pos)
+static result_t regstream_setpos(handle_t hndl, int32_t pos, uint32_t whence)
   {
   result_t result;
-
-  if (failed(result = check_handle(hndl)))
+  regstream_t *stream;
+  if (failed(result = is_typeof(hndl, &regstream_type, (void **)&stream)))
     return result;
 
-  regstream_handle_t *stream = (regstream_handle_t *)hndl;
 
-  if(pos > stream->field.length)
-    pos = stream->field.length;
+  uint32_t new_pos;
+  switch (whence)
+    {
+    case STREAM_SEEK_CUR:
+      new_pos = (uint32_t)(((int32_t)stream->offset) + pos);
+      break;
+    case STREAM_SEEK_END:
+      new_pos = (uint32_t)(((int32_t)stream->field.length) + pos);
+      break;
+    case STREAM_SEEK_SET:
+      new_pos = (uint32_t)pos;
+      break;
+    }
 
-  stream->offset = pos;
+  if (new_pos > stream->field.length)
+    return e_bad_parameter;
+
+  stream->offset = new_pos;
   return s_ok;
   }
 
-static result_t regstream_length(stream_handle_t *hndl, uint32_t *length)
+static result_t regstream_length(handle_t hndl, uint32_t *length)
   {
   result_t result;
-
-  if (failed(result = check_handle(hndl)))
+  regstream_t *stream;
+  if (failed(result = is_typeof(hndl, &regstream_type, (void **)&stream)))
     return result;
 
-  regstream_handle_t *stream = (regstream_handle_t *)hndl;
   *length = (uint32_t) stream->field.length;
 
   return s_ok;
   }
 
-static result_t regstream_truncate(stream_handle_t *hndl, uint32_t length)
+static result_t regstream_truncate(handle_t hndl, uint32_t length)
   {
   result_t result;
-
-  if (failed(result = check_handle(hndl)))
+  regstream_t *stream;
+  if (failed(result = is_typeof(hndl, &regstream_type, (void **)&stream)))
     return result;
-  regstream_handle_t *stream = (regstream_handle_t *)hndl;
 
   if(length >= stream->field.length)
-    return e_bad_parameter;
+    return s_ok;
 
   uint32_t size_required = ((length - 1) | (SECTOR_SIZE - 1)) + 1;
   uint32_t stream_size = stream->field.extent;    // make sure this points at the last cluster
@@ -657,7 +697,7 @@ static result_t regstream_truncate(stream_handle_t *hndl, uint32_t length)
       }
 
     if (failed(result = reg_set_value(stream->field.hdr.parent, stream->field.hdr.name, field_stream,
-      sizeof(regstream_handle_t) - sizeof(field_definition_t), &stream->field.length, 0)))
+      sizeof(regstream_t) - sizeof(field_definition_t), &stream->field.length, 0)))
       return exit_registry(result);
     }
 
@@ -665,24 +705,17 @@ static result_t regstream_truncate(stream_handle_t *hndl, uint32_t length)
 
   // save the new field descriptor
   return exit_registry(reg_set_value(stream->field.hdr.parent, stream->field.hdr.name, field_stream,
-    sizeof(regstream_handle_t) - sizeof(field_definition_t), &stream->field.length, 0));
+    sizeof(regstream_t) - sizeof(field_definition_t), &stream->field.length, 0));
   }
 
-static result_t regstream_close(stream_handle_t *hndl)
-  {
-  // we only have to release the memory as the state is persisted
-  neutron_free(hndl);
-
-  return s_ok;
-  }
-
-static result_t regstream_delete(stream_handle_t *hndl)
+  /*
+static result_t regstream_delete(handle_t hndl)
   {
   result_t result;
 
   if (failed(result = check_handle(hndl)))
     return result;
-  regstream_handle_t *stream = (regstream_handle_t *)hndl;
+  regstream_t *stream = (regstream_t *)hndl;
 
   if(failed(result = regstream_truncate(hndl, 0)))
     return result;
@@ -696,8 +729,8 @@ static result_t regstream_delete(stream_handle_t *hndl)
 
   return exit_registry(s_ok);
   }
-
-static result_t get_full_path(memid_t key, uint16_t len, char *path)
+  */
+char *get_full_path(memid_t key)
   {
   char name[REG_NAME_MAX+1];
 
@@ -707,55 +740,29 @@ static result_t get_full_path(memid_t key, uint16_t len, char *path)
   enter_registry();
   
   if (failed(result = reg_query_memid_impl(key, 0, name, 0, &parent)))
-    return exit_registry(result);
+    {
+    exit_registry(result);
+    return 0;
+    }
   
   exit_registry(result);
 
   name[REG_NAME_MAX] = 0;
 
+  char *path = 0;
   if (parent != 0)
-    {
-    if (failed(result = get_full_path(parent, len, path)))
-      return result;
-    }
+    path = get_full_path(parent);
   else
-    path[0] = 0;
+    neutron_strdup("", 0, &path);
 
-  size_t path_length = strlen(path);
+  size_t len = strlen(path) + strlen(name) + 2;
 
-  if (path_length > 0 &&
-    (path_length > 1 || strcmp(path, "/") != 0))
-    strncat(path, "/", len);
+  char *rslt;
+  neutron_malloc(len * sizeof(char), (void **)&rslt);
 
-  strncat(path, name, len);
-
-  return s_ok;
-  }
-
-static result_t regstream_path(stream_handle_t *hndl, bool full_path, uint16_t len, char *path)
-  {
-  result_t result;
-
-  if (failed(result = check_handle(hndl)))
-    return result;
-
-  if (path == 0)
-    return e_bad_parameter;
-
-  regstream_handle_t *stream = (regstream_handle_t *)hndl;
-
-  memid_t parent = stream->field.hdr.parent;
-
-  if (!full_path || parent == 0)
-    strncpy(path, stream->field.hdr.name, len);
-  else
-    {
-    if (failed(result = get_full_path(parent, len, path)))
-      return result;
-    
-    strncat(path, "/", len);
-    strncat(path, stream->field.hdr.name, len);
-    }
-
-  return s_ok;
+  strcpy(rslt, path);
+  strcat(rslt, "/");
+  strcat(rslt, name);
+  
+  return rslt;
   }

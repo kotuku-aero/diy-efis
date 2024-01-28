@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="argv.c" />
+    <ClCompile Include="comm_device.c" />
+    <ClCompile Include="direct_draw_screen.c" />
+    <ClCompile Include="getdelim.c" />
+    <ClCompile Include="getopt.c" />
+    <ClCompile Include="json.c" />
+    <ClCompile Include="krypton.c" />
+    <ClCompile Include="krypton_filesystem.c" />
+    <ClCompile Include="slcan.c" />
+    <ClCompile Include="splash_320_240.c" />
+    <ClCompile Include="win_flash_image.c" />
+    <ClCompile Include="flash_disk.c" />
+    <ClCompile Include="mfd_cli_impl.c" />
+    <ClCompile Include="mfd_cli.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="argv.h" />
+    <ClInclude Include="ftd2xx.h" />
+    <ClInclude Include="getdelim.h" />
+    <ClInclude Include="getopt.h" />
+    <ClInclude Include="json.h" />
+    <ClInclude Include="krypton.h" />
+    <ClInclude Include="slcan.h" />
+    <ClInclude Include="mfd_cli.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="mfd.cli" />
+  </ItemGroup>
+</Project>
