@@ -8,8 +8,10 @@
 #include <string.h>
 #include <stdlib.h>
 
+#ifdef CANFLY
 // protobuffers support functions
 #include "protobuf-c.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -2101,118 +2103,6 @@ extern void neutron_run(const char *name,
   uint8_t priority,
   handle_t *task);
 
-///////////////////////////////////////////////////////////////////////////////
-//
-// Pipe Functions
-//
-/**
-* @function result_t (*bearer_msg_fn)(handle_t channel, void *parg, const char *op, size_t len, const void *data)
-* Function called when a bearer channel message is received
-* @param channel  Handle to the channel for the message
-* @param parg     Argument provided when the channel created
-* @param msg      packet received.
-* @return s_ok if the message is handled
-*/
-typedef result_t(*bearer_msg_fn)(handle_t channel, handle_t parg, uint16_t len, const uint8_t *data);
-// this is called when a close is called.  Can be caused by a 
-// close message from the client, or a timeout
-typedef result_t(*close_fn)(handle_t channel, handle_t parg);
-// this is called when a connect request is received from a remote channel in the case of a server
-// or the remote channel has accepted a connection request in the case of a client
-typedef result_t(*accept_fn)(handle_t channel, handle_t *parg);
-/**
- * @function create_service(service_handler_t *service, uint16_t service_type)
- * assign default protocol handlers for a service, and register the service.
- * @param service_type  The service number to register for
- * @param parg          Service creation argument
- * @param accept_msg    Callback function for the client to accept a connection
- * @param close_msg     Callback function for the client closing the service
- * @param service  handle to the registered service
- * @return s_ok if service registered
- */
-extern result_t create_service(uint8_t service_type, void *parg, accept_fn accept_msg, bearer_msg_fn bearer_msg, close_fn close_msg, handle_t *service);
-/**
- * @function create_service_client(uint16_t server_node, uint16_t service_type, bearer_msg_fn bearer_msg, close_fn close_msg, handle_t *service);
- * register a client node and allocate a bearer channel.
- * @param server_node   The remote node to connect to
- * @param service_type  The remote service to connect to
- * @param bearer_msg    Callback function for a server->client message
- * @param close_msg     Callback function for the server closing the channel
- * @param parg          Argument that can be added to the payload
- * @param client        The client service handler
- * @return s_ok if client connected to the remote service.
- */
-extern result_t create_service_client(uint8_t server_node, uint8_t service_type,
-  accept_fn accept_msg, bearer_msg_fn bearer_msg, close_fn close_msg,
-  void *parg, handle_t *client);
-/**
- * @function release_service_client(service_handler_t *client)
- * Release a client and return all resources. This send
- * @param client  Client to release
- * @return s_ok if the client is released.
- */
-extern result_t close_service_client(handle_t client);
-/**
- * @function send_bearer_message(handle_t handle, const char *op, size_t length, const void *msg)
- * Send a service message to the remote device.  The handle can be a service handle for server->client messages
- * or a client handle form client->server messages
- * @param handle    Client or server to send from
- * @param length    Length of message
- * @param msg       message to be sent
- * @return s_ok after the message is sent
- */
-extern result_t send_bearer_message(handle_t handle, uint16_t length, const uint8_t *msg);
-/**
- * @brief clean up a pipe, only called by a service when the io routines detect a client close request
- * @param pipe pipe to clean up
- * @return
-*/
-extern result_t request_close_pipe(handle_t pipe);
-/**
- * @brief Return the argument attached to a pipe when it was created
- * @param pipe pipe to query
- * @param parg argument
- * @return s_ok if pipe is valid
-*/
-extern result_t get_pipe_arg(handle_t pipe, void **parg);
-/**
- * @function get_pipe_mutex(handle_t pipe, uint32_t delay)
- * @brief Get the internal mutex that allows single-process access to the pipr
- * @param pipe  pipe to lock
- * @param delay max milliseconds to wait
- * @return s_ok if locak is granted
-*/
-extern result_t get_pipe_mutex(handle_t pipe, uint32_t delay);
-extern result_t release_pipe_mutex(handle_t pipe);
-extern result_t check_pipe_msg(const canmsg_t *msg);
-
-///////////////////////////////////////////////////////////////////////////////
-//
-//  Protobuffer support functions
-//
-
-//////////////////////////////////////////////////////////////////////////////
-// Client support
-// buffer to handle a reply from a protobuffer message
-typedef struct _reply_buffer_t {
-  ProtobufCMessage *request;
-  handle_t receive_wait;
-  uint16_t reply_call_id;
-  // how many bytes read from the pipe
-  uint16_t bytes_read;
-  uint16_t payload_len;
-  uint16_t payload_ptr;
-  uint16_t payload_size;    // allocated size.
-  uint8_t *payload;
-  } reply_buffer_t;
-
-extern result_t call_rpc(handle_t client, uint16_t method_index, const ProtobufCMessage *request, reply_buffer_t *reply);
-extern result_t create_reply_buffer(reply_buffer_t **reply);
-extern result_t release_reply_buffer(reply_buffer_t *reply);
-extern result_t reset_reply_buffer(const ProtobufCMessage *request, reply_buffer_t *reply);
-extern result_t create_protoc_client(uint8_t remote_id, uint8_t service_id, uint32_t timeout, reply_buffer_t *reply, handle_t *hndl);
-extern result_t close_protoc_client(handle_t hndl);
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /// 
 /// CanFly/Neutron startup
@@ -2326,8 +2216,6 @@ typedef struct _neutron_parameters_t
   bool init_config_db;
   uint32_t status_interval;     // status interval check
   } neutron_parameters_t;
-
-extern result_t pipe_init(const neutron_parameters_t *params);
 
 /**
  * @brief cached startup parameters

@@ -89,9 +89,6 @@ extern result_t run_krypton(stream_t *console, const char *prompt, cli_node_t *c
 
 extern result_t krypton_fs_init(const char* root_path, filesystem_t** fs);
 
-// created an emulated flash file system
-extern result_t krypton_create_flash_disk(memid_t key, flash_params_t* params, bool *init_mode, flash_disk_t** out);
-
 #ifdef __cplusplus
 }
 #endif

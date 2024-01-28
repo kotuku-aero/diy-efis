@@ -291,9 +291,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\libs\neutron\neutron-service.pb-c.h" />
     <ClInclude Include="..\..\libs\neutron\neutron.h" />
-    <ClInclude Include="..\..\libs\neutron\protobuf-service.h" />
     <ClInclude Include="..\..\libs\neutron\registry.h" />
     <ClInclude Include="..\..\libs\neutron\stream.h" />
     <ClInclude Include="..\..\libs\neutron\type_vector.h" />
@@ -304,16 +302,9 @@
     <ClCompile Include="..\..\libs\neutron\crc.c" />
     <ClCompile Include="..\..\libs\neutron\decompress.c" />
     <ClCompile Include="..\..\libs\neutron\deque.c" />
-    <ClCompile Include="..\..\libs\neutron\flash_filesystem.c" />
     <ClCompile Include="..\..\libs\neutron\filesystem.c" />
     <ClCompile Include="..\..\libs\neutron\manifest.c" />
-    <ClCompile Include="..\..\libs\neutron\neutron-proto.c" />
-    <ClCompile Include="..\..\libs\neutron\neutron-service.pb-c.c" />
     <ClCompile Include="..\..\libs\neutron\neutron.c" />
-    <ClCompile Include="..\..\libs\neutron\neutron_services.c" />
-    <ClCompile Include="..\..\libs\neutron\pipe.c" />
-    <ClCompile Include="..\..\libs\neutron\protobuf-c.c" />
-    <ClCompile Include="..\..\libs\neutron\protobuf-service.c" />
     <ClCompile Include="..\..\libs\neutron\registry.c" />
     <ClCompile Include="..\..\libs\neutron\registry_filesystem.c" />
     <ClCompile Include="..\..\libs\neutron\regstream.c" />

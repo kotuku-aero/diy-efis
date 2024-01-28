@@ -1027,32 +1027,6 @@
           .base.base.base.on_paint_background = on_paint_background_auto,
           };
         
-          static ecu_annunciator_t kmag_annunciator ={
-          .base.base.style =
-    
-      BORDER_RIGHT |
-    
-      BORDER_BOTTOM |
-    
-      DRAW_BACKGROUND |
-    
-    BORDER_NONE,
-    .base.base.border_color = color_white,
-    .base.base.background_color = color_black,
-    .base.base.name_color = color_white,
-    .base.base.name = "kMAG",
-    .base.base.status_timeout = 10000,
-      .base.base.sensor_failed = false,
-      .base.base.alarm_color = color_red,
-      .base.base.rect.left = 60,
-    .base.base.rect.top = 547,
-    .base.base.rect.right = 60 + 136,
-    .base.base.rect.bottom = 547 + 20,
-  
-          .base.base.on_message = on_kmag_msg,
-          .base.base.on_paint_foreground = on_paint_kmag,
-          };
-        
           static auto_annunciator_t oat_annunciator ={
           .base.base.base.style =
     
@@ -2736,53 +2710,50 @@
         if(failed(result = create_annunciator_widget(hwnd, 8, aircraft, (annunciator_t *) &hp_annunciator, 0)))
         return result;
       
-        if(failed(result = create_annunciator_widget(hwnd, 9, aircraft, (annunciator_t *) &kmag_annunciator, 0)))
+        if(failed(result = create_annunciator_widget(hwnd, 9, aircraft, (annunciator_t *) &oat_annunciator, 0)))
         return result;
       
-        if(failed(result = create_annunciator_widget(hwnd, 10, aircraft, (annunciator_t *) &oat_annunciator, 0)))
+        if(failed(result = create_edutemps_widget(hwnd, 10, aircraft, &edu_temps, 0)))
         return result;
       
-        if(failed(result = create_edutemps_widget(hwnd, 11, aircraft, &edu_temps, 0)))
+        if(failed(result = create_gauge_widget(hwnd, 11, aircraft, &oilt_gauge, 0)))
         return result;
       
-        if(failed(result = create_gauge_widget(hwnd, 12, aircraft, &oilt_gauge, 0)))
+        if(failed(result = create_gauge_widget(hwnd, 12, aircraft, &oilp_gauge, 0)))
         return result;
       
-        if(failed(result = create_gauge_widget(hwnd, 13, aircraft, &oilp_gauge, 0)))
+        if(failed(result = create_gauge_widget(hwnd, 13, aircraft, &volts_gauge, 0)))
         return result;
       
-        if(failed(result = create_gauge_widget(hwnd, 14, aircraft, &volts_gauge, 0)))
+        if(failed(result = create_gauge_widget(hwnd, 14, aircraft, &fuelp_gauge, 0)))
         return result;
       
-        if(failed(result = create_gauge_widget(hwnd, 15, aircraft, &fuelp_gauge, 0)))
+        if(failed(result = create_gauge_widget(hwnd, 15, aircraft, &fuelf_gauge, 0)))
         return result;
       
-        if(failed(result = create_gauge_widget(hwnd, 16, aircraft, &fuelf_gauge, 0)))
+        if(failed(result = create_gauge_widget(hwnd, 16, aircraft, &amps_gauge, 0)))
         return result;
       
-        if(failed(result = create_gauge_widget(hwnd, 17, aircraft, &amps_gauge, 0)))
+        if(failed(result = create_gauge_widget(hwnd, 17, aircraft, &left_fuel_gauge, 0)))
         return result;
       
-        if(failed(result = create_gauge_widget(hwnd, 18, aircraft, &left_fuel_gauge, 0)))
+        if(failed(result = create_gauge_widget(hwnd, 18, aircraft, &right_fuel_gauge, 0)))
         return result;
       
-        if(failed(result = create_gauge_widget(hwnd, 19, aircraft, &right_fuel_gauge, 0)))
+        if(failed(result = create_gauge_widget(hwnd, 19, aircraft, &fuelt_gauge, 0)))
         return result;
       
-        if(failed(result = create_gauge_widget(hwnd, 20, aircraft, &fuelt_gauge, 0)))
+        if(failed(result = create_gauge_widget(hwnd, 20, aircraft, &flap_gauge, 0)))
         return result;
       
-        if(failed(result = create_gauge_widget(hwnd, 21, aircraft, &flap_gauge, 0)))
+        if(failed(result = create_pancake_widget(hwnd, 21, aircraft, &pitch_indicator, 0)))
         return result;
       
-        if(failed(result = create_pancake_widget(hwnd, 22, aircraft, &pitch_indicator, 0)))
-        return result;
-      
-        if(failed(result = create_pancake_widget(hwnd, 23, aircraft, &roll_indicator, 0)))
+        if(failed(result = create_pancake_widget(hwnd, 22, aircraft, &roll_indicator, 0)))
         return result;
       
 
-        if(failed(result = create_marquee_widget(hwnd, 24, aircraft, &marquee, &widget)))
+        if(failed(result = create_marquee_widget(hwnd, 23, aircraft, &marquee, &widget)))
         return result;
 
         marquee.selected_alarm = -1;
@@ -2900,7 +2871,7 @@
           return result;
           child_num++;
         
-        if(failed(result = create_map_widget(hwnd, 25, aircraft, &nav, 0)))
+        if(failed(result = create_map_widget(hwnd, 24, aircraft, &nav, 0)))
         return result;
       
 

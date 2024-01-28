@@ -428,14 +428,6 @@ void can_rx_task(void *parg)
       
       (*set_id)(rx_msg.data[6], rx_msg.data[7]);
       }
-    // handle the services next.  The service channel +1 is the reply channel
-    else if(failed(check_pipe_msg(&rx_msg)))
-      {
-      // call all of the message handlers....
-      msg_hook_t *handler;
-      for (handler = listener; handler != 0; handler = handler->next)
-        (handler->callback)(&rx_msg, handler->parg);
-      }
     }
   }
 
@@ -443,9 +435,6 @@ result_t canfly_init(const neutron_parameters_t *params, bool create_publish_tas
   {
   handle_t task_handle;
   result_t result;
-
-  if (failed(result = pipe_init(params)))
-    return result;
 
   node_id = params->node_id;
   set_id = params->set_id;

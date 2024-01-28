@@ -267,24 +267,6 @@
         >
       <rect left="0" top="547" width="60" height="20"/>
     </hp>
-    <ecu name="kMAG"
-         id="kmag_annunciator"
-         can-id="on_check_kmag"
-         background-color="color_black"
-         border-color="color_white"
-         label-color="color_white"
-         text-color="color_white"
-         small-font="neo_9_font"
-         name-color="color_white"
-         label-offset="30"
-         text-offset="30"
-         format="%d"
-         value-type="v_uint16"
-         border-right="true"
-         border-bottom="true"
-         fill-background="true">
-      <rect left="60" top="547" width="136" height="20"/>
-    </ecu>
     <auto name="OAT"
           id="oat_annunciator"
           can-id="id_outside_air_temperature"

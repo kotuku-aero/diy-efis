@@ -9,7 +9,7 @@
 //#include "../../libs/proton/layout_window.h"
 #include "../../libs/proton/menu_window.h"
 #include "../../libs/mfdlib/mfd_layout.h"
-#include "../../pic/kPFD/pfd.h"
+#include "pfd.h"
 #include <stdio.h>
 #include <sys/types.h>
 #include <fcntl.h>
@@ -443,46 +443,7 @@ int main(int argc, char** argv)
     return;
     }
 
-  memid_t fs;
-  if (succeeded(reg_open_key(root, flash_str, &fs)) ||
-    succeeded(reg_create_key(root, flash_str, &fs)))
-    {
-    flash_disk_t* boot_disk;
-    flash_params_t params;
-    bool init_mode;
-    if (failed(krypton_create_flash_disk(fs, &params, &init_mode, &boot_disk)))
-      {
-      trace_error("Cannot create the flash disk system");
-      return;
-      }
-
-    filesystem_t *flash;
-    if (init_mode)
-      {
-      if (failed(create_flash_filesystem(boot_disk, &params, false, &flash)))
-        {
-        trace_error("Cannot initialize a new file system");
-        return;
-        }
-      }
-    else
-      {
-      if (failed(open_flash_filesystem(boot_disk, &params, &flash)))
-        {
-        trace_error("Cannot open existing file system");
-        return;
-        }
-      }
-
-
-    if (failed(mount('F', flash)))
-      {
-      trace_error("Cannot mount the flash file system");
-      return;
-      }
-    }
-
-    static const char *root_fs_name = "fs";
+  static const char *root_fs_name = "fs";
 
   // and mount the registry as the root filesystem
   filesystem_t *root_fs;

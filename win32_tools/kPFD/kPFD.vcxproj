@@ -111,7 +111,7 @@
       <AdditionalDependencies>shlwapi.lib;ddraw.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>cd $(SolutionDir)..\pic\kPFD
+      <Command>cd $(ProjectDir)
 $(SolutionDir)bin\Kotuku.Yehudi -a=pfd pfd.xml</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
@@ -188,9 +188,9 @@ $(SolutionDir)bin\Kotuku.Yehudi -a=pfd pfd.xml</Command>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\pic\kPFD\pfd.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="mfd_cli.c" />
+    <ClCompile Include="pfd.c" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\atomdb\atomdb.vcxproj">
@@ -222,14 +222,14 @@ $(SolutionDir)bin\Kotuku.Yehudi -a=pfd pfd.xml</Command>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\pic\kPFD\pfd.h" />
     <ClInclude Include="mfd_cli.h" />
+    <ClInclude Include="pfd.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="mfd.cli" />
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="..\..\pic\kPFD\pfd.xml" />
+    <Xml Include="pfd.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
