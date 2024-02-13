@@ -12,7 +12,7 @@ The display technology is based on a [Raspberry-PI](https://www.raspberrypi.org/
 The simplest way to try the code is to build on Microsoft Windows.  This is not a supported platform for the actual device but will allow you to easily test the devices.
 
 * If you don't have Microsoft Visual Studio 2017 download a free copy from [www.visualstudio.com](https://www.visualstudio.com/vs/cplusplus/)
-* I use [TortoiseGit](https://tortoisegit.org/) to do the checkout of the DIY-EFIS repository.
+* I use [GitKraken](https://www.gitkraken.com/download) to do the checkout of the DIY-EFIS repository.
 * Open the project file /win32_tools/diy-efis.sln
 * Set the default project to pfd.
 * 
