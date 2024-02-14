@@ -1,0 +1,1303 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          174.81363055555556,
+          -37.00463333333333
+        ]
+      },
+      "properties": {
+        "id": "4720639",
+        "type": "VOR_DME",
+        "designator": "AA",
+        "name": "AUCKLAND",
+        "frequency": "114.80",
+        "frequencyuom": "MHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": "NZAA",
+        "morse": ".-  .-"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -159.77333333333334,
+          -18.82472222222222
+        ]
+      },
+      "properties": {
+        "id": "4922867",
+        "type": "NDB",
+        "designator": "AI",
+        "name": "AITUTAKI",
+        "frequency": "320",
+        "frequencyuom": "KHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": null,
+        "morse": ".-  .."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          176.07427777777778,
+          -38.74322222222222
+        ]
+      },
+      "properties": {
+        "id": "4922897",
+        "type": "NDB_DME",
+        "designator": "AP",
+        "name": "TAUPO",
+        "frequency": "230",
+        "frequencyuom": "KHZ",
+        "dmefrequency": "116.70",
+        "dmefrequencyuom": "MHZ",
+        "aerodrome": "NZAP",
+        "morse": ".-  .--."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -158.10666666666665,
+          -20.003333333333334
+        ]
+      },
+      "properties": {
+        "id": "1661108339",
+        "type": "NDB",
+        "designator": "AT",
+        "name": "ATIU",
+        "frequency": "388",
+        "frequencyuom": "KHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": null,
+        "morse": ".-  -"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          169.98322222222222,
+          -46.027833333333334
+        ]
+      },
+      "properties": {
+        "id": "4922966",
+        "type": "NDB",
+        "designator": "BE",
+        "name": "BERRIDALE",
+        "frequency": "394",
+        "frequencyuom": "KHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": "NZDN",
+        "morse": "-...  ."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          172.51463611111112,
+          -43.5041
+        ]
+      },
+      "properties": {
+        "id": "4720789",
+        "type": "VOR_DME",
+        "designator": "CH",
+        "name": "CHRISTCHURCH",
+        "frequency": "115.30",
+        "frequencyuom": "MHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": "NZCH",
+        "morse": "-.-.  ...."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -176.56633333333335,
+          -43.95702777777778
+        ]
+      },
+      "properties": {
+        "id": "4923139",
+        "type": "NDB",
+        "designator": "CI",
+        "name": "CHATHAM (CHATHAM ISLANDS)",
+        "frequency": "322",
+        "frequencyuom": "KHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": "NZCI",
+        "morse": "-.-.  .."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -172.01761666666667,
+          -13.826255555555555
+        ]
+      },
+      "properties": {
+        "id": "4923253",
+        "type": "NDB",
+        "designator": "FA",
+        "name": "FALEOLO",
+        "frequency": "270",
+        "frequencyuom": "KHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": null,
+        "morse": "..-.  .-"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -171.99294166666667,
+          -13.82875
+        ]
+      },
+      "properties": {
+        "id": "4720861",
+        "type": "VOR_DME",
+        "designator": "FA",
+        "name": "FALEOLO",
+        "frequency": "113.90",
+        "frequencyuom": "MHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": null,
+        "morse": "..-.  .-"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -175.1447222222222,
+          -21.249833333333335
+        ]
+      },
+      "properties": {
+        "id": "4923271",
+        "type": "NDB",
+        "designator": "FM",
+        "name": "FUAAMOTU",
+        "frequency": "245",
+        "frequencyuom": "KHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": null,
+        "morse": "..-.  --"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          179.1977777777778,
+          -8.524722222222223
+        ]
+      },
+      "properties": {
+        "id": "4923289",
+        "type": "NDB",
+        "designator": "FU",
+        "name": "FUNAFUTI",
+        "frequency": "340",
+        "frequencyuom": "KHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": null,
+        "morse": "..-.  ..-"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          177.9775611111111,
+          -38.66051111111111
+        ]
+      },
+      "properties": {
+        "id": "4720879",
+        "type": "VOR_DME",
+        "designator": "GS",
+        "name": "GISBORNE",
+        "frequency": "114.20",
+        "frequencyuom": "MHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": "NZGS",
+        "morse": "--.  ..."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          170.9562222222222,
+          -42.72933333333334
+        ]
+      },
+      "properties": {
+        "id": "4923403",
+        "type": "NDB_DME",
+        "designator": "HK",
+        "name": "HOKITIKA",
+        "frequency": "310",
+        "frequencyuom": "KHZ",
+        "dmefrequency": "117.50",
+        "dmefrequencyuom": "MHZ",
+        "aerodrome": "NZHK",
+        "morse": "....  -.-"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          170.16194444444446,
+          -45.94588888888889
+        ]
+      },
+      "properties": {
+        "id": "4923412",
+        "type": "NDB_DME",
+        "designator": "HL",
+        "name": "HENLEY",
+        "frequency": "378",
+        "frequencyuom": "KHZ",
+        "dmefrequency": "115.70",
+        "dmefrequencyuom": "MHZ",
+        "aerodrome": "NZDN",
+        "morse": "....  .-.."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          175.33854722222222,
+          -37.84926333333333
+        ]
+      },
+      "properties": {
+        "id": "4720935",
+        "type": "VOR_DME",
+        "designator": "HN",
+        "name": "HAMILTON",
+        "frequency": "114.00",
+        "frequencyuom": "MHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": "NZHN",
+        "morse": "....  -."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -176.20183333333333,
+          -13.239583333333332
+        ]
+      },
+      "properties": {
+        "id": "4720941",
+        "type": "VOR",
+        "designator": "HOI",
+        "name": "WALLIS HIHIFO",
+        "frequency": "113.00",
+        "frequencyuom": "MHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": null,
+        "morse": "....  ---  .."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          173.69552777777778,
+          -42.42038888888889
+        ]
+      },
+      "properties": {
+        "id": "4923514",
+        "type": "NDB",
+        "designator": "KI",
+        "name": "KAIKOURA",
+        "frequency": "350",
+        "frequencyuom": "KHZ",
+        "dmefrequency": "114.60",
+        "dmefrequencyuom": "MHZ",
+        "aerodrome": "NZKI",
+        "morse": "-.-  .."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          173.91111111111113,
+          -35.262027777777774
+        ]
+      },
+      "properties": {
+        "id": "4923529",
+        "type": "NDB_DME",
+        "designator": "KK",
+        "name": "KERIKERI",
+        "frequency": "226",
+        "frequencyuom": "KHZ",
+        "dmefrequency": "116.10",
+        "dmefrequencyuom": "MHZ",
+        "aerodrome": "NZKK",
+        "morse": "-.-  -.-"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          173.2423611111111,
+          -35.02858333333333
+        ]
+      },
+      "properties": {
+        "id": "4923562",
+        "type": "NDB_DME",
+        "designator": "KT",
+        "name": "KAITAIA",
+        "frequency": "238",
+        "frequencyuom": "KHZ",
+        "dmefrequency": "115.80",
+        "dmefrequencyuom": "MHZ",
+        "aerodrome": "NZKT",
+        "morse": "-.-  -"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          159.07294444444443,
+          -31.528916666666667
+        ]
+      },
+      "properties": {
+        "id": "4923592",
+        "type": "NDB",
+        "designator": "LHI",
+        "name": "LORD HOWE ISLAND",
+        "frequency": "272",
+        "frequencyuom": "KHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": null,
+        "morse": ".-..  ....  .."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -170.74894444444442,
+          -14.35375
+        ]
+      },
+      "properties": {
+        "id": "4923616",
+        "type": "NDB",
+        "designator": "LOG",
+        "name": "LOGOTALA HILL",
+        "frequency": "242",
+        "frequencyuom": "KHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": null,
+        "morse": ".-..  ---  --."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          169.47986111111112,
+          -45.165527777777775
+        ]
+      },
+      "properties": {
+        "id": "400001515533712",
+        "type": "NDB",
+        "designator": "LX",
+        "name": "ALEXANDRA",
+        "frequency": "386",
+        "frequencyuom": "KHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": null,
+        "morse": ".-..  -..-"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -161.0025,
+          -10.379666666666667
+        ]
+      },
+      "properties": {
+        "id": "4923715",
+        "type": "NDB",
+        "designator": "MH",
+        "name": "MANIHIKI",
+        "frequency": "380",
+        "frequencyuom": "KHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": null,
+        "morse": "--  ...."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          170.32016666666667,
+          -45.87138888888889
+        ]
+      },
+      "properties": {
+        "id": "228626816",
+        "type": "NDB",
+        "designator": "MI",
+        "name": "MOSGIEL",
+        "frequency": "358",
+        "frequencyuom": "KHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": "NZDN",
+        "morse": "--  .."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          167.92083333333332,
+          -29.00726388888889
+        ]
+      },
+      "properties": {
+        "id": "4923834",
+        "type": "NDB",
+        "designator": "NF",
+        "name": "NORFOLK IS",
+        "frequency": "260",
+        "frequencyuom": "KHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": null,
+        "morse": "-.  ..-."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          167.93216666666666,
+          -29.047333333333334
+        ]
+      },
+      "properties": {
+        "id": "4721151",
+        "type": "VOR_DME",
+        "designator": "NF",
+        "name": "NORFOLK IS",
+        "frequency": "112.40",
+        "frequencyuom": "MHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": null,
+        "morse": "-.  ..-."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -171.83166666666665,
+          -9.17
+        ]
+      },
+      "properties": {
+        "id": "4923858",
+        "type": "NDB",
+        "designator": "NK",
+        "name": "NUKUNONU",
+        "frequency": "394",
+        "frequencyuom": "KHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": null,
+        "morse": "-.  -.-"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          174.82819444444445,
+          -41.22877777777778
+        ]
+      },
+      "properties": {
+        "id": "4923861",
+        "type": "NDB",
+        "designator": "NL",
+        "name": "NEWLANDS",
+        "frequency": "358",
+        "frequencyuom": "KHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": "NZWN",
+        "morse": "-.  .-.."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          174.18393333333333,
+          -39.007241666666665
+        ]
+      },
+      "properties": {
+        "id": "4721175",
+        "type": "VOR_DME",
+        "designator": "NP",
+        "name": "NEW PLYMOUTH",
+        "frequency": "114.40",
+        "frequencyuom": "MHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": "NZNP",
+        "morse": "-.  .--."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          176.86892500000002,
+          -39.45380277777778
+        ]
+      },
+      "properties": {
+        "id": "4721181",
+        "type": "VOR_DME",
+        "designator": "NR",
+        "name": "NAPIER",
+        "frequency": "113.80",
+        "frequencyuom": "MHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": "NZNR",
+        "morse": "-.  .-."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          173.2162972222222,
+          -41.303686111111105
+        ]
+      },
+      "properties": {
+        "id": "4721187",
+        "type": "VOR_DME",
+        "designator": "NS",
+        "name": "NELSON",
+        "frequency": "113.10",
+        "frequencyuom": "MHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": "NZNS",
+        "morse": "-.  ..."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -169.9152638888889,
+          -19.074716666666667
+        ]
+      },
+      "properties": {
+        "id": "4923906",
+        "type": "NDB",
+        "designator": "NU",
+        "name": "NIUE",
+        "frequency": "345",
+        "frequencyuom": "KHZ",
+        "dmefrequency": "112.70",
+        "dmefrequencyuom": "MHZ",
+        "aerodrome": null,
+        "morse": "-.  ..-"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          168.31763666666666,
+          -46.41158
+        ]
+      },
+      "properties": {
+        "id": "4721193",
+        "type": "VOR_DME",
+        "designator": "NV",
+        "name": "INVERCARGILL",
+        "frequency": "116.80",
+        "frequencyuom": "MHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": "NZNV",
+        "morse": "-.  ...-"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          175.39195819444444,
+          -40.20960552777778
+        ]
+      },
+      "properties": {
+        "id": "4727504",
+        "type": "VOR_DME",
+        "designator": "OH",
+        "name": "OHAKEA",
+        "frequency": "117.10",
+        "frequencyuom": "MHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": "NZOH",
+        "morse": "---  ...."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          174.80670247222224,
+          -38.82674941666667
+        ]
+      },
+      "properties": {
+        "id": "4721220",
+        "type": "DME",
+        "designator": "OR",
+        "name": "OHURA",
+        "frequency": "113.00",
+        "frequencyuom": "MHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": null,
+        "morse": "---  .-."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          175.6378472222222,
+          -40.32024722222223
+        ]
+      },
+      "properties": {
+        "id": "4721289",
+        "type": "VOR_DME",
+        "designator": "PM",
+        "name": "PALMERSTON NORTH",
+        "frequency": "113.40",
+        "frequencyuom": "MHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": "NZPM",
+        "morse": ".--.  --"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          174.9833611111111,
+          -40.903
+        ]
+      },
+      "properties": {
+        "id": "4924104",
+        "type": "NDB_DME",
+        "designator": "PP",
+        "name": "PARAPARAUMU",
+        "frequency": "242",
+        "frequencyuom": "KHZ",
+        "dmefrequency": "117.30",
+        "dmefrequencyuom": "MHZ",
+        "aerodrome": "NZPP",
+        "morse": ".--.  .--."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -158.04333333333332,
+          -8.993333333333332
+        ]
+      },
+      "properties": {
+        "id": "4924126",
+        "type": "NDB",
+        "designator": "PY",
+        "name": "PENRHYN",
+        "frequency": "400",
+        "frequencyuom": "KHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": null,
+        "morse": ".--.  -.--"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          168.78264722222224,
+          -44.98411388888889
+        ]
+      },
+      "properties": {
+        "id": "4721355",
+        "type": "VOR_DME",
+        "designator": "QN",
+        "name": "QUEENSTOWN",
+        "frequency": "113.60",
+        "frequencyuom": "MHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": "NZQN",
+        "morse": "--.-  -."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -159.81444444444446,
+          -21.201666666666664
+        ]
+      },
+      "properties": {
+        "id": "4721325",
+        "type": "VOR_DME",
+        "designator": "RG",
+        "name": "RAROTONGA",
+        "frequency": "113.50",
+        "frequencyuom": "MHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": null,
+        "morse": ".-.  --."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -159.8213888888889,
+          -21.20777777777778
+        ]
+      },
+      "properties": {
+        "id": "4924147",
+        "type": "NDB",
+        "designator": "RG",
+        "name": "RAROTONGA",
+        "frequency": "352",
+        "frequencyuom": "KHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": null,
+        "morse": ".-.  --."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          176.31393111111112,
+          -38.10804836111111
+        ]
+      },
+      "properties": {
+        "id": "4721337",
+        "type": "VOR_DME",
+        "designator": "RO",
+        "name": "ROTORUA",
+        "frequency": "112.10",
+        "frequencyuom": "MHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": "NZRO",
+        "morse": ".-.  ---"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          170.2806077777778,
+          -44.13560805555556
+        ]
+      },
+      "properties": {
+        "id": "4721346",
+        "type": "DME",
+        "designator": "RY",
+        "name": "MOUNT MARY",
+        "frequency": "112.50",
+        "frequencyuom": "MHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": null,
+        "morse": ".-.  -.--"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          174.35733333333332,
+          -35.88547222222222
+        ]
+      },
+      "properties": {
+        "id": "4924213",
+        "type": "NDB",
+        "designator": "SF",
+        "name": "SPRINGFIELD",
+        "frequency": "366",
+        "frequencyuom": "KHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": "NZWR",
+        "morse": "...  ..-."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          170.47719444444445,
+          -45.79451944444444
+        ]
+      },
+      "properties": {
+        "id": "4721385",
+        "type": "VOR_DME",
+        "designator": "SW",
+        "name": "SWAMPY",
+        "frequency": "112.70",
+        "frequencyuom": "MHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": "NZDN",
+        "morse": "...  .--"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -175.1485888888889,
+          -21.24416666666667
+        ]
+      },
+      "properties": {
+        "id": "4721403",
+        "type": "VOR_DME",
+        "designator": "TBU",
+        "name": "FUAAMOTU",
+        "frequency": "114.50",
+        "frequencyuom": "MHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": null,
+        "morse": "-  -...  ..-"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          176.19122222222222,
+          -37.67755555555555
+        ]
+      },
+      "properties": {
+        "id": "4924288",
+        "type": "NDB_DME",
+        "designator": "TG",
+        "name": "TAURANGA",
+        "frequency": "346",
+        "frequencyuom": "KHZ",
+        "dmefrequency": "113.20",
+        "dmefrequencyuom": "MHZ",
+        "aerodrome": "NZTG",
+        "morse": "-  --."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          175.31372222222222,
+          -38.921527777777776
+        ]
+      },
+      "properties": {
+        "id": "4924309",
+        "type": "NDB",
+        "designator": "TM",
+        "name": "TAUMARUNUI",
+        "frequency": "1630",
+        "frequencyuom": "KHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": null,
+        "morse": "-  --"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -173.79111111111112,
+          -15.978333333333333
+        ]
+      },
+      "properties": {
+        "id": "229919559",
+        "type": "NDB",
+        "designator": "TP",
+        "name": "NIUATOPUTAPU",
+        "frequency": "361",
+        "frequencyuom": "KHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": null,
+        "morse": "-  .--."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          171.22505555555557,
+          -44.30844444444444
+        ]
+      },
+      "properties": {
+        "id": "4924351",
+        "type": "NDB_DME",
+        "designator": "TU",
+        "name": "TIMARU",
+        "frequency": "366",
+        "frequencyuom": "KHZ",
+        "dmefrequency": "115.90",
+        "dmefrequencyuom": "MHZ",
+        "aerodrome": "NZTU",
+        "morse": "-  ..-"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -170.71951083333335,
+          -14.332137777777778
+        ]
+      },
+      "properties": {
+        "id": "4924357",
+        "type": "NDB",
+        "designator": "TUT",
+        "name": "PAGO PAGO",
+        "frequency": "403",
+        "frequencyuom": "KHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": null,
+        "morse": "-  ..-  -"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -173.96966666666665,
+          -18.5855
+        ]
+      },
+      "properties": {
+        "id": "4924360",
+        "type": "NDB",
+        "designator": "TV",
+        "name": "VAVAU",
+        "frequency": "400",
+        "frequencyuom": "KHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": null,
+        "morse": "-  ...-"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          173.86268055555556,
+          -41.519675
+        ]
+      },
+      "properties": {
+        "id": "4723971",
+        "type": "VOR_DME",
+        "designator": "WB",
+        "name": "WOODBOURNE",
+        "frequency": "115.60",
+        "frequencyuom": "MHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": "NZWB",
+        "morse": ".--  -..."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          176.91544444444446,
+          -37.92466666666667
+        ]
+      },
+      "properties": {
+        "id": "4924441",
+        "type": "NDB_DME",
+        "designator": "WK",
+        "name": "WHAKATANE",
+        "frequency": "362",
+        "frequencyuom": "KHZ",
+        "dmefrequency": "117.70",
+        "dmefrequencyuom": "MHZ",
+        "aerodrome": "NZWK",
+        "morse": ".--  -.-"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          174.8169611111111,
+          -41.33722777777778
+        ]
+      },
+      "properties": {
+        "id": "4723989",
+        "type": "VOR_DME",
+        "designator": "WN",
+        "name": "WELLINGTON",
+        "frequency": "112.30",
+        "frequencyuom": "MHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": "NZWN",
+        "morse": ".--  -."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          174.63123611111112,
+          -36.786791666666666
+        ]
+      },
+      "properties": {
+        "id": "400001181283283",
+        "type": "VOR_DME",
+        "designator": "WP",
+        "name": "WHENUAPAI",
+        "frequency": "116.40",
+        "frequencyuom": "MHZ",
+        "dmefrequency": null,
+        "dmefrequencyuom": null,
+        "aerodrome": "NZWP",
+        "morse": ".--  .--."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          174.36180555555555,
+          -35.77183333333333
+        ]
+      },
+      "properties": {
+        "id": "4924477",
+        "type": "NDB_DME",
+        "designator": "WR",
+        "name": "WHANGAREI",
+        "frequency": "326",
+        "frequencyuom": "KHZ",
+        "dmefrequency": "117.30",
+        "dmefrequencyuom": "MHZ",
+        "aerodrome": "NZWR",
+        "morse": ".--  .-."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          171.5800277777778,
+          -41.74238888888889
+        ]
+      },
+      "properties": {
+        "id": "4924486",
+        "type": "NDB_DME",
+        "designator": "WS",
+        "name": "WESTPORT",
+        "frequency": "278",
+        "frequencyuom": "KHZ",
+        "dmefrequency": "116.90",
+        "dmefrequencyuom": "MHZ",
+        "aerodrome": "NZWS",
+        "morse": ".--  ..."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          175.02650000000003,
+          -39.95938888888889
+        ]
+      },
+      "properties": {
+        "id": "4924492",
+        "type": "NDB_DME",
+        "designator": "WU",
+        "name": "WHANGANUI",
+        "frequency": "382",
+        "frequencyuom": "KHZ",
+        "dmefrequency": "116.00",
+        "dmefrequencyuom": "MHZ",
+        "aerodrome": "NZWU",
+        "morse": ".--  ..-"
+      }
+    }
+  ]
+}
