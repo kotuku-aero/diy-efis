@@ -18,15 +18,33 @@ The simplest way to try the code is to build on Microsoft Windows.  This is not 
 
 There are a few other repositories that may be useful if you want to process the map data:
 
+### Landmass features
+
 https://github.com/kotuku-aero/natural_earth
 
 This is a copy of the necessary data from [Natural Earth Website](https://www.naturalearthdata.com/) The data is not always useful as it has too much detail for aircraft use.  See comments below about data plans.
+
+### Terrain data
 
 https://github.com/kotuku-aero/terrain
 
 This is a copy of the GTOPO30 DEM data.  The gtopo data can be difficult to source and does not change rapidly.  See comments below about data plans.
 
-Facebook page 
+### Contour data
+
+https://github.com/kotuku-aero/contours
+
+This is my processed contours.  These are created from the GTOPO30 DEM dataset.  This is done using QGIS
+
+- Load the GTOPO DEM file
+- use a gaussian filter to remove noise.  This smooths the lidar data
+- generate contours at 1000ft intervals and save them
+
+The shp2db tool is then used to convert the shape files into a CanFly atom database.  This has a 1 degree spatial index.  The clipper2 library the clips the contours to those (approx 14000)  1 degree squares.  The AtomDB then loads those clipped (closed) contours and renders them.
+
+Makes for a very fast and light-weight rendering engine.  The 1000ft intervals are hypsometrically tinted
+
+## Facebook page 
 
 https://www.facebook.com/diyefis/
 
