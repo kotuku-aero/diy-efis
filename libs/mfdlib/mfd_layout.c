@@ -80,7 +80,7 @@ result_t on_create_navigator_widget(handle_t hwnd, widget_t* widget)
   wnd->show_water = true;
 
 
-  if (failed(result = load_layers(wnd, "C:\\Projects\\map_data")))
+  if (failed(result = load_layers(wnd, "C:\\Projects\\map-data")))
     return result;
 
   // hard coded for now.

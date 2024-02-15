@@ -31,7 +31,7 @@ static void print_help()
     << "    -d <name>  Set the name of the indexed container (required)" << endl
     << "    -m <name>  Set the name of the field that is indexed (required)" << endl
     << "    -n <name>  set the name (required)" << endl
-    << "example: indexdb -s /Projects/map_data/cities.csv -n \"Cities by name\" /Projects/map_data/cities-by-name.db" << endl;
+    << "example: indexdb -s /Projects/map-data/cities.csv -n \"Cities by name\" /Projects/map-data/cities-by-name.db" << endl;
   }
 
 /* The metadata database is a CSV file in the form:

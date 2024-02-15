@@ -12,7 +12,7 @@ static void print_help()
     << " Options are one of:" << endl
     << "    -r <w,n,e,s> set the spatial rect as west, north, east, south" << endl
     << "    -h      Print help" << endl
-    << "example: dumpdb  \\Projects\\map_data\\coastlines.db" << endl;
+    << "example: dumpdb  \\Projects\\map-data\\coastlines.db" << endl;
   }
 
 static bool has_option(cargs_t& args, const char* opt)

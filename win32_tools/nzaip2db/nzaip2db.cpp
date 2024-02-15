@@ -32,7 +32,7 @@ static void print_help()
     << "    -n <name>  set the name" << endl
     << "    -z <min>,<max> set the min-max scale for the geography (required)"
     << "    -m <filename>  create a metadata file that exports the shape metadata" << endl
-    << "example: nzaip2db -s /Projects/NZDATA -c 2301 -n \"NZANR\" /Projects/map_data/nz.db" << endl;
+    << "example: nzaip2db -s /Projects/NZDATA -c 2301 -n \"NZANR\" /Projects/map-data/nz.db" << endl;
   }
 
 static void add_path(kotuku::spatial_entity* entity, const rapidjson::Value& path,

@@ -31,7 +31,7 @@ static void print_help()
     << "    -s <path>  Schema definition (required)" << endl
     << "    -d <name>  Database name to export(required) " << endl
     << "    -m <path>  Set the path of the metadata file" << endl
-    << "example: arinc2db -c 2306 -s localhost -u export:password -d CFIPS_2304 -m C:/Projects/tmp/map_data.csv C:/Projects/map_data/navdata .db" << endl;
+    << "example: arinc2db -c 2306 -s localhost -u export:password -d CFIPS_2304 -m C:/Projects/tmp/map-data.csv C:/Projects/map-data/navdata .db" << endl;
   }
 
 static bool has_option(cargs_t& args, const char* opt)

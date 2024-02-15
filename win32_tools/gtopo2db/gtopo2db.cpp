@@ -24,7 +24,7 @@ static void print_help()
     << "    -z <num>   Set the hillshade zenith to <num> degrees (rec. 45)" << endl
     << "    -n <name>  set the name" << endl
     << " NOTE: both -a and -z must be provided to hillshade the output pixmaps" << endl
-    << "example: gtopo2db -s /Projects/terrain -c 2301 -n \"All World\" - a 315 - z 45 /Projects/map_data/terrain.db" << endl;
+    << "example: gtopo2db -s /Projects/terrain -c 2301 -n \"All World\" - a 315 - z 45 /Projects/map-data/terrain.db" << endl;
   }
 
 static bool has_option(cargs_t& args, const char* opt)

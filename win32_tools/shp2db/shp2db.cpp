@@ -18,10 +18,10 @@ static void print_help()
     << "    -n <name>  set the name" << endl
     << "    -z <min>,<max> set the min-max scale for the geography (required)"
     << "    -m <filename>  create a metadata file that exports the shape metadata" << endl
-    << "example: shp2db -s \\Projects\\contours\\land.shp -t coastlines -r W180,N90,E180,S60 -n \"Coastlines 7.5 arcsec\" -c 2301  \\Projects\\map_data\\coastlines.db" << endl;
+    << "example: shp2db -s \\Projects\\contours\\land.shp -t coastlines -r W180,N90,E180,S60 -n \"Coastlines 7.5 arcsec\" -c 2301  \\Projects\\map-data\\coastlines.db" << endl;
   }
 
-//-s \Projects\contours\land.shp -t coastlines -r W180,N90,E180,S60 -n "Coastlines 7.5 arcsec" -c 2301  \Projects\map_data\coastlines.db
+//-s \Projects\contours\land.shp -t coastlines -r W180,N90,E180,S60 -n "Coastlines 7.5 arcsec" -c 2301  \Projects\map-data\coastlines.db
 
 static bool has_option(cargs_t& args, const char* opt)
   {
