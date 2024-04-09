@@ -463,18 +463,6 @@ extern "C" {
    */
   extern result_t polygon(handle_t canvas, const rect_t *clip_rect, color_t pen, color_t fill, uint32_t count, const point_t *points);
   /**
-   * @brief Draw a series of polygons.  Right-handed polygons are fill, left-handed are voids
-   * @param canvas              gdi object to draw ploygons on
-   * @param clip_rect           rectangle to clip to
-   * @param pen                 Pen to draw lines with
-   * @param fill                Fill color for the polygons
-   * @param num_polygon         Number of polygons
-   * @param polygon_counts      array of lengths for the polygons
-   * @param points              points that form the polygons
-   * @return s_ok if rendered ok
-  */
-  extern result_t polypolygon(handle_t canvas, const rect_t* clip_rect, color_t pen, color_t fill, uint32_t num_polygon, const uint32_t *polygon_counts, const point_t* points);
-  /**
    * @brief Draw a rectangle
    * @param clip_rect     rectangle to clip to
    * @param pen           pen to outline with, can be 0

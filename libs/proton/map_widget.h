@@ -9,6 +9,11 @@
 
 typedef struct _map_widget_t map_widget_t;
 
+extern void on_gps_position(map_widget_t *widget, const lla_t *position);
+extern void on_map_zoom(map_widget_t *widget, int32_t zoom);
+extern void on_map_rotate(map_widget_t *widget, int32_t rotate);
+extern void on_map_mode(map_widget_t *widget, map_display_mode mode);
+
 typedef viewport_t *viewportp_t;
 type_vector_t(viewportp);
 
@@ -20,8 +25,20 @@ typedef struct _map_widget_t {
   extent_t font_cell_size;
   aircraft_t* aircraft;
 
+  const char *db_path;
+  const char *config_path;
+  // this sets how far the aircraft image can crawl over a
+  // canvas before a refresh of the background is requested
+  uint32_t max_image_crawl;
+
   // spatial_point_t position;
   map_params_t params;
+
+  // temporary from GPS, only published if the
+  // gps_valid event is received as well
+  lla_t gps_position;
+  // this is the last calculated gps position.
+  lla_t prev_gps_position;
 
   // layers
   // created bitmap that holds the background that
@@ -99,5 +116,6 @@ typedef struct _map_widget_t {
 extern result_t create_map_widget(handle_t parent, uint16_t id, aircraft_t *aircraft, map_widget_t* wnd, handle_t* hndl);
 
 extern result_t load_layers(map_widget_t* wnd, const char *path);
+
 
 #endif

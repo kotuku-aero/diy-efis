@@ -145,7 +145,7 @@ result_t canvas_create(const extent_t* size, handle_t* hndl)
   if (size == 0 || hndl == 0)
     return e_bad_parameter;
 
-  framebuffer_t* fb;
+  gdi_t* fb;
   result_t result;
 
   if (failed(result = bsp_framebuffer_create_rect(size, &fb)))
@@ -154,14 +154,13 @@ result_t canvas_create(const extent_t* size, handle_t* hndl)
   return create_canvas_from_framebuffer(fb, hndl);
   }
 
-result_t create_canvas_from_framebuffer(framebuffer_t* fb, handle_t* hndl)
+result_t create_canvas_from_framebuffer(gdi_t* fb, handle_t* hndl)
   {
   result_t result;
   canvas_t* canvas;
 
   if (failed(result = neutron_calloc(1, sizeof(canvas_t), (void**)&canvas)))
     return result;
-
 
   canvas->base.type = &canvas_type;
   canvas->fb = fb;
@@ -176,7 +175,7 @@ result_t canvas_create_bitmap(const bitmap_t* bitmap, handle_t* hndl)
   if (bitmap == 0 || hndl == 0)
     return e_bad_parameter;
 
-  framebuffer_t* fb;
+  gdi_t* fb;
   result_t result;
 
   if (failed(result = bsp_framebuffer_create_bitmap(bitmap, &fb)))

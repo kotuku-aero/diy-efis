@@ -103,8 +103,7 @@ static void show_menu(menu_widget_t *wnd, menu_t *menu)
   wnd->active_keys = menu->keys;
   wnd->menu_timer = wnd->menu_timeout;
 
-  invalidate_overlay_rect(wnd->window, 0);
-  show_window(wnd->window);
+  invalidate(wnd->window);
   }
 
 void show_checklist_menu(menu_widget_t* wnd, menu_item_checklist_t* checklist)
@@ -121,8 +120,7 @@ void show_checklist_menu(menu_widget_t* wnd, menu_item_checklist_t* checklist)
   wnd->active_keys = checklist->popup->keys;
   wnd->menu_timer = wnd->menu_timeout;
 
-  invalidate_overlay_rect(wnd->window, 0);
-  show_window(wnd->window);
+  invalidate(wnd->window);
   }
 
 static void show_item_editor(menu_widget_t *wnd, menu_item_t *item)
@@ -146,6 +144,8 @@ static void close_menu(menu_widget_t *wnd)
   wnd->menu_timer = 0;
 
   wnd->active_keys = wnd->root_keys;
+
+  invalidate(wnd->window);
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -392,7 +392,7 @@ static result_t on_key0(handle_t hwnd, const canmsg_t *msg, void *wnddata)
 
   const keys_t *handler = wnd->active_keys == 0 ? wnd->root_keys : wnd->active_keys;
   if (evaluate_item(hwnd, wnd, msg, handler->key0))
-    invalidate_overlay_rect(hwnd, 0);
+    invalidate(hwnd);
 
   return s_ok;
   }
@@ -403,7 +403,7 @@ static result_t on_key1(handle_t hwnd, const canmsg_t *msg, void *wnddata)
 
   const keys_t *handler = wnd->active_keys == 0 ? wnd->root_keys : wnd->active_keys;
   if (evaluate_item(hwnd, wnd, msg, handler->key1))
-    invalidate_overlay_rect(hwnd, 0);
+    invalidate(hwnd);
 
   return s_ok;
   }
@@ -414,7 +414,7 @@ static result_t on_key2(handle_t hwnd, const canmsg_t *msg, void *wnddata)
 
   const keys_t *handler = wnd->active_keys == 0 ? wnd->root_keys : wnd->active_keys;
   if (evaluate_item(hwnd, wnd, msg, handler->key2))
-    invalidate_overlay_rect(hwnd, 0);
+    invalidate(hwnd);
 
   return s_ok;
   }
@@ -425,7 +425,7 @@ static result_t on_key3(handle_t hwnd, const canmsg_t *msg, void *wnddata)
 
   const keys_t *handler = wnd->active_keys == 0 ? wnd->root_keys : wnd->active_keys;
   if (evaluate_item(hwnd, wnd, msg, handler->key3))
-    invalidate_overlay_rect(hwnd, 0);
+    invalidate(hwnd);
 
   return s_ok;
   }
@@ -436,7 +436,7 @@ static result_t on_key4(handle_t hwnd, const canmsg_t *msg, void *wnddata)
 
   const keys_t *handler = wnd->active_keys == 0 ? wnd->root_keys : wnd->active_keys;
   if (evaluate_item(hwnd, wnd, msg, handler->key4))
-    invalidate_overlay_rect(hwnd, 0);
+    invalidate(hwnd);
 
   return s_ok;
   }
@@ -447,7 +447,7 @@ static result_t on_key5(handle_t hwnd, const canmsg_t *msg, void *wnddata)
 
   const keys_t *handler = wnd->active_keys == 0 ? wnd->root_keys : wnd->active_keys;
   if (evaluate_item(hwnd, wnd, msg, handler->key5))
-    invalidate_overlay_rect(hwnd, 0);
+    invalidate(hwnd);
 
   return s_ok;
   }
@@ -458,7 +458,7 @@ static result_t on_key6(handle_t hwnd, const canmsg_t *msg, void *wnddata)
 
   const keys_t *handler = wnd->active_keys == 0 ? wnd->root_keys : wnd->active_keys;
   if (evaluate_item(hwnd, wnd, msg, handler->key6))
-    invalidate_overlay_rect(hwnd, 0);
+    invalidate(hwnd);
 
   return s_ok;
   }
@@ -469,7 +469,7 @@ static result_t on_key7(handle_t hwnd, const canmsg_t *msg, void *wnddata)
 
   const keys_t *handler = wnd->active_keys == 0 ? wnd->root_keys : wnd->active_keys;
   if (evaluate_item(hwnd, wnd, msg, handler->key7))
-    invalidate_overlay_rect(hwnd, 0);
+    invalidate(hwnd);
 
   return s_ok;
   }
@@ -485,12 +485,12 @@ static result_t on_decka(handle_t hwnd, const canmsg_t *msg, void *wnddata)
   if (value > 0)
     {
     if (evaluate_item(hwnd, wnd, msg, handler->decka_up))
-      invalidate_overlay_rect(hwnd, 0);
+      invalidate(hwnd);
     }
   else if (value < 0)
     {
     if (evaluate_item(hwnd, wnd, msg, handler->decka_dn))
-      invalidate_overlay_rect(hwnd, 0);
+      invalidate(hwnd);
     }
 
   return s_ok;
@@ -506,12 +506,12 @@ static result_t on_deckb(handle_t hwnd, const canmsg_t *msg, void *wnddata)
   if (value > 0)
     {
     if (evaluate_item(hwnd, wnd, msg, handler->deckb_up))
-      invalidate_overlay_rect(hwnd, 0);
+      invalidate(hwnd);
     }
   else if (value < 0)
     {
     if (evaluate_item(hwnd, wnd, msg, handler->deckb_dn))
-      invalidate_overlay_rect(hwnd, 0);
+      invalidate(hwnd);
     }
 
   return s_ok;
@@ -528,12 +528,12 @@ static result_t on_press_decka(handle_t hwnd, const canmsg_t* msg, void* wnddata
   if (value > 0)
     {
     if (evaluate_item(hwnd, wnd, msg, handler->decka_press_up))
-      invalidate_overlay_rect(hwnd, 0);
+      invalidate(hwnd);
     }
   else if (value < 0)
     {
     if (evaluate_item(hwnd, wnd, msg, handler->decka_press_dn))
-      invalidate_overlay_rect(hwnd, 0);
+      invalidate(hwnd);
     }
 
   return s_ok;
@@ -549,12 +549,12 @@ static result_t on_press_deckb(handle_t hwnd, const canmsg_t* msg, void* wnddata
   if (value > 0)
     {
     if (evaluate_item(hwnd, wnd, msg, handler->deckb_press_up))
-      invalidate_overlay_rect(hwnd, 0);
+      invalidate(hwnd);
     }
   else if (value < 0)
     {
     if (evaluate_item(hwnd, wnd, msg, handler->deckb_press_dn))
-      invalidate_overlay_rect(hwnd, 0);
+      invalidate(hwnd);
     }
 
   return s_ok;
@@ -583,7 +583,7 @@ static result_t on_menu_up(handle_t hwnd, const canmsg_t *msg, void *wnddata)
     }
 
   if (changed)
-    invalidate_overlay_rect(hwnd, 0);
+    invalidate(hwnd);
 
   return s_ok;
   }
@@ -607,7 +607,7 @@ static result_t on_menu_dn(handle_t hwnd, const canmsg_t *msg, void *wnddata)
     }
 
   if (changed)
-    invalidate_overlay_rect(hwnd, 0);
+    invalidate(hwnd);
 
   return s_ok;
   }
@@ -634,7 +634,7 @@ static result_t on_menu_left(handle_t hwnd, const canmsg_t *msg, void *wnddata)
     }
 
   if (changed)
-    invalidate_overlay_rect(hwnd, 0);
+    invalidate(hwnd);
 
   return s_ok;
   }
@@ -664,7 +664,7 @@ static result_t on_menu_right(handle_t hwnd, const canmsg_t *msg, void *wnddata)
     }
 
   if (changed)
-    invalidate_overlay_rect(hwnd, 0);
+    invalidate(hwnd);
 
   return s_ok;
   }
@@ -702,7 +702,7 @@ static result_t on_ok(handle_t hwnd, const canmsg_t *msg, void *wnddata)
     }
 
   if (changed)
-    invalidate_overlay_rect(hwnd, 0);
+    invalidate(hwnd);
 
   return s_ok;
   }
@@ -713,7 +713,7 @@ static result_t on_cancel(handle_t hwnd, const canmsg_t *msg, void *wnddata)
 
   close_menu(wnd);
   hide_window(hwnd);
-  invalidate_overlay_rect(hwnd, 0);
+  invalidate(hwnd);
 
   return s_ok;
   }
@@ -752,14 +752,12 @@ result_t menu_wndproc(handle_t hwnd, const canmsg_t *msg, void *wnddata)
           {
           close_menu(wnd);
           hide_window(hwnd);
-          invalidate_overlay_rect(hwnd, 0);
+          invalidate(hwnd);
           }
         }
 #endif
       break;
-    case id_paint_background:
-    case id_paint_foreground:
-    case id_paint_overlay:
+    case id_paint:
       on_paint_widget(hwnd, msg, wnddata);
       break;
     case id_key0:
@@ -852,7 +850,7 @@ result_t create_menu_window(handle_t parent, uint16_t id, aircraft_t* aircraft, 
 
   wnd->window = hndl;
 
-  wnd->base.on_paint_overlay = menu_window_on_paint;
+  wnd->base.on_paint = menu_window_on_paint;
 
   if (out != 0)
     *out = hndl;

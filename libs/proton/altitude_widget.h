@@ -9,6 +9,8 @@
 typedef struct _altitude_widget_t {
   widget_t base;
 
+  handle_t background_canvas;
+
   color_t text_color;
   color_t pen;
   const font_t* font;           // neo 9

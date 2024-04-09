@@ -21,25 +21,28 @@ static void draw_point(handle_t canvas, gauge_widget_t* wnd, const rect_t* wnd_r
 static void draw_graph_value(handle_t canvas, gauge_widget_t* wnd, const rect_t* wnd_rect, color_t pen, int32_t offset);
 static void draw_bar_graph(handle_t canvas, gauge_widget_t* wnd, const rect_t* wnd_rect, const rect_t* rect);
 
-static void on_paint_background(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)
+static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)
   {
   gauge_widget_t* wnd = (gauge_widget_t*)wnddata;
-  // fill the background with hollow
-  rectangle(canvas, wnd_rect, color_hollow, color_hollow, wnd_rect);
 
-  on_paint_widget_background(canvas, wnd_rect, msg, wnddata);
+  if (wnd->background_canvas == nullptr)
+    {
+    extent_t ex;
+    rect_extents(wnd_rect, &ex);
+    canvas_create(&ex, &wnd->background_canvas);
 
-  if (wnd->style == gs_hbar)
-    on_paint_background_hbar(canvas, wnd, wnd_rect);
-  else if (is_bar_style(wnd))
-    on_paint_background_bar(canvas, wnd, wnd_rect);
-  else
-    on_paint_background_dial(canvas, wnd, wnd_rect);
-  }
+    on_paint_widget_background(wnd->background_canvas, wnd_rect, msg, wnddata);
 
-static void on_paint_foreground(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)
-  {
-  gauge_widget_t* wnd = (gauge_widget_t*)wnddata;
+    if (wnd->style == gs_hbar)
+      on_paint_background_hbar(wnd->background_canvas, wnd, wnd_rect);
+    else if (is_bar_style(wnd))
+      on_paint_background_bar(wnd->background_canvas, wnd, wnd_rect);
+    else
+      on_paint_background_dial(wnd->background_canvas, wnd, wnd_rect);
+    }
+
+  point_t pt = { 0, 0 };
+  bit_blt(canvas, wnd_rect, wnd_rect, wnd->background_canvas, wnd_rect, &pt, src_copy);
 
   if (wnd->style == gs_hbar)
     on_paint_hbar(canvas, wnd, wnd_rect);
@@ -831,7 +834,7 @@ result_t gauge_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
     }
 
   if (changed)
-    invalidate_foreground_rect(hwnd, 0);
+    invalidate(hwnd);
 
   return widget_wndproc(hwnd, msg, wnddata);
   }
@@ -843,8 +846,7 @@ result_t create_gauge_widget(handle_t parent, uint16_t id, aircraft_t* aircraft,
   if (failed(result = create_widget(parent, id, gauge_wndproc, &wnd->base, &hndl)))
     return result;
 
-  wnd->base.on_paint_foreground = on_paint_foreground;
-  wnd->base.on_paint_background = on_paint_background;
+  wnd->base.on_paint = on_paint;
 
   if (out != 0)
     *out = hndl;

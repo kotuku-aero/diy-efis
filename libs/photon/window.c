@@ -1,8 +1,6 @@
 #include "photon_priv.h"
 
-const canmsg_t paint_background_msg = { id_paint_background };
-const canmsg_t paint_foreground_msg = { id_paint_foreground };
-const canmsg_t paint_overlay_msg = { id_paint_overlay };
+const canmsg_t paint_msg = { id_paint };
 
 const typeid_t window_type;
 
@@ -34,9 +32,7 @@ static result_t window_close(handle_t hndl)
     child = next;
     }
 
-  if (failed(result = close_handle(window->background_canvas)) ||
-    failed(result = close_handle(window->foreground_canvas)) ||
-    failed(result = close_handle(window->overlay_canvas)))
+  if (failed(result = close_handle(window->canvas)))
     return result;
 
   memset(window, 0, sizeof(window_t));
@@ -48,6 +44,90 @@ const typeid_t window_type =
   .name = "window",
   .etherealize = window_close
   };
+/**
+* @brief Convert a window position to an absolute position
+* @param fb    framebuffer
+* @param src   source rectangle
+* @param dst   calculated rectangle
+* @return dst
+*/
+static inline const rect_t* to_framebuffer_position(gdi_t* fb, const rect_t* src, rect_t* dst)
+  {
+  rect_copy(src, dst);
+  dst->left += fb->position.left;
+  dst->top += fb->position.top;
+  dst->right += fb->position.left;
+  dst->bottom += fb->position.top;
+
+  return dst;
+  }
+
+static inline result_t window_get_pixel(gdi_t* fb, const point_t* src, color_t* pix)
+  {
+  point_t pt;
+  return fb->surface->base.get_pixel(&fb->surface->base, to_absolute_pt(src, fb, &pt), pix);
+  }
+
+static inline result_t window_set_pixel(gdi_t* fb, const point_t* dest, color_t color, color_t* pix)
+  {
+  point_t pt;
+  return fb->surface->base.set_pixel(&fb->surface->base, to_absolute_pt(dest, fb, &pt), color, pix);
+  }
+
+static inline result_t window_fast_fill(gdi_t* fb, const rect_t* dest, color_t fill_color)
+  {
+  rect_t r;
+  return fb->surface->base.fast_fill(&fb->surface->base, to_absolute_rect(dest, fb, &r), fill_color);
+  }
+
+static inline result_t window_fast_line(gdi_t* fb, const point_t* p1, const point_t* p2, color_t fill_color)
+  {
+  point_t pt1;
+  point_t pt2;
+
+  return fb->surface->base.fast_line(&fb->surface->base, to_absolute_pt(p1, fb, &pt1), to_absolute_pt(p2, fb, &pt2), fill_color);
+  }
+
+static inline result_t window_fast_copy(gdi_t* fb, const point_t* dest, const gdi_t* src_canvas, const rect_t* src, raster_operation op)
+  {
+  point_t p1;
+  rect_t r1;
+
+  return fb->surface->base.fast_copy(&fb->surface->base, to_absolute_pt(dest, fb, &p1), &src_canvas->surface->base, to_absolute_rect(src, src_canvas, &r1), op);
+  }
+
+
+static result_t create_child_framebuffer(canvas_t* parent, const rect_t* rect, gdi_t** out)
+  {
+  result_t result;
+  // a child framebuffer shares its parent's buffer
+  // check the ranges.  The window must be completely within its parent.
+  if (rect->left < 0 || rect->left > rect_width(&parent->fb->position) ||
+    rect->top < 0 || rect->top > rect_height(&parent->fb->position) ||
+    rect->right < rect->left || rect->right > rect_width(&parent->fb->position) ||
+    rect->bottom > rect_height(&parent->fb->position))
+    return e_bad_parameter;       // rect exceeds bounds
+
+  gdi_t* fb;
+  if (failed(result = neutron_calloc(1, sizeof(gdi_t), (void**)&fb)))
+    return result;
+
+  // initialize the child with routines that use the parent canvas
+  fb->surface = parent->fb->surface;
+  fb->is_surface = false;
+  fb->fast_copy = window_fast_copy;
+  fb->fast_fill = window_fast_fill;
+  fb->fast_line = window_fast_line;
+  fb->get_pixel = window_get_pixel;
+  fb->set_pixel = window_set_pixel;
+
+  to_framebuffer_position(parent->fb, rect, &fb->position);      // store the rectange as relative to the canvas
+  to_absolute_rect(&fb->position, fb, &fb->absolute_position);
+
+  *out = fb;
+
+  return s_ok;
+  }
 
 result_t window_create(handle_t hparent, const rect_t* bounds, wndproc_fn cb, void* wnddata, uint16_t id, handle_t* hndl)
   {
@@ -74,27 +154,14 @@ result_t window_create(handle_t hparent, const rect_t* bounds, wndproc_fn cb, vo
 
   rect_copy(bounds, &window->position);
 
-  framebuffer_t* fb;
+  gdi_t* fb;
   canvas_t* canvas;
-  // create the canvas's
-  if (parent->background_canvas != 0 &&
-    (failed(result = is_typeof(parent->background_canvas, &canvas_type, (void**)&canvas)) ||
-      failed(result = bsp_framebuffer_create_child(canvas->fb, bounds, &fb)) ||
-      failed(result = create_canvas_from_framebuffer(fb, &window->background_canvas))))
+  // create the canvas
+  if (parent->canvas != 0 &&
+    (failed(result = is_typeof(parent->canvas, &canvas_type, (void**)&canvas)) ||
+      failed(result = create_child_framebuffer(canvas, bounds, &fb)) ||
+      failed(result = create_canvas_from_framebuffer(fb, (handle_t *) &window->canvas))))
     return result;
-
-  if (parent->foreground_canvas != 0 &&
-    (failed(result = is_typeof(parent->foreground_canvas, &canvas_type, (void**)&canvas)) ||
-      failed(result = bsp_framebuffer_create_child(canvas->fb, bounds, &fb)) ||
-      failed(result = create_canvas_from_framebuffer(fb, &window->foreground_canvas))))
-    return result;
-
-  if (parent->overlay_canvas != 0 &&
-    (failed(result = is_typeof(parent->overlay_canvas, &canvas_type, (void**)&canvas)) ||
-      failed(result = bsp_framebuffer_create_child(canvas->fb, bounds, &fb)) ||
-      failed(result = create_canvas_from_framebuffer(fb, &window->overlay_canvas))))
-    return result;
-
 
   // link window
   if (parent != 0)
@@ -285,7 +352,19 @@ result_t show_window(handle_t hndl)
   if (failed(result = is_typeof(hndl, &window_type, (void**)&window)))
     return result;
 
+  if (!window->visible)
+    {
   window->visible = true;
+    // visible changed so add to invalid count
+    if (window->canvas->fb->invalid)
+      {
+      enter_critical();
+      //trace_info("show_window: invalidate window %d\n", window->id);
+      window->canvas->fb->surface->invalid_count++;
+      exit_critical();
+      }
+    }
+
   return s_ok;
   }
 
@@ -296,7 +375,19 @@ result_t hide_window(handle_t hndl)
   if (failed(result = is_typeof(hndl, &window_type, (void**)&window)))
     return result;
 
+  if (window->visible)
+    {
   window->visible = false;
+    // visible changed so remove invalid count
+    if (window->canvas->fb->invalid)
+      {
+      enter_critical();
+      //trace_info("hide_window: un-invalidate window %d\n", window->id);
+      window->canvas->fb->surface->invalid_count--;
+      exit_critical();
+      }
+    }
+
   return s_ok;
   }
 
@@ -337,28 +428,10 @@ result_t window_setpos(handle_t hndl, const rect_t* pos)
   rect_copy(pos, &window->position);
 
   canvas_t* canvas;
-  if (window->background_canvas != 0)
-    {
-    if (failed(result = is_typeof(window->background_canvas, &canvas_type, (void**)&canvas)))
-      return result;
-    rect_copy(pos, &canvas->fb->position);
-    }
-
-  if (window->foreground_canvas != 0)
-    {
-    if (failed(result = is_typeof(window->foreground_canvas, &canvas_type, (void**)&canvas)))
+  if (failed(result = is_typeof(window->canvas, &canvas_type, (void**)&canvas)))
       return result;
 
-    rect_copy(pos, &canvas->fb->position);
-    }
-
-  if (window->overlay_canvas != 0)
-    {
-    if (failed(result = is_typeof(window->overlay_canvas, &canvas_type, (void**)&canvas)))
-      return result;
-
-    rect_copy(pos, &canvas->fb->position);
-    }
+  to_absolute_rect(&window->position, canvas->fb, &canvas->fb->absolute_position);
 
   return s_ok;
   }
@@ -487,427 +560,117 @@ result_t insert_after(handle_t hndl, handle_t hsibling)
   return s_ok;
   }
 
-result_t get_background_canvas(handle_t hwnd, handle_t* canvas)
+result_t invalidate(handle_t hndl)
   {
-  window_t* window;
   result_t result;
+  window_t* window;
+  if (failed(result = is_typeof(hndl, &window_type, (void**)&window)))
+    return result;
+
+   // invalidate the canvas
+  enter_critical();
+  if (!window->canvas->fb->invalid)
+    {
+    if (window->visible)
+      {
+      //trace_info("invalidate: invalidate window %d\n", window->id);
+      window->canvas->fb->surface->invalid_count++;
+      }
+
+    window->canvas->fb->invalid = true;
+    }
+  exit_critical();
+
+  // invalidate our children
+  for (window_t* child = window->child; child != 0; child = child->next)
+    {
+    if (failed(is_invalid((handle_t)child)))
+      invalidate((handle_t)child);
+    }
+
+      return s_ok;
+  }
+
+result_t is_invalid(handle_t hwnd)
+  {
+  result_t result;
+  window_t* window;
   if (failed(result = is_typeof(hwnd, &window_type, (void**)&window)))
     return result;
 
-  *canvas = window->background_canvas;
-
-  return s_ok;
-  }
-
-result_t get_foreground_canvas(handle_t hwnd, handle_t* canvas)
-  {
-  window_t* window;
-  result_t result;
-  if (failed(result = is_typeof(hwnd, &window_type, (void**)&window)))
-    return result;
-
-  *canvas = window->foreground_canvas;
-
-  return s_ok;
-  }
-
-result_t get_overlay_canvas(handle_t hwnd, handle_t* canvas)
-  {
-  window_t* window;
-  result_t result;
-  if (failed(result = is_typeof(hwnd, &window_type, (void**)&window)))
-    return result;
-
-  *canvas = window->overlay_canvas;
-
-  return s_ok;
-  }
-
-
-result_t is_invalid(handle_t hndl)
-  {
-  result_t result;
   canvas_t* canvas;
-  if (failed(result = is_typeof(hndl, &canvas_type, (void**)&canvas)))
-    return result;
+  if (failed(result = is_typeof(window->canvas, &canvas_type, (void**)&canvas)))
+      return result;
 
   return canvas->fb->invalid ? s_ok : s_false;
   }
 
-result_t invalidate_background_rect(handle_t hndl, const rect_t* rect)
+result_t begin_paint(handle_t hwnd, handle_t* paint_canvas)
   {
   result_t result;
   window_t* window;
-  if (failed(result = is_typeof(hndl, &window_type, (void**)&window)))
+  if (failed(result = is_typeof(hwnd, &window_type, (void**)&window)))
     return result;
 
-  if (window->background_canvas == 0)
+  if (window->canvas == nullptr)
     return e_invalid_operation;
 
-  // if this canvas is not our own we need to tell the owner about this
-  // but this may recurse, hence the _invalid = true being set
   canvas_t* canvas;
-  if (failed(result = is_typeof(window->background_canvas, &canvas_type, (void**)&canvas)))
+  if (failed(result = is_typeof(window->canvas, &canvas_type, (void**)&canvas)))
+      return result;
+
+  // tell the surface that this is in a paint operation
+  enter_critical();
+  canvas->fb->surface->paint_depth++;
+  exit_critical();
+
+  if (paint_canvas != nullptr)
+    *paint_canvas = window->canvas;
+
+      return s_ok;
+  }
+
+result_t end_paint(handle_t hwnd)
+  {
+  result_t result;
+  window_t* window;
+  if (failed(result = is_typeof(hwnd, &window_type, (void**)&window)))
     return result;
 
-  //if (succeeded(window_is_invalid(canvas->fb)))
-  //  return s_ok;
+  if (window->canvas == 0)
+    return e_invalid_operation;
 
-  window_mark_invalid(canvas->fb);
-
-  rect_t wnd_rect;
-
-  // now we need to invalidate our children
-  window_t* child = window->child;
-
-  while (child != 0)
-    {
-    handle_t child_canvas;
-    if (succeeded(get_background_canvas(child, &child_canvas)) &&
-      failed(is_invalid(child_canvas)))
-      {
-      if (failed(result = window_rect((handle_t)child, &wnd_rect)) ||
-        failed(result = invalidate_background_rect((handle_t)child, &wnd_rect)))
+  canvas_t* canvas;
+  if (failed(result = is_typeof(window->canvas, &canvas_type, (void**)&canvas)))
         return result;
-      }
 
-    child = child->next;
-    }
-
-  if (!canvas->fb->is_surface)
+  bool paint_complete = false;
+  enter_critical();
+  // one less invalid window
+  if (canvas->fb->invalid)
     {
-    // ask the parent to redraw, it will then pass the message down
-    // based on the correct z-order
-    if (failed(result = window_rect((handle_t)window->parent, &wnd_rect)) ||
-      failed(result = invalidate_background_rect((handle_t)window->parent, &wnd_rect)))
-      return result;
-    }
+    //trace_info("end_paint: un-invalidate window %d\n", window->id);
 
-  // post a paint message to the window.  This actually just sets the
-  // paint request, but this is the only way to send a message
-  // between threads.
-  return post_message(hndl, &paint_background_msg, 0);
+    canvas->fb->surface->invalid_count--;
+    canvas->fb->invalid = false;
+  }
+  canvas->fb->surface->paint_depth--;
+  paint_complete = canvas->fb->surface->paint_depth == 0;
+  exit_critical();
+
+  if (paint_complete)
+  {
+    handle_t screen;
+    get_screen(&screen);
+
+    screen_surface_t *surface;
+    get_screen_surface(screen, &surface);
+
+    // if the paint is complete then sync the framebuffer
+    gdi_painting_done(surface);
   }
 
-result_t begin_background_paint(handle_t hwnd, handle_t* paint_canvas)
-  {
-  result_t result;
-  window_t* window;
-  if (failed(result = is_typeof(hwnd, &window_type, (void**)&window)))
-    return result;
-
-  if (window->background_canvas == 0)
-    return e_invalid_operation;
-
-  if (paint_canvas != 0)
-    *paint_canvas = window->background_canvas;
-
-  // if this canvas is not our own we need to tell the owner about this
-  // but this may recurse, hence the _invalid = true being set
-
-  canvas_t* canvas;
-  do
-    {
-    if (failed(result = is_typeof(window->background_canvas, &canvas_type, (void**)&canvas)))
-      return result;
-
-    if (canvas->fb->is_surface)
-      break;
-
-    window = window->parent;
-    } while (window != 0);
-
-    if (window == 0)
       return s_ok;
-
-    return window_begin_paint(canvas->fb);
-  }
-
-result_t end_background_paint(handle_t hwnd)
-  {
-  result_t result;
-  window_t* window;
-  if (failed(result = is_typeof(hwnd, &window_type, (void**)&window)))
-    return result;
-
-  if (window->background_canvas == 0)
-    return e_invalid_operation;
-
-  // if this canvas is not our own we need to tell the owner about this
-  // but this may recurse, hence the _invalid = true being set
-
-  int depth = 0;
-  canvas_t* canvas;
-  do
-    {
-    if (failed(result = is_typeof(window->background_canvas, &canvas_type, (void**)&canvas)))
-      return result;
-
-    if (canvas->fb->is_surface)
-      break;
-
-    if(depth++ == 0)
-      canvas->fb->invalid = false;
-      
-    window = window->parent;
-    } while (window != 0);
-
-    if (window == 0)
-      return s_ok;
-
-  return window_end_paint(canvas->fb);
-  }
-
-result_t invalidate_foreground_rect(handle_t hndl, const rect_t* rect)
-  {
-  result_t result;
-  window_t* window;
-  if (failed(result = is_typeof(hndl, &window_type, (void**)&window)))
-    return result;
-
-  if (window->foreground_canvas == 0)
-    return e_invalid_operation;
-
-  // if this canvas is not our own we need to tell the owner about this
-  // but this may recurse, hence the _invalid = true being set
-  canvas_t* canvas;
-  if (failed(result = is_typeof(window->foreground_canvas, &canvas_type, (void**)&canvas)))
-    return result;
-
-  // if already invalid then exit
-  //if (succeeded(window_is_invalid(canvas->fb)))
-  //  return s_ok;
-
-  window_mark_invalid(canvas->fb);
-
-  rect_t wnd_rect;
-
-  // now we need to invalidate our children
-  window_t* child = window->child;
-
-  while (child != 0)
-    {
-    handle_t child_canvas;
-    if (succeeded(get_foreground_canvas(child, &child_canvas)) &&
-      failed(is_invalid(child_canvas)))
-      {
-      if (failed(result = window_rect((handle_t)child, &wnd_rect)) ||
-        failed(result = invalidate_foreground_rect((handle_t)child, &wnd_rect)))
-        return result;
-      }
-
-    child = child->next;
-    }
-
-  if (!canvas->fb->is_surface)
-    {
-    // ask the parent to redraw, it will then pass the message down
-    // based on the correct z-order
-    if (failed(result = window_rect((handle_t)window->parent, &wnd_rect)) ||
-      failed(result = invalidate_foreground_rect((handle_t)window->parent, &wnd_rect)))
-      return result;
-    }
-
-  // post a paint message to the window.  This actually just sets the
-  // paint request, but this is the only way to send a message
-  // between threads.
-  return post_message(hndl, &paint_foreground_msg, 0);
-  }
-
-result_t begin_foreground_paint(handle_t hwnd, handle_t* paint_canvas)
-  {
-  result_t result;
-  window_t* window;
-  if (failed(result = is_typeof(hwnd, &window_type, (void**)&window)))
-    return result;
-
-
-  if (window->foreground_canvas == 0)
-    return e_invalid_operation;
-
-  if (paint_canvas != 0)
-    *paint_canvas = window->foreground_canvas;
-
-  // if this canvas is not our own we need to tell the owner about this
-  // but this may recurse, hence the _invalid = true being set
-
-  canvas_t* canvas;
-  do
-    {
-    if (failed(result = is_typeof(window->foreground_canvas, &canvas_type, (void**)&canvas)))
-      return result;
-
-    if (canvas->fb->is_surface)
-      break;
-
-    window = window->parent;
-    } while (window != 0);
-
-    if (window == 0)
-      return s_ok;
-
-    return window_begin_paint(canvas->fb);
-  }
-
-result_t end_foreground_paint(handle_t hwnd)
-  {
-  result_t result;
-  window_t* window;
-  if (failed(result = is_typeof(hwnd, &window_type, (void**)&window)))
-    return result;
-
-
-  if (window->foreground_canvas == 0)
-    return e_invalid_operation;
-
-  // if this canvas is not our own we need to tell the owner about this
-  // but this may recurse, hence the _invalid = true being set
-
-  int depth = 0;
-  canvas_t* canvas;
-  do
-    {
-    if (failed(result = is_typeof(window->foreground_canvas, &canvas_type, (void**)&canvas)))
-      return result;
-
-    if (canvas->fb->is_surface)
-      break;
-
-    if (depth++ == 0)
-      canvas->fb->invalid = false;
-
-    window = window->parent;
-    } while (window != 0);
-
-    if (window == 0)
-      return s_ok;
-
-    return window_end_paint(canvas->fb);
-  }
-
-result_t invalidate_overlay_rect(handle_t hndl, const rect_t* rect)
-  {
-  result_t result;
-  window_t* window;
-  if (failed(result = is_typeof(hndl, &window_type, (void**)&window)))
-    return result;
-
-  if (window->overlay_canvas == 0)
-    return e_invalid_operation;
-
-  // if this canvas is not our own we need to tell the owner about this
-  // but this may recurse, hence the _invalid = true being set
-  canvas_t* canvas;
-  if (failed(result = is_typeof(window->overlay_canvas, &canvas_type, (void**)&canvas)))
-    return result;
-
-  //if (succeeded(window_is_invalid(canvas->fb)))
-  //  return s_ok;
-
-  window_mark_invalid(canvas->fb);
-
-  rect_t wnd_rect;
-
-  // now we need to invalidate our children
-  window_t* child = window->child;
-
-  while (child != 0)
-    {
-    handle_t child_canvas;
-    if (succeeded(get_overlay_canvas(child, &child_canvas)) &&
-      failed(is_invalid(child_canvas)))
-      {
-      if (failed(result = window_rect((handle_t)child, &wnd_rect)) ||
-        failed(result = invalidate_overlay_rect((handle_t)child, &wnd_rect)))
-        return result;
-      }
-
-    child = child->next;
-    }
-
-  if (!canvas->fb->is_surface)
-    {
-    // ask the parent to redraw, it will then pass the message down
-    // based on the correct z-order
-    if (failed(result = window_rect((handle_t)window->parent, &wnd_rect)) ||
-      failed(result = invalidate_overlay_rect((handle_t)window->parent, &wnd_rect)))
-      return result;
-    }
-
-  // post a paint message to the window.  This actually just sets the
-  // paint request, but this is the only way to send a message
-  // between threads.
-  return post_message(hndl, &paint_overlay_msg, 0);
-  }
-
-result_t begin_overlay_paint(handle_t hwnd, handle_t* paint_canvas)
-  {
-  result_t result;
-  window_t* window;
-  if (failed(result = is_typeof(hwnd, &window_type, (void**)&window)))
-    return result;
-
-
-  if (window->overlay_canvas == 0)
-    return e_invalid_operation;
-
-  if (paint_canvas != 0)
-    *paint_canvas = window->overlay_canvas;
-
-  // if this canvas is not our own we need to tell the owner about this
-  // but this may recurse, hence the _invalid = true being set
-
-  canvas_t* canvas;
-  do
-    {
-    if (failed(result = is_typeof(window->overlay_canvas, &canvas_type, (void**)&canvas)))
-      return result;
-
-    if (canvas->fb->is_surface)
-      break;
-
-    window = window->parent;
-    } while (window != 0);
-
-    if (window == 0)
-      return s_ok;
-
-    return window_begin_paint(canvas->fb);
-  }
-
-result_t end_overlay_paint(handle_t hwnd)
-  {
-  result_t result;
-  window_t* window;
-  if (failed(result = is_typeof(hwnd, &window_type, (void**)&window)))
-    return result;
-
-  if (window->overlay_canvas == 0)
-    return e_invalid_operation;
-
-  // if this canvas is not our own we need to tell the owner about this
-  // but this may recurse, hence the _invalid = true being set
-
-  int depth = 0;
-  canvas_t* canvas;
-  do
-    {
-    if (failed(result = is_typeof(window->overlay_canvas, &canvas_type, (void**)&canvas)))
-      return result;
-
-    if (canvas->fb->is_surface)
-      break;
-
-    if (depth++ == 0)
-      canvas->fb->invalid = false;
-
-    window = window->parent;
-    } while (window != 0);
-
-    if (window == 0)
-      return s_ok;
-
-    return window_end_paint(canvas->fb);
   }
 
 result_t defwndproc(handle_t wnd, const canmsg_t* msg, void* wnddata)
@@ -917,9 +680,7 @@ result_t defwndproc(handle_t wnd, const canmsg_t* msg, void* wnddata)
   handle_t hchild;
   uint16_t id = get_can_id(msg);
 
-  if (id == id_paint_foreground ||
-    id == id_paint_background ||
-    id == id_paint_overlay)
+  if (id == id_paint)
     {
     // we assume the widget has painted its canvas, we work over our children
     // in z-order
@@ -930,18 +691,7 @@ result_t defwndproc(handle_t wnd, const canmsg_t* msg, void* wnddata)
     if (failed(get_first_child(wnd, &hchild)) || hchild == 0)
       return s_ok;
 
-    switch (id)
-      {
-      case id_paint_background:
-        begin_background_paint(wnd, 0);
-        break;
-      case id_paint_foreground:
-        begin_foreground_paint(wnd, 0);
-        break;
-      case id_paint_overlay:
-        begin_overlay_paint(wnd, 0);
-        break;
-      }
+    begin_paint(wnd, 0);    // start painting, set ctr == 1 on first paint
 
     // paint in lowest order to highest, note if there is
     // no window with painting order of 0 then the first
@@ -969,7 +719,8 @@ result_t defwndproc(handle_t wnd, const canmsg_t* msg, void* wnddata)
             max_order = z_order;
           }
 
-        if (z_order == painting_order && succeeded(is_visible(painting_wnd)))
+        if (z_order == painting_order &&
+          succeeded(is_visible(painting_wnd)))
           {
           get_wndproc(painting_wnd, &wndproc, &wnddata);
 
@@ -988,18 +739,7 @@ result_t defwndproc(handle_t wnd, const canmsg_t* msg, void* wnddata)
         painting_order = next_z_order;        // lowest paint z-order
       }
 
-    switch (id)
-      {
-      case id_paint_background:
-        end_background_paint(wnd);
-        break;
-      case id_paint_foreground:
-        end_foreground_paint(wnd);
-        break;
-      case id_paint_overlay:
-        end_overlay_paint(wnd);
-        break;
-      }
+    end_paint(wnd);
     }
   else
     {
@@ -1037,129 +777,89 @@ result_t send_message(handle_t hndl, const canmsg_t* msg)
 /////////////////////////////////////////////////////////////////////////
 //
 // This is the double buffered framebuffer draw code.
-
-// these are the fbds state machine transitions
-// a bsp_sync is detected
-result_t window_sync(framebuffer_t* fb)
+result_t get_screen_surface(handle_t hwnd, screen_surface_t** surface)
   {
-  // if the framebuffer 
-  if (fb->state >= fbds_in_sync && fb->paint_depth == 0)
-    bsp_sync_framebuffer(fb);
+  if (surface == 0)
+    return e_bad_pointer;
+
+  result_t result;
+  screen_t* window;
+  if (failed(result = is_typeof(hwnd, &screen_type, (void**)&window)))
+    return result;
+
+  canvas_t* canvas;
+  if (failed(result = is_typeof(window->base.canvas, &canvas_type, (void**)&canvas)))
+    return result;
+
+  *surface = (screen_surface_t *) canvas->fb->surface;
 
   return s_ok;
   }
 
-// these should be states
-result_t window_mark_invalid(framebuffer_t* fb)
+// called when the window has been sync'd with the video buffer
+// and the window is ready to be painted.
+// called within an IRQ so cannot block
+result_t gdi_sync(screen_surface_t* gdi)
   {
-  fb->invalid = true;
+
+  if (gdi->state == fbds_in_sync)
+  {
+    bsp_sync_framebuffer();
+
+    // if the state has changed then we need to post a paint message
+    if (gdi->state == fbds_in_sync_need_paint)
+    #ifdef _WIN32
+      post_message(0, &paint_msg, 0);
+    #else
+      post_message_from_isr(&paint_msg);
+    #endif
+
+    gdi->state = fbds_idle;
+      }
+
+  return s_ok;
+    }
+
+result_t gdi_painting_done(screen_surface_t* gdi)
+  {
+  gdi->state = fbds_in_sync;
+
   return s_ok;
   }
 
-result_t window_is_invalid(framebuffer_t* fb)
+result_t window_queue_empty(screen_surface_t* gdi)
   {
-  return fb->invalid ? s_ok : s_false;
-  }
-
-result_t window_queue_empty(framebuffer_t* fb)
-  {
-  result_t result = s_false;
   enter_critical();
-  switch (fb->state)
+  switch (gdi->state)
     {
     case fbds_idle:
-      // fb->state = fbds_painting;          // the GDI is painting so don't update video buffer
-      result = s_ok;
+      gdi->state = fbds_painting;          // the GDI is painting so don't update video buffer
       break;
     case fbds_in_sync:
-      fb->state = fbds_in_sync_need_paint;
+      if (gdi->base.invalid_count > 0)
+        gdi->state = fbds_in_sync_need_paint;  // the GDI is painting so don't update video buffer
       break;
     }
   exit_critical();
 
-  return result;
-  }
-
-result_t window_begin_paint(framebuffer_t* fb)       // the application is starting to paint
-  {
-  fb->paint_depth++;
-  if (fb->state == fbds_in_sync_need_paint)
-    {
-    switch (fb->type)
-      {
-      case lt_background:
-        post_message(0, &paint_background_msg, INDEFINITE_WAIT);
-        break;
-      case lt_foreground:
-        post_message(0, &paint_foreground_msg, INDEFINITE_WAIT);
-        break;
-      case lt_overlay:
-        post_message(0, &paint_overlay_msg, INDEFINITE_WAIT);
-        break;
-      }
-    }
-
-  fb->state = fbds_painting;
-
   return s_ok;
   }
 
-result_t window_end_paint(framebuffer_t* fb)         // the application has finished painting
-  {
-  if (--fb->paint_depth == 0)
-    {
-    fb->invalid = false;
-    fb->state = fbds_in_sync;          // wait for vsync
-    }
-
-  return s_ok;
-  }
-
-result_t window_sync_done(framebuffer_t* fb)
+result_t window_sync_done(screen_surface_t *gdi)
   {
   // if there was a queue empty while we are paining then
   // post another paint message
-  if (fb->state == fbds_in_sync_need_paint)
-    {
-#ifdef _WIN32
-    result_t result;
-    handle_t screen;
-    if (failed(result = get_screen(&screen)))
-      return result;
-#endif
-
-    // on embedded systems this is in an ISR 
-    switch (fb->type)
+  if (gdi->state == fbds_in_sync_need_paint)
       {
-      case lt_background:
 #ifdef _WIN32
-        if (failed(result = post_message(screen, &paint_background_msg, INDEFINITE_WAIT)))
-          return result;
+    post_message(0, &paint_msg, INDEFINITE_WAIT);
 #else
-        post_message_from_isr(&paint_background_msg);
+    post_message_from_isr(&paint_msg);
 #endif
-        break;
-      case lt_foreground:
-#ifdef _WIN32
-        if (failed(result = post_message(screen, &paint_foreground_msg, INDEFINITE_WAIT)))
-          return result;
-#else
-        post_message_from_isr(&paint_foreground_msg);
-#endif
-        break;
-      case lt_overlay:
-#ifdef _WIN32
-        if (failed(result = post_message(screen, &paint_overlay_msg, INDEFINITE_WAIT)))
-          return result;
-#else
-        post_message_from_isr(&paint_overlay_msg);
-#endif
-        break;
-      }
     }
 
-  fb->state = fbds_idle;
-  fb->invalid = false;
+  gdi->state = fbds_idle;
+
   return s_ok;
   }
 

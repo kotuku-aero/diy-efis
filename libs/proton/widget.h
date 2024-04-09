@@ -18,6 +18,11 @@ typedef struct _widget_t widget_t;
 */
 typedef result_t (*on_create_widget_fn)(handle_t hwnd, widget_t* widget);
 
+/**
+ * @brief Used to cache settings from the map
+*/
+typedef result_t(*on_event_fn)(widget_t* widget, const char* setting_name, const variant_t* value);
+
 // rtti
 extern const typeid_t widget_type;
 /**
@@ -48,6 +53,8 @@ extern const typeid_t widget_type;
 typedef struct _widget_t {
   rect_t rect;              // relative to parent
   uint32_t style;
+  gdi_dim_t background_gutter; // if non-zero indent background by this amount
+  color_t gutter_color;     // color to paint the gutter
   color_t border_color;
   color_t background_color;
   color_t name_color;
@@ -67,14 +74,15 @@ typedef struct _widget_t {
 
   // paint handler functions.  Will be called by
   // on_widget_msg if not 0
-  paint_fn on_paint_foreground;
-  paint_fn on_paint_background;
-  paint_fn on_paint_overlay;
+  paint_fn on_paint;
+
   on_message_fn on_message;
   on_create_widget_fn on_create;
+  on_event_fn settings_event;
   bool sensor_failed;         // set when the widget sensor is not responding
   uint32_t sensor_timer;      // counts till the sensor is not detected anymore
   bool is_alarm;              // set when an alarm is seen
+  void *extra;                // extra data for widget
   } widget_t;
 
 /**

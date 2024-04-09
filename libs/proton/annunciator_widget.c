@@ -1,26 +1,6 @@
 #include "annunciator_widget.h"
 
-void on_paint_background_auto(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, annunciator_t* wnd)
-  {
-  auto_annunciator_t* ann = (auto_annunciator_t*)wnd;
-
-  rect_t clip_rect;
-  on_paint_widget_background(canvas, wnd_rect, msg, ann);
-
-  if ((ann->base.base.base.style & DRAW_NAME) != 0)
-    {
-    // calculate the size of the label
-    rect_create(ann->base.label_offset, wnd_rect->top + 1, ann->base.text_offset - 1, wnd_rect->bottom - 1, &clip_rect);
-
-    uint16_t text_len = (uint16_t)strlen(ann->base.base.base.name);
-
-    point_t label_origin = { ann->base.label_offset, wnd_rect->top + 1 };
-
-    draw_text(canvas, wnd_rect, ann->base.small_font, ann->base.label_color, ann->base.base.base.background_color,
-      text_len, ann->base.base.base.name, &label_origin, &clip_rect, 0, 0);
-    }
-
-  }
+#include "../../libs/atom/board_id.h"
 
 /**
  * @brief Draw a basic text annunciator
@@ -34,25 +14,48 @@ static void on_draw_text(handle_t canvas, const rect_t* wnd_rect, annunciator_t*
   {
   text_annunciator_t* ann = (text_annunciator_t*)wnd;
   rect_t clip_rect;
+  extent_t ex;
+
+  if (ann->base.background_canvas == nullptr)
+    {
+    rect_extents(wnd_rect, &ex);
+    // create a canvas
+    canvas_create(&ex, &ann->base.background_canvas);
+
+    on_paint_widget_background(ann->base.background_canvas, wnd_rect, nullptr, wnd);
+ 
+    if ((ann->base.base.style & DRAW_NAME) != 0)
+      {
+      // calculate the size of the label
+      rect_create(ann->label_offset, wnd_rect->top + 1, ann->text_offset - 1, wnd_rect->bottom - 1, &clip_rect);
+
+      uint16_t text_len = (uint16_t)strlen(ann->base.base.name);
+
+      point_t label_origin = { ann->label_offset, wnd_rect->top + 1 };
+
+      draw_text(ann->base.background_canvas, wnd_rect, ann->small_font, ann->label_color, ann->base.base.background_color,
+        text_len, ann->base.base.name, &label_origin, &clip_rect, 0, 0);
+      }
+    }
+
+  point_t pt = { 0, 0 };
+  bit_blt(canvas, wnd_rect, wnd_rect, wnd->background_canvas, wnd_rect, &pt, src_copy);
 
   point_t origin = { ann->text_offset, wnd_rect->top + 1 };
   //rect_create(origin.x, origin.y, wnd_rect->right, wnd_rect->bottom - 1, &clip_rect);
   rect_create(1, 1, wnd_rect->right, wnd_rect->bottom - 1, &clip_rect);
 
-  // erase the old text
-  rectangle(canvas, &clip_rect, color_hollow, color_hollow, &clip_rect);
-
   draw_text(canvas, wnd_rect, ann->small_font, ann->text_color, wnd->base.background_color,
     0, value, &origin, &clip_rect, 0, 0);
   }
 
-result_t on_auto_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata)
+bool on_auto_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata)
   {
   auto_annunciator_t* ann = (auto_annunciator_t*)wnddata;
 
   bool changed = false;
 
-  if (get_can_id(msg) == ann->base.can_id)
+  if (can_id == ann->base.can_id)
     {
 
     variant_t old_value;
@@ -69,7 +72,7 @@ result_t on_auto_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* 
     changed = compare_variant(&old_value, &ann->value) != 0;
     }
 
-  return changed ? s_ok : s_false;
+  return changed;
   }
 
 void on_paint_auto(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnd)
@@ -136,7 +139,7 @@ bool on_def_utc_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* w
   return changed;
   }
 
-void on_paint_utc(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, annunciator_t* wnd)
+void on_paint_utc(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnd)
   {
   utc_annunciator_t* data = (utc_annunciator_t*)wnd;
 
@@ -146,7 +149,7 @@ void on_paint_utc(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, 
   on_draw_text(canvas, wnd_rect, wnd, txt);
   }
 
-result_t on_hours_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata)
+bool on_hours_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata)
   {
   hours_annunciator_t* data = (hours_annunciator_t*)wnddata;
   bool changed = false;
@@ -160,7 +163,7 @@ result_t on_hours_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void*
     data->hours = value;
     }
 
-  return changed ? s_ok : s_false;
+  return changed;
   }
 
 void on_paint_hours(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)
@@ -175,7 +178,7 @@ void on_paint_hours(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg
   on_draw_text(canvas, wnd_rect, wnddata, txt);
   }
 
-result_t on_hp_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata)
+bool on_hp_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata)
   {
   hp_annunciator_t* data = (hp_annunciator_t*)wnddata;
 
@@ -189,10 +192,10 @@ result_t on_hp_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wn
     data->hp = value;
     }
 
-  return changed ? s_ok : s_false;
+  return changed;
   }
 
-void on_paint_hp(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, annunciator_t* wnddata)
+void on_paint_hp(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)
   {
   hp_annunciator_t* data = (hp_annunciator_t*)wnddata;
 
@@ -202,7 +205,153 @@ void on_paint_hp(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, a
   on_draw_text(canvas, wnd_rect, wnddata, txt);
   }
 
-result_t on_hobbs_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata)
+
+bool on_kmag_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata)
+  {
+  ecu_annunciator_t* data = (ecu_annunciator_t*)wnddata;
+
+  bool changed = false;
+  int16_t value_i16;
+  uint16_t value_u16;
+
+  if (can_id >= id_status_node_0 && can_id <= id_status_node_15)
+    {
+    // status information
+    // [0] = 0xFF  (BINARY)
+    // [1] = NodeID
+    // [2] = Board Status e_board_status
+    // [3] = Board Type  Note bits 7--5 are the feature type
+    // [4] = Serial Number 31..24
+    // [5] = Serial Number 23..16
+    // [6] = Serial Number 15..8
+    // [7] = Serial Number 7..0
+    if ((msg->data[3] & BOARD_TYPE_MASK) == mag_board_id)
+      {
+
+      switch (msg->data[3] & BOARD_FEATURE_MASK)
+        {
+        case mag_left_board_type:
+          changed = data->left_status != (e_board_status)msg->data[2];
+          data->left_status = (e_board_status)msg->data[2];
+          break;
+        case mag_right_board_type:
+          changed = data->right_status != (e_board_status)msg->data[2];
+          data->right_status = (e_board_status)msg->data[2];
+          break;
+        }
+      }
+    }
+  else if (can_id == id_left_ignition_advance)
+    {
+    if (succeeded(get_param_int16(msg, &value_i16)))
+      {
+      changed = data->left_advance != value_i16;
+      data->left_advance = value_i16;
+      }
+    }
+  else if (can_id == id_right_ignition_advance)
+    {
+    if (succeeded(get_param_int16(msg, &value_i16)))
+      {
+      changed = data->right_advance != value_i16;
+      data->right_advance = value_i16;
+      }
+    }
+  else if (can_id == id_fuel_map)
+    {
+    if (succeeded(get_param_uint16(msg, &value_u16)))
+      {
+      changed = data->afr_map_mode != value_u16;
+      data->afr_map_mode = value_u16;
+      }
+    }
+
+  return changed;
+  }
+
+void on_paint_kmag(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)
+  {
+  ecu_annunciator_t* data = (ecu_annunciator_t*)wnddata;
+
+  // draw the left status
+  rect_t rect_status;
+  int32_t height = rect_height(wnd_rect);
+
+  int32_t indicator_height = height - 3;
+  if (indicator_height > 12)
+    indicator_height = 12;
+
+  int32_t indicator_center = height >> 1;
+
+  rect_status.left = wnd_rect->left + 2;
+  rect_status.top = indicator_center - (indicator_height >> 1);
+  rect_status.right = rect_status.left + indicator_height;
+  rect_status.bottom = rect_status.top + indicator_height;
+
+  if (data->left_status == bs_unknown || data->left_status == bs_fault)
+    ellipse(canvas, wnd_rect, color_white, color_red, &rect_status);
+  else if (data->left_status == bs_running)
+    ellipse(canvas, wnd_rect, color_white, color_lightgreen, &rect_status);
+  else if (data->left_status == bs_inhibited)
+    ellipse(canvas, wnd_rect, color_white, color_orange, &rect_status);
+  else
+    ellipse(canvas, wnd_rect, color_white, color_black, &rect_status);
+
+  rect_status.left = wnd_rect->right - indicator_height - 3;
+  rect_status.right = rect_status.left + indicator_height;
+
+  if (data->right_status == bs_unknown || data->right_status == bs_fault)
+    ellipse(canvas, wnd_rect, color_white, color_red, &rect_status);
+  else if (data->right_status == bs_running)
+    ellipse(canvas, wnd_rect, color_white, color_lightgreen, &rect_status);
+  else if (data->right_status == bs_inhibited)
+    ellipse(canvas, wnd_rect, color_white, color_orange, &rect_status);
+  else
+    ellipse(canvas, wnd_rect, color_white, color_black, &rect_status);
+
+  const char *afr_mode = nullptr;
+  color_t afr_mode_color = color_lightblue;
+  switch (data->afr_map_mode)
+    {
+    case 0 :
+      afr_mode = "Manual";
+      break;
+    case 1:
+      afr_mode = "Nitro";
+      break;
+    case 2:
+      afr_mode = "Climb";
+      break;
+    case 3:
+      afr_mode = "Cruise";
+      break;
+    case 4:
+      afr_mode_color = color_purple;
+      afr_mode = "ECU SYNC";
+      break;
+    case 5:
+      afr_mode_color = color_red;
+      afr_mode = "AFR ERR";
+      break;
+    }
+
+  if (afr_mode != nullptr)
+    {
+    // draw the mixture stats
+    extent_t ex;
+    text_extent(data->base.base.name_font, 0, afr_mode, &ex);
+
+    point_t pt = 
+      {
+      (rect_width(wnd_rect) >> 1) - (ex.dx >> 1),
+      (height  >> 1) - (ex.dy >> 1)
+      };
+
+    draw_text(canvas, wnd_rect, data->base.base.name_font, afr_mode_color, color_hollow, 0, afr_mode, &pt, wnd_rect, 0, 0);
+    }
+  }
+
+bool on_hobbs_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata)
   {
   hobbs_annunciator_t* data = (hobbs_annunciator_t*)wnddata;
 
@@ -217,10 +366,10 @@ result_t on_hobbs_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void*
     data->hobbs = value;
     }
 
-  return changed ? s_ok : s_false;
+  return changed;
   }
 
-void on_paint_hobbs(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, annunciator_t* wnddata)
+void on_paint_hobbs(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)
   {
   hobbs_annunciator_t* data = (hobbs_annunciator_t*)wnddata;
 
@@ -237,7 +386,7 @@ result_t annunciator_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
 
   if (wnd != 0 && (*wnd->base.on_message)(hwnd, can_id, msg, wnd))
     {
-    invalidate_foreground_rect(hwnd, 0);
+    invalidate(hwnd);
 
     return s_ok;
     }
@@ -245,7 +394,6 @@ result_t annunciator_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
   // pass to default
   return widget_wndproc(hwnd, msg, wnddata);
   }
-
 
 result_t create_annunciator_widget(handle_t parent, uint16_t id, aircraft_t* aircraft, annunciator_t* wnd, handle_t* out)
   {

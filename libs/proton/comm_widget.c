@@ -8,14 +8,13 @@ result_t comm_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
 
   switch (get_can_id(msg))
     {
-    case id_paint_background:
-    case id_paint_foreground:
+    case id_paint:
       on_paint_widget(hwnd, msg, wnddata);
       break;
     }
 
   if (changed)
-    invalidate_foreground_rect(hwnd, 0);
+    invalidate(hwnd);
 
   return defwndproc(hwnd, msg, wnddata);
   }

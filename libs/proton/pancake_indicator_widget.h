@@ -15,7 +15,7 @@
 */
 typedef struct _pancake_widget_t {
   widget_t base;
-
+  handle_t background_canvas; // canvas to draw the background on
   // this is updated on each window message
   int16_t value;            // converted value
   int16_t min_value;        // minimum value

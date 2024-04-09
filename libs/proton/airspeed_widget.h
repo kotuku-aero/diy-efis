@@ -9,6 +9,9 @@
 
 typedef struct _airspeed_widget_t {
   widget_t base;
+
+  handle_t background_canvas;
+
   // color to use for text
   color_t text_color;
   // pen color for lines

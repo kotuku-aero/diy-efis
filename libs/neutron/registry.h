@@ -25,7 +25,7 @@ extern "C"
   // a large file is up to 32k which is 16 clusters
 #define MAX_REGSTREAM_LENGTH (CLUSTER_SIZE << CLUSTER_SHIFT)
   // this field is 28 bytes long
-typedef struct _can_field_definition_t {
+typedef struct _field_definition_t {
   // Length MUST be the first 2 bytes
 	uint16_t length;                // sizeof(field_type_x)
 	memid_t memid;              		// memory ID used to access this parameter

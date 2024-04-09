@@ -6,7 +6,6 @@
 
 typedef struct _map_entity_t map_entity_t;
 
-static canmsg_t request_paint = { id_request_paint_background };
 
 static void paint_worker(void* args)
   {
@@ -16,15 +15,13 @@ static void paint_worker(void* args)
     {
     semaphore_wait(wnd->worker_start, INDEFINITE_WAIT);
 
-#ifdef _WIN32
     extent_t ex;
     canvas_extents(wnd->background_bitmap, &ex);
+
     rect_t rect;
     rect_create_ex(0, 0, ex.dx, ex.dy, &rect);
 
     rectangle(wnd->background_bitmap, &rect, color_hollow, wnd->params.day_theme.water_color, &rect);
-
-#endif
 
     viewport_t *viewport;
 
@@ -90,51 +87,31 @@ static void paint_worker(void* args)
         select_and_render_viewport(viewport, &wnd->navdata_params.base, wnd->background_bitmap);
       }
 
-    /*
-  extent_t ex;
-  canvas_extents(wnd->background_bitmap, &ex);
-
-  rect_t canvas_rect;
-  rect_create_ex(0, 0, ex.dx, ex.dy, &canvas_rect);
-
-  // TODO: this should be on the foreground layer
-  canvas_extents(wnd->map_aircraft, &ex);
-  rect_t icon_rect;
-  rect_create_ex(0, 0, ex.dx, ex.dy, &icon_rect);
-
-  point_t src_pt = { 0, 0 };
-
-  rect_t map_rect;
-  rect_create_ex(wnd->map_center.x - (ex.dx >> 1),
-    wnd->map_center.y - (ex.dy >> 1),
-    ex.dx, ex.dy, &map_rect);
-
-  // draw the aircraft on the canvas
-  bit_blt(wnd->background_bitmap, &canvas_rect, &map_rect, wnd->map_aircraft, &icon_rect, &src_pt, src_alpha_blend);
-  */
-  // todo: should be layers...
+    // todo: should be layers...
     wnd->render_background_complete = true;
     wnd->render_background_busy = false;
 
-    post_message(wnd->hwnd, &request_paint, INDEFINITE_WAIT);
+    invalidate(wnd->hwnd);
     }
   }
 
-static void on_paint_background(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)
+static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* _msg, void* wnddata)
   {
   map_widget_t* wnd = (map_widget_t*)wnddata;
 
-  on_paint_widget_background(canvas, wnd_rect, msg, wnddata);
-
+  // based on the current scale, draw the range circle that is scale / 4
   extent_t ex;
   rect_extents(wnd_rect, &ex);
+
+  // draw decorations
+  on_paint_widget_background(canvas, wnd_rect, _msg, wnddata);
 
   // This takes 2 passes, if the background is complete then
   // the worker has rendered the background, otherwise
   // the params are set and the worker is asked to paint
   if (wnd->render_background_complete)
     {
-    wnd->render_background_complete = false;
+    // wnd->render_background_complete = false;
 
     extent_t ex;
     canvas_extents(wnd->background_bitmap, &ex);
@@ -147,6 +124,24 @@ static void on_paint_background(handle_t canvas, const rect_t* wnd_rect, const c
     }
   else if (!wnd->render_background_busy)
     {
+    // see if borders
+    rect_t map_rect;
+    rect_copy(wnd_rect, &map_rect);
+    
+    if(wnd->base.style & BORDER_LEFT)
+      map_rect.left++;
+    
+    if(wnd->base.style & BORDER_RIGHT)
+      map_rect.right--;
+    
+    if(wnd->base.style & BORDER_TOP)
+      map_rect.top++;
+    
+    if(wnd->base.style & BORDER_BOTTOM)
+      map_rect.bottom--;
+    
+    rectangle(canvas, wnd_rect, color_hollow, color_black, &map_rect);
+
     wnd->render_background_busy = true;
 
     // create the corners of the display, it could be rotated
@@ -157,17 +152,17 @@ static void on_paint_background(handle_t canvas, const rect_t* wnd_rect, const c
 
     pixel_rhombus_t screen_area =
       {
-      .top_left.x = 0,
-      .top_left.y = 0,
+      .top_left.x = map_rect.left,
+      .top_left.y = map_rect.top,
 
-      .bottom_left.x = 0,
-      .bottom_left.y = ex.dy,
+      .bottom_left.x = map_rect.left,
+      .bottom_left.y = map_rect.bottom,
 
-      .top_right.x = ex.dx,
-      .top_right.y = 0,
+      .top_right.x = map_rect.right,
+      .top_right.y = map_rect.top,
 
-      .bottom_right.x = ex.dx,
-      .bottom_right.y = ex.dy
+      .bottom_right.x = map_rect.right,
+      .bottom_right.y = map_rect.bottom
       };
 
 
@@ -242,15 +237,6 @@ static void on_paint_background(handle_t canvas, const rect_t* wnd_rect, const c
     semaphore_signal(wnd->worker_start);
     }
 
-  // else the worker is busy so no changes
-  }
-
-static void on_paint_foreground(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* _msg, void* wnddata)
-  {
-  map_widget_t* wnd = (map_widget_t*)wnddata;
-
-  rectangle(canvas, wnd_rect, color_hollow, color_hollow, wnd_rect);
-
   point_t aircraft[] = {
     { wnd->map_center.x + 0, wnd->map_center.y - 15 },
     { wnd->map_center.x + 2, wnd->map_center.y - 14 },
@@ -286,10 +272,6 @@ static void on_paint_foreground(handle_t canvas, const rect_t* wnd_rect, const c
   polygon(canvas, wnd_rect, color_hollow, color_white, numelements(aircraft), aircraft);
 
 
-  // based on the current scale, draw the range circle that is scale / 4
-  extent_t ex;
-  rect_extents(wnd_rect, &ex);
-
   int32_t range_dist = ex.dx >> 2;
 
   rect_t range_rect =
@@ -303,6 +285,7 @@ static void on_paint_foreground(handle_t canvas, const rect_t* wnd_rect, const c
   ellipse(canvas, wnd_rect, color_white, color_hollow, &range_rect);
 
   // TODO: map in km, miles
+  // 
   // range at right of arc (maybe at right)
   char range[8];
   sprintf(range, "%d nm", wnd->params.scale / 7400);
@@ -317,8 +300,78 @@ static void on_paint_foreground(handle_t canvas, const rect_t* wnd_rect, const c
     };
 
   draw_text(canvas, wnd_rect, wnd->params.font, color_white, color_hollow, 0, range, &txt_point, wnd_rect, eto_vertical, 0);
+
   }
 
+// return s_ok if the position changed
+static result_t update_gps_position(handle_t hwnd, map_widget_t* widget)
+  {
+  fixed_t lat = float_to_fixed(widget->gps_position.lat);
+  fixed_t lng = float_to_fixed(widget->gps_position.lng);
+
+  bool changed = 
+    lat != widget->params.ned_center.latlng.lat ||
+    lng != widget->params.ned_center.latlng.lng;
+
+  if (changed)
+    {
+    rect_t rect;
+    window_rect(hwnd, &rect);
+    float moved_by = 0;
+    // the map zoom is scaled distance for screen /4
+    float map_zoom = nm_to_meters(widget->params.scale) * 4;
+    // now holds how many meters for 1 pixel
+    map_zoom /= rect_width(&rect);
+
+    // determine how many pixels the change is
+    if (widget->prev_gps_position.alt > 0 &&
+      widget->prev_gps_position.lat > 0 &&
+      widget->prev_gps_position.lng > 0)
+      {
+      moved_by = distance(&widget->prev_gps_position, &widget->gps_position);
+
+      if(moved_by < map_zoom)
+        return s_false;         // map not changed
+      }
+
+    // the position has changed in reality (gt 1 pixel)
+    on_gps_position(widget, &widget->gps_position);
+
+    // to save rendering the background continually the quickest way
+    // is to move the aircraft/hsi image slightly till more than a specific
+    // number of pixels is moved.
+    if (moved_by > 0)
+      {
+      float delta_x = lng_separation(&widget->prev_gps_position, &widget->gps_position);
+      float delta_y = lat_separation(&widget->prev_gps_position, &widget->gps_position);
+
+      delta_x /= map_zoom;
+      delta_y /= map_zoom;
+
+      widget->params.body_crawl_distance.dx = (gdi_dim_t)(delta_x / map_zoom);
+      widget->params.body_crawl_distance.dy = (gdi_dim_t)(delta_x / map_zoom);
+
+      // if the crawl is > max_image_crawl then start a background re-position
+      // but if already running, then don't do it.
+      if (moved_by > widget->max_image_crawl)
+        {
+        // force a background repait
+        invalidate(hwnd);
+        }
+      }
+    else
+      {
+      // this is the first position update so just prepare
+      // the map.
+      invalidate(hwnd);
+      }
+
+    // cache the old position
+    memcpy(&widget->prev_gps_position, &widget->gps_position, sizeof(lla_t));
+    }
+ 
+  return s_ok;
+  }
 
 static result_t map_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
   {
@@ -327,23 +380,38 @@ static result_t map_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
   bool changed = false;
   switch (get_can_id(msg))
     {
-    case id_request_paint_background:
-      invalidate_background_rect(hwnd, 0);
+    case id_gps_lat :
+      get_param_float(msg, &wnd->gps_position.lat);
+      break;
+    case id_gps_lng :
+      get_param_float(msg, &wnd->gps_position.lng);
+      break;
+    case id_gps_height :
+      get_param_float(msg, &wnd->gps_position.alt);
+      break;
+    case id_true_track :
+      // we don't use magnetic
+      break;
+    case id_gps_groundspeed :
+      break;
+    case id_gps_valid :
+      // save the value
+      changed = succeeded(update_gps_position(hwnd, wnd));
       break;
     case id_magnetic_heading:
-    {
-    int16_t direction;
-    get_param_int16(msg, &direction);
+      {
+      int16_t direction;
+      get_param_int16(msg, &direction);
 
-    while (direction < 0)
-      direction += 360;
-    while (direction > 359)
-      direction -= 360;
+      while (direction < 0)
+        direction += 360;
+      while (direction > 359)
+        direction -= 360;
 
-    changed = wnd->direction != direction;
-    wnd->direction = direction;
-    }
-    break;
+      changed = wnd->direction != direction;
+      wnd->direction = direction;
+      }
+      break;
     case id_selected_course:
       {
       int16_t value;
@@ -376,7 +444,7 @@ static result_t map_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
         if (wnd->params.scale < 1)
           wnd->params.scale = 1;
 
-        invalidate_background_rect(hwnd, 0);
+        invalidate(hwnd);
         changed = true;
         }
       }
@@ -390,11 +458,11 @@ static result_t map_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
       ex.dx = (gdi_dim_t)(((int32_t)value) >> 16);
       ex.dy = (gdi_dim_t)((int16_t)(value & 0xffff));
 
-      handle_t background_canvas;
-      get_background_canvas(hwnd, &background_canvas);
+      rect_t wnd_rect;
+      window_rect(hwnd, &wnd_rect);
 
       extent_t canvas_ex;
-      canvas_extents(background_canvas, &canvas_ex);
+      rect_extents(&wnd_rect, &canvas_ex);
 
       // calculate the offsets based on the scale
       fixed_t degrees_per_pixel = make_fixed(0, wnd->params.scale / 1850, 0);
@@ -404,14 +472,14 @@ static result_t map_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
       wnd->params.ned_center.latlng.lng = sub_fixed(wnd->params.ned_center.latlng.lng, mul_fixed(degrees_per_pixel, int_to_fixed(ex.dy)));
       wnd->params.ned_center.latlng.lat = add_fixed(wnd->params.ned_center.latlng.lat, mul_fixed(degrees_per_pixel, int_to_fixed(ex.dx)));
 
-      invalidate_background_rect(hwnd, 0);
+      invalidate(hwnd);
       changed = true;
       }
       break;
     }
 
   if (changed)
-    invalidate_foreground_rect(hwnd, 0);
+    invalidate(hwnd);
 
   // pass to default
   return widget_wndproc(hwnd, msg, wnddata);
@@ -429,13 +497,12 @@ result_t create_map_widget(handle_t parent, uint16_t id, aircraft_t *aircraft, m
     return result;
 
   wnd->aircraft = aircraft;
-  wnd->base.on_paint_background = on_paint_background;
-  wnd->base.on_paint_foreground = on_paint_foreground;
+  wnd->base.on_paint = on_paint;
 
   if (failed(result = semaphore_create(&wnd->worker_start)))
     return result;
 
-  if (failed(result = task_create(0, DEFAULT_STACK_SIZE, paint_worker, wnd, BELOW_NORMAL, &wnd->background_worker)))
+  if (failed(result = task_create("NAV", DEFAULT_STACK_SIZE, paint_worker, wnd, BELOW_NORMAL, &wnd->background_worker)))
     return result;
 
   if (out != 0)

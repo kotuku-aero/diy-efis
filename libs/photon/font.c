@@ -58,12 +58,13 @@ result_t draw_text(handle_t hndl, const rect_t *clip_rect, const font_t *font,
         uint8_t bitmap_bits = glyph[byte];
 
         size_t bit;
-        for (bit = 8; bit > 0; bit--)
+        uint8_t mask_bit = 0x80;
+        for (bit = 8; bit > 0; bit--, mask_bit >>= 1)
           {
           if (succeeded(rect_contains(clip_rect, &pos)))
             {
             // pick up the column byte
-            if(((bitmap_bits >> (bit - 1)) & 0x01))
+            if((bitmap_bits & mask_bit) != 0)
               (*canvas->fb->set_pixel)(canvas->fb, &pos, fg, 0);
             else if ((format & eto_opaque)!= 0)
               (*canvas->fb->set_pixel)(canvas->fb, &pos, bg, 0);

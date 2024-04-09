@@ -43,7 +43,7 @@ typedef struct
 
 typedef struct _gauge_widget_t {
   widget_t base;
-
+  handle_t background_canvas; // canvas to draw the background on
   gauge_style style;
   const font_t* font;
   const selected_unit_t** converter;

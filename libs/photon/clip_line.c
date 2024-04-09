@@ -2,99 +2,78 @@
 
 typedef int out_code_t;
 
-// 0000
 #define INSIDE 0
-// 0001
 #define LEFT 1
-// 0010
 #define RIGHT 2
-// 0100
 #define ABOVE 4
-// 1000
 #define BELOW 8
 
-
-out_code_t compute_out_code(const point_t* pt, const rect_t* rect)
+static inline out_code_t compute_out_code(const point_t* pt, const rect_t* rect)
   {
-  out_code_t code;
+  out_code_t code = INSIDE;
 
-  code = INSIDE;          // initialised as being inside of clip window
-
-  if (pt->x < rect->left)             // to the left of clip window
-    code |= LEFT;
-  else if (pt->x > rect->right)       // to the right of clip window
-    code |= RIGHT;
-  if (pt->y < rect->top)              // above the clip window
-    code |= ABOVE;
-  else if (pt->y > rect->bottom)      // below the clip window
-    code |= BELOW;
+  code |= (pt->x < rect->left) ? LEFT : ((pt->x > rect->right) ? RIGHT : 0);
+  code |= (pt->y < rect->top) ? ABOVE : ((pt->y > rect->bottom) ? BELOW : 0);
 
   return code;
   }
 
-// clip a line to within the clipping rectangle.  Return true if part of line is within the rectangle
 bool clip_line(point_t* p1, point_t* p2, const rect_t* clip_rect)
   {
-  // compute outcodes for P0, P1, and whatever point lies outside the clip rectangle
-  out_code_t out_code_0 = compute_out_code(p1, clip_rect);
-  out_code_t out_code_1 = compute_out_code(p2, clip_rect);
+  out_code_t out_code_p1 = compute_out_code(p1, clip_rect);
+  out_code_t out_code_p2 = compute_out_code(p2, clip_rect);
+  point_t* p_out;
+  out_code_t* out_code_out;
 
   while (true)
     {
-    if (!(out_code_0 | out_code_1))
-      { // Bitwise OR is 0. Trivially accept and get out of loop
-      return true;        // line inside rectange
-      }
-    else if (out_code_0 & out_code_1)
-      { // Bitwise AND is not 0. Trivially reject and get out of loop
-      return false;       // line outside rectangle
+    if (!(out_code_p1 | out_code_p2))
+    {
+      return true;
+    }
+    else if (out_code_p1 & out_code_p2)
+    {
+      return false;
       }
     else
       {
-      // failed both tests, so calculate the line segment to clip
-      // from an outside point to an intersection with clip edge
       float x, y;
 
-      // At least one endpoint is outside the clip rectangle; pick it.
-      out_code_t outcodeOut = out_code_0 ? out_code_0 : out_code_1;
+      if (out_code_p1)
+      {
+        p_out = p1;
+        out_code_out = &out_code_p1;
+      }
+      else
+      {
+        p_out = p2;
+        out_code_out = &out_code_p2;
+      }
 
-      // Now find the intersection point;
-      // use formulas y = y0 + slope * (x - x0), x = x0 + (1 / slope) * (y - y0)
-      if (outcodeOut & BELOW)
-        {           // point is above the clip rectangle
+      if (*out_code_out & BELOW)
+      {
         x = (float)(p1->x + (p2->x - p1->x) * (clip_rect->bottom - p1->y) / (p2->y - p1->y));
         y = clip_rect->bottom;
         }
-      else if (outcodeOut & ABOVE)
-        { // point is below the clip rectangle
+      else if (*out_code_out & ABOVE)
+      {
         x = (float)(p1->x + (p2->x - p1->x) * (clip_rect->top - p1->y) / (p2->y - p1->y));
         y = clip_rect->top;
         }
-      else if (outcodeOut & RIGHT)
-        {  // point is to the right of clip rectangle
+      else if (*out_code_out & RIGHT)
+      {
         y = (float)(p1->y + (p2->y - p1->y) * (clip_rect->right - p1->x) / (p2->x - p1->x));
         x = clip_rect->right;
         }
-      else if (outcodeOut & LEFT)
-        {   // point is to the left of clip rectangle
+      else if (*out_code_out & LEFT)
+      {
         y = (float)(p1->y + (p2->y - p1->y) * (clip_rect->left - p1->x) / (p2->x - p1->x));
         x = clip_rect->left;
         }
 
-      // Now we move outside point to intersection point to clip
-      // and get ready for next pass.
-      if (outcodeOut == out_code_0)
-        {
-        p1->x = (gdi_dim_t)x;
-        p1->y = (gdi_dim_t)y;
-        out_code_0 = compute_out_code(p1, clip_rect);
-        }
-      else
-        {
-        p2->x = (gdi_dim_t)x;
-        p2->y = (gdi_dim_t)y;
-        out_code_1 = compute_out_code(p2, clip_rect);
-        }
+      p_out->x = (gdi_dim_t)x;
+      p_out->y = (gdi_dim_t)y;
+      *out_code_out = compute_out_code(p_out, clip_rect);
       }
     }
   }

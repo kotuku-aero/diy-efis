@@ -623,7 +623,7 @@ result_t allocate_memid(uint16_t length, memid_t *memid)
 
 result_t release_memid(memid_t memid, uint16_t memid_size)
   {
-  release_block(memid, ((memid_size-1)|BLOCK_MASK) >> BLOCK_SHIFT);
+  release_block(memid, (((memid_size-1)|BLOCK_MASK)+1) >> BLOCK_SHIFT);
 
   return flush_memid_bitblock(memid, memid_size);
   }
@@ -1213,77 +1213,93 @@ result_t reg_rename_key(memid_t key, const char *new_name)
   return e_not_implemented;
   }
 
-result_t reg_delete_key(memid_t memid)
+result_t reg_delete_key_impl(memid_t memid)
   {
   result_t result;
   field_key_t key;
   memid_t next_child;
   field_definition_t child;
 
-  enter_registry();
   if(failed(result = reg_read_bytes(get_block_offset(memid), sizeof(field_key_t), &key)))
-    return exit_registry(result);
+    return result;
 
   if(key.hdr.data_type != field_key)
-    return exit_registry(e_bad_parameter);
+    return e_bad_parameter;
 
   child.memid = 0;
 
   if(failed(result == reg_open_first_child(memid, &next_child)))
-    return exit_registry(result);
+    return result;
 
+  // release the children
   while(next_child != 0)
     {
     if(failed(result = reg_read_bytes(get_block_offset(next_child), sizeof(field_definition_t), &child)))
-      return exit_registry(result);
+      return result;
 
     next_child = child.next;
 
     if(child.data_type == field_key)
       {
       // recurse over keys....
-      if(failed(result = reg_delete_key(child.memid)))
-        return exit_registry(result);
+      if(failed(result = reg_delete_key_impl(child.memid)))
+        return result;
       }
-
-    if(failed(result = release_memid(child.memid, child.length)))
-      return exit_registry(result);
+    else if(failed(result = release_memid(child.memid, child.length)))
+      return result;
     }
 
   // release the next/previous
   if(key.hdr.previous != 0)
     {
     if(failed(result = reg_read_bytes(get_block_offset(key.hdr.previous), sizeof(field_definition_t), &child)))
-      return exit_registry(result);
+      return result;
 
     child.next = key.hdr.next;
     if(failed(result = reg_write_bytes(get_block_offset(child.memid), sizeof(field_definition_t), &child)))
-      return exit_registry(result);
+      return result;
 
-    // update our parent
-    if(failed(result = reg_read_bytes(get_block_offset(key.hdr.parent), sizeof(field_definition_t), &child)))
-      return exit_registry(result);
+    // unlink the parent from the child (only if first/last child)
+    field_key_t parent;
+    if(failed(result = reg_read_bytes(get_block_offset(key.hdr.parent), sizeof(field_key_t), &parent)))
+      return result;
 
-    child.next = key.hdr.next;
-    if(child.previous == key.hdr.memid)
-      child.previous = 0;
+    if(parent.first_child == key.hdr.memid)
+      parent.first_child = key.hdr.next;
 
-    if(failed(result = reg_write_bytes(get_block_offset(key.hdr.parent), sizeof(field_definition_t), &child)))
-      return exit_registry(result);
+    if(parent.last_child == key.hdr.memid)
+      parent.last_child = key.hdr.previous;
+
+    if(failed(result = reg_write_bytes(get_block_offset(key.hdr.parent), sizeof(field_key_t), &parent)))
+      return result;
     }
 
   if(key.hdr.next != 0)
     {
     if(failed(result = reg_read_bytes(get_block_offset(key.hdr.next), sizeof(field_definition_t), &child)))
-      return exit_registry(result);
+      return result;
 
     child.previous = key.hdr.previous;
     if(failed(result = reg_write_bytes(get_block_offset(child.memid), sizeof(field_definition_t), &child)))
-      return exit_registry(result);
+      return result;
     }
 
+  memid = key.hdr.memid;
+
+  uint16_t length = key.hdr.length;
+  memset(&key, 0, sizeof(field_key_t));
+
+  if(failed(result = reg_write_bytes(get_block_offset(memid), sizeof(field_key_t), &key)))
+    return result;
+
   // now release the key
-  return exit_registry(release_memid(key.hdr.memid, key.hdr.length));
+  return release_memid(memid, length);
+  }
+
+result_t reg_delete_key(memid_t memid)
+  {
+  enter_registry();
+  return exit_registry(reg_delete_key_impl(memid));
   }
 
 result_t reg_delete_value_impl(memid_t memid, const char *name)
@@ -1304,6 +1320,7 @@ result_t reg_delete_value_impl(memid_t memid, const char *name)
   if(failed(result == reg_open_first_child(memid, &next_child)))
     return result;
 
+  bool found = false;
   while(next_child != 0)
     {
     if(failed(result = reg_read_bytes(get_block_offset(next_child), sizeof(field_definition_t), &child)))
@@ -1315,9 +1332,13 @@ result_t reg_delete_value_impl(memid_t memid, const char *name)
       child.data_type != field_none &&
        strncmp(child.name, name, sizeof(child.name))== 0)
       {
+      found = true;
       break;
       }
     }
+
+  if(!found || child.memid == 0)
+    return e_path_not_found;
 
   field_definition_t link_child;
   // unlink the key
@@ -1327,7 +1348,7 @@ result_t reg_delete_value_impl(memid_t memid, const char *name)
       return result;
 
     link_child.next = child.next;
-    if(failed(result = reg_write_bytes(child.previous, sizeof(field_definition_t), &link_child)))
+    if(failed(result = reg_write_bytes(get_block_offset(child.previous), sizeof(field_definition_t), &link_child)))
       return result;
     }
 
@@ -1361,8 +1382,17 @@ result_t reg_delete_value_impl(memid_t memid, const char *name)
   if (update && failed(result = reg_write_bytes(get_block_offset(child.parent), sizeof(field_key_t), &key)))
     return result;  
 
+  memid = child.memid;
+  uint16_t length = child.length;
+  memset(&child, 0, sizeof(field_definition_t));
+
+  // write nulled out data
+  if (failed(result = reg_write_bytes(get_block_offset(memid), sizeof(field_definition_t), &child)))
+    return result;
+
+
   // now release the key
-  return release_memid(child.memid, child.length);
+  return release_memid(memid, length);
   }
 
 result_t reg_delete_value(memid_t memid, const char *name)

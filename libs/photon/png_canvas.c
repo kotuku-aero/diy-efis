@@ -942,7 +942,7 @@ static void render_png(png_stream_t *png_stream)
     };
 
   // make sure the canvas is valid
-  framebuffer_t *fb;
+  gdi_t *fb;
   if (failed(result = bsp_framebuffer_create_rect(&dim, &fb)))
     return result;
 

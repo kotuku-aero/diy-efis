@@ -1,28 +1,23 @@
 #include "airspeed_widget.h"
 #include "converters.h"
 
-static void on_paint_background(handle_t canvas, const rect_t *wnd_rect, const canmsg_t* msg, void *wnddata)
+static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)
   {
   airspeed_widget_t* wnd = (airspeed_widget_t *)wnddata;
 
-  on_paint_widget_background(canvas, wnd_rect, msg, wnddata);
-
   extent_t ex;
   rect_extents(wnd_rect, &ex);
 
-  rect_t rect;
-  rectangle(canvas, wnd_rect, 0, color_darkgrey, rect_create(8, 8, ex.dx - 9, ex.dy - 8, &rect));
-  }
-
-static void on_paint_foreground(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)
+  if (wnd->background_canvas == nullptr)
   {
-  airspeed_widget_t* wnd = (airspeed_widget_t*)wnddata;
+    // create a canvas
+    canvas_create(&ex, &wnd->background_canvas);
 
-  // fill the background with hollow
-  rectangle(canvas, wnd_rect, color_hollow, color_hollow, wnd_rect);
+    on_paint_widget_background(wnd->background_canvas, wnd_rect, msg, wnddata);
+    }
 
-  extent_t ex;
-  rect_extents(wnd_rect, &ex);
+  point_t pt = { 0, 0 };
+  bit_blt(canvas, wnd_rect, wnd_rect, wnd->background_canvas, wnd_rect, &pt, src_copy);
 
   rect_t rect;
 
@@ -156,7 +151,7 @@ static result_t airspeed_wndproc(handle_t hwnd, const canmsg_t *msg, void *wndda
     wnd->airspeed = value;
 
     if (changed)
-      invalidate_foreground_rect(hwnd, 0);
+      invalidate(hwnd);
 
     return s_ok;
     }
@@ -173,8 +168,7 @@ result_t create_airspeed_widget(handle_t parent, uint16_t id, aircraft_t *aircra
     return result;
 
   wnd->aircraft = aircraft;
-  wnd->base.on_paint_background = on_paint_background;
-  wnd->base.on_paint_foreground = on_paint_foreground;
+  wnd->base.on_paint = on_paint;
 
   if (out != 0)
     *out = hndl;

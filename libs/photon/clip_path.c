@@ -61,11 +61,10 @@ static void clip_to_line(canvas_t* canvas, const point_t *clip1, const point_t *
   points_clear(&canvas->solution);
 
   int len = points_count(&canvas->path);
+  point_t *pts = points_begin(&canvas->path);
 
   for (int i = 0; i < len; i++)
     {
-    point_t *pts = points_begin(&canvas->path);
-
     // forms a line
     point_t *p1 = pts + i;
 
@@ -98,9 +97,8 @@ static void clip_to_line(canvas_t* canvas, const point_t *clip1, const point_t *
     debug_break();
 #endif
 
-    // calculate position of p1
+    // calculate position of p1 and p2
     int32_t pos1 = (clip2->x - clip1->x) * (p1->y - clip1->y) - (clip2->y - clip1->y) * (p1->x - clip1->x);
-    // calculate position of p2
     int32_t pos2 = (clip2->x - clip1->x) * (p2->y - clip1->y) - (clip2->y - clip1->y) * (p2->x - clip1->x);
 
     if(pos1 < 0 && pos2 < 0)

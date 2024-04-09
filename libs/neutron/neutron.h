@@ -8,10 +8,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#ifdef CANFLY
-// protobuffers support functions
-#include "protobuf-c.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -2367,25 +2363,14 @@ typedef struct _flash_params_t {
   //
   // Set to -1 to disable block-level wear-leveling.
   int32_t block_cycles;
-  // Size of block caches in bytes. Each cache buffers a portion of a block in
-  // RAM. The flash filesystem needs a read cache, a program cache, and one additional
-  // cache per file. Larger caches can improve performance by storing more
-  // data and reducing the number of disk accesses. Must be a multiple of the
-  // read and program sizes, and a factor of the block size.
-  uint32_t cache_size;
-  // Size of the lookahead buffer in bytes. A larger lookahead buffer
-  // increases the number of blocks found during an allocation pass. The
-  // lookahead buffer is stored as a compact bitmap, so each byte of RAM
-  // can track 8 blocks. Must be a multiple of 8.
-  uint32_t lookahead_size;
   // Optional upper limit on length of file names in bytes. No downside for
   // larger names except the size of the info struct which is controlled by
   // the LFS_NAME_MAX define. Defaults to LFS_NAME_MAX when zero. Stored in
-  // superblock and must be respected by other littlefs drivers.
+  // superblock and must be respected by other drivers.
   uint32_t name_max;
   // Optional upper limit on files in bytes. No downside for larger files
   // but must be <= LFS_FILE_MAX. Defaults to LFS_FILE_MAX when zero. Stored
-  // in superblock and must be respected by other littlefs drivers.
+  // in superblock and must be respected by other drivers.
   uint32_t file_max;
   // Optional upper limit on custom attributes in bytes. No downside for
   // larger attributes size but must be <= LFS_ATTR_MAX. Defaults to
@@ -2396,6 +2381,14 @@ typedef struct _flash_params_t {
   // can help bound the metadata compaction time. Must be <= block_size.
   // Defaults to block_size when zero.
   uint32_t metadata_max;
+  uint32_t page_size;       // minimum page size that can be written
+  // Size of an erasable block in bytes. This does not impact ram consumption
+  // and may be larger than the physical erase size. However, non-inlined
+  // files take up at minimum one block. Must be a multiple of the read and
+  // program sizes.
+  uint32_t block_size;
+  // Number of erasable blocks on the device.
+  uint32_t block_count;
 
   uint32_t oob_size;        // size of oob data per page
 
@@ -2406,9 +2399,6 @@ typedef struct _flash_params_t {
   // a multiple of this value.
   uint32_t prog_size;
 
-  } flash_params_t;
-
-typedef struct _flash_disk_t {
   flash_erase_fn erase;
   flash_write_fn write;
   flash_read_fn read;
@@ -2418,21 +2408,48 @@ typedef struct _flash_disk_t {
   flash_sync_fn sync;
   } flash_disk_t;
 
+
 /**
  * @brief Open an existing flash file system
  * @param disk  Disk to use for the file system
+ * @param cache_size  Size of block caches in bytes. Each cache buffers a portion of a block in
+ * RAM. The flash filesystem needs a read cache, a program cache, and one additional
+ * cache per file. Larger caches can improve performance by storing more
+ * data and reducing the number of disk accesses. Must be a multiple of the
+ * read and program sizes, and a factor of the block size.
+ * @param lookahead_size  Size of the lookahead buffer in bytes. A larger lookahead buffer
+ * increases the number of blocks found during an allocation pass. The
+ * lookahead buffer is stored as a compact bitmap, so each byte of RAM
+ * can track 8 blocks. Must be a multiple of 8.
  * @param fs    Handle to the filesystem
  * @return s_ok if opened ok
 */
-extern result_t open_flash_filesystem(const flash_disk_t *disk, const flash_params_t* params, filesystem_t **fs);
+extern result_t open_flash_filesystem(const flash_disk_t *disk,
+                                      uint32_t cache_size,
+                                      uint32_t lookahead_size,
+                                      filesystem_t **fs);
 /**
  * @brief Initialize a new filesystem on a disk
  * @param disk      Disk to allocate on
+ * @param cache_size  Size of block caches in bytes. Each cache buffers a portion of a block in
+ * RAM. The flash filesystem needs a read cache, a program cache, and one additional
+ * cache per file. Larger caches can improve performance by storing more
+ * data and reducing the number of disk accesses. Must be a multiple of the
+ * read and program sizes, and a factor of the block size.
+ * @param lookahead_size  Size of the lookahead buffer in bytes. A larger lookahead buffer
+ * increases the number of blocks found during an allocation pass. The
+ * lookahead buffer is stored as a compact bitmap, so each byte of RAM
+ * can track 8 blocks. Must be a multiple of 8.
+ * @param params    Superblock params
  * @param wipe_fs   If set all blocks are erased
  * @param fs        New filesystem
  * @return 
 */
-extern result_t create_flash_filesystem(const flash_disk_t *disk, const flash_params_t* params, bool wipe_fs, filesystem_t **fs);
+extern result_t create_flash_filesystem(const flash_disk_t *disk,
+                                        uint32_t cache_size,
+                                        uint32_t lookahead_size,
+                                        bool wipe_fs,
+                                        filesystem_t **fs);
 /**
  * @brief create an image update file
  * @param name    Name of the image

@@ -42,7 +42,6 @@ result_t run_proton(proton_params_t *args)
     trace_error("Cannot create the layout\n");
     return result;
     }
-  
 
   // despatch messages
   canmsg_t msg;

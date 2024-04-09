@@ -144,8 +144,7 @@ result_t create_layout(handle_t parent, memid_t key, create_widgets_fn layout_fn
   if (failed(result = (*layout_fn)(hwnd, aircraft)))
     return result;
 
-  invalidate_background_rect(hwnd, &rect);
-  invalidate_foreground_rect(hwnd, &rect);
+  invalidate(hwnd);
 
   return s_ok;
   }

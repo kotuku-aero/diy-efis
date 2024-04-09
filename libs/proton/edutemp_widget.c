@@ -67,115 +67,115 @@ static void draw_failed_sensor(handle_t canvas, const rect_t* clip_rect, color_t
 
 static const char* cyl_numbers[] = { "1", "2", "3", "4", "5", "6" };
 
-static void on_paint_background(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)
+static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)
   {
-  on_paint_widget_background(canvas, wnd_rect, msg, wnddata);
-
   edu_temp_widget_t* wnd = (edu_temp_widget_t*)wnddata;
   extent_t ex;
   rect_extents(wnd_rect, &ex);
 
-  point_t pt_text = { 2, wnd->cht_line };
-  draw_text(canvas, wnd_rect, wnd->font, wnd->cht_color, color_hollow, 3, "CHT",
-    &pt_text, 0, eto_none, 0);
-
-  pt_text.x = wnd->right_gutter;
-  pt_text.y = wnd->egt_line;
-
-  draw_text(canvas, wnd_rect, wnd->font, wnd->egt_color, color_hollow, 3, "EGT",
-    &pt_text, 0, eto_none, 0);
-
-  extent_t text_ex;
-  char val[16];
-  point_t text_pt;
-
-  // draw the CHT redline
-  // TODO: this should be in a static background that is only updated if
-  // settings change....
-
-  sprintf(val, "%d", to_display_temperature->convert_uint16(wnd->cht_red_line));
-
-  uint16_t len = (uint16_t)strlen(val);
-
-  text_extent(wnd->font, len, val, &text_ex);
-
-  text_pt.x = wnd->left_gutter - text_ex.dx;
-  text_pt.y = wnd->cht_red_line_pos - (text_ex.dy >> 1);
-
-  draw_text(canvas, wnd_rect, wnd->font, color_red, color_hollow, len, val, &text_pt, wnd_rect, eto_none, 0);
-
-  // draw the EGT redline
-  sprintf(val, "%d", to_display_temperature->convert_uint16(wnd->egt_red_line));
-
-  len = (uint16_t)strlen(val);
-
-  text_extent(wnd->font, len, val, &text_ex);
-
-  text_pt.x = wnd_rect->right - (text_ex.dx + 1);
-  text_pt.y = wnd->bar_top - (text_ex.dy >> 1);
-
-  draw_text(canvas, wnd_rect, wnd->font, color_red, color_hollow, len, val, &text_pt, wnd_rect, eto_none, 0);
-
-  // draw the CHT min
-  sprintf(val, "%d", to_display_temperature->convert_uint16(wnd->cht_min));
-
-  len = (uint16_t)strlen(val);
-
-  text_extent(wnd->font, len, val, &text_ex);
-
-  text_pt.x = wnd->left_gutter - text_ex.dx;
-  text_pt.y = wnd->bar_bottom - (text_ex.dy >> 1);
-
-  draw_text(canvas, wnd_rect, wnd->font, color_white, color_hollow, len, val, &text_pt, wnd_rect, eto_none, 0);
-
-  // draw the egt_min
-  sprintf(val, "%d", to_display_temperature->convert_uint16(wnd->egt_min));
-
-  len = (uint16_t)strlen(val);
-
-  text_extent(wnd->font, len, val, &text_ex);
-
-  text_pt.x = wnd->right_gutter;
-  text_pt.y = wnd->bar_bottom - (text_ex.dy >> 1);
-
-  draw_text(canvas, wnd_rect, wnd->font, color_white, color_hollow, len, val, &text_pt, wnd_rect, eto_none, 0);
-
-  int32_t bar_center = wnd->cylinder_draw_width >> 1;
-  int32_t pos = wnd->left_gutter + bar_center;
-  point_t pts[2];
-
-  // draw the vertical separators between the cylinders
-  for (uint16_t i = 0; i < wnd->num_cylinders; i++)
+  if (wnd->background_canvas == nullptr)
     {
-    pts[0].x = pos; pts[0].y = wnd->bar_top;
-    pts[1].x = pos; pts[1].y = wnd->bar_bottom + 1;
+    canvas_create(&ex, &wnd->background_canvas);
+    on_paint_widget_background(wnd->background_canvas, wnd_rect, msg, wnddata);
 
-    polyline(canvas, wnd_rect, color_white, 2, pts);
+    edu_temp_widget_t* wnd = (edu_temp_widget_t*)wnddata;
+    extent_t ex;
+    rect_extents(wnd_rect, &ex);
 
-    pts[0].x = pos - bar_center + 1; pts[0].y = wnd->cht_red_line_pos;
-    pts[1].x = pos - 1; pts[1].y = wnd->cht_red_line_pos;
-    polyline(canvas, wnd_rect, color_red, 2, pts);
+    point_t pt_text = { 2, wnd->cht_line };
+    draw_text(wnd->background_canvas, wnd_rect, wnd->font, wnd->cht_color, color_hollow, 3, "CHT",
+      &pt_text, 0, eto_none, 0);
 
-    // draw the cylinder number
-    text_extent(wnd->font, 1, cyl_numbers[i], &text_ex);
+    pt_text.x = wnd->right_gutter;
+    pt_text.y = wnd->egt_line;
 
-    text_pt.x = pos - (text_ex.dx >> 1); text_pt.y = wnd->bar_bottom + 1;
-    draw_text(canvas, wnd_rect, wnd->font, color_white, color_hollow, 1, cyl_numbers[i], &text_pt, wnd_rect, eto_none, 0);
+    draw_text(wnd->background_canvas, wnd_rect, wnd->font, wnd->egt_color, color_hollow, 3, "EGT",
+      &pt_text, 0, eto_none, 0);
+
+    extent_t text_ex;
+    char val[16];
+    point_t text_pt;
+
+    // draw the CHT redline
+    // TODO: this should be in a static background that is only updated if
+    // settings change....
+
+    sprintf(val, "%d", to_display_temperature->convert_uint16(wnd->cht_red_line));
+
+    uint16_t len = (uint16_t)strlen(val);
+
+    text_extent(wnd->font, len, val, &text_ex);
+
+    text_pt.x = wnd->left_gutter - text_ex.dx;
+    text_pt.y = wnd->cht_red_line_pos - (text_ex.dy >> 1);
+
+    draw_text(wnd->background_canvas, wnd_rect, wnd->font, color_red, color_hollow, len, val, &text_pt, wnd_rect, eto_none, 0);
+
+    // draw the EGT redline
+    sprintf(val, "%d", to_display_temperature->convert_uint16(wnd->egt_red_line));
+
+    len = (uint16_t)strlen(val);
+
+    text_extent(wnd->font, len, val, &text_ex);
+
+    text_pt.x = wnd_rect->right - (text_ex.dx + 1);
+    text_pt.y = wnd->bar_top - (text_ex.dy >> 1);
+
+    draw_text(wnd->background_canvas, wnd_rect, wnd->font, color_red, color_hollow, len, val, &text_pt, wnd_rect, eto_none, 0);
+
+    // draw the CHT min
+    sprintf(val, "%d", to_display_temperature->convert_uint16(wnd->cht_min));
+
+    len = (uint16_t)strlen(val);
+
+    text_extent(wnd->font, len, val, &text_ex);
+
+    text_pt.x = wnd->left_gutter - text_ex.dx;
+    text_pt.y = wnd->bar_bottom - (text_ex.dy >> 1);
+
+    draw_text(wnd->background_canvas, wnd_rect, wnd->font, color_white, color_hollow, len, val, &text_pt, wnd_rect, eto_none, 0);
+
+    // draw the egt_min
+    sprintf(val, "%d", to_display_temperature->convert_uint16(wnd->egt_min));
+
+    len = (uint16_t)strlen(val);
+
+    text_extent(wnd->font, len, val, &text_ex);
+
+    text_pt.x = wnd->right_gutter;
+    text_pt.y = wnd->bar_bottom - (text_ex.dy >> 1);
+
+    draw_text(wnd->background_canvas, wnd_rect, wnd->font, color_white, color_hollow, len, val, &text_pt, wnd_rect, eto_none, 0);
+
+    int32_t bar_center = wnd->cylinder_draw_width >> 1;
+    int32_t pos = wnd->left_gutter + bar_center;
+    point_t pts[2];
+
+    // draw the vertical separators between the cylinders
+    for (uint16_t i = 0; i < wnd->num_cylinders; i++)
+      {
+      pts[0].x = pos; pts[0].y = wnd->bar_top;
+      pts[1].x = pos; pts[1].y = wnd->bar_bottom + 1;
+
+      polyline(wnd->background_canvas, wnd_rect, color_white, 2, pts);
+
+      pts[0].x = pos - bar_center + 1; pts[0].y = wnd->cht_red_line_pos;
+      pts[1].x = pos - 1; pts[1].y = wnd->cht_red_line_pos;
+      polyline(wnd->background_canvas, wnd_rect, color_red, 2, pts);
+
+      // draw the cylinder number
+      text_extent(wnd->font, 1, cyl_numbers[i], &text_ex);
+
+      text_pt.x = pos - (text_ex.dx >> 1); text_pt.y = wnd->bar_bottom + 1;
+      draw_text(wnd->background_canvas, wnd_rect, wnd->font, color_white, color_hollow, 1, cyl_numbers[i], &text_pt, wnd_rect, eto_none, 0);
 
 
-    pos += wnd->cylinder_draw_width;
+      pos += wnd->cylinder_draw_width;
+      }
     }
-  }
 
-static void on_paint_foreground(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)
-  {
-  // fill the background with hollow
-  rectangle(canvas, wnd_rect, color_hollow, color_hollow, wnd_rect);
-
-  extent_t ex;
-  rect_extents(wnd_rect, &ex);
-  edu_temp_widget_t* wnd = (edu_temp_widget_t*)wnddata;
-
+  point_t pt = { 0, 0 };
+  bit_blt(canvas, wnd_rect, wnd_rect, wnd->background_canvas, wnd_rect, &pt, src_copy);
 
   int32_t bar_center = wnd->cylinder_draw_width >> 1;
   int32_t pos = wnd->left_gutter + bar_center;
@@ -376,7 +376,7 @@ result_t edutemp_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
     }
 
   if (changed)
-    invalidate_foreground_rect(hwnd, 0);
+    invalidate(hwnd);
 
   // pass to default
   return widget_wndproc(hwnd, msg, wnddata);
@@ -389,8 +389,7 @@ result_t create_edutemps_widget(handle_t parent, uint16_t id, aircraft_t* aircra
   if (failed(result = create_widget(parent, id, edutemp_wndproc, &wnd->base, &hndl)))
     return result;
 
-  wnd->base.on_paint_background = on_paint_background;
-  wnd->base.on_paint_foreground = on_paint_foreground;
+  wnd->base.on_paint = on_paint;
 
   if (out != 0)
     *out = hndl;

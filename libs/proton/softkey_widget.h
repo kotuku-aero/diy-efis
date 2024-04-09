@@ -6,6 +6,7 @@
 
 typedef struct _softkey_window_t {
   widget_t base;
+  handle_t background_canvas;
 
   uint16_t enable_id;
   // message to send if tapped

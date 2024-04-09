@@ -8,7 +8,7 @@ typedef struct _annunciator_t annunciator_t;
 
 typedef struct _annunciator_t {
   widget_t base;
-
+  handle_t background_canvas;
   } annunciator_t;
 
 typedef struct _text_annunciator_t {
@@ -43,7 +43,7 @@ typedef struct _utc_annunciator_t {
   } utc_annunciator_t;
 
 extern bool on_def_utc_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
-extern void on_paint_utc(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, annunciator_t* wnd);
+extern void on_paint_utc(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnd);
 
 //-----------------------------------------------------------------------------
 // Hours
@@ -53,7 +53,7 @@ typedef struct _hours_annunciator_t {
   uint32_t hours; // hobbs hours, stored in AHRS as hours * 100
   } hours_annunciator_t;
 
-extern result_t on_hours_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
+extern bool on_hours_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
 extern void on_paint_hours(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata);
 
 //-----------------------------------------------------------------------------
@@ -64,8 +64,8 @@ typedef struct _hp_annunciator_t {
   uint16_t hp;        // hp * 100
   } hp_annunciator_t;
 
-extern result_t on_hp_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
-extern void on_paint_hp(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, annunciator_t* wnddata);
+extern bool on_hp_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
+extern void on_paint_hp(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata);
 
 //-----------------------------------------------------------------------------
 // kmag
@@ -82,8 +82,8 @@ typedef struct _ecu_annunciator_t {
 
   } ecu_annunciator_t;
 
-extern result_t on_kmag_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
-extern void on_paint_kmag(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, annunciator_t* wnddata);
+extern bool on_kmag_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
+extern void on_paint_kmag(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata);
 
 //-----------------------------------------------------------------------------
 // hobbs
@@ -93,12 +93,11 @@ typedef struct _hobbs_annunciator_t {
   int16_t hobbs;        // hobbs * 100
   } hobbs_annunciator_t;
 
-extern result_t on_hobbs_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
-extern void on_paint_hobbs(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, annunciator_t* wnddata);
+extern bool on_hobbs_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
+extern void on_paint_hobbs(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata);
 
-extern result_t on_auto_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
-extern void on_paint_auto(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, annunciator_t* wnd);
-extern void on_paint_background_auto(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, annunciator_t* wnd);
+extern bool on_auto_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
+extern void on_paint_auto(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnd);
 
 extern result_t annunciator_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata);
 /**

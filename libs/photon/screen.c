@@ -15,11 +15,11 @@ typedef struct _queued_msg_t {
   } queued_msg_t;
 
 static const photon_parameters_t *params;
+static handle_t screen_hook;
 
 screen_t *_screen;
 
 #define PA_TO_KVA1(pa)	((void *) ((pa) | 0xa0000000))
-
 
 result_t get_screen(handle_t *hndl)
   {
@@ -28,7 +28,6 @@ result_t get_screen(handle_t *hndl)
 
   result_t result;
 
-
   if (_screen != 0)
     {
     *hndl = (handle_t)_screen;
@@ -36,7 +35,16 @@ result_t get_screen(handle_t *hndl)
     }
 
   enter_critical();
-  framebuffer_t *fb;
+  if (_screen != 0)
+    {
+    exit_critical();
+    *hndl = (handle_t)_screen;
+    return s_ok;
+    }
+
+  exit_critical();
+  
+  screen_surface_t *surface;
 
   if (failed(result = neutron_malloc(sizeof(screen_t), (void **)&_screen)))
     return result;
@@ -47,35 +55,25 @@ result_t get_screen(handle_t *hndl)
   _screen->base.position.right = params->gdi_extents.dx;
   _screen->base.position.bottom = params->gdi_extents.dy;
   
-  if(failed(result = bsp_open_layer(params == 0 ? 0 : params->orientation, lt_background, &fb)) ||
-    failed(result = create_canvas_from_framebuffer(fb, &_screen->base.background_canvas)))
+  if(failed(result = bsp_open_framebuffer(&surface)) ||
+    failed(result = create_canvas_from_framebuffer(&surface->base.base, (handle_t *) &_screen->base.canvas)))
     return result;
   
-  if(failed(result = bsp_open_layer(params == 0 ? 0 : params->orientation, lt_foreground, &fb)) ||
-    failed(result = create_canvas_from_framebuffer(fb, &_screen->base.foreground_canvas)))
-    return result;
-  
-  if(failed(result = bsp_open_layer(params == 0 ? 0 : params->orientation, lt_overlay, &fb)) ||
-    failed(result = create_canvas_from_framebuffer(fb, &_screen->base.overlay_canvas)))
-    return result;
-
-  rect_copy(&fb->position, &_screen->base.position);
-  _screen->base.wndproc = 0;      // no wndproc for the screen as it is a queue only
+  rect_copy(&surface->base.base.position, &_screen->base.position);
+  _screen->base.wndproc = 0;      // no wndproc for the _screen as it is a queue only
   _screen->base.visible = true;
+
+  _screen->queue_empty = window_queue_empty;
 
   if (failed(result = deque_create(sizeof(queued_msg_t), APP_QUEUE_SIZE, &_screen->event_queue)))
     {
-    exit_critical();
-
     neutron_free(_screen);
     return result;
     }
 
   *hndl = (handle_t) _screen;
 
-  exit_critical();
-
-  return s_ok;
+  return result;
   }
 
 static bool screen_hook_fn(const canmsg_t *canmsg, void *parg)
@@ -91,15 +89,13 @@ static bool screen_hook_fn(const canmsg_t *canmsg, void *parg)
   return true;
   }
 
-static handle_t screen_hook;
-
 result_t initialize_screen(const photon_parameters_t *_params)
   {
   params = _params;
 
-  // hook the messages
   return subscribe(screen_hook_fn , 0, &screen_hook);
   }
+
 
 result_t post_message(handle_t hndl, const canmsg_t *canmsg, uint32_t delay)
   {
@@ -125,9 +121,7 @@ result_t post_message_from_isr(const canmsg_t *canmsg)
   }
 #endif
 
-extern const canmsg_t paint_background_msg;
-extern const canmsg_t paint_foreground_msg;
-extern const canmsg_t paint_overlay_msg;
+extern const canmsg_t paint_msg;
 
 result_t get_message(handle_t *hndl, canmsg_t *canmsg)
   {
@@ -136,44 +130,22 @@ result_t get_message(handle_t *hndl, canmsg_t *canmsg)
 
   result_t result = s_false;
   queued_msg_t msg;
-  canvas_t *canvas = 0;
+  screen_surface_t *surface = (screen_surface_t*) _screen->base.canvas->fb->surface;
 
   while (result != s_ok)
     {
-    uint32_t delay = _screen->needs_paint ? 0 : INDEFINITE_WAIT;
+    uint32_t delay = surface->base.invalid_count > 0 ? 0 : INDEFINITE_WAIT;
     switch (result = pop_front(_screen->event_queue, &msg, delay))
       {
       case e_timeout:
-        // these are done in order so the screen looks ok
-        // if for some reason the system randomly paints.
-        if(succeeded(result = is_typeof(_screen->base.background_canvas, &canvas_type, (void **)&canvas)) &&
-            canvas->fb->invalid)
+         if(surface->base.invalid_count > 0 &&
+           surface->state == fbds_idle)      // only paint when screen is done.
           {
-          (*canvas->fb->queue_empty)(canvas->fb);
+          (*_screen->queue_empty)(surface);
           *hndl = 0;
-          memcpy(canmsg, &paint_background_msg, sizeof(canmsg_t));
+          memcpy(canmsg, &paint_msg, sizeof(canmsg_t));
           return s_ok;
           }
-
-        if(succeeded(result = is_typeof(_screen->base.foreground_canvas, &canvas_type, (void **)&canvas)) &&
-            canvas->fb->invalid)
-          {
-          (*canvas->fb->queue_empty)(canvas->fb);
-          *hndl = 0;
-          memcpy(canmsg, &paint_foreground_msg, sizeof(canmsg_t));
-          return s_ok;
-          }
-
-        if(succeeded(result = is_typeof(_screen->base.overlay_canvas, &canvas_type, (void **)&canvas)) &&
-          canvas->fb->invalid)
-          {
-          (*canvas->fb->queue_empty)(canvas->fb);
-          *hndl = 0;
-          memcpy(canmsg, &paint_overlay_msg, sizeof(canmsg_t));
-          return s_ok;
-          }
-
-        _screen->needs_paint = false;
         return s_false;
       case s_ok:
         break;

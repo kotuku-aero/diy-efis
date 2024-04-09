@@ -2,58 +2,91 @@
 #include "../photon/photon_priv.h"
 #include <stdio.h>
 
-void on_paint_widget_background(handle_t canvas, const rect_t* rect, const canmsg_t* msg, void* wnddata)
+void on_paint_widget_background(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)
   {
-  widget_t* wnd = (widget_t*)wnddata;
+  widget_t* widget = (widget_t*)wnddata;
+
+  extent_t ex;
+  rect_extents(wnd_rect, &ex);
 
   // fill without a border
-  if (wnd->background_color != color_hollow && wnd->style & DRAW_BACKGROUND)
-    rectangle(canvas, rect, 0, wnd->background_color, rect);
+  if (widget->is_alarm)
+    {
+    // handle the alarm of the widget by drawing a box
+    rect_t alarm_rect =
+      {
+      .left = wnd_rect->left + (widget->style & BORDER_LEFT ? 1 : 0),
+      .top = wnd_rect->top + (widget->style & BORDER_TOP ? 1 : 0),
+      .right = wnd_rect->right - (widget->style & BORDER_RIGHT ? 2 : 1),
+      .bottom = wnd_rect->bottom - (widget->style & BORDER_BOTTOM ? 2 : 1)
+      };
+
+    rectangle(canvas, wnd_rect, widget->alarm_color, color_hollow, &alarm_rect);
+    }
+  else if (widget->background_color != color_hollow && widget->style & DRAW_BACKGROUND)
+    {
+    // todo make the +/- 8 a setting
+    rect_t rect;
+    if (widget->background_gutter != 0)
+      {
+      // left gutter
+      rectangle(canvas, wnd_rect, color_hollow, widget->gutter_color, rect_create_ex(0, 0, widget->background_gutter, ex.dy, &rect));
+      // right gutter
+      rectangle(canvas, wnd_rect, color_hollow, widget->gutter_color, rect_create_ex(ex.dx - widget->background_gutter, 0, widget->background_gutter, ex.dy, &rect));
+      // top gutter
+      rectangle(canvas, wnd_rect, color_hollow, widget->gutter_color, rect_create_ex(widget->background_gutter, 0, ex.dx - (widget->background_gutter << 1), widget->background_gutter, &rect));
+      // bottom gutter
+      rectangle(canvas, wnd_rect, color_hollow, widget->gutter_color, rect_create_ex(widget->background_gutter, ex.dy - widget->background_gutter, ex.dx - (widget->background_gutter << 1), widget->background_gutter, &rect));
+      }
+
+    rectangle(canvas, wnd_rect, 0, widget->background_color, rect_create(widget->background_gutter, widget->background_gutter, ex.dx - widget->background_gutter, ex.dy - widget->background_gutter, &rect));
+
+    }
 
   point_t pts[2];
 
-  if (wnd->style & BORDER_BOTTOM)
+  if (widget->style & BORDER_BOTTOM)
     {
-    pts[0].x = rect->left;
-    pts[0].y = rect->bottom - 1;
+    pts[0].x = wnd_rect->left;
+    pts[0].y = wnd_rect->bottom - 1;
 
-    pts[1].x = rect->right + 1;
+    pts[1].x = wnd_rect->right + 1;
     pts[1].y = pts[0].y;
 
-    polyline(canvas, rect, wnd->border_color, 2, pts);
+    polyline(canvas, wnd_rect, widget->border_color, 2, pts);
     }
 
-  if (wnd->style & BORDER_TOP)
+  if (widget->style & BORDER_TOP)
     {
-    pts[0].x = rect->left;
-    pts[0].y = rect->top;
+    pts[0].x = wnd_rect->left;
+    pts[0].y = wnd_rect->top;
 
-    pts[1].x = rect->right + 1;
+    pts[1].x = wnd_rect->right + 1;
     pts[1].y = pts[0].y;
 
-    polyline(canvas, rect, wnd->border_color, 2, pts);
+    polyline(canvas, wnd_rect, widget->border_color, 2, pts);
     }
 
-  if (wnd->style & BORDER_LEFT)
+  if (widget->style & BORDER_LEFT)
     {
-    pts[0].x = rect->left;
-    pts[0].y = rect->top;
+    pts[0].x = wnd_rect->left;
+    pts[0].y = wnd_rect->top;
 
     pts[1].x = pts[0].x;
-    pts[1].y = rect->bottom;
+    pts[1].y = wnd_rect->bottom;
 
-    polyline(canvas, rect, wnd->border_color, 2, pts);
+    polyline(canvas, wnd_rect, widget->border_color, 2, pts);
     }
 
-  if (wnd->style & BORDER_RIGHT)
+  if (widget->style & BORDER_RIGHT)
     {
-    pts[0].x = rect->right - 1;
-    pts[0].y = rect->top;
+    pts[0].x = wnd_rect->right - 1;
+    pts[0].y = wnd_rect->top;
 
     pts[1].x = pts[0].x;
-    pts[1].y = rect->bottom;
+    pts[1].y = wnd_rect->bottom;
 
-    polyline(canvas, rect, wnd->border_color, 2, pts);
+    polyline(canvas, wnd_rect, widget->border_color, 2, pts);
     }
   }
 
@@ -81,10 +114,10 @@ result_t widget_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
     // timer is a 1 second interval, so subtract 1000
     if (widget->sensor_timer > 0)
       {
-      if(widget->sensor_timer >= 1000)
+      if (widget->sensor_timer >= 1000)
         widget->sensor_timer -= 1000;
       else
-        widget->sensor_timer == 0;
+        widget->sensor_timer = 0;
 
       if (widget->sensor_timer == 0)
         {
@@ -101,12 +134,11 @@ result_t widget_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
       widget->is_alarm = (flag != 0);
       }
     }
-  else if (id == id_paint_foreground ||
-    id == id_paint_background)
+  else if (id == id_paint)
     on_paint_widget(hwnd, msg, wnddata);
 
   if (changed)
-    invalidate_foreground_rect(hwnd, 0);
+    invalidate(hwnd);
 
   return defwndproc(hwnd, msg, wnddata);
   }
@@ -118,16 +150,12 @@ result_t create_widget(handle_t parent, uint16_t id, wndproc_fn cb, widget_t* wi
   if (failed(result = window_create(parent, &widget->rect, cb, widget, id, hwnd)))
     return result;
 
-  if (widget->on_paint_background == 0)
-    widget->on_paint_background = on_paint_widget_background;
+  invalidate(*hwnd);
 
-  invalidate_background_rect(*hwnd, &widget->rect);
-  invalidate_foreground_rect(*hwnd, &widget->rect);
-
-  if(failed(result = set_z_order(*hwnd, widget->z_order)))
+  if (failed(result = set_z_order(*hwnd, widget->z_order)))
     return result;
 
-  if(widget->on_create != 0)
+  if (widget->on_create != 0)
     result = (*widget->on_create)(*hwnd, widget);
   else
     result = s_ok;
@@ -135,93 +163,35 @@ result_t create_widget(handle_t parent, uint16_t id, wndproc_fn cb, widget_t* wi
   return result;
   }
 
-typedef result_t(*end_widget_paint_fn)(handle_t hwnd);
-typedef result_t(*begin_widget_paint_fn)(handle_t hwnd, handle_t* canvas);
-
-typedef struct _paint_handlers_t {
-  begin_widget_paint_fn begin_paint;
-  end_widget_paint_fn end_paint;
-  } paint_handlers_t;
-
-static const paint_handlers_t background_painter = { begin_background_paint, end_background_paint };
-static const paint_handlers_t foreground_painter = { begin_foreground_paint, end_foreground_paint };
-static const paint_handlers_t overlay_painter = { begin_overlay_paint, end_overlay_paint };
-
-
 result_t on_paint_widget(handle_t hwnd, const canmsg_t* msg, widget_t* widget)
   {
-  paint_fn handler = 0;
-  const paint_handlers_t* painter = 0;
+  result_t result;
+  handle_t canvas;
 
-  uint16_t id = get_can_id(msg);
-  switch (id)
+  if (failed(result = begin_paint(hwnd, &canvas)))
+    return result;
+
+  rect_t wnd_rect;
+  window_rect(hwnd, &wnd_rect);
+
+  if (widget->on_paint != nullptr)
+    (widget->on_paint)(canvas, &wnd_rect, msg, widget);
+
+  // handle the sensor failed case
+  if (widget->sensor_failed)
     {
-    case id_paint_background:
-      handler = widget->on_paint_background;
-      painter = &background_painter;
-      break;
-    case id_paint_foreground:
-      handler = widget->on_paint_foreground;
-      painter = &foreground_painter;
-      break;
-    case id_paint_overlay:
-      handler = widget->on_paint_overlay;
-      painter = &overlay_painter;
-      break;
+    point_t pts[2];
+
+    rect_top_left(&wnd_rect, pts);
+    rect_bottom_right(&wnd_rect, pts + 1);
+    polyline(canvas, &wnd_rect, widget->alarm_color, 2, pts);
+
+    rect_top_right(&wnd_rect, pts);
+    rect_bottom_left(&wnd_rect, pts + 1);
+    polyline(canvas, &wnd_rect, widget->alarm_color, 2, pts);
     }
 
-    if (handler == 0)
-      return s_ok;
-
-    result_t result;
-    handle_t canvas;
-
-    if (failed(result = (*painter->begin_paint)(hwnd, &canvas)))
-      return result;
-
-    rect_t wnd_rect;
-    window_rect(hwnd, &wnd_rect);
-
-    if (id == id_paint_foreground)
-      {
-      if (widget->is_alarm)
-        {
-        // handle the alarm of the widget by drawing a box
-        rect_t alarm_rect =
-          {
-          .left = wnd_rect.left + (widget->style & BORDER_LEFT ? 1 : 0),
-          .top = wnd_rect.top + (widget->style & BORDER_TOP ? 1 : 0),
-          .right = wnd_rect.right - (widget->style & BORDER_RIGHT ? 2 : 1),
-          .bottom = wnd_rect.bottom - (widget->style & BORDER_BOTTOM ? 2 : 1)
-          };
-
-        rectangle(canvas, &wnd_rect, widget->alarm_color, color_hollow, &alarm_rect);
-        }
-      else
-        // fill background with hollow.
-        rectangle(canvas, &wnd_rect, color_hollow, color_hollow, &wnd_rect);
-      }
-
-    (*handler)(canvas, &wnd_rect, msg, widget);
-
-    if (id == id_paint_foreground)
-      {
-      // handle the sensor failed case
-      if (widget->sensor_failed)
-        {
-        point_t pts[2];
-
-        rect_top_left(&wnd_rect, pts);
-        rect_bottom_right(&wnd_rect, pts + 1);
-        polyline(canvas, &wnd_rect, widget->alarm_color, 2, pts);
-
-        rect_top_right(&wnd_rect, pts);
-        rect_bottom_left(&wnd_rect, pts + 1);
-        polyline(canvas, &wnd_rect, widget->alarm_color, 2, pts);
-        }
-      }
-
-    return (*painter->end_paint)(hwnd);
+  return end_paint(hwnd);
   }
 
 result_t on_paint_roller_background(handle_t canvas,

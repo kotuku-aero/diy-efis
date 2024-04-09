@@ -2,26 +2,30 @@
 
 static void on_paint_background(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)
   {
-  softkey_window_t* wnd = (softkey_window_t*)wnddata;
-
-  // create the button shape
-  rect_t btn_rect = { wnd_rect->left + 1, wnd_rect->top + 1, wnd_rect->right -1, wnd_rect->bottom -1 };
-
-  round_rect(canvas, wnd_rect, wnd->base.border_color, color_black, &btn_rect, 5);
   }
 
-static void on_paint_foreground(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)
+static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)
   {
   softkey_window_t *wnd = (softkey_window_t *)wnddata;
-
-  // fill the background with hollow
-  rectangle(canvas, wnd_rect, color_hollow, color_hollow, wnd_rect);
-
   extent_t ex;
   rect_extents(wnd_rect, &ex);
 
+  if (wnd->background_canvas == nullptr)
+    {
+    canvas_create(&ex, &wnd->background_canvas);
+
+    on_paint_widget_background(wnd->background_canvas, wnd_rect, msg, wnddata);
+
+    // create the button shape
+    rect_t btn_rect = { wnd_rect->left + 1, wnd_rect->top + 1, wnd_rect->right - 1, wnd_rect->bottom - 1 };
+
+    round_rect(wnd->background_canvas, wnd_rect, wnd->base.border_color, color_black, &btn_rect, 5);
+    }
+
+  point_t pt = { 0, 0 };
+  bit_blt(canvas, wnd_rect, wnd_rect, wnd->background_canvas, wnd_rect, &pt, src_copy);
+
   rect_t btn_rect = { wnd_rect->left + 3, wnd_rect->top + 3, wnd_rect->right - 3, wnd_rect->bottom - 3 };
-  point_t pt;
 
   if (wnd->glyph != 0)
     {
@@ -62,8 +66,7 @@ static result_t softkey_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddat
 
   switch (get_can_id(msg))
     {
-    case id_paint_background:
-    case id_paint_foreground:
+    case id_paint:
       on_paint_widget(hwnd, msg, wnddata);
       break;
     case id_touch_tap:
@@ -78,12 +81,12 @@ static result_t softkey_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddat
             post_message(0, &wnd->tapped_msg, INDEFINITE_WAIT);
           wnd->is_selected = true;
           // repaint our window as selected.
-          invalidate_foreground_rect(hwnd, 0);
+          invalidate(hwnd);
           }
         else if ((touch_msg->flags & TOUCH_END) != 0)
           {
           wnd->is_selected = false;
-          invalidate_foreground_rect(hwnd, 0);
+          invalidate(hwnd);
           }
         }
       break;
@@ -103,8 +106,7 @@ result_t create_softkey_window(handle_t parent, uint16_t id, aircraft_t* aircraf
   if (failed(result = create_widget(parent, id, softkey_wndproc, &wnd->base, &hndl)))
     return result;
 
-  wnd->base.on_paint_foreground = on_paint_foreground;
-  wnd->base.on_paint_background = on_paint_background;
+  wnd->base.on_paint = on_paint;
 
   if(failed(result = register_touch_window(hndl, 0)))
     return result;

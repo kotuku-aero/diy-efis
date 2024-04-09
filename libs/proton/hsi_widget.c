@@ -1,14 +1,22 @@
 #include "hsi_widget.h"
 #include "proton.h"
 
-static void on_paint_foreground(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* _msg, void* wnddata)
+static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* _msg, void* wnddata)
   {
   hsi_widget_t *wnd = (hsi_widget_t *)wnddata;
 
   extent_t ex;
   rect_extents(wnd_rect, &ex);
 
-  point_t pt;
+  if(wnd->background_canvas == nullptr)
+    {
+    canvas_create(&ex, &wnd->background_canvas);
+    on_paint_widget_background(wnd->background_canvas, wnd_rect, _msg, wnddata);
+    };
+
+  point_t pt = {0, 0};
+
+  bit_blt(canvas, wnd_rect, wnd_rect, wnd->background_canvas, wnd_rect, &pt, src_copy);
 
   /////////////////////////////////////////////////////////////////////////////
   //
@@ -402,7 +410,7 @@ result_t hsi_wndproc(handle_t hwnd, const canmsg_t *msg, void *wnddata)
     }
 
   if (changed)
-    invalidate_foreground_rect(hwnd, 0);
+    invalidate(hwnd);
 
   return widget_wndproc(hwnd, msg, wnddata);
   }
@@ -424,7 +432,7 @@ result_t hsi_wndproc(handle_t hwnd, const canmsg_t *msg, void *wnddata)
       return result;
 
     wnd->aircraft = aircraft;
-    wnd->base.on_paint_foreground = on_paint_foreground;
+    wnd->base.on_paint = on_paint;
 
     if (out != 0)
       *out = hndl;

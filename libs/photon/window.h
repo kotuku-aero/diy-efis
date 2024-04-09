@@ -143,23 +143,15 @@ extern const typeid_t window_type;
   */
   extern result_t set_z_order(handle_t hwnd, uint8_t value);
   /**
-   * @brief Invalidate a rectangle.  In most cases rect is ignored
-   * @param rect rectangle to invalidate.  Use position() in most cases
-  */
-  extern result_t invalidate_background_rect(handle_t hwnd, const rect_t *rect);
-  /**
-     * @brief Invalidate a rectangle.  In most cases rect is ignored
-     * @param rect rectangle to invalidate.  Use position() in most cases
+     * @brief Invalidate the foreground canvas
+   * @param hwnd window to invalidate
+   * @return s_ok if the window is valid
     */
-  extern result_t invalidate_foreground_rect(handle_t hwnd, const rect_t* rect);
+  extern result_t invalidate(handle_t hwnd);
   /**
-     * @brief Invalidate a rectangle.  In most cases rect is ignored
-     * @param rect rectangle to invalidate.  Use position() in most cases
-    */
-  extern result_t invalidate_overlay_rect(handle_t hwnd, const rect_t* rect);
-  /**
-   * @brief Window needs to be painted.  Reset when on_paint is processed
-   * @return true if the window is invalid and needs painting
+   * @brief Check if a window is invalid
+   * @param hwnd window to check
+   * @return s_ok if the window is invalid
   */
   extern result_t is_invalid(handle_t hwnd);
   /**
@@ -172,50 +164,12 @@ extern const typeid_t window_type;
    * @brief notify that window is starting to paint on the gdi
    * @param canvas
   */
-  extern result_t begin_background_paint(handle_t hwnd, handle_t* canvas);
+  extern result_t begin_paint(handle_t hwnd, handle_t *canvas);
   /**
    * @brief notify that the window has finished painting
    * @param canvas
   */
-  extern result_t end_background_paint(handle_t hwnd);
-  /**
-   * @brief notify that window is starting to paint on the gdi
-   * @param canvas 
-  */
-  extern result_t begin_foreground_paint(handle_t hwnd, handle_t *canvas);
-  /**
-   * @brief notify that the window has finished painting
-   * @param canvas 
-  */
-  extern result_t end_foreground_paint(handle_t hwnd);
-  /**
-  * @brief notify that window is starting to paint on the gdi
-  * @param canvas
- */
-  extern result_t begin_overlay_paint(handle_t hwnd, handle_t* canvas);
-  /**
-   * @brief notify that the window has finished painting
-   * @param canvas
-  */
-  extern result_t end_overlay_paint(handle_t hwnd);
-  /**
-   * @brief return the canvas to render the background onto
-   * @param hwnd window requesting the canvas
-   * @return s_ok if the canvas exists
-  */
-  extern result_t get_background_canvas(handle_t hwnd, handle_t *canvas);
-  /**
-   * @brief Return the canvas to render the foreground onto
-   * @param hwnd window requesting the canvas
-   * @return s_ok if the canvas exists
-  */
-  extern result_t get_foreground_canvas(handle_t hwnd, handle_t *canvas);
-  /**
-   * @brief Return the overlay canvas to render the foreground onto
-   * @param hwnd window requesting the canvas
-   * @return s_ok if the canvas exists
-  */
-  extern result_t get_overlay_canvas(handle_t hwnd, handle_t *canvas);
+  extern result_t end_paint(handle_t hwnd);
   /**
    * @brief handle the default message processing.  Should be called after all
    * window processing a message is done
@@ -285,14 +239,9 @@ typedef struct _touch_msg_t {
 * raw message is ne
 */
 #define id_timer 1400
-#define id_paint_foreground 1401
-#define id_paint_background 1402
-#define id_paint_overlay 1403
-#define id_request_paint_foreground 1404
-#define id_request_paint_background 1405
-#define id_request_paint_overlay 1406
-#define id_close 1407             // the window is closed
-#define id_end_dialog 1408        // the dialog is dismissed
+#define id_paint 1401
+#define id_close 1402             // the window is closed
+#define id_end_dialog 1403        // the dialog is dismissed
 /*
 * Touch screen interfaces.
 * 

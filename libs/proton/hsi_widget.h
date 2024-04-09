@@ -27,6 +27,8 @@ typedef struct _hsi_widget_t {
   int16_t heading_bug;
   int16_t heading;
   aircraft_t *aircraft;
+
+  handle_t background_canvas;
   } hsi_widget_t;
 
 extern result_t create_hsi_widget(handle_t parent, uint16_t id, aircraft_t *aircraft, hsi_widget_t* wnd, handle_t* hndl);

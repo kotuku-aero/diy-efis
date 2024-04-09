@@ -24,7 +24,11 @@ result_t marquee_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
 
       if (wnd->selected_alarm < 0 &&
           succeeded(get_window_by_id(hwnd, wnd->selected_index + wnd->base_widget_id, &hann)))
+        {
         show_window(hann);
+
+        invalidate(hann);
+        }
 
       changed = true;
       }
@@ -40,7 +44,11 @@ result_t marquee_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
 
       if (wnd->selected_alarm < 0 &&
         succeeded(get_window_by_id(hwnd, wnd->selected_index + wnd->base_widget_id, &hann)))
+        {
         show_window(hann);
+
+        invalidate(hann);
+        }
 
       changed = true;
       }
@@ -139,9 +147,7 @@ result_t marquee_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
 
   if (changed)
     {
-    invalidate_background_rect(hwnd, 0);
-    invalidate_foreground_rect(hwnd, 0);
-    //invalidate_background_rect(hann, 0);
+    invalidate(hann);
     }
 
   return widget_wndproc(hwnd, msg, wnddata);
@@ -195,8 +201,7 @@ static void close_alarm(handle_t parent, handle_t hwnd, marquee_widget_t* marque
       show_window(hchild);
     }
 
-  invalidate_background_rect(hchild, 0);
-  invalidate_foreground_rect(hchild, 0);
+  invalidate(hchild);
 
   // make sure the menu system is re-enabled.
   use_alarm_keys(false);
@@ -248,6 +253,8 @@ result_t create_marquee_widget(handle_t parent, uint16_t id, aircraft_t* aircraf
   handle_t hndl;
   if (failed(result = create_widget(parent, id, marquee_wndproc, &wnd->base, &hndl)))
     return result;
+
+  show_window(hndl);
 
   if (out != 0)
     *out = hndl;
@@ -303,8 +310,7 @@ result_t alarm_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
   bool changed = false;
   switch (can_id)
     {
-    case id_paint_background :
-    case id_paint_foreground :
+    case id_paint :
       on_paint_widget(hwnd, msg, wnddata);
       break;
 
@@ -317,7 +323,7 @@ result_t alarm_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
     }
 
   if (changed)
-    invalidate_foreground_rect(hwnd, 0);
+    invalidate(hwnd);
 
   return s_ok;
   }

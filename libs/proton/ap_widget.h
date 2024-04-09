@@ -19,6 +19,7 @@ typedef enum {
 
 typedef struct _ap_widget_t {
   widget_t base;
+  handle_t background_canvas;
 
   extent_t font_cell_size;
   aircraft_t* aircraft;

@@ -2,7 +2,7 @@
 #include "proton.h"
 #include "../atomdb/spatial.h"
 
-static void on_paint_foreground(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)
+static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)
   {
   attitude_widget_t *wnd = (attitude_widget_t *)wnddata;
   extent_t ex;
@@ -380,8 +380,7 @@ result_t attitude_wndproc(handle_t hwnd, const canmsg_t *msg, void *wnddata)
 
   switch (get_can_id(msg))
     {
-    case id_paint_background:
-    case id_paint_foreground:
+    case id_paint:
       on_paint_widget(hwnd, msg, wnddata);
       break;
     case id_yaw_angle:
@@ -440,7 +439,7 @@ result_t attitude_wndproc(handle_t hwnd, const canmsg_t *msg, void *wnddata)
     }
 
   if (changed)
-    invalidate_foreground_rect(hwnd, 0);
+    invalidate(hwnd);
 
   // pass to default
   return defwndproc(hwnd, msg, wnddata);
@@ -455,7 +454,7 @@ result_t create_attitude_widget(handle_t parent, uint16_t id, aircraft_t* aircra
     return result;
 
   wnd->aircraft = aircraft;
-  wnd->base.on_paint_foreground = on_paint_foreground;
+  wnd->base.on_paint = on_paint;
 
   if (out != 0)
     *out = hndl;

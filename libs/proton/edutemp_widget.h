@@ -25,6 +25,7 @@ typedef struct _edu_bar_t {
 
 typedef struct _edu_temp_widget_t {
   widget_t base;
+  handle_t background_canvas;
 
   // the edu support up to 12 sensors (6 egt, 6 cht)
   uint16_t num_cylinders;

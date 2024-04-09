@@ -11,15 +11,23 @@ static void on_paint_background(handle_t canvas, const rect_t* wnd_rect, const c
   {
   altitude_widget_t* wnd = (altitude_widget_t*)wnddata;
 
-  on_paint_widget_background(canvas, wnd_rect, msg, wnddata);
+  }
 
+static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)
+  {
+  altitude_widget_t *wnd = (altitude_widget_t *)wnddata;
   extent_t ex;
   rect_extents(wnd_rect, &ex);
 
-  rect_t rect;
-  int32_t median_y = ex.dy >> 1;
+  if(wnd->background_canvas == nullptr)
+    {
+    // create a canvas
+    canvas_create(&ex, &wnd->background_canvas);
 
-   rectangle(canvas, wnd_rect, 0, color_darkgrey, rect_create(8, 8, ex.dx - 8, ex.dy - 8, &rect));
+    on_paint_widget_background(wnd->background_canvas, wnd_rect, msg, wnddata);
+
+    rect_t rect;
+    gdi_dim_t median_y = ex.dy >> 1;
 
   // vsi markers
   int i;
@@ -38,22 +46,16 @@ static void on_paint_background(handle_t canvas, const rect_t* wnd_rect, const c
     extent_t size;
     point_t pt;
     text_extent(wnd->font, marks[i].length, marks[i].text, &size);
-    draw_text(canvas, wnd_rect, wnd->font, color_yellow, wnd->base.background_color,
+      draw_text(wnd->background_canvas, wnd_rect, wnd->font, color_yellow, wnd->base.background_color,
       marks[i].length, marks[i].text,
       point_create(ex.dx - 9 - size.dx, marks[i].pos - (size.dy >> 1), &pt),
       0, 0, 0);
     }
   }
  
-static void on_paint_foreground(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)
-  {
-  altitude_widget_t *wnd = (altitude_widget_t *)wnddata;
+  point_t pt = { 0, 0 };
+  bit_blt(canvas, wnd_rect, wnd_rect, wnd->background_canvas, wnd_rect, &pt, src_copy);
 
-  // fill the background with hollow
-  rectangle(canvas, wnd_rect, color_hollow, color_hollow, wnd_rect);
-
-  extent_t ex;
-  rect_extents(wnd_rect, &ex);
   
   int32_t median_y = ex.dy >> 1;
   
@@ -190,7 +192,6 @@ static void on_paint_foreground(handle_t canvas, const rect_t* wnd_rect, const c
   uint16_t len = (uint16_t) strlen(str);
 	extent_t size;
   text_extent(wnd->font, len, str, &size);
-  point_t pt;
 
 	draw_text(canvas, &vsi_rect, wnd->font, color_green, color_black,
             len, str,
@@ -234,7 +235,7 @@ static void on_baro_corrected_altitude(handle_t hwnd, const canmsg_t *msg, void 
   wnd->altitude = value;
 
 	if(changed)
-	  invalidate_foreground_rect(hwnd, 0);
+	  invalidate(hwnd);
 	}
 
 static void on_altitude_rate(handle_t hwnd, const canmsg_t *msg, void *wnddata)
@@ -253,7 +254,7 @@ static void on_altitude_rate(handle_t hwnd, const canmsg_t *msg, void *wnddata)
   wnd->vertical_speed = value;
 
   if (changed)
-    invalidate_foreground_rect(hwnd, 0);
+    invalidate(hwnd);
   }
 
 static void on_qnh(handle_t hwnd, const canmsg_t *msg, void *wnddata)
@@ -268,7 +269,7 @@ static void on_qnh(handle_t hwnd, const canmsg_t *msg, void *wnddata)
   wnd->qnh = value;
 
   if (changed)
-    invalidate_foreground_rect(hwnd, 0);
+    invalidate(hwnd);
   }
 
 result_t altitude_wndproc(handle_t hwnd, const canmsg_t *msg, void *wnddata)
@@ -298,8 +299,8 @@ result_t create_altitude_widget(handle_t parent, uint16_t id, aircraft_t* aircra
     return result;
 
   wnd->aircraft = aircraft;
-  wnd->base.on_paint_background = on_paint_background;
-  wnd->base.on_paint_foreground = on_paint_foreground;
+
+  wnd->base.on_paint = on_paint;
 
   if (out != 0)
     *out = hndl;

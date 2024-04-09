@@ -25,41 +25,51 @@ static const char *ap_modes[] =
 static void on_paint_background(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)
   {
   ap_widget_t* wnd = (ap_widget_t*)wnddata;
-  on_paint_widget_background(canvas, wnd_rect, msg, wnddata);
-
-  rect_t button_rect;
-  rect_create_ex(wnd->gutter, wnd->gutter, rect_width(wnd_rect) - (wnd->gutter << 1), wnd->button_height, &button_rect);
-  // mode button
-  rectangle(canvas, wnd_rect, color_blue, color_lightblue, &button_rect);
-
-  point_t pt;
-  rect_top_left(&wnd->wpt_label, &pt);
-  draw_text(canvas, wnd_rect, wnd->base.name_font, color_white, color_hollow, 0, wpt_label, &pt, &wnd->wpt_label, 0, 0);
-
-  rect_top_left(&wnd->dst_label, &pt);
-  draw_text(canvas, wnd_rect, wnd->base.name_font, color_white, color_hollow, 0, dst_label, &pt, &wnd->dst_label, 0, 0);
-
-  rect_top_left(&wnd->ete_label, &pt);
-  draw_text(canvas, wnd_rect, wnd->base.name_font, color_white, color_hollow, 0, ete_label, &pt, &wnd->ete_label, 0, 0);
-
-  rect_top_left(&wnd->alt_label, &pt);
-  draw_text(canvas, wnd_rect, wnd->base.name_font, color_white, color_hollow, 0, alt_label, &pt, &wnd->alt_label, 0, 0);
-
-  rect_top_left(&wnd->vs_label, &pt);
-  draw_text(canvas, wnd_rect, wnd->base.name_font, color_white, color_hollow, 0, vs_label, &pt, &wnd->vs_label, 0, 0);
   }
 
-static void on_paint_foreground(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)
+static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)
   {
   ap_widget_t *wnd = (ap_widget_t *)wnddata;
+  extent_t ex;
+
+  if (wnd->background_canvas == nullptr)
+    {
+    rect_extents(wnd_rect, &ex);
+    canvas_create(&ex, &wnd->background_canvas);
+
+    on_paint_widget_background(wnd->background_canvas, wnd_rect, msg, wnddata);
+
+    rect_t button_rect;
+    rect_create_ex(wnd->gutter, wnd->gutter, rect_width(wnd_rect) - (wnd->gutter << 1), wnd->button_height, &button_rect);
+    // mode button
+    rectangle(wnd->background_canvas, wnd_rect, color_blue, color_lightblue, &button_rect);
+
+    point_t pt;
+    rect_top_left(&wnd->wpt_label, &pt);
+    draw_text(wnd->background_canvas, wnd_rect, wnd->base.name_font, color_white, color_hollow, 0, wpt_label, &pt, &wnd->wpt_label, 0, 0);
+
+    rect_top_left(&wnd->dst_label, &pt);
+    draw_text(wnd->background_canvas, wnd_rect, wnd->base.name_font, color_white, color_hollow, 0, dst_label, &pt, &wnd->dst_label, 0, 0);
+
+    rect_top_left(&wnd->ete_label, &pt);
+    draw_text(wnd->background_canvas, wnd_rect, wnd->base.name_font, color_white, color_hollow, 0, ete_label, &pt, &wnd->ete_label, 0, 0);
+
+    rect_top_left(&wnd->alt_label, &pt);
+    draw_text(wnd->background_canvas, wnd_rect, wnd->base.name_font, color_white, color_hollow, 0, alt_label, &pt, &wnd->alt_label, 0, 0);
+
+    rect_top_left(&wnd->vs_label, &pt);
+    draw_text(wnd->background_canvas, wnd_rect, wnd->base.name_font, color_white, color_hollow, 0, vs_label, &pt, &wnd->vs_label, 0, 0);
+
+    }
+
+  point_t pt = { 0, 0 };
+  bit_blt(canvas, wnd_rect, wnd_rect, wnd->background_canvas, wnd_rect, &pt, src_copy);
 
   // draw the mode text
   const char *ap_mode = ap_modes[wnd->mode];
 
-  extent_t ex;
   text_extent(wnd->base.name_font, 0, ap_mode, &ex);
 
-  point_t pt;
   rect_top_left(&wnd->mode_button, &pt);
 
   int32_t txt_top = rect_height(&wnd->mode_button);
@@ -126,7 +136,7 @@ static result_t ap_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
   //  }
 
   if (changed)
-    invalidate_foreground_rect(hwnd, 0);
+    invalidate(hwnd);
 
   return widget_wndproc(hwnd, msg, wnddata);
   }
@@ -241,8 +251,7 @@ result_t create_autopilot_widget(handle_t parent, uint16_t id, aircraft_t* aircr
   rect_create_ex(label_pt.x, label_pt.y, label_ex.dx, label_ex.dy, &wnd->vs_label);
   rect_create_ex(value_pt.x, value_pt.y, value_ex.dx, value_ex.dy, &wnd->vs_value);
 
-  wnd->base.on_paint_background = on_paint_background;
-  wnd->base.on_paint_foreground = on_paint_foreground;
+  wnd->base.on_paint = on_paint;
 
   if (out != 0)
     *out = hndl;
