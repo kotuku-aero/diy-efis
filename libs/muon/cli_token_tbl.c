@@ -1,6 +1,6 @@
 /*
 diy-efis
-Copyright (C) 2016 Kotuku Aerospace Limited
+Copyright (C) 2016-2022 Kotuku Aerospace Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,10 +28,14 @@ providers.
 
 If any file has a copyright notice or portions of code have been used
 and the original copyright notice is not yet transcribed to the repository
-then the origional copyright notice is to be respected.
+then the original copyright notice is to be respected.
 
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
+
+If you wish to use any of this code in a commercial application then
+you must obtain a licence from the copyright holder.  Contact
+support@kotuku.aero for information on the commercial licences.
 */
 /**
  * \file     cli_token_tbl.c
@@ -69,18 +73,18 @@ it must be removed as soon as possible after the code fragment is identified.
 #include <string.h>
 
 /********** Token match functions **********/
-extern result_t cli_match_root(cli_t *context, cli_token_t *token, cli_node_t *node, bool *is_complete);
-extern result_t cli_match_end(cli_t *context, cli_token_t *token, cli_node_t *node, bool *is_complete);
-extern result_t cli_match_keyword(cli_t *context, cli_token_t *token, cli_node_t *node, bool *is_complete);
-extern result_t cli_match_string(cli_t *context, cli_token_t *token, cli_node_t *node, bool *is_complete);
-extern result_t cli_match_path(cli_t *context, cli_token_t *token, cli_node_t *node, bool *is_complete);
-extern result_t cli_match_uint(cli_t *context, cli_token_t *token, cli_node_t *node, bool *is_complete);
-extern result_t cli_match_int(cli_t *context, cli_token_t *token, cli_node_t *node, bool *is_complete);
-extern result_t cli_match_float(cli_t *context, cli_token_t *token, cli_node_t *node, bool *is_complete);
-extern result_t cli_match_script(cli_t *context, cli_token_t *token, cli_node_t *node, bool *is_complete);
-extern result_t cli_match_matrix(cli_t *context, cli_token_t *token, cli_node_t *node, bool *is_complete);
-extern result_t cli_match_xyz(cli_t *context, cli_token_t *token, cli_node_t *node, bool *is_complete);
-extern result_t cli_match_enum(cli_t *context, cli_token_t *token, cli_node_t *node, bool *is_complete);
+extern result_t cli_match_root(cli_t *context, cli_token_t *token, const cli_node_t *node, bool *is_complete);
+extern result_t cli_match_end(cli_t *context, cli_token_t *token, const cli_node_t *node, bool *is_complete);
+extern result_t cli_match_keyword(cli_t *context, cli_token_t *token, const cli_node_t *node, bool *is_complete);
+extern result_t cli_match_string(cli_t *context, cli_token_t *token, const cli_node_t *node, bool *is_complete);
+extern result_t cli_match_path(cli_t *context, cli_token_t *token, const cli_node_t *node, bool *is_complete);
+extern result_t cli_match_uint(cli_t *context, cli_token_t *token, const cli_node_t *node, bool *is_complete);
+extern result_t cli_match_int(cli_t *context, cli_token_t *token, const cli_node_t *node, bool *is_complete);
+extern result_t cli_match_float(cli_t *context, cli_token_t *token, const cli_node_t *node, bool *is_complete);
+extern result_t cli_match_script(cli_t *context, cli_token_t *token, const cli_node_t *node, bool *is_complete);
+extern result_t cli_match_matrix(cli_t *context, cli_token_t *token, const cli_node_t *node, bool *is_complete);
+extern result_t cli_match_xyz(cli_t *context, cli_token_t *token, const cli_node_t *node, bool *is_complete);
+extern result_t cli_match_enum(cli_t *context, cli_token_t *token, const cli_node_t *node, bool *is_complete);
 
 /**
  * \brief    An table of match functions.

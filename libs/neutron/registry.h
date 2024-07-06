@@ -1,38 +1,3 @@
-/*
-diy-efis
-Copyright (C) 2016 Kotuku Aerospace Limited
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-If a file does not contain a copyright header, either because it is incomplete
-or a binary file then the above copyright notice will apply.
-
-Portions of this repository may have further copyright notices that may be
-identified in the respective files.  In those cases the above copyright notice and
-the GPL3 are subservient to that copyright notice.
-
-Portions of this repository contain code fragments from the following
-providers.
-
-
-If any file has a copyright notice or portions of code have been used
-and the original copyright notice is not yet transcribed to the repository
-then the origional copyright notice is to be respected.
-
-If any material is included in the repository that is not open source
-it must be removed as soon as possible after the code fragment is identified.
-*/
 #ifndef __registry_h__
 #define	__registry_h__
 
@@ -42,20 +7,25 @@ extern "C"
 #endif
   
 #include "neutron.h"
+
   // a memid descrbes a block which id 32 bytes
 #define BLOCK_SHIFT 5
 #define BLOCK_SIZE (1 << BLOCK_SHIFT)
 #define BLOCK_MASK (BLOCK_SIZE -1)
 #define BLOCKS_PER_SECTOR 4
+#define BLOCKS_PER_SECTOR_SHIFT 2
 #define SECTOR_SIZE 128
 #define SECTOR_MASK (SECTOR_SIZE-1)
 #define SECTOR_SHIFT 7
 #define SECTORS_PER_CLUSTER 16
 #define CLUSTER_MASK (SECTORS_PER_CLUSTER-1)
 #define CLUSTER_SHIFT 4
-#define CLUSTER_SIZE (SECTOR_SIZE * SECTORS_PER_CLUSTER)
+#define CLUSTER_SIZE ((SECTOR_SIZE << CLUSTER_SHIFT))
+  // a small file is < 2k and is 1 extent
+  // a large file is up to 32k which is 16 clusters
+#define MAX_REGSTREAM_LENGTH (CLUSTER_SIZE << CLUSTER_SHIFT)
   // this field is 28 bytes long
-typedef struct _can_field_definition_t {
+typedef struct _field_definition_t {
   // Length MUST be the first 2 bytes
 	uint16_t length;                // sizeof(field_type_x)
 	memid_t memid;              		// memory ID used to access this parameter
@@ -65,6 +35,16 @@ typedef struct _can_field_definition_t {
 	char name[REG_NAME_MAX+1];     	// Name of the parameter 0 terminated
 	uint8_t data_type;              // type of data stored or published
 	} field_definition_t;
+  
+typedef struct _field_int8_t {
+	field_definition_t hdr;
+	int8_t value;
+	} field_int8_t;
+  
+typedef struct _field_uint8_t {
+	field_definition_t hdr;
+	uint8_t value;
+	} field_uint8_t;
   
 typedef struct _field_int16_t {
 	field_definition_t hdr;
@@ -131,17 +111,18 @@ typedef struct _field_bool_t {
   } field_bool_t;
 
 // total size is 64 bytes
+// the system supports up to 
 typedef struct _field_stream_t {
   field_definition_t hdr;
-  // length of the stream.  Will be 0..65535
-  uint16_t length;
-  // extent of the file.  Can be > length but never less
-  uint16_t extent;
+  uint16_t length;      // length of the stream, up to 65535 bytes
+  uint16_t extent;      // extent of the file.  Can be > length but never less
   memid_t sectors[SECTORS_PER_CLUSTER];
   } field_stream_t;
 
 typedef union {
   field_key_t key_f;
+  field_int8_t int8_f;
+  field_uint8_t uint8_f;
   field_int16_t int16_f;
   field_uint16_t uint16_f;
   field_int32_t int32_f;

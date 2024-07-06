@@ -1,7 +1,7 @@
 #ifndef __neutron_cli_h__
 #define __neutron_cli_h__
 /* This is an auto-generated file by cli */
-#include "muon.h"
+#include "../muon/muon.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -9,41 +9,43 @@ extern "C" {
 
 extern cli_node_t neutron_cli_root;
 
-extern result_t uint16_name_value_action(cli_t *context, const char * uint16_name_, uint16_t uint16_name_value_);
+extern result_t config_uint8_name_value_action(cli_t *context, const char * config_uint8_name_, uint16_t config_uint8_name_value_);
 
-extern result_t int16_name_value_action(cli_t *context, const char * int16_name_, int16_t int16_name_value_);
+extern result_t config_int8_name_value_action(cli_t *context, const char * config_int8_name_, int16_t config_int8_name_value_);
 
-extern result_t uint32_name_value_action(cli_t *context, const char * uint32_name_, uint32_t uint32_name_value_);
+extern result_t config_uint16_name_value_action(cli_t *context, const char * config_uint16_name_, uint16_t config_uint16_name_value_);
 
-extern result_t int32_name_value_action(cli_t *context, const char * int32_name_, int32_t int32_name_value_);
+extern result_t config_int16_name_value_action(cli_t *context, const char * config_int16_name_, int16_t config_int16_name_value_);
 
-extern result_t xyz_name_value_action(cli_t *context, const char * xyz_name_, xyz_t *xyz_name_value_);
+extern result_t config_uint32_name_value_action(cli_t *context, const char * config_uint32_name_, uint32_t config_uint32_name_value_);
 
-extern result_t matrix_name_value_action(cli_t *context, const char * matrix_name_, matrix_t *matrix_name_value_);
+extern result_t config_int32_name_value_action(cli_t *context, const char * config_int32_name_, int32_t config_int32_name_value_);
 
-extern result_t string_name_value_action(cli_t *context, const char * string_name_, const char * string_name_value_);
+extern result_t config_xyz_name_value_action(cli_t *context, const char * config_xyz_name_, xyz_t *config_xyz_name_value_);
 
-extern result_t stream_name_value_action(cli_t *context, const char * stream_name_, const char * stream_name_value_);
+extern result_t config_matrix_name_value_action(cli_t *context, const char * config_matrix_name_, matrix_t *config_matrix_name_value_);
 
-extern result_t bool_name_value_action(cli_t *context, const char * bool_name_, uint16_t bool_name_value_);
+extern result_t config_string_name_value_action(cli_t *context, const char * config_string_name_, const char * config_string_name_value_);
+
+extern result_t config_bool_name_value_action(cli_t *context, const char * config_bool_name_, uint16_t config_bool_name_value_);
 
 extern const enum_t booleans[];
 
-extern result_t float_name_value_action(cli_t *context, const char * float_name_, float float_name_value_);
+extern result_t config_float_name_value_action(cli_t *context, const char * config_float_name_, float config_float_name_value_);
 
-extern result_t edit_name_action(cli_t *context, const char * edit_name_);
+extern result_t config_rm_name_action(cli_t *context, const char * config_rm_name_);
 
-extern result_t cat_name_action(cli_t *context, const char * cat_name_);
+extern result_t config_mkdir_path_action(cli_t *context, const char * config_mkdir_path_);
 
-extern result_t rm_name_action(cli_t *context, const char * rm_name_);
+extern result_t config_rmdir_path_action(cli_t *context, const char * config_rmdir_path_);
 
-extern result_t mkdir_path_action(cli_t *context, const char * mkdir_path_);
+extern result_t config_cd_path_action(cli_t *context, const char * config_cd_path_);
 
-extern result_t rmdir_path_action(cli_t *context, const char * rmdir_path_);
+extern result_t config_ls_path_recursive_action(cli_t *context, const char * config_ls_path_);
 
-extern result_t cd_path_action(cli_t *context, const char * cd_path_);
+extern result_t config_exit_action(cli_t *context);
 
-extern result_t ls_path_recursive_action(cli_t *context, const char * ls_path_);
+extern result_t config_action(cli_t *context);
 
 extern result_t neutron_ls_id_action(cli_t *context, uint16_t *neutron_ls_id_);
 
@@ -101,7 +103,7 @@ extern result_t neutron_exit_action(cli_t *context);
 
 extern result_t neutron_action(cli_t *context);
 
-extern result_t send_can_id_type_session_val1_val2_val3_val4_action(cli_t *context, uint16_t send_can_id_, uint16_t send_can_id_type_, uint16_t send_can_id_type_session_, const char * send_can_id_type_session_val1_, const char * send_can_id_type_session_val1_val2_, const char * send_can_id_type_session_val1_val2_val3_, const char * send_can_id_type_session_val1_val2_val3_val4_);
+extern result_t send_can_id_type_val1_val2_val3_val4_action(cli_t *context, uint16_t send_can_id_, uint16_t send_can_id_type_, const char * send_can_id_type_val1_, const char * send_can_id_type_val1_val2_, const char * send_can_id_type_val1_val2_val3_, const char * send_can_id_type_val1_val2_val3_val4_);
 
 extern const enum_t can_types[];
 

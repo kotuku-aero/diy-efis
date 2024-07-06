@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\libs\muon\cansend.c" />
+    <ClCompile Include="..\..\libs\muon\cli.c" />
+    <ClCompile Include="..\..\libs\muon\cli_enumerations.c" />
+    <ClCompile Include="..\..\libs\muon\cli_fsm.c" />
+    <ClCompile Include="..\..\libs\muon\cli_line.c" />
+    <ClCompile Include="..\..\libs\muon\cli_publisher.c" />
+    <ClCompile Include="..\..\libs\muon\cli_regedit.c" />
+    <ClCompile Include="..\..\libs\muon\cli_string.c" />
+    <ClCompile Include="..\..\libs\muon\cli_token.c" />
+    <ClCompile Include="..\..\libs\muon\cli_token_tbl.c" />
+    <ClCompile Include="..\..\libs\muon\neutron_cli.c" />
+    <ClCompile Include="..\..\libs\muon\neutron_cli_impl.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\libs\muon\cli.h" />
+    <ClInclude Include="..\..\libs\muon\cli_enumerations.h" />
+    <ClInclude Include="..\..\libs\muon\muon.h" />
+    <ClInclude Include="..\..\libs\muon\neutron_cli.h" />
+    <ClInclude Include="..\..\libs\muon\neutron_cli_impl.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\libs\muon\neutron.cli" />
+  </ItemGroup>
+</Project>

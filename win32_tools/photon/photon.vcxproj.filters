@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="..\..\libs\photon\photon.h" />
+    <ClInclude Include="..\..\libs\photon\photon_priv.h" />
+    <ClInclude Include="..\..\libs\photon\window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\libs\photon\canvas.c" />
+    <ClCompile Include="..\..\libs\photon\font.c" />
+    <ClCompile Include="..\..\libs\photon\photon.c" />
+    <ClCompile Include="..\..\libs\photon\png_canvas.c" />
+    <ClCompile Include="..\..\libs\photon\screen.c" />
+    <ClCompile Include="..\..\libs\photon\touch.c" />
+    <ClCompile Include="..\..\libs\photon\window.c" />
+    <ClCompile Include="..\..\libs\photon\polygon.c" />
+    <ClCompile Include="..\..\libs\photon\polyline.c" />
+    <ClCompile Include="..\..\libs\photon\rotate_point.c" />
+    <ClCompile Include="..\..\libs\photon\ellipse.c" />
+    <ClCompile Include="..\..\libs\photon\rectangle.c" />
+    <ClCompile Include="..\..\libs\photon\round_rect.c" />
+    <ClCompile Include="..\..\libs\photon\bit_blt.c" />
+    <ClCompile Include="..\..\libs\photon\arc.c" />
+    <ClCompile Include="..\..\libs\photon\pie.c" />
+    <ClCompile Include="..\..\libs\photon\clip_path.c" />
+    <ClCompile Include="..\..\libs\photon\clip_line.c" />
+  </ItemGroup>
+</Project>

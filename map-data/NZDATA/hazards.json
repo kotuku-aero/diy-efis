@@ -1,0 +1,3350 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.02176600000038,
+            -36.325716999999855
+          ]
+        ]
+      },
+      "properties": {
+        "id": "2",
+        "type": "KITE FLYING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.562717000003,
+            -37.12020199999832
+          ]
+        ]
+      },
+      "properties": {
+        "id": "3",
+        "type": "KITE FLYING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            178.0798790011587,
+            -38.68685899785229
+          ]
+        ]
+      },
+      "properties": {
+        "id": "4",
+        "type": "KITE FLYING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            176.8967700003453,
+            -39.388397999540445
+          ]
+        ]
+      },
+      "properties": {
+        "id": "5",
+        "type": "KITE FLYING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            176.92512500035406,
+            -39.52793699951619
+          ]
+        ]
+      },
+      "properties": {
+        "id": "6",
+        "type": "KITE FLYING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.9916640000952,
+            -37.455185999916395
+          ]
+        ]
+      },
+      "properties": {
+        "id": "8",
+        "type": "KITE FLYING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            176.14514000012406,
+            -37.610409999885995
+          ]
+        ]
+      },
+      "properties": {
+        "id": "9",
+        "type": "KITE FLYING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.7015500000047,
+            -36.57902699999733
+          ]
+        ]
+      },
+      "properties": {
+        "id": "10",
+        "type": "KITE FLYING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            176.34005100017052,
+            -37.71200499983543
+          ]
+        ]
+      },
+      "properties": {
+        "id": "11",
+        "type": "KITE FLYING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            176.603967000254,
+            -37.82279899973854
+          ]
+        ]
+      },
+      "properties": {
+        "id": "12",
+        "type": "KITE FLYING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            176.77982500032462,
+            -37.884151999650804
+          ]
+        ]
+      },
+      "properties": {
+        "id": "13",
+        "type": "KITE FLYING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            172.894135,
+            -34.68998399999999
+          ]
+        ]
+      },
+      "properties": {
+        "id": "15",
+        "type": "KITE FLYING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            173.042296,
+            -34.857084
+          ]
+        ]
+      },
+      "properties": {
+        "id": "16",
+        "type": "KITE FLYING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            173.426456,
+            -34.978249000000005
+          ]
+        ]
+      },
+      "properties": {
+        "id": "17",
+        "type": "KITE FLYING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            168.70263100838292,
+            -45.353955312404395
+          ]
+        ]
+      },
+      "properties": {
+        "id": "231",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            170.2767689999653,
+            -45.87997699992849
+          ]
+        ]
+      },
+      "properties": {
+        "id": "80",
+        "type": "MODEL ACFT",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            173.047658,
+            -41.11009400000001
+          ]
+        ]
+      },
+      "properties": {
+        "id": "82",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            172.98462300000003,
+            -41.224938
+          ]
+        ]
+      },
+      "properties": {
+        "id": "83",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            172.98717800000003,
+            -41.103431
+          ]
+        ]
+      },
+      "properties": {
+        "id": "84",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.12377457751552,
+            -41.147255728577484
+          ]
+        ]
+      },
+      "properties": {
+        "id": "76",
+        "type": "GLIDER ACTIVITY",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.1956342931702,
+            -41.10052839242184
+          ]
+        ]
+      },
+      "properties": {
+        "id": "75",
+        "type": "GLIDER ACTIVITY",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.21760384397362,
+            -40.33857417535827
+          ]
+        ]
+      },
+      "properties": {
+        "id": "1",
+        "type": "KITE FLYING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            177.94938078861563,
+            -38.696182517745136
+          ]
+        ]
+      },
+      "properties": {
+        "id": "14",
+        "type": "KITE FLYING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            173.32556167930855,
+            -41.20702827936473
+          ]
+        ]
+      },
+      "properties": {
+        "id": "81",
+        "type": "MODEL ACFT",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            170.00373211734455,
+            -43.986477101588875
+          ]
+        ]
+      },
+      "properties": {
+        "id": "78",
+        "type": "GLIDER ACTIVITY",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            176.55487000020935,
+            -40.01288699972522
+          ]
+        ]
+      },
+      "properties": {
+        "id": "85",
+        "type": "GLIDER ACTIVITY",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            176.83148500030975,
+            -39.7386559995762
+          ]
+        ]
+      },
+      "properties": {
+        "id": "86",
+        "type": "MODEL ACFT",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            176.93580400035754,
+            -39.57153499950698
+          ]
+        ]
+      },
+      "properties": {
+        "id": "87",
+        "type": "MODEL ACFT",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            176.9283880003551,
+            -39.544141999513315
+          ]
+        ]
+      },
+      "properties": {
+        "id": "88",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.32055100002435,
+            -37.165502999982145
+          ]
+        ]
+      },
+      "properties": {
+        "id": "90",
+        "type": "SENSITIVE FAUNA",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.19982100001684,
+            -40.12774799998442
+          ]
+        ]
+      },
+      "properties": {
+        "id": "91",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.28209100002033,
+            -40.301596999980404
+          ]
+        ]
+      },
+      "properties": {
+        "id": "92",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            176.14911300011985,
+            -38.69423999987695
+          ]
+        ]
+      },
+      "properties": {
+        "id": "93",
+        "type": "GLIDER ACTIVITY",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.70627800005053,
+            -40.086829999946175
+          ]
+        ]
+      },
+      "properties": {
+        "id": "94",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.48692400003176,
+            -40.47381999996689
+          ]
+        ]
+      },
+      "properties": {
+        "id": "95",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            172.955835,
+            -43.585623999999996
+          ]
+        ]
+      },
+      "properties": {
+        "id": "97",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.68444700005324,
+            -37.30583399995678
+          ]
+        ]
+      },
+      "properties": {
+        "id": "99",
+        "type": "GLIDER ACTIVITY",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.74640200005987,
+            -37.55083999994963
+          ]
+        ]
+      },
+      "properties": {
+        "id": "100",
+        "type": "GLIDER ACTIVITY",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.89050400007827,
+            -37.81920599993034
+          ]
+        ]
+      },
+      "properties": {
+        "id": "101",
+        "type": "GLIDER ACTIVITY",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            176.10105200011517,
+            -37.56130299989558
+          ]
+        ]
+      },
+      "properties": {
+        "id": "102",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            176.3799950001816,
+            -37.72540799982312
+          ]
+        ]
+      },
+      "properties": {
+        "id": "103",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.8993380000076,
+            -40.87470399999329
+          ]
+        ]
+      },
+      "properties": {
+        "id": "104",
+        "type": "SENSITIVE FAUNA",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.62434900004098,
+            -41.05786899995285
+          ]
+        ]
+      },
+      "properties": {
+        "id": "105",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            177.96168000106894,
+            -38.687809998133204
+          ]
+        ]
+      },
+      "properties": {
+        "id": "106",
+        "type": "MODEL ACFT",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.02504000000033,
+            -41.578399999999824
+          ]
+        ]
+      },
+      "properties": {
+        "id": "107",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            172.26083199999997,
+            -43.26604999999996
+          ]
+        ]
+      },
+      "properties": {
+        "id": "108",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            172.1574899999999,
+            -43.33869299999993
+          ]
+        ]
+      },
+      "properties": {
+        "id": "109",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            172.08668999999983,
+            -43.316237999999906
+          ]
+        ]
+      },
+      "properties": {
+        "id": "110",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            172.31222299999993,
+            -43.33305799999997
+          ]
+        ]
+      },
+      "properties": {
+        "id": "111",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.20455100001828,
+            -37.821155999986274
+          ]
+        ]
+      },
+      "properties": {
+        "id": "112",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            172.16832399999993,
+            -43.45357199999995
+          ]
+        ]
+      },
+      "properties": {
+        "id": "116",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            169.96503999993317,
+            -44.49449799986915
+          ]
+        ]
+      },
+      "properties": {
+        "id": "118",
+        "type": "MODEL ACFT",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            169.67009399990354,
+            -45.0411399997676
+          ]
+        ]
+      },
+      "properties": {
+        "id": "121",
+        "type": "MET BALLOON",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            171.4344939999976,
+            -44.07564099999753
+          ]
+        ]
+      },
+      "properties": {
+        "id": "122",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            171.3974659999973,
+            -44.10178699999718
+          ]
+        ]
+      },
+      "properties": {
+        "id": "123",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.4205770000275,
+            -40.52737499997175
+          ]
+        ]
+      },
+      "properties": {
+        "id": "124",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.31665800002185,
+            -40.49800499997832
+          ]
+        ]
+      },
+      "properties": {
+        "id": "125",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.32751400002246,
+            -40.426533999977785
+          ]
+        ]
+      },
+      "properties": {
+        "id": "126",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.05179200001263,
+            -37.00512699999156
+          ]
+        ]
+      },
+      "properties": {
+        "id": "127",
+        "type": "MODEL ACFT",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.05981111565595,
+            -41.37014693987549
+          ]
+        ]
+      },
+      "properties": {
+        "id": "128",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.93236596818912,
+            -41.41972237257883
+          ]
+        ]
+      },
+      "properties": {
+        "id": "129",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.67804094109064,
+            -41.33285674762012
+          ]
+        ]
+      },
+      "properties": {
+        "id": "130",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.11573184423497,
+            -35.2389859091165
+          ]
+        ]
+      },
+      "properties": {
+        "id": "131",
+        "type": "PARASAILING",
+        "designator": null,
+        "elevation": 800,
+        "note": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.1072712571878,
+            -35.27636413333794
+          ]
+        ]
+      },
+      "properties": {
+        "id": "132",
+        "type": "PARASAILING",
+        "designator": null,
+        "elevation": 800,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.4651485570024,
+            -36.47637382770569
+          ]
+        ]
+      },
+      "properties": {
+        "id": "133",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.43355478030406,
+            -36.88748913635885
+          ]
+        ]
+      },
+      "properties": {
+        "id": "134",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.607790309433,
+            -36.46786465807048
+          ]
+        ]
+      },
+      "properties": {
+        "id": "136",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.77923233113864,
+            -36.75426496249325
+          ]
+        ]
+      },
+      "properties": {
+        "id": "138",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.80182238720303,
+            -36.79158299125463
+          ]
+        ]
+      },
+      "properties": {
+        "id": "139",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.8215364026356,
+            -36.82646047384271
+          ]
+        ]
+      },
+      "properties": {
+        "id": "140",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.8819645382355,
+            -36.84116142250696
+          ]
+        ]
+      },
+      "properties": {
+        "id": "141",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.6362074290801,
+            -37.25609570746871
+          ]
+        ]
+      },
+      "properties": {
+        "id": "142",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.8575760897812,
+            -37.81109608613225
+          ]
+        ]
+      },
+      "properties": {
+        "id": "143",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.930189205173,
+            -39.897690110323445
+          ]
+        ]
+      },
+      "properties": {
+        "id": "144",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.9362770911079,
+            -41.00120787797376
+          ]
+        ]
+      },
+      "properties": {
+        "id": "145",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.8974203541719,
+            -41.018204360483125
+          ]
+        ]
+      },
+      "properties": {
+        "id": "146",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.84446899452016,
+            -41.05983722209508
+          ]
+        ]
+      },
+      "properties": {
+        "id": "147",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.14595504213213,
+            -41.14839980365175
+          ]
+        ]
+      },
+      "properties": {
+        "id": "148",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.22444234692995,
+            -37.52694398846828
+          ]
+        ]
+      },
+      "properties": {
+        "id": "149",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.14776374018138,
+            -37.26888348924486
+          ]
+        ]
+      },
+      "properties": {
+        "id": "120",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.09273668537156,
+            -37.23142637182204
+          ]
+        ]
+      },
+      "properties": {
+        "id": "119",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.0611895005482,
+            -37.234142470456746
+          ]
+        ]
+      },
+      "properties": {
+        "id": "89",
+        "type": "SENSITIVE FAUNA",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.54824573807895,
+            -36.8061331798312
+          ]
+        ]
+      },
+      "properties": {
+        "id": "135",
+        "type": "MODEL ACFT",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.52987322158572,
+            -37.087021656959614
+          ]
+        ]
+      },
+      "properties": {
+        "id": "150",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.08491888434702,
+            -36.89585256196338
+          ]
+        ]
+      },
+      "properties": {
+        "id": "151",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.08618922712154,
+            -36.782525460197434
+          ]
+        ]
+      },
+      "properties": {
+        "id": "152",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.01621000001154,
+            -36.801074999992494
+          ]
+        ]
+      },
+      "properties": {
+        "id": "114",
+        "type": "WINCH",
+        "designator": null,
+        "elevation": 2000,
+        "note": "HANG GLIDING"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.4051391072875,
+            -40.58758604819023
+          ]
+        ]
+      },
+      "properties": {
+        "id": "153",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.80552696520317,
+            -40.34571630172091
+          ]
+        ]
+      },
+      "properties": {
+        "id": "154",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.57781366659108,
+            -40.48396014132542
+          ]
+        ]
+      },
+      "properties": {
+        "id": "155",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.66233764595268,
+            -39.43900074145979
+          ]
+        ]
+      },
+      "properties": {
+        "id": "113",
+        "type": "MET BALLOON",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.84104745663865,
+            -37.65352569879402
+          ]
+        ]
+      },
+      "properties": {
+        "id": "156",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.96124541953822,
+            -37.41479198129855
+          ]
+        ]
+      },
+      "properties": {
+        "id": "157",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.87669659590574,
+            -37.01387870508951
+          ]
+        ]
+      },
+      "properties": {
+        "id": "158",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            176.26970944871783,
+            -38.37552399337115
+          ]
+        ]
+      },
+      "properties": {
+        "id": "159",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            176.9148720394555,
+            -39.698864333534026
+          ]
+        ]
+      },
+      "properties": {
+        "id": "160",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            176.92448586671836,
+            -39.4788647301385
+          ]
+        ]
+      },
+      "properties": {
+        "id": "161",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            177.03095006304335,
+            -37.943704717700655
+          ]
+        ]
+      },
+      "properties": {
+        "id": "163",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            176.17646399496357,
+            -37.62863501160199
+          ]
+        ]
+      },
+      "properties": {
+        "id": "164",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.15443967187755,
+            -41.65419904646501
+          ]
+        ]
+      },
+      "properties": {
+        "id": "166",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.23354889099798,
+            -41.73012741185312
+          ]
+        ]
+      },
+      "properties": {
+        "id": "167",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            173.75810300859152,
+            -41.32711750713673
+          ]
+        ]
+      },
+      "properties": {
+        "id": "168",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            173.68873848382478,
+            -41.287782587773144
+          ]
+        ]
+      },
+      "properties": {
+        "id": "169",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            173.3142384864416,
+            -41.311376546705546
+          ]
+        ]
+      },
+      "properties": {
+        "id": "170",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            168.46368935098633,
+            -45.63061011392755
+          ]
+        ]
+      },
+      "properties": {
+        "id": "115",
+        "type": "GLIDER ACTIVITY",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            169.11438699981477,
+            -44.681514999421694
+          ]
+        ]
+      },
+      "properties": {
+        "id": "98",
+        "type": "WINCH",
+        "designator": null,
+        "elevation": 3500,
+        "note": "HANG GLIDING"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            172.45348719613193,
+            -43.23164246549691
+          ]
+        ]
+      },
+      "properties": {
+        "id": "96",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.74253325857197,
+            -36.82675985867017
+          ]
+        ]
+      },
+      "properties": {
+        "id": "137",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            173.3512159924421,
+            -41.21778474728228
+          ]
+        ]
+      },
+      "properties": {
+        "id": "171",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            173.22277281228293,
+            -41.35239827683954
+          ]
+        ]
+      },
+      "properties": {
+        "id": "172",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            173.07585711946587,
+            -41.19700931668328
+          ]
+        ]
+      },
+      "properties": {
+        "id": "173",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            173.09414751748596,
+            -41.75195102038975
+          ]
+        ]
+      },
+      "properties": {
+        "id": "174",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            172.80166405576145,
+            -42.597550956935976
+          ]
+        ]
+      },
+      "properties": {
+        "id": "175",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            172.83453610769936,
+            -42.489844365526544
+          ]
+        ]
+      },
+      "properties": {
+        "id": "176",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            172.93644220579824,
+            -41.579305033998935
+          ]
+        ]
+      },
+      "properties": {
+        "id": "177",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            172.85139651644536,
+            -41.40168076200335
+          ]
+        ]
+      },
+      "properties": {
+        "id": "178",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            172.86148316439252,
+            -41.02567625151583
+          ]
+        ]
+      },
+      "properties": {
+        "id": "179",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            172.67477473335055,
+            -41.425547017403105
+          ]
+        ]
+      },
+      "properties": {
+        "id": "180",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            172.73365682953576,
+            -41.91989595608812
+          ]
+        ]
+      },
+      "properties": {
+        "id": "77",
+        "type": "GLIDER ACTIVITY",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            172.71672991047402,
+            -43.83073403467448
+          ]
+        ]
+      },
+      "properties": {
+        "id": "7",
+        "type": "KITE FLYING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            173.00223312864793,
+            -43.78151132106377
+          ]
+        ]
+      },
+      "properties": {
+        "id": "181",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            172.83526650814434,
+            -43.78105179825854
+          ]
+        ]
+      },
+      "properties": {
+        "id": "182",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            172.78070446028548,
+            -43.56445647837949
+          ]
+        ]
+      },
+      "properties": {
+        "id": "183",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            172.70214729835703,
+            -43.59792606157319
+          ]
+        ]
+      },
+      "properties": {
+        "id": "184",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            172.637589934609,
+            -43.643764498427544
+          ]
+        ]
+      },
+      "properties": {
+        "id": "185",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            172.59227501269902,
+            -43.815845816340804
+          ]
+        ]
+      },
+      "properties": {
+        "id": "186",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            172.49093592183277,
+            -41.72709039745106
+          ]
+        ]
+      },
+      "properties": {
+        "id": "188",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            171.7767506781807,
+            -41.73853360579881
+          ]
+        ]
+      },
+      "properties": {
+        "id": "189",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            171.84061424645526,
+            -41.64538592293467
+          ]
+        ]
+      },
+      "properties": {
+        "id": "190",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            171.6723607084622,
+            -43.15543936268747
+          ]
+        ]
+      },
+      "properties": {
+        "id": "191",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            171.33266816316228,
+            -42.41245104671729
+          ]
+        ]
+      },
+      "properties": {
+        "id": "192",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            171.25867156728089,
+            -42.348732646034726
+          ]
+        ]
+      },
+      "properties": {
+        "id": "193",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            171.0115445873775,
+            -44.745061275426494
+          ]
+        ]
+      },
+      "properties": {
+        "id": "194",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            170.89657427743623,
+            -44.633904668213184
+          ]
+        ]
+      },
+      "properties": {
+        "id": "195",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            170.61189792681338,
+            -43.951776704706205
+          ]
+        ]
+      },
+      "properties": {
+        "id": "196",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            170.6096050706506,
+            -44.209667377665916
+          ]
+        ]
+      },
+      "properties": {
+        "id": "197",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            170.25717322021157,
+            -44.13817271814542
+          ]
+        ]
+      },
+      "properties": {
+        "id": "198",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            169.9331846260102,
+            -43.88009984313585
+          ]
+        ]
+      },
+      "properties": {
+        "id": "117",
+        "type": "GLIDER ACTIVITY",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            170.09140031696376,
+            -44.39392194222049
+          ]
+        ]
+      },
+      "properties": {
+        "id": "199",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            169.9850548146472,
+            -44.519233039186915
+          ]
+        ]
+      },
+      "properties": {
+        "id": "200",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            169.77927218245725,
+            -44.227762898949784
+          ]
+        ]
+      },
+      "properties": {
+        "id": "201",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            169.38266520716775,
+            -44.77187826579712
+          ]
+        ]
+      },
+      "properties": {
+        "id": "202",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            169.22032065061438,
+            -44.62238867028109
+          ]
+        ]
+      },
+      "properties": {
+        "id": "203",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            169.1662152321478,
+            -44.6916278941918
+          ]
+        ]
+      },
+      "properties": {
+        "id": "204",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            169.05134107693945,
+            -44.69369466472929
+          ]
+        ]
+      },
+      "properties": {
+        "id": "205",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            169.1799139221348,
+            -44.73308852591548
+          ]
+        ]
+      },
+      "properties": {
+        "id": "206",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            169.07552286612415,
+            -44.87391256543858
+          ]
+        ]
+      },
+      "properties": {
+        "id": "207",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            168.9868690377796,
+            -44.867561139166725
+          ]
+        ]
+      },
+      "properties": {
+        "id": "208",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            168.89758454631001,
+            -44.632139327124555
+          ]
+        ]
+      },
+      "properties": {
+        "id": "210",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            172.30331495291256,
+            -43.59039756403164
+          ]
+        ]
+      },
+      "properties": {
+        "id": "187",
+        "type": "MODEL ACFT",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            168.74059155972404,
+            -45.26368972357738
+          ]
+        ]
+      },
+      "properties": {
+        "id": "212",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            168.42774890815912,
+            -45.04949277249596
+          ]
+        ]
+      },
+      "properties": {
+        "id": "213",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.81833333333657,
+            -37.950833333331154
+          ]
+        ]
+      },
+      "properties": {
+        "id": "214",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.8861111111151,
+            -37.766111111108415
+          ]
+        ]
+      },
+      "properties": {
+        "id": "215",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.603055555578,
+            -37.61999999998166
+          ]
+        ]
+      },
+      "properties": {
+        "id": "216",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.5002777777957,
+            -37.89361111109644
+          ]
+        ]
+      },
+      "properties": {
+        "id": "217",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.76805555558641,
+            -38.022222222195
+          ]
+        ]
+      },
+      "properties": {
+        "id": "218",
+        "type": "FLIGHT TRAINING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.1111881411996,
+            -35.25636332408815
+          ]
+        ]
+      },
+      "properties": {
+        "id": "219",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            168.64682068131927,
+            -45.060600488244035
+          ]
+        ]
+      },
+      "properties": {
+        "id": "211",
+        "type": "PARASAILING",
+        "designator": null,
+        "elevation": 1500,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            168.76943576145263,
+            -44.933786721152764
+          ]
+        ]
+      },
+      "properties": {
+        "id": "220",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            168.90752330610948,
+            -44.960560994673315
+          ]
+        ]
+      },
+      "properties": {
+        "id": "221",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            168.67537752506823,
+            -45.12507688556588
+          ]
+        ]
+      },
+      "properties": {
+        "id": "222",
+        "type": "PARASAILING",
+        "designator": null,
+        "elevation": 800,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            169.22337221992032,
+            -45.0070944397534
+          ]
+        ]
+      },
+      "properties": {
+        "id": "225",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            168.72283055990405,
+            -45.326752779475434
+          ]
+        ]
+      },
+      "properties": {
+        "id": "226",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.93083127226302,
+            -41.231110106919786
+          ]
+        ]
+      },
+      "properties": {
+        "id": "227",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            175.4355547457124,
+            -41.00639020652971
+          ]
+        ]
+      },
+      "properties": {
+        "id": "228",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            177.54021633069766,
+            -38.27080016371012
+          ]
+        ]
+      },
+      "properties": {
+        "id": "229",
+        "type": "WINCH",
+        "designator": null,
+        "elevation": 4000,
+        "note": "HANG GLIDING"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [
+            174.0250568579638,
+            -41.295223362686684
+          ]
+        ]
+      },
+      "properties": {
+        "id": "230",
+        "type": "HANG GLIDING",
+        "designator": null,
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          170.09841761764852,
+          -43.32873601917443
+        ]
+      },
+      "properties": {
+        "id": "101003486939625",
+        "type": "PLA",
+        "designator": "P717",
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          168.74883570479477,
+          -45.08568138852437
+        ]
+      },
+      "properties": {
+        "id": "101000787817785",
+        "type": "PLA",
+        "designator": "P715",
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          172.75860925711422,
+          -43.565291708164146
+        ]
+      },
+      "properties": {
+        "id": "400001515323534",
+        "type": "PLA",
+        "designator": "P812",
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          174.05818643710293,
+          -35.226924200239566
+        ]
+      },
+      "properties": {
+        "id": "400001565256552",
+        "type": "PLA",
+        "designator": "P134",
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          169.30341845487837,
+          -44.69051450032327
+        ]
+      },
+      "properties": {
+        "id": "400001533518257",
+        "type": "PLA",
+        "designator": "P912",
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          174.0833364106343,
+          -35.26667699249528
+        ]
+      },
+      "properties": {
+        "id": "800001372596652",
+        "type": "PLA",
+        "designator": "P132",
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          169.93694556563915,
+          -43.45723608503982
+        ]
+      },
+      "properties": {
+        "id": "101000787817783",
+        "type": "PLA",
+        "designator": "P714",
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          170.1179453746344,
+          -44.25051425937849
+        ]
+      },
+      "properties": {
+        "id": "400001510074228",
+        "type": "PLA",
+        "designator": "P910",
+        "elevation": null,
+        "note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          172.62430384297227,
+          -43.523347239637786
+        ]
+      },
+      "properties": {
+        "id": "101000787817787",
+        "type": "PLA",
+        "designator": "P816",
+        "elevation": null,
+        "note": null
+      }
+    }
+  ]
+}

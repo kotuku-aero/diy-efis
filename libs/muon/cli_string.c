@@ -1,6 +1,6 @@
 /*
 diy-efis
-Copyright (C) 2016 Kotuku Aerospace Limited
+Copyright (C) 2016-2022 Kotuku Aerospace Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,10 +28,14 @@ providers.
 
 If any file has a copyright notice or portions of code have been used
 and the original copyright notice is not yet transcribed to the repository
-then the origional copyright notice is to be respected.
+then the original copyright notice is to be respected.
 
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
+
+If you wish to use any of this code in a commercial application then
+you must obtain a licence from the copyright holder.  Contact
+support@kotuku.aero for information on the commercial licences.
 */
 #include "muon.h"
 
@@ -39,13 +43,14 @@ it must be removed as soon as possible after the code fragment is identified.
 #include <string.h>
 #include <ctype.h>
 
-vector_p string_split(const char *s, char sep)
+charps_t *string_split(const char *s, char sep)
   {
   if(s == 0 || sep == 0)
     return 0;
 
-  vector_p tokens;
-  vector_create(sizeof(const char *), &tokens);
+  charps_t  *tokens;
+  charps_create(&tokens);
+  
   uint16_t len = (uint16_t)strlen(s);
   uint16_t start = 0;
   uint16_t end;
@@ -57,10 +62,11 @@ vector_p string_split(const char *s, char sep)
       {
       if(end > start)
         {
-        str = (char *)neutron_malloc(end - start + 1);
+        neutron_malloc(end - start + 1, (void **)&str);
+
         memcpy(str, &s[start], end - start);
         str[end - start] = 0;
-        vector_push_back(tokens, &str);
+        charps_push_back(tokens, str);
         start = end+1;
         }
       }
@@ -68,30 +74,28 @@ vector_p string_split(const char *s, char sep)
 
   if(end > start && end > 0)
     {
-    str = (char *)neutron_malloc(end - start + 1);
+    neutron_malloc(end - start + 1, (void **)&str);
     memcpy(str, &s[start], end - start);
     str[end - start] = 0;
-    vector_push_back(tokens, &str);
+    charps_push_back(tokens, str);
     }
 
   return tokens;
   }
 
-void kfree_split(vector_p tokens)
+void close_and_free_charps(charps_t *tokens)
   {
   if (tokens == 0)
     return;
 
-  uint16_t len;
-  vector_count(tokens, &len);
+  uint16_t len = charps_count(tokens);
 
   uint16_t i;
   for(i = 0; i < len; i++)
     {
-    char * str;
-    vector_at(tokens, i, &str);
+    char * str = charps_begin(tokens)[i];
     neutron_free(str);
     }
 
-  vector_close(tokens);
+  charps_close(tokens);
   }

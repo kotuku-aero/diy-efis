@@ -1,6 +1,6 @@
 /*
 diy-efis
-Copyright (C) 2016 Kotuku Aerospace Limited
+Copyright (C) 2016-2022 Kotuku Aerospace Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,17 +28,21 @@ providers.
 
 If any file has a copyright notice or portions of code have been used
 and the original copyright notice is not yet transcribed to the repository
-then the origional copyright notice is to be respected.
+then the original copyright notice is to be respected.
 
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
+
+If you wish to use any of this code in a commercial application then
+you must obtain a licence from the copyright holder.  Contact
+support@kotuku.aero for information on the commercial licences.
 */
 #include "neutron_cli_impl.h"
 
 extern const char *node_name;
 static const char *cr_lf = "\r\n";
 
-static void make_prompt(char *prompt, size_t maxlen, const char *dirname)
+void make_prompt(char *prompt, size_t maxlen, char *dirname)
   {
   // the prompt is either the full path or ...\<dirname>\<dirname>
   size_t dirlen = strlen(dirname);
@@ -59,24 +63,23 @@ static void make_prompt(char *prompt, size_t maxlen, const char *dirname)
       dirp++;
     }
   else
-    strcpy(prompt, "/");
+    strcpy(prompt, "");
 
   strncat(prompt, dirp, maxlen);
 
-  neutron_free((void *)dirname);
+  neutron_free(dirname);
   }
 
 static void show_key(handle_t dest, memid_t key, bool full_path, bool recursive, uint16_t *indent)
   {
-  char name[REG_NAME_MAX + 1];
-  const char * path;
-  if(full_path)
+  char name[MAX_PROMPT_LENGTH];
+  char *path = 0;
+  if (full_path)
     path = get_full_path(key);
   else
     {
     reg_query_memid(key, 0, name, 0, 0);
-    path = (char *)neutron_malloc(strlen(name)+1);
-    strcpy((char *)path, name);
+    neutron_strdup(name, 0, &path);
     }
 
   field_datatype type = 0;
@@ -115,25 +118,43 @@ result_t action(cli_t *context)
   return s_ok;
   }
 
-result_t uint16_name_value_action(cli_t *context, const char * name_, uint16_t value_)
+result_t config_uint8_name_value_action(cli_t *context, const char * name_, uint16_t value_)
   {
   if(name_ == 0)
+    return e_bad_parameter;
+
+  // set the value
+  return reg_set_uint8(get_context(context), name_, (uint8_t) value_);
+  }
+
+result_t config_int8_name_value_action(cli_t *context, const char * name_, int16_t value_)
+  {
+  if(name_ == 0)
+    return e_bad_parameter;
+
+  // set the value
+  return reg_set_int8(get_context(context), name_, (int8_t) value_);
+   }
+
+result_t config_uint16_name_value_action(cli_t *context, const char * name_, uint16_t value_)
+  {
+  if (name_ == 0)
     return e_bad_parameter;
 
   // set the value
   return reg_set_uint16(get_context(context), name_, value_);
   }
 
-result_t int16_name_value_action(cli_t *context, const char * name_, int16_t value_)
+result_t config_int16_name_value_action(cli_t *context, const char * name_, int16_t value_)
   {
-  if(name_ == 0)
+  if (name_ == 0)
     return e_bad_parameter;
 
   // set the value
   return reg_set_int16(get_context(context), name_, value_);
-   }
+  }
 
-result_t uint32_name_value_action(cli_t *context, const char * name_, uint32_t value_)
+result_t config_uint32_name_value_action(cli_t *context, const char * name_, uint32_t value_)
   {
   if(name_ == 0)
     return e_bad_parameter;
@@ -142,7 +163,7 @@ result_t uint32_name_value_action(cli_t *context, const char * name_, uint32_t v
   return reg_set_uint32(get_context(context), name_, value_);
   }
 
-result_t int32_name_value_action(cli_t *context, const char * name_, int32_t value_)
+result_t config_int32_name_value_action(cli_t *context, const char * name_, int32_t value_)
   {
   if(name_ == 0)
     return e_bad_parameter;
@@ -150,7 +171,7 @@ result_t int32_name_value_action(cli_t *context, const char * name_, int32_t val
   return reg_set_int32(get_context(context), name_, value_);
   }
 
-result_t xyz_name_value_action(cli_t *context, const char * name_, xyz_t *value_)
+result_t config_xyz_name_value_action(cli_t *context, const char * name_, xyz_t *value_)
   {
   if(name_ == 0 ||
       value_ == 0)
@@ -160,7 +181,7 @@ result_t xyz_name_value_action(cli_t *context, const char * name_, xyz_t *value_
   return reg_set_xyz(get_context(context), name_, value_);
   }
 
-result_t matrix_name_value_action(cli_t *context, const char * name_, matrix_t *value_)
+result_t config_matrix_name_value_action(cli_t *context, const char * name_, matrix_t *value_)
   {
   if(name_ == 0 ||
       value_ == 0)
@@ -170,7 +191,7 @@ result_t matrix_name_value_action(cli_t *context, const char * name_, matrix_t *
   return reg_set_matrix(get_context(context), name_, value_);
   }
 
-result_t string_name_value_action(cli_t *context, const char * name_, const char * value_)
+result_t config_string_name_value_action(cli_t *context, const char * name_, const char * value_)
   {
   if(name_ == 0 ||
       value_ == 0)
@@ -180,69 +201,7 @@ result_t string_name_value_action(cli_t *context, const char * name_, const char
   return reg_set_string(get_context(context), name_, value_);
   }
 
-static result_t stream_cb(cli_t *parser, stream_p stream, vector_p buffer)
-  {
-  result_t result;
-  // the parg is a stream_p
-  char *str;
-  uint16_t len;
-
-  if (failed(result = vector_begin(buffer, (void **)&str)) ||
-    failed(result = vector_count(buffer, &len)) ||
-    failed(result = stream_write(stream, str, len)))
-    return result;
-
-  vector_close(buffer);
-  stream_close(stream);
-
-  return s_ok;
-  }
-
-result_t script_name_value_action(cli_t *context, const char * name, const char *value)
-  {
-  // determine if the value exists.. If so and it ends with a \ then we enter
-  // into user input mode for the stream
-  if (name == 0 || value == 0)
-    return e_bad_parameter;
-
-
-  result_t result;
-  vector_p buffer;
-  stream_p stream;
-  if (failed(result = stream_create(get_context(context), name, &stream)))
-    return result;
-
-  if (failed(result = vector_create(sizeof(char), &buffer)))
-    {
-    stream_close(stream);
-    return result;
-    }
-
-
-  // see if the value ends with a 
-  size_t len = strlen(value);
-  size_t pos;
-  for (pos = 0; pos < len; pos++)
-    {
-    if (pos == len - 1 && value[pos] == '\\')
-      {
-      if (failed(result = cli_user_input(context, "", true, stream, buffer, stream_cb)))
-        {
-        stream_close(stream);
-        vector_close(buffer);
-        return result;
-        }
-
-      return s_ok;
-      }
-    vector_push_back(buffer, &value[pos]);
-    }
-
-  // means was a string without a continuation
-  return stream_cb(context, stream, buffer);
-  }
-
-result_t bool_name_value_action(cli_t *context, const char * name_, uint16_t value_)
+result_t config_bool_name_value_action(cli_t *context, const char * name_, uint16_t value_)
   {
   if(name_ == 0)
     return e_bad_parameter;
@@ -251,7 +210,7 @@ result_t bool_name_value_action(cli_t *context, const char * name_, uint16_t val
   return reg_set_bool(get_context(context), name_, value_ != 0);
   }
 
-result_t float_name_value_action(cli_t *context, const char * name_, float value_)
+result_t config_float_name_value_action(cli_t *context, const char * name_, float value_)
   {
   if(name_ == 0)
     return e_bad_parameter;
@@ -260,46 +219,28 @@ result_t float_name_value_action(cli_t *context, const char * name_, float value
   return reg_set_float(get_context(context), name_, value_);
   }
 
-result_t edit_name_action(cli_t *context, const char * name_)
-  {
-  if(name_ == 0)
-    return e_bad_parameter;
-
-  result_t result;
-
-  stream_p stream;
-  if(failed(stream_open(get_context(context), name_, &stream)))
-    {
-    if(failed(result = stream_create(get_context(context), name_, &stream)))
-      return result;
-    }
-
-  // open the editor and edit the script.
-  return edit_script(context, name_, stream);
-  }
-
-result_t cat_name_action(cli_t *context, const char * name)
+result_t config_cat_name_action(cli_t *context, const char * name)
   {
   result_t result;
 
-  if(name == 0)
+  if (name == 0)
     return e_bad_parameter;
 
-  stream_p stream;
+  handle_t stream;
 
-  if(failed(result = stream_open(get_context(context), name, &stream)))
+  if (failed(result = reg_stream_open(get_context(context), name, STREAM_O_RD, &stream)))
     return result;
 
   stream_copy(stream, context->cfg.console_out);
 
-  stream_close(stream);
+  close_handle(stream);
 
   stream_puts(context->cfg.console_out, "\r\n");
 
   return result;
   }
 
-result_t rm_name_action(cli_t *context, const char * name_)
+result_t config_rm_name_action(cli_t *context, const char * name_)
   {
   result_t result;
   if(failed(result = reg_delete_value(get_context(context), name_)))
@@ -310,7 +251,7 @@ result_t rm_name_action(cli_t *context, const char * name_)
   return s_ok;
   }
 
-result_t rmdir_path_action(cli_t *context, const char * name_)
+result_t config_rmdir_path_action(cli_t *context, const char * name_)
   {
   result_t result;
   memid_t key;
@@ -324,7 +265,7 @@ result_t rmdir_path_action(cli_t *context, const char * name_)
   return s_ok;
   }
 
-result_t mkdir_path_action(cli_t *context, const char * name_)
+result_t config_mkdir_path_action(cli_t *context, const char * name_)
   {
   // open a sub-key
   result_t result;
@@ -334,15 +275,16 @@ result_t mkdir_path_action(cli_t *context, const char * name_)
     stream_puts(context->cfg.console_err, "Error when creating key\r\n");
     return result;
     }
-
+  
   // update the submode
   make_prompt(context->prompt[context->root_level], MAX_PROMPT_LENGTH, get_full_path(memid));
+
   context->current[context->root_level] = memid;
 
   return s_ok;
   }
 
-result_t cd_path_action(cli_t *context, const char * name_)
+result_t config_cd_path_action(cli_t *context, const char * name_)
   {
   // open a sub-key
   result_t result;
@@ -355,17 +297,18 @@ result_t cd_path_action(cli_t *context, const char * name_)
 
   // update the submode
   make_prompt(context->prompt[context->root_level], MAX_PROMPT_LENGTH, get_full_path(memid));
+
   context->current[context->root_level] = memid;
 
   return s_ok;
   }
 
-result_t ls_path_recursive_action(cli_t *context, const char * path)
+result_t config_ls_path_recursive_action(cli_t *context, const char * path)
   {
   uint16_t indent = 0;
   result_t result;
   memid_t key;
-  vector_p matches = 0;
+  charps_t *matches = 0;
 
   bool recursive = context->tokens[2].token_buffer != 0 && strlen(context->tokens[2].token_buffer) != 0;
 
@@ -392,28 +335,18 @@ result_t ls_path_recursive_action(cli_t *context, const char * path)
   else
     {
     // decide what to do
-    uint16_t len;
-    if (failed(result = vector_count(matches, &len)))
-      {
-      kfree_split(matches);
-      return result;
-      }
+    uint16_t len = charps_count(matches);
 
     for (i = 0; i < len; i++)
       {
-      const char * name;
-      if (failed(result = vector_at(matches, i, &name)))
-        {
-        kfree_split(matches);
-        return result;
-        }
+      char * name = charps_begin(matches)[i];
 
       if (failed(result = reg_query_child(key, name, &child, &dt, 0)))
         {
         if (result == e_not_found)
           continue;      // very weird!
 
-        kfree_split(matches);
+        close_and_free_charps(matches);
         return result;
         }
 
@@ -426,19 +359,14 @@ result_t ls_path_recursive_action(cli_t *context, const char * path)
     // now the directories
     for (i = 0; i < len; i++)
       {
-      const char * name;
-      if (failed(result = vector_at(matches, i, &name)))
-        {
-        kfree_split(matches);
-        return result;
-        }
+      char * name = charps_begin(matches)[i];
 
       if (failed(result = reg_query_child(key, name, &child, &dt, 0)))
         {
         if (result == e_not_found)
           continue;      // very weird!
 
-        kfree_split(matches);
+        close_and_free_charps(matches);
         return result;
         }
 
@@ -454,8 +382,20 @@ result_t ls_path_recursive_action(cli_t *context, const char * path)
         }
       }
 
-    kfree_split(matches);
+    close_and_free_charps(matches);
     }
+  return s_ok;
+  }
+
+result_t config_action(cli_t *context)
+  {
+  return cli_submode_enter(context, 0, "config");
+  }
+
+result_t config_exit_action(cli_t *context)
+  {
+  cli_submode_exit(context);
+
   return s_ok;
   }
 

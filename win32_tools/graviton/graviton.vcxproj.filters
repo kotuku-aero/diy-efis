@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\libs\graviton\aircraft.c" />
+    <ClCompile Include="..\..\libs\graviton\terrain.c" />
+    <ClCompile Include="..\..\libs\graviton\layer.c" />
+    <ClCompile Include="..\..\libs\graviton\coastline.c" />
+    <ClCompile Include="..\..\libs\graviton\airspace.c" />
+    <ClCompile Include="..\..\libs\graviton\cities.c" />
+    <ClCompile Include="..\..\libs\graviton\contours.c" />
+    <ClCompile Include="..\..\libs\graviton\obstacles.c" />
+    <ClCompile Include="..\..\libs\graviton\surface_water.c" />
+    <ClCompile Include="..\..\libs\graviton\transport.c" />
+    <ClCompile Include="..\..\libs\graviton\viewport.c" />
+    <ClCompile Include="..\..\libs\graviton\atomdb_viewport.c" />
+    <ClCompile Include="..\..\libs\graviton\au_nz_map_renderer.c" />
+    <ClCompile Include="..\..\libs\graviton\land.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\libs\graviton\aircraft.h" />
+    <ClInclude Include="..\..\libs\graviton\fis.h" />
+    <ClInclude Include="..\..\libs\graviton\geography.h" />
+    <ClInclude Include="..\..\libs\graviton\layer.h" />
+    <ClInclude Include="..\..\libs\graviton\viewport.h" />
+    <ClInclude Include="..\..\libs\graviton\schema.h" />
+    <ClInclude Include="..\..\libs\graviton\atomdb_viewport.h" />
+  </ItemGroup>
+</Project>

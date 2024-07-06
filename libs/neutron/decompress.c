@@ -1,4 +1,43 @@
 #include "neutron.h"
+/*
+diy-efis
+Copyright (C) 2016-2022 Kotuku Aerospace Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+If a file does not contain a copyright header, either because it is incomplete
+or a binary file then the above copyright notice will apply.
+
+Portions of this repository may have further copyright notices that may be
+identified in the respective files.  In those cases the above copyright notice and
+the GPL3 are subservient to that copyright notice.
+
+Portions of this repository contain code fragments from the following
+providers.
+
+
+If any file has a copyright notice or portions of code have been used
+and the original copyright notice is not yet transcribed to the repository
+then the original copyright notice is to be respected.
+
+If any material is included in the repository that is not open source
+it must be removed as soon as possible after the code fragment is identified.
+
+If you wish to use any of this code in a commercial application then
+you must obtain a licence from the copyright holder.  Contact
+support@kotuku.aero for information on the commercial licences.
+*/
 
 #define NUM_CODE_LENGTH_CODES 19	/*the code length_code codes. 0-15: code lengths, 16: copy previous 3-6 times, 17: 3-10 zeros, 18: 11-138 zeros */
 #define NUM_DEFLATE_CODE_SYMBOLS 288	/*256 literals, the end code, some length_code codes, and 2 unused codes */
@@ -19,14 +58,14 @@
 // Hauffman decoder
 //
 
-static const uint16_t length_base[29] = {	/*the base lengths represented by codes 257-285 */
+static const uint16_t length_base[31] = {	/*the base lengths represented by codes 257-285 */
   3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59,
-  67, 83, 99, 115, 131, 163, 195, 227, 258
+  67, 83, 99, 115, 131, 163, 195, 227, 258, 0, 0
   };
 
-static const uint16_t length_extra[29] = {	/*the extra bits used by codes 257-285 (added to base length_code) */
+static const uint16_t length_extra[31] = {	/*the extra bits used by codes 257-285 (added to base length_code) */
   0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5,
-  5, 5, 5, 0
+  5, 5, 5, 0, 99, 99
   };
 
 /*the base backwards distances (the bits of distance codes appear after length_code codes and use their own huffman tree) */
@@ -157,20 +196,22 @@ static void huffman_tree_init(huffman_tree_t* tree, huffman_node_t *buffer, uint
 maxbitlen is the maximum bits that a code in the tree can have. return value is error.*/
 static result_t huffman_tree_create_lengths(decoder_state_t* decoder, huffman_tree_t* tree, const uint16_t *bitlen)
   {
-   uint16_t *tree1d = (uint16_t *)neutron_malloc(sizeof(int16_t) * tree->numcodes);
-  //uint16_t tree1d[NUM_DEFLATE_CODE_SYMBOLS];
-  uint16_t *blcount = (uint16_t *)neutron_malloc(sizeof(int16_t) * (MAX_BIT_LENGTH + 1));
-  //uint16_t blcount[MAX_BIT_LENGTH + 1];
-  uint16_t *nextcode = (uint16_t *)neutron_malloc(sizeof(int16_t) * (MAX_BIT_LENGTH + 1));
-  //uint16_t nextcode[MAX_BIT_LENGTH + 1];
+  uint16_t *tree1d;
+  neutron_malloc(sizeof(uint16_t) * tree->numcodes, (void **)&tree1d);
+
+  uint16_t *blcount;
+  neutron_malloc(sizeof(uint16_t) * (tree->maxbitlen + 1), (void **)&blcount);
+
+  uint16_t *nextcode;
+  neutron_malloc(sizeof(uint16_t) * (tree->maxbitlen + 1), (void **)&nextcode);
 
   uint16_t bits, n, i;
   uint16_t nodefilled = 0;	/*up to which node it is filled */
   uint16_t treepos = 0;	/*position in the tree (1 of the numcodes columns) */
 
                         /* initialize local vectors */
-  memset(blcount, 0, sizeof(int16_t) * (MAX_BIT_LENGTH + 1));
-  memset(nextcode, 0, sizeof(int16_t) * (MAX_BIT_LENGTH + 1));
+  memset(blcount, 0, sizeof(uint16_t) * (tree->maxbitlen + 1));
+  memset(nextcode, 0, sizeof(uint16_t) * (tree->maxbitlen + 1));
 
   /*step 1: count number of instances of each code length_code */
   for (bits = 0; bits < tree->numcodes; bits++)
@@ -185,6 +226,8 @@ static result_t huffman_tree_create_lengths(decoder_state_t* decoder, huffman_tr
     {
     if (bitlen[n] != 0)
       tree1d[n] = nextcode[bitlen[n]]++;
+    else
+      tree1d[n] = 0;
     }
 
   /*
@@ -286,7 +329,10 @@ static result_t huffman_decode_symbol(decoder_state_t *decoder, const huffman_tr
   }
 
 /* get the tree of a deflated block with dynamic tree, the tree itself is also Huffman compressed with a known tree*/
-static result_t get_tree_inflate_dynamic(decoder_state_t* decoder, huffman_tree_t* codetree, huffman_tree_t* codetree_distance, huffman_tree_t* codelengthcodetree)
+static result_t get_tree_inflate_dynamic(decoder_state_t* decoder, 
+  huffman_tree_t* codetree, 
+  huffman_tree_t* codetree_distance,
+  huffman_tree_t* codelengthcodetree)
   {
   result_t result = s_ok;
   uint16_t n;
@@ -296,18 +342,25 @@ static result_t get_tree_inflate_dynamic(decoder_state_t* decoder, huffman_tree_
   uint16_t i;
 
   /*the bit pointer is or will go past the memory */
-  hlit = read_bits(decoder, 5) + 257;	/*number of literal/length_code codes + 257. Unlike the spec, the value 257 is added to it here already */
+  /*number of literal/length_code codes + 257. Unlike the spec, the value 257 is added to it here already */
+  hlit = read_bits(decoder, 5) + 257;	
   hdist = read_bits(decoder, 5) + 1;	/*number of distance codes. Unlike the spec, the value 1 is added to it here already */
-  hclen = read_bits(decoder, 4) + 4;	/*number of code length_code codes. Unlike the spec, the value 4 is added to it here already */
+  /*number of code length_code codes. Unlike the spec, the value 4 is added to it here already */
+  hclen = read_bits(decoder, 4) + 4;	
+
+  //trace_debug("hlit = %d, hdist = %d, hclen = %d\n", hlit, hdist, hclen);
 
   if(hlit > NUM_DEFLATE_CODE_SYMBOLS || hdist > NUM_DISTANCE_SYMBOLS)
     return e_bad_parameter;
 
-  uint16_t *codelengthcode = (uint16_t *)neutron_malloc(sizeof(uint16_t) * NUM_CODE_LENGTH_CODES);
-  //uint16_t codelengthcode[NUM_CODE_LENGTH_CODES];
-  uint16_t *bitlen = (uint16_t *)neutron_malloc(sizeof(uint16_t) * NUM_DEFLATE_CODE_SYMBOLS);
-  //uint16_t bitlen[NUM_DEFLATE_CODE_SYMBOLS];
-  uint16_t *bitlength_distance = (uint16_t *)neutron_malloc(sizeof(uint16_t) * NUM_DISTANCE_SYMBOLS);
+  uint16_t *codelengthcode;
+  neutron_malloc(sizeof(uint16_t) * NUM_CODE_LENGTH_CODES, (void **)&codelengthcode);
+
+  uint16_t *bitlen;
+  neutron_malloc(sizeof(uint16_t) * NUM_DEFLATE_CODE_SYMBOLS, (void **)&bitlen);
+
+  uint16_t *bitlength_distance;
+  neutron_malloc(sizeof(uint16_t) * NUM_DISTANCE_SYMBOLS, (void **)&bitlength_distance);
 
   /* clear bitlen arrays */
   memset(bitlen, 0, sizeof(uint16_t) * NUM_DEFLATE_CODE_SYMBOLS);
@@ -315,6 +368,7 @@ static result_t get_tree_inflate_dynamic(decoder_state_t* decoder, huffman_tree_
 
   for(i = 0; i < hclen; i++)
     codelengthcode[code_lengths_order[i]] = read_bits(decoder, 3);
+
   for (; i < NUM_CODE_LENGTH_CODES; i++)
     codelengthcode[code_lengths_order[i]] = 0;	/*if not, it must stay 0 */
 
@@ -339,13 +393,10 @@ static result_t get_tree_inflate_dynamic(decoder_state_t* decoder, huffman_tree_
     if (code <= 15)
       {	/*a length_code code */
       if (i < hlit)
-        {
         bitlen[i] = code;
-        }
       else
-        {
         bitlength_distance[i - hlit] = code;
-        }
+
       i++;
       }
     else if (code == 16)
@@ -356,13 +407,9 @@ static result_t get_tree_inflate_dynamic(decoder_state_t* decoder, huffman_tree_
       replength += read_bits(decoder, 2);
 
       if ((i - 1) < hlit)
-        {
         value = bitlen[i - 1];
-        }
       else
-        {
         value = bitlength_distance[i - hlit - 1];
-        }
 
       /*repeat this value in the next lengths */
       for (n = 0; n < replength; n++)
@@ -375,13 +422,10 @@ static result_t get_tree_inflate_dynamic(decoder_state_t* decoder, huffman_tree_
           }
 
         if (i < hlit)
-          {
           bitlen[i] = value;
-          }
         else
-          {
           bitlength_distance[i - hlit] = value;
-          }
+
         i++;
         }
       }
@@ -403,13 +447,10 @@ static result_t get_tree_inflate_dynamic(decoder_state_t* decoder, huffman_tree_
           }
 
         if (i < hlit)
-          {
           bitlen[i] = 0;
-          }
         else
-          {
           bitlength_distance[i - hlit] = 0;
-          }
+
         i++;
         }
       }
@@ -499,7 +540,7 @@ static result_t read_uint16(handle_t stream, uint16_t *value)
   }
 
 // read bytes from compressed stream into the buffer
-result_t decompress(stream_p stream, handle_t parg, get_byte_fn getter, set_byte_fn setter, uint32_t *length)
+result_t decompress(handle_t stream, handle_t parg, get_byte_fn getter, set_byte_fn setter, uint32_t *length)
   {
   result_t result;
   uint32_t bp = 0;	/*bit pointer in the "in" data, current byte is bp >> 3, current bit is bp & 0x7 (from lsb to msb of the byte) */
@@ -523,12 +564,14 @@ result_t decompress(stream_p stream, handle_t parg, get_byte_fn getter, set_byte
     {
     if (decoder.end_of_block)
       {
+      // release all memory
+      cleanup(&decoder, s_ok);
+
       if (decoder.last_block)
-        return cleanup(&decoder, s_ok);
+        return s_ok;
 
       /* read block control bits */
-      // must be on a byte boundary
-      decoder.bitpointer = 0;
+      // decoder.bitpointer = ((decoder.bitpointer-1)| 7)+1;
       decoder.last_block = read_bit(&decoder);
 
       decoder.compression = read_bits(&decoder, 2);
@@ -549,37 +592,42 @@ result_t decompress(stream_p stream, handle_t parg, get_byte_fn getter, set_byte
         }
       else if (decoder.compression == 1)
         {
-        decoder.codetree_buffer = fixed_deflate_codetree;
-        decoder.codetree_distance_buffer = fixed_distance_tree;
-        decoder.codetree = (huffman_tree_t *)neutron_malloc(sizeof(huffman_tree_t));
-        decoder.codetree_distances = (huffman_tree_t *)neutron_malloc(sizeof(huffman_tree_t));
+        decoder.codetree_buffer = (huffman_node_t *) fixed_deflate_codetree;
+        decoder.codetree_distance_buffer = (huffman_node_t *) fixed_distance_tree;
+        
+        neutron_malloc(sizeof(huffman_tree_t), (void **)&decoder.codetree);
+        neutron_malloc(sizeof(huffman_tree_t), (void **)&decoder.codetree_distances);
+
         /* fixed trees */
         huffman_tree_init(decoder.codetree, decoder.codetree_buffer, NUM_DEFLATE_CODE_SYMBOLS, DEFLATE_CODE_BITLEN);
         huffman_tree_init(decoder.codetree_distances, decoder.codetree_distance_buffer, NUM_DISTANCE_SYMBOLS, DISTANCE_BITLEN);
         }
       else if (decoder.compression == 2)
         {
+        //trace_debug("Decode type 2\n");
         /* dynamic trees */
-        decoder.codetree_buffer = (huffman_node_t *)neutron_malloc(sizeof(huffman_node_t) * NUM_DEFLATE_CODE_SYMBOLS);
+        neutron_malloc(sizeof(huffman_node_t) * NUM_DEFLATE_CODE_SYMBOLS, (void **)&decoder.codetree_buffer);
         memset(decoder.codetree_buffer, 0, sizeof(huffman_node_t) * NUM_DEFLATE_CODE_SYMBOLS);
 
-        decoder.codetree_distance_buffer = (huffman_node_t *)neutron_malloc(sizeof(huffman_node_t) * NUM_DISTANCE_SYMBOLS);
+        neutron_malloc(sizeof(huffman_node_t) * NUM_DISTANCE_SYMBOLS, (void **)&decoder.codetree_distance_buffer);
         memset(decoder.codetree_distance_buffer, 0, sizeof(huffman_node_t) * NUM_DISTANCE_SYMBOLS);
 
-        decoder.codelengthcodetree_buffer = (huffman_node_t *)neutron_malloc(sizeof(huffman_node_t) * NUM_CODE_LENGTH_CODES);
+        neutron_malloc(sizeof(huffman_node_t) * NUM_CODE_LENGTH_CODES, (void **)&decoder.codelengthcodetree_buffer);
         memset(decoder.codelengthcodetree_buffer, 0, sizeof(huffman_node_t) * NUM_CODE_LENGTH_CODES);
 
-        decoder.codetree = (huffman_tree_t *)neutron_malloc(sizeof(huffman_tree_t));
-        decoder.codetree_distances = (huffman_tree_t *)neutron_malloc(sizeof(huffman_tree_t));
-        decoder.codelengthcodetree = (huffman_tree_t *)neutron_malloc(sizeof(huffman_tree_t));
+        neutron_malloc(sizeof(huffman_tree_t), (void **)&decoder.codetree);
+        neutron_malloc(sizeof(huffman_tree_t), (void **)&decoder.codetree_distances);
+        neutron_malloc(sizeof(huffman_tree_t), (void **)&decoder.codelengthcodetree);
 
         huffman_tree_init(decoder.codetree, decoder.codetree_buffer, NUM_DEFLATE_CODE_SYMBOLS, DEFLATE_CODE_BITLEN);
         huffman_tree_init(decoder.codetree_distances, decoder.codetree_distance_buffer, NUM_DISTANCE_SYMBOLS, DISTANCE_BITLEN);
         huffman_tree_init(decoder.codelengthcodetree, decoder.codelengthcodetree_buffer, NUM_CODE_LENGTH_CODES, CODE_LENGTH_BITLEN);
 
-        if(failed(result = get_tree_inflate_dynamic(&decoder, decoder.codetree, decoder.codetree_distances, decoder.codelengthcodetree)))
+        if (failed(result = get_tree_inflate_dynamic(&decoder, decoder.codetree, decoder.codetree_distances, decoder.codelengthcodetree)))
           return cleanup(&decoder, result);
         }
+      else
+        return e_bad_pointer;
       }
 
     if (decoder.compression != 0)
@@ -590,6 +638,8 @@ result_t decompress(stream_p stream, handle_t parg, get_byte_fn getter, set_byte
         
         if(failed(result = huffman_decode_symbol(&decoder, decoder.codetree, &code)))
           return cleanup(&decoder, result);
+
+        //trace_debug("code = %d (0x%x), pos=0x%08.8x\n", code, code, pos);
 
         if (code == 256)
           {
@@ -607,9 +657,11 @@ result_t decompress(stream_p stream, handle_t parg, get_byte_fn getter, set_byte
             *length = *length + 1;
           }
         else if (code >= FIRST_LENGTH_CODE_INDEX && code <= LAST_LENGTH_CODE_INDEX)
-          {	/*length_code code */
+          {	
+          /*length_code code */
             /* part 1: get length_code base */
-          uint32_t length_code = length_base[code - FIRST_LENGTH_CODE_INDEX];
+          uint32_t code_index = code - FIRST_LENGTH_CODE_INDEX;
+          uint32_t length_code = length_base[code_index];
           uint16_t codeD;
           uint32_t distance;
           uint16_t numextrabitsD;
@@ -619,10 +671,12 @@ result_t decompress(stream_p stream, handle_t parg, get_byte_fn getter, set_byte
           uint16_t numextrabits;
 
           /* part 2: get extra bits and add the value of that to length_code */
-          numextrabits = length_extra[code - FIRST_LENGTH_CODE_INDEX];
+          numextrabits = length_extra[code_index];
 
           if(numextrabits > 0)
             length_code += read_bits(&decoder, numextrabits);
+
+          //trace_debug("length = %d, numextrabits = %d\n", length_code, numextrabits);
 
           /*part 3: get distance code */
           if(failed(result = huffman_decode_symbol(&decoder, decoder.codetree_distances, &codeD)))
@@ -644,13 +698,15 @@ result_t decompress(stream_p stream, handle_t parg, get_byte_fn getter, set_byte
           start = pos;
           backward = start - distance;
 
+          //trace_debug("copy %d bytes from %d to %d\n", length_code, backward, pos);
+
           for (forward = 0; forward < length_code; forward++)
             {
             uint8_t value;
             if(failed(result = (*getter)(parg, backward, &value)))
               return cleanup(&decoder, result);
 
-            if(failed(result = (*setter)(parg, pos++, value)))
+            if (failed(result = (*setter)(parg, pos++, value)))
               return result;
 
             if (length != 0)
@@ -663,7 +719,10 @@ result_t decompress(stream_p stream, handle_t parg, get_byte_fn getter, set_byte
             }
           }
         else
+          {
+          //trace_debug("code %d is out of range\n");
           return e_bad_handle;
+          }
         }
       }
     else
@@ -671,8 +730,7 @@ result_t decompress(stream_p stream, handle_t parg, get_byte_fn getter, set_byte
       uint8_t byte;
       for (bytes_read = 0; bytes_read < len; bytes_read++)
         {
-        uint16_t num_read = 0;
-
+        uint32_t num_read = 0;
         if (failed(result = stream_read(stream, &byte, 1, &num_read)))
           return result;
 
@@ -682,7 +740,7 @@ result_t decompress(stream_p stream, handle_t parg, get_byte_fn getter, set_byte
           break;
           }
         else
-          if(failed(result =(*setter)(parg, pos++, byte)))
+          if (failed(result = (*setter)(parg, pos++, byte)))
             return result;
         }
 

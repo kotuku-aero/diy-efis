@@ -1,6 +1,8 @@
+#ifndef __CLI_H__
+#define __CLI_H__
 /*
 diy-efis
-Copyright (C) 2016 Kotuku Aerospace Limited
+Copyright (C) 2016-2022 Kotuku Aerospace Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,17 +30,15 @@ providers.
 
 If any file has a copyright notice or portions of code have been used
 and the original copyright notice is not yet transcribed to the repository
-then the origional copyright notice is to be respected.
+then the original copyright notice is to be respected.
 
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
-*/
-#ifndef __CLI_H__
-#define __CLI_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+If you wish to use any of this code in a commercial application then
+you must obtain a licence from the copyright holder.  Contact
+support@kotuku.aero for information on the commercial licences.
+*/
 
 /*
  * CLI Parser assumes the following types are defined: uint8_t, int8_t,
@@ -48,9 +48,15 @@ extern "C" {
  * have these types defined, you need to define them here.
  */
 #include "../neutron/neutron.h"
+#include "../neutron/vector.h"
 #include <stdint.h>
- ////////////////////////////////////////////////////////////////////////////////
- //
+
+vector_t(char)
+
+typedef char *charp;
+
+vector_t(charp)
+
 /**
 * Split 's' with separator in 'sep'. An array
 * of const char * strings is returned.
@@ -58,13 +64,13 @@ extern "C" {
 * @param sep   separator to split string
 * @return a vector of the strings as split.
 */
-extern vector_p string_split(const char *s, char sep);
+extern charps_t *string_split(const char *s, char sep);
 /**
 * Free the result returned by string_split_len(), or do nothing if 'tokens' is 0.
 * @param tokens
 * @param count
 */
-extern void kfree_split(vector_p tokens);
+extern void close_and_free_charps(charps_t *tokens);
 
 /**
  * Maximum number of nested sub-mode levels.
@@ -126,6 +132,7 @@ typedef enum {
     CLI_MAX_NODES
 } cli_node_type_t;
 
+typedef struct cli_node_ cli_node_t;
 /**
  * A node in the parser tree. It has a node type which determines
  * what type of token is accepted.
@@ -136,14 +143,14 @@ typedef struct cli_node_ {
     void                  *param;    /**< Token-dependent parameter */
     char                  *desc;     /**< A per-node description string */
     /** Pointer to the next sibling in the same level of the tree */
-    const struct cli_node_ *sibling;
+    const cli_node_t *sibling;
     /** Pointer to all its children in the next level of the tree */
-    const struct cli_node_ *children;
+    const cli_node_t *children;
 } cli_node_t;
 
 /**
  * \struct   cli_token_t
- * \brief    A parsed token.
+ * @function    A parsed token.
  */
 typedef struct cli_token_ {
     /** Index (in the line) of the beginning of the token */
@@ -177,7 +184,7 @@ typedef struct cli_token_ {
 
 /**
  * \struct   cli_line_t
- * \brief    A parser line structure.
+ * @function    A parser line structure.
  * \details  A parser line represents a line of user input in the parser.
  */
 typedef struct {
@@ -191,16 +198,16 @@ typedef struct {
  * Return the number of tokens in the cparser for a particular parsed command.
  */
 #define CLI_NUM_TOKENS(p)      (p->token_tos)
-
 /**
  * User input callback. This function is called after a user input 
  * is completed.
  */
-typedef result_t (*cli_input_cb)(struct _cli_t *context, stream_p stream, vector_p buffer);
+typedef result_t (*cli_input_cb)(struct _cli_t *context, handle_t stream, chars_t *buffer);
 
+typedef result_t (*cli_receive_char_fn)(handle_t context, const char *ch, uint16_t len);
 /**
  * \struct   cli_cfg_
- * \brief    Contains all configurable parameters of a parser.
+ * @function    Contains all configurable parameters of a parser.
  */
 typedef struct cli_cfg_ {
     cli_node_t  *root;
@@ -209,6 +216,7 @@ typedef struct cli_cfg_ {
     char ch_del;
     char ch_help;
     const char *prompt;
+    cli_receive_char_fn receive_char;
     int32_t  flags;
     handle_t console_in;
     handle_t console_out;
@@ -216,7 +224,7 @@ typedef struct cli_cfg_ {
 } cli_cfg_t;
 
 /**
- * \brief    Parser FSM states.
+ * @function    Parser FSM states.
  * \details  There are 3 possible states in parser FSM.
  */
 typedef enum cli_state_ {
@@ -226,8 +234,10 @@ typedef enum cli_state_ {
     CLI_MAX_STATES
 } cli_state_t;
 
+
+
 /**
- * \brief    CLI parser structrure.
+ * @function    CLI parser structrure.
  * \details  This structure contains all configuration and running states.
  *           of a parser instance.
  */
@@ -237,13 +247,18 @@ typedef struct _cli_t {
     /** Current nested level */
     uint16_t  root_level;
     /** Parse tree root node at different nested levels */
-    cli_node_t *root[CLI_MAX_NESTED_LEVELS];
+    const cli_node_t *root[CLI_MAX_NESTED_LEVELS];
     /** Parser prompt at different nested levels */
     char prompt[CLI_MAX_NESTED_LEVELS][MAX_PROMPT_LENGTH];
+
     // current registry key that is open
     memid_t current[CLI_MAX_NESTED_LEVELS];
+
+    // path that is displayed
+    char path[256];
+
     /** Current node */
-    cli_node_t    *cur_node;
+    const cli_node_t    *cur_node;
 
     /********** FSM states **********/
     cli_state_t   state;       /**< Current state */
@@ -261,14 +276,16 @@ typedef struct _cli_t {
 
     /** Flag indicating if the parser should continue to except input */
     bool               done;   
+    // this is signalled when the parser is terminated
+    handle_t terminated_event;
 
     /********** User input **********/
     /** OS vector for User data */
-    vector_p user_buf;
+    chars_t  *user_buf;
     /** Whether to echo user input */
     bool user_do_echo;
     /** Callback function when the input is complete */
-    stream_p stream;
+    handle_t  stream;
     cli_input_cb  user_input_cb;
 
     /********** Last executed command **********/
@@ -277,12 +294,11 @@ typedef struct _cli_t {
     /** Result code of the command */
     result_t  last_rc;
     /** End node of the command. 0 if the command is invalid. */
-    cli_node_t    *last_end_node;
+    const cli_node_t *last_end_node;
 } cli_t;
 
 typedef result_t (*cli_glue_fn)(cli_t *parser);
-typedef result_t (*cli_token_fn)(char *token, int token_len,
-                                             int *is_complete);
+typedef result_t (*cli_token_fn)(char *token, int token_len, int *is_complete);
 
 static inline memid_t get_context(cli_t *parser)
   {
@@ -305,23 +321,23 @@ typedef enum {
 
 /**
  * \typedef  cli_walker_fn
- * \brief    Walker function prototype used in cli_walk().
+ * @function    Walker function prototype used in cli_walk().
  *
- * \param    parser Pointer to the parser structure.
- * \param    node   Pointer to the current node being walked.
- * \param    cookie An opaque pointer passed from cli_walk().
+ * @param    parser Pointer to the parser structure.
+ * @param    node   Pointer to the current node being walked.
+ * @param    cookie An opaque pointer passed from cli_walk().
  *
- * \return   s_ok to continue the walk; e_unexpected to abort.
+ * @returns   s_ok to continue the walk; e_unexpected to abort.
  */
-typedef result_t (*cli_walker_fn)(cli_t *parser, cli_node_t *node, void *cookie);
+typedef result_t (*cli_walker_fn)(cli_t *parser, const cli_node_t *node, void *cookie);
 
 /**
- * \brief    Initialize a parser.
+ * @function    Initialize a parser.
  *
- * \param    cfg Pointer to the parser configuration structure.
+ * @param    cfg Pointer to the parser configuration structure.
  *
  * \retval   parser Pointer to the initialized parser.
- * \return   s_ok if succeeded; e_unexpected if failed.
+ * @returns   s_ok if succeeded; e_unexpected if failed.
  */
 extern result_t cli_init(cli_cfg_t *cfg, cli_t *parser);
 
@@ -331,64 +347,66 @@ Cleanup and release all resources
 extern void cli_cleanup(cli_t *parser);
 
 /**
- * \brief    Input a character to the parser.
+ * @function    Input a character to the parser.
  *
- * \param    parser  Pointer to the parser structure.
- * \param    ch      Character to be input.
- * \param    ch_type Character type.
+ * @param    parser  Pointer to the parser structure.
+ * @param    ch      Character to be input.
+ * @param    ch_type Character type.
  *
- * \return   s_ok if succeeded; e_unexpected if failed.
+ * @returns   s_ok if succeeded; e_unexpected if failed.
  */
 extern result_t cli_input(cli_t *parser, char ch, cli_char_t ch_type);
 
 /**
- * \brief    Run the parser. 
+ * @function    Run the parser. 
  * \details  This function is a wrapper around cli_input(). It first 
  *           calls cli_io_init(). Then, it calls cli_getch() and 
  *           feeds character into the parser until it quits.
  *
- * \param    parser Pointer to the parser structure.
+ * @param    parser Pointer to the parser structure.
  *
- * \return   s_ok if succeeded; e_unexpected if failed.
+ * @returns   s_ok if succeeded; e_unexpected if failed.
  */
 extern result_t cli_run(cli_t *parser);
 
+extern result_t cli_abort(cli_t *parser);
+
 /**
- * \brief    Walk the parse tree in the parser.
+ * @function    Walk the parse tree in the parser.
  *
- * \param    parser  Pointer to the parser structure.
- * \param    pre_fn  Walker function that called before tranverse its children.
- * \param    post_fn Walker function that called after transvere its children.
- * \param    cookie  An opaque pointer that is passed back to the caller via
+ * @param    parser  Pointer to the parser structure.
+ * @param    pre_fn  Walker function that called before tranverse its children.
+ * @param    post_fn Walker function that called after transvere its children.
+ * @param    cookie  An opaque pointer that is passed back to the caller via
  *                   callback functions 'pre_fn' and 'post_fn'.
  *
- * \return   s_ok if succeeded; e_unexpected if failed.
+ * @returns   s_ok if succeeded; e_unexpected if failed.
  */
 extern result_t cli_walk(cli_t *parser, cli_walker_fn pre_fn,
                               cli_walker_fn post_fn, void *cookie);
 
 /**
- * \brief    Walk the parser tree and generate a list of all available commands.
+ * @function    Walk the parser tree and generate a list of all available commands.
  *
- * \param    parser Pointer to the parser structure.
- * \param    str    Pointer to a filter string. If it is 0, all
+ * @param    parser Pointer to the parser structure.
+ * @param    str    Pointer to a filter string. If it is 0, all
  *                  commands in the parse tree are displayed. Otherwise,
  *                  only commands with keywords that contain 'str' as
  *                  a substring are displayed.
  *
- * \return   s_ok if succeeded; e_bad_parameter if 
+ * @returns   s_ok if succeeded; e_bad_parameter if 
  *           the parser structure is invalid.
  */
 extern result_t cli_help_cmd(cli_t *parser, char *str);
 
 /**
- * \brief    Exit a parser session.
+ * @function    Exit a parser session.
  * \details  This call causes the parser to exit and returns from 
  *           cli_run().
  *
- * \param    parser - Pointer to the parser structure.
+ * @param    parser - Pointer to the parser structure.
  *
- * \return   s_ok if succeeded; e_bad_parameter if failed.
+ * @returns   s_ok if succeeded; e_bad_parameter if failed.
  */
 extern result_t cli_quit(cli_t *parser);
 
@@ -404,89 +422,83 @@ extern result_t cli_quit(cli_t *parser);
 extern result_t cli_submode_enter(cli_t *parser, memid_t key, const char * prompt);
 
 /**
- * \brief    Leave a submode. 
+ * @function    Leave a submode. 
  * \details  The previous mode context and prompt are automatically restored.
  *
- * \param    parser Pointer to the parser structure.
+ * @param    parser Pointer to the parser structure.
  *
- * \return   s_ok if succeeded; e_bad_parameter if the input 
+ * @returns   s_ok if succeeded; e_bad_parameter if the input 
  *           parameters are invalid; e_unexpected if the parser has not 
  *           entered any submode.
  */
 extern result_t cli_submode_exit(cli_t *parser);
 /**
- * \brief    Read a raw string from the user via the terminal.
+ * @function    Read a raw string from the user via the terminal.
  *
- * \param    parser   Pointer to the parser structure.
- * \param    prompt   Pointer to a prompt string. If 0, nothing is printed.
- * \param    echoed   1 to echo the input; 0 otherwise.
- * \param    cb       Callback function that is called when input is complete.
+ * @param    parser   Pointer to the parser structure.
+ * @param    prompt   Pointer to a prompt string. If 0, nothing is printed.
+ * @param    echoed   1 to echo the input; 0 otherwise.
+ * @param    cb       Callback function that is called when input is complete.
  *
- * \return   s_ok if succeeded;
+ * @returns   s_ok if succeeded;
  *           e_bad_parameter if the input parameters are invalid.
  */
 extern result_t cli_user_input(cli_t *parser, const char *prompt,
-                                    bool echoed, stream_p stream, vector_p buffer, cli_input_cb cb);
+                                    bool echoed, handle_t  stream, handle_t  buffer, cli_input_cb cb);
 /**
- * \brief    Match function pointer.
+ * @function    Match function pointer.
  * \details  This function pointer is the prototype of all
  *           CLI Parser match functions.
  *
- * \param    token     Pointer to the token.
- * \param    token_len Number of valid characters in the token.
- * \param    node      The parse tree node to be matched against.
+ * @param    token     Pointer to the token.
+ * @param    token_len Number of valid characters in the token.
+ * @param    node      The parse tree node to be matched against.
  *
  * \retval   is_complete Return 1 from if the token matches the entire
  *                       token; 0 otherwise.
- * \return   s_ok if it is a complete or partial match; 
+ * @returns   s_ok if it is a complete or partial match; 
  *           e_unexpected if it does match the node.
  */
-typedef result_t (*cli_match_fn)(cli_t *context, cli_token_t *token,  cli_node_t *node, bool *is_complete);
+typedef result_t (*cli_match_fn)(cli_t *context, cli_token_t *token,  const cli_node_t *node, bool *is_complete);
 
 /**
- * \brief    Completion function pointer.
+ * @function    Completion function pointer.
  * \details  This function pointer is the prototype of all
  *           CLI Parser match functions.
  *
- * \param    parser    Pointer to the parser.
- * \param    node      Pointer to the current matching parse node.
- * \param    token     Pointer to the token.
- * \param    token_len Number of valid characters in the token.
+ * @param    parser    Pointer to the parser.
+ * @param    node      Pointer to the current matching parse node.
+ * @param    token     Pointer to the token.
+ * @param    token_len Number of valid characters in the token.
  */
 typedef result_t (*cli_complete_fn)(cli_t *context,
                                     const cli_node_t *node,
                                     cli_token_t *token);
 
 /**
- * \brief    Get function pointer.
+ * @function    Get function pointer.
  * \details  This function pointer is the prototype of all CLI Parser 
  *           get functions.
  *
- * \param    token     Pointer to the token.
+ * @param    token     Pointer to the token.
  *
  * \retval   val       Pointer to the returned parameter value.
- * \return   s_ok if succeeded; e_unexpected otherwise.
+ * @returns   s_ok if succeeded; e_unexpected otherwise.
  */
 typedef result_t (*cli_get_fn)(cli_t *context, const cli_token_t *token, void *val);
 
 extern cli_match_fn    cli_match_fn_tbl[CLI_MAX_NODES];
 extern cli_complete_fn cli_complete_fn_tbl[CLI_MAX_NODES];
 
-
-// this structure describes an enumeration
-// MUST be sorted in name order or the completions won't work
-// the values can be any order
-typedef struct _enum_t {
-  const char *name;
-  uint16_t value;
-  } enum_t;
+// static list of enumerations
+extern const enum_t can_ids[];
 
 /********** Token complete functions **********/
 extern result_t cli_complete_keyword(cli_t *parser, const cli_node_t *node, cli_token_t *token);
 extern result_t cli_complete_enum(cli_t *parser, const cli_node_t *node, cli_token_t *token);
 extern result_t cli_complete_path(cli_t *parser, const cli_node_t *node, cli_token_t *token);
 
-extern result_t match_path(cli_t *context, const char * path, bool ignore_wildcard, memid_t *key, vector_p *matches);
+extern result_t match_path(cli_t *context, const char * path, bool ignore_wildcard, memid_t *key, charps_t **matches);
 
 /********** Token get functions **********/
 extern result_t cli_get_string(const cli_token_t *token, const char * *value);
@@ -505,18 +517,18 @@ extern result_t convert_string_to_enum(const char * token, const enum_t *enums, 
 
 
 /**
- * \brief    Print the CLI prompt.
+ * @function    Print the CLI prompt.
  * \details  If in privileged mode, prepend a '+'.
  *
- * \param    parser Pointer to the parser structure.
+ * @param    parser Pointer to the parser structure.
  */
 extern void cli_print_prompt(const cli_t *parser);
 /**
  * Reset a line buffer into an "empty" state.
  *
- * \param    line Pointer to a line structure.
+ * @param    line Pointer to a line structure.
  *
- * \return   s_ok if succeeded; e_bad_parameter if the line 
+ * @returns   s_ok if succeeded; e_bad_parameter if the line 
  *           is 0.
  */ 
 extern result_t cli_line_reset(cli_line_t *line);
@@ -527,10 +539,10 @@ result_t cli_line_init(cli_line_t *line);
 /**
  * Insert a character into a line buffer at the current position.
  *
- * \param    parser Pointer to a parser structure.
- * \param    ch     Character to be inserted.
+ * @param    parser Pointer to a parser structure.
+ * @param    ch     Character to be inserted.
  *
- * \return   s_ok if succeeded; e_bad_parameter if inputs
+ * @returns   s_ok if succeeded; e_bad_parameter if inputs
  *           are invalid; e_no_space if the line buffer is full.
  */
 extern result_t cli_line_insert(cli_t *parser, char ch);
@@ -539,9 +551,9 @@ extern result_t cli_line_insert(cli_t *parser, char ch);
  * Delete a character from the line buffer immediately before
  * the current position. The current position is moved back by one.
  *
- * \param    parser Pointer to a parser structure.
+ * @param    parser Pointer to a parser structure.
  *
- * \return   s_ok if succeeded; e_bad_parameter if inputs
+ * @returns   s_ok if succeeded; e_bad_parameter if inputs
  *           are invalid; e_not_found if the line buffer is empty.
  */
 extern result_t cli_line_delete(cli_t *parser);
@@ -549,9 +561,9 @@ extern result_t cli_line_delete(cli_t *parser);
 /**
  * Move the current position of the current line to the next character.
  *
- * \param    parser Pointer to the parser structure.
+ * @param    parser Pointer to the parser structure.
  *
- * \return   A character to be fed into parser FSM; 0 if no character
+ * @returns   A character to be fed into parser FSM; 0 if no character
  *           is to be fed.
  */
 extern char cli_line_next_char(cli_t *parser);
@@ -559,9 +571,9 @@ extern char cli_line_next_char(cli_t *parser);
 /**
  * Move the current position of the current line to the previous character.
  *
- * \param    parser Pointer to the parser structure.
+ * @param    parser Pointer to the parser structure.
  *
- * \return   A character to be fed into parser FSM; 0 if no character
+ * @returns   A character to be fed into parser FSM; 0 if no character
  *           is to be fed.
  */
 extern char cli_line_prev_char(cli_t *parser);
@@ -569,9 +581,9 @@ extern char cli_line_prev_char(cli_t *parser);
 /**
  * Move the current line to the next line.
  *
- * \param    parser Pointer to the parser structure.
+ * @param    parser Pointer to the parser structure.
  *
- * \return   s_ok if succeeded; e_bad_parameter if inputs
+ * @returns   s_ok if succeeded; e_bad_parameter if inputs
  *           are invalid.
  */
 extern result_t cli_line_next_line(cli_t *parser);
@@ -579,9 +591,9 @@ extern result_t cli_line_next_line(cli_t *parser);
 /**
  * Move the current line to the previous line.
  *
- * \param    parser Pointer to the parser structure.
+ * @param    parser Pointer to the parser structure.
  *
- * \return   s_ok if succeeded; e_bad_parameter if inputs
+ * @returns   s_ok if succeeded; e_bad_parameter if inputs
  *           are invalid.
  */
 extern result_t cli_line_prev_line(cli_t *parser);
@@ -589,30 +601,30 @@ extern result_t cli_line_prev_line(cli_t *parser);
 /**
  * Print the current line including the current line.
  *
- * \param    parser       Pointer to the parser structure.
- * \param    print_prompt 1 if the parser prompt should be printed first.
- * \param    new_line     1 if a linefeed should be printed first;
+ * @param    parser       Pointer to the parser structure.
+ * @param    print_prompt 1 if the parser prompt should be printed first.
+ * @param    new_line     1 if a linefeed should be printed first;
  *                        0 otherwise.
  *
- * \return   None. Crash on failure.
+ * @returns   None. Crash on failure.
  */
 extern result_t cli_line_print(const cli_t *parser, int print_prompt, int new_line);
 
 /**
  * Return the current position of the current line.
  *
- * \param    parser Pointer to the parser structure.
+ * @param    parser Pointer to the parser structure.
  *
- * \return   Current position of the current line.
+ * @returns   Current position of the current line.
  */
 extern uint16_t cli_line_current(const cli_t *parser);
 
 /**
  * Return the last position of the current line.
  *
- * \param    parser Pointer to the parser structure.
+ * @param    parser Pointer to the parser structure.
  *
- * \return   Last position of the current line. This index points to
+ * @returns   Last position of the current line. This index points to
  *           the terminating 0 character of the current line.
  */
 extern uint16_t cli_line_last(const cli_t *parser);
@@ -620,9 +632,9 @@ extern uint16_t cli_line_last(const cli_t *parser);
 /**
  * Return the character of the the current position of the current line.
  *
- * \param    parser Pointer to the parser structure.
+ * @param    parser Pointer to the parser structure.
  *
- * \return   Character of the current position of the current line.
+ * @returns   Character of the current position of the current line.
  */
 extern char cli_line_current_char(const cli_t *parser);
 
@@ -634,41 +646,37 @@ extern result_t cli_line_advance(cli_t *parser);
 /**
  * Reset all parser FSM states.
  *
- * \param    parser Pointer to the parser structure.
+ * @param    parser Pointer to the parser structure.
  *
- * \return   None.
+ * @returns   None.
  */
 extern void cli_fsm_reset(cli_t *parser);
 
 /**
  * Input a character to parser FSM.
  *
- * \param    parser Pointer to the parser structure.
- * \param    ch     Input character.
+ * @param    parser Pointer to the parser structure.
+ * @param    ch     Input character.
  *
- * \return   s_ok if succeeded; e_unexpected otherwise.
+ * @returns   s_ok if succeeded; e_unexpected otherwise.
  */
 extern result_t cli_fsm_input(cli_t *parser, char ch);
 
 /**
  * Walk through all children of a node. Return a match node if one is found.
  *
- * \param    parser    Pointer to the parser structure.
- * \param    token     Pointer to the beginning of the token.
- * \param    parent    Pointer to the parent node.
+ * @param    parser    Pointer to the parser structure.
+ * @param    token     Pointer to the beginning of the token.
+ * @param    parent    Pointer to the parent node.
  *
  * \retval   match       Pointer to a node that matches the token.
  *                       If there are multiple matches, the highest priority match
  *                       is returned.
  * \retval   is_complete 1 if the token completely matches 
- * \return   Number of matches.
+ * @returns   Number of matches.
  */
 extern int cli_match(cli_t *parser, cli_token_t *token,
-                  cli_node_t *parent, cli_node_t **match,
+                  const cli_node_t *parent, const cli_node_t **match,
                   bool *is_complete);
-
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
 
 #endif /* __CLI_H__ */

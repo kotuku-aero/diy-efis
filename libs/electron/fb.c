@@ -154,7 +154,7 @@ static result_t init_canvas(framebuffer_canvas_t *canvas,
   return s_ok;
   }
 
-result_t bsp_canvas_create_rect(const extent_t *size, canvas_t **canvas)
+result_t bsp_framebuffer_create_rect(const extent_t *size, canvas_t **canvas)
   {
   framebuffer_canvas_t *new_canvas = (framebuffer_canvas_t *)malloc(sizeof(framebuffer_canvas_t));
 
@@ -174,7 +174,7 @@ result_t bsp_canvas_create_rect(const extent_t *size, canvas_t **canvas)
   return s_ok;
   }
 
-result_t bsp_canvas_create_child(canvas_t *parent, const rect_t *rect, canvas_t **canvas)
+result_t bsp_framebuffer_create_child(canvas_t *parent, const rect_t *rect, canvas_t **canvas)
   {
   if(parent->version != sizeof(framebuffer_canvas_t))
     return e_bad_parameter;
@@ -204,7 +204,7 @@ result_t bsp_canvas_create_child(canvas_t *parent, const rect_t *rect, canvas_t 
   return s_ok;
   }
 
-result_t bsp_canvas_create_bitmap(const bitmap_t *bitmap, canvas_t **hndl)
+result_t bsp_framebuffer_create_bitmap(const bitmap_t *bitmap, canvas_t **hndl)
   {
   rect_t rect;
 
@@ -236,15 +236,13 @@ result_t bsp_canvas_create_bitmap(const bitmap_t *bitmap, canvas_t **hndl)
   return s_ok;
   }
 
-result_t bsp_canvas_close(canvas_t *hndl)
+result_t bsp_framebuffer_close(canvas_t *hndl)
   {
   if(hndl->version != sizeof(framebuffer_canvas_t))
     return e_invalid_handle;
 
   framebuffer_canvas_t *canvas = (framebuffer_canvas_t *)hndl;
-  if(!canvas->owns)
-    return e_invalid_handle;
-
+  if(canvas->owns)
   free(canvas->buffer);
 
   free(hndl);

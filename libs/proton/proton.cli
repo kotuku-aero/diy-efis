@@ -1,10 +1,10 @@
 #include "../ion/ion.cli"
 
 proton
-#submodule proton
+#submode proton
   screen <UINT16:screen-x> <UINT16:screen-y>
   orientation <ENUM:orientations:orient>
-  init <STRING:layout_name:Name of the initial layout>
+  init <STRING:layout_name>
   ls { <STRING:layout_name> }
   add <STRING:layout_name>
   del <STRING:layout_name>
@@ -25,4 +25,4 @@ proton
 	exit
   #endsubmode
   exit
-#endsubmodule
+#endsubmode

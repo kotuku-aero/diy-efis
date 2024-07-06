@@ -1,6 +1,8 @@
+#ifndef __muon_h__
+#define __muon_h__
 /*
 diy-efis
-Copyright (C) 2016 Kotuku Aerospace Limited
+Copyright (C) 2016-2022 Kotuku Aerospace Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,13 +30,15 @@ providers.
 
 If any file has a copyright notice or portions of code have been used
 and the original copyright notice is not yet transcribed to the repository
-then the origional copyright notice is to be respected.
+then the original copyright notice is to be respected.
 
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
+
+If you wish to use any of this code in a commercial application then
+you must obtain a licence from the copyright holder.  Contact
+support@kotuku.aero for information on the commercial licences.
 */
-#ifndef __muon_h__
-#define __muon_h__
 
 /* muon version number */
 #ifdef VER
@@ -46,42 +50,13 @@ it must be removed as soon as possible after the code fragment is identified.
 #include "../neutron/neutron.h"
 #include "cli.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-/*
- * Typical usage of muon to process a can_message
- * 
- * result_t process_msg(const canmsg_t *msg)
- * {
- * const char *function;
- * 
- * // function is loaded from store:
- * 
- * any_value_t val;
- * val.Pointer = &msg->msg;
- * 
- * muon_t muon;
- * muon_initialise(&muon, 256, 0, 0, 0);
- * muon_include_all_system_headers(&muon);
- * muon_parse(&muon, "script", function, false, false, false, false);
- * muon_call_fn(&muon, "ev_msg", 1, &val);
- * muon_cleanup(&muon);
- * 
- * return s_ok;
- * }
- */
+#ifdef __cplusplus
+  }
+#endif
 
-/**
- * Initialize the CLI parser.  Hooks the message queue
- * @return s_ok if hook installed ok
- */
-extern result_t muon_initialize_cli(cli_node_t *cli_root);
-/**
- * Edit a stream
- * @param stdin   stream to read console from
- * @param stdout  stream to write console to
- * @param title   editor title
- * @param stream  stream to read/write file to
- */
-result_t muon_edit(handle_t ci, handle_t co, const char *title, handle_t stream);
 
-#endif /* PICOC_H */
+#endif

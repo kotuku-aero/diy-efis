@@ -1,6 +1,8 @@
+#ifndef __stream_h__
+#define	__stream_h__
 /*
 diy-efis
-Copyright (C) 2016 Kotuku Aerospace Limited
+Copyright (C) 2016-2022 Kotuku Aerospace Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,51 +30,41 @@ providers.
 
 If any file has a copyright notice or portions of code have been used
 and the original copyright notice is not yet transcribed to the repository
-then the origional copyright notice is to be respected.
+then the original copyright notice is to be respected.
 
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
+
+If you wish to use any of this code in a commercial application then
+you must obtain a licence from the copyright holder.  Contact
+support@kotuku.aero for information on the commercial licences.
 */
-#ifndef STREAM_H
-#define	STREAM_H
 
-#ifdef	__cplusplus
-extern "C"
-  {
-#endif
-  
 #include "neutron.h"
-  
-struct _stream_handle_t;
 
-typedef result_t (*stream_eof_fn)(struct _stream_handle_t *stream);
-typedef result_t (*stream_read_fn)(struct _stream_handle_t *stream, void *buffer, uint16_t size, uint16_t *read);
-typedef result_t (*stream_write_fn)(struct _stream_handle_t *stream, const void *buffer, uint16_t size);
-typedef result_t (*stream_getpos_fn)(struct _stream_handle_t *stream, uint32_t *pos);
-typedef result_t (*stream_setpos_fn)(struct _stream_handle_t *stream, uint32_t pos);
-typedef result_t (*stream_length_fn)(struct _stream_handle_t *stream, uint32_t *length);
-typedef result_t (*stream_truncate_fn)(struct _stream_handle_t *stream, uint32_t length);
-typedef result_t (*stream_close_fn)(struct _stream_handle_t *stream);
-typedef result_t (*stream_delete_fn)(struct _stream_handle_t *stream);
-typedef result_t (*stream_path_fn)(struct _stream_handle_t *stream, bool full_path, uint16_t len, char *path);
-
-typedef struct _stream_handle_t {
-  uint16_t version;
-  stream_eof_fn stream_eof;
-  stream_read_fn stream_read;
-  stream_write_fn stream_write;
-  stream_getpos_fn stream_getpos;
-  stream_setpos_fn stream_setpos;
-  stream_length_fn stream_length;
-  stream_truncate_fn stream_truncate;
-  stream_close_fn stream_close;
-  stream_delete_fn stream_delete;
-  stream_path_fn stream_path;
-  } stream_handle_t;
-
-#ifdef	__cplusplus
-  }
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-#endif	/* STREAM_H */
+  typedef struct _stream_t stream_t;
+
+  typedef struct _stream_t {
+    base_t base;
+    result_t(*eof)(handle_t stream);
+    result_t(*read)(handle_t stream, void* buffer, uint32_t size, uint32_t* read);
+    result_t(*write)(handle_t stream, const void* buffer, uint32_t size);
+    result_t(*getpos)(handle_t stream, uint32_t* pos);
+    result_t(*setpos)(handle_t stream, int32_t pos, uint32_t whence);
+    result_t(*length)(handle_t stream, uint32_t* length);
+    result_t(*truncate)(handle_t stream, uint32_t length);
+    result_t(*sync)(handle_t stream);
+  } stream_t;
+
+  extern const typeid_t stream_type;
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
 

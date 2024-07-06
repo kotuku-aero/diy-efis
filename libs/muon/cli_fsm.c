@@ -1,6 +1,6 @@
 /*
 diy-efis
-Copyright (C) 2016 Kotuku Aerospace Limited
+Copyright (C) 2016-2022 Kotuku Aerospace Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,10 +28,14 @@ providers.
 
 If any file has a copyright notice or portions of code have been used
 and the original copyright notice is not yet transcribed to the repository
-then the origional copyright notice is to be respected.
+then the original copyright notice is to be respected.
 
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
+
+If you wish to use any of this code in a commercial application then
+you must obtain a licence from the copyright holder.  Contact
+support@kotuku.aero for information on the commercial licences.
 */
 #include "cli.h"
 #include <string.h>
@@ -39,11 +43,12 @@ it must be removed as soon as possible after the code fragment is identified.
 
 int cli_match(cli_t *parser,
               cli_token_t *token,
-              cli_node_t *parent, cli_node_t **match, bool *is_complete)
+              const cli_node_t *parent,
+              const cli_node_t **match, bool *is_complete)
   {
   int num_matches = 0;
   bool local_is_complete;
-  cli_node_t *child;
+  const cli_node_t *child;
   result_t rc;
 
   *match = 0;
@@ -172,7 +177,8 @@ static cli_state_t push_back_char(cli_token_t *token, char ch)
      token->token_length == (token->token_buflen-1))
     {
     // re-allocate the buffer
-    char *new_buffer = (char *)neutron_malloc(token->token_buflen + 32);
+    char *new_buffer;
+    neutron_malloc(token->token_buflen + 32, (void **)&new_buffer);
     if(token->token_buffer != 0)
       {
       strcpy(new_buffer, token->token_buffer);
@@ -452,8 +458,6 @@ result_t cli_fsm_input(cli_t *parser, char ch)
   {
   int input_type;
   bool ch_processed;
-  int n;
-  int m;
 
   /*
    * We classify the input into one of 3 classes: backspace (BS),

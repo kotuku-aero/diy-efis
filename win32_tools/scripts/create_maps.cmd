@@ -1,0 +1,7 @@
+..\bin\gtopo2db -s \Projects\terrain -c 2301 -n "All World" -a 315 -z 45 \Projects\map-data\terrain.db
+..\bin\shp2db -s \Projects\contours\Contours1000ft.shp -t contours -r W180,N90,E180,S60 -n "Contours 7.5 arcsec" -c 2301 -z 0,100000  \Projects\map-data\contours.db
+..\bin\shp2db -s "G:\My Drive\Projects\Graviton\contours\land-polygons\land_polygons.shp" -t coastlines -r W180,N90,E180,S60 -n "Coastlines" -z 0,100000  \Projects\map-data\coastlines.db
+..\bin\shp2db -s "G:\My Drive\Projects\Graviton\contours\land-polygons-simplified\land.shp" -t landareas -r W180,N90,E180,S60 -n "Landarea" -z 0,100000  \Projects\map-data\landareas.db
+..\bin\shp2db -s \Projects\natural_earth\ne_10m_populated_places.shp;\Projects\natural_earth\ne_10m_urban_areas.shp -t cities -r W180,N90,E180,S60 -n "Cities 10m"  -z 0,100000 \Projects\map-data\cities.db
+..\bin\shp2db -s \Projects\natural_earth\ne_10m_lakes.shp;\Projects\natural_earth\ne_10m_rivers_north_america.shp;\Projects\natural_earth\ne_10m_rivers_australia.shp;\Projects\natural_earth\ne_10m_rivers_lake_centerlines.shp -t surface_water -r W180,N90,E180,S60 -n "Lakes and rivers 10m" -z 0,200  \Projects\map-data\surface_water.db
+..\bin\nzaip2db -s "G:\My Drive\Projects\Graviton\preflight" -r W180,N90,E180,S60 -n "NZ Airspace" C:\Projects\map-data\nz_airspace.db

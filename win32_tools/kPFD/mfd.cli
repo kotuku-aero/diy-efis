@@ -1,0 +1,7 @@
+#include "../../libs/muon/neutron.cli"
+
+send_can <ENUM:can_ids:id> <ENUM:can_types:type> { <STRING:val1> { <STRING:val2> { <STRING:val3> { <STRING:val4> } } } }
+
+recv_can <ENUM:can_ids:id> <ENUM:can_types:type> { <STRING:val1> { <STRING:val2> { <STRING:val3> { <STRING:val4> } } } }
+
+exit

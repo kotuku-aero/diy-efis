@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="clipper.core.h" />
+    <ClInclude Include="clipper.engine.h" />
+    <ClInclude Include="clipper.export.h" />
+    <ClInclude Include="clipper.h" />
+    <ClInclude Include="clipper.minkowski.h" />
+    <ClInclude Include="clipper.offset.h" />
+    <ClInclude Include="clipper.rectclip.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="clipper.engine.cpp" />
+    <ClCompile Include="clipper.offset.cpp" />
+    <ClCompile Include="clipper.rectclip.cpp" />
+  </ItemGroup>
+</Project>

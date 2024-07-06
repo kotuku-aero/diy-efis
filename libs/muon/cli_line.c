@@ -1,6 +1,6 @@
 /*
 diy-efis
-Copyright (C) 2016 Kotuku Aerospace Limited
+Copyright (C) 2016-2022 Kotuku Aerospace Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,10 +28,14 @@ providers.
 
 If any file has a copyright notice or portions of code have been used
 and the original copyright notice is not yet transcribed to the repository
-then the origional copyright notice is to be respected.
+then the original copyright notice is to be respected.
 
 If any material is included in the repository that is not open source
 it must be removed as soon as possible after the code fragment is identified.
+
+If you wish to use any of this code in a commercial application then
+you must obtain a licence from the copyright holder.  Contact
+support@kotuku.aero for information on the commercial licences.
 */
 #include "cli.h"
 #include <string.h>
@@ -41,8 +45,11 @@ it must be removed as soon as possible after the code fragment is identified.
 
 result_t cli_line_init(cli_line_t *line)
   {
+  result_t result;
+  if (failed(result = neutron_malloc(CLI_MAX_LINE_LENGTH + 1, (void **) &line->buffer)))
+    return result;
+
   line->current = 0;
-  line->buffer = (char *)neutron_malloc(CLI_MAX_LINE_LENGTH+1);
   line->buffer[0] = 0;
   line->buflen = CLI_MAX_LINE_LENGTH;
 
@@ -64,6 +71,7 @@ result_t cli_line_reset(cli_line_t *line)
 
 result_t cli_line_insert(cli_t *parser, char ch)
   {
+  result_t result;
   int n;
   cli_line_t *line;
 
@@ -72,11 +80,16 @@ result_t cli_line_insert(cli_t *parser, char ch)
 
   line = &parser->lines[parser->cur_line];
 
-  uint16_t len = strlen(line->buffer);
+  uint16_t len = (uint16_t) strlen(line->buffer);
   if (len >= (line->buflen - 1))
     {
     // expand the buffer
-    char *new_buffer = (char *)neutron_malloc(line->buflen + 32);
+
+    char *new_buffer;
+    
+    if (failed(result = neutron_malloc(line->buflen + 32, (void **)&new_buffer)))
+      return result;
+
     strcpy(new_buffer, line->buffer);
     line->buflen += 32;
     neutron_free(line->buffer);
@@ -101,7 +114,7 @@ result_t cli_line_insert(cli_t *parser, char ch)
   line->current++; /* update current position */
   stream_puts(parser->cfg.console_out, &line->buffer[line->current]);
 
-  uint16_t last = strlen(line->buffer);
+  uint16_t last = (uint16_t)strlen(line->buffer);
   /* Move cursor back to the current position */
   for (n = line->current; n < last; n++)
     stream_putc(parser->cfg.console_out, '\b');
@@ -119,7 +132,7 @@ result_t cli_line_delete(cli_t *parser)
 
   line = &parser->lines[parser->cur_line];
 
-  uint16_t length = strlen(line->buffer);
+  uint16_t length = (uint16_t)strlen(line->buffer);
 
   if (line->current == 0 || length == 0)
     {
@@ -128,7 +141,7 @@ result_t cli_line_delete(cli_t *parser)
     }
 
   line->current--;
-  uint16_t len = strlen(line->buffer);
+  uint16_t len = (uint16_t)strlen(line->buffer);
 
   memmove(&line->buffer[line->current], &line->buffer[line->current + 1], (len + 1) - line->current);
   length--;
@@ -167,7 +180,7 @@ result_t cli_line_print(const cli_t *parser, int print_prompt, int new_line)
 
   stream_puts(parser->cfg.console_out, line->buffer);
 
-  uint16_t last = strlen(line->buffer);
+  uint16_t last = (uint16_t)strlen(line->buffer);
 
   /* Move the cursor back the current position */
   for (n = line->current; n < last; n++)
@@ -183,7 +196,7 @@ uint16_t cli_line_current(const cli_t *parser)
 
 uint16_t cli_line_last(const cli_t *parser)
   {
-  return strlen(parser->lines[parser->cur_line].buffer);
+  return (uint16_t)strlen(parser->lines[parser->cur_line].buffer);
   }
 
 char cli_line_current_char(const cli_t *parser)
@@ -206,7 +219,7 @@ char cli_line_next_char(cli_t *parser)
 
   line = &parser->lines[parser->cur_line];
 
-  uint16_t last =strlen(line->buffer);
+  uint16_t last = (uint16_t)strlen(line->buffer);
   if (last == line->current)
     {
     /* Already at the end of the line */

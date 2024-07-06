@@ -6,6 +6,8 @@
 #include <stdint.h>
 #include "regex.h"
 
+#include "../../libs/neutron/neutron.h"
+
 #ifdef _UINCODE
 #define scisprint iswprint
 #define scstrlen wcslen
@@ -92,7 +94,7 @@ static int trex_newnode(TRex *exp, TRexNodeType type)
 	if(exp->_nallocated < (exp->_nsize + 1)) {
 		int oldsize = exp->_nallocated;
 		exp->_nallocated *= 2;
-		exp->_nodes = (TRexNode *)neutron_realloc(exp->_nodes, exp->_nallocated * sizeof(TRexNode));
+    neutron_realloc(exp->_nallocated * sizeof(TRexNode), (void **) &exp->_nodes);
 	}
 	exp->_nodes[exp->_nsize++] = n;
 	newid = exp->_nsize - 1;
@@ -531,18 +533,21 @@ static const TRexChar *trex_matchnode(TRex* exp,TRexNode *node,const TRexChar *s
 /* public api */
 TRex *trex_compile(const TRexChar *pattern,const TRexChar **error)
 {
-	TRex *exp = (TRex *)neutron_malloc(sizeof(TRex));
+	TRex *exp;
+	neutron_malloc(sizeof(TRex), (void **)&exp);
 	exp->_eol = exp->_bol = NULL;
 	exp->_p = pattern;
 	exp->_nallocated = (int)scstrlen(pattern) * sizeof(TRexChar);
-	exp->_nodes = (TRexNode *)neutron_malloc(exp->_nallocated * sizeof(TRexNode));
+	neutron_malloc(exp->_nallocated * sizeof(TRexNode), (void **)&exp->_nodes);
 	exp->_nsize = 0;
 	exp->_matches = 0;
 	exp->_nsubexpr = 0;
 	exp->_first = trex_newnode(exp,OP_EXPR);
 	exp->_error = error;
-	exp->_jmpbuf = neutron_malloc(sizeof(jmp_buf));
-	if(setjmp(*((jmp_buf*)exp->_jmpbuf)) == 0) {
+	neutron_malloc(sizeof(jmp_buf), (void **)&exp->_jmpbuf);
+
+	if(setjmp(*((jmp_buf*)exp->_jmpbuf)) == 0) 
+		{
 		int res = trex_list(exp);
 		exp->_nodes[exp->_first].left = res;
 		if(*exp->_p!='\0')
@@ -564,7 +569,7 @@ TRex *trex_compile(const TRexChar *pattern,const TRexChar **error)
 			scprintf(_SC("\n"));
 		}
 #endif
-		exp->_matches = (TRexMatch *) neutron_malloc(exp->_nsubexpr * sizeof(TRexMatch));
+		neutron_malloc(exp->_nsubexpr * sizeof(TRexMatch), (void **)&exp->_matches);
 		memset(exp->_matches,0,exp->_nsubexpr * sizeof(TRexMatch));
 	}
 	else{
