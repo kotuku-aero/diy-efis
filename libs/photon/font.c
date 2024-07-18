@@ -61,7 +61,7 @@ result_t draw_text(handle_t hndl, const rect_t *clip_rect, const font_t *font,
         uint8_t mask_bit = 0x80;
         for (bit = 8; bit > 0; bit--, mask_bit >>= 1)
           {
-          if (succeeded(rect_contains(clip_rect, &pos)))
+          if (rect_contains(clip_rect, &pos))
             {
             // pick up the column byte
             if((bitmap_bits & mask_bit) != 0)
