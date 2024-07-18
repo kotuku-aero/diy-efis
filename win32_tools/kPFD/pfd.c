@@ -605,11 +605,15 @@
           static airspeed_widget_t asi_widget = {
           .base.style =
     
-      BORDER_BOTTOM |
+      DRAW_BACKGROUND |
     
     BORDER_NONE,
+    .base.background_gutter = 8,
+    .base.gutter_color = color_black,
     .base.border_color = color_white,
+    .base.background_color = color_gray,
     .base.name = "ASI",
+    .base.z_order = 10,
     .base.status_timeout = 10000,
       .base.sensor_failed = false,
       .base.alarm_color = color_red,
@@ -624,7 +628,7 @@
           .large_roller = &neo_15_font,
           .small_roller = &neo_9_font,
           
-              .pixels_per_unit = 10,
+              .pixels_per_unit = 3,
             
           };
         
@@ -636,6 +640,7 @@
     BORDER_NONE,
     .base.border_color = color_white,
     .base.name = "ATT",
+    .base.z_order = 0,
     .base.status_timeout = 10000,
       .base.sensor_failed = false,
       .base.alarm_color = color_red,
@@ -652,11 +657,15 @@
           static altitude_widget_t alt_widget = {
           .base.style =
     
-      BORDER_BOTTOM |
+      DRAW_BACKGROUND |
     
     BORDER_NONE,
+    .base.background_gutter = 8,
+    .base.gutter_color = color_black,
     .base.border_color = color_white,
+    .base.background_color = color_gray,
     .base.name = "ALT",
+    .base.z_order = 10,
     .base.status_timeout = 10000,
       .base.sensor_failed = false,
       .base.alarm_color = color_red,
@@ -677,12 +686,17 @@
     
       BORDER_LEFT |
     
+      BORDER_TOP |
+    
       BORDER_RIGHT |
     
       BORDER_BOTTOM |
     
+      DRAW_BACKGROUND |
+    
     BORDER_NONE,
     .base.border_color = color_white,
+    .base.background_color = color_black,
     .base.name = "HSI",
     .base.name_font  = &neo_9_font,
     .base.on_create = on_create_hsi_widget,
@@ -699,10 +713,15 @@
           static ap_widget_t ap_widget ={
           .base.style =
     
+      BORDER_TOP |
+    
       BORDER_BOTTOM |
+    
+      DRAW_BACKGROUND |
     
     BORDER_NONE,
     .base.border_color = color_white,
+    .base.background_color = color_black,
     .base.name = "AP",
     .base.name_font  = &neo_9_font,
     .base.on_create = on_create_autopilot_widget,
@@ -786,6 +805,7 @@
     
     BORDER_NONE,
     .base.border_color = color_white,
+    .base.background_color = color_black,
     .base.name_color = color_white,
     .base.name = "MAP",
     .base.name_font  = &neo_9_font,
@@ -940,6 +960,7 @@
     
     BORDER_NONE,
     .base.border_color = color_white,
+    .base.background_color = color_black,
     .base.name_color = color_white,
     .base.name = "RPM",
     .base.name_font  = &neo_9_font,
@@ -991,6 +1012,204 @@
 
           };
         
+          static datetime_annunciator_t utc_annunciator ={
+          .base.base.base.style =
+    
+      BORDER_TOP |
+    
+      DRAW_NAME |
+    
+    BORDER_NONE,
+    .base.base.base.border_color = color_white,
+    .base.base.base.background_color = color_blue,
+    .base.base.base.name_color = color_white,
+    .base.base.base.name = "UTC",
+    .base.base.base.name_font  = &neo_9_font,
+    .base.base.base.status_timeout = 10000,
+      .base.base.base.sensor_failed = false,
+      .base.base.base.alarm_color = color_red,
+      .base.base.base.rect.left = 0,
+    .base.base.base.rect.top = 240,
+    .base.base.base.rect.right = 0 + 60,
+    .base.base.base.rect.bottom = 240 + 40,
+  .base.can_id = id_datetime_utc,
+    .base.label_color = color_white,
+    .base.text_color  = color_purple,
+    .base.small_font = &neo_9_font,
+    .base.label_offset = 2,
+    .base.text_offset = 30,
+    .base.compact = true,
+    
+          .format = "%H:%M",
+          .base.base.base.on_message = on_datetime_msg,
+          .base.base.base.on_paint = on_paint_datetime,
+          };
+        
+          static datetime_annunciator_t utc_date_annunciator ={
+          .base.base.base.style =
+    
+      BORDER_TOP |
+    
+      DRAW_NAME |
+    
+    BORDER_NONE,
+    .base.base.base.border_color = color_white,
+    .base.base.base.background_color = color_blue,
+    .base.base.base.name_color = color_white,
+    .base.base.base.name = "UTC DATE",
+    .base.base.base.name_font  = &neo_9_font,
+    .base.base.base.status_timeout = 10000,
+      .base.base.base.sensor_failed = false,
+      .base.base.base.alarm_color = color_red,
+      .base.base.base.rect.left = 0,
+    .base.base.base.rect.top = 280,
+    .base.base.base.rect.right = 0 + 60,
+    .base.base.base.rect.bottom = 280 + 40,
+  .base.can_id = id_datetime_utc,
+    .base.label_color = color_white,
+    .base.text_color  = color_purple,
+    .base.small_font = &neo_9_font,
+    .base.label_offset = 2,
+    .base.text_offset = 30,
+    .base.compact = true,
+    
+          .format = "%y-%m-%d",
+          .base.base.base.on_message = on_datetime_msg,
+          .base.base.base.on_paint = on_paint_datetime,
+          };
+        
+          static hobbs_annunciator_t air_annunciator ={
+          .base.base.base.style =
+    
+      BORDER_TOP |
+    
+      DRAW_NAME |
+    
+    BORDER_NONE,
+    .base.base.base.border_color = color_white,
+    .base.base.base.background_color = color_blue,
+    .base.base.base.name_color = color_white,
+    .base.base.base.name = "AIR",
+    .base.base.base.name_font  = &neo_9_font,
+    .base.base.base.status_timeout = 10000,
+      .base.base.base.sensor_failed = false,
+      .base.base.base.alarm_color = color_red,
+      .base.base.base.rect.left = 0,
+    .base.base.base.rect.top = 320,
+    .base.base.base.rect.right = 0 + 60,
+    .base.base.base.rect.bottom = 320 + 40,
+  .base.can_id = id_engine_hours,
+    .base.label_color = color_white,
+    .base.text_color  = color_purple,
+    .base.small_font = &neo_9_font,
+    .base.label_offset = 2,
+    .base.text_offset = 30,
+    .base.compact = true,
+    
+          .base.base.base.on_message = on_hobbs_msg,
+          .base.base.base.on_paint = on_paint_hobbs,
+          };
+        
+          static hobbs_annunciator_t eng_annunciator ={
+          .base.base.base.style =
+    
+      BORDER_TOP |
+    
+      DRAW_NAME |
+    
+    BORDER_NONE,
+    .base.base.base.border_color = color_white,
+    .base.base.base.background_color = color_blue,
+    .base.base.base.name_color = color_white,
+    .base.base.base.name = "ENG",
+    .base.base.base.name_font  = &neo_9_font,
+    .base.base.base.status_timeout = 10000,
+      .base.base.base.sensor_failed = false,
+      .base.base.base.alarm_color = color_red,
+      .base.base.base.rect.left = 0,
+    .base.base.base.rect.top = 360,
+    .base.base.base.rect.right = 0 + 60,
+    .base.base.base.rect.bottom = 360 + 40,
+  .base.can_id = id_engine_hours,
+    .base.label_color = color_white,
+    .base.text_color  = color_purple,
+    .base.small_font = &neo_9_font,
+    .base.label_offset = 2,
+    .base.text_offset = 30,
+    .base.compact = true,
+    
+          .base.base.base.on_message = on_hobbs_msg,
+          .base.base.base.on_paint = on_paint_hobbs,
+          };
+        
+          static datetime_annunciator_t lcl_annunciator ={
+          .base.base.base.style =
+    
+      BORDER_TOP |
+    
+      DRAW_NAME |
+    
+    BORDER_NONE,
+    .base.base.base.border_color = color_white,
+    .base.base.base.background_color = color_blue,
+    .base.base.base.name_color = color_white,
+    .base.base.base.name = "LCL",
+    .base.base.base.name_font  = &neo_9_font,
+    .base.base.base.status_timeout = 10000,
+      .base.base.base.sensor_failed = false,
+      .base.base.base.alarm_color = color_red,
+      .base.base.base.rect.left = 0,
+    .base.base.base.rect.top = 400,
+    .base.base.base.rect.right = 0 + 60,
+    .base.base.base.rect.bottom = 400 + 40,
+  .base.can_id = id_datetime_lcl,
+    .base.label_color = color_white,
+    .base.text_color  = color_purple,
+    .base.small_font = &neo_9_font,
+    .base.label_offset = 2,
+    .base.text_offset = 30,
+    .base.compact = true,
+    
+          .format = "%H:%M",
+          .base.base.base.on_message = on_datetime_msg,
+          .base.base.base.on_paint = on_paint_datetime,
+          };
+        
+          static datetime_annunciator_t lcl_date_annunciator ={
+          .base.base.base.style =
+    
+      BORDER_TOP |
+    
+      BORDER_BOTTOM |
+    
+      DRAW_NAME |
+    
+    BORDER_NONE,
+    .base.base.base.border_color = color_white,
+    .base.base.base.background_color = color_blue,
+    .base.base.base.name_color = color_white,
+    .base.base.base.name = "LCL DATE",
+    .base.base.base.name_font  = &neo_9_font,
+    .base.base.base.status_timeout = 10000,
+      .base.base.base.sensor_failed = false,
+      .base.base.base.alarm_color = color_red,
+      .base.base.base.rect.left = 0,
+    .base.base.base.rect.top = 440,
+    .base.base.base.rect.right = 0 + 60,
+    .base.base.base.rect.bottom = 440 + 40,
+  .base.can_id = id_datetime_lcl,
+    .base.label_color = color_white,
+    .base.text_color  = color_purple,
+    .base.small_font = &neo_9_font,
+    .base.label_offset = 2,
+    .base.text_offset = 30,
+    .base.compact = true,
+    
+          .format = "%y-%m-%d",
+          .base.base.base.on_message = on_datetime_msg,
+          .base.base.base.on_paint = on_paint_datetime,
+          };
+        
           static hp_annunciator_t hp_annunciator ={
           .base.base.base.style =
     
@@ -999,8 +1218,6 @@
       BORDER_BOTTOM |
     
       DRAW_NAME |
-    
-      DRAW_BACKGROUND |
     
     BORDER_NONE,
     .base.base.base.border_color = color_white,
@@ -1017,14 +1234,40 @@
     .base.base.base.rect.bottom = 547 + 20,
   .base.can_id = id_engine_hp,
     .base.label_color = color_white,
-    .base.text_color  = color_white,
+    .base.text_color  = color_purple,
     .base.small_font = &neo_9_font,
     .base.label_offset = 2,
     .base.text_offset = 30,
-  
+    
           .base.base.base.on_message = on_hp_msg,
-          .base.base.base.on_paint_foreground = on_paint_hp,
-          .base.base.base.on_paint_background = on_paint_background_auto,
+          .base.base.base.on_paint = on_paint_hp,
+          };
+        
+          static ecu_annunciator_t kmag_annunciator ={
+          .base.base.style =
+    
+      BORDER_RIGHT |
+    
+      BORDER_BOTTOM |
+    
+      DRAW_BACKGROUND |
+    
+    BORDER_NONE,
+    .base.base.border_color = color_white,
+    .base.base.background_color = color_black,
+    .base.base.name_color = color_white,
+    .base.base.name = "kMAG",
+    .base.base.name_font  = &neo_9_font,
+    .base.base.status_timeout = 10000,
+      .base.base.sensor_failed = false,
+      .base.base.alarm_color = color_red,
+      .base.base.rect.left = 60,
+    .base.base.rect.top = 547,
+    .base.base.rect.right = 60 + 136,
+    .base.base.rect.bottom = 547 + 20,
+  
+          .base.base.on_message = on_kmag_msg,
+          .base.base.on_paint = on_paint_kmag,
           };
         
           static auto_annunciator_t oat_annunciator ={
@@ -1036,14 +1279,12 @@
     
       DRAW_NAME |
     
-      DRAW_BACKGROUND |
-    
     BORDER_NONE,
     .base.base.base.border_color = color_white,
     .base.base.base.background_color = color_blue,
     .base.base.base.name = "OAT",
     .base.base.base.name_font  = &neo_9_font,
-    .base.base.base.on_paint_foreground = on_paint_auto,
+    .base.base.base.on_paint = on_paint_auto,
     .base.base.base.on_message = on_auto_msg,
     .base.base.base.status_timeout = 10000,
       .base.base.base.sensor_failed = false,
@@ -1054,18 +1295,17 @@
     .base.base.base.rect.bottom = 547 + 20,
   .base.can_id = id_outside_air_temperature,
     .base.label_color = color_white,
-    .base.text_color  = color_white,
+    .base.text_color  = color_purple,
     .base.small_font = &neo_9_font,
     .base.label_offset = 2,
     .base.text_offset = 30,
-  
+    
             .converter = &to_display_temperature,
           
           .value_type = v_uint16,
           .fmt = "%d",
           .base.base.base.on_message = on_auto_msg,
-          .base.base.base.on_paint_foreground = on_paint_auto,
-          .base.base.base.on_paint_background = on_paint_background_auto,
+          .base.base.base.on_paint = on_paint_auto,
           };
         
           static edu_temp_widget_t edu_temps ={
@@ -1073,10 +1313,11 @@
     
       BORDER_RIGHT |
     
-      BORDER_BOTTOM |
+      DRAW_BACKGROUND |
     
     BORDER_NONE,
     .base.border_color = color_white,
+    .base.background_color = color_black,
     .base.name = "TEMPS",
     .base.status_timeout = 10000,
       .base.sensor_failed = false,
@@ -1101,8 +1342,8 @@
           .bar_bottom = 104,
           .status_top = 102,
           .font = &neo_9_font,
-          .cht_color= color_lightblue,
-          .egt_color= color_lightgreen,
+          .cht_color= color_lightgreen,
+          .egt_color= color_lightblue,
           
           .cht[1-1].can_id = id_cylinder_head_temperature1,
     .cht[1-1].default_color = color_lightgreen,
@@ -1125,7 +1366,7 @@
     .cht[3-1].bar_name = "3",
     .cht[3-1].sensor_id = id_cylinder_head_temperature3_status,
     .cht[3-1].value = 273,
-  .cht[4-1].can_id = id_cylinder_head_temperature1,
+  .cht[4-1].can_id = id_cylinder_head_temperature4,
     .cht[4-1].default_color = color_lightgreen,
     .cht[4-1].alarm_id = id_cylinder_head_temperature4_alarm,
     .cht[4-1].alarm_color = color_red,
@@ -1194,9 +1435,15 @@
           static gauge_widget_t oilt_gauge ={
           .base.style =
     
+      BORDER_RIGHT |
+    
       DRAW_NAME |
     
+      DRAW_BACKGROUND |
+    
     BORDER_NONE,
+    .base.border_color = color_white,
+    .base.background_color = color_black,
     .base.name_color = color_white,
     .base.name = "OILT",
     .base.name_font  = &neo_9_font,
@@ -1260,12 +1507,17 @@
           static gauge_widget_t oilp_gauge ={
           .base.style =
     
+      BORDER_RIGHT |
+    
       BORDER_BOTTOM |
     
       DRAW_NAME |
     
+      DRAW_BACKGROUND |
+    
     BORDER_NONE,
     .base.border_color = color_white,
+    .base.background_color = color_black,
     .base.name_color = color_white,
     .base.name = "OILP",
     .base.name_font  = &neo_9_font,
@@ -1335,12 +1587,13 @@
           static gauge_widget_t volts_gauge ={
           .base.style =
     
-      BORDER_BOTTOM |
-    
       DRAW_NAME |
+    
+      DRAW_BACKGROUND |
     
     BORDER_NONE,
     .base.border_color = color_white,
+    .base.background_color = color_black,
     .base.name_color = color_white,
     .base.name = "VOLTS",
     .base.name_font  = &neo_9_font,
@@ -1402,9 +1655,15 @@
           static gauge_widget_t fuelp_gauge ={
           .base.style =
     
+      BORDER_RIGHT |
+    
       DRAW_NAME |
     
+      DRAW_BACKGROUND |
+    
     BORDER_NONE,
+    .base.border_color = color_white,
+    .base.background_color = color_black,
     .base.name_color = color_white,
     .base.name = "FUELP",
     .base.name_font  = &neo_9_font,
@@ -1462,12 +1721,17 @@
           static gauge_widget_t fuelf_gauge ={
           .base.style =
     
+      BORDER_RIGHT |
+    
       BORDER_BOTTOM |
     
       DRAW_NAME |
     
+      DRAW_BACKGROUND |
+    
     BORDER_NONE,
     .base.border_color = color_white,
+    .base.background_color = color_black,
     .base.name_color = color_white,
     .base.name = "FUELF",
     .base.name_font  = &neo_9_font,
@@ -1536,12 +1800,15 @@
           static gauge_widget_t amps_gauge ={
           .base.style =
     
-      BORDER_BOTTOM |
+      BORDER_RIGHT |
     
       DRAW_NAME |
     
+      DRAW_BACKGROUND |
+    
     BORDER_NONE,
     .base.border_color = color_white,
+    .base.background_color = color_black,
     .base.name_color = color_white,
     .base.name = "AMPS",
     .base.name_font  = &neo_9_font,
@@ -1603,10 +1870,15 @@
           static gauge_widget_t left_fuel_gauge ={
           .base.style =
     
+      BORDER_RIGHT |
+    
       DRAW_NAME |
+    
+      DRAW_BACKGROUND |
     
     BORDER_NONE,
     .base.border_color = color_white,
+    .base.background_color = color_black,
     .base.name_color = color_white,
     .base.name = "LEFT",
     .base.name_font  = &neo_9_font,
@@ -1669,10 +1941,15 @@
           static gauge_widget_t right_fuel_gauge ={
           .base.style =
     
+      BORDER_RIGHT |
+    
       DRAW_NAME |
+    
+      DRAW_BACKGROUND |
     
     BORDER_NONE,
     .base.border_color = color_white,
+    .base.background_color = color_black,
     .base.name_color = color_white,
     .base.name = "RIGHT",
     .base.name_font  = &neo_9_font,
@@ -1735,10 +2012,15 @@
           static gauge_widget_t fuelt_gauge ={
           .base.style =
     
+      BORDER_RIGHT |
+    
       DRAW_NAME |
+    
+      DRAW_BACKGROUND |
     
     BORDER_NONE,
     .base.border_color = color_white,
+    .base.background_color = color_black,
     .base.name_color = color_white,
     .base.name = "FUELT",
     .base.name_font  = &neo_9_font,
@@ -1864,7 +2146,10 @@
           static pancake_widget_t pitch_indicator ={
           .base.style =
     
+      DRAW_BACKGROUND |
+    
     BORDER_NONE,
+    .base.background_color = color_black,
     .base.name = "PITCH",
     .base.status_timeout = 10000,
       .base.sensor_failed = false,
@@ -1894,7 +2179,10 @@
           static pancake_widget_t roll_indicator ={
           .base.style =
     
+      DRAW_BACKGROUND |
+    
     BORDER_NONE,
+    .base.background_color = color_black,
     .base.name = "ROLL",
     .base.status_timeout = 10000,
       .base.sensor_failed = false,
@@ -2020,9 +2308,9 @@
             .base.rect.left = 1,
             .base.rect.top = 1,
             .base.rect.right = 256 -2,
-            .base.rect.bottom = 53 -2,
+            .base.rect.bottom = 33 -2,
             .base.name_font = &neo_15_font,
-            .base.on_paint_foreground = on_paint_alarm_foreground,
+            .base.on_paint = on_paint_alarm_foreground,
             },
           
             {
@@ -2037,9 +2325,9 @@
             .base.rect.left = 1,
             .base.rect.top = 1,
             .base.rect.right = 256 -2,
-            .base.rect.bottom = 53 -2,
+            .base.rect.bottom = 33 -2,
             .base.name_font = &neo_15_font,
-            .base.on_paint_foreground = on_paint_alarm_foreground,
+            .base.on_paint = on_paint_alarm_foreground,
             },
           
             {
@@ -2054,9 +2342,9 @@
             .base.rect.left = 1,
             .base.rect.top = 1,
             .base.rect.right = 256 -2,
-            .base.rect.bottom = 53 -2,
+            .base.rect.bottom = 33 -2,
             .base.name_font = &neo_15_font,
-            .base.on_paint_foreground = on_paint_alarm_foreground,
+            .base.on_paint = on_paint_alarm_foreground,
             },
           
             {
@@ -2071,9 +2359,9 @@
             .base.rect.left = 1,
             .base.rect.top = 1,
             .base.rect.right = 256 -2,
-            .base.rect.bottom = 53 -2,
+            .base.rect.bottom = 33 -2,
             .base.name_font = &neo_15_font,
-            .base.on_paint_foreground = on_paint_alarm_foreground,
+            .base.on_paint = on_paint_alarm_foreground,
             },
           
             {
@@ -2088,9 +2376,9 @@
             .base.rect.left = 1,
             .base.rect.top = 1,
             .base.rect.right = 256 -2,
-            .base.rect.bottom = 53 -2,
+            .base.rect.bottom = 33 -2,
             .base.name_font = &neo_15_font,
-            .base.on_paint_foreground = on_paint_alarm_foreground,
+            .base.on_paint = on_paint_alarm_foreground,
             },
           
             {
@@ -2105,9 +2393,9 @@
             .base.rect.left = 1,
             .base.rect.top = 1,
             .base.rect.right = 256 -2,
-            .base.rect.bottom = 53 -2,
+            .base.rect.bottom = 33 -2,
             .base.name_font = &neo_15_font,
-            .base.on_paint_foreground = on_paint_alarm_foreground,
+            .base.on_paint = on_paint_alarm_foreground,
             },
           
             {
@@ -2122,9 +2410,9 @@
             .base.rect.left = 1,
             .base.rect.top = 1,
             .base.rect.right = 256 -2,
-            .base.rect.bottom = 53 -2,
+            .base.rect.bottom = 33 -2,
             .base.name_font = &neo_15_font,
-            .base.on_paint_foreground = on_paint_alarm_foreground,
+            .base.on_paint = on_paint_alarm_foreground,
             },
           
             {
@@ -2139,9 +2427,9 @@
             .base.rect.left = 1,
             .base.rect.top = 1,
             .base.rect.right = 256 -2,
-            .base.rect.bottom = 53 -2,
+            .base.rect.bottom = 33 -2,
             .base.name_font = &neo_15_font,
-            .base.on_paint_foreground = on_paint_alarm_foreground,
+            .base.on_paint = on_paint_alarm_foreground,
             },
           
             {
@@ -2156,9 +2444,9 @@
             .base.rect.left = 1,
             .base.rect.top = 1,
             .base.rect.right = 256 -2,
-            .base.rect.bottom = 53 -2,
+            .base.rect.bottom = 33 -2,
             .base.name_font = &neo_15_font,
-            .base.on_paint_foreground = on_paint_alarm_foreground,
+            .base.on_paint = on_paint_alarm_foreground,
             },
           
             {
@@ -2173,9 +2461,9 @@
             .base.rect.left = 1,
             .base.rect.top = 1,
             .base.rect.right = 256 -2,
-            .base.rect.bottom = 53 -2,
+            .base.rect.bottom = 33 -2,
             .base.name_font = &neo_15_font,
-            .base.on_paint_foreground = on_paint_alarm_foreground,
+            .base.on_paint = on_paint_alarm_foreground,
             },
           
             {
@@ -2190,9 +2478,9 @@
             .base.rect.left = 1,
             .base.rect.top = 1,
             .base.rect.right = 256 -2,
-            .base.rect.bottom = 53 -2,
+            .base.rect.bottom = 33 -2,
             .base.name_font = &neo_15_font,
-            .base.on_paint_foreground = on_paint_alarm_foreground,
+            .base.on_paint = on_paint_alarm_foreground,
             },
           
             {
@@ -2207,9 +2495,9 @@
             .base.rect.left = 1,
             .base.rect.top = 1,
             .base.rect.right = 256 -2,
-            .base.rect.bottom = 53 -2,
+            .base.rect.bottom = 33 -2,
             .base.name_font = &neo_15_font,
-            .base.on_paint_foreground = on_paint_alarm_foreground,
+            .base.on_paint = on_paint_alarm_foreground,
             },
           
             {
@@ -2224,9 +2512,9 @@
             .base.rect.left = 1,
             .base.rect.top = 1,
             .base.rect.right = 256 -2,
-            .base.rect.bottom = 53 -2,
+            .base.rect.bottom = 33 -2,
             .base.name_font = &neo_15_font,
-            .base.on_paint_foreground = on_paint_alarm_foreground,
+            .base.on_paint = on_paint_alarm_foreground,
             },
           
             {
@@ -2241,9 +2529,9 @@
             .base.rect.left = 1,
             .base.rect.top = 1,
             .base.rect.right = 256 -2,
-            .base.rect.bottom = 53 -2,
+            .base.rect.bottom = 33 -2,
             .base.name_font = &neo_15_font,
-            .base.on_paint_foreground = on_paint_alarm_foreground,
+            .base.on_paint = on_paint_alarm_foreground,
             },
           
           };
@@ -2252,19 +2540,24 @@
                 static auto_annunciator_t marquee_ann_2 ={
                 .base.base.base.style =
     
+      BORDER_RIGHT |
+    
       DRAW_NAME |
     
+      DRAW_BACKGROUND |
+    
     BORDER_NONE,
+    .base.base.base.border_color = color_white,
+    .base.base.base.background_color = color_black,
     .base.base.base.name = "Tot. Fuel",
-    .base.base.base.on_paint_foreground = on_paint_auto,
-    .base.base.base.on_paint_background = on_paint_background_auto,
+    .base.base.base.on_paint = on_paint_auto,
     .base.base.base.on_message = on_auto_msg,
     .base.base.base.status_timeout = 10000,
       .base.base.base.sensor_failed = false,
       .base.base.base.alarm_color = color_red,
       .base.base.base.rect.left = 0,
     .base.base.base.rect.top = 0,
-    .base.base.base.rect.right = 0 + 254,
+    .base.base.base.rect.right = 0 + 256,
     .base.base.base.rect.bottom = 0 + 33,
   .base.can_id = id_fuel_total,
     .base.label_color = color_white,
@@ -2272,7 +2565,7 @@
     .base.small_font = &neo_15_font,
     .base.label_offset = 2,
     .base.text_offset = 110,
-  
+    
                   .converter = &to_display_volume,
                 
                 .value_type = v_uint16,
@@ -2282,19 +2575,24 @@
                 static hours_annunciator_t marquee_ann_3 ={
                 .base.base.base.style =
     
+      BORDER_RIGHT |
+    
       DRAW_NAME |
     
+      DRAW_BACKGROUND |
+    
     BORDER_NONE,
+    .base.base.base.border_color = color_white,
+    .base.base.base.background_color = color_black,
     .base.base.base.name = "Fuel Endur.",
-    .base.base.base.on_paint_foreground = on_paint_hours,
-    .base.base.base.on_paint_background = on_paint_background_auto,
+    .base.base.base.on_paint = on_paint_hours,
     .base.base.base.on_message = on_hours_msg,
     .base.base.base.status_timeout = 10000,
       .base.base.base.sensor_failed = false,
       .base.base.base.alarm_color = color_red,
       .base.base.base.rect.left = 0,
     .base.base.base.rect.top = 0,
-    .base.base.base.rect.right = 0 + 254,
+    .base.base.base.rect.right = 0 + 256,
     .base.base.base.rect.bottom = 0 + 33,
   .base.can_id = id_fuel_endurance,
     .base.label_color = color_white,
@@ -2302,27 +2600,32 @@
     .base.small_font = &neo_15_font,
     .base.label_offset = 2,
     .base.text_offset = 110,
-  
+    
                 .base.base.base.on_message = on_hours_msg,
-                .base.base.base.on_paint_foreground = on_paint_hours,
+                .base.base.base.on_paint = on_paint_hours,
                 };
               
                 static auto_annunciator_t marquee_ann_4 ={
                 .base.base.base.style =
     
+      BORDER_RIGHT |
+    
       DRAW_NAME |
     
+      DRAW_BACKGROUND |
+    
     BORDER_NONE,
-    .base.base.base.name = "Tot. Fuel",
-    .base.base.base.on_paint_foreground = on_paint_auto,
-    .base.base.base.on_paint_background = on_paint_background_auto,
+    .base.base.base.border_color = color_white,
+    .base.base.base.background_color = color_black,
+    .base.base.base.name = "Fuel Pres.",
+    .base.base.base.on_paint = on_paint_auto,
     .base.base.base.on_message = on_auto_msg,
     .base.base.base.status_timeout = 10000,
       .base.base.base.sensor_failed = false,
       .base.base.base.alarm_color = color_red,
       .base.base.base.rect.left = 0,
     .base.base.base.rect.top = 0,
-    .base.base.base.rect.right = 0 + 254,
+    .base.base.base.rect.right = 0 + 256,
     .base.base.base.rect.bottom = 0 + 33,
   .base.can_id = id_fuel_pressure,
     .base.label_color = color_white,
@@ -2330,7 +2633,7 @@
     .base.small_font = &neo_15_font,
     .base.label_offset = 2,
     .base.text_offset = 110,
-  
+    
                   .converter = &to_display_pressure,
                 
                 .value_type = v_int16,
@@ -2340,19 +2643,24 @@
                 static auto_annunciator_t marquee_ann_5 ={
                 .base.base.base.style =
     
+      BORDER_RIGHT |
+    
       DRAW_NAME |
     
+      DRAW_BACKGROUND |
+    
     BORDER_NONE,
-    .base.base.base.name = "Fuel F.",
-    .base.base.base.on_paint_foreground = on_paint_auto,
-    .base.base.base.on_paint_background = on_paint_background_auto,
+    .base.base.base.border_color = color_white,
+    .base.base.base.background_color = color_black,
+    .base.base.base.name = "Fuel Flow",
+    .base.base.base.on_paint = on_paint_auto,
     .base.base.base.on_message = on_auto_msg,
     .base.base.base.status_timeout = 10000,
       .base.base.base.sensor_failed = false,
       .base.base.base.alarm_color = color_red,
       .base.base.base.rect.left = 0,
     .base.base.base.rect.top = 0,
-    .base.base.base.rect.right = 0 + 254,
+    .base.base.base.rect.right = 0 + 256,
     .base.base.base.rect.bottom = 0 + 33,
   .base.can_id = id_fuel_flow_rate,
     .base.label_color = color_white,
@@ -2360,7 +2668,7 @@
     .base.small_font = &neo_15_font,
     .base.label_offset = 2,
     .base.text_offset = 110,
-  
+    
                   .converter = &to_display_flow,
                 
                 .value_type = v_uint16,
@@ -2370,19 +2678,24 @@
                 static hobbs_annunciator_t marquee_ann_6 ={
                 .base.base.base.style =
     
+      BORDER_RIGHT |
+    
       DRAW_NAME |
     
+      DRAW_BACKGROUND |
+    
     BORDER_NONE,
+    .base.base.base.border_color = color_white,
+    .base.base.base.background_color = color_black,
     .base.base.base.name = "Eng. Hrs.",
-    .base.base.base.on_paint_foreground = on_paint_hours,
-    .base.base.base.on_paint_background = on_paint_background_auto,
+    .base.base.base.on_paint = on_paint_hours,
     .base.base.base.on_message = on_hours_msg,
     .base.base.base.status_timeout = 10000,
       .base.base.base.sensor_failed = false,
       .base.base.base.alarm_color = color_red,
       .base.base.base.rect.left = 0,
     .base.base.base.rect.top = 0,
-    .base.base.base.rect.right = 0 + 254,
+    .base.base.base.rect.right = 0 + 256,
     .base.base.base.rect.bottom = 0 + 33,
   .base.can_id = id_engine_hours,
     .base.label_color = color_white,
@@ -2390,27 +2703,32 @@
     .base.small_font = &neo_15_font,
     .base.label_offset = 2,
     .base.text_offset = 110,
-  
+    
                 .base.base.base.on_message = on_hobbs_msg,
-                .base.base.base.on_paint_foreground = on_paint_hobbs,
+                .base.base.base.on_paint = on_paint_hobbs,
                 };
               
                 static auto_annunciator_t marquee_ann_7 ={
                 .base.base.base.style =
     
+      BORDER_RIGHT |
+    
       DRAW_NAME |
     
+      DRAW_BACKGROUND |
+    
     BORDER_NONE,
+    .base.base.base.border_color = color_white,
+    .base.base.base.background_color = color_black,
     .base.base.base.name = "Oil Pres.",
-    .base.base.base.on_paint_foreground = on_paint_auto,
-    .base.base.base.on_paint_background = on_paint_background_auto,
+    .base.base.base.on_paint = on_paint_auto,
     .base.base.base.on_message = on_auto_msg,
     .base.base.base.status_timeout = 10000,
       .base.base.base.sensor_failed = false,
       .base.base.base.alarm_color = color_red,
       .base.base.base.rect.left = 0,
     .base.base.base.rect.top = 0,
-    .base.base.base.rect.right = 0 + 254,
+    .base.base.base.rect.right = 0 + 256,
     .base.base.base.rect.bottom = 0 + 33,
   .base.can_id = id_oil_pressure,
     .base.label_color = color_white,
@@ -2418,7 +2736,7 @@
     .base.small_font = &neo_15_font,
     .base.label_offset = 2,
     .base.text_offset = 110,
-  
+    
                   .converter = &to_display_pressure,
                 
                 .value_type = v_uint16,
@@ -2428,19 +2746,24 @@
                 static auto_annunciator_t marquee_ann_8 ={
                 .base.base.base.style =
     
+      BORDER_RIGHT |
+    
       DRAW_NAME |
     
+      DRAW_BACKGROUND |
+    
     BORDER_NONE,
+    .base.base.base.border_color = color_white,
+    .base.base.base.background_color = color_black,
     .base.base.base.name = "Oil Temp.",
-    .base.base.base.on_paint_foreground = on_paint_auto,
-    .base.base.base.on_paint_background = on_paint_background_auto,
+    .base.base.base.on_paint = on_paint_auto,
     .base.base.base.on_message = on_auto_msg,
     .base.base.base.status_timeout = 10000,
       .base.base.base.sensor_failed = false,
       .base.base.base.alarm_color = color_red,
       .base.base.base.rect.left = 0,
     .base.base.base.rect.top = 0,
-    .base.base.base.rect.right = 0 + 254,
+    .base.base.base.rect.right = 0 + 256,
     .base.base.base.rect.bottom = 0 + 33,
   .base.can_id = id_oil_temperature,
     .base.label_color = color_white,
@@ -2448,7 +2771,7 @@
     .base.small_font = &neo_15_font,
     .base.label_offset = 2,
     .base.text_offset = 110,
-  
+    
                   .converter = &to_display_temperature,
                 
                 .value_type = v_uint16,
@@ -2458,19 +2781,24 @@
                 static auto_annunciator_t marquee_ann_9 ={
                 .base.base.base.style =
     
+      BORDER_RIGHT |
+    
       DRAW_NAME |
     
+      DRAW_BACKGROUND |
+    
     BORDER_NONE,
+    .base.base.base.border_color = color_white,
+    .base.base.base.background_color = color_black,
     .base.base.base.name = "Volts",
-    .base.base.base.on_paint_foreground = on_paint_auto,
-    .base.base.base.on_paint_background = on_paint_background_auto,
+    .base.base.base.on_paint = on_paint_auto,
     .base.base.base.on_message = on_auto_msg,
     .base.base.base.status_timeout = 10000,
       .base.base.base.sensor_failed = false,
       .base.base.base.alarm_color = color_red,
       .base.base.base.rect.left = 0,
     .base.base.base.rect.top = 0,
-    .base.base.base.rect.right = 0 + 254,
+    .base.base.base.rect.right = 0 + 256,
     .base.base.base.rect.bottom = 0 + 33,
   .base.can_id = id_dc_voltage,
     .base.label_color = color_white,
@@ -2478,7 +2806,7 @@
     .base.small_font = &neo_15_font,
     .base.label_offset = 2,
     .base.text_offset = 110,
-  
+    
                 .value_type = v_uint16,
                 .fmt = "%d",
                 };
@@ -2486,19 +2814,24 @@
                 static auto_annunciator_t marquee_ann_10 ={
                 .base.base.base.style =
     
+      BORDER_RIGHT |
+    
       DRAW_NAME |
     
+      DRAW_BACKGROUND |
+    
     BORDER_NONE,
+    .base.base.base.border_color = color_white,
+    .base.base.base.background_color = color_black,
     .base.base.base.name = "Amps",
-    .base.base.base.on_paint_foreground = on_paint_auto,
-    .base.base.base.on_paint_background = on_paint_background_auto,
+    .base.base.base.on_paint = on_paint_auto,
     .base.base.base.on_message = on_auto_msg,
     .base.base.base.status_timeout = 10000,
       .base.base.base.sensor_failed = false,
       .base.base.base.alarm_color = color_red,
       .base.base.base.rect.left = 0,
     .base.base.base.rect.top = 0,
-    .base.base.base.rect.right = 0 + 254,
+    .base.base.base.rect.right = 0 + 256,
     .base.base.base.rect.bottom = 0 + 33,
   .base.can_id = id_dc_current,
     .base.label_color = color_white,
@@ -2506,7 +2839,7 @@
     .base.small_font = &neo_15_font,
     .base.label_offset = 2,
     .base.text_offset = 110,
-  
+    
                 .value_type = v_int16,
                 .fmt = "%d",
                 };
@@ -2514,19 +2847,24 @@
                 static auto_annunciator_t marquee_ann_11 ={
                 .base.base.base.style =
     
+      BORDER_RIGHT |
+    
       DRAW_NAME |
     
+      DRAW_BACKGROUND |
+    
     BORDER_NONE,
+    .base.base.base.border_color = color_white,
+    .base.base.base.background_color = color_black,
     .base.base.base.name = "IAT",
-    .base.base.base.on_paint_foreground = on_paint_auto,
-    .base.base.base.on_paint_background = on_paint_background_auto,
+    .base.base.base.on_paint = on_paint_auto,
     .base.base.base.on_message = on_auto_msg,
     .base.base.base.status_timeout = 10000,
       .base.base.base.sensor_failed = false,
       .base.base.base.alarm_color = color_red,
       .base.base.base.rect.left = 0,
     .base.base.base.rect.top = 0,
-    .base.base.base.rect.right = 0 + 254,
+    .base.base.base.rect.right = 0 + 256,
     .base.base.base.rect.bottom = 0 + 33,
   .base.can_id = id_inlet_air_temperature,
     .base.label_color = color_white,
@@ -2534,7 +2872,7 @@
     .base.small_font = &neo_15_font,
     .base.label_offset = 2,
     .base.text_offset = 110,
-  
+    
                   .converter = &to_display_temperature,
                 
                 .value_type = v_int16,
@@ -2581,9 +2919,9 @@
       .base.sensor_failed = false,
       .base.alarm_color = color_red,
       .base.rect.left = 0,
-    .base.rect.top = 547,
+    .base.rect.top = 567,
     .base.rect.right = 0 + 256,
-    .base.rect.bottom = 547 + 53,
+    .base.rect.bottom = 567 + 33,
   
           .base_widget_id = 1000,
           .base_alarm_id = 2000,
@@ -2668,6 +3006,8 @@
     .params.night_theme.runway_color = RGBA(178, 187, 193, 230),
     .params.night_theme.runway_ext_color = RGBA(132, 142, 150, 230),
     
+          .db_path = "C:/Projects/map-data",
+          .config_path = "/proton/pfd/navigator",
           .params.font = &neo_9_font,
           
               .show_contours = true,
@@ -2707,53 +3047,74 @@
         if(failed(result = create_gauge_widget(hwnd, 7, aircraft, &rpm_gauge, 0)))
         return result;
       
-        if(failed(result = create_annunciator_widget(hwnd, 8, aircraft, (annunciator_t *) &hp_annunciator, 0)))
+        if(failed(result = create_annunciator_widget(hwnd, 8, aircraft, (annunciator_t *) &utc_annunciator, 0)))
         return result;
       
-        if(failed(result = create_annunciator_widget(hwnd, 9, aircraft, (annunciator_t *) &oat_annunciator, 0)))
+        if(failed(result = create_annunciator_widget(hwnd, 9, aircraft, (annunciator_t *) &utc_date_annunciator, 0)))
         return result;
       
-        if(failed(result = create_edutemps_widget(hwnd, 10, aircraft, &edu_temps, 0)))
+        if(failed(result = create_annunciator_widget(hwnd, 10, aircraft, (annunciator_t *) &air_annunciator, 0)))
         return result;
       
-        if(failed(result = create_gauge_widget(hwnd, 11, aircraft, &oilt_gauge, 0)))
+        if(failed(result = create_annunciator_widget(hwnd, 11, aircraft, (annunciator_t *) &eng_annunciator, 0)))
         return result;
       
-        if(failed(result = create_gauge_widget(hwnd, 12, aircraft, &oilp_gauge, 0)))
+        if(failed(result = create_annunciator_widget(hwnd, 12, aircraft, (annunciator_t *) &lcl_annunciator, 0)))
         return result;
       
-        if(failed(result = create_gauge_widget(hwnd, 13, aircraft, &volts_gauge, 0)))
+        if(failed(result = create_annunciator_widget(hwnd, 13, aircraft, (annunciator_t *) &lcl_date_annunciator, 0)))
         return result;
       
-        if(failed(result = create_gauge_widget(hwnd, 14, aircraft, &fuelp_gauge, 0)))
+        if(failed(result = create_annunciator_widget(hwnd, 14, aircraft, (annunciator_t *) &hp_annunciator, 0)))
         return result;
       
-        if(failed(result = create_gauge_widget(hwnd, 15, aircraft, &fuelf_gauge, 0)))
+        if(failed(result = create_annunciator_widget(hwnd, 15, aircraft, (annunciator_t *) &kmag_annunciator, 0)))
         return result;
       
-        if(failed(result = create_gauge_widget(hwnd, 16, aircraft, &amps_gauge, 0)))
+        if(failed(result = create_annunciator_widget(hwnd, 16, aircraft, (annunciator_t *) &oat_annunciator, 0)))
         return result;
       
-        if(failed(result = create_gauge_widget(hwnd, 17, aircraft, &left_fuel_gauge, 0)))
+        if(failed(result = create_edutemps_widget(hwnd, 17, aircraft, &edu_temps, 0)))
         return result;
       
-        if(failed(result = create_gauge_widget(hwnd, 18, aircraft, &right_fuel_gauge, 0)))
+        if(failed(result = create_gauge_widget(hwnd, 18, aircraft, &oilt_gauge, 0)))
         return result;
       
-        if(failed(result = create_gauge_widget(hwnd, 19, aircraft, &fuelt_gauge, 0)))
+        if(failed(result = create_gauge_widget(hwnd, 19, aircraft, &oilp_gauge, 0)))
         return result;
       
-        if(failed(result = create_gauge_widget(hwnd, 20, aircraft, &flap_gauge, 0)))
+        if(failed(result = create_gauge_widget(hwnd, 20, aircraft, &volts_gauge, 0)))
         return result;
       
-        if(failed(result = create_pancake_widget(hwnd, 21, aircraft, &pitch_indicator, 0)))
+        if(failed(result = create_gauge_widget(hwnd, 21, aircraft, &fuelp_gauge, 0)))
         return result;
       
-        if(failed(result = create_pancake_widget(hwnd, 22, aircraft, &roll_indicator, 0)))
+        if(failed(result = create_gauge_widget(hwnd, 22, aircraft, &fuelf_gauge, 0)))
+        return result;
+      
+        if(failed(result = create_gauge_widget(hwnd, 23, aircraft, &amps_gauge, 0)))
+        return result;
+      
+        if(failed(result = create_gauge_widget(hwnd, 24, aircraft, &left_fuel_gauge, 0)))
+        return result;
+      
+        if(failed(result = create_gauge_widget(hwnd, 25, aircraft, &right_fuel_gauge, 0)))
+        return result;
+      
+        if(failed(result = create_gauge_widget(hwnd, 26, aircraft, &fuelt_gauge, 0)))
+        return result;
+      
+        if(failed(result = create_gauge_widget(hwnd, 27, aircraft, &flap_gauge, 0)))
+        return result;
+      
+        if(failed(result = create_pancake_widget(hwnd, 28, aircraft, &pitch_indicator, 0)))
+        return result;
+      
+        if(failed(result = create_pancake_widget(hwnd, 29, aircraft, &roll_indicator, 0)))
         return result;
       
 
-        if(failed(result = create_marquee_widget(hwnd, 23, aircraft, &marquee, &widget)))
+        if(failed(result = create_marquee_widget(hwnd, 30, aircraft, &marquee, &widget)))
         return result;
 
         marquee.selected_alarm = -1;
@@ -2871,7 +3232,7 @@
           return result;
           child_num++;
         
-        if(failed(result = create_map_widget(hwnd, 24, aircraft, &nav, 0)))
+        if(failed(result = create_map_widget(hwnd, 31, aircraft, &nav, 0)))
         return result;
       
 

@@ -35,20 +35,14 @@ static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* _m
   const int32_t font_x_y = 19;
   const int32_t font_center = (font_x_y >> 1) + 1;
   const int32_t font_ordinal = major_mark + font_center;
+  // draw the marker
+  point_t pts[4];
 
   // start at 0
-  int32_t i = 0;
-  int32_t index;
-  for (index = -wnd->direction; i < 12; index += 30, i++)
+  int32_t i;
+  int32_t index = -wnd->direction;
+  for (i = 0; i < 12; index += 30, i++)
     {
-    while (index > 359)
-      index -= 360;
-
-    while (index < 0)
-      index += 360;
-
-    // draw the marker
-    point_t pts[2];
 
     pts[0].x = center_x; pts[0].y = mark_start;
     pts[1].x = center_x; pts[1].y = major_mark;
@@ -71,11 +65,15 @@ static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* _m
 
       do_minor_mark = !do_minor_mark;
       }
+    }
 
-    // we now draw the text onto the canvas.  The text has a 23x23 pixel
-    // block so the center is 12, 12.
-    pts[0].x = center_x; pts[0].y = font_ordinal;
-    int16_t rotn = (index < 0) ? index + 360 : index;
+    index = -wnd->direction;
+    for(int i = 0; i < 12; i++, index += 30)
+      {
+      pts[0].x = center_x;
+      pts[0].y = font_ordinal;
+      int16_t rotn = (index >=360) ? index - 360 : index;
+
     rotate_point(&median, rotn, &pts[0]);
 
     // each of these is a font for
@@ -105,11 +103,13 @@ static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* _m
       };
 
     draw_text(canvas, wnd_rect, &neo_9_font, color_white, color_black,
-      0, marks[rotn / 30],
+        0, marks[i],
       point_create(pts[0].x - font_center, pts[0].y - font_center, &pt),
       0, 0, 0);
-    }
 
+    }
+    // we now draw the text onto the canvas.  The text has a 23x23 pixel
+    // block so the center is 12, 12.
   ///////////////////////////////////////////////////////////////////////////
   // Draw the Track
 
@@ -178,7 +178,6 @@ static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* _m
 
   int32_t cdi = (int32_t) max(-66.0f, min(66.0f, roundf(cdi_var)));
 
-  point_t pts[4];
   pts[0].x = center_x; pts[0].y = center_y - 98;
   pts[1].x = center_x; pts[1].y = center_y - 50;
 

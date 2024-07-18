@@ -5,6 +5,7 @@ static void draw_detail(handle_t canvas, ap_widget_t* wnd,
   const char* value, color_t fg);
 
 static const char *wpt_label = "WPT";
+static const char *brg_label = "BRG";
 static const char *dst_label = "DST";
 static const char *ete_label = "ETE";
 static const char *alt_label = "ALT";
@@ -21,11 +22,6 @@ static const char *ap_modes[] =
   "180L",
   "180R"
   };
-
-static void on_paint_background(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)
-  {
-  ap_widget_t* wnd = (ap_widget_t*)wnddata;
-  }
 
 static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)
   {
@@ -47,6 +43,9 @@ static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* ms
     point_t pt;
     rect_top_left(&wnd->wpt_label, &pt);
     draw_text(wnd->background_canvas, wnd_rect, wnd->base.name_font, color_white, color_hollow, 0, wpt_label, &pt, &wnd->wpt_label, 0, 0);
+
+    rect_top_left(&wnd->brg_label, &pt);
+    draw_text(wnd->background_canvas, wnd_rect, wnd->base.name_font, color_white, color_hollow, 0, brg_label, &pt, &wnd->dst_label, 0, 0);
 
     rect_top_left(&wnd->dst_label, &pt);
     draw_text(wnd->background_canvas, wnd_rect, wnd->base.name_font, color_white, color_hollow, 0, dst_label, &pt, &wnd->dst_label, 0, 0);
@@ -86,15 +85,18 @@ static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* ms
 
   pt.x += txt_right;
 
-  draw_text(canvas, wnd_rect, wnd->base.name_font, color_black, color_lightblue, 0, ap_mode, &pt, &wnd->mode_button, 0, 0);
+  draw_text(canvas, wnd_rect, wnd->base.name_font, color_black, color_purple, 0, ap_mode, &pt, &wnd->mode_button, 0, 0);
 
   // display the waypoint
   draw_detail(canvas, wnd, wnd_rect, &wnd->wpt_value, wnd->waypoint, wnd->active_color);
 
-  // draw the distance
+  // display the desired track angle
   char buf[64];
-  sprintf(buf, "%d", (int)wnd->dist_to_waypoint);
+  sprintf(buf, "%d", (int)wnd->desired_track_angle);
+  draw_detail(canvas, wnd, wnd_rect, &wnd->brg_value, buf, wnd->info_color);
 
+  // draw the distance
+  sprintf(buf, "%d", (int)wnd->dist_to_waypoint);
   draw_detail(canvas, wnd, wnd_rect, &wnd->dst_value, buf, wnd->info_color);
 
   static const char* unknown_time = "--:--";
@@ -130,10 +132,18 @@ static result_t ap_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
   bool changed = false;
   uint16_t id = get_can_id(msg);
 
-  // TODO:
-  //switch (id)
-  //  {
-  //  }
+ 
+  switch (id)
+    {
+    case id_desired_track_angle:
+      {
+      uint16_t v;
+      get_param_uint16(msg, &v);
+
+      changed = wnd->desired_track_angle != v;
+      }
+      break;
+    }
 
   if (changed)
     invalidate(hwnd);
@@ -226,6 +236,12 @@ result_t create_autopilot_widget(handle_t parent, uint16_t id, aircraft_t* aircr
   // create the waypoint details
   rect_create_ex(label_pt.x, label_pt.y, label_ex.dx, label_ex.dy, &wnd->wpt_label);
   rect_create_ex(value_pt.x, value_pt.y, value_ex.dx, value_ex.dy, &wnd->wpt_value);
+  label_pt.y += y_incr;
+  value_pt.y += y_incr;
+
+  // create the bearing label
+  rect_create_ex(label_pt.x, label_pt.y, label_ex.dx, label_ex.dy, &wnd->brg_label);
+  rect_create_ex(value_pt.x, value_pt.y, value_ex.dx, value_ex.dy, &wnd->brg_value);
   label_pt.y += y_incr;
   value_pt.y += y_incr;
 

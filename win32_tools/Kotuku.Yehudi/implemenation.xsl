@@ -83,7 +83,8 @@
               .pixels_per_unit = <value-of select="pixels-per-unit"/>,
             </when>
             <otherwise>
-              .pixels_per_unit = 10,
+              <!-- makes for about +/- 40 knots on a 240 pixel display -->
+              .pixels_per_unit = 3,
             </otherwise>
           </choose>
           };
@@ -129,19 +130,18 @@
           .value_type = <value-of select="@value-type"/>,
           .fmt = "<value-of select="@format"/>",
           .base.base.base.on_message = on_auto_msg,
-          .base.base.base.on_paint_foreground = on_paint_auto,
-          .base.base.base.on_paint_background = on_paint_background_auto,
+          .base.base.base.on_paint = on_paint_auto,
           };
         </when>
-        <when test="local-name(.) = 'utc'">
-          static utc_annunciator_t <value-of select ="@id"/> ={
+        <when test="local-name(.) = 'datetime'">
+          static datetime_annunciator_t <value-of select ="@id"/> ={
           <call-template name="define-text-annunciator">
             <with-param name="definition" select="."/>
             <with-param name="prefix" select="'.base'"/>
           </call-template>
-          .base.base.base.om_message = on_def_utc_msg,
-          .base.base.base.on_paint_foreground = on_paint_utc,
-          .base.base.base.on_paint_background = on_paint_background_auto,
+          .format = "<value-of select="@format"/>",
+          .base.base.base.on_message = on_datetime_msg,
+          .base.base.base.on_paint = on_paint_datetime,
           };
         </when>
         <when test="local-name(.) = 'hours'">
@@ -151,8 +151,7 @@
             <with-param name="prefix" select="'.base'"/>
           </call-template>
           .base.base.base.on_message = on_hours_msg,
-          .base.base.base.on_paint_foreground = on_paint_hours,
-          .base.base.base.on_paint_background = on_paint_background_auto,
+          .base.base.base.on_paint = on_paint_hours,
           };
         </when>
         <when test="local-name(.) = 'hp'">
@@ -162,8 +161,7 @@
             <with-param name="prefix" select="'.base'"/>
           </call-template>
           .base.base.base.on_message = on_hp_msg,
-          .base.base.base.on_paint_foreground = on_paint_hp,
-          .base.base.base.on_paint_background = on_paint_background_auto,
+          .base.base.base.on_paint = on_paint_hp,
           };
         </when>
         <when test="local-name(.) = 'ecu'">
@@ -173,7 +171,7 @@
             <with-param name="prefix" select="'.base.base'"/>
           </call-template>
           .base.base.on_message = on_kmag_msg,
-          .base.base.on_paint_foreground = on_paint_kmag,
+          .base.base.on_paint = on_paint_kmag,
           };
         </when>
         <when test="local-name(.) = 'hobbs'">
@@ -182,8 +180,8 @@
             <with-param name="definition" select="."/>
             <with-param name="prefix" select="'.base'"/>
           </call-template>
-          .base.base.base.on_message = on_hobbs_mg,
-          .base.base.base.on_paint_foreground = on_paint_hobbs,
+          .base.base.base.on_message = on_hobbs_msg,
+          .base.base.base.on_paint = on_paint_hobbs,
           };
         </when>
         <when test="local-name(.) = 'autopilot'">
@@ -388,6 +386,8 @@
             <with-param name="definition" select="./kt:night-theme"/>
             <with-param name="prefix" select="'.params.night_theme'"/>
           </call-template>
+          .db_path = "<value-of select="./@db-path"/>",
+          .config_path = "<value-of select="./@config-path"/>",
           .params.font = <text disable-output-escaping="yes">&amp;</text><value-of select="./@font"/>,
           <if test="./@show-terrain">
           .show_terrain = <value-of select="./@show-terrain"/>,
@@ -486,7 +486,7 @@
             .base.rect.right = <value-of select="../kt:rect/@width"/> -2,
             .base.rect.bottom = <value-of select="../kt:rect/@height"/> -2,
             .base.name_font = <text disable-output-escaping="yes">&amp;</text><value-of select="../@font"/>,
-            .base.on_paint_foreground = on_paint_alarm_foreground,
+            .base.on_paint = on_paint_alarm_foreground,
             },
           </for-each>
           };
@@ -515,14 +515,15 @@
                 .fmt = "<value-of select="@format"/>",
                 };
               </when>
-              <when test="local-name(.) = 'utc'">
-                static utc_annunciator_t <value-of select ="concat($name, '_ann_', $index)"/> ={
+              <when test="local-name(.) = 'datetime'">
+                static datetime_annunciator_t <value-of select ="concat($name, '_ann_', $index)"/> ={
                 <call-template name="define-text-annunciator">
                   <with-param name="definition" select="."/>
                   <with-param name="prefix" select="'.base'"/>
                 </call-template>
-                .base.base.base.on_message = on_def_utc_msg,
-                .base.base.base.on_paint_foreground = on_paint_utc,
+                .format = "<value-of select="@format"/>",
+                .base.base.base.on_message = on_datetime_msg,
+                .base.base.base.on_paint = on_paint_datetime,
                 };
               </when>
               <when test="local-name(.) = 'hours'">
@@ -532,7 +533,7 @@
                   <with-param name="prefix" select="'.base'"/>
                 </call-template>
                 .base.base.base.on_message = on_hours_msg,
-                .base.base.base.on_paint_foreground = on_paint_hours,
+                .base.base.base.on_paint = on_paint_hours,
                 };
               </when>
               <when test="local-name(.) = 'hp'">
@@ -542,7 +543,7 @@
                   <with-param name="prefix" select="'.base'"/>
                 </call-template>
                 .base.base.base.on_message = on_hp_msg,
-                .base.base.base.on_paint_foreground = on_paint_hp,
+                .base.base.base.on_paint = on_paint_hp,
                 };
               </when>
               <when test="local-name(.) = 'hobbs'">
@@ -552,7 +553,7 @@
                   <with-param name="prefix" select="'.base'"/>
                 </call-template>
                 .base.base.base.on_message = on_hobbs_msg,
-                .base.base.base.on_paint_foreground = on_paint_hobbs,
+                .base.base.base.on_paint = on_paint_hobbs,
                 };
               </when>
 
@@ -617,7 +618,7 @@
         if(failed(result = create_annunciator_widget(hwnd, <value-of select="$id"/>, aircraft, (annunciator_t *) <text disable-output-escaping="yes">&amp;</text><value-of select="./@id"/>, 0)))
         return result;
       </when>
-      <when test="local-name(.) = 'utc'">
+      <when test="local-name(.) = 'datetime'">
         if(failed(result = create_annunciator_widget(hwnd, <value-of select="$id"/>, aircraft, (annunciator_t *) <text disable-output-escaping="yes">&amp;</text><value-of select="./@id"/>, 0)))
         return result;
       </when>
@@ -713,6 +714,9 @@
     <value-of select="$prefix"/>.small_font = <text disable-output-escaping="yes">&amp;</text><value-of select="$definition/@small-font"/>,
     <value-of select="$prefix"/>.label_offset = <value-of select="$definition/@label-offset"/>,
     <value-of select="$prefix"/>.text_offset = <value-of select="$definition/@text-offset"/>,
+    <if test="$definition/@compact">
+      <value-of select="$prefix"/>.compact = <value-of select="$definition/@compact"/>,
+    </if>
   </template>
 
   <template name="define-widget">
@@ -747,6 +751,12 @@
       DRAW_BACKGROUND |
     </if>
     BORDER_NONE,
+    <if test="$definition/@background-gutter">
+      <value-of select="$prefix"/>.background_gutter = <value-of select="$definition/@background-gutter"/>,
+    </if>
+    <if test="$definition/@gutter-color">
+      <value-of select="$prefix"/>.gutter_color = <value-of select="$definition/@gutter-color"/>,
+    </if>
     <if test="$definition/@border-color">
       <value-of select="$prefix"/>.border_color = <value-of select="$definition/@border-color"/>,
     </if>
@@ -770,16 +780,16 @@
       <value-of select="$prefix"/>.z_order = <value-of select="$definition/@z-order"/>,
     </if>
     <if test="$definition/@on-paint">
-      <value-of select="$prefix"/>.on_paint_foreground = <value-of select="$definition/@on-paint"/>,
-    </if>
-    <if test="$definition/@on-paint-background">
-      <value-of select="$prefix"/>.on_paint_background = <value-of select="$definition/@on-paint-background"/>,
+      <value-of select="$prefix"/>.on_paint = <value-of select="$definition/@on-paint"/>,
     </if>
     <if test="$definition/@on-message">
       <value-of select="$prefix"/>.on_message = <value-of select="$definition/@on-message"/>,
     </if>
     <if test="$definition/@on-create">
       <value-of select="$prefix"/>.on_create = <value-of select="$definition/@on-create"/>,
+    </if>
+    <if test="$definition/on-event">
+      .settings_event = <value-of select="$definition//@on-event"/>,
     </if>
     <choose>
       <when test="@status-timeout">

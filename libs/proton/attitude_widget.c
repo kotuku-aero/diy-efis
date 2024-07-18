@@ -120,16 +120,13 @@ static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* ms
       rotate_point(&wnd->median, wnd->roll, &pts[1]);
 
       polyline(canvas, wnd_rect, color_white, 2, pts);
-
-      // we have a bitmap which is the text to draw.  We then select the bitmap
-      // from the text angle and the rotation angle.
-      // the text is 19x19 pixels
-
       // calc the text angle as 10, 20..90
-      char text_angle[3] = { (pitch_angle / 100) + '0', 0};
-      text_angle[0] = text_angle[0] < 0 ? -text_angle[0] : text_angle[0];
-      text_angle[1] = '0';
-      text_angle[2] = 0;
+      char text_angle[3] = 
+        {
+        (abs(pitch_angle) / 100) + '0',
+        '0',
+        0
+        };
 
       if (text_angle > 0)
         {

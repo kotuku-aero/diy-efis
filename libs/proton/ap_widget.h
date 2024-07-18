@@ -30,6 +30,7 @@ typedef struct _ap_widget_t {
   int16_t time_to_next;         // time_to_next
   uint16_t altitude_set;        // current selected (use converter)
   uint16_t vertical_speed;      // current vertical speed (use converter)
+  uint16_t desired_track_angle; // desired track angle
 
   // text to display as waypoint
   char waypoint[16];
@@ -46,6 +47,8 @@ typedef struct _ap_widget_t {
   rect_t mode_button;
   rect_t wpt_label;
   rect_t wpt_value;
+  rect_t brg_label;
+  rect_t brg_value;
   rect_t dst_label;
   rect_t dst_value;
   rect_t ete_label;

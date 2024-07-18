@@ -112,32 +112,41 @@
   <layout>
     <airspeed name="ASI"
               id ="asi_widget"
+              fill-background="true"
+              background-color="color_gray"
+              background-gutter="8"
+              gutter-color="color_black"
               border-color="color_white"
-              border-bottom="true"
               text-color="color_white"
               pen-color="color_white"
               font="neo_9_font"
               large-roller-font="neo_15_font"
               small-roller-font="neo_9_font"
+              z-order="10"
               >
       <rect left="0" top="0" width="60" height="240"/>
     </airspeed>
     <attitude name="ATT"
               id="att_widget"
               border-color="color_white"
-              border-bottom="true">
+              border-bottom="true"
+              z-order="0" >
       <rect left="60" top ="0" width="240" height="240"/>
       <median x="120" y="120"/>
     </attitude>
     <altitude name="ALT"
               id="alt_widget"
+              fill-background="true"
+              background-color="color_gray"
+              background-gutter="8"
+              gutter-color="color_black"
               border-color="color_white"
-              border-bottom="true"
               text-color="color_white"
               pen-color="color_white"
               font="neo_9_font"
               large-roller-font="neo_15_font"
               small-roller-font="neo_9_font"
+              z-order="10"
               >
       <rect left="300" top="0" width="80" height="240"/>
     </altitude>
@@ -146,7 +155,10 @@
          border-color="color_white"
          border-left="true"
          border-right="true"
+         border-top ="true"
          border-bottom="true"
+         background-color="color_black"
+         fill-background="true"
         on-create="on_create_hsi_widget"
         name-font="neo_9_font">
       <rect left="60" top="240" width="240" height="240"/>
@@ -154,6 +166,8 @@
     <autopilot name="AP"
                id="ap_widget"
                name-font="neo_9_font"
+               fill-background="true"
+               background-color="color_black"
                border-color="color_white"
                height="15"
                gutter="2"
@@ -162,6 +176,7 @@
                info-color="color_yellow"
                active-color="color_purple"
                border-bottom="true"
+               border-top="true"
                on-create="on_create_autopilot_widget">
       <rect left="300" top="240" width="80" height="240"/>
     </autopilot>
@@ -169,6 +184,7 @@
            id="map_gauge"
            style="bar"
            bar-width="5"
+           background-color="color_black"
            fill-background="true"
            draw-name="true"
            name-color="color_white"
@@ -208,20 +224,21 @@
            style="bar"
            bar-width="5"
            fill-background="true"
+           background-color="color_black"
            draw-name="true"
            name-color="color_white"
            border-bottom="true"
            border-right="true"
            border-color="color_white"
            name-font="neo_9_font"
-           can-id="id_engine_rpm" 
+           can-id="id_engine_rpm"
            draw-value="true"
            radii="75"
            arc-width="5"
            arc-begin="230"
            arc-range="80"
            font="neo_9_font"
-           value-font="neo_18_font" 
+           value-font="neo_18_font"
            alarm-id="id_rpm_high_alarm"
            alarm-color="color_red"
            >
@@ -246,14 +263,146 @@
       <tick value="2750"/>
       <tick value="3000" text="3"/>
     </gauge>
+
+    <datetime name="UTC"
+        id="utc_annunciator"
+        fill-background="false"
+        draw-name="true"
+        can-id="id_datetime_utc"
+          label-color ="color_white"
+          background-color ="color_blue"
+         compact="true"
+        text-color="color_purple"
+        border-color="color_white"
+        border-top="true"
+        small-font="neo_9_font"
+        name-color="color_white"
+        name-font="neo_9_font"
+        label-offset="2"
+        text-offset="30"
+         value-type="v_uint32"
+            format="%H:%M"
+            >
+      <rect left="0" top="240" width="60" height="40"/>
+    </datetime>
+
+    <datetime name="UTC DATE"
+        id="utc_date_annunciator"
+        fill-background="false"
+        draw-name="true"
+        can-id="id_datetime_utc"
+          label-color ="color_white"
+          background-color ="color_blue"
+         compact="true"
+        text-color="color_purple"
+        border-color="color_white"
+        border-top="true"
+        small-font="neo_9_font"
+        name-color="color_white"
+        name-font="neo_9_font"
+        label-offset="2"
+        text-offset="30"
+         value-type="v_uint32"
+            format="%y-%m-%d"
+            >
+      <rect left="0" top="280" width="60" height="40"/>
+    </datetime>
+
+    <hobbs name="AIR"
+           id="air_annunciator"
+        fill-background="false"
+        draw-name="true"
+        can-id="id_engine_hours"
+          label-color ="color_white"
+          background-color ="color_blue"
+        text-color="color_purple"
+        border-color="color_white"
+        border-top="true"
+         compact="true"
+        small-font="neo_9_font"
+        name-color="color_white"
+        name-font="neo_9_font"
+        label-offset="2"
+        text-offset="30"
+        value-type="v_uint32"
+            >
+      <rect left="0" top="320" width="60" height="40"/>
+    </hobbs>
+
+    <hobbs name="ENG"
+            id="eng_annunciator"
+         fill-background="false"
+         draw-name="true"
+         compact="true"
+         can-id="id_engine_hours"
+          label-color ="color_white"
+          background-color ="color_blue"
+         text-color="color_purple"
+         border-color="color_white"
+         border-top="true"
+         small-font="neo_9_font"
+         name-color="color_white"
+         name-font="neo_9_font"
+         label-offset="2"
+         text-offset="30"
+         value-type="v_uint32"
+            >
+      <rect left="0" top="360" width="60" height="40"/>
+    </hobbs>
+
+    <datetime name="LCL" 
+              id="lcl_annunciator"
+              fill-background="false"
+              draw-name="true"
+              can-id="id_datetime_lcl"
+              label-color ="color_white"
+              background-color ="color_blue"
+              compact="true"
+              text-color="color_purple"
+              border-color="color_white"
+              border-top="true"
+              small-font="neo_9_font"
+              name-color="color_white"
+              name-font="neo_9_font"
+              label-offset="2"
+              text-offset="30"
+              value-type="v_uint32"
+              format="%H:%M"
+            >
+      <rect left="0" top="400" width="60" height="40"/>
+    </datetime>
+
+    <datetime name="LCL DATE"
+              id="lcl_date_annunciator"
+              fill-background="false"
+              draw-name="true"
+              can-id="id_datetime_lcl"
+              label-color ="color_white"
+              background-color ="color_blue"
+              compact="true"
+              text-color="color_purple"
+              border-color="color_white"
+              border-top="true"
+              border-bottom ="true"
+              small-font="neo_9_font"
+              name-color="color_white"
+              name-font="neo_9_font"
+              label-offset="2"
+              text-offset="30"
+              value-type="v_uint32"
+              format="%y-%m-%d"
+            >
+      <rect left="0" top="440" width="60" height="40"/>
+    </datetime>
+
     <hp name="HP"
         id="hp_annunciator"
-        fill-background="true"
-        background-color="color_blue"
+        fill-background="false"
         draw-name="true"
         can-id="id_engine_hp"
-        label-color="color_white"
-        text-color="color_white"
+          label-color ="color_white"
+          background-color ="color_blue"
+        text-color="color_purple"
         border-color="color_white"
         border-right="true"
         border-bottom="true"
@@ -267,19 +416,38 @@
         >
       <rect left="0" top="547" width="60" height="20"/>
     </hp>
+    <ecu name="kMAG"
+         id="kmag_annunciator"
+         can-id="on_check_kmag"
+         background-color="color_black"
+         border-color="color_white"
+         label-color="color_white"
+         text-color="color_white"
+         small-font="neo_9_font"
+         name-font="neo_9_font"
+         name-color="color_white"
+         label-offset="30"
+         text-offset="30"
+         format="%d"
+         value-type="v_uint16"
+         border-right="true"
+         border-bottom="true"
+         fill-background="true">
+      <rect left="60" top="547" width="136" height="20"/>
+    </ecu>
     <auto name="OAT"
           id="oat_annunciator"
           can-id="id_outside_air_temperature"
-          background-color="color_blue"
           border-color="color_white"
           label-color ="color_white"
-          text-color="color_white"
+          background-color ="color_blue"
+          text-color="color_purple"
           label-offset="2"
           text-offset="30"
           small-font="neo_9_font"
           border-bottom="true"
           border-right="true"
-          fill-background="true"
+          fill-background="false"
           on-message="on_auto_msg"
           on-paint="on_paint_auto"
           format="%d"
@@ -293,11 +461,13 @@
     <edu-temps name="TEMPS"
                id="edu_temps"
                num-cyl="4"
+               fill-background="true"
+               background-color="color_black"
                left-gutter="24"
                right-gutter="196"
                cylinder-draw-width="40"
-               egt-color="color_lightgreen"
-               cht-color="color_lightblue"
+               egt-color="color_lightblue"
+               cht-color="color_lightgreen"
                egt-line="5"
                cht-line="17"
                bar-top="31"
@@ -310,7 +480,6 @@
                cht-redline-pos="68"
                font="neo_9_font"
                border-right="true"
-               border-bottom="true"
                border-color="color_white">
       <rect left="256" top="480" width="256" height="120"/>
       <egt name="1"
@@ -356,7 +525,7 @@
             alarm-id="id_cylinder_head_temperature3_alarm"
             sensor-id="id_cylinder_head_temperature3_status" />
       <cht name="4"
-            can-id="id_cylinder_head_temperature1"
+            can-id="id_cylinder_head_temperature4"
             color="color_lightgreen"
             alarm-color="color_red"
             alarm-id="id_cylinder_head_temperature4_alarm"
@@ -365,6 +534,8 @@
     <gauge name="OILT"
            id="oilt_gauge"
            style="hbar"
+           background-color="color_black"
+           fill-background="true"
            draw-value="true"
            value-font="neo_12_font"
            name-font="neo_9_font"
@@ -376,6 +547,8 @@
            alarm-id="id_high_oil_temperature_alarm"
            alarm-color =" color_red"
            sensor-id="id_oil_temperature_sensor_status"
+           border-color="color_white"
+           border-right="true"
            >
       <rect left="512" top="480" width="128" height="40" />
       <name-pt x="55" y="30"/>
@@ -389,6 +562,8 @@
     <gauge name="OILP"
            id="oilp_gauge"
            style="hbar"
+           background-color="color_black"
+           fill-background="true"
            draw-value="true"
            value-font="neo_12_font"
            name-font="neo_9_font"
@@ -399,6 +574,7 @@
            font="neo_12_font"
            border-color="color_white"
            border-bottom="true"
+           border-right="true"
            alarm-id="id_low_oil_pressure_alarm"
            alarm-color =" color_red"
            sensor-id="id_oil_pressure_sensor_status"
@@ -414,6 +590,8 @@
     <gauge name="VOLTS"
            id="volts_gauge"
            style="hbar"
+           background-color="color_black"
+           fill-background="true"
            draw-value="true"
            value-font="neo_12_font"
            name-font="neo_9_font"
@@ -422,7 +600,6 @@
            can-id="id_dc_voltage"
            font="neo_12_font"
            border-color="color_white"
-           border-bottom="true"
            alarm-id="id_bus_volts_high_alarm"
            alarm-color =" color_red"
            sensor-id="id_volts_sensor_status"
@@ -439,6 +616,8 @@
     <gauge name="FUELP"
            id="fuelp_gauge"
            style="hbar"
+           background-color="color_black"
+           fill-background="true"
            draw-value="true"
            value-font="neo_12_font"
            name-font="neo_9_font"
@@ -450,6 +629,8 @@
            alarm-id="id_low_fuel_pressure_alarm"
            alarm-color =" color_red"
            sensor-id="id_fuel_pressure_sensor_status"
+           border-color="color_white"
+           border-right="true"
            >
       <rect left="640" top="480" width="128" height="40" />
       <name-pt x="55" y="30"/>
@@ -462,6 +643,8 @@
     <gauge name="FUELF"
            id="fuelf_gauge"
            style="hbar"
+           background-color="color_black"
+           fill-background="true"
            draw-value="true"
            value-font="neo_12_font"
            name-font="neo_9_font"
@@ -472,6 +655,7 @@
            font="neo_12_font"
            border-color="color_white"
            border-bottom="true"
+           border-right="true"
            alarm-color="color_red"
            sensor-id="id_fuel_flow_sensor_status"
            >
@@ -485,6 +669,8 @@
     <gauge name="AMPS"
            id="amps_gauge"
            style="hbar"
+           background-color="color_black"
+           fill-background="true"
            draw-value="true"
            value-font="neo_12_font"
            name-font="neo_9_font"
@@ -493,10 +679,10 @@
            can-id="id_dc_current"
            font="neo_12_font"
            border-color="color_white"
-           border-bottom="true"
            alarm-id="id_high_amps_alarm"
            alarm-color =" color_red"
            sensor-id="id_amps_sensor_status"
+           border-right="true"
            >
       <rect left="640" top="560" width="128" height="40" />
       <name-pt x="55" y="30"/>
@@ -510,6 +696,8 @@
     <gauge name="LEFT"
            id="left_fuel_gauge"
            style="hbar"
+           background-color="color_black"
+           fill-background="true"
            draw-value="true"
            value-font="neo_12_font"
            name-font="neo_9_font"
@@ -519,6 +707,7 @@
            converter="to_display_volume"
            font="neo_12_font"
            border-color="color_white"
+           border-right="true"
            sensor-id="id_left_fuel_quantity_sensor_status"
            >
       <rect left="768" top="480" width="128" height="40" />
@@ -532,6 +721,8 @@
     <gauge name="RIGHT"
            id="right_fuel_gauge"
            style="hbar"
+           background-color="color_black"
+           fill-background="true"
            draw-value="true"
            value-font="neo_12_font"
            name-font="neo_9_font"
@@ -541,6 +732,7 @@
            converter="to_display_volume"
            font="neo_12_font"
            border-color="color_white"
+           border-right="true"
            sensor-id="id_right_fuel_quantity_sensor_status"
            >
       <rect left="768" top="520" width="128" height="40" />
@@ -554,6 +746,8 @@
     <gauge name="FUELT"
            id="fuelt_gauge"
            style="hbar"
+           background-color="color_black"
+           fill-background="true"
            draw-value="true"
            value-font="neo_12_font"
            name-font="neo_9_font"
@@ -563,6 +757,7 @@
            converter="to_display_flow"
            font="neo_12_font"
            border-color="color_white"
+           border-right="true"
            sensor-id="id_right_fuel_quantity_sensor_status"
            >
       <rect left="768" top="560" width="128" height="40" />
@@ -602,10 +797,12 @@
              id="pitch_indicator"
              can-id="id_pitch_trim_value"
              horizontal="false"
-             outline-color="color_white" 
+             fill-background="true"
+             background-color="color_black"
+             outline-color="color_white"
              indicator-color="color_lightblue"
              width="26"
-             height="9" 
+             height="9"
              gutter="2"
              min-value="-100"
              max-value="100"
@@ -617,10 +814,12 @@
              id="roll_indicator"
              can-id="id_roll_trim_value"
              horizontal="true"
-             outline-color="color_white" 
+             fill-background="true"
+             background-color="color_black"
+             outline-color="color_white"
              indicator-color="color_lightblue"
              width="22"
-             height="7" 
+             height="7"
              gutter="1"
              min-value="-100"
              max-value="100"
@@ -628,7 +827,7 @@
       <rect left="936" top="518" height="32" width="88"/>
       <indicator-rect left="1" top="1" height="24" width="86"/>
     </pancake>
-    
+
     <marquee name="ALARMS"
              id="marquee"
              base-id="1000"
@@ -641,10 +840,14 @@
              alarm-background="color_red"
              alarm-text="color_black"
              >
-      <rect left="0" top="547" width="256" height="53"/>
+      <rect left="0" top="567" width="256" height="33"/>
       <!-- Fuel Totalizer -->
       <auto small-font="neo_15_font"
             name="Tot. Fuel"
+            fill-background="true"
+            background-color="color_black"
+             border-right="true"
+             border-color="color_white"
             text-color="color_lightblue"
             label-color="color_white"
             label-offset="2"
@@ -652,32 +855,38 @@
             can-id="id_fuel_total"
             on-message="on_auto_msg"
             on-paint="on_paint_auto"
-            on-paint-background="on_paint_background_auto"
             format="%d"
             draw-name="true"
             value-type="v_uint16"
             converter="to_display_volume">
-        <rect left="0" top="0" width="254" height="33"/>
+        <rect left="0" top="0" width="256" height="33"/>
       </auto>
       <!-- Fuel endurance -->
       <hours small-font="neo_15_font"
             name="Fuel Endur."
             text-color="color_lightblue"
             label-color="color_white"
+             border-right="true"
+             border-color="color_white"
             label-offset="2"
             text-offset="110"
             can-id="id_fuel_endurance"
             on-message="on_hours_msg"
             on-paint="on_paint_hours"
-            on-paint-background="on_paint_background_auto"
             format="%d"
+            fill-background="true"
+            background-color="color_black"
             draw-name="true"
             value-type="v_uint16">
-        <rect left="0" top="0" width="254" height="33"/>
+        <rect left="0" top="0" width="256" height="33"/>
       </hours>
       <!-- Fuel Pressure -->
       <auto small-font="neo_15_font"
-            name="Tot. Fuel"
+            name="Fuel Pres."
+            fill-background="true"
+            background-color="color_black"
+             border-right="true"
+             border-color="color_white"
             text-color="color_lightblue"
             label-color="color_white"
             label-offset="2"
@@ -685,16 +894,19 @@
             can-id="id_fuel_pressure"
             on-message="on_auto_msg"
             on-paint="on_paint_auto"
-            on-paint-background="on_paint_background_auto"
             format="%d"
             draw-name="true"
             value-type="v_int16"
             converter="to_display_pressure">
-        <rect left="0" top="0" width="254" height="33"/>
+        <rect left="0" top="0" width="256" height="33"/>
       </auto>
       <!-- Fuel Flow -->
       <auto small-font="neo_15_font"
-            name="Fuel F."
+            name="Fuel Flow"
+            fill-background="true"
+            background-color="color_black"
+             border-right="true"
+             border-color="color_white"
             text-color="color_lightblue"
             label-color="color_white"
             label-offset="2"
@@ -702,111 +914,128 @@
             can-id="id_fuel_flow_rate"
             on-message="on_auto_msg"
             on-paint="on_paint_auto"
-            on-paint-background="on_paint_background_auto"
             format="%d"
             draw-name="true"
             value-type="v_uint16"
             converter="to_display_flow">
-        <rect left="0" top="0" width="254" height="33"/>
+        <rect left="0" top="0" width="256" height="33"/>
       </auto>
       <!-- Engine hours -->
       <hobbs small-font="neo_15_font"
             name="Eng. Hrs."
             text-color="color_lightblue"
             label-color="color_white"
+             border-right="true"
+             border-color="color_white"
             label-offset="2"
             text-offset="110"
             can-id="id_engine_hours"
             on-message="on_hours_msg"
             on-paint="on_paint_hours"
-            on-paint-background="on_paint_background_auto"
             format="%d"
             draw-name="true"
+            fill-background="true"
+            background-color="color_black"
             value-type="v_uint16">
-        <rect left="0" top="0" width="254" height="33"/>
+        <rect left="0" top="0" width="256" height="33"/>
       </hobbs>
       <!-- Oil Pressure-->
       <auto small-font="neo_15_font"
             name="Oil Pres."
             text-color="color_lightblue"
+             border-right="true"
+             border-color="color_white"
             label-color="color_white"
             label-offset="2"
             text-offset="110"
             can-id="id_oil_pressure"
             on-message="on_auto_msg"
             on-paint="on_paint_auto"
-            on-paint-background="on_paint_background_auto"
             format="%d"
             draw-name="true"
+            fill-background="true"
+            background-color="color_black"
             value-type="v_uint16"
             converter="to_display_pressure">
-        <rect left="0" top="0" width="254" height="33"/>
+        <rect left="0" top="0" width="256" height="33"/>
       </auto>
       <!-- Oil Temperature-->
       <auto small-font="neo_15_font"
             name="Oil Temp."
             text-color="color_lightblue"
+             border-right="true"
+             border-color="color_white"
             label-color="color_white"
             label-offset="2"
             text-offset="110"
             can-id="id_oil_temperature"
             on-message="on_auto_msg"
             on-paint="on_paint_auto"
-            on-paint-background="on_paint_background_auto"
             format="%d"
             draw-name="true"
+            fill-background="true"
+            background-color="color_black"
             value-type="v_uint16"
             converter="to_display_temperature">
-        <rect left="0" top="0" width="254" height="33"/>
+        <rect left="0" top="0" width="256" height="33"/>
       </auto>
       <!-- Volts -->
       <auto small-font="neo_15_font"
             name="Volts"
             text-color="color_lightblue"
             label-color="color_white"
+             border-right="true"
+             border-color="color_white"
             label-offset="2"
             text-offset="110"
             can-id="id_dc_voltage"
             on-message="on_auto_msg"
             on-paint="on_paint_auto"
-            on-paint-background="on_paint_background_auto"
             format="%d"
+            fill-background="true"
+            background-color="color_black"
             draw-name="true"
             value-type="v_uint16">
-        <rect left="0" top="0" width="254" height="33"/>
+        <rect left="0" top="0" width="256" height="33"/>
       </auto>
       <!-- Amps -->
       <auto small-font="neo_15_font"
             name="Amps"
             text-color="color_lightblue"
             label-color="color_white"
+             border-right="true"
+             border-color="color_white"
             label-offset="2"
             text-offset="110"
             can-id="id_dc_current"
             on-message="on_auto_msg"
             on-paint="on_paint_auto"
-            on-paint-background="on_paint_background_auto"
             format="%d"
+            fill-background="true"
+            background-color="color_black"
             draw-name="true"
             value-type="v_int16">
-        <rect left="0" top="0" width="254" height="33"/>
+        <rect left="0" top="0" width="256" height="33"/>
       </auto>
       <!-- IAT -->
       <auto small-font="neo_15_font"
             name="IAT"
             text-color="color_lightblue"
             label-color="color_white"
+             border-right="true"
+             border-color="color_white"
             label-offset="2"
             text-offset="110"
             can-id="id_inlet_air_temperature"
             on-message="on_auto_msg"
             on-paint="on_paint_auto"
-            on-paint-background="on_paint_background_auto"
             format="%d"
+            fill-background="true"
+            background-color="color_black"
             draw-name="true"
             value-type="v_int16"
             converter="to_display_temperature">
-        <rect left="0" top="0" width="254" height="33"/>
+        <rect left="0" top="0" width="256" height="33"/>
       </auto>
 
       <alarm priority="1"
@@ -914,7 +1143,10 @@
          border-color="color_white"
          border-left="true"
          border-bottom="true"
-         on-create="on_create_navigator_widget">
+         on-create="on_create_navigator_widget"
+         db-path="C:/Projects/map-data"
+         config-path="/proton/pfd/navigator"
+         >
       <rect left="380" top="0" width="644" height="480" />
       <day-theme alarm-color="color_red"
                  warning-color="color_yellow"
@@ -1017,7 +1249,7 @@
         <contour color="color_white" contour_color="color_hollow" elevation="305"/>
       </night-theme>
     </map>
-         
+
   </layout>
 
 </application>

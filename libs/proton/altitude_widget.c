@@ -221,71 +221,49 @@ static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* ms
            &vsi_rect, 0, 0);
 	}
 
-static void on_baro_corrected_altitude(handle_t hwnd, const canmsg_t *msg, void *wnddata)
+result_t altitude_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
   {
   altitude_widget_t *wnd = (altitude_widget_t *)wnddata;
-
   bool changed = false;
-  
+  switch (get_can_id(msg))
+    {
+    case id_baro_corrected_altitude:
+      {
   float v;
   get_param_float(msg, &v);
 
   int16_t value = (int16_t)to_display_alt->convert_float(v);
   changed = wnd->altitude != value;
   wnd->altitude = value;
-
-	if(changed)
-	  invalidate(hwnd);
 	}
-
-static void on_altitude_rate(handle_t hwnd, const canmsg_t *msg, void *wnddata)
+      break;
+    case id_altitude_rate:
   {
-  altitude_widget_t *wnd = (altitude_widget_t *)wnddata;
-
-  bool changed = false;
 
   float v;
   get_param_float(msg, &v);
 
+      // alt rate is meters/sec
   // alt rate is ft/min not ft/sec the value passed is m/sec
-  int16_t value = (int16_t)roundf(to_display_alt->convert_float(v)/60);
+      int16_t value = (int16_t)roundf(to_display_alt->convert_float(v));
 
   changed = wnd->vertical_speed != value;
   wnd->vertical_speed = value;
-
-  if (changed)
-    invalidate(hwnd);
   }
-
-static void on_qnh(handle_t hwnd, const canmsg_t *msg, void *wnddata)
+      break;
+    case id_qnh:
   {
-  altitude_widget_t *wnd = (altitude_widget_t *)wnddata;
-
-  bool changed = false;
-
   uint16_t value;
   get_param_uint16(msg, &value);
   changed = wnd->qnh != value;
   wnd->qnh = value;
 
-  if (changed)
-    invalidate(hwnd);
   }
-
-result_t altitude_wndproc(handle_t hwnd, const canmsg_t *msg, void *wnddata)
-  {
-  switch (get_can_id(msg))
-    {
-    case id_baro_corrected_altitude:
-      on_baro_corrected_altitude(hwnd, msg, wnddata);
-      break;
-    case id_altitude_rate:
-      on_altitude_rate(hwnd, msg, wnddata);
-      break;
-    case id_qnh:
-      on_qnh(hwnd, msg, wnddata);
       break;
     }
+
+  if (changed)
+    invalidate(hwnd);
 
   // pass to default
   return widget_wndproc(hwnd, msg, wnddata);

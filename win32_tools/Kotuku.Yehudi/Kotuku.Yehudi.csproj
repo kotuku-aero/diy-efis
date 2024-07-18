@@ -55,9 +55,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="definitions.xsl" />
-    <EmbeddedResource Include="implemenation.xsl">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="implemenation.xsl" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

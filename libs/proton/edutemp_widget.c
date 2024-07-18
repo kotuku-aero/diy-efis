@@ -207,6 +207,7 @@ static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* ms
       rect_t egt_max_rect;
       rect_create(text_pt.x - 2, text_pt.y, text_pt.x + text_ex.dx, wnd_rect->bottom - 1, &egt_max_rect);
       rectangle(canvas, wnd_rect, color_white, color_hollow, &egt_max_rect);
+      draw_text(canvas, wnd_rect, wnd->font, color_white, color_hollow, 1, cyl_numbers[i], &text_pt, wnd_rect, eto_none, 0);
 
       break;
       }

@@ -18,8 +18,10 @@ typedef struct _text_annunciator_t {
   color_t label_color;
   color_t text_color;
   const font_t* small_font;
-  int32_t label_offset;
-  int32_t text_offset;
+  gdi_dim_t label_offset;
+  gdi_dim_t text_offset;
+  bool compact;
+  paint_fn on_paint_background;
   } text_annunciator_t;
 
 typedef struct _auto_annunciator_t {
@@ -32,25 +34,28 @@ typedef struct _auto_annunciator_t {
   variant_t value;
   } auto_annunciator_t;
 
+extern void on_draw_text(handle_t canvas, const rect_t* wnd_rect, annunciator_t* wnd, const char* value);
 extern void on_paint_auto(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnd);
+extern void on_paint_text_background(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnd);
 
 //-----------------------------------------------------------------------------
 // UTC time
-typedef struct _utc_annunciator_t {
+typedef struct _datetime_annunciator_t {
   text_annunciator_t base;
+  const char *format;
+  tm_t clock;
+  char txt[64];   // text representation
+  } datetime_annunciator_t;
 
-  uint16_t clock;
-  } utc_annunciator_t;
-
-extern bool on_def_utc_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
-extern void on_paint_utc(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnd);
+extern bool on_datetime_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
+extern void on_paint_datetime(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnd);
 
 //-----------------------------------------------------------------------------
 // Hours
 typedef struct _hours_annunciator_t {
   text_annunciator_t base;
 
-  uint32_t hours; // hobbs hours, stored in AHRS as hours * 100
+  uint32_t hours; // hours
   } hours_annunciator_t;
 
 extern bool on_hours_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
@@ -90,7 +95,7 @@ extern void on_paint_kmag(handle_t canvas, const rect_t* wnd_rect, const canmsg_
 typedef struct _hobbs_annunciator_t {
   text_annunciator_t base;
 
-  int16_t hobbs;        // hobbs * 100
+  uint32_t hobbs;        // time in minutes
   } hobbs_annunciator_t;
 
 extern bool on_hobbs_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);

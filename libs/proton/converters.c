@@ -411,7 +411,7 @@ const selected_unit_t convert_meters_to_km =
 //
 static float float_meters_to_ft(float value)
   {
-  return value / 3.28084f;
+  return value * 3.28084f;
   }
 
 static int16_t int16_meters_to_ft(int16_t value)

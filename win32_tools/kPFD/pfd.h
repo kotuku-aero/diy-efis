@@ -25,27 +25,27 @@ extern "C" {
 
   extern result_t get_selected_units(menu_item_checklist_t *checklist, uint16_t *value);
 
-  extern result_t on_auto_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
+  extern bool on_auto_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
     
-  extern result_t on_auto_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
+  extern bool on_auto_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
     
-  extern result_t on_hours_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
+  extern bool on_hours_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
     
-  extern result_t on_auto_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
+  extern bool on_auto_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
     
-  extern result_t on_auto_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
+  extern bool on_auto_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
     
-  extern result_t on_hours_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
+  extern bool on_hours_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
     
-  extern result_t on_auto_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
+  extern bool on_auto_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
     
-  extern result_t on_auto_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
+  extern bool on_auto_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
     
-  extern result_t on_auto_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
+  extern bool on_auto_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
     
-  extern result_t on_auto_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
+  extern bool on_auto_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
     
-  extern result_t on_auto_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
+  extern bool on_auto_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
     
   extern void on_paint_auto(handle_t canvas, const rect_t *wnd_rect, const canmsg_t* msg, void* wnddata);
     

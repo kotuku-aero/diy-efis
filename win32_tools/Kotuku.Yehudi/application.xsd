@@ -197,6 +197,7 @@
       <xs:element name="rect" type="rect" minOccurs="1" maxOccurs="1"/>
       <xs:element name="name-pt" type="point" minOccurs="0" maxOccurs="1"/>
     </xs:sequence>
+    <xs:attribute name ="gutter" type="xs:int" default="0"/>
     <xs:attribute name="name" type="xs:string" use="optional"/>
     <xs:attribute name="draw-name" type="xs:boolean" use="optional"/>
     <xs:attribute name="fill-background" type="xs:boolean" use="optional"/>
@@ -211,9 +212,9 @@
     <xs:attribute name="z-order" type="xs:unsignedByte" use="optional"/>
     <xs:attribute name="id" type="xs:string" use="optional"/>
     <xs:attribute name="on-paint" type="xs:string" use="optional"/>
-    <xs:attribute name="on-paint-background" type="xs:string" use="optional"/>
     <xs:attribute name="on-message" type="xs:string" use="optional"/>
     <xs:attribute name="on-create" type="xs:string" use="optional"/>
+    <xs:attribute name="on-event" type="xs:string" use="optional"/>
     <xs:attribute name="status-timeout" type="xs:unsignedInt" default="10000"/>
     <xs:attribute name="alarm-id" type="xs:string" use="optional"/>
     <xs:attribute name="alarm-color" type="xs:string" use="optional"/>
@@ -321,6 +322,7 @@
         <xs:attribute name="text-offset" type="xs:int" use="required"/>
         <xs:attribute name="format" type="xs:string" use="required"/>
         <xs:attribute name="value-type" type="value-type" use="required"/>
+        <xs:attribute name="compact" type="xs:boolean" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -334,10 +336,10 @@
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType name="utc-annunciator">
+  <xs:complexType name="datetime-annunciator">
     <xs:complexContent>
       <xs:extension base="text-annunciator">
-
+        <xs:attribute name="format" type="xs:string" use="required"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -553,6 +555,8 @@
         <xs:attribute name="show-contours" type="xs:boolean" default =" true"/>
         <xs:attribute name="show-cities" type="xs:boolean" default="true"/>
         <xs:attribute name="show-water" type="xs:boolean" default="true"/>
+        <xs:attribute name="db-path" type="xs:string" use="required"/>
+        <xs:attribute name="config-path" type="xs:string" use="required"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

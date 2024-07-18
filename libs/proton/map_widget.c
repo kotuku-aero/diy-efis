@@ -111,7 +111,7 @@ static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* _m
   // the params are set and the worker is asked to paint
   if (wnd->render_background_complete)
     {
-    // wnd->render_background_complete = false;
+    wnd->render_background_complete = false;
 
     extent_t ex;
     canvas_extents(wnd->background_bitmap, &ex);
@@ -124,6 +124,8 @@ static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* _m
     }
   else if (!wnd->render_background_busy)
     {
+    wnd->render_background_busy = true;
+
     // see if borders
     rect_t map_rect;
     rect_copy(wnd_rect, &map_rect);
@@ -141,8 +143,6 @@ static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* _m
       map_rect.bottom--;
     
     rectangle(canvas, wnd_rect, color_hollow, color_black, &map_rect);
-
-    wnd->render_background_busy = true;
 
     // create the corners of the display, it could be rotated
     // in respect to the screen
@@ -355,7 +355,7 @@ static result_t update_gps_position(handle_t hwnd, map_widget_t* widget)
       // but if already running, then don't do it.
       if (moved_by > widget->max_image_crawl)
         {
-        // force a background repait
+        // force a background repaint
         invalidate(hwnd);
         }
       }
@@ -444,7 +444,6 @@ static result_t map_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
         if (wnd->params.scale < 1)
           wnd->params.scale = 1;
 
-        invalidate(hwnd);
         changed = true;
         }
       }
@@ -472,7 +471,6 @@ static result_t map_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
       wnd->params.ned_center.latlng.lng = sub_fixed(wnd->params.ned_center.latlng.lng, mul_fixed(degrees_per_pixel, int_to_fixed(ex.dy)));
       wnd->params.ned_center.latlng.lat = add_fixed(wnd->params.ned_center.latlng.lat, mul_fixed(degrees_per_pixel, int_to_fixed(ex.dx)));
 
-      invalidate(hwnd);
       changed = true;
       }
       break;

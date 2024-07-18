@@ -47,7 +47,7 @@ extern "C" {
   </for-each>
 
     <for-each select="//@on-message">
-  extern result_t <value-of select="."/>(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
+  extern bool <value-of select="."/>(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
     </for-each>
 
     <for-each select="//@on-paint">
@@ -56,6 +56,10 @@ extern "C" {
 
     <for-each select="//@on-create">
   extern result_t <value-of select="."/>(handle_t hwnd, widget_t *widget);
+    </for-each>
+
+    <for-each select="//@on-event">
+    extern  result_t <value-of select="."/>(map_widget_t *widget, const char *setting_name, const variant_t *value);
     </for-each>
 
     extern result_t create_<value-of select="$app-name"/>(handle_t hwnd, aircraft_t *aircraft);

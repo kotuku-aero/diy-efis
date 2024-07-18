@@ -31,28 +31,36 @@ static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* ms
 
   // the vertical tape displays 28 knots around the current position
   // as there are 240 pixels.  We calc the upper one first
-  int32_t top_asi = ((int32_t)wnd->airspeed * wnd->pixels_per_unit) + median - wnd->pixels_per_unit;
 
-  // assign the first line airspeed
-  int32_t asi_line =(top_asi / 25) * 25;
-  int32_t marker_line;
+  int32_t top_asi = ((int32_t) wnd->airspeed) + (median / wnd->pixels_per_unit);
+
+  // assign the first line airspeed - always a multiple of 5
+  int32_t asi_line =(top_asi / 5) * 5;
+
+  // should be in the class defintion
+  gdi_dim_t pixels_per_5_knots = wnd->pixels_per_unit * 5;
+  gdi_dim_t pixels_per_10_knots = wnd->pixels_per_unit * 10;
+
+  gdi_dim_t marker_line;      // this is the pixel offset of the marker
   // work out how many lines to the next lowest marker
-  for(marker_line =(top_asi - asi_line)+ wnd->pixels_per_unit; marker_line < ex.dy; marker_line += 25)
+  for(marker_line =(top_asi - asi_line)* wnd->pixels_per_unit; marker_line < ex.dy; marker_line += pixels_per_5_knots)
     {
     // draw a line from 10 pixels to 30 pixels then the text.
     // lines at 25 are shorter
+    bool long_line = asi_line ==((asi_line / 10) * 10);
     point_t pts[2] =
       {
-      { asi_line ==((asi_line / 50) * 50) ? bar_width-20 : bar_width-18, marker_line },
+      // wide line for 25 knots
+      { long_line ? bar_width-20 : bar_width-18, marker_line },
       { bar_width-13, marker_line }
       };
 
     polyline(canvas, wnd_rect, wnd->pen, 2, pts);
 
-    if(asi_line ==((asi_line / 100) * 100))
+    if(long_line)
       {
       char str[64];
-      sprintf(str, "%d",(int)asi_line / wnd->pixels_per_unit);
+      sprintf(str, "%d",(int)asi_line);
 
       uint16_t len = (uint16_t) strlen(str);
       extent_t size;
@@ -64,7 +72,7 @@ static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* ms
                 0, 0, 0);
       }
 
-    asi_line -= 25;
+    asi_line -= 5;
 
     if(asi_line < 0)
       break;
@@ -74,55 +82,56 @@ static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* ms
   // each knot is 10 pixels in the y direction
   // the scale is 240 pixels high. 
 
-  int32_t vne_pixels = top_asi - (int32_t)(to_display_airspeed->convert_float(wnd->aircraft->vne) * wnd->pixels_per_unit);
-  int32_t vno_pixels = top_asi - (int32_t)(to_display_airspeed->convert_float(wnd->aircraft->vno) * wnd->pixels_per_unit);
-  int32_t va_pixels = top_asi - (int32_t)(to_display_airspeed->convert_float(wnd->aircraft->va) * wnd->pixels_per_unit);
-  int32_t vfe_pixels = top_asi - (int32_t)(to_display_airspeed->convert_float(wnd->aircraft->vfe) * wnd->pixels_per_unit);
-  int32_t vs0_pixels = top_asi - (int32_t)(to_display_airspeed->convert_float(wnd->aircraft->vs0) * wnd->pixels_per_unit);      // stall flaps extended
-  int32_t vs1_pixels = top_asi - (int32_t)(to_display_airspeed->convert_float(wnd->aircraft->vs1) * wnd->pixels_per_unit);      // stall flaps up
-  int32_t vx_pixels = top_asi - (int32_t)(to_display_airspeed->convert_float(wnd->aircraft->vx) * wnd->pixels_per_unit);        // best angle of climb
-  int32_t vy_pixels = top_asi - (int32_t)(to_display_airspeed->convert_float(wnd->aircraft->vy) * wnd->pixels_per_unit);        // best rate of climb
+  gdi_dim_t vne_pixels = (gdi_dim_t)((top_asi - to_display_airspeed->convert_float(wnd->aircraft->vne)) * wnd->pixels_per_unit);
+  gdi_dim_t vno_pixels = (gdi_dim_t)((top_asi - to_display_airspeed->convert_float(wnd->aircraft->vno)) * wnd->pixels_per_unit);
+  gdi_dim_t va_pixels = (gdi_dim_t)((top_asi - to_display_airspeed->convert_float(wnd->aircraft->va)) * wnd->pixels_per_unit);
+  gdi_dim_t vfe_pixels = (gdi_dim_t)((top_asi - to_display_airspeed->convert_float(wnd->aircraft->vfe)) * wnd->pixels_per_unit);
+  gdi_dim_t vs0_pixels = (gdi_dim_t)((top_asi - to_display_airspeed->convert_float(wnd->aircraft->vs0)) * wnd->pixels_per_unit);      // stall flaps extended
+  gdi_dim_t vs1_pixels = (gdi_dim_t)((top_asi - to_display_airspeed->convert_float(wnd->aircraft->vs1)) * wnd->pixels_per_unit);      // stall flaps up
+  gdi_dim_t vx_pixels = (gdi_dim_t)((top_asi - to_display_airspeed->convert_float(wnd->aircraft->vx)) * wnd->pixels_per_unit);        // best angle of climb
+  gdi_dim_t vy_pixels = (gdi_dim_t)((top_asi - to_display_airspeed->convert_float(wnd->aircraft->vy)) * wnd->pixels_per_unit);        // best rate of climb
 
-  int32_t bar0 = bar_width - 12;
-  int32_t bar1 = bar_width - 8;
-  int32_t bar2 =bar_width - 4;
+  gdi_dim_t bar0 = bar_width - 12;
+  gdi_dim_t bar1 = bar_width - 8;
+  gdi_dim_t bar2 =bar_width - 4;
+
 
   // draw vne exceeded
   if(vne_pixels >= 8)
-    rectangle(canvas, wnd_rect, 0, color_red, rect_create(bar2, 8, bar2+4, min((int32_t)ex.dy-8, vne_pixels), &rect));
+    rectangle(canvas, wnd_rect, 0, color_red, rect_create(bar2, 8, bar2+4, min((gdi_dim_t)ex.dy-8, vne_pixels), &rect));
 
   // draw vne->vno
-  if(vno_pixels >= (int32_t)8 && vne_pixels < (int32_t)ex.dy-8)
+  if(vno_pixels >= (gdi_dim_t)8 && vne_pixels < (gdi_dim_t)ex.dy-8)
     rectangle(canvas, wnd_rect, 0, color_yellow,
-              rect_create(bar2, max((int32_t)8, vne_pixels), bar2+4,
-                        min((int32_t)ex.dy-8, vno_pixels), &rect));
+              rect_create(bar2, max((gdi_dim_t)8, vne_pixels), bar2+4,
+                        min((gdi_dim_t)ex.dy-8, vno_pixels), &rect));
 
   // draw vno->vs1
   if(vs1_pixels >= 8 && vno_pixels < 232)
     rectangle(canvas, wnd_rect, 0, color_green,
-              rect_create(bar2, max((int32_t)8, vno_pixels),
-                        bar2+4, min((int32_t)ex.dy-8, vs1_pixels), &rect));
+              rect_create(bar2, max((gdi_dim_t)8, vno_pixels),
+                        bar2+4, min((gdi_dim_t)ex.dy-8, vs1_pixels), &rect));
 
   // draw vfe->vs0
   if(vs0_pixels >= 8 && vfe_pixels < 232)
     rectangle(canvas, wnd_rect, 0, color_white,
-              rect_create(bar1, max((int32_t)8, vfe_pixels),
-                        bar1+4, min((int32_t)ex.dy-8, vs0_pixels), &rect));
+              rect_create(bar1, max((gdi_dim_t)8, vfe_pixels),
+                        bar1+4, min((gdi_dim_t)ex.dy-8, vs0_pixels), &rect));
 
   // draw vy -> vx
   if(vx_pixels >= 8 && vy_pixels < 232)
     rectangle(canvas, wnd_rect, 0, color_blue,
-              rect_create(bar0, max((int32_t)8, vy_pixels), bar0 + 4,
-                        min((int32_t)ex.dy-8, vx_pixels), &rect));
+              rect_create(bar0, max((gdi_dim_t)8, vy_pixels), bar0 + 4,
+                        min((gdi_dim_t)ex.dy-8, vx_pixels), &rect));
 
 
   // draw the roller over the top of the other info
-  rect_create(8, median - 20, bar_width -8, median + 20, &roller_box);
+  rect_create(0, median - 20, bar_width -8, median + 20, &roller_box);
   on_paint_roller_background(canvas, &roller_box, color_black, color_white, false, &value_box);
 
   roller_box.right -= 20;
   on_display_roller(canvas, &roller_box,
-    (uint32_t)(to_display_airspeed->convert_float(wnd->airspeed)), 1,  color_white,
+    (gdi_dim_t)(wnd->airspeed), 1,  color_white,
     wnd->large_roller, wnd->small_roller);
   }
 
