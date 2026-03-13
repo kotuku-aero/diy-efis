@@ -1,9 +1,0 @@
-[Unit]
-Description=DIY EFIS Display
-
-[Service]
-ExecStart=/usr/diy-efis/diy-efis
-Restart=on-failure
-
-[Install[
-WantedBy=multi-user.target

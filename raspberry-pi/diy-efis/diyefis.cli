@@ -1,3 +1,0 @@
-#include "../../libs/ion/ion.cli"
-shell
-exit
