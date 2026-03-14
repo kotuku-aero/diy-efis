@@ -2,8 +2,6 @@
  * canfly_stubs.c - Atom OS User-Mode Syscall Stubs
  *
  * Auto-generated from syscalls.xml v1.0
- * Generated: 2026-03-14 15:44:38
- * Target: pic32mz
  *
  * Each function marshals parameters into MIPS registers and executes
  * the SYSCALL instruction. The kernel handler dispatches based on

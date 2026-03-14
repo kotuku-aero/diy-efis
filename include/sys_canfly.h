@@ -4,8 +4,6 @@
  * Canfly OS Public SDK Header
  *
  * Auto-generated from syscalls.xml v1.0
- * Generated: 2026-03-14 15:44:38
- * Target: pic32mz
  *
  * This header declares the complete user-mode API for applications
  * running on the Atom operating system. Functions declared here
