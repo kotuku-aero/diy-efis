@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding ="utf-8" ?>
+<application xmlns="http://kotuku.aero/schema/kotuku.xsd">
+  <id>id_map_water</id>
+  <id>id_map_contours</id>
+  <id>id_map_cities</id>
+  <id>id_map_transport</id>
+  <id>id_map_obstacles</id>
+  <id>id_map_mode</id>
+
+  <menu id =" 100"
+        root-keys="root"
+        alarm-keys="alarm_keys"
+        font="neo_9_font"
+        background-color="color_black"
+        fill-background="false"
+        selected-background-color="color_white"
+        selected-color="color_magenta"
+        border-color="color_yellow"
+        text-color="color_green"
+        menu-timeout="7"
+        setup-menu="setup_menu">
+    <rect left="0" top="0" width="320" height="240"/>
+    <menu-rect x="0" y="0"/>
+    <menu-start x="0" y="240"/>
+    <!-- Menu used when the menu is closed -->
+    <keys name="root">
+      <hold-key0>
+        <!-- popup menu if long press of left spin -->
+        <popup-action caption="Settings" menu="settings_menu" />
+      </hold-key0>
+      
+      <key0>
+        <!-- Toggle HS mode between HDG, CRS, INT modes -->
+        <event-action caption="HS Mode" can-id="id_toggle_hs_mode" value-type="v_int16" value="1"/>
+      </key0>
+      <!--<decka-up>
+        --><!-- Rotate HDG bug up --><!--
+        <event-action caption="HDG Up" can-id="id_heading_up" value-type="v_int16" value="1"/>
+      </decka-up>
+      <decka-dn>
+        --><!-- Rotate HDG bug down --><!--
+        <event-action caption="HDG Dn" can-id="id_heading_dn" value-type="v_int16" value="1"/>
+      </decka-dn>
+      
+      <key1>
+        --><!-- Change the VS mode ALT HLD, ALT SEL, VS SEL --><!--
+        <event-action caption="VS Mode" can-id="id_toggle_vs_mode" value-type="v_int16" value="1"/>
+      </key1>
+      <hold-key1>
+        <popup-action caption="AP Mode" menu="ap_menu" />
+      </hold-key1>
+      <deckb-up>
+        <event-action caption="VS Up" can-id="id_vertical_altitude_change" value-type="v_int16" value="100" converter="convert_meters_to_ft"/>
+      </deckb-up>
+      <deckb-dn>
+        <event-action caption="VS Dn" can-id="id_vertical_altitude_change" value-type="v_int16" value="-100" converter="convert_meters_to_ft"/>
+      </deckb-dn>
+      <deckb-press-up>
+        <event-action caption="VS Up" can-id="id_vertical_altitude_change" value-type="v_int16" value="1000" converter="convert_meters_to_ft"/>
+      </deckb-press-up>
+      <deckb-press-dn>
+        <event-action caption="VS Dn" can-id="id_vertical_altitude_change" value-type="v_int16" value="-1000" converter="convert_meters_to_ft"/>
+      </deckb-press-dn>-->
+    </keys>
+    
+    <!-- Menu used when an alarm is displayed -->
+    <keys name="alarm_keys">
+      <key0>
+        <event-action caption="Close" can-id="id_alarm_close" value-type="v_int16" value="1"/>
+      </key0>
+      <key1>
+        <event-action caption="Park" can-id="id_alarm_park" value-type="v_int16" value="1"/>
+      </key1>
+    </keys>
+
+    <!-- Menu used when a popup is active -->
+    <keys name="popup_keys">
+      <key0>
+        <event-action caption="OK" can-id="id_ok" value-type="v_int16" value="1"/>
+      </key0>
+      <key1>
+        <event-action caption="Cancel" can-id="id_cancel" value-type="v_int16" value="1"/>
+      </key1>
+      <decka-up>
+        <event-action caption="Up" can-id="id_up" value-type="v_int16" value="1"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="Dn" can-id="id_down" value-type="v_int16" value="1"/>
+      </decka-dn>
+    </keys>
+
+    <keys name="edit_keys">
+      <key0>
+        <event-action caption="OK" can-id="id_ok" value-type="v_int16" value="1"/>
+      </key0>
+      <key1>
+        <event-action caption="Cancel" can-id="id_cancel" value-type="v_int16" value="1"/>
+      </key1>
+      <decka-up>
+        <event-action caption="Up" can-id="id_spin_edit" value-type="v_int16" value="10"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="Dn" can-id="id_spin_edit" value-type="v_int16" value="-10"/>
+      </decka-dn>
+      <decka-press-up>
+        <event-action caption="Up" can-id="id_spin_edit" value-type="v_int16" value="1"/>
+      </decka-press-up>
+      <decka-press-dn>
+        <event-action caption="Dn" can-id="id_spin_edit" value-type="v_int16" value="-1"/>
+      </decka-press-dn>
+    </keys>
+
+    <keys name="node_id_keys">
+      <key0>
+        <event-action caption="OK" can-id="id_ok" value-type="v_int16" value="1"/>
+      </key0>
+      <key1>
+        <event-action caption="Cancel" can-id="id_cancel" value-type="v_int16" value="1"/>
+      </key1>
+      <decka-up>
+        <event-action caption="Up" can-id="id_spin_edit" value-type="v_int16" value="1"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="Dn" can-id="id_spin_edit" value-type="v_int16" value="-1"/>
+      </decka-dn>
+      <decka-press-up>
+        <event-action caption="Up" can-id="id_spin_edit" value-type="v_int16" value="1"/>
+      </decka-press-up>
+      <decka-press-dn>
+        <event-action caption="Dn" can-id="id_spin_edit" value-type="v_int16" value="-1"/>
+      </decka-press-dn>
+    </keys>
+
+    <menu name="settings_menu" keys="popup_keys" caption="Settings">
+      <event-action caption="AP Off" can-id="id_autopilot_enable" value-type="v_uint16" value="0"/>
+      <checklist-action caption="HNAV Mode" get-index="get_hnav_mode" popup="hnav_menu"/>
+      <checklist-action caption="VNAV Mode" get-index="get_vnav_mode" popup="vnav_menu"/>
+      <spin-edit-action caption="VSpeed"
+                        min-value="50"
+                        max-value="1000"
+                        get-method="get_vertical_speed"
+                        set-method="set_vertical_speed"
+                        keys="edit_keys"/>
+      <spin-edit-action caption="Alt"
+                        min-value="0"
+                        max-value="25000"
+                        get-method="get_assigned_altitude"
+                        set-method="set_assigned_altitude"
+                        keys="edit_keys"/>
+      <spin-edit-action caption="Brightness"
+                        min-value="10"
+                        max-value="100"
+                        get-method="get_brightness"
+                        set-method="set_brightness"
+                        keys="edit_keys"/>
+        <!-- this will be removed when the push-button on startup works -->
+        <popup-action menu="setup_menu" caption="Setup"/>
+    </menu>
+
+    <!-- Map Menu -->
+    <menu name="map_menu" keys="popup_keys" caption="Map">
+      <spin-edit-action caption="Range"
+                        min-value="10"
+                        get-max-value="get_range_max"
+                        get-method="get_range"
+                        set-method="set_range"
+                        converter="convert_meters_to_nm"
+                        keys="edit_keys"/>
+      <checklist-action caption="Mode" get-index="get_mode" popup="map_mode_menu" />
+      <checklist-action caption="Water" get-index="get_water_mode" popup="map_water_menu" />
+      <checklist-action caption="Contours" get-index="get_contours_mode" popup="map_contours_menu" />
+      <checklist-action caption="Cities" get-index="get_cities_mode" popup="map_cities_menu" />
+      <checklist-action caption="Transport" get-index="get_transport_mode" popup="map_transport_menu" />
+      <checklist-action caption="Obstacles" get-index="get_obstacles_mode" popup="map_obstacles_menu" />
+    </menu>
+
+    <menu name="hnav_menu" keys="popup_keys" caption="HNAV Mode">
+      <event-action caption="OFF" can-id="id_hnav_mode" value-type="v_uint16" value="0"/>
+      <event-action caption="HDG" can-id="id_hnav_mode" value-type="v_uint16" value="1"/>
+      <event-action caption="NAV" can-id="id_hnav_mode" value-type="v_uint16" value="2"/>
+      <event-action caption="REV-L" can-id="id_hnav_mode" value-type="v_uint16" value="3"/>
+      <event-action caption="REV-R" can-id="id_hnav_mode" value-type="v_uint16" value="3"/>
+    </menu>
+
+    <menu name="vnav_menu" keys="popup_keys" caption="VNAV Mode">
+      <event-action caption="OFF" can-id="id_vnav_mode" value-type="v_uint16" value="0"/>
+      <event-action caption="VS" can-id="id_vnav_mode" value-type="v_uint16" value="1"/>
+      <event-action caption="ALT" can-id="id_vnav_mode" value-type="v_uint16" value="2"/>
+    </menu>
+
+    <menu name="map_mode_menu" keys="popup_keys" caption="Mode">
+      <event-action caption="North Up" can-id="id_map_mode" value-type="v_int16" value="0"/>
+      <event-action caption="Track Up" can-id="id_map_mode" value-type="v_int16" value="1"/>
+      <event-action caption="Course Up" can-id="id_map_mode" value-type="v_int16" value="2"/>
+      <event-action caption="Heading Up" can-id="id_map_mode" value-type="v_int16" value="3"/>
+    </menu>
+
+    <menu name="map_water_menu" keys="popup_keys" caption="Water">
+      <event-action caption="Off" can-id="id_map_water" value-type="v_int16" value="0"/>
+      <event-action caption="On" can-id="id_map_water" value-type="v_int16" value="1"/>
+    </menu>
+
+    <menu name="map_contours_menu" keys="popup_keys" caption="Contours">
+      <event-action caption="Off" can-id="id_map_contours" value-type="v_int16" value="0"/>
+      <event-action caption="On" can-id="id_map_contours" value-type="v_int16" value="1"/>
+    </menu>
+
+    <menu name="map_cities_menu" keys="popup_keys" caption="Cities">
+      <event-action caption="Off" can-id="id_map_cities" value-type="v_int16" value="0"/>
+      <event-action caption="On" can-id="id_map_cities" value-type="v_int16" value="1"/>
+    </menu>
+
+    <menu name="map_transport_menu" keys="popup_keys" caption="Transport">
+      <event-action caption="Off" can-id="id_map_transport" value-type="v_int16" value="0"/>
+      <event-action caption="On" can-id="id_map_transport" value-type="v_int16" value="1"/>
+    </menu>
+
+    <menu name="map_obstacles_menu" keys="popup_keys" caption="Obstacles">
+      <event-action caption="Off" can-id="id_map_obstacles" value-type="v_int16" value="0"/>
+      <event-action caption="On" can-id="id_map_obstacles" value-type="v_int16" value="1"/>
+    </menu>
+
+    <menu name="setup_menu" keys="popup_keys" caption="Setup">
+      <spin-edit-action caption="Node ID"
+                        min-value="8"
+                        max-value="14"
+                        get-method="get_node_id"
+                        set-method="set_node_id"
+                        keys="node_id_keys"/>
+    </menu>
+  </menu>
+
+  <layout>
+    <map name="NAV"
+         id="nav"
+         font="neo_9_bold_font"
+         border-color="color_white"
+         border-left="true"
+         border-bottom="true"
+         on-create="on_create_navigator_widget"
+         db-path="C:/Projects/map-data"
+         config-path="/proton/pfd/navigator"
+         >
+      <rect left="0" top="0" width="320" height="240" />
+      <center x="160" y="200"/>
+      <day-theme alarm-color="color_red"
+                 warning-color="color_yellow"
+                 land-color="RGB(125, 211, 105)"
+                 coastline-color="color_black"
+                 residential-area="color_khaki"
+                 residential-street="color_black"
+                 highway="color_black"
+                 big-road="color_black"
+                 major-road="color_black"
+                 water-color="RGB(205, 231, 244)"
+                 class-a-airspace="color_blue"
+                 class-b-airspace="color_blue"
+                 class-c-airspace="color_purple"
+                 class-d-airspace="color_purple"
+                 class-e-airspace="color_blue"
+                 class-f-airspace="color_blue"
+                 class-g-airspace="color_blue"
+                 class-m-airspace="color_red"
+                 cfz-airspace="color_blue"
+                 mbz-airspace="color_blue"
+                 danger-area="color_red"
+                 restricted-area="color_red"
+                 grass-runway-outline="RGBA(247, 247, 247, 255)"
+                 grass-runway-fill="RGBA(186, 221, 105, 204)"
+                 grass-runway-extension="RGBA(216, 229, 179, 230)"
+                 runway-outline="RGBA(65, 71, 76, 255)"
+                 runway-fill="RGBA(178, 187, 193, 230)"
+                 runway-extension="RGBA(132, 142, 150, 230)"
+                 aerodrome="color_khaki"
+                 aerodrome-border="color_black"
+                 >
+        <contour color="RGB(74, 113, 49)" contour_color="color_hollow" elevation="152"/>
+        <contour color="RGB(66, 105, 33)" contour_color="color_hollow" elevation="305"/>
+        <contour color="RGB(58, 97, 16)" contour_color="color_hollow" elevation="457"/>
+        <contour color="RGB(74, 105, 16)" contour_color="color_hollow" elevation="610"/>
+        <contour color="RGB(82, 109, 25)" contour_color="color_hollow" elevation="762"/>
+        <contour color="RGB(90, 113, 25)" contour_color="color_hollow" elevation="914"/>
+        <contour color="RGB(99, 117, 25)" contour_color="color_hollow" elevation="1067"/>
+        <contour color="RGB(107, 121, 33)" contour_color="color_hollow" elevation="1219"/>
+        <contour color="RGB(115, 129, 41)" contour_color="color_hollow" elevation="1372"/>
+        <contour color="RGB(132, 134, 41)" contour_color="color_hollow" elevation="1524"/>
+        <contour color="RGB(140, 138, 49)" contour_color="color_hollow" elevation="1676"/>
+        <contour color="RGB(148, 138, 49)" contour_color="color_hollow" elevation="1829"/>
+        <contour color="RGB(156, 142, 49)" contour_color="color_hollow" elevation="1981"/>
+        <contour color="RGB(156, 146, 49)" contour_color="color_hollow" elevation="2134"/>
+        <contour color="RGB(181, 154, 66)" contour_color="color_hollow" elevation="2286"/>
+        <contour color="RGB(156, 121, 49)" contour_color="color_hollow" elevation="2438"/>
+        <contour color="RGB(115, 65, 25)" contour_color="color_hollow" elevation="2591"/>
+        <contour color="RGB(94, 53, 21)" contour_color="color_hollow" elevation="2743"/>
+        <contour color="RGB(77, 43, 17)" contour_color="color_hollow" elevation="2896"/>
+        <contour color="color_white" contour_color="color_hollow" elevation="305"/>
+      </day-theme>
+      <night-theme alarm-color="color_red"
+                 warning-color="color_yellow"
+                 land-color="RGB(214, 211, 63)"
+                 coastline-color="color_black"
+                 residential-area="color_khaki"
+                 residential-street="color_black"
+                 highway="color_black"
+                 big-road="color_black"
+                   major-road="color_black"
+                 water-color="RGB(205, 231, 244)"
+                 class-a-airspace="color_blue"
+                 class-b-airspace="color_blue"
+                 class-c-airspace="color_purple"
+                 class-d-airspace="color_purple"
+                 class-e-airspace="color_blue"
+                 class-f-airspace="color_blue"
+                 class-g-airspace="color_blue"
+                 class-m-airspace="color_red"
+                 cfz-airspace="color_blue"
+                 mbz-airspace="color_blue"
+                 danger-area="color_red"
+                 restricted-area="color_red"
+                 grass-runway-outline="RGBA(247, 247, 247, 255)"
+                 grass-runway-fill="RGBA(186, 221, 105, 204)"
+                 grass-runway-extension="RGBA(216, 229, 179, 230)"
+                 runway-outline="RGBA(65, 71, 76, 255)"
+                 runway-fill="RGBA(178, 187, 193, 230)"
+                 runway-extension="RGBA(132, 142, 150, 230)"
+                   aerodrome="color_lightgrey"
+                   aerodrome-border="color_black"
+                 >
+        <contour color="RGB(74, 113, 49)" contour_color="color_hollow" elevation="152"/>
+        <contour color="RGB(66, 105, 33)" contour_color="color_hollow" elevation="305"/>
+        <contour color="RGB(58, 97, 16)" contour_color="color_hollow" elevation="457"/>
+        <contour color="RGB(74, 105, 16)" contour_color="color_hollow" elevation="610"/>
+        <contour color="RGB(82, 109, 25)" contour_color="color_hollow" elevation="762"/>
+        <contour color="RGB(90, 113, 25)" contour_color="color_hollow" elevation="914"/>
+        <contour color="RGB(99, 117, 25)" contour_color="color_hollow" elevation="1067"/>
+        <contour color="RGB(107, 121, 33)" contour_color="color_hollow" elevation="1219"/>
+        <contour color="RGB(115, 129, 41)" contour_color="color_hollow" elevation="1372"/>
+        <contour color="RGB(132, 134, 41)" contour_color="color_hollow" elevation="1524"/>
+        <contour color="RGB(140, 138, 49)" contour_color="color_hollow" elevation="1676"/>
+        <contour color="RGB(148, 138, 49)" contour_color="color_hollow" elevation="1829"/>
+        <contour color="RGB(156, 142, 49)" contour_color="color_hollow" elevation="1981"/>
+        <contour color="RGB(156, 146, 49)" contour_color="color_hollow" elevation="2134"/>
+        <contour color="RGB(181, 154, 66)" contour_color="color_hollow" elevation="2286"/>
+        <contour color="RGB(156, 121, 49)" contour_color="color_hollow" elevation="2438"/>
+        <contour color="RGB(115, 65, 25)" contour_color="color_hollow" elevation="2591"/>
+        <contour color="RGB(94, 53, 21)" contour_color="color_hollow" elevation="2743"/>
+        <contour color="RGB(77, 43, 17)" contour_color="color_hollow" elevation="2896"/>
+        <contour color="color_white" contour_color="color_hollow" elevation="305"/>
+      </night-theme>
+    </map>
+
+  </layout>
+
+</application>

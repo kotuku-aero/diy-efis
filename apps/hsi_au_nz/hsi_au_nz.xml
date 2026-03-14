@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding ="utf-8" ?>
+<application xmlns="http://kotuku.aero/schema/kotuku.xsd"
+             xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <menu id =" 100"
+        root-keys="root"
+        alarm-keys="alarm_keys"
+        font="neo_9_font"
+        background-color="color_black"
+        fill-background="false"
+        selected-background-color="color_white"
+        selected-color="color_magenta"
+        border-color="color_yellow"
+        text-color="color_green"
+        menu-timeout="7"
+        setup-menu="setup_menu">
+    <rect left="0" top="0" width="320" height="240"/>
+    <menu-rect x="0" y="0"/>
+    <menu-start x="0" y="240"/>
+    <!-- Menu used when the menu is closed -->
+    <keys name="root">
+      <key0>
+        <popup-action caption="Settings" menu="settings_menu" />
+      </key0>
+      <key1>
+        <event-action caption="Cancel" can-id="id_cancel" value-type="v_int16" value="1"/>
+      </key1>
+      <decka-up>
+        <event-action caption="HDGUp" can-id="id_heading_change" value-type="v_int16" value="1"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="HDGDn" can-id="id_heading_change" value-type="v_int16" value="-1"/>
+      </decka-dn>
+      <decka-press-up>
+        <event-action caption="ALTUp" can-id="id_altitude_change" value-type="v_int16" value="100"/>
+      </decka-press-up>
+      <decka-press-dn>
+        <event-action caption="ALTDn" can-id="id_altitude_change" value-type="v_int16" value="-100"/>
+      </decka-press-dn>
+    </keys>
+
+    <!-- Menu used when a popup is active -->
+    <keys name="popup_keys">
+      <key0>
+        <event-action caption="OK" can-id="id_ok" value-type="v_int16" value="1"/>
+      </key0>
+      <key1>
+        <event-action caption="Cancel" can-id="id_cancel" value-type="v_int16" value="1"/>
+      </key1>
+      <decka-up>
+        <event-action caption="Up" can-id="id_up" value-type="v_int16" value="1"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="Dn" can-id="id_down" value-type="v_int16" value="1"/>
+      </decka-dn>
+    </keys>
+
+    <keys name="edit_keys">
+      <key0>
+        <event-action caption="OK" can-id="id_ok" value-type="v_int16" value="1"/>
+      </key0>
+      <key1>
+        <event-action caption="Cancel" can-id="id_cancel" value-type="v_int16" value="1"/>
+      </key1>
+      <decka-up>
+        <event-action caption="Up" can-id="id_spin_edit" value-type="v_int16" value="10"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="Dn" can-id="id_spin_edit" value-type="v_int16" value="-10"/>
+      </decka-dn>
+      <decka-press-up>
+        <event-action caption="Up" can-id="id_spin_edit" value-type="v_int16" value="1"/>
+      </decka-press-up>
+      <decka-press-dn>
+        <event-action caption="Dn" can-id="id_spin_edit" value-type="v_int16" value="-1"/>
+      </decka-press-dn>
+    </keys>
+
+    <keys name="node_id_keys">
+      <key0>
+        <event-action caption="OK" can-id="id_ok" value-type="v_int16" value="1"/>
+      </key0>
+      <key1>
+        <event-action caption="Cancel" can-id="id_cancel" value-type="v_int16" value="1"/>
+      </key1>
+      <decka-up>
+        <event-action caption="Up" can-id="id_spin_edit" value-type="v_int16" value="1"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="Dn" can-id="id_spin_edit" value-type="v_int16" value="-1"/>
+      </decka-dn>
+      <decka-press-up>
+        <event-action caption="Up" can-id="id_spin_edit" value-type="v_int16" value="1"/>
+      </decka-press-up>
+      <decka-press-dn>
+        <event-action caption="Dn" can-id="id_spin_edit" value-type="v_int16" value="-1"/>
+      </decka-press-dn>
+    </keys>
+
+    <!-- Menu used when an alarm is displayed -->
+    <keys name="alarm_keys">
+      <key0>
+        <event-action caption="Close" can-id="id_alarm_close" value-type="v_int16" value="1"/>
+      </key0>
+      <key1>
+        <event-action caption="Park" can-id="id_alarm_park" value-type="v_int16" value="1"/>
+      </key1>
+    </keys>
+
+    <menu name="settings_menu" keys="popup_keys" caption="Main">
+      <event-action caption="AP Off" can-id="id_autopilot_enable" value-type="v_uint16" value="0"/>
+      <checklist-action caption="HNAV Mode" get-index="get_hnav_mode" popup="hnav_menu"/>
+      <checklist-action caption="VNAV Mode" get-index="get_vnav_mode" popup="vnav_menu"/>
+      <spin-edit-action caption="VSpeed"
+                        min-value="50"
+                        max-value="1000"
+                        get-method="get_vertical_speed"
+                        set-method="set_vertical_speed"
+                        keys="edit_keys"/>
+      <spin-edit-action caption="Alt"
+                        min-value="0"
+                        max-value="25000"
+                        get-method="get_assigned_altitude"
+                        set-method="set_assigned_altitude"
+                        keys="edit_keys"/>
+      <spin-edit-action caption="Brightness"
+                        min-value="10"
+                        max-value="100"
+                        get-method="get_brightness"
+                        set-method="set_brightness"
+                        keys="edit_keys"/>
+        <!-- this will be removed when the push-button on startup works -->
+        <popup-action menu="setup_menu" caption="Setup"/>
+    </menu>
+
+    <menu name="hnav_menu" keys="popup_keys" caption="HNAV Mode">
+      <event-action caption="OFF" can-id="id_hnav_mode" value-type="v_uint16" value="0"/>
+      <event-action caption="HDG" can-id="id_hnav_mode" value-type="v_uint16" value="1"/>
+      <event-action caption="NAV" can-id="id_hnav_mode" value-type="v_uint16" value="2"/>
+    </menu>
+    
+    <menu name="vnav_menu" keys="popup_keys" caption="VNAV Mode">
+      <event-action caption="OFF" can-id="id_vnav_mode" value-type="v_uint16" value="0"/>
+      <event-action caption="VS" can-id="id_vnav_mode" value-type="v_uint16" value="1"/>
+      <event-action caption="ALT" can-id="id_vnav_mode" value-type="v_uint16" value="2"/>
+    </menu>
+
+    <menu name="setup_menu" keys="popup_keys" caption="Setup">
+      <spin-edit-action caption="Node ID"
+                        min-value="8"
+                        max-value="14"
+                        get-method="get_node_id"
+                        set-method="set_node_id"
+                        keys="node_id_keys"/>
+    </menu>
+  </menu>
+
+  <layout>
+
+    <datetime name="UTC"
+              id="utc_annunciator"
+              fill-background="false"
+              draw-name="true"
+              can-id="id_datetime_utc"
+              label-color ="color_white"
+              background-color ="color_blue"
+              compact="true"
+              text-color="color_purple"
+              border-color="color_white"
+              border-top="false"
+              border-right="true"
+              small-font="neo_9_bold_font"
+              name-color="color_white"
+              name-font="neo_9_bold_font"
+              label-offset="2"
+              text-offset="30"
+              value-type="v_uint32"
+              format="%H:%M"
+            >
+      <rect left="0" top="0" width="60" height="40"/>
+    </datetime>
+
+    <datetime name="UTC DATE"
+              id="utc_date_annunciator"
+              fill-background="false"
+              draw-name="true"
+              can-id="id_datetime_utc"
+              label-color ="color_white"
+              background-color ="color_blue"
+              compact="true"
+              text-color="color_purple"
+              border-color="color_white"
+              border-top="true"
+              border-right="true"
+              small-font="neo_9_bold_font"
+              name-color="color_white"
+              name-font="neo_9_bold_font"
+              label-offset="2"
+              text-offset="30"
+              value-type="v_uint32"
+              format="%y-%m-%d"
+            >
+      <rect left="0" top="40" width="60" height="40"/>
+    </datetime>
+
+    <hobbs name="AIR"
+           id="air_annunciator"
+           fill-background="false"
+           draw-name="true"
+           can-id="id_air_time"
+           label-color ="color_white"
+           background-color ="color_blue"
+           text-color="color_purple"
+           border-color="color_white"
+           border-top="true"
+           border-right="true"
+           compact="true"
+           small-font="neo_9_bold_font"
+           name-color="color_white"
+           name-font="neo_9_bold_font"
+           label-offset="2"
+           text-offset="30"
+           value-type="v_uint32"
+           format="%05.1f"
+            >
+      <rect left="0" top="80" width="60" height="40"/>
+    </hobbs>
+
+    <hobbs name="ENG"
+            id="eng_annunciator"
+           fill-background="false"
+           draw-name="true"
+           compact="true"
+           can-id="id_engine_hours"
+           label-color ="color_white"
+           background-color ="color_blue"
+           text-color="color_purple"
+           border-color="color_white"
+           border-top="true"
+           border-right="true"
+           small-font="neo_9_bold_font"
+           name-color="color_white"
+           name-font="neo_9_bold_font"
+           label-offset="2"
+           text-offset="30"
+           value-type="v_uint32"
+           format="%05.1f"
+    >
+      <rect left="0" top="120" width="60" height="40"/>
+    </hobbs>
+
+    <datetime name="LCL"
+              id="lcl_annunciator"
+              fill-background="false"
+              draw-name="true"
+              can-id="id_datetime_lcl"
+              label-color ="color_white"
+              background-color ="color_blue"
+              compact="true"
+              text-color="color_purple"
+              border-color="color_white"
+              border-top="true"
+              border-right="true"
+              small-font="neo_9_bold_font"
+              name-color="color_white"
+              name-font="neo_9_bold_font"
+              label-offset="2"
+              text-offset="30"
+              value-type="v_uint32"
+              format="%H:%M"
+            >
+      <rect left="0" top="160" width="60" height="40"/>
+    </datetime>
+
+    <datetime name="LCL DATE"
+              id="lcl_date_annunciator"
+              fill-background="false"
+              draw-name="true"
+              can-id="id_datetime_lcl"
+              label-color ="color_white"
+              background-color ="color_blue"
+              compact="true"
+              text-color="color_purple"
+              border-color="color_white"
+              border-top="true"
+              border-right ="true"
+              small-font="neo_9_bold_font"
+              name-color="color_white"
+              name-font="neo_9_bold_font"
+              label-offset="2"
+              text-offset="30"
+              value-type="v_uint32"
+              format="%y-%m-%d"
+            >
+      <rect left="0" top="200" width="60" height="40"/>
+    </datetime>
+
+
+    <hsi name="HSI"
+         id="hsi_widget"
+         border-color="color_white"
+         border-left="false"
+         border-right="false"
+         border-top ="true"
+         border-bottom="true"
+         background-color="color_black"
+         fill-background="true"
+        on-create="on_create_hsi_widget"
+        name-font="neo_9_font">
+      <rect left="60" top="00" width="200" height="200"/>
+    </hsi>
+    <autopilot name="AP"
+               id="ap_widget"
+               can-id="id_autopilot_mode"
+               name-font="neo_9_font"
+               fill-background="false"
+               text-color="color_purple"
+               label-color ="color_hollow"
+               label-offset="0"
+               border-color="color_white"
+               border-bottom="true"
+               border-top="true"
+               text-offset="0"
+               text-format="eto_clipped | eto_center"
+               small-font="neo_9_bold_font"
+               value-type="v_uint16"
+               format="%s"
+>
+      <rect left="260" top="0" width="60" height="240"/>
+    </autopilot>
+  </layout>
+
+</application>

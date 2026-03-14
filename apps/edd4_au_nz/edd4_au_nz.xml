@@ -1,0 +1,822 @@
+<?xml version="1.0" encoding ="utf-8" ?>
+<application xmlns="http://kotuku.aero/schema/kotuku.xsd"
+             xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <menu id ="100"
+        root-keys="root"
+        alarm-keys="alarm_keys"
+        font="neo_9_font"
+        background-color="color_black"
+        fill-background="false"
+        selected-background-color="color_white"
+        selected-color="color_magenta"
+        border-color="color_yellow"
+        text-color="color_green"
+        menu-timeout="7"
+        setup-menu="setup_menu">
+    <rect left="0" top="0" width="320" height="240"/>
+    <menu-rect x="0" y="0"/>
+    <menu-start x="0" y="240"/>
+    <!-- Menu used when the menu is closed -->
+    <keys name="root">
+      <key0>
+        <popup-action caption="Settings" menu="settings_menu" />
+      </key0>
+      <key1>
+        <event-action caption="Cancel" can-id="id_cancel" value-type="v_int16" value="1"/>
+      </key1>
+      <decka-up>
+        <event-action caption="Next" can-id="id_marquee_next" value-type="v_int16" value="1"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="Prev" can-id="id_marquee_prev" value-type="v_int16" value="1"/>
+      </decka-dn>
+    </keys>
+    <!-- Menu used when an alarm is displayed -->
+    <keys name="alarm_keys">
+      <key0>
+        <event-action caption="Close" can-id="id_alarm_close" value-type="v_int16" value="1"/>
+      </key0>
+      <key1>
+        <event-action caption="Park" can-id="id_alarm_park" value-type="v_int16" value="1"/>
+      </key1>
+    </keys>
+
+    <!-- Menu used when a popup is active -->
+    <keys name="popup_keys">
+      <key0>
+        <event-action caption="OK" can-id="id_ok" value-type="v_int16" value="1"/>
+      </key0>
+      <key1>
+        <event-action caption="Cancel" can-id="id_cancel" value-type="v_int16" value="1"/>
+      </key1>
+      <decka-up>
+        <event-action caption="Up" can-id="id_up" value-type="v_int16" value="1"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="Dn" can-id="id_down" value-type="v_int16" value="1"/>
+      </decka-dn>
+    </keys>
+
+    <keys name="edit_keys">
+      <key0>
+        <event-action caption="OK" can-id="id_ok" value-type="v_int16" value="1"/>
+      </key0>
+      <key1>
+        <event-action caption="Cancel" can-id="id_cancel" value-type="v_int16" value="1"/>
+      </key1>
+      <decka-up>
+        <event-action caption="Up" can-id="id_spin_edit" value-type="v_int16" value="10"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="Dn" can-id="id_spin_edit" value-type="v_int16" value="-10"/>
+      </decka-dn>
+      <decka-press-up>
+        <event-action caption="Up" can-id="id_spin_edit" value-type="v_int16" value="1"/>
+      </decka-press-up>
+      <decka-press-dn>
+        <event-action caption="Dn" can-id="id_spin_edit" value-type="v_int16" value="-1"/>
+      </decka-press-dn>
+    </keys>
+
+    <menu name="settings_menu" keys="popup_keys" caption="Settings">
+      <event-action caption="Full Fuel" can-id="id_set_fuel_available" value-type="v_uint32" get-value="get_fuel_max"/>
+      <spin-edit-action caption="Fuel total"
+                        min-value="0"
+                        get-max-value="get_fuel_max"
+                        converter="convert_cc_to_litres"
+                        get-method="get_fuel_total"
+                        set-method="set_fuel_total"
+                        keys="edit_keys"/>
+      <spin-edit-action caption="Brightness"
+                        min-value="10"
+                        max-value="100"
+                        get-method="get_brightness"
+                        set-method="set_brightness"
+                        keys="edit_keys"/>
+    </menu>
+
+    <keys name="node_id_keys">
+      <key0>
+        <event-action caption="OK" can-id="id_ok" value-type="v_int16" value="1"/>
+      </key0>
+      <key1>
+        <event-action caption="Cancel" can-id="id_cancel" value-type="v_int16" value="1"/>
+      </key1>
+      <decka-up>
+        <event-action caption="Up" can-id="id_spin_edit" value-type="v_int16" value="1"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="Dn" can-id="id_spin_edit" value-type="v_int16" value="-1"/>
+      </decka-dn>
+      <decka-press-up>
+        <event-action caption="Up" can-id="id_spin_edit" value-type="v_int16" value="1"/>
+      </decka-press-up>
+      <decka-press-dn>
+        <event-action caption="Dn" can-id="id_spin_edit" value-type="v_int16" value="-1"/>
+      </decka-press-dn>
+    </keys>
+
+    <menu name="setup_menu" keys="popup_keys" caption="Setup">
+      <spin-edit-action caption="Node ID"
+                        min-value="8"
+                        max-value="14"
+                        get-method="get_node_id"
+                        set-method="set_node_id"
+                        keys="node_id_keys"/>
+    </menu>
+  </menu>
+
+  <layout>
+    <gauge name="MAP"
+           id="map_gauge"
+           style="point"
+           bar-width="5"
+           background-color="color_black"
+           fill-background="true"
+           draw-name="true"
+           name-color="color_white"
+           border-bottom="true"
+           border-right="true"
+           border-color="color_white"
+           name-font="neo_9_bold_font"
+           can-id="id_manifold_pressure"
+           draw-value="true"
+           radii="75"
+           arc-width="5"
+           arc-begin="230"
+           arc-range="80"
+           converter="convert_hpa_to_inhg"
+           font="neo_9_bold_font"
+           value-font="neo_18_font"
+           alarm-id="id_map_divergence_alarm"
+           alarm-color ="color_red"
+           sensor-id="id_manifold_pressure_sensor_status"
+           >
+      <rect left="0" top="0" width="112" height="67"/>
+      <name-pt x="13" y="8"/>
+      <center x="56" y="90"/>
+      <value-rect left="15" top="40" width="80" height="26"/>
+
+      <step value="0" color="color_hollow" pen="color_white" />
+      <step value="35" color="color_green" pen="color_white"/>
+
+      <tick value="10" text="10" />
+      <tick value="15"/>
+      <tick value="20" text="20"/>
+      <tick value="25"/>
+      <tick value="30" text="30"/>
+    </gauge>
+    <gauge name="RPM"
+           id="rpm_gauge"
+           style="point"
+           bar-width="5"
+           fill-background="true"
+           background-color="color_black"
+           draw-name="true"
+           name-color="color_white"
+           border-bottom="true"
+           border-right="true"
+           border-color="color_white"
+           name-font="neo_9_bold_font"
+           can-id="id_engine_rpm" 
+           draw-value="true"
+           radii="75"
+           arc-width="5"
+           arc-begin="230"
+           arc-range="80"
+           font="neo_9_bold_font"
+           value-font="neo_18_font" 
+           alarm-id="id_rpm_high_alarm"
+           alarm-color="color_red"
+           >
+      <rect left="112" top="0" width="112" height="67"/>
+      <name-pt x="13" y="8"/>
+      <center x="56" y="90"/>
+      <value-rect left="15" top="40" width="80" height="26"/>
+
+      <step value="500" color="color_scarlet" pen="color_white"/>
+      <step value="2750" color="color_green" pen="color_white"/>
+      <step value="3100" color="color_green" pen="color_white"/>
+
+      <tick value="500"/>
+      <tick value="750"/>
+      <tick value="1000" text="1"/>
+      <tick value="1250"/>
+      <tick value="1500"/>
+      <tick value="1750"/>
+      <tick value="2000" text="2"/>
+      <tick value="2250"/>
+      <tick value="2500"/>
+      <tick value="2750"/>
+      <tick value="3000" text="3"/>
+    </gauge>
+    <hp name="HP"
+        id="hp_annunciator"
+        fill-background="true"
+        background-color="color_blue"
+        draw-name="true"
+        can-id="id_engine_hp"
+        label-color="color_white"
+        text-color="color_white"
+        border-color="color_white"
+        border-right="true"
+        border-bottom="true"
+        small-font="neo_9_bold_font"
+        name-color="color_white"
+        name-font="neo_9_bold_font"
+        label-offset="2"
+        text-offset="30"
+        format="%d"
+        value-type="v_uint16"
+        >
+      <rect left="0" top="67" width="60" height="20"/>
+    </hp>
+    <ecu name="kMAG"
+         id="kmag_annunciator"
+         can-id="on_check_kmag"
+         background-color="color_black"
+         border-color="color_white"
+         label-color="color_white"
+         text-color="color_white"
+         small-font="neo_9_font"
+         name-font="neo_9_font"
+         name-color="color_white"
+         label-offset="30"
+         text-offset="30"
+         format="%d"
+         value-type="v_uint16"
+         border-right="true"
+         border-bottom="true"
+         fill-background="true">
+      <rect left="60" top="67" width="104" height="20"/>
+    </ecu>
+    <auto name="OAT"
+          id="oat_annunciator"
+          can-id="id_outside_air_temperature"
+          background-color="color_blue"
+          border-color="color_white"
+          label-color ="color_white"
+          text-color="color_white"
+          label-offset="2"
+          text-offset="30"
+          small-font="neo_9_bold_font"
+          border-bottom="true"
+          border-right="true"
+          fill-background="true"
+          on-message="on_auto_msg"
+          on-paint="on_paint_auto"
+          format="%d"
+          value-type="v_uint16"
+          converter="convert_kelvin_to_c"
+          draw-name="true"
+          name-font="neo_9_bold_font"
+          >
+      <rect left="164" top="67" width="60" height="20"/>
+    </auto>
+
+    <edutemps name="TEMPS"
+               id="edu_temps"
+               num-cyl="4"
+               fill-background="true"
+               background-color="color_black"
+               left-gutter="24"
+               right-gutter="196"
+               cylinder-draw-width="40"
+               converter="convert_kelvin_to_f"
+               egt-color="color_lightblue"
+               cht-color="color_lightgreen"
+               egt-line="5"
+               cht-line="17"
+               bar-top="31"
+               bar-bottom="104"
+               status-top="102"
+               egt-redline="1650"
+               egt-min="1000"
+               cht-redline="500"
+               cht-min="225"
+               redline-pos="38"
+               font="neo_9_bold_font"
+               border-right="true"
+               border-bottom="true"
+               border-color="color_white">
+      <rect left="0" top="87" width="224" height="120"/>
+      <egt name="1"
+           can-id="id_exhaust_gas_temperature1"
+           color="color_lightblue"
+           alarm-color="color_red"
+           alarm-id="id_exhaust_gas_temperature1_alarm"
+           sensor-id="id_exhaust_gas_temperature1_status" />
+      <egt name="2"
+           can-id="id_exhaust_gas_temperature2"
+           color="color_lightblue"
+           alarm-color="color_red"
+           alarm-id="id_exhaust_gas_temperature2_alarm"
+           sensor-id="id_exhaust_gas_temperature2_status" />
+      <egt name="3"
+           can-id="id_exhaust_gas_temperature3"
+           color="color_lightblue"
+           alarm-color="color_red"
+           alarm-id="id_exhaust_gas_temperature3_alarm"
+           sensor-id="id_exhaust_gas_temperature3_status" />
+      <egt name="4"
+           can-id="id_exhaust_gas_temperature4"
+           color="color_lightblue"
+           alarm-color="color_red"
+           alarm-id="id_exhaust_gas_temperature4_alarm"
+           sensor-id="id_exhaust_gas_temperature4_status" />
+      <cht name="1"
+           can-id="id_cylinder_head_temperature1"
+           color="color_lightgreen"
+           alarm-color="color_red"
+           alarm-id="id_cylinder_head_temperature1_alarm"
+           sensor-id="id_cylinder_head_temperature1_status" />
+      <cht name="2"
+            can-id="id_cylinder_head_temperature2"
+            color="color_lightgreen"
+            alarm-color="color_red"
+            alarm-id="id_cylinder_head_temperature2_alarm"
+            sensor-id="id_cylinder_head_temperature2_status" />
+      <cht name="3"
+            can-id="id_cylinder_head_temperature3"
+            color="color_lightgreen"
+            alarm-color="color_red"
+            alarm-id="id_cylinder_head_temperature3_alarm"
+            sensor-id="id_cylinder_head_temperature3_status" />
+      <cht name="4"
+            can-id="id_cylinder_head_temperature4"
+            color="color_lightgreen"
+            alarm-color="color_red"
+            alarm-id="id_cylinder_head_temperature4_alarm"
+            sensor-id="id_cylinder_head_temperature4_status" />
+    </edutemps>
+
+    <gauge name="OILT"
+           id="oilt_gauge"
+           style="hbar"
+           background-color="color_black"
+           fill-background="true"
+           draw-value="true"
+           value-font="neo_12_bold_font"
+           name-font="neo_9_bold_font"
+           draw-name="true"
+           name-color="color_white"
+           can-id="id_oil_temperature"
+           converter="convert_kelvin_to_f"
+           font="neo_12_font"
+           alarm-id="id_high_oil_temperature_alarm"
+           alarm-color =" color_red"
+           sensor-id="id_oil_temperature_sensor_status"
+           >
+      <rect left="224" top="0" width="96" height="40" />
+      <name-pt x="55" y="30"/>
+      <value-rect left="3" top="20" width="17" height="19"/>
+
+      <step color="color_hollow" pen="color_hollow" value="32"/>
+      <step color="color_scarlet" pen="color_scarlet" value="90"/>
+      <step color="color_lightgreen" pen="color_lightgreen" value="220"/>
+      <step color="color_scarlet" pen="color_scarlet" value="250"/>
+    </gauge>
+
+    <gauge name="OILP"
+           id="oilp_gauge"
+           style="hbar"
+           background-color="color_black"
+           fill-background="true"
+           draw-value="true"
+           value-font="neo_12_bold_font"
+           name-font="neo_9_bold_font"
+           name-color="color_white"
+           draw-name="true"
+           can-id="id_oil_pressure"
+           converter="convert_hpa_to_psi"
+           font="neo_12_font"
+           border-color="color_white"
+           border-bottom="true"
+           alarm-id="id_low_oil_pressure_alarm"
+           alarm-color =" color_red"
+           sensor-id="id_oil_pressure_sensor_status"
+           >
+      <rect left="224" top="40" width="96" height="40" />
+      <name-pt x="55" y="30"/>
+      <value-rect left="3" top="20" width="17" height="19"/>
+
+      <step color="color_red" pen="color_red" value="0"/>
+      <step color="color_red" pen="color_red" value="20"/>
+      <step color="color_lightgreen" pen="color_lightgreen" value="120"/>
+    </gauge>
+
+    <gauge name="FUELP"
+           id="fuelp_gauge"
+           style="hbar"
+           background-color="color_black"
+           fill-background="true"
+           draw-value="true"
+           value-font="neo_12_bold_font"
+           name-font="neo_9_bold_font"
+           name-color="color_white"
+           can-id="id_fuel_pressure"
+           converter="convert_hpa_to_psi"
+           font="neo_12_font"
+           draw-name="true"
+           alarm-id="id_low_fuel_pressure_alarm"
+           alarm-color ="color_red"
+           sensor-id="id_fuel_pressure_sensor_status"
+           >
+      <rect left="224" top="80" width="96" height="40" />
+      <name-pt x="55" y="30"/>
+      <value-rect left="3" top="20" width="17" height="19"/>
+
+      <step color="color_hollow" pen="color_hollow" value="10"/>
+      <step color="color_red" pen="color_red" value="15"/>
+      <step color="color_lightgreen" pen="color_lightgreen" value="45"/>
+    </gauge>
+
+    <gauge name="FUELF"
+           id="fuelf_gauge"
+           style="hbar"
+           background-color="color_black"
+           fill-background="true"
+           draw-value="true"
+           value-font="neo_12_bold_font"
+           name-font="neo_9_bold_font"
+           name-color="color_white"
+           draw-name="true"
+           can-id="id_fuel_flow_rate"
+           converter="convert_flow_to_litres"
+           font="neo_12_font"
+           border-color="color_white"
+           border-bottom="true"
+           alarm-color="color_red"
+           sensor-id="id_fuel_flow_sensor_status"
+           >
+      <rect left="224" top="120" width="96" height="40" />
+      <name-pt x="55" y="30"/>
+      <value-rect left="3" top="20" width="17" height="19"/>
+
+      <step color="color_hollow" pen="color_hollow" value="0"/>
+      <step color="color_red" pen="color_red" value="5"/>
+      <step color="color_lightgreen" pen="color_lightgreen" value="60"/>
+    </gauge>
+
+    <gauge name="LEFT"
+           id="left_fuel_gauge"
+           style="hbar"
+           background-color="color_black"
+           fill-background="true"
+           draw-value="true"
+           value-font="neo_12_bold_font"
+           name-font="neo_9_bold_font"
+           name-color="color_white"
+           draw-name="true"
+           can-id="id_left_fuel_quantity"
+           converter="convert_cc_to_litres"
+           font="neo_12_font"
+           border-color="color_white"
+           sensor-id="id_left_fuel_quantity_sensor_status"
+           >
+      <rect left="224" top="160" width="96" height="40" />
+      <name-pt x="55" y="30"/>
+      <value-rect left="3" top="20" width="17" height="19"/>
+
+      <step color="color_hollow" pen="color_hollow" value="0"/>
+      <step color="color_red" pen="color_red" value="5"/>
+      <step color="color_lightgreen" pen="color_lightgreen" value="66"/>
+    </gauge>
+
+    <gauge name="RIGHT"
+           id="right_fuel_gauge"
+           style="hbar"
+           background-color="color_black"
+           fill-background="true"
+           draw-value="true"
+           value-font="neo_12_bold_font"
+           name-font="neo_9_bold_font"
+           name-color="color_white"
+           draw-name="true"
+           can-id="id_right_fuel_quantity"
+           converter="convert_cc_to_litres"
+           font="neo_12_font"
+           border-color="color_white"
+           sensor-id="id_right_fuel_quantity_sensor_status"
+           >
+      <rect left="224" top="200" width="96" height="40" />
+      <name-pt x="55" y="30"/>
+      <value-rect left="3" top="20" width="17" height="19"/>
+
+      <step color="color_hollow" pen="color_hollow" value="0"/>
+      <step color="color_red" pen="color_red" value="5"/>
+      <step color="color_lightgreen" pen="color_lightgreen" value="66"/>
+    </gauge>
+
+    <marquee name="ALARMS"
+             id="marquee"
+             base-id="1000"
+             base-alarm-id="2000"
+             border-right="true"
+             border-color="color_white"
+             font="neo_15_font"
+             background-color="color_black"
+             fill-background="true"
+             alarm-background="color_red"
+             alarm-text="color_black"
+             on-paint="on_paint_marquee"
+             >
+      <rect left="0" top="207" width="224" height="33"/>
+      <!-- Fuel Totalizer -->
+      <auto small-font="neo_15_font"
+            id="m_tot_fuel"
+            name="Tot. Fuel"
+            fill-background="true"
+            background-color="color_black"
+            text-color="color_lightblue"
+            label-color="color_white"
+            label-offset="2"
+            text-offset="110"
+            can-id="id_fuel_total"
+            on-message="on_auto_msg"
+            on-paint="on_paint_auto"
+            format="%d"
+            draw-name="true"
+            value-type="v_uint32"
+            converter="convert_cc_to_litres">
+        <rect left="0" top="0" width="223" height="33"/>
+      </auto>
+      <!-- Fuel endurance -->
+      <hours small-font="neo_15_font"
+            name="Fuel Endur."
+             id="m_fuel_tot"
+            text-color="color_lightblue"
+            label-color="color_white"
+            label-offset="2"
+            text-offset="110"
+            can-id="id_fuel_endurance"
+            on-message="on_hours_msg"
+            on-paint="on_paint_hours"
+            format="%d"
+            fill-background="true"
+            background-color="color_black"
+            draw-name="true"
+            value-type="v_uint32">
+        <rect left="0" top="0" width="223" height="33"/>
+      </hours>
+      <!-- Fuel Pressure -->
+      <auto small-font="neo_15_font"
+            name="Fuel Pres."
+            id="m_fuel_pressure"
+            fill-background="true"
+            background-color="color_black"
+            text-color="color_lightblue"
+            label-color="color_white"
+            label-offset="2"
+            text-offset="110"
+            can-id="id_fuel_pressure"
+            on-message="on_auto_msg"
+            on-paint="on_paint_auto"
+            format="%d"
+            draw-name="true"
+            value-type="v_int16"
+            converter="convert_hpa_to_psi">
+        <rect left="0" top="0" width="223" height="33"/>
+      </auto>
+      <!-- Fuel Flow -->
+      <auto small-font="neo_15_font"
+            name="Fuel Flow"
+            fill-background="true"
+            id="m_fuel_flow"
+            background-color="color_black"
+            text-color="color_lightblue"
+            label-color="color_white"
+            label-offset="2"
+            text-offset="110"
+            can-id="id_fuel_flow_rate"
+            on-message="on_auto_msg"
+            on-paint="on_paint_auto"
+            format="%d"
+            draw-name="true"
+            value-type="v_uint32"
+            converter="convert_flow_to_litres">
+        <rect left="0" top="0" width="223" height="33"/>
+      </auto>
+      <!-- Engine hours -->
+      <hobbs small-font="neo_15_font"
+            name="Eng. Hrs."
+            text-color="color_lightblue"
+            label-color="color_white"
+            label-offset="2"
+            text-offset="110"
+            can-id="id_engine_hours"
+            on-message="on_hours_msg"
+            on-paint="on_paint_hours"
+            format="%d"
+            draw-name="true"
+            fill-background="true"
+            background-color="color_black"
+            value-type="v_uint32">
+        <rect left="0" top="0" width="223" height="33"/>
+      </hobbs>
+      <!-- Oil Pressure-->
+      <auto small-font="neo_15_font"
+            name="Oil Pres."
+            id="m_oil_pressure"
+            text-color="color_lightblue"
+            label-color="color_white"
+            label-offset="2"
+            text-offset="110"
+            can-id="id_oil_pressure"
+            on-message="on_auto_msg"
+            on-paint="on_paint_auto"
+            format="%d"
+            draw-name="true"
+            fill-background="true"
+            background-color="color_black"
+            value-type="v_uint16"
+            converter="convert_hpa_to_psi">
+        <rect left="0" top="0" width="223" height="33"/>
+      </auto>
+      <!-- Oil Temperature-->
+      <auto small-font="neo_15_font"
+            name="Oil Temp."
+            id="m_oil_temp"
+            text-color="color_lightblue"
+            label-color="color_white"
+            label-offset="2"
+            text-offset="110"
+            can-id="id_oil_temperature"
+            on-message="on_auto_msg"
+            on-paint="on_paint_auto"
+            format="%d"
+            draw-name="true"
+            fill-background="true"
+            background-color="color_black"
+            value-type="v_uint16"
+            converter="convert_kelvin_to_f">
+        <rect left="0" top="0" width="223" height="33"/>
+      </auto>
+      <!-- Volts -->
+      <auto small-font="neo_15_font"
+            name="Volts"
+            id="m_volts"
+            text-color="color_lightblue"
+            label-color="color_white"
+            label-offset="2"
+            text-offset="110"
+            can-id="id_dc_voltage"
+            on-message="on_auto_msg"
+            on-paint="on_paint_auto"
+            format="%d"
+            fill-background="true"
+            background-color="color_black"
+            draw-name="true"
+            value-type="v_uint16">
+        <rect left="0" top="0" width="223" height="33"/>
+      </auto>
+      <!-- Amps -->
+      <auto small-font="neo_15_font"
+            name="Amps"
+            id="m_amps"
+            text-color="color_lightblue"
+            label-color="color_white"
+            label-offset="2"
+            text-offset="110"
+            can-id="id_dc_current"
+            on-message="on_auto_msg"
+            on-paint="on_paint_auto"
+            format="%d"
+            fill-background="true"
+            background-color="color_black"
+            draw-name="true"
+            value-type="v_int16">
+        <rect left="0" top="0" width="223" height="33"/>
+      </auto>
+      <!-- IAT -->
+      <auto small-font="neo_15_font"
+            name="IAT"
+            id="m_iat"
+            text-color="color_lightblue"
+            label-color="color_white"
+            label-offset="2"
+            text-offset="110"
+            can-id="id_inlet_air_temperature"
+            on-message="on_auto_msg"
+            on-paint="on_paint_auto"
+            format="%d"
+            fill-background="true"
+            background-color="color_black"
+            draw-name="true"
+            value-type="v_int16"
+            converter="convert_kelvin_to_c">
+        <rect left="0" top="0" width="223" height="33"/>
+      </auto>
+
+      <alarm priority="1"
+           message="Low oil pressure"
+             annunciator="m_oil_pressure"
+           can-park="true">
+        <alarm-id>id_low_oil_pressure_alarm</alarm-id>
+      </alarm>
+
+      <alarm priority="2"
+             message="Low fuel pressure"
+             annunciator="m_fuel_pressure"
+             can-park="true">
+        <alarm-id>id_low_fuel_pressure_alarm</alarm-id>
+      </alarm>
+
+      <alarm priority="3"
+             message="High oil temperature"
+              annunciator="m_oil_temp"
+             can-park="true">
+        <alarm-id>id_high_oil_temperature_alarm</alarm-id>
+      </alarm>
+
+      <alarm priority="5"
+             message="Timing divergence"
+             can-park="true">
+        <alarm-id>id_timing_divergence_alarm</alarm-id>
+        <alarm-id>id_rpm_divergence_alarm</alarm-id>
+        <alarm-id>id_map_divergence_alarm</alarm-id>
+        <alarm-id>id_iat_divergence_alarm</alarm-id>
+        <alarm-id>id_fuel_pressure_divergence_alarm</alarm-id>
+      </alarm>
+
+      <alarm priority="6"
+             message="High CHT"
+             can-park="true">
+        <alarm-id>id_cylinder_head_temperature1_alarm</alarm-id>
+        <alarm-id>id_cylinder_head_temperature2_alarm</alarm-id>
+        <alarm-id>id_cylinder_head_temperature3_alarm</alarm-id>
+        <alarm-id>id_cylinder_head_temperature4_alarm</alarm-id>
+        <alarm-id>id_cylinder_head_temperature5_alarm</alarm-id>
+        <alarm-id>id_cylinder_head_temperature6_alarm</alarm-id>
+      </alarm>
+
+      <alarm priority="7"
+             message="Low Fuel"
+             annunciator="m_fuel_tot"
+             can-park="true">
+        <alarm-id>id_low_fuel_alarm</alarm-id>
+      </alarm>
+
+      <alarm priority="8"
+             message="CHT Cold Shock"
+             can-park="true">
+        <alarm-id>id_cold_shock_alarm</alarm-id>
+      </alarm>
+
+      <alarm priority="9"
+             message="High voltage"
+             annunciator="m_volts"
+             can-park="true">
+        <alarm-id>id_bus_volts_high_alarm</alarm-id>
+      </alarm>
+
+      <alarm priority="10"
+             message="Low Voltage"
+              annunciator="m_volts"
+             can-park="true">
+        <alarm-id>id_bus_volts_low_alarm</alarm-id>
+      </alarm>
+
+      <alarm priority="11"
+             message="High Fuel Pressure"
+             annunciator="m_fuel_pressure"
+             can-park="true">
+        <alarm-id>id_high_fuel_pressure_alarm</alarm-id>
+      </alarm>
+
+      <alarm priority="12"
+             message="High Current"
+              annunciator="m_amps"
+             can-park="true">
+        <alarm-id>id_high_amps_alarm</alarm-id>
+      </alarm>
+
+      <alarm priority="13"
+             message="kMAG Temperature"
+             can-park="true">
+        <alarm-id>id_mag_temperature_alarm</alarm-id>
+      </alarm>
+
+      <alarm priority="14"
+             message="Low Fuel Flow"
+              annunciator="m_fuel_flow"
+             can-park="true">
+        <alarm-id>id_fuel_flow_rate_alarm</alarm-id>
+      </alarm>
+
+      <alarm priority="14"
+             message="EGT Temperature"
+             can-park="true">
+        <alarm-id>id_exhaust_gas_temperature1_alarm</alarm-id>
+        <alarm-id>id_exhaust_gas_temperature2_alarm</alarm-id>
+        <alarm-id>id_exhaust_gas_temperature3_alarm</alarm-id>
+        <alarm-id>id_exhaust_gas_temperature4_alarm</alarm-id>
+        <alarm-id>id_exhaust_gas_temperature5_alarm</alarm-id>
+        <alarm-id>id_exhaust_gas_temperature6_alarm</alarm-id>
+      </alarm>
+
+    </marquee>
+
+  </layout>
+
+</application>

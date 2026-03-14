@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding ="utf-8" ?>
+<application xmlns="http://kotuku.aero/schema/kotuku.xsd">
+
+  <menu id=" 100"
+        root-keys="root"
+        alarm-keys="alarm_keys"
+        font="neo_9_font"
+        background-color="color_black"
+        fill-background="false"
+        selected-background-color="color_white"
+        selected-color="color_magenta"
+        border-color="color_yellow"
+        text-color="color_green"
+        menu-timeout="7"
+        setup-menu="setup_menu">
+    <rect left="0" top="0" width="320" height="240"/>
+    <menu-rect x="0" y="0"/>
+    <menu-start x="0" y="240"/>
+    <!-- Menu used when the menu is closed -->
+    <keys name="root">
+      <key0>
+        <popup-action caption="Settings" menu="settings_menu"/>
+      </key0>
+      <key1>
+        <popup-action caption="Autopilot" menu="autopilot_menu"/>
+      </key1>
+      <decka-press-up>
+        <event-action caption="QNHUp" can-id="id_qnh_change" value-type="v_int16" value="1"/>
+      </decka-press-up>
+      <decka-press-dn>
+        <event-action caption="QNHDn" can-id="id_qnh_change" value-type="v_int16" value="-1"/>
+      </decka-press-dn>
+      <decka-up>
+        <event-action caption="HDGUp" can-id="id_heading_change" value-type="v_int16" value="1"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="HDGDn" can-id="id_heading_change" value-type="v_int16" value="-1"/>
+      </decka-dn>
+      <deckb-up>
+        <event-action caption="ALTUp" can-id="id_altitude_change" value-type="v_int16" value="100"/>
+      </deckb-up>
+      <deckb-dn>
+        <event-action caption="ALTDn" can-id="id_altitude_change" value-type="v_int16" value="-100"/>
+      </deckb-dn>
+      <deckb-press-up>
+        <event-action caption="VSUp" can-id="id_vertical_rate_change" value-type="v_int16" value="100"/>
+      </deckb-press-up>
+      <deckb-press-dn>
+        <event-action caption="VSDn" can-id="id_vertical_rate_change" value-type="v_int16" value="-100"/>
+      </deckb-press-dn>
+    </keys>
+
+    <!-- Menu used when an alarm is displayed -->
+    <keys name="alarm_keys">
+      <key0>
+        <event-action caption="Close" can-id="id_alarm_close" value-type="v_int16" value="1"/>
+      </key0>
+      <key1>
+        <event-action caption="Park" can-id="id_alarm_park" value-type="v_int16" value="1"/>
+      </key1>
+    </keys>
+
+    <!-- Menu used when a popup is active -->
+    <keys name="popup_keys">
+      <key0>
+        <event-action caption="OK" can-id="id_ok" value-type="v_int16" value="1"/>
+      </key0>
+      <key1>
+        <event-action caption="Cancel" can-id="id_cancel" value-type="v_int16" value="1"/>
+      </key1>
+      <decka-up>
+        <event-action caption="Up" can-id="id_up" value-type="v_int16" value="1"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="Dn" can-id="id_down" value-type="v_int16" value="1"/>
+      </decka-dn>
+    </keys>
+
+    <keys name="edit_keys">
+      <key0>
+        <event-action caption="OK" can-id="id_ok" value-type="v_int16" value="1"/>
+      </key0>
+      <key1>
+        <event-action caption="Cancel" can-id="id_cancel" value-type="v_int16" value="1"/>
+      </key1>
+      <decka-up>
+        <event-action caption="Up" can-id="id_spin_edit" value-type="v_int16" value="10"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="Dn" can-id="id_spin_edit" value-type="v_int16" value="-10"/>
+      </decka-dn>
+      <decka-press-up>
+        <event-action caption="Up" can-id="id_spin_edit" value-type="v_int16" value="1"/>
+      </decka-press-up>
+      <decka-press-dn>
+        <event-action caption="Dn" can-id="id_spin_edit" value-type="v_int16" value="-1"/>
+      </decka-press-dn>
+    </keys>
+
+    <keys name="node_id_keys">
+      <key0>
+        <event-action caption="OK" can-id="id_ok" value-type="v_int16" value="1"/>
+      </key0>
+      <key1>
+        <event-action caption="Cancel" can-id="id_cancel" value-type="v_int16" value="1"/>
+      </key1>
+      <decka-up>
+        <event-action caption="Up" can-id="id_spin_edit" value-type="v_int16" value="1"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="Dn" can-id="id_spin_edit" value-type="v_int16" value="-1"/>
+      </decka-dn>
+      <decka-press-up>
+        <event-action caption="Up" can-id="id_spin_edit" value-type="v_int16" value="1"/>
+      </decka-press-up>
+      <decka-press-dn>
+        <event-action caption="Dn" can-id="id_spin_edit" value-type="v_int16" value="-1"/>
+      </decka-press-dn>
+    </keys>
+
+    <!-- left button menu, airframe and operational settings -->
+    <menu name="settings_menu" keys="popup_keys" caption="Settings">
+      <popup-action caption="Airframe" menu="af_menu"/>
+      <spin-edit-action caption="Brightness"
+                        min-value="10"
+                        max-value="100"
+                        get-method="get_brightness"
+                        set-method="set_brightness"
+                        keys="edit_keys"/>
+        <!-- this will be removed when the push-button on startup works -->
+        <popup-action menu="setup_menu" caption="Setup"/>
+    </menu>
+
+    <!-- right button menu, autopilot settings -->
+    <menu name="autopilot_menu" caption="Autopilot" keys="popup_keys">
+      <event-action caption="AP Off" can-id="id_autopilot_enable" value-type="v_uint16" value="0"/>
+      <checklist-action caption="HNAV Mode" get-index="get_hnav_mode" popup="hnav_menu"/>
+      <checklist-action caption="VNAV Mode" get-index="get_vnav_mode" popup="vnav_menu"/>
+     </menu>
+
+    <!-- Menu to control the airframe state.  Normally used for trim and flap adjustments at startup -->
+    <menu name="af_menu" keys="popup_keys" caption="AF Functions">
+      <event-action caption="Trim 0" can-id="id_pitch_trim_change" value-type="v_int16" value="0"/>
+      <event-action caption="Roll 0" can-id="id_roll_trim_change" value-type="v_int16" value="0"/>
+      <event-action caption="Flap 0" can-id="id_flap_change" value-type="v_int16" value="0"/>
+      <event-action caption="Flap 10" can-id="id_flap_change" value-type="v_int16" value="10"/>
+      <event-action caption="Flap 25" can-id="id_flap_change" value-type="v_int16" value="25"/>
+      <event-action caption="Flap 40" can-id="id_flap_change" value-type="v_int16" value="40"/>
+    </menu>
+
+    <!-- Menu to control the horizontal navigation mode -->
+    <menu name="hnav_menu" keys="popup_keys" caption="HNAV Mode">
+      <event-action caption="OFF" can-id="id_hnav_mode" value-type="v_uint16" value="0"/>
+      <event-action caption="HDG" can-id="id_hnav_mode" value-type="v_uint16" value="1"/>
+      <event-action caption="NAV" can-id="id_hnav_mode" value-type="v_uint16" value="2"/>
+      <event-action caption="REV-L" can-id="id_hnav_mode" value-type="v_uint16" value="3"/>
+      <event-action caption="REV-R" can-id="id_hnav_mode" value-type="v_uint16" value="3"/>
+    </menu>
+
+    <!-- Menu to control the vertical navigation mode -->
+    <menu name="vnav_menu" keys="popup_keys" caption="VNAV Mode">
+      <event-action caption="OFF" can-id="id_vnav_mode" value-type="v_uint16" value="0"/>
+      <event-action caption="VS" can-id="id_vnav_mode" value-type="v_uint16" value="1"/>
+      <event-action caption="ALT" can-id="id_vnav_mode" value-type="v_uint16" value="2"/>
+    </menu>
+
+    <!-- Menu entered for setup.  Press and hold left key at power up -->
+    <menu name="setup_menu" keys="popup_keys" caption="Setup">
+      <spin-edit-action caption="Node ID"
+                        min-value="8"
+                        max-value="14"
+                        get-method="get_node_id"
+                        set-method="set_node_id"
+                        keys="node_id_keys"/>
+    </menu>
+  </menu>
+
+  <layout>
+    <compass name="CMP"
+             id="compass_widget"
+             fill-background="true"
+             background-color="color_black"
+             border-color="color_white"
+             text-color="color_white"
+             pen-color="color_white"
+             name-font="neo_9_bold_font">
+      <rect left="0" top="0" width="320" height="20"/>
+    </compass>
+
+    <airspeed name="ASI"
+              id="asi_widget"
+              fill-background="true"
+              background-color="0x80808080"
+              background-gutter="8"
+              gutter-color="color_hollow"
+              border-color="color_white"
+              text-color="color_white"
+              pen-color="color_white"
+              font="neo_9_bold_font"
+              large-roller-font="neo_15_font"
+              small-roller-font="neo_9_bold_font"
+              converter="convert_ms_to_kts"
+              z-order="10"
+    >
+      <rect left="0" top="20" width="60" height="200"/>
+    </airspeed>
+    <attitude name="ATT"
+              id="att_widget"
+              border-color="color_white"
+              border-bottom="true"
+              z-order="0"
+              name-font="neo_9_bold_font"
+              show-aoa="true">
+      <rect left="0" top="20" width="320" height="200"/>
+      <median x="160" y="100"/>
+      <skid-indicator left="90" top="184" width="140" height="15"/>
+    </attitude>
+    <altitude name="ALT"
+              id="alt_widget"
+              fill-background="true"
+              background-color="0x80808080"
+              background-gutter="8"
+              gutter-color="color_hollow"
+              border-color="color_white"
+              text-color="color_white"
+              pen-color="color_white"
+              font="neo_9_bold_font"
+              large-roller-font="neo_15_font"
+              small-roller-font="neo_9_bold_font"
+              altitude-converter="convert_meters_to_ft"
+              alt-rate-converter="convert_ms_to_fpm"
+              qnh-converter="convert_hpa_to_hpa"
+              z-order="10"
+    >
+      <rect left="240" top="20" width="80" height="200"/>
+    </altitude>
+    <pancake name="FLAP"
+             id="flap_indicator"
+             can-id="id_flap_position_value"
+             horizontal="false"
+             fill-background="true"
+             background-color="color_hollow"
+             outline-color="color_white"
+             indicator-color="color_darkgreen"
+             fill="true"
+             bar-width="14"
+             bar-height="7"
+             bar-gutter="2"
+             min-value="0"
+             max-value="40"
+             z-order="10"
+    >
+      <rect left="220" top="110" height="90" width="20"/>
+      <indicator-rect left="0" top="0" height="90" width="20"/>
+    </pancake>
+    <pancake name="PITCH"
+             id="pitch_indicator"
+             can-id="id_pitch_trim_value"
+             horizontal="false"
+             fill-background="true"
+             background-color="color_hollow"
+             outline-color="color_white"
+             indicator-color="color_darkgreen"
+             bar-width="14"
+             bar-height="7"
+             bar-gutter="2"
+             min-value="-50"
+             max-value="50"
+             z-order="10"
+    >
+      <rect left="60" top="110" height="90" width="20"/>
+      <indicator-rect left="0" top="0" height="90" width="20"/>
+    </pancake>
+    <pancake name="ROLL"
+             id="roll_indicator"
+             can-id="id_roll_trim_value"
+             horizontal="true"
+             fill-background="true"
+             background-color="color_black"
+             outline-color="color_white"
+             indicator-color="color_darkgreen"
+             bar-width="14"
+             bar-height="7"
+             bar-gutter="2"
+             min-value="-50"
+             max-value="50"
+    >
+      <rect left="110" top="220" height="20" width="100"/>
+      <indicator-rect left="0" top="0" height="20" width="100"/>
+    </pancake>
+    <auto name="H:"
+          id="id_hnav"
+          can-id="id_autopilot_mode"
+          fill-background="true"
+          background-color="color_black"
+          border-color="color_white"
+          text-color="color_white"
+          name-font="neo_9_bold_font"
+          label-offset="2"
+          label-color="color_white"
+          text-offset="16"
+          small-font="neo_9_bold_font"
+          value-type="v_uint16"
+          format="%03.3d"
+          draw-name="true"
+    >
+      <rect left="0" top="220" width="56" height="20"/>
+    </auto>
+    <auto name="HDG:"
+          id="id_hdg"
+          can-id="id_heading"
+          fill-background="true"
+          background-color="color_black"
+          border-color="color_white"
+          text-color="color_magenta"
+          name-font="neo_9_bold_font"
+          label-offset="2"
+          label-color="color_magenta"
+          text-offset="31"
+          small-font="neo_9_bold_font"
+          value-type="v_uint16"
+          format="%03.3d"
+          draw-name="true"
+    >
+      <rect left="56" top="220" width="56" height="20"/>
+    </auto>
+    <auto name="CRS:"
+          id="id_crs"
+          can-id="id_track"
+          fill-background="true"
+          background-color="color_black"
+          border-color="color_white"
+          text-color="color_green"
+          name-font="neo_9_bold_font"
+          label-offset="2"
+          label-color="color_green"
+          text-offset="31"
+          small-font="neo_9_bold_font"
+          value-type="v_uint16"
+          format="%03.3d"
+          draw-name="true"
+    >
+      <rect left="208 " top="220" width="56" height="20"/>
+    </auto>
+    <auto name="V:"
+          id="id_vnav"
+          can-id="id_autopilot_mode"
+          fill-background="true"
+          background-color="color_black"
+          border-color="color_white"
+          text-color="color_white"
+          name-font="neo_9_bold_font"
+          label-offset="2"
+          label-color="color_white"
+          text-offset="16"
+          small-font="neo_9_bold_font"
+          value-type="v_uint16"
+          format="%03.3d"
+          draw-name="true"
+    >
+      <rect left="264" top="220" width="56" height="20"/>
+    </auto>
+  </layout>
+
+</application>
