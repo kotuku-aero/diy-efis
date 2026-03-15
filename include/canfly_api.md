@@ -3055,8 +3055,7 @@ result_t fms_enum_flight_plans(handle_t* handle, char* name, char* comment, char
 | `description` | `char*` | out | Description of the flight plan. ULength of buffer must be CFG_STRING_MAX |
 | `type` | `char*` | out | Type of the flight plan. ULength of buffer must be CFG_STRING_MAX |
 | `active` | `bool*` | out | True if this is the active flightplan |
-| `cookie` | `uint32_t*` | out | Cookie to pass to enumerate_flight_plan to get the details of the
-          flightplan. |
+| `cookie` | `uint32_t*` | out | Cookie to pass to enumerate_flight_plan to get the details of the flightplan. |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
 
 ---

@@ -2630,8 +2630,7 @@ static inline result_t trace_message(uint16_t level, const char* msg)
  * @param description [out]  * Description of the flight plan. ULength of buffer must be CFG_STRING_MAX
  * @param type [out]  * Type of the flight plan. ULength of buffer must be CFG_STRING_MAX
  * @param active [out]  * True if this is the active flightplan
- * @param cookie [out]  * Cookie to pass to enumerate_flight_plan to get the details of the
- * flightplan.
+ * @param cookie [out]  * Cookie to pass to enumerate_flight_plan to get the details of the flightplan.
  * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 2560
