@@ -179,8 +179,7 @@ static inline result_t subscribe(uint16_t first_id, uint16_t last_id, handle_t h
  * @param parent  * 
  * @param name  * 
  * @param key [out]  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 256
  */
@@ -196,8 +195,7 @@ extern result_t cfg_create_key(memid_t parent, const char* name, memid_t* key, o
  * @param parent  * 
  * @param name  * 
  * @param key [out]  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 257
  */
@@ -211,8 +209,7 @@ extern result_t cfg_open_key(memid_t parent, const char* name, memid_t* key, ove
  * Remove a key, all sub-keys and values
  * @note This call may use overlapped I/O.
  * @param key  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 258
  */
@@ -227,8 +224,7 @@ extern result_t cfg_delete_key(memid_t key, overlapped_t * overlapped);
  * @note This call may use overlapped I/O.
  * @param parent  * 
  * @param name  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 259
  */
@@ -248,8 +244,7 @@ extern result_t cfg_delete_value(memid_t parent, const char* name, overlapped_t 
  * @param len  * 
  * @param name [out]  * 
  * @param child [in,out]  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 260
  */
@@ -267,8 +262,7 @@ extern result_t cfg_enum_key(memid_t key, field_datatype* type, uint16_t* length
  * @param name [out]  * 
  * @param length [out]  * 
  * @param parent [out]  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 261
  */
@@ -284,8 +278,7 @@ extern result_t cfg_query_memid(memid_t entry, field_datatype* type, char* name,
  * @param parent  * 
  * @param name  * 
  * @param new_name  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 262
  */
@@ -300,8 +293,7 @@ extern result_t cfg_rename_value(memid_t parent, const char* name, const char* n
  * @note This call may use overlapped I/O.
  * @param key  * 
  * @param new_name  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 263
  */
@@ -317,8 +309,7 @@ extern result_t cfg_rename_key(memid_t key, const char* new_name, overlapped_t *
  * @param parent  * 
  * @param name  * 
  * @param result [out]  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 270
  */
@@ -334,8 +325,7 @@ extern result_t cfg_get_bool(memid_t parent, const char* name, bool* result, ove
  * @param parent  * 
  * @param name  * 
  * @param value  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 271
  */
@@ -351,8 +341,7 @@ extern result_t cfg_set_bool(memid_t parent, const char* name, bool value, overl
  * @param parent  * 
  * @param name  * 
  * @param result [out]  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 272
  */
@@ -368,8 +357,7 @@ extern result_t cfg_get_int8(memid_t parent, const char* name, int8_t* result, o
  * @param parent  * 
  * @param name  * 
  * @param value  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 273
  */
@@ -385,8 +373,7 @@ extern result_t cfg_set_int8(memid_t parent, const char* name, int8_t value, ove
  * @param parent  * 
  * @param name  * 
  * @param result [out]  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 274
  */
@@ -402,8 +389,7 @@ extern result_t cfg_get_uint8(memid_t parent, const char* name, uint8_t* result,
  * @param parent  * 
  * @param name  * 
  * @param value  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 275
  */
@@ -419,8 +405,7 @@ extern result_t cfg_set_uint8(memid_t parent, const char* name, uint8_t value, o
  * @param parent  * 
  * @param name  * 
  * @param result [out]  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 276
  */
@@ -436,8 +421,7 @@ extern result_t cfg_get_int16(memid_t parent, const char* name, int16_t* result,
  * @param parent  * 
  * @param name  * 
  * @param value  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 277
  */
@@ -453,8 +437,7 @@ extern result_t cfg_set_int16(memid_t parent, const char* name, int16_t value, o
  * @param parent  * 
  * @param name  * 
  * @param result [out]  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 278
  */
@@ -470,8 +453,7 @@ extern result_t cfg_get_uint16(memid_t parent, const char* name, uint16_t* resul
  * @param parent  * 
  * @param name  * 
  * @param value  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 279
  */
@@ -487,8 +469,7 @@ extern result_t cfg_set_uint16(memid_t parent, const char* name, uint16_t value,
  * @param parent  * 
  * @param name  * 
  * @param result [out]  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 280
  */
@@ -504,8 +485,7 @@ extern result_t cfg_get_int32(memid_t parent, const char* name, int32_t* result,
  * @param parent  * 
  * @param name  * 
  * @param value  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 281
  */
@@ -521,8 +501,7 @@ extern result_t cfg_set_int32(memid_t parent, const char* name, int32_t value, o
  * @param parent  * 
  * @param name  * 
  * @param result [out]  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 282
  */
@@ -538,8 +517,7 @@ extern result_t cfg_get_uint32(memid_t parent, const char* name, uint32_t* resul
  * @param parent  * 
  * @param name  * 
  * @param value  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 283
  */
@@ -555,8 +533,7 @@ extern result_t cfg_set_uint32(memid_t parent, const char* name, uint32_t value,
  * @param parent  * 
  * @param name  * 
  * @param result [out]  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 284
  */
@@ -572,8 +549,7 @@ extern result_t cfg_get_float(memid_t parent, const char* name, float* result, o
  * @param parent  * 
  * @param name  * 
  * @param value  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 285
  */
@@ -590,8 +566,7 @@ extern result_t cfg_set_float(memid_t parent, const char* name, float value, ove
  * @param name  * 
  * @param value [out]  * 
  * @param length [in,out]  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 286
  */
@@ -607,8 +582,7 @@ extern result_t cfg_get_string(memid_t parent, const char* name, char* value, ui
  * @param parent  * 
  * @param name  * 
  * @param value  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 287
  */
@@ -624,8 +598,7 @@ extern result_t cfg_set_string(memid_t parent, const char* name, const char* val
  * @param parent  * 
  * @param name  * 
  * @param result [out]  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 288
  */
@@ -641,8 +614,7 @@ extern result_t cfg_get_lla(memid_t parent, const char* name, lla_t* result, ove
  * @param parent  * 
  * @param name  * 
  * @param value  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 289
  */
@@ -658,8 +630,7 @@ extern result_t cfg_set_lla(memid_t parent, const char* name, const lla_t* value
  * @param parent  * 
  * @param name  * 
  * @param result [out]  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 290
  */
@@ -675,8 +646,7 @@ extern result_t cfg_get_xyz(memid_t parent, const char* name, xyz_t* result, ove
  * @param parent  * 
  * @param name  * 
  * @param value  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 291
  */
@@ -692,8 +662,7 @@ extern result_t cfg_set_xyz(memid_t parent, const char* name, const xyz_t* value
  * @param parent  * 
  * @param name  * 
  * @param result [out]  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 292
  */
@@ -709,8 +678,7 @@ extern result_t cfg_get_matrix(memid_t parent, const char* name, matrix_t* resul
  * @param parent  * 
  * @param name  * 
  * @param value  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 293
  */
@@ -726,8 +694,7 @@ extern result_t cfg_set_matrix(memid_t parent, const char* name, const matrix_t*
  * @param parent  * 
  * @param name  * 
  * @param result [out]  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 294
  */
@@ -743,8 +710,7 @@ extern result_t cfg_get_qtn(memid_t parent, const char* name, qtn_t* result, ove
  * @param parent  * 
  * @param name  * 
  * @param value  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 295
  */
@@ -760,8 +726,7 @@ extern result_t cfg_set_qtn(memid_t parent, const char* name, const qtn_t* value
  * @param parent  * 
  * @param name  * 
  * @param value [out]  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 296
  */
@@ -777,8 +742,7 @@ extern result_t cfg_get_utc(memid_t parent, const char* name, tm_t* value, overl
  * @param parent  * 
  * @param name  * 
  * @param value  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 297
  */
@@ -797,8 +761,7 @@ extern result_t cfg_set_utc(memid_t parent, const char* name, const tm_t* value,
  * @note This call may use overlapped I/O.
  * @param msg  * 
  * @param timeout  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 512
  */
@@ -857,8 +820,7 @@ static inline result_t set_device_id(uint8_t id)
  * @param path  * 
  * @param flags  * 
  * @param stream [out]  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 768
  */
@@ -877,8 +839,7 @@ static inline result_t stream_open(const char* path, uint32_t flags, handle_t* s
  * Remove a stream
  * @note This call may use overlapped I/O.
  * @param path  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 769
  */
@@ -898,8 +859,7 @@ static inline result_t stream_delete(const char* path, overlapped_t * overlapped
  * @note This call may use overlapped I/O.
  * @param old_filename  * 
  * @param new_filename  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 770
  */
@@ -921,8 +881,7 @@ static inline result_t stream_rename(const char* old_filename, const char* new_f
  * @param buffer [out]  * 
  * @param size  * 
  * @param read [out]  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 775
  */
@@ -943,8 +902,7 @@ static inline result_t stream_read(handle_t stream, void* buffer, uint32_t size,
  * @param stream  * 
  * @param buffer  * 
  * @param size  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 776
  */
@@ -1019,8 +977,7 @@ static inline result_t stream_length(handle_t stream, uint32_t* length)
  * @note This call may use overlapped I/O.
  * @param stream  * 
  * @param length  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 780
  */
@@ -1057,8 +1014,7 @@ static inline result_t stream_eof(handle_t stream)
  * @note This call may use overlapped I/O.
  * @param from  * 
  * @param to  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 782
  */
@@ -1077,8 +1033,7 @@ static inline result_t stream_copy(handle_t from, handle_t to, overlapped_t * ov
  * Create a directory
  * @note This call may use overlapped I/O.
  * @param path  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 800
  */
@@ -1097,8 +1052,7 @@ static inline result_t create_directory(const char* path, overlapped_t * overlap
  * Remove an empty directory
  * @note This call may use overlapped I/O.
  * @param path  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 801
  */
@@ -1118,8 +1072,7 @@ static inline result_t remove_directory(const char* path, overlapped_t * overlap
  * @note This call may use overlapped I/O.
  * @param dirname  * 
  * @param dirp [out]  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 802
  */
@@ -1139,8 +1092,7 @@ static inline result_t open_directory(const char* dirname, handle_t* dirp, overl
  * @note This call may use overlapped I/O.
  * @param dirp  * 
  * @param stat [out]  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 803
  */
@@ -1159,8 +1111,7 @@ static inline result_t read_directory(handle_t dirp, stat_t* stat, overlapped_t 
  * Rewind directory enumeration
  * @note This call may use overlapped I/O.
  * @param dirp  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 804
  */
@@ -1180,8 +1131,7 @@ static inline result_t rewind_directory(handle_t dirp, overlapped_t * overlapped
  * @note This call may use overlapped I/O.
  * @param path  * 
  * @param st [out]  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 805
  */
@@ -2608,8 +2558,7 @@ static inline result_t map_position_to_screen(handle_t canvas, const lla_t* posi
  * Get an aircraft performance parameter
  * @note This call may use overlapped I/O.
  * @param value [out]  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 2048
  */
@@ -2628,8 +2577,7 @@ static inline result_t get_aircraft(aircraft_t* value, overlapped_t * overlapped
  * Set an aircraft performance parameter
  * @note This call may use overlapped I/O.
  * @param value  * 
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 2049
  */
@@ -2684,8 +2632,7 @@ static inline result_t trace_message(uint16_t level, const char* msg)
  * @param active [out]  * True if this is the active flightplan
  * @param cookie [out]  * Cookie to pass to enumerate_flight_plan to get the details of the
  * flightplan.
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 2560
  */
@@ -2702,8 +2649,7 @@ extern result_t fms_enum_flight_plans(handle_t* handle, char* name, char* commen
  * @param comment [out]  * Name of the flight plan. ULength of buffer must be CFG_STRING_MAX
  * @param description [out]  * Name of the flight plan. ULength of buffer must be CFG_STRING_MAX
  * @param type [out]  * Name of the flight plan. ULength of buffer must be CFG_STRING_MAX
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 2561
  */
@@ -2716,8 +2662,7 @@ extern result_t fms_get_active_flightplan(uint32_t* cookie, char* name, char* co
 /**
  * @note This call may use overlapped I/O.
  * @param cookie  * Cookie of the flightplan to make active
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 2562
  */
@@ -2730,8 +2675,7 @@ extern result_t fms_set_active_flightplan_number(uint32_t cookie, overlapped_t *
 /**
  * @note This call may use overlapped I/O.
  * @param cookie [out]  * Cookie of the flightplan that was inverted (the original is not changed)
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 2563
  */
@@ -2754,8 +2698,7 @@ extern result_t fms_invert_active_flightplan(uint32_t* cookie, overlapped_t * ov
  * @param name [out]  * Name of the flight plan. ULength of buffer must be CFG_NAME_MAX
  * @param comment [out]  * Comment of the flight plan. ULength of buffer must be CFG_STRING_MAX
  * @param description [out]  * Description of the flight plan. ULength of buffer must be CFG_STRING_MAX
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 2564
  */
@@ -2767,35 +2710,30 @@ extern result_t fms_enum_flight_plan(handle_t* handle, uint32_t cookie, uint32_t
 
 /**
  * @note This call may use overlapped I/O.
- * @param handle [in,out]  * on the first call this is nullptr, it must then be returned on all subsequent calls.
- * close_handle must be called when the enumeration is over
+ * @param handle [in,out]  * on the first call this is nullptr, it must then be returned on all subsequent calls. close_handle must be called when the enumeration is over
  * @param filter  * This parameter allows a filter to be used to select possible
  * waypoint matches. The filter can have wild card characters of * and ?
  * Is only used when the handle parameter is nullptr, otherwise it is ignored
  * on subsequenxt calls
  * @param id [out]  * The id of the route point that is being returned on this call
- * @param sequence [out]  * The sequence number of the route point. No guarantee that the returned
- * points are in this order
  * @param position [out]  * Position of the waypoint
  * @param type [out]  * This is the waypoint type enumeration.
  * @param name [out]  * Name of the waypoint. ULength of buffer must be CFG_NAME_MAX
  * @param comment [out]  * Comment of the waypoint. ULength of buffer must be CFG_STRING_MAX
  * @param description [out]  * Description of the waypoint. ULength of buffer must be CFG_STRING_MAX
- * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
- * called when the operation completes
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 2565
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL fms_enum_waypoints(handle_t* handle, const char * filter, uint32_t* id, uint32_t* sequence, lla_t* position, uint32_t* type, char* name, char* comment, char* description, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL fms_enum_waypoints(handle_t* handle, const char * filter, uint32_t* id, lla_t* position, uint32_t* type, char* name, char* comment, char* description, overlapped_t * overlapped);
 #else
-extern result_t fms_enum_waypoints(handle_t* handle, const char * filter, uint32_t* id, uint32_t* sequence, lla_t* position, uint32_t* type, char* name, char* comment, char* description, overlapped_t * overlapped);
+extern result_t fms_enum_waypoints(handle_t* handle, const char * filter, uint32_t* id, lla_t* position, uint32_t* type, char* name, char* comment, char* description, overlapped_t * overlapped);
 #endif
 
 /**
  * @note This call may use overlapped I/O.
- * @param handle [in,out]  * on the first call this is nullptr, it must then be returned on all subsequent calls.
- * close_handle must be called when the enumeration is over
+ * @param handle [in,out]  * on the first call this is nullptr, it must then be returned on all subsequent calls. close_handle must be called when the enumeration is over
  * @param filter  * This parameter allows a filter to be used to select possible
  * waypoint matches. The filter can have wild card characters of * and ?
  * Is only used when the handle parameter is nullptr, otherwise it is ignored
@@ -2806,8 +2744,6 @@ extern result_t fms_enum_waypoints(handle_t* handle, const char * filter, uint32
  * @param wpt_type_filter  * This allows for finding a specific type of nearest waypoint. if the
  * value is WPT_TYPE_UNSPECIFIED then all types are returned
  * @param id [out]  * The id of the route point that is being returned on this call
- * @param sequence [out]  * The sequence number of the route point. No guarantee that the returned
- * points are in this order
  * @param position [out]  * Position of the waypoint
  * @param type [out]  * This is the waypoint type enumeration.
  * @param name [out]  * Name of the waypoint. ULength of buffer must be CFG_NAME_MAX
@@ -2819,9 +2755,9 @@ extern result_t fms_enum_waypoints(handle_t* handle, const char * filter, uint32
  * @syscall 2566
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL fms_enum_nearest(handle_t* handle, const char * filter, uint32_t distance, uint32_t wpt_type_filter, uint32_t* id, uint32_t* sequence, lla_t* position, uint32_t* type, char* name, char* comment, char* description, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL fms_enum_nearest(handle_t* handle, const char * filter, uint32_t distance, uint32_t wpt_type_filter, uint32_t* id, lla_t* position, uint32_t* type, char* name, char* comment, char* description, overlapped_t * overlapped);
 #else
-extern result_t fms_enum_nearest(handle_t* handle, const char * filter, uint32_t distance, uint32_t wpt_type_filter, uint32_t* id, uint32_t* sequence, lla_t* position, uint32_t* type, char* name, char* comment, char* description, overlapped_t * overlapped);
+extern result_t fms_enum_nearest(handle_t* handle, const char * filter, uint32_t distance, uint32_t wpt_type_filter, uint32_t* id, lla_t* position, uint32_t* type, char* name, char* comment, char* description, overlapped_t * overlapped);
 #endif
 
 /**

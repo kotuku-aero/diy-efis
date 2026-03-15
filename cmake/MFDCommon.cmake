@@ -175,7 +175,7 @@ function(mfd_configure_pic32_target)
 
     # Package the ELF into a binary image with header and SHA256
     find_package(Python3 REQUIRED COMPONENTS Interpreter)
-    set(PACKAGE_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/scripts/package_usermode.py")
+    set(PACKAGE_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/../../scripts/package_usermode.py")
     set(IMAGE_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/images")
 
     add_custom_command(TARGET ${ARG_TARGET} POST_BUILD

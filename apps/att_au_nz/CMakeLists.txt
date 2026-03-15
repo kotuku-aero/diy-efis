@@ -1,6 +1,3 @@
-# CMakeLists.txt for att_au_nz Application
-# Supports both Emulator and MIPS32 platforms
-
 cmake_minimum_required(VERSION 3.15)
 
 # ============================================================================

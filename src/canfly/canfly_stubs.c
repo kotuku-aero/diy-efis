@@ -2783,36 +2783,35 @@ result_t fms_enum_flight_plan(handle_t* handle, uint32_t cookie, uint32_t* id, u
   return __result;
 }
 
-result_t fms_enum_waypoints(handle_t* handle, const char * filter, uint32_t* id, uint32_t* sequence, lla_t* position, uint32_t* type, char* name, char* comment, char* description, overlapped_t * overlapped)
+result_t fms_enum_waypoints(handle_t* handle, const char * filter, uint32_t* id, lla_t* position, uint32_t* type, char* name, char* comment, char* description, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)handle;
   register uint32_t __p1 __asm__("$a1") = (uint32_t)filter;
   register uint32_t __p2 __asm__("$a2") = (uint32_t)id;
-  register uint32_t __p3 __asm__("$a3") = (uint32_t)sequence;
+  register uint32_t __p3 __asm__("$a3") = (uint32_t)position;
 
   /* Parameters beyond 4 are passed on the stack per MIPS o32 ABI */
-  /* Allocate 24 bytes for 6 stack parameters */
+  /* Allocate 20 bytes for 5 stack parameters */
 
   __asm__ volatile (
-    "addiu $sp, $sp, -24\n\t"
+    "addiu $sp, $sp, -20\n\t"
     "sw %6, 0($sp)\n\t"
     "sw %7, 4($sp)\n\t"
     "sw %8, 8($sp)\n\t"
     "sw %9, 12($sp)\n\t"
     "sw %10, 16($sp)\n\t"
-    "sw %11, 20($sp)\n\t"
     "li $v0, %1\n\t"
     "syscall\n\t"
-    "addiu $sp, $sp, 24\n\t"
+    "addiu $sp, $sp, 20\n\t"
     : "=r"(__result)
-    : "i"(SYSCALL_FMS_ENUM_WAYPOINTS), "r"(__p0), "r"(__p1), "r"(__p2), "r"(__p3), "r"((uint32_t)position), "r"((uint32_t)type), "r"((uint32_t)name), "r"((uint32_t)comment), "r"((uint32_t)description), "r"((uint32_t)overlapped)
+    : "i"(SYSCALL_FMS_ENUM_WAYPOINTS), "r"(__p0), "r"(__p1), "r"(__p2), "r"(__p3), "r"((uint32_t)type), "r"((uint32_t)name), "r"((uint32_t)comment), "r"((uint32_t)description), "r"((uint32_t)overlapped)
   );
 
   return __result;
 }
 
-result_t fms_enum_nearest(handle_t* handle, const char * filter, uint32_t distance, uint32_t wpt_type_filter, uint32_t* id, uint32_t* sequence, lla_t* position, uint32_t* type, char* name, char* comment, char* description, overlapped_t * overlapped)
+result_t fms_enum_nearest(handle_t* handle, const char * filter, uint32_t distance, uint32_t wpt_type_filter, uint32_t* id, lla_t* position, uint32_t* type, char* name, char* comment, char* description, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)handle;
@@ -2821,10 +2820,10 @@ result_t fms_enum_nearest(handle_t* handle, const char * filter, uint32_t distan
   register uint32_t __p3 __asm__("$a3") = (uint32_t)wpt_type_filter;
 
   /* Parameters beyond 4 are passed on the stack per MIPS o32 ABI */
-  /* Allocate 32 bytes for 8 stack parameters */
+  /* Allocate 28 bytes for 7 stack parameters */
 
   __asm__ volatile (
-    "addiu $sp, $sp, -32\n\t"
+    "addiu $sp, $sp, -28\n\t"
     "sw %6, 0($sp)\n\t"
     "sw %7, 4($sp)\n\t"
     "sw %8, 8($sp)\n\t"
@@ -2832,12 +2831,11 @@ result_t fms_enum_nearest(handle_t* handle, const char * filter, uint32_t distan
     "sw %10, 16($sp)\n\t"
     "sw %11, 20($sp)\n\t"
     "sw %12, 24($sp)\n\t"
-    "sw %13, 28($sp)\n\t"
     "li $v0, %1\n\t"
     "syscall\n\t"
-    "addiu $sp, $sp, 32\n\t"
+    "addiu $sp, $sp, 28\n\t"
     : "=r"(__result)
-    : "i"(SYSCALL_FMS_ENUM_NEAREST), "r"(__p0), "r"(__p1), "r"(__p2), "r"(__p3), "r"((uint32_t)id), "r"((uint32_t)sequence), "r"((uint32_t)position), "r"((uint32_t)type), "r"((uint32_t)name), "r"((uint32_t)comment), "r"((uint32_t)description), "r"((uint32_t)overlapped)
+    : "i"(SYSCALL_FMS_ENUM_NEAREST), "r"(__p0), "r"(__p1), "r"(__p2), "r"(__p3), "r"((uint32_t)id), "r"((uint32_t)position), "r"((uint32_t)type), "r"((uint32_t)name), "r"((uint32_t)comment), "r"((uint32_t)description), "r"((uint32_t)overlapped)
   );
 
   return __result;

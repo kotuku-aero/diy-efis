@@ -57,6 +57,6 @@ apps/hsi_au_nz/hsi_au_nz.h
 apps/nav_au_nz/nav_au_nz_priv.h
 apps/nav_au_nz/nav_au_nz.c
 apps/nav_au_nz/nav_au_nz.h
-apps/pfd_au_nz/en_nz_priv.h
-apps/pfd_au_nz/en_nz.c
-apps/pfd_au_nz/en_nz.h
+apps/pfd_au_nz/au_nz_priv.h
+apps/pfd_au_nz/au_nz.c
+apps/pfd_au_nz/au_nz.h

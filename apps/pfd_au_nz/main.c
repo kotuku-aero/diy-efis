@@ -4,8 +4,8 @@
 #include "../../src/mfdlib/menu_handlers.h"
 
 // layout files
-#include "en_nz.h"
-#include "en_nz_priv.h"
+#include "au_nz.h"
+#include "au_nz_priv.h"
 
 uint32_t num_key_captions = 7;
 key_number_t key_captions[7] = { kn_decka | kn_key0, kn_key2, kn_key3, kn_key4, kn_key5, kn_key6, kn_deckb | kn_key1 };
@@ -171,5 +171,5 @@ int main()
   {
 #endif
 
-  return run_proton(0, create_layout, create_en_nz, my_wndproc);
+  return run_proton(0, create_layout, create_au_nz, my_wndproc);
   }

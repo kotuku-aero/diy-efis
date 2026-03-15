@@ -29,11 +29,11 @@
  * errno implementation
  * Newlib expects a per-thread errno, but in bare metal we use a simple global.
  */
-static int _errno = 0;
-int *__errno(void)
-  {
-  return &_errno;
-  }
+// static int _errno = 0;
+// int *__errno(void)
+//   {
+//   return &_errno;
+//   }
 
 /*
  * sbrk - Increase program data space
@@ -72,6 +72,7 @@ void *sbrk(int incr)
 void _exit(int status)
   {
   sys_exit(status);
+  while (true);
   }
 
 /*
