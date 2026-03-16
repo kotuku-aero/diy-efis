@@ -1174,49 +1174,26 @@ typedef enum _display_units {
 typedef struct _aircraft_t {
   uint32_t hex_code;    // this is the adsb hex code
   char registration[CFG_STRING_MAX+1];
-  float vs0;
-  float vs1;
-  float vfe;
-  float vno;
-  float vne;
-  float va;
-  float vx;
-  float vy;
-  float glide_airspeed;
+  float vs0;        // m/s stall speed landing at mtow
+  float vs1;        // m/s stall speed clean at mtow
+  float vfe;        // m/s max flap extension speed
+  float vno;        // m/s normal operations speed
+  float vne;        // m/s vne at amsl
+  float va;         // m/s aircraft maouvering speed
+  float vg;         // m/s best glide airspeec
+  float vx;         // m/s best angle of climb
+  float vy;         // m/s best rate of climb
+  float vz;         // m/s best rate of descent
   bool auto_flap_retract;
-  /**
-   * vfe limit m/s
-   */
-  float vfe_max;
-  /**
-   * speed at which trim is divided by 2
-   */
-  float vtrim;
-  /**
-   *  climb airspeed
-  */
-  float climb_airspeed;
-  /**
-   *  sea level climb m/s
-   */
-  float climb_amsl_rate;
-  /**
-   *  service ceiling climb m/s
-   */
-  float climb_ceiling_rate;
-  /**
-   *  descent airspeed
-   */
-  float descent_airspeed;
-  /**
-   *  m/s
-   */
-  float descent_rate;
-  uint32_t critical_aoa;
-  uint32_t approach_aoa;
-  uint32_t climb_aoa;
-  uint32_t cruise_aoa;
-  uint32_t yaw_max;
+  float vfe_max;    // point at which the flaps will be retracted if enabled
+  float vtrim;      // speed at which trim speed is divided by 2
+  float climb_amsl_rate;  // m/s sea level climb m/s at Vy
+  float climb_ceiling_rate; // service ceiling climb m/s
+  uint32_t critical_aoa;  // max angle of attack.
+  uint32_t climb_aoa;     // max climb aoa, usually 90% of critical (top of yellow band)
+  uint32_t approach_aoa;  // usually 75% of critical_aoa (bottom of yellow band)
+  uint32_t cruise_aoa;  // bottom of green band.  Aoa indicator turns off at this point
+  uint32_t yaw_max;   // maximum yaw angle
 
   // this is used by the edu display
   uint16_t num_cylinders;
