@@ -1200,6 +1200,8 @@ typedef struct _aircraft_t {
   display_units units;
 } aircraft_t;
 
+#ifndef __cplusplus
+// C++ must use std::min and std::max
 #ifdef min
 #undef min
 #endif
@@ -1209,6 +1211,7 @@ typedef struct _aircraft_t {
 #undef max
 #endif
 #define max(a, b) ((a) > (b) ? (a) : (b))
+#endif
 
 #ifndef _SPATIAL_TYPES
 #define _SPATIAL_TYPES
