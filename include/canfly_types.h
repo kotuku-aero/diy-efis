@@ -167,53 +167,40 @@ typedef struct _lla_t
  * @param y Y
  * @param z Z
  */
-typedef union _xyz_t
+typedef struct _xyz_t
 {
-  float array[3];
-
-  struct
-  {
-    float x;
-    float y;
-    float z;
-  } axis;
+  float x;
+  float y;
+  float z;
 } xyz_t;
 
 /** @struct qtn_t
  * Quarternion type
  */
-typedef union _qtn_t
+typedef struct _qtn_t
 {
-  float array[4];
-
-  struct {
-    float w;
-    float x;
-    float y;
-    float z;
-  } element;
+  float x;
+  float y;
+  float z;
+  float w;
 } qtn_t;
 
 /** @struct matrix_t
  * Generic matrix parameter
  * @param v Values
  */
-typedef union _matrix_t
-{
-  float array[3][3];
-
-  struct {
-    float xx;
-    float xy;
-    float xz;
-    float yx;
-    float yy;
-    float yz;
-    float zx;
-    float zy;
-    float zz;
-  } element;
-} matrix_t;
+typedef struct _matrix_t
+  {
+  float xx;
+  float xy;
+  float xz;
+  float yx;
+  float yy;
+  float yz;
+  float zx;
+  float zy;
+  float zz;
+  } matrix_t;
 
 
 ////////////////////////////////////////////////////////////////////////
