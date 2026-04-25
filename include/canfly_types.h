@@ -791,7 +791,7 @@ typedef struct _touch_msg_t
 #define LENGTH_MASK 0xF000
 #define LENGTH_MASK_FD 0x0007F000
 #define ID_MASK 0x07FF
-#define BINARY_MASK 0x08000
+#define BINARY_MASK 0x0800
 
 /**
  * @brief Set the length of a CANbus message
