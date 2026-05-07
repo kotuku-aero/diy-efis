@@ -44,7 +44,7 @@ CANFLYID(id_autopilot_degraded_mode,40,CANFLY_BOOL, "0=NO ALARM, 1=ALARM")
 
 
 
-
+CANFLYID(id_kmag_quorum,128,CANFLY_BINARY, "See quorum for definition")
 
 
 /*************************************************
@@ -190,7 +190,7 @@ CANFLYID(id_left_mixture_lever,456,CANFLY_UINT16 , "0-100%")
 CANFLYID(id_left_ignition_dwell,457,CANFLY_UINT16, "msec")
 CANFLYID(id_left_ignition_advance,458,CANFLY_INT16, "degrees")
 CANFLYID(id_left_injector_dwell,459,CANFLY_UINT16, "msec")
-CANFLYID(id_left_mixture_mode,460,CANFLY_UINT16, "Mixture mode for the left MAG status see id_mixture_mode")
+CANFLYID(id_left_mixture_mode,465,CANFLY_UINT16, "Mixture mode for the left MAG  0 = cuttoff, 1 = manual, 2 = auto")
 /*************************************************
  * RIGHT kMAG  Filter size = 32
  */
@@ -206,7 +206,7 @@ CANFLYID(id_right_mixture_lever,488,CANFLY_UINT16 , "0-100%")
 CANFLYID(id_right_ignition_dwell,489,CANFLY_UINT16, "msec")
 CANFLYID(id_right_ignition_advance,490,CANFLY_INT16, "degrees")
 CANFLYID(id_right_injector_dwell,491,CANFLY_UINT16, "msec")
-CANFLYID(id_right_mixture_mode,492,CANFLY_UINT16, "Mixture mode for the right MAG status see id_mixture_mode")
+CANFLYID(id_right_mixture_mode,497,CANFLY_UINT16, "Mixture mode for the right MAG 0 = cuttoff, 1 = manual, 2 = auto")
 /*************************************************
  * Avionics Hub Filter size = 64
  * The avioncs hub includes all of the AHRS datapoints

@@ -1,5 +1,28 @@
 #include "../../include/annunciator_widget.h"
 
+/*
+ * The quorum message sends a struct like this:
+ * 
+typedef PACKED struct _quorum_msg_t {
+  uint8_t can_type;     // always CANFLY_BINARY
+  uint8_t flags;        // see below
+  uint16_t chk;         // crc16 of message with chk field == 0
+  uint32_t cookie;      // 0 = abdication, otherwise 1..2^32-1
+  } quorum_msg_t;
+
+ * the flags are:
+ * 
+ */
+
+#define FLAG_SIDE           0x01
+#define FLAG_SIDE_LEFT      0x00
+#define FLAG_SIDE_RIGHT     0x01
+
+#define FLAG_ROLE           0x02
+#define FLAG_ROLE_MASTER    0x00
+#define FLAG_ROLE_SECONDARY 0x02
+
+
 result_t on_kmag_msg(handle_t hwnd, const canmsg_t* msg, void* wnddata)
   {
   ecu_annunciator_t* data = (ecu_annunciator_t*)wnddata;
@@ -52,13 +75,33 @@ result_t on_kmag_msg(handle_t hwnd, const canmsg_t* msg, void* wnddata)
       data->right_advance = value_i16;
       }
     }
-  else if (can_id == id_fuel_map)
+  else if(can_id == id_kmag_quorum)
     {
-    if (succeeded(get_param_uint16(msg, &value_u16)))
+    if((msg->data[1] & FLAG_SIDE) == FLAG_SIDE_RIGHT)
       {
-      changed = data->afr_map_mode != value_u16;
-      data->afr_map_mode = value_u16;
+      bool active = (msg->data[1] & FLAG_ROLE) == FLAG_ROLE_MASTER;
+      changed = active != data->quorum_right_active;
+      data->quorum_right_active = active;
       }
+    else
+      {
+      bool active = (msg->data[1] & FLAG_ROLE) == FLAG_ROLE_MASTER;
+      changed = active != data->quorum_left_active;
+      data->quorum_left_active = active;
+      }
+    }
+  else if(can_id == id_left_mixture_mode)
+    {
+    get_param_uint16(msg, &value_u16);
+    changed = data->left_mixture_mode != value_u16;
+    data->left_mixture_mode = value_u16;
+    }
+  else if(can_id == id_right_mixture_mode)
+    {
+    // TODO: cuttoff??
+    get_param_uint16(msg, &value_u16);
+    changed = data->right_mixture_mode != value_u16;
+    data->right_mixture_mode = value_u16;
     }
 
   if (changed)
@@ -73,6 +116,7 @@ void on_paint_kmag(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg,
 
   // draw the left status
   rect_t rect_status;
+  rect_t rect_master;
   int32_t height = rect_height(wnd_rect);
 
   on_paint_widget_background(canvas, wnd_rect, msg, wnddata);
@@ -88,6 +132,18 @@ void on_paint_kmag(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg,
   rect_status.right = rect_status.left + indicator_height;
   rect_status.bottom = rect_status.top + indicator_height;
 
+  // draw the master status
+  if(data->quorum_left_active)
+    {
+    // draw a rectangle around the status as white
+    rect_master.left = rect_status.left -2;
+    rect_master.top = wnd_rect->top;
+    rect_master.right = rect_status.right +2;
+    rect_master.bottom = wnd_rect->bottom -2;
+    
+    rectangle(canvas, wnd_rect, color_lightgreen, color_lightgreen, &rect_master);
+    }
+
   if (data->left_status == bs_unknown)
     ellipse(canvas, wnd_rect, color_white, color_red, &rect_status);
   else if (data->left_status == bs_running)
@@ -100,6 +156,18 @@ void on_paint_kmag(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg,
   rect_status.left = wnd_rect->right - indicator_height - 3;
   rect_status.right = rect_status.left + indicator_height;
 
+  // draw the master status
+  if(data->quorum_right_active)
+    {
+    // draw a rectangle around the status as white
+    rect_master.left = rect_status.left -2;
+    rect_master.top = wnd_rect->top;
+    rect_master.right = rect_status.right +1;
+    rect_master.bottom = wnd_rect->bottom-2;
+    
+    rectangle(canvas, wnd_rect, color_lightgreen, color_lightgreen, &rect_master);
+    }
+
   if (data->right_status == bs_unknown)
     ellipse(canvas, wnd_rect, color_white, color_red, &rect_status);
   else if (data->right_status == bs_running)
@@ -111,27 +179,27 @@ void on_paint_kmag(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg,
 
   const char* afr_mode = nullptr;
   color_t afr_mode_color = color_lightblue;
-  switch (data->afr_map_mode)
+
+  uint16_t mode = 0;
+  if(data->left_mixture_mode != data->right_mixture_mode)
+    mode = 4;
+  else
+    mode = data->left_mixture_mode;
+
+  switch (mode)
     {
     case 0:
       afr_mode = "Manual";
       break;
     case 1:
-      afr_mode = "Nitro";
+      afr_mode = "Cuttoff";
       break;
     case 2:
-      afr_mode = "Climb";
-      break;
-    case 3:
-      afr_mode = "Cruise";
+      afr_mode = "Auto";
       break;
     case 4:
       afr_mode_color = color_purple;
       afr_mode = "ECU SYNC";
-      break;
-    case 5:
-      afr_mode_color = color_red;
-      afr_mode = "AFR ERR";
       break;
     }
 

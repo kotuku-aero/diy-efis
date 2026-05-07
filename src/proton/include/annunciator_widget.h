@@ -115,12 +115,16 @@ typedef struct _ecu_annunciator_t {
   e_board_status right_status;
   int16_t right_advance;
 
-  uint16_t afr_map_mode;
+  bool quorum_left_active;
+  bool quorum_right_active;
 
+  uint16_t left_mixture_mode;
+  uint16_t right_mixture_mode;
   } ecu_annunciator_t;
 
 extern result_t on_kmag_msg(handle_t hwnd, const canmsg_t* msg, void* wnddata);
 extern void on_paint_kmag(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata);
+extern result_t on_create_kmag(handle_t hwnd, widget_t* widget);
 
 //-----------------------------------------------------------------------------
 // hobbs

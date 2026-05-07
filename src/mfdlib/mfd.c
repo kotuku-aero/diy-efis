@@ -46,16 +46,6 @@ result_t mfd_wndproc(handle_t wnd, const canmsg_t* msg, void* wnddata)
       get_param_float(msg, &mfd.altitude);
       break;
 
-    case id_left_fuel_map:
-      get_param_uint16(msg, &mfd.left_fuel_map);
-      update_selected_fuel_map();
-      break;
-
-    case id_right_fuel_map:
-      get_param_uint16(msg, &mfd.right_fuel_map);
-      update_selected_fuel_map();
-      break;
-
     case id_max_fuel_available:
       get_param_uint32(msg, &mfd.max_fuel_available);
       break;
