@@ -1,0 +1,2963 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<application xmlns="http://kotuku.aero/schema/kotuku.xsd"
+             xmlns:xs="http://www.w3.org/2001/XMLSchema"
+             target-namespace="http://kotuku.aero/schema/kotuku.xsd"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://kotuku.aero/schema/kotuku.xsd file://../../resources/application.xsd">
+
+  <!-- ========================================= -->
+  <!-- MENU SECTION                              -->
+  <!-- ========================================= -->
+  <menu id="230"
+        root-keys="root_keys"
+        font="neo_9_font"
+        background-color="color_black"
+        fill-background="false"
+        selected-background-color="color_white"
+        selected-color="color_magenta"
+        border-color="color_yellow"
+        text-color="color_green"
+        menu-timeout="7">
+    <rect left="0" top="0" width="1024" height="600"/>
+    <menu-rect x="0" y="0"/>
+    <menu-start x="220" y="580"/>
+
+    <captions x="220" y="580" width="584" height="20">
+      <button key-name="kn_decka" left="0" top="0" width="85" height="20"/>
+      <button key-name="kn_key2" left="85" top="0" width="83" height="20"/>
+      <button key-name="kn_key3" left="168" top="0" width="83" height="20"/>
+      <button key-name="kn_key4" left="251" top="0" width="83" height="20" />
+      <button key-name="kn_key5" left="334" top="0" width="83" height="20"/>
+      <button key-name="kn_key6" left="417" top="0" width="83" height="20"/>
+      <button key-name="kn_deckb" left="500" top="0" width="84" height="20"/>
+    </captions>
+
+    <!-- Decal orientation menu -->
+    <menu name="decal_menu" keys="adahrs_keys" caption="Decal Orientation">
+      <event-action caption="Up" can-id="id_decal_orientation" value-type="v_int16" value="0"/>
+      <event-action caption="Down" can-id="id_decal_orientation" value-type="v_int16" value="1"/>
+      <event-action caption="Left" can-id="id_decal_orientation" value-type="v_int16" value="2"/>
+      <event-action caption="Right" can-id="id_decal_orientation" value-type="v_int16" value="3"/>
+      <event-action caption="Front" can-id="id_decal_orientation" value-type="v_int16" value="4"/>
+      <event-action caption="Back" can-id="id_decal_orientation" value-type="v_int16" value="5"/>
+    </menu>
+    <!-- ================================================================ -->
+    <!-- ROOT KEYS - Main interface when no menu is active -->
+    <!-- ================================================================ -->
+    <keys name="root">
+      <!-- Left spin button (Deck A) -->
+      <key0 caption="Info/ALT">
+        <popup-action caption="Info" menu="config_menu" />
+      </key0>
+      <decka-up>
+        <event-action caption="Next" can-id="id_marquee_next" value-type="v_int16" value="1"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="Prev" can-id="id_marquee_prev" value-type="v_int16" value="1"/>
+      </decka-dn>
+      <decka-press-up>
+        <event-action caption="ALT Up" can-id="id_altitude_change" value-type="v_int16" value="100"/>
+      </decka-press-up>
+      <decka-press-dn>
+        <event-action caption="ALT Dn" can-id="id_altitude_change" value-type="v_int16" value="-100"/>
+      </decka-press-dn>
+
+      <!-- Key 2: Autopilot Vertical Mode -->
+      <key2 caption="AP Vert">
+        <popup-action caption="AP Vertical" menu="ap_vertical_menu" />
+      </key2>
+      <hold-key2>
+        <event-action caption="AP V-Mode Toggle" can-id="id_toggle_vs_mode" value-type="v_int16" value="1"/>
+      </hold-key2>
+
+      <!-- Key 3: Autopilot Disconnect / Quick Access -->
+      <key3 caption="AP Disc">
+        <event-action caption="AP Disconnect" can-id="id_ap_disc" value-type="v_int16" value="1"/>
+      </key3>
+      <hold-key3>
+        <popup-action caption="AP Menu" menu="ap_main_menu" />
+      </hold-key3>
+
+      <!-- Key 4: Autopilot Lateral Mode -->
+      <key4 caption="AP Lat">
+        <popup-action caption="AP Lateral" menu="ap_lateral_menu" />
+      </key4>
+      <hold-key4>
+        <event-action caption="AP H-Mode Toggle" can-id="id_toggle_hs_mode" value-type="v_int16" value="1"/>
+      </hold-key4>
+
+      <!-- Key 5: Navigation / Flight Plan -->
+      <key5 caption="NAV">
+        <popup-action caption="Navigation" menu="nav_main_menu" />
+      </key5>
+      <hold-key5>
+        <popup-action caption="Nearest" menu="nearest_menu" />
+      </hold-key5>
+
+      <!-- Key 6: Map -->
+      <key6 caption="Map">
+        <popup-action caption="Map" menu="map_menu" />
+      </key6>
+      <hold-key6>
+        <popup-action caption="Airframe" menu="af_menu" />
+      </hold-key6>
+
+      <!-- Right Spin Button (Deck B) -->
+      <key1 caption="HDG/QNH">
+        <event-action caption="Cancel" can-id="id_menu_cancel" value-type="v_int16" value="1"/>
+      </key1>
+      <deckb-up>
+        <event-action caption="HDG Up" can-id="id_heading_change" value-type="v_int16" value="1"/>
+      </deckb-up>
+      <deckb-dn>
+        <event-action caption="HDG Dn" can-id="id_heading_change" value-type="v_int16" value="-1"/>
+      </deckb-dn>
+      <deckb-press-up>
+        <event-action caption="QNH Up" can-id="id_qnh_change" value-type="v_int16" value="1"/>
+      </deckb-press-up>
+      <deckb-press-dn>
+        <event-action caption="QNH Dn" can-id="id_qnh_change" value-type="v_int16" value="-1"/>
+      </deckb-press-dn>
+    </keys>
+
+    <keys name="alarm_keys">
+      <key0 caption="Accept">
+        <event-action caption="Accept" can-id="id_menu_ok" value-type="v_int16" value="1"/>
+      </key0>
+      <key6 caption="Cancel">
+        <event-action caption="Cancel" can-id="id_menu_cancel" value-type="v_int16" value="1"/>
+      </key6>
+      <decka-up>
+        <event-action caption="Next" can-id="id_tab_next" value-type="v_int16" value="1"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="Prev" can-id="id_tab_prev" value-type="v_int16" value="1"/>
+      </decka-dn>
+    </keys>
+
+    <keys name="numeric_edit_keys">
+      <key0 caption="Accept">
+        <event-action caption="Accept" can-id="id_menu_ok" value-type="v_int16" value="1"/>
+      </key0>
+      <key6 caption="Cancel">
+        <event-action caption="Cancel" can-id="id_menu_cancel" value-type="v_int16" value="1"/>
+      </key6>
+      <deckb-up>
+        <event-action caption="Up" can-id="id_spin_edit" value-type="v_int16" value="1"/>
+      </deckb-up>
+      <deckb-dn>
+        <event-action caption="Down" can-id="id_spin_edit" value-type="v_int16" value="-1"/>
+      </deckb-dn>
+      <deckb-press-up>
+        <event-action caption="Up x10" can-id="id_spin_edit" value-type="v_int16" value="10"/>
+      </deckb-press-up>
+      <deckb-press-dn>
+        <event-action caption="Down x10" can-id="id_spin_edit" value-type="v_int16" value="-10"/>
+      </deckb-press-dn>
+    </keys>
+
+    <keys name="button_keys">
+      <key0 caption="Execute">
+        <event-action caption="Execute" can-id="id_button_press" value-type="v_int16" value="1"/>
+      </key0>
+      <key6 caption="Cancel">
+        <event-action caption="Cancel" can-id="id_menu_cancel" value-type="v_int16" value="1"/>
+      </key6>
+    </keys>
+
+    <keys name="checkbox_keys">
+      <key0 caption="Accept">
+        <event-action caption="Accept" can-id="id_menu_ok" value-type="v_int16" value="1"/>
+      </key0>
+      <key6 caption="Cancel">
+        <event-action caption="Cancel" can-id="id_menu_cancel" value-type="v_int16" value="1"/>
+      </key6>
+      <deckb-up>
+        <event-action caption="Toggle" can-id="id_toggle_check" value-type="v_int16" value="1"/>
+      </deckb-up>
+      <deckb-dn>
+        <event-action caption="Toggle" can-id="id_toggle_check" value-type="v_int16" value="1"/>
+      </deckb-dn>
+    </keys>
+
+    <keys name="listbox_keys">
+      <key0 caption="Edit">
+        <event-action caption="Edit" can-id="id_enter_edit" value-type="v_int16" value="1"/>
+      </key0>
+      <key6 caption="Cancel">
+        <event-action caption="Cancel" can-id="id_menu_cancel" value-type="v_int16" value="1"/>
+      </key6>
+      <deckb-up>
+        <event-action caption="Up" can-id="id_list_up" value-type="v_int16" value="1"/>
+      </deckb-up>
+      <deckb-dn>
+        <event-action caption="Down" can-id="id_list_down" value-type="v_int16" value="1"/>
+      </deckb-dn>
+    </keys>
+
+    <keys name="text_edit_keys">
+      <key0 caption="Accept">
+        <event-action caption="Accept" can-id="id_menu_ok" value-type="v_int16" value="1"/>
+      </key0>
+      <key6 caption="Cancel">
+        <event-action caption="Cancel" can-id="id_menu_cancel" value-type="v_int16" value="1"/>
+      </key6>
+      <deckb-up>
+        <event-action caption="Next Char" can-id="id_edit_next_char" value-type="v_int16" value="1"/>
+      </deckb-up>
+      <deckb-dn>
+        <event-action caption="Prev Char" can-id="id_edit_prev_char" value-type="v_int16" value="1"/>
+      </deckb-dn>
+    </keys>
+
+    <keys name="adahrs_keys">
+      <key0 caption="Accept">
+        <event-action caption="Accept" can-id="id_menu_ok" value-type="v_int16" value="1"/>
+      </key0>
+      <key6 caption="Cancel">
+        <event-action caption="Cancel" can-id="id_menu_cancel" value-type="v_int16" value="1"/>
+      </key6>
+      <decka-up>
+        <event-action caption="Next" can-id="id_tab_next" value-type="v_int16" value="1"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="Prev" can-id="id_tab_prev" value-type="v_int16" value="1"/>
+      </decka-dn>
+    </keys>
+
+    <keys name="edu_keys">
+      <key0 caption="Accept">
+        <event-action caption="Accept" can-id="id_menu_ok" value-type="v_int16" value="1"/>
+      </key0>
+      <key6 caption="Cancel">
+        <event-action caption="Cancel" can-id="id_menu_cancel" value-type="v_int16" value="1"/>
+      </key6>
+      <decka-up>
+        <event-action caption="Next" can-id="id_tab_next" value-type="v_int16" value="1"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="Prev" can-id="id_tab_prev" value-type="v_int16" value="1"/>
+      </decka-dn>
+    </keys>
+
+    <keys name="mag_keys">
+      <key0 caption="Accept">
+        <event-action caption="Accept" can-id="id_menu_ok" value-type="v_int16" value="1"/>
+      </key0>
+      <key6 caption="Cancel">
+        <event-action caption="Cancel" can-id="id_menu_cancel" value-type="v_int16" value="1"/>
+      </key6>
+      <decka-up>
+        <event-action caption="Next" can-id="id_tab_next" value-type="v_int16" value="1"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="Prev" can-id="id_tab_prev" value-type="v_int16" value="1"/>
+      </decka-dn>
+    </keys>
+
+    <keys name="startup_keys">
+      <key0 caption="Accept">
+        <event-action caption="Accept" can-id="id_menu_ok" value-type="v_int16" value="1"/>
+      </key0>
+      <key6 caption="Cancel">
+        <event-action caption="Cancel" can-id="id_menu_cancel" value-type="v_int16" value="1"/>
+      </key6>
+      <decka-up>
+        <event-action caption="Next" can-id="id_tab_next" value-type="v_int16" value="1"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="Prev" can-id="id_tab_prev" value-type="v_int16" value="1"/>
+      </decka-dn>
+    </keys>
+
+    <keys name="targetafr_keys">
+      <key0 caption="Accept">
+        <event-action caption="Accept" can-id="id_menu_ok" value-type="v_int16" value="1"/>
+      </key0>
+      <key6 caption="Cancel">
+        <event-action caption="Cancel" can-id="id_menu_cancel" value-type="v_int16" value="1"/>
+      </key6>
+      <decka-up>
+        <event-action caption="Next" can-id="id_tab_next" value-type="v_int16" value="1"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="Prev" can-id="id_tab_prev" value-type="v_int16" value="1"/>
+      </decka-dn>
+    </keys>
+
+    <keys name="advinjector_keys">
+      <key0 caption="Accept">
+        <event-action caption="Accept" can-id="id_menu_ok" value-type="v_int16" value="1"/>
+      </key0>
+      <key6 caption="Cancel">
+        <event-action caption="Cancel" can-id="id_menu_cancel" value-type="v_int16" value="1"/>
+      </key6>
+      <decka-up>
+        <event-action caption="Next" can-id="id_tab_next" value-type="v_int16" value="1"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="Prev" can-id="id_tab_prev" value-type="v_int16" value="1"/>
+      </decka-dn>
+    </keys>
+
+
+    <!-- Air data ports orientation menu -->
+    <menu name="air_data_ports_menu" keys="adahrs_keys" caption="Air Data Ports">
+      <event-action caption="Front" can-id="id_air_data_ports" value-type="v_int16" value="0"/>
+      <event-action caption="Left" can-id="id_air_data_ports" value-type="v_int16" value="1"/>
+      <event-action caption="Rear" can-id="id_air_data_ports" value-type="v_int16" value="2"/>
+      <event-action caption="Right" can-id="id_air_data_ports" value-type="v_int16" value="3"/>
+    </menu>
+
+    <!-- Cylinder count menu (replaces radio button group) -->
+    <menu name="cylinder_count_menu" keys="edu_keys" caption="Cylinder Count">
+      <event-action caption="4 Cylinder" can-id="id_cylinder_count" value-type="v_int16" value="4"/>
+      <event-action caption="6 Cylinder" can-id="id_cylinder_count" value-type="v_int16" value="6"/>
+    </menu>
+
+    <!-- Fuel sensor type menu (replaces radio button group) -->
+    <menu name="fuel_sensor_menu" keys="edu_keys" caption="Fuel Sensor Type">
+      <event-action caption="Resistive Sensor" can-id="id_fuel_sensor_type" value-type="v_int16" value="0"/>
+      <event-action caption="Voltage Sensor" can-id="id_fuel_sensor_type" value-type="v_int16" value="1"/>
+    </menu>
+
+    <!-- Menu for selecting CAN ID from device list -->
+    <menu name="can_id_menu" keys="listbox_keys" caption="Select CAN ID">
+      <!-- This menu would be populated dynamically from deviceCanFlyIDBindingSource -->
+    </menu>
+
+    <!-- Menu for selecting Alarm ID -->
+    <menu name="alarm_id_menu" keys="listbox_keys" caption="Select Alarm ID">
+      <!-- This menu would be populated dynamically from alarmCanFlyIDBindingSource -->
+    </menu>
+
+    <!-- Menu for selecting Reset ID -->
+    <menu name="reset_id_menu" keys="listbox_keys" caption="Select Reset ID">
+      <!-- This menu would be populated dynamically from deviceCanFlyIDBindingSource -->
+    </menu>
+
+  </menu>
+
+
+  <!-- ========================================= -->
+  <!-- TEMPLATES SECTION                         -->
+  <!-- ========================================= -->
+  <templates>
+    <panel name="Alarms"
+          id="_alarms"
+           container-type="alarm_t"
+           container-is-list="true"
+           container-name="alarms">
+      <rect left="0" top="0" width="994" height="570"/>
+      <!-- 
+              LISTBOX + PROPERTY PAGE PATTERN:
+              The DataGridView from the original design is replaced with a listbox on the left
+              showing the alarm list, and a property group on the right for editing the selected alarm.
+      
+              Original DataGridView columns:
+              - Name (text)
+              - CanID (combobox from deviceCanFlyIDBindingSource)
+              - AlarmType/Event (checkbox)
+              - Enabled (checkbox)
+              - AlarmID (combobox from alarmCanFlyIDBindingSource)
+              - MinEnabled (checkbox)
+              - Min (numeric)
+              - MaxEnabled (checkbox)
+              - Max (numeric)
+              - Hysteresis (numeric)
+              - Frequency (numeric)
+              - ResetID (combobox from deviceCanFlyIDBindingSource)
+      
+              Data binding: alarmBindingSource -> Kotuku.CanFly.Alarm
+              -->
+
+      <!-- Listbox showing alarm names (2 columns: Name, CanID) -->
+      <listbox id="id_adahars_alarm_list"
+               binding="Alarms"
+               value-type="v_int16"
+               tab-order="1"
+               menu="listbox_keys"
+               background-color="color_black"
+               border-color="color_white"
+               name-color="color_white"
+               border-left="true"
+               border-top="true"
+               border-right="true"
+               border-bottom="true"
+               container-name="alarms"
+               container-type="alarms_t">
+        <rect left="10" top="10" width="350" height="540"/>
+        <column binding="can_id"/>
+        <!-- Column definitions would go here if supported by XSD -->
+        <!-- Column 1: Name (200px) -->
+        <!-- Column 2: CanID (150px) -->
+      </listbox>
+
+      <!-- Property page for selected alarm -->
+      <groupbox id="id_adahars_alarms_properties"
+                background-color="color_black"
+                border-color="color_white"
+                name="Alarm Properties"
+                name-color="color_white"
+                draw-name="true"
+                border-left="true"
+                border-top="true"
+                border-right="true"
+                border-bottom="true">
+        <rect left="380" top="10" width="624" height="540"/>
+
+        <!-- Name -->
+        <label id="id_adahars_alarms_alarm_name_lbl"
+               background-color="color_black"
+               name-color="color_white"
+               draw-name="true"
+               name="Name:">
+          <rect left="10" top="30" width="80" height="20"/>
+        </label>
+        <edit can-id="id_adahars_alarms_alarm_name"
+              binding="Name"
+              value-type="v_string"
+              tab-order="2"
+              menu="text_edit_keys"
+              background-color="color_black"
+              border-color="color_white"
+              border-left="true"
+              border-top="true"
+              border-right="true"
+              border-bottom="true">
+          <rect left="100" top="30" width="250" height="25"/>
+        </edit>
+
+        <!-- CanID -->
+        <label id="id_adahars_alarms_can_id_lbl"
+               background-color="color_black"
+               name-color="color_white"
+               draw-name="true"
+               name="CanFly ID:">
+          <rect left="10" top="65" width="80" height="20"/>
+        </label>
+        <edit id="id_adahars_alarms_can_id"
+              binding="CanID"
+              value-type="v_uint16"
+              tab-order="3"
+              menu="can_id_menu"
+              background-color="color_black"
+              border-color="color_white"
+              border-left="true"
+              border-top="true"
+              border-right="true"
+              border-bottom="true">
+          <rect left="100" top="65" width="250" height="25"/>
+        </edit>
+
+        <!-- Event (AlarmType as checkbox) -->
+        <checkbox can-id="id_adahars_alarms_alarm_type"
+                  binding="AlarmType"
+                  value-type="v_bool"
+                  tab-order="4"
+                  menu="checkbox_keys"
+                  name="Is Event"
+                  draw-name="true"
+                  name-color="color_white"
+                  background-color="color_black"
+                  checked="false">
+          <rect left="10" top="100" width="150" height="25"/>
+        </checkbox>
+
+        <!-- Enabled -->
+        <checkbox id="id_adahars_alarms_alarm_enabled"
+                  binding="Enabled"
+                  value-type="v_bool"
+                  tab-order="5"
+                  menu="checkbox_keys"
+                  name="Enabled"
+                  draw-name="true"
+                  name-color="color_white"
+                  background-color="color_black"
+                  checked="false">
+          <rect left="200" top="100" width="150" height="25"/>
+        </checkbox>
+
+        <!-- AlarmID -->
+        <label id="id_adahars_alarms_alarm_id_lbl"
+               background-color="color_black"
+               name-color="color_white"
+               draw-name="true"
+               name="Alarm CanFly ID:">
+          <rect left="10" top="135" width="80" height="20"/>
+        </label>
+        <edit can-id="id_alarm_alarm_id"
+              binding="AlarmID"
+              value-type="v_uint16"
+              tab-order="6"
+              menu="alarm_id_menu"
+              background-color="color_black"
+              border-color="color_white"
+              border-left="true"
+              border-top="true"
+              border-right="true"
+              border-bottom="true">
+          <rect left="100" top="135" width="250" height="25"/>
+        </edit>
+
+        <!-- Min group -->
+        <checkbox id="id_adahars_alarms_alarm_min_enabled"
+                  binding="MinEnabled"
+                  value-type="v_bool"
+                  tab-order="7"
+                  menu="checkbox_keys"
+                  name="Min Enabled"
+                  draw-name="true"
+                  name-color="color_white"
+                  background-color="color_black"
+                  checked="false">
+          <rect left="10" top="170" width="150" height="25"/>
+        </checkbox>
+
+        <label id="id_adahars_alarms_min_lbl"
+               background-color="color_black"
+               name-color="color_white"
+               draw-name="true"
+               name="Min:">
+          <rect left="10" top="205" width="80" height="20"/>
+        </label>
+        <edit id="id_adahars_alarms_alarm_min"
+              binding="Min"
+              value-type="v_float"
+              tab-order="8"
+              menu="numeric_edit_keys"
+              background-color="color_black"
+              border-color="color_white"
+              border-left="true"
+              border-top="true"
+              border-right="true"
+              border-bottom="true">
+          <rect left="100" top="205" width="150" height="25"/>
+        </edit>
+
+        <!-- Max group -->
+        <checkbox id="id_adahars_alarms_alarm_max_enabled"
+                  binding="MaxEnabled"
+                  value-type="v_bool"
+                  tab-order="9"
+                  menu="checkbox_keys"
+                  name="Max Enabled"
+                  draw-name="true"
+                  name-color="color_white"
+                  background-color="color_black"
+                  checked="false">
+          <rect left="10" top="240" width="150" height="25"/>
+        </checkbox>
+
+        <label id="id_adahars_alarms_max_lbl"
+               background-color="color_black"
+               name-color="color_white"
+               draw-name="true"
+               name="Max:">
+          <rect left="10" top="275" width="80" height="20"/>
+        </label>
+        <edit id="id_adahars_alarms_alarm_max"
+              binding="Max"
+              value-type="v_float"
+              tab-order="10"
+              menu="numeric_edit_keys"
+              background-color="color_black"
+              border-color="color_white"
+              border-left="true"
+              border-top="true"
+              border-right="true"
+              border-bottom="true">
+          <rect left="100" top="275" width="150" height="25"/>
+        </edit>
+
+        <!-- Hysteresis -->
+        <label id="id_adahars_alarms_hysteresis_lbl"
+               background-color="color_black"
+               name-color="color_white"
+               draw-name="true"
+               name="Hysteresis:">
+          <rect left="10" top="310" width="80" height="20"/>
+        </label>
+        <edit id="id_adahars_alarms_alarm_hysteresis"
+              binding="Hysteresis"
+              value-type="v_float"
+              tab-order="11"
+              menu="numeric_edit_keys"
+              background-color="color_black"
+              border-color="color_white"
+              border-left="true"
+              border-top="true"
+              border-right="true"
+              border-bottom="true">
+          <rect left="100" top="310" width="150" height="25"/>
+        </edit>
+
+        <!-- Frequency -->
+        <label id="id_adahars_alarms_frequency_lbl"
+               background-color="color_black"
+               name-color="color_white"
+               draw-name="true"
+               name="Frequency:">
+          <rect left="10" top="345" width="80" height="20"/>
+        </label>
+        <edit id="id_adahars_alarms_alarm_frequency"
+              binding="Frequency"
+              value-type="v_int16"
+              tab-order="12"
+              menu="numeric_edit_keys"
+              background-color="color_black"
+              border-color="color_white"
+              border-left="true"
+              border-top="true"
+              border-right="true"
+              border-bottom="true">
+          <rect left="100" top="345" width="150" height="25"/>
+        </edit>
+
+        <!-- ResetID -->
+        <label id="id_adahars_alarms_reset_id_lbl"
+               background-color="color_black"
+               name-color="color_white"
+               draw-name="true"
+               name="Reset ID:">
+          <rect left="10" top="380" width="80" height="20"/>
+        </label>
+        <edit can-id="id_adahars_alarms_alarm_reset_id"
+              binding="ResetID"
+              value-type="v_uint16"
+              tab-order="13"
+              menu="reset_id_menu"
+              background-color="color_black"
+              border-color="color_white"
+              border-left="true"
+              border-top="true"
+              border-right="true"
+              border-bottom="true">
+          <rect left="100" top="380" width="250" height="25"/>
+        </edit>
+      </groupbox>
+    </panel>
+  </templates>
+
+  <!-- ========================================= -->
+  <!-- LAYOUT SECTION                            -->
+  <!-- ========================================= -->
+  <layout>
+    <tab name="Settings"
+         background-color="color_black"
+         border-color="color_white"
+         border-left="true"
+         border-top="true"
+         border-right="true"
+         border-bottom="true"
+         container-type="void"
+         container-name="void">
+      <rect left="0" top="0" width="1024" height="600"/>
+      <tab-page-rect left="0" top="0" width="1024" height="570"/>
+      <!-- HUB Settings page -->
+      <tab-page name="kHUB"
+                menu="adahrs_keys"
+                container-name="hub"
+                container-type="hub_t">
+        <rect left="0" top="0" width="1024" height="600"/>
+        <!-- vertical tab group-->
+        <tab name="HUB PAGES"
+             id="id_adahars_tab_group"
+             background-color="color_black"
+             border-color="color_white"
+             border-left="true"
+             border-top="true"
+             border-right="true"
+             border-bottom="true"
+             orientation="vertical"
+             text-orientation="vertical"
+             container-name="hub"
+             container-type="hub_t">
+          <rect left="0" top="0" width="1024" height="600"/>
+          <tab-page-rect left="0" top="0" width="994" height="570"/>
+          <tab-page name="ADAHRS"
+                    id="id_adahars_settings"
+                    container-type="hub_t"
+                    container-name="hub">
+            <rect left="0" top="0" width="994" height="570"/>
+
+            <!-- Data binding: adharsBindingSource -> ADHARSExtension -->
+
+            <!-- Use internal GPS checkbox -->
+            <!-- Data binding: adharsBindingSource -> ADHARSExtension.InternalGps -->
+            <checkbox id="id_adahars_internal_gps"
+                      binding="InternalGps"
+                      value-type="v_bool"
+                      tab-order="1"
+                      menu="checkbox_keys"
+                      name="Use internal GPS"
+                      draw-name="true"
+                      name-color="color_white"
+                      background-color="color_black"
+                      checked="false">
+              <rect left="28" top="23" width="128" height="20"/>
+            </checkbox>
+
+            <!-- ========================================= -->
+            <!-- DIAGNOSTICS GROUP                         -->
+            <!-- ========================================= -->
+            <groupbox id="id_adahars_grp_diagnostics"
+                      background-color="color_black"
+                      border-color="color_white"
+                      name="Diagnostics"
+                      name-color="color_white"
+                      draw-name="true"
+                      border-left="true"
+                      border-top="true"
+                      border-right="true"
+                      border-bottom="true">
+              <rect left="186" top="24" width="200" height="49"/>
+
+              <!-- Publish Raw IMU data checkbox -->
+              <!-- Data binding: adharsBindingSource -> ADHARSExtension.PublishRaw -->
+              <checkbox id="id_adahars_publish_raw"
+                        binding="PublishRaw"
+                        value-type="v_bool"
+                        tab-order="2"
+                        menu="checkbox_keys"
+                        name="Publish Raw IMU data"
+                        draw-name="true"
+                        name-color="color_white"
+                        background-color="color_black"
+                        checked="false">
+                <rect left="6" top="18" width="147" height="20"/>
+              </checkbox>
+            </groupbox>
+
+            <!-- ========================================= -->
+            <!-- HARD IRON CORRECTION GROUP                -->
+            <!-- ========================================= -->
+            <groupbox id="id_adahars_hard_iron"
+                      background-color="color_black"
+                      border-color="color_white"
+                      name="Hard Iron Correction"
+                      name-color="color_white"
+                      draw-name="true"
+                      border-left="true"
+                      border-top="true"
+                      border-right="true"
+                      border-bottom="true">
+              <rect left="3" top="79" width="383" height="54"/>
+
+              <!-- X label -->
+              <label id="id_adahars_lbl_x"
+                     background-color="color_black"
+                     name-color="color_white"
+                     draw-name="true"
+                     name="X:">
+                <rect left="14" top="24" width="17" height="13"/>
+              </label>
+
+              <!-- Hard Iron X -->
+              <!-- Data binding: adharsBindingSource -> ADHARSExtension.HardIronX -->
+              <edit id="id_adahars_hard_iron_x"
+                    binding="HardIronX"
+                    value-type="v_float"
+                    tab-order="3"
+                    menu="numeric_edit_keys"
+                    background-color="color_black"
+                    border-color="color_white"
+                    border-left="true"
+                    border-top="true"
+                    border-right="true"
+                    border-bottom="true">
+                <rect left="37" top="22" width="58" height="20"/>
+              </edit>
+
+              <!-- Y label -->
+              <label id="id_adahars_lbl_y"
+                     background-color="color_black"
+                     name-color="color_white"
+                     draw-name="true"
+                     name="Y:">
+                <rect left="107" top="24" width="17" height="13"/>
+              </label>
+
+              <!-- Hard Iron Y -->
+              <!-- Data binding: adharsBindingSource -> ADHARSExtension.HardIronY (format: N5) -->
+              <edit id="id_adahars_hard_iron_y"
+                    binding="HardIronY"
+                    value-type="v_float"
+                    tab-order="4"
+                    menu="numeric_edit_keys"
+                    background-color="color_black"
+                    border-color="color_white"
+                    border-left="true"
+                    border-top="true"
+                    border-right="true"
+                    border-bottom="true">
+                <rect left="130" top="22" width="58" height="20"/>
+              </edit>
+
+              <!-- Z label -->
+              <label id="id_adahars_lbl_z"
+                     background-color="color_black"
+                     name-color="color_white"
+                     draw-name="true"
+                     name="Z:">
+                <rect left="195" top="23" width="17" height="13"/>
+              </label>
+
+              <!-- Hard Iron Z -->
+              <!-- Data binding: adharsBindingSource -> ADHARSExtension.HardIronZ (format: N5) -->
+              <edit id="id_adahars_hard_iron_z"
+                    binding="HardIronZ"
+                    value-type="v_float"
+                    tab-order="5"
+                    menu="numeric_edit_keys"
+                    background-color="color_black"
+                    border-color="color_white"
+                    border-left="true"
+                    border-top="true"
+                    border-right="true"
+                    border-bottom="true">
+                <rect left="218" top="21" width="58" height="20"/>
+              </edit>
+            </groupbox>
+
+            <!-- ========================================= -->
+            <!-- HUB ORIENTATION GROUP                     -->
+            <!-- ========================================= -->
+            <groupbox id="id_adahars_grp_hub_orientation"
+                      background-color="color_black"
+                      border-color="color_white"
+                      name="HUB Orientation"
+                      name-color="color_white"
+                      draw-name="true"
+                      border-left="true"
+                      border-top="true"
+                      border-right="true"
+                      border-bottom="true">
+              <rect left="3" top="148" width="383" height="207"/>
+
+              <!-- Instruction text 1 -->
+              <label id="id_adahars_lbl_instruction1"
+                     background-color="color_black"
+                     name-color="color_white"
+                     multiline="true"
+                     draw-name="true"
+                     name="The hub can be mounted in any orientation that is parallel to the axis of the aircraft. Select what orientation the box is mounted in.">
+                <rect left="6" top="15" width="244" height="39"/>
+              </label>
+
+              <!-- Decal label -->
+              <label id="id_adahars_lbl_decal"
+                     background-color="color_black"
+                     name-color="color_white"
+                     draw-name="true"
+                     name="Decal Orientation:">
+                <rect left="6" top="66" width="37" height="13"/>
+              </label>
+
+              <!-- Decal orientation combo -->
+              <!-- Data binding: comboBox1 -> Decal orientation -->
+              <edit id="id_adahars_decal_orientation"
+                    binding="DecalOrientation"
+                    value-type="v_int16"
+                    tab-order="6"
+                    menu="decal_menu"
+                    background-color="color_black"
+                    border-color="color_white"
+                    border-left="true"
+                    border-top="true"
+                    border-right="true"
+                    border-bottom="true">
+                <rect left="48" top="63" width="121" height="21"/>
+              </edit>
+
+              <!-- Air Data Ports label -->
+              <label id="id_adahars_lbl_air_data_ports"
+                     background-color="color_black"
+                     name-color="color_white"
+                     draw-name="true"
+                     name="Air Data Ports:">
+                <rect left="175" top="66" width="78" height="13"/>
+              </label>
+
+              <!-- Air Data Ports combo -->
+              <!-- Data binding: comboBox2 -> Air data ports orientation -->
+              <edit id="id_adahars_id_air_data_ports"
+                    binding="AirDataPorts"
+                    value-type="v_int16"
+                    tab-order="7"
+                    menu="air_data_ports_menu"
+                    background-color="color_black"
+                    border-color="color_white"
+                    border-left="true"
+                    border-top="true"
+                    border-right="true"
+                    border-bottom="true">
+                <rect left="255" top="63" width="121" height="21"/>
+              </edit>
+
+              <!-- Instruction text 2 -->
+              <label id="id_adahars_lbl_instruction2"
+                     background-color="color_black"
+                     name-color="color_white"
+                     multiline="true"
+                     draw-name="true"
+                     name="Once the orientation is set, level the main axis of the aircraft then select Calibrate to set the final alignment.">
+                <rect left="9" top="95" width="207" height="39"/>
+              </label>
+              <!-- Text: " -->
+
+              <!-- Calibrate button -->
+              <button id="id_adahars_id_calibrate_button"
+                      tab-order="8"
+                      menu="button_keys"
+                      name="Calibrate..."
+                      draw-name="true"
+                      name-color="color_white"
+                      background-color="color_black"
+                      border-color="color_white"
+                      border-left="true"
+                      border-top="true"
+                      border-right="true"
+                      border-bottom="true"
+                      key-name="kn_key0">
+                <rect left="255" top="107" width="121" height="23"/>
+              </button>
+
+              <!-- Instruction text 3 -->
+              <label id="id_adahars_lbl_instruction3"
+                     background-color="color_black"
+                     name-color="color_white"
+                     multiline="true"
+                     draw-name="true"
+                     Name="If the aircraft has a different attitude when taxiing then return the aircraft to that position and select Set Offset to set that angle.">
+                <rect left="6" top="154" width="236" height="39"/>
+              </label>
+
+              <!-- Set offset button -->
+              <button id="id_adahars_set_offset_button"
+                      tab-order="9"
+                      menu="button_keys"
+                      name="Set offset..."
+                      draw-name="true"
+                      name-color="color_white"
+                      background-color="color_black"
+                      border-color="color_white"
+                      border-left="true"
+                      border-top="true"
+                      border-right="true"
+                      border-bottom="true"
+                      key-name="kn_key0">
+                <rect left="255" top="170" width="121" height="23"/>
+              </button>
+            </groupbox>
+
+          </tab-page>
+          <tab-page-ref ref-name="Alarms"
+                        binding="hub->alarms"
+                        value-type="alarms_t"
+                        id-prefix="id_adahars_"/>
+        </tab>
+      </tab-page>
+      <!-- EDU Settings page -->
+      <tab-page name="kEDU"
+                menu="edu_keys"
+                container-name="edu"
+                container-type="edu_t">
+        <rect left="0" top="0" width="1024" height="570"/>
+        <!-- EDU settings layout would go here -->
+        <tab name="EDU pages"
+             background-color="color_black"
+             border-color="color_white"
+             border-left="true"
+             border-top="true"
+             border-right="true"
+             border-bottom="true"
+             orientation="vertical"
+             text-orientation="vertical"
+             container-name="edu"
+             container-type="edu_t">
+          <rect left="0" top="0" width="1024" height="600"/>
+          <tab-page-rect left="0" top="0" width="994" height="570"/>
+          <tab-page name="edu_page">
+            <rect left="0" top="0" width="1024" height="600"/>
+
+            <!-- 
+            MIGRATION NOTE: This is an extensive configuration page with:
+            - Cylinder count selection (4 or 6 cylinder)
+            - Fuel flow K-factor
+            - Left fuel quantity and units
+            - Divergence alarms checkbox
+            - Gauge reference pressure (HPA)
+            - Fuel sensor type (Resistive/Voltage)
+            - MAP compensation tables (6 values for different MAP pressures)
+            - Oil pressure/temperature calibration (10 value pairs)
+            - Auto-lean configuration
+            - Calculator button functionality
+      
+            The original form contains approximately 50+ textbox controls for various
+            calibration values across multiple group boxes. This template shows the
+            high-level structure; full implementation would require all controls.
+            -->
+
+            <!-- Cylinder Count Selection -->
+            <label id="id_edu_cylinder_count"
+                   background-color="color_black"
+                   name-color="color_white"
+                   draw-name="true">
+              <rect left="10" top="10" width="100" height="20"/>
+            </label>
+            <edit id="id_edu_cylinder_count"
+                  binding="CylinderCount"
+                  value-type="v_int16"
+                  default-value="4"
+                  tab-order="1"
+                  menu="cylinder_count_menu"
+                  background-color="color_black"
+                  border-color="color_white"
+                  border-left="true"
+                  border-top="true"
+                  border-right="true"
+                  border-bottom="true">
+              <rect left="120" top="10" width="120" height="25"/>
+            </edit>
+
+            <!-- Fuel Flow K-Factor -->
+            <label id="id_edu_lbl_fuel_flow_k"
+                   background-color="color_black"
+                   name-color="color_white"
+                   draw-name="true">
+              <rect left="10" top="45" width="100" height="20"/>
+            </label>
+            <edit id="id_edu_fuel_flow_k_factor"
+                  binding="FuelFlowKFactor"
+                  value-type="v_float"
+                  tab-order="2"
+                  menu="numeric_edit_keys"
+                  background-color="color_black"
+                  border-color="color_white"
+                  border-left="true"
+                  border-top="true"
+                  border-right="true"
+                  border-bottom="true">
+              <rect left="120" top="45" width="120" height="25"/>
+            </edit>
+
+            <!-- Left Fuel Quantity -->
+            <label id="id_edu_lbl_left_fuel_qty"
+                   background-color="color_black"
+                   name-color="color_white"
+                   draw-name="true">
+              <rect left="10" top="80" width="100" height="20"/>
+            </label>
+            <edit id="id_edu_left_fuel_qty"
+                  binding="LeftFuelQty"
+                  value-type="v_float"
+                  tab-order="3"
+                  menu="numeric_edit_keys"
+                  background-color="color_black"
+                  border-color="color_white"
+                  border-left="true"
+                  border-top="true"
+                  border-right="true"
+                  border-bottom="true">
+              <rect left="120" top="80" width="120" height="25"/>
+            </edit>
+
+            <!-- Divergence Alarms -->
+            <checkbox id="id_edu_divergence_alarms"
+                      binding="DivergenceAlarms"
+                      value-type="v_bool"
+                      tab-order="4"
+                      menu="checkbox_keys"
+                      name="Divergence Alarms"
+                      draw-name="true"
+                      name-color="color_white"
+                      background-color="color_black"
+                      checked="false">
+              <rect left="10" top="115" width="200" height="25"/>
+            </checkbox>
+
+            <!-- Gauge Reference Pressure -->
+            <label id="id_edu_lbl_gauge_hpa"
+                   background-color="color_black"
+                   name-color="color_white"
+                   draw-name="true">
+              <rect left="10" top="150" width="100" height="20"/>
+            </label>
+            <edit id="id_edu_gauge_hpa"
+                  binding="GaugeHPA"
+                  value-type="v_int16"
+                  tab-order="5"
+                  menu="numeric_edit_keys"
+                  background-color="color_black"
+                  border-color="color_white"
+                  border-left="true"
+                  border-top="true"
+                  border-right="true"
+                  border-bottom="true">
+              <rect left="120" top="150" width="120" height="25"/>
+            </edit>
+
+            <!-- Fuel Sensor Type -->
+            <groupbox id="id_edu_grp_fuel_sensor"
+                      background-color="color_black"
+                      border-color="color_white"
+                      name="Fuel Sensor Type"
+                      name-color="color_white"
+                      draw-name="true"
+                      border-left="true"
+                      border-top="true"
+                      border-right="true"
+                      border-bottom="true">
+              <rect left="10" top="190" width="250" height="60"/>
+
+              <edit id="id_edu_fuel_sensor_type"
+                    binding="FuelSensorType"
+                    value-type="v_int16"
+                    default-value="0"
+                    tab-order="6"
+                    menu="fuel_sensor_menu"
+                    background-color="color_black"
+                    border-color="color_white"
+                    border-left="true"
+                    border-top="true"
+                    border-right="true"
+                    border-bottom="true">
+                <rect left="10" top="25" width="230" height="25"/>
+              </edit>
+            </groupbox>
+
+            <!-- ========================================= -->
+            <!-- MAP COMPENSATION GROUP                    -->
+            <!-- ========================================= -->
+            <groupbox id="id_edu_grp_map_compensation"
+                      background-color="color_black"
+                      border-color="color_white"
+                      name="MAP Compensation"
+                      name-color="color_white"
+                      draw-name="true"
+                      border-left="true"
+                      border-top="true"
+                      border-right="true"
+                      border-bottom="true">
+              <rect left="280" top="10" width="350" height="200"/>
+
+              <!-- 
+        NOTE: Original form contains 6 textbox controls for MAP compensation
+        at different pressure values (350, 500, 650, 800, 950, 1100 HPA).
+        Each would be implemented as separate edit controls.
+        -->
+            </groupbox>
+
+            <!-- ========================================= -->
+            <!-- OIL PRESSURE/TEMP CALIBRATION GROUP       -->
+            <!-- ========================================= -->
+            <groupbox id="id_edu_grp_oil_calibration"
+                      background-color="color_black"
+                      border-color="color_white"
+                      name="Oil Pressure/Temperature Calibration"
+                      name-color="color_white"
+                      draw-name="true"
+                      border-left="true"
+                      border-top="true"
+                      border-right="true"
+                      border-bottom="true">
+              <rect left="10" top="260" width="620" height="320"/>
+
+              <!-- 
+        NOTE: Original form contains 10 pairs of textbox controls for oil
+        pressure and temperature calibration at different sensor values.
+        Each pair would be implemented as separate edit controls.
+        -->
+            </groupbox>
+
+            <!-- ========================================= -->
+            <!-- AUTO LEAN GROUP                           -->
+            <!-- ========================================= -->
+            <groupbox id="id_edu_grp_auto_lean"
+                      background-color="color_black"
+                      border-color="color_white"
+                      name="Auto Lean"
+                      name-color="color_white"
+                      draw-name="true"
+                      border-left="true"
+                      border-top="true"
+                      border-right="true"
+                      border-bottom="true">
+              <rect left="650" top="10" width="350" height="570"/>
+
+              <checkbox id="id_edu_auto_lean_enable"
+                        binding="AutoLeanEnable"
+                        value-type="v_bool"
+                        tab-order="7"
+                        menu="checkbox_keys"
+                        name="Enable Auto Lean"
+                        draw-name="true"
+                        name-color="color_white"
+                        background-color="color_black"
+                        checked="false">
+                <rect left="10" top="25" width="200" height="25"/>
+              </checkbox>
+
+              <!-- 
+        NOTE: Auto lean group contains additional configuration fields
+        for lean mixture parameters.
+        -->
+            </groupbox>
+          </tab-page>
+          <tab-page-ref ref-name="Alarms"
+                        binding="edu->alarms"
+                        value-type="alarms_t"
+                        id-prefix="id_edu_"/>
+        </tab>
+      </tab-page>
+      <tab-page name="kMAG"
+                menu="mag_keys"
+                id="id_mag_settings"
+                container-type="mag_t"
+                container-name="mag">
+        <rect left="0" top="0" width="1024" height="600"/>
+        <!-- Vertical tabs within the tab -->
+        <tab name="MAG pages"
+             background-color="color_black"
+             border-color="color_white"
+             border-left="true"
+             border-top="true"
+             border-right="true"
+             border-bottom="true"
+             orientation="vertical"
+             text-orientation="vertical"
+             container-type="mag_t"
+             container-name="mag">
+          <rect left ="0" top="0" width="1024" height="570"/>
+          <tab-page-rect left="0" top="0" width="994" height="570"/>
+          <tab-page name="Settings">
+            <rect left="0" top="0" width="1024" height="600"/>
+
+            <!-- Data binding: ignitionBindingSource -> IgnitionExtension -->
+
+            <!-- ========================================= -->
+            <!-- IGNITION DWELL GROUP                      -->
+            <!-- ========================================= -->
+            <groupbox id="id_mag_grp_ignition_dwell"
+                      background-color="color_black"
+                      border-color="color_white"
+                      name="Ignition Dwell"
+                      name-color="color_white"
+                      draw-name="true"
+                      border-left="true"
+                      border-top="true"
+                      border-right="true"
+                      border-bottom="true">
+              <rect left="13" top="6" width="344" height="68"/>
+
+              <!-- Label for units -->
+              <label id="id_mag_lbl_dwell_units"
+                     background-color="color_black"
+                     name-color="color_white"
+                     draw-name="true">
+                <rect left="15" top="41" width="34" height="13"/>
+              </label>
+
+              <!-- Voltage labels -->
+              <label id="id_mag_lbl_8v"
+                     background-color="color_black"
+                     name-color="color_white"
+                     draw-name="true"
+                     name="8v">
+                <rect left="55" top="16" width="30" height="13"/>
+              </label>
+              <label id="id_mag_lbl_10v"
+                     background-color="color_black"
+                     name-color="color_white"
+                     draw-name="true"
+                     name="10v">
+                <rect left="110" top="16" width="35" height="13"/>
+              </label>
+              <label id="id_mag_lbl_12v"
+                     background-color="color_black"
+                     name-color="color_white"
+                     draw-name="true"
+                     name="12v">
+                <rect left="165" top="16" width="35" height="13"/>
+              </label>
+              <label id="id_mag_lbl_14v"
+                     background-color="color_black"
+                     name-color="color_white"
+                     draw-name="true"
+                     name="14v">
+                <rect left="220" top="16" width="35" height="13"/>
+              </label>
+              <label id="id_mag_lbl_16v"
+                     background-color="color_black"
+                     name-color="color_white"
+                     draw-name="true"
+                     name="16v">
+                <rect left="275" top="16" width="35" height="13"/>
+              </label>
+
+              <!-- Dwell time values for each voltage -->
+              <!-- Data binding: ignitionBindingSource -> IgnitionExtension.Volts8 (format: N3) -->
+              <edit id="id_mag_dwell_8v"
+                    binding="Volts8"
+                    value-type="v_float"
+                    tab-order="1"
+                    menu="numeric_edit_keys"
+                    background-color="color_black"
+                    border-color="color_white"
+                    border-left="true"
+                    border-top="true"
+                    border-right="true"
+                    border-bottom="true">
+                <rect left="55" top="35" width="50" height="20"/>
+              </edit>
+
+              <!-- Data binding: ignitionBindingSource -> IgnitionExtension.Volts10 (format: N3) -->
+              <edit id="id_mag_dwell_10v"
+                    binding="Volts10"
+                    value-type="v_float"
+                    tab-order="2"
+                    menu="numeric_edit_keys"
+                    background-color="color_black"
+                    border-color="color_white"
+                    border-left="true"
+                    border-top="true"
+                    border-right="true"
+                    border-bottom="true">
+                <rect left="110" top="35" width="50" height="20"/>
+              </edit>
+
+              <!-- Data binding: ignitionBindingSource -> IgnitionExtension.Volts12 (format: N3) -->
+              <edit id="id_mag_dwell_12v"
+                    binding="Volts12"
+                    value-type="v_float"
+                    tab-order="3"
+                    menu="numeric_edit_keys"
+                    background-color="color_black"
+                    border-color="color_white"
+                    border-left="true"
+                    border-top="true"
+                    border-right="true"
+                    border-bottom="true">
+                <rect left="165" top="35" width="50" height="20"/>
+              </edit>
+
+              <!-- Data binding: ignitionBindingSource -> IgnitionExtension.Volts14 (format: N3) -->
+              <edit id="id_mag_dwell_14v"
+                    binding="Volts14"
+                    value-type="v_float"
+                    tab-order="4"
+                    menu="numeric_edit_keys"
+                    background-color="color_black"
+                    border-color="color_white"
+                    border-left="true"
+                    border-top="true"
+                    border-right="true"
+                    border-bottom="true">
+                <rect left="220" top="35" width="50" height="20"/>
+              </edit>
+
+              <!-- Data binding: ignitionBindingSource -> IgnitionExtension.Volts16 (format: N3) -->
+              <edit id="id_mag_dwell_16v"
+                    binding="Volts16"
+                    value-type="v_float"
+                    tab-order="5"
+                    menu="numeric_edit_keys"
+                    background-color="color_black"
+                    border-color="color_white"
+                    border-left="true"
+                    border-top="true"
+                    border-right="true"
+                    border-bottom="true">
+                <rect left="275" top="35" width="50" height="20"/>
+              </edit>
+            </groupbox>
+
+            <!-- ========================================= -->
+            <!-- ENGINE PARAMETERS                         -->
+            <!-- ========================================= -->
+
+            <!-- RPM Limit label -->
+            <label id="id_mag_lbl_rpm_limit"
+                   background-color="color_black"
+                   name-color="color_white"
+                   draw-name="true"
+                   name="RPM Limit">
+              <rect left="13" top="90" width="80" height="13"/>
+            </label>
+
+            <!-- Data binding: ignitionBindingSource -> IgnitionExtension.RpmLimit -->
+            <edit id="id_mag_rpm_limit"
+                  binding="RpmLimit"
+                  value-type="v_int16"
+                  tab-order="6"
+                  menu="numeric_edit_keys"
+                  background-color="color_black"
+                  border-color="color_white"
+                  border-left="true"
+                  border-top="true"
+                  border-right="true"
+                  border-bottom="true">
+              <rect left="100" top="87" width="80" height="20"/>
+            </edit>
+
+            <!-- Left Rotation checkbox -->
+            <!-- Data binding: ignitionBindingSource -> IgnitionExtension.LeftRotation -->
+            <checkbox id="id_mag_left_rotation"
+                      binding="LeftRotation"
+                      value-type="v_bool"
+                      tab-order="7"
+                      menu="checkbox_keys"
+                      name="Left Rotation"
+                      draw-name="true"
+                      name-color="color_white"
+                      background-color="color_black"
+                      checked="false">
+              <rect left="13" top="115" width="150" height="20"/>
+            </checkbox>
+
+            <!-- Cylinder 1 CC label -->
+            <label id="id_mag_lbl_cyl_cc"
+                   background-color="color_black"
+                   name-color="color_white"
+                   draw-name="true"
+                   name="Cylindr CC">
+              <rect left="13" top="145" width="80" height="13"/>
+            </label>
+
+            <!-- Data binding: ignitionBindingSource -> IgnitionExtension.Cyl1CC -->
+            <edit id="id_mag_cyl_cc"
+                  binding="cfg->kmag.cyl_cc"
+                  value-type="v_int16"
+                  tab-order="8"
+                  menu="numeric_edit_keys"
+                  background-color="color_black"
+                  border-color="color_white"
+                  border-left="true"
+                  border-top="true"
+                  border-right="true"
+                  border-bottom="true">
+              <rect left="100" top="142" width="80" height="20"/>
+            </edit>
+
+            <!-- ========================================= -->
+            <!-- MIXTURE CONTROL GROUP                     -->
+            <!-- ========================================= -->
+            <groupbox id="id_mag_grp_mixture_control"
+                      background-color="color_black"
+                      border-color="color_white"
+                      name="Mixture Control"
+                      name-color="color_white"
+                      draw-name="true"
+                      border-left="true"
+                      border-top="true"
+                      border-right="true"
+                      border-bottom="true">
+              <rect left="370" top="6" width="250" height="100"/>
+
+              <!-- Parameter 1 label -->
+              <label id="id_mag_lbl_mixture_idle_cutoff"
+                     background-color="color_black"
+                     name-color="color_white"
+                     draw-name="true"
+                     name="Idle Cutoff %:">
+                <rect left="10" top="25" width="100" height="13"/>
+              </label>
+
+              <edit id="id_mag_mixture_idle_cuttoff"
+                    binding="cfg->kmag.mixture_cutoff"
+                    value-type="v_float"
+                    tab-order="9"
+                    menu="numeric_edit_keys"
+                    background-color="color_black"
+                    border-color="color_white"
+                    border-left="true"
+                    border-top="true"
+                    border-right="true"
+                    border-bottom="true">
+                <rect left="120" top="22" width="100" height="20"/>
+              </edit>
+
+              <!-- Parameter 2 label -->
+              <label id="id_mag_mixture_manual"
+                     background-color="color_black"
+                     name-color="color_white"
+                     draw-name="true"
+                     name="Mixture Maual %:">
+                <rect left="10" top="55" width="100" height="13"/>
+              </label>
+
+              <edit id="id_mag_mixture_manual"
+                    binding="cfg->kmag.mixture_manual"
+                    value-type="v_float"
+                    tab-order="10"
+                    menu="numeric_edit_keys"
+                    background-color="color_black"
+                    border-color="color_white"
+                    border-left="true"
+                    border-top="true"
+                    border-right="true"
+                    border-bottom="true">
+                <rect left="120" top="52" width="100" height="20"/>
+              </edit>
+            </groupbox>
+
+            <!-- ========================================= -->
+            <!-- TRANSIENT THROTTLE ENRICHMENT GROUP       -->
+            <!-- ========================================= -->
+            <groupbox id="id_mag_grp_tte"
+                      background-color="color_black"
+                      border-color="color_white"
+                      name=""
+                      name-color="color_white"
+                      draw-name="false"
+                      border-left="true"
+                      border-top="true"
+                      border-right="true"
+                      border-bottom="true">
+              <rect left="6" top="184" width="431" height="318"/>
+
+              <!-- TTE Enable checkbox (overlays the group box border as title) -->
+              <!-- Data binding: injectionBindingSource -> InjectionExtension.TTEEnabled -->
+              <checkbox id="id_mag_tte_enabled"
+                        binding="cfg->kmag.tte_enabled"
+                        value-type="v_bool"
+                        tab-order="11"
+                        menu="checkbox_keys"
+                        name="Transient Throttle Enrichment"
+                        draw-name="true"
+                        name-color="color_white"
+                        background-color="color_black"
+                        checked="false">
+                <rect left="15" top="0" width="250" height="20"/>
+              </checkbox>
+
+              <!-- Load Rate Dead Band label -->
+              <label id="id_mag_lbl_load_rate_deadband"
+                     background-color="color_black"
+                     name-color="color_white"
+                     draw-name="true"
+                     name="Load Rate Deadband">
+                <rect left="15" top="25" width="130" height="13"/>
+              </label>
+
+              <!-- Data binding: injectionBindingSource -> InjectionExtension.LoadRateDeadBand -->
+              <edit id="id_mag_load_rate_deadband"
+                    binding="cfg->kmag.load_rate_deadband"
+                    value-type="v_float"
+                    tab-order="12"
+                    menu="numeric_edit_keys"
+                    background-color="color_black"
+                    border-color="color_white"
+                    border-left="true"
+                    border-top="true"
+                    border-right="true"
+                    border-bottom="true">
+                <rect left="155" top="22" width="80" height="20"/>
+              </edit>
+
+              <!-- Load Acceleration Dead Band label -->
+              <label id="id_mag_lbl_load_accel_deadband"
+                     background-color="color_black"
+                     name-color="color_white"
+                     draw-name="true"
+                     name="Load Acceleration Deadband">
+                <rect left="15" top="55" width="130" height="13"/>
+              </label>
+
+              <!-- Data binding: injectionBindingSource -> InjectionExtension.LoadAccelerationDeadBand -->
+              <edit id="id_mag_load_accel_deadband"
+                    binding="cfg->kmag.load_accel_deadband"
+                    value-type="v_float"
+                    tab-order="13"
+                    menu="numeric_edit_keys"
+                    background-color="color_black"
+                    border-color="color_white"
+                    border-left="true"
+                    border-top="true"
+                    border-right="true"
+                    border-bottom="true">
+                <rect left="155" top="52" width="80" height="20"/>
+              </edit>
+
+              <!-- Transient Detect Duration label -->
+              <label id="id_mag_lbl_transient_detect_duration"
+                     background-color="color_black"
+                     name-color="color_white"
+                     draw-name="true"
+                     name="Transient Detect Duration:">
+                <rect left="15" top="85" width="130" height="13"/>
+              </label>
+
+              <!-- Data binding: injectionBindingSource -> InjectionExtension.TransientDetectDuration -->
+              <edit id="id_mag_transient_detect_duration"
+                    binding="cfg->kmag.transient_detect_duration"
+                    value-type="v_int16"
+                    tab-order="14"
+                    menu="numeric_edit_keys"
+                    background-color="color_black"
+                    border-color="color_white"
+                    border-left="true"
+                    border-top="true"
+                    border-right="true"
+                    border-bottom="true">
+                <rect left="155" top="82" width="80" height="20"/>
+              </edit>
+
+              <!-- Descriptive label for the table -->
+              <label id="id_mag_lbl_tte_description"
+                     background-color="color_black"
+                     name-color="color_white"
+                     multiline="true"
+                     draw-name="true"
+                     name="This table is a VE enhancement. For a 10% extra fuel entry enter 110 which will calculate VE * 1.10">
+                <rect left="276" top="44" width="146" height="52"/>
+              </label>
+
+              <!-- ========================================= -->
+              <!-- TRANSIENT THROTTLE ENRICHMENT RATE TABLE  -->
+              <!-- ========================================= -->
+              <groupbox id="id_mag_grp_tte_rate"
+                        background-color="color_black"
+                        border-color="color_white"
+                        name="Transient Throttle Enrichment Rate"
+                        name-color="color_white"
+                        draw-name="true"
+                        border-left="true"
+                        border-top="true"
+                        border-right="true"
+                        border-bottom="true">
+                <rect left="10" top="115" width="410" height="195"/>
+
+                <!-- 
+          7 columns x 6 rows = 42 cells
+          Columns (Enrichment Load Derivative): 25, 50, 100, 200, 300, 500, 1000
+          Rows (MAP vertical axis): 350, 500, 650, 800, 950, 1100
+          -->
+
+                <!-- Column headers (Enrichment Load Derivative) -->
+                <label id="id_mag_lbl_tte_25" background-color="color_black" name-color="color_white" draw-name="true" name="25">
+                  <rect left="50" top="15" width="30" height="13"/>
+                </label>
+                <label id="id_mag_lbl_tte_50" background-color="color_black" name-color="color_white" draw-name="true" name="50">
+                  <rect left="90" top="15" width="30" height="13"/>
+                </label>
+                <label id="id_mag_lbl_tte_100" background-color="color_black" name-color="color_white" draw-name="true" name="100">
+                  <rect left="130" top="15" width="40" height="13"/>
+                </label>
+                <label id="id_mag_lbl_tte_200" background-color="color_black" name-color="color_white" draw-name="true" name="100">
+                  <rect left="180" top="15" width="40" height="13"/>
+                </label>
+                <label id="id_mag_lbl_tte_300" background-color="color_black" name-color="color_white" draw-name="true" name="300">
+                  <rect left="230" top="15" width="40" height="13"/>
+                </label>
+                <label id="id_mag_lbl_tte_500" background-color="color_black" name-color="color_white" draw-name="true" name="500">
+                  <rect left="280" top="15" width="40" height="13"/>
+                </label>
+                <label id="id_mag_lbl_tte_1000" background-color="color_black" name-color="color_white" draw-name="true" name="1000">
+                  <rect left="330" top="15" width="50" height="13"/>
+                </label>
+
+                <!-- Row labels (MAP vertical axis) -->
+                <label id="id_mag_lbl_tte_map_350" background-color="color_black" name-color="color_white" draw-name="true" name="350">
+                  <rect left="5" top="40" width="30" height="13"/>
+                </label>
+                <label id="id_mag_lbl_tte_map_500" background-color="color_black" name-color="color_white" draw-name="true" name="500">
+                  <rect left="5" top="65" width="30" height="13"/>
+                </label>
+                <label id="id_mag_lbl_tte_map_650" background-color="color_black" name-color="color_white" draw-name="true" name="650">
+                  <rect left="5" top="90" width="30" height="13"/>
+                </label>
+                <label id="id_mag_lbl_tte_map_800" background-color="color_black" name-color="color_white" draw-name="true" name="800">
+                  <rect left="5" top="115" width="30" height="13"/>
+                </label>
+                <label id="id_mag_lbl_tte_map_950" background-color="color_black" name-color="color_white" draw-name="true" name="950">
+                  <rect left="5" top="140" width="30" height="13"/>
+                </label>
+                <label id="id_mag_lbl_tte_map_1100" background-color="color_black" name-color="color_white" draw-name="true" name="1100">
+                  <rect left="5" top="165" width="35" height="13"/>
+                </label>
+
+                <!-- TTE Rate Table - 7 columns x 6 rows = 42 edit controls -->
+                <!-- Row 1: MAP 350 -->
+                <edit id="id_mag_id_tte_350_25" binding="cfg->kmag.tte[MAP350][PCT25]" value-type="v_int16" tab-order="15" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="50" top="35" width="35" height="22"/>
+                </edit>
+                <edit id="id_mag_id_tte_350_50" binding="cfg->kmag.tte[MAP350][PCT50]" value-type="v_int16" tab-order="16" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="90" top="35" width="35" height="22"/>
+                </edit>
+                <edit id="id_mag_id_tte_350_100" binding="cfg->kmag.tte[MAP350][PCT100]" value-type="v_int16" tab-order="17" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="130" top="35" width="45" height="22"/>
+                </edit>
+                <edit id="id_mag_id_tte_350_200" binding="cfg->kmag.tte[MAP350][PCT200]" value-type="v_int16" tab-order="18" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="180" top="35" width="45" height="22"/>
+                </edit>
+                <edit id="id_mag_id_tte_350_300" binding="cfg->kmag.tte[MAP350][PCT300]" value-type="v_int16" tab-order="19" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="230" top="35" width="45" height="22"/>
+                </edit>
+                <edit id="id_mag_id_350_500" binding="cfg->kmag.tte[MAP350][PCT500]" value-type="v_int16" tab-order="20" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="280" top="35" width="45" height="22"/>
+                </edit>
+                <edit id="id_mag_id_tte_350_1000" binding="cfg->kmag.tte[MAP350][PCT1000]" value-type="v_int16" tab-order="21" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="330" top="35" width="55" height="22"/>
+                </edit>
+
+                <!-- Row 2: MAP 500 -->
+                <edit id="id_mag_tte_500_25=" binding="cfg->kmag.tte[MAP500][PCT25]" value-type="v_int16" tab-order="22" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="50" top="60" width="35" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_500_50" binding="cfg->kmag.tte[MAP500][PCT50]" value-type="v_int16" tab-order="23" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="90" top="60" width="35" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_500_100" binding="cfg->kmag.tte[MAP500][PCT100]" value-type="v_int16" tab-order="24" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="130" top="60" width="45" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_500_200" binding="cfg->kmag.tte[MAP500][PCT200]" value-type="v_int16" tab-order="25" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="180" top="60" width="45" height="22"/>
+                </edit>
+                <edit iid="id_mag_tte_500_300" binding="cfg->kmag.tte[MAP500][PCT300]" value-type="v_int16" tab-order="26" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="230" top="60" width="45" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_500_500" binding="cfg->kmag.tte[MAP500][PCT500]" value-type="v_int16" tab-order="27" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="280" top="60" width="45" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_500_1000" binding="cfg->kmag.tte[MAP500][PCT1000]" value-type="v_int16" tab-order="28" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="330" top="60" width="55" height="22"/>
+                </edit>
+
+                <!-- Row 3: MAP 650 -->
+                <edit id="id_mag_tte_650_25" binding="cfg->kmag.tte[MAP650][PCT25]" value-type="v_int16" tab-order="29" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="50" top="85" width="35" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_650_50" binding="cfg->kmag.tte[MAP650][PCT50]" value-type="v_int16" tab-order="30" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="90" top="85" width="35" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_650_100" binding="cfg->kmag.tte[MAP650][PCT100]" value-type="v_int16" tab-order="31" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="130" top="85" width="45" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_650_200" binding="cfg->kmag.tte[MAP650][PCT200]" value-type="v_int16" tab-order="32" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="180" top="85" width="45" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_650_300" binding="cfg->kmag.tte[MAP650][PCT300]" value-type="v_int16" tab-order="33" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="230" top="85" width="45" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_650_500" binding="cfg->kmag.tte[MAP650][PCT500]" value-type="v_int16" tab-order="34" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="280" top="85" width="45" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_650_1000" binding="cfg->kmag.tte[MAP650][PCT1000]" value-type="v_int16" tab-order="35" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="330" top="85" width="55" height="22"/>
+                </edit>
+
+                <!-- Row 4: MAP 800 -->
+                <edit id="id_mag_tte_800_25" binding="cfg->kmag.tte[MAP800][PCT25]" value-type="v_int16" tab-order="36" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="50" top="110" width="35" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_800_50" binding="cfg->kmag.tte[MAP800][PCT50]" value-type="v_int16" tab-order="37" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="90" top="110" width="35" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_800_100" binding="cfg->kmag.tte[MAP800][PCT100]" value-type="v_int16" tab-order="38" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="130" top="110" width="45" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_800_200" binding="cfg->kmag.tte[MAP800][PCT200]" value-type="v_int16" tab-order="39" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="180" top="110" width="45" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_800_300" binding="cfg->kmag.tte[MAP800][PCT300]" value-type="v_int16" tab-order="40" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="230" top="110" width="45" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_800_500" binding="cfg->kmag.tte[MAP800][PCT500]" value-type="v_int16" tab-order="41" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="280" top="110" width="45" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_800_1000" binding="cfg->kmag.tte[MAP800][PCT1000]" value-type="v_int16" tab-order="42" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="330" top="110" width="55" height="22"/>
+                </edit>
+
+                <!-- Row 5: MAP 950 -->
+                <edit id="id_mag_tte_950_25" binding="cfg->kmag.tte[MAP950][PCT25]" value-type="v_int16" tab-order="43" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="50" top="135" width="35" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_950_50" binding="cfg->kmag.tte[MAP950][PCT50]" value-type="v_int16" tab-order="44" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="90" top="135" width="35" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_950_100" binding="cfg->kmag.tte[MAP950][PCT100]" value-type="v_int16" tab-order="45" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="130" top="135" width="45" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_950_200" binding="cfg->kmag.tte[MAP950][PCT200]" value-type="v_int16" tab-order="46" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="180" top="135" width="45" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_950_300" binding="cfg->kmag.tte[MAP950][PCT300]" value-type="v_int16" tab-order="47" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="230" top="135" width="45" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_950_500" binding="cfg->kmag.tte[MAP950][PCT500]" value-type="v_int16" tab-order="48" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="280" top="135" width="45" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_950_1000" binding="cfg->kmag.tte[MAP950][PCT1000]" value-type="v_int16" tab-order="49" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="330" top="135" width="55" height="22"/>
+                </edit>
+
+                <!-- Row 6: MAP 1100 -->
+                <edit id="id_mag_tte_1100_25" binding="cfg->kmag.tte[MAP1100][PCT25]" value-type="v_int16" tab-order="50" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="50" top="160" width="35" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_1100_50" binding="cfg->kmag.tte[MAP1100][PCT50]" value-type="v_int16" tab-order="51" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="90" top="160" width="35" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_1100_100" binding="cfg->kmag.tte[MAP1100][PCT100]" value-type="v_int16" tab-order="52" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="130" top="160" width="45" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_1100_200" binding="cfg->kmag.tte[MAP1100][PCT200]" value-type="v_int16" tab-order="53" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="180" top="160" width="45" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_1100_300" binding="cfg->kmag.tte[MAP1100][PCT300]" value-type="v_int16" tab-order="54" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="230" top="160" width="45" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_1100_500" binding="cfg->kmag.tte[MAP1100][PCT500]" value-type="v_int16" tab-order="55" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="280" top="160" width="45" height="22"/>
+                </edit>
+                <edit id="id_mag_tte_1100_1000" binding="cfg->kmag.tte[MAP1100][PCT1000]" value-type="v_int16" tab-order="56" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="330" top="160" width="55" height="22"/>
+                </edit>
+              </groupbox>
+            </groupbox>
+          </tab-page>
+          <tab-page name="Startup">
+            <rect left="0" top="0" width="1024" height="600"/>
+
+            <!-- 
+      Data bindings: 
+      - ignitionBindingSource -> CanFly.kMAG.Extensions.IgnitionExtension
+      - injectionBindingSource -> CanFly.kMAG.Extensions.InjectionExtension
+      -->
+
+            <!-- Start Retard -->
+            <label id="id_mag_lbl_start_retard"
+                   background-color="color_black"
+                   name-color="color_white"
+                   draw-name="true"
+                   name="Start Retard:">
+              <rect left="3" top="14" width="67" height="13"/>
+            </label>
+            <!-- Data binding: ignitionBindingSource -> IgnitionExtension.StartRetard (format: N0) -->
+            <edit id="id_mag_start_retard"
+                  binding="StartRetard"
+                  value-type="v_int16"
+                  tab-order="1"
+                  menu="numeric_edit_keys"
+                  background-color="color_black"
+                  border-color="color_white"
+                  border-left="true"
+                  border-top="true"
+                  border-right="true"
+                  border-bottom="true">
+              <rect left="86" top="11" width="71" height="20"/>
+            </edit>
+
+            <!-- Start RPM -->
+            <label id="id_mag_lbl_start_rpm"
+                   background-color="color_black"
+                   name-color="color_white"
+                   draw-name="true"
+                   name="Start RPM:">
+              <rect left="3" top="40" width="59" height="13"/>
+            </label>
+            <!-- Data binding: ignitionBindingSource -> IgnitionExtension.StartRpm (format: N0) -->
+            <edit id="id_mag_start_rpm"
+                  binding="StartRpm"
+                  value-type="v_int16"
+                  tab-order="2"
+                  menu="numeric_edit_keys"
+                  background-color="color_black"
+                  border-color="color_white"
+                  border-left="true"
+                  border-top="true"
+                  border-right="true"
+                  border-bottom="true">
+              <rect left="86" top="37" width="71" height="20"/>
+            </edit>
+
+            <!-- ========================================= -->
+            <!-- COLD START GROUP                          -->
+            <!-- ========================================= -->
+            <groupbox id="id_mag_grp_cold_start"
+                      background-color="color_black"
+                      border-color="color_white"
+                      name="Cold Start"
+                      name-color="color_white"
+                      draw-name="true"
+                      border-left="true"
+                      border-top="true"
+                      border-right="true"
+                      border-bottom="true">
+              <rect left="6" top="92" width="366" height="83"/>
+
+              <!-- Cold Start Correction checkbox -->
+              <!-- Data binding: injectionBindingSource -> InjectionExtension.ColdStartCorrection -->
+              <checkbox id="id_mag_cold_start_correction"
+                        binding="ColdStartCorrection"
+                        value-type="v_bool"
+                        tab-order="3"
+                        menu="checkbox_keys"
+                        name="Cold Start Correction"
+                        draw-name="true"
+                        name-color="color_white"
+                        background-color="color_black"
+                        checked="false">
+                <rect left="6" top="10" width="200" height="20"/>
+              </checkbox>
+
+              <!-- Temperature labels -->
+              <label id="id_mag_lbl_temp_0" background-color="color_black" name-color="color_white" draw-name="true" name="50">
+                <rect left="181" top="26" width="13" height="13"/>
+              </label>
+              <label id="id_mag_lbl_temp_25" background-color="color_black" name-color="color_white" draw-name="true" name="50">
+                <rect left="229" top="26" width="19" height="13"/>
+              </label>
+              <label id="id_mag_lbl_temp_50" background-color="color_black" name-color="color_white" draw-name="true" name="50">
+                <rect left="281" top="26" width="19" height="13"/>
+              </label>
+              <label id="id_mag_lbl_temp_75" background-color="color_black" name-color="color_white" draw-name="true" name="75">
+                <rect left="320" top="26" width="19" height="13"/>
+              </label>
+
+              <!-- Enrichment label -->
+              <label id="id_mag_lbl_enrichment"
+                     background-color="color_black"
+                     name-color="color_white"
+                     draw-name="true"
+                     name="Enrichment:">
+                <rect left="19" top="53" width="143" height="13"/>
+              </label>
+
+              <!-- Temperature Enrichment 0 -->
+              <!-- Data binding: injectionBindingSource -> InjectionExtension.TemperateEnrichment0 (format: N0) -->
+              <edit id="id_mag_temp_enrich_0"
+                    binding="TemperateEnrichment0"
+                    value-type="v_int16"
+                    tab-order="4"
+                    menu="numeric_edit_keys"
+                    background-color="color_black"
+                    border-color="color_white"
+                    border-left="true"
+                    border-top="true"
+                    border-right="true"
+                    border-bottom="true">
+                <rect left="167" top="48" width="43" height="20"/>
+              </edit>
+
+              <!-- Temperature Enrichment 25 -->
+              <!-- Data binding: injectionBindingSource -> InjectionExtension.TemperateEnrichment25 (format: N0) -->
+              <edit id="id_mag_temp_enrich_25"
+                    binding="TemperateEnrichment25"
+                    value-type="v_int16"
+                    tab-order="5"
+                    menu="numeric_edit_keys"
+                    background-color="color_black"
+                    border-color="color_white"
+                    border-left="true"
+                    border-top="true"
+                    border-right="true"
+                    border-bottom="true">
+                <rect left="216" top="48" width="43" height="20"/>
+              </edit>
+
+              <!-- Temperature Enrichment 50 -->
+              <!-- Data binding: injectionBindingSource -> InjectionExtension.TemperateEnrichment50 (format: N0) -->
+              <edit id="id_mag_temp_enrich_50"
+                    binding="TemperateEnrichment50"
+                    value-type="v_int16"
+                    tab-order="6"
+                    menu="numeric_edit_keys"
+                    background-color="color_black"
+                    border-color="color_white"
+                    border-left="true"
+                    border-top="true"
+                    border-right="true"
+                    border-bottom="true">
+                <rect left="265" top="48" width="43" height="20"/>
+              </edit>
+
+              <!-- Temperature Enrichment 75 -->
+              <!-- Data binding: injectionBindingSource -> InjectionExtension.TemperateEnrichment75 (format: N0) -->
+              <edit id="id_mag_temp_enrich_75"
+                    binding="TemperateEnrichment75"
+                    value-type="v_int16"
+                    tab-order="7"
+                    menu="numeric_edit_keys"
+                    background-color="color_black"
+                    border-color="color_white"
+                    border-left="true"
+                    border-top="true"
+                    border-right="true"
+                    border-bottom="true">
+                <rect left="314" top="48" width="43" height="20"/>
+              </edit>
+            </groupbox>
+
+            <!-- Start AFR -->
+            <label id="id_mag_lbl_start_afr"
+                   background-color="color_black"
+                   name-color="color_white"
+                   draw-name="true"
+                   name="Start AFR:">
+              <rect left="6" top="185" width="60" height="13"/>
+            </label>
+            <!-- Data binding: injectionBindingSource -> InjectionExtension.StartAFR -->
+            <edit id="id_mag_start_afr"
+                    binding="StartAFR"
+                    value-type="v_float"
+                    tab-order="8"
+                    menu="numeric_edit_keys"
+                    background-color="color_black"
+                    border-color="color_white"
+                    border-left="true"
+                    border-top="true"
+                    border-right="true"
+                    border-bottom="true">
+              <rect left="86" top="182" width="71" height="20"/>
+            </edit>
+
+            <!-- Start VE -->
+            <label id="id_mag_lbl_start_ve"
+                   background-color="color_black"
+                   name-color="color_white"
+                   draw-name="true"
+                   name="Start VE:">
+              <rect left="6" top="211" width="55" height="13"/>
+            </label>
+            <!-- Data binding: injectionBindingSource -> InjectionExtension.StartVE -->
+            <edit id="id_mag_start_ve"
+                  binding="StartVE"
+                  value-type="v_int16"
+                  tab-order="9"
+                  menu="numeric_edit_keys"
+                  background-color="color_black"
+                  border-color="color_white"
+                  border-left="true"
+                  border-top="true"
+                  border-right="true"
+                  border-bottom="true">
+              <rect left="86" top="208" width="71" height="20"/>
+            </edit>
+
+            <!-- ========================================= -->
+            <!-- INJECTOR DEAD TIME GROUP                  -->
+            <!-- ========================================= -->
+            <groupbox id="id_mag_grp_inj_dead_time"
+                      background-color="color_black"
+                      border-color="color_white"
+                      name="Injector Dead Time"
+                      name-color="color_white"
+                      draw-name="true"
+                      border-left="true"
+                      border-top="true"
+                      border-right="true"
+                      border-bottom="true">
+              <rect left="400" top="10" width="300" height="180"/>
+
+              <!-- 8 Volts -->
+              <label id="id_mag_lbl_8v" background-color="color_black" name-color="color_white" draw-name="true" name="8v">
+                <rect left="10" top="30" width="80" height="13"/>
+              </label>
+              <edit id="id_mag_inj_dead_time_8v"
+                    binding="InjDeadTime8Volts"
+                    value-type="v_float"
+                    tab-order="10"
+                    menu="numeric_edit_keys"
+                    background-color="color_black"
+                    border-color="color_white"
+                    border-left="true"
+                    border-top="true"
+                    border-right="true"
+                    border-bottom="true">
+                <rect left="100" top="27" width="80" height="20"/>
+              </edit>
+
+              <!-- 10 Volts -->
+              <label id="id_mag_lbl_10v" background-color="color_black" name-color="color_white" draw-name="true" name="10v">
+                <rect left="10" top="56" width="80" height="13"/>
+              </label>
+              <edit id="id_mag_inj_dead_time_10v"
+                    binding="InjDeadTime10Volts"
+                    value-type="v_float"
+                    tab-order="11"
+                    menu="numeric_edit_keys"
+                    background-color="color_black"
+                    border-color="color_white"
+                    border-left="true"
+                    border-top="true"
+                    border-right="true"
+                    border-bottom="true">
+                <rect left="100" top="53" width="80" height="20"/>
+              </edit>
+
+              <!-- 12 Volts -->
+              <label id="id_mag_lbl_12v" background-color="color_black" name-color="color_white" draw-name="true" name="12v">
+                <rect left="10" top="82" width="80" height="13"/>
+              </label>
+              <edit id="id_mag_inj_dead_time_12v"
+                    binding="InjDeadTime12Volts"
+                    value-type="v_float"
+                    tab-order="12"
+                    menu="numeric_edit_keys"
+                    background-color="color_black"
+                    border-color="color_white"
+                    border-left="true"
+                    border-top="true"
+                    border-right="true"
+                    border-bottom="true">
+                <rect left="100" top="79" width="80" height="20"/>
+              </edit>
+
+              <!-- 14 Volts -->
+              <label id="id_mag_lbl_14v" background-color="color_black" name-color="color_white" draw-name="true" name="14v">
+                <rect left="10" top="108" width="80" height="13"/>
+              </label>
+              <edit id="id_mag_inj_dead_time_14v"
+                    binding="InjDeadTime14Volts"
+                    value-type="v_float"
+                    tab-order="13"
+                    menu="numeric_edit_keys"
+                    background-color="color_black"
+                    border-color="color_white"
+                    border-left="true"
+                    border-top="true"
+                    border-right="true"
+                    border-bottom="true">
+                <rect left="100" top="105" width="80" height="20"/>
+              </edit>
+
+              <!-- 16 Volts -->
+              <label id="id_mag_lbl_16v" background-color="color_black" name-color="color_white" draw-name="true" name="16v">
+                <rect left="10" top="134" width="80" height="13"/>
+              </label>
+              <edit id="id_mag_inj_dead_time_16v"
+                    binding="InjDeadTime16Volts"
+                    value-type="v_float"
+                    tab-order="14"
+                    menu="numeric_edit_keys"
+                    background-color="color_black"
+                    border-color="color_white"
+                    border-left="true"
+                    border-top="true"
+                    border-right="true"
+                    border-bottom="true">
+                <rect left="100" top="131" width="80" height="20"/>
+              </edit>
+            </groupbox>
+
+            <!-- ========================================= -->
+            <!-- INJECTOR FLOW GROUP                       -->
+            <!-- ========================================= -->
+            <groupbox id="id_mag_grp_injector_flow"
+                      background-color="color_black"
+                      border-color="color_white"
+                      name="Injector Flow Calibration"
+                      name-color="color_white"
+                      draw-name="true"
+                      border-left="true"
+                      border-top="true"
+                      border-right="true"
+                      border-bottom="true">
+              <rect left="400" top="200" width="600" height="350"/>
+
+              <!-- Specific Gravity of Fuel -->
+              <label id="id_mag_lbl_sg_fuel"
+                     background-color="color_black"
+                     name-color="color_white"
+                     draw-name="true"
+                     name="SG Fuel (kg/m3)">
+                <rect left="10" top="25" width="120" height="13"/>
+              </label>
+              <edit id="id_mag_sg_fuel"
+                    binding="SGFuel"
+                    value-type="v_float"
+                    tab-order="15"
+                    menu="numeric_edit_keys"
+                    background-color="color_black"
+                    border-color="color_white"
+                    border-left="true"
+                    border-top="true"
+                    border-right="true"
+                    border-bottom="true">
+                <rect left="140" top="22" width="80" height="20"/>
+              </edit>
+
+              <!-- Calculate button -->
+              <button id="id_mag_calculate_flow"
+                      tab-order="16"
+                      menu="button_keys"
+                      name="Calculate"
+                      draw-name="true"
+                      name-color="color_white"
+                      background-color="color_black"
+                      border-color="color_white"
+                      border-left="true"
+                      border-top="true"
+                      border-right="true"
+                      border-bottom="true"
+                      key-name="kn_key0">
+                <rect left="240" top="22" width="100" height="23"/>
+              </button>
+
+              <!-- 
+        NOTE: The original form contains a complex table of injector flow values
+        at different pressures (1000-2250 PSI) for calibration. These would be 
+        implemented as a series of edit controls organized in rows and columns.
+        
+        Flow calibration values:
+        - Flow at 1000 PSI
+        - Flow at 1250 PSI
+        - Flow at 1500 PSI
+        - Flow at 1750 PSI
+        - Flow at 2000 PSI
+        - Flow at 2250 PSI (Injector 1 only)
+        
+        Each pressure point would have corresponding edit controls.
+        -->
+            </groupbox>
+
+          </tab-page>
+          <tab-page name="AFR">
+            <rect left="0" top="0" width="1024" height="600"/>
+
+            <!-- 
+      Target AFR Editor - Two 10x6 tables stacked vertically:
+      1. Advance (degrees) - Ignition timing advance table  
+      2. Target AFR - Air-fuel ratio targets
+      
+      Both tables use same RPM/MAP structure: 10 RPM x 6 MAP = 60 cells each
+      Total: 120 edit controls
+      -->
+
+            <!-- ========================================= -->
+            <!-- ADVANCE (DEGREES) TABLE - Upper           -->
+            <!-- ========================================= -->
+            <groupbox id="id_mag_grp_advance"
+                      background-color="color_black"
+                      border-color="color_white"
+                      name="Advance (degrees)"
+                      name-color="color_white"
+                      draw-name="true"
+                      border-left="true"
+                      border-top="true"
+                      border-right="true"
+                      border-bottom="true">
+              <rect left="3" top="3" width="616" height="235"/>
+
+              <!-- RPM Column Headers -->
+              <label id="id_mag_lcl_adv_rpm_500" background-color="color_black" name-color="color_white" draw-name="true" name="500 ">
+                <rect left="30" top="15" width="40" height="15"/>
+              </label>
+              <label id="id_mag_lcl_adv_rpm_750" background-color="color_black" name-color="color_white" draw-name="true" name="750">
+                <rect left="80" top="15" width="40" height="15"/>
+              </label>
+              <label id="id_mag_lcl_adv_rpm_1000" background-color="color_black" name-color="color_white" draw-name="true" name="1000">
+                <rect left="130" top="15" width="50" height="15"/>
+              </label>
+              <label id="id_mag_lcl_adv_rpm_1250" background-color="color_black" name-color="color_white" draw-name="true" name="1250">
+                <rect left="190" top="15" width="50" height="15"/>
+              </label>
+              <label id="id_mag_lcl_adv_rpm_1500" background-color="color_black" name-color="color_white" draw-name="true" name="1500">
+                <rect left="250" top="15" width="50" height="15"/>
+              </label>
+              <label id="id_mag_lcl_adv_rpm_1750" background-color="color_black" name-color="color_white" draw-name="true" name="1750">
+                <rect left="310" top="15" width="50" height="15"/>
+              </label>
+              <label id="id_mag_lcl_adv_rpm_2000" background-color="color_black" name-color="color_white" draw-name="true" name="2000">
+                <rect left="370" top="15" width="50" height="15"/>
+              </label>
+              <label id="id_mag_lcl_adv_rpm_2250" background-color="color_black" name-color="color_white" draw-name="true" name="2250">
+                <rect left="430" top="15" width="50" height="15"/>
+              </label>
+              <label id="id_mag_lcl_adv_rpm_2500" background-color="color_black" name-color="color_white" draw-name="true" name="2500">
+                <rect left="490" top="15" width="50" height="15"/>
+              </label>
+              <label id="id_mag_lcl_adv_rpm_2750" background-color="color_black" name-color="color_white" draw-name="true" name="2750">
+                <rect left="550" top="15" width="50" height="15"/>
+              </label>
+
+              <!-- MAP Row Labels -->
+              <label id="id_mag_lbl_adv_map_350" background-color="color_black" name-color="color_white" draw-name="true" name="350">
+                <rect left="5" top="40" width="20" height="15"/>
+              </label>
+              <label id="id_mag_lbl_adv_map_500" background-color="color_black" name-color="color_white" draw-name="true" name="500">
+                <rect left="5" top="70" width="20" height="15"/>
+              </label>
+              <label id="id_mag_lbl_adv_map_650" background-color="color_black" name-color="color_white" draw-name="true" name="650">
+                <rect left="5" top="100" width="20" height="15"/>
+              </label>
+              <label id="id_mag_lbl_adv_map_800" background-color="color_black" name-color="color_white" draw-name="true" name="800">
+                <rect left="5" top="130" width="20" height="15"/>
+              </label>
+              <label id="id_mag_lbl_adv_map_950" background-color="color_black" name-color="color_white" draw-name="true" name="950">
+                <rect left="5" top="160" width="20" height="15"/>
+              </label>
+              <label id="id_mag_lbl_adv_map_1100" background-color="color_black" name-color="color_white" draw-name="true" name="1100">
+                <rect left="5" top="190" width="25" height="15"/>
+              </label>
+
+              <edit id="id_mag_adv_500_350" binding="cfg->ignition.advance[RPM500][MAP350]" value-type="v_int16" tab-order="1" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_750_350" binding="cfg->ignition.advance[RPM750][MAP350]" value-type="v_int16" tab-order="2" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_1000_350" binding="cfg->ignition.advance[RPM1000][MAP350]" value-type="v_int16" tab-order="3" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_1250_350" binding="cfg->ignition.advance[RPM1250][MAP350]" value-type="v_int16" tab-order="4" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_1500_350" binding="cfg->ignition.advance[RPM1500][MAP350]" value-type="v_int16" tab-order="5" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_1750_350" binding="cfg->ignition.advance[RPM1750][MAP350]" value-type="v_int16" tab-order="6" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_2000_350" binding="cfg->ignition.advance[RPM2000][MAP350]" value-type="v_int16" tab-order="7" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_2250_350" binding="cfg->ignition.advance[RPM2250][MAP350]" value-type="v_int16" tab-order="8" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_2500_350" binding="cfg->ignition.advance[RPM2500][MAP350]" value-type="v_int16" tab-order="9" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_2750_350" binding="cfg->ignition.advance[RPM2750][MAP350]" value-type="v_int16" tab-order="10" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+
+              <edit id="id_mag_adv_500_500" binding="cfg->ignition.advance[RPM500][MAP500]" value-type="v_int16" tab-order="1" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_750_500" binding="cfg->ignition.advance[RPM750][MAP350]" value-type="v_int16" tab-order="2" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_1000_500" binding="cfg->ignition.advance[RPM1000][MAP350]" value-type="v_int16" tab-order="3" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_1250_500" binding="cfg->ignition.advance[RPM1250][MAP350]" value-type="v_int16" tab-order="4" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_1500_500" binding="cfg->ignition.advance[RPM1500][MAP350]" value-type="v_int16" tab-order="5" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_1750_500" binding="cfg->ignition.advance[RPM1750][MAP350]" value-type="v_int16" tab-order="6" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_2000_500" binding="cfg->ignition.advance[RPM2000][MAP350]" value-type="v_int16" tab-order="7" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_2250_500" binding="cfg->ignition.advance[RPM2250][MAP350]" value-type="v_int16" tab-order="8" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_2500_500" binding="cfg->ignition.advance[RPM2500][MAP350]" value-type="v_int16" tab-order="9" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_2750_500" binding="cfg->ignition.advance[RPM2750][MAP350]" value-type="v_int16" tab-order="10" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+
+              <edit id="id_mag_adv_500_650" binding="cfg->ignition.advance[RPM500][MAP650]" value-type="v_int16" tab-order="1" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_750_650" binding="cfg->ignition.advance[RPM750][MAP650]" value-type="v_int16" tab-order="2" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_1000_650" binding="cfg->ignition.advance[RPM1000][MAP650]" value-type="v_int16" tab-order="3" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_1250_650" binding="cfg->ignition.advance[RPM1250][MAP650]" value-type="v_int16" tab-order="4" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_1500_650" binding="cfg->ignition.advance[RPM1500][MAP650]" value-type="v_int16" tab-order="5" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_1750_650" binding="cfg->ignition.advance[RPM1750][MAP650]" value-type="v_int16" tab-order="6" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_2000_650" binding="cfg->ignition.advance[RPM2000][MAP650]" value-type="v_int16" tab-order="7" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_2250_650" binding="cfg->ignition.advance[RPM2250][MAP650]" value-type="v_int16" tab-order="8" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_2500_650" binding="cfg->ignition.advance[RPM2500][MAP650]" value-type="v_int16" tab-order="9" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_2750_650" binding="cfg->ignition.advance[RPM2750][MAP650]" value-type="v_int16" tab-order="10" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+
+              <edit id="id_mag_adv_500_800" binding="cfg->ignition.advance[RPM500][MAP800]" value-type="v_int16" tab-order="1" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_750_800" binding="cfg->ignition.advance[RPM750][MAP800]" value-type="v_int16" tab-order="2" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_1000_800" binding="cfg->ignition.advance[RPM1000][MAP800]" value-type="v_int16" tab-order="3" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_1250_800" binding="cfg->ignition.advance[RPM1250][MAP800]" value-type="v_int16" tab-order="4" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_1500_800" binding="cfg->ignition.advance[RPM1500][MAP800]" value-type="v_int16" tab-order="5" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_1750_800" binding="cfg->ignition.advance[RPM1750][MAP800]" value-type="v_int16" tab-order="6" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_2000_800" binding="cfg->ignition.advance[RPM2000][MAP800]" value-type="v_int16" tab-order="7" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_2250_800" binding="cfg->ignition.advance[RPM2250][MAP800]" value-type="v_int16" tab-order="8" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_2500_800" binding="cfg->ignition.advance[RPM2500][MAP800]" value-type="v_int16" tab-order="9" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_2750_800" binding="cfg->ignition.advance[RPM2750][MAP800]" value-type="v_int16" tab-order="10" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+
+              <edit id="id_mag_adv_500_950" binding="cfg->ignition.advance[RPM500][MAP950]" value-type="v_int16" tab-order="1" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_750_950" binding="cfg->ignition.advance[RPM750][MAP950]" value-type="v_int16" tab-order="2" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_1000_950" binding="cfg->ignition.advance[RPM1000][MAP950]" value-type="v_int16" tab-order="3" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_1250_950" binding="cfg->ignition.advance[RPM1250][MAP950]" value-type="v_int16" tab-order="4" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_1500_950" binding="cfg->ignition.advance[RPM1500][MAP950]" value-type="v_int16" tab-order="5" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_1750_950" binding="cfg->ignition.advance[RPM1750][MAP950]" value-type="v_int16" tab-order="6" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_2000_950" binding="cfg->ignition.advance[RPM2000][MAP950]" value-type="v_int16" tab-order="7" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_2250_950" binding="cfg->ignition.advance[RPM2250][MAP950]" value-type="v_int16" tab-order="8" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_2500_950" binding="cfg->ignition.advance[RPM2500][MAP950]" value-type="v_int16" tab-order="9" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_2750_950" binding="cfg->ignition.advance[RPM2750][MAP950]" value-type="v_int16" tab-order="10" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+
+              <edit id="id_mag_adv_500_1100" binding="cfg->ignition.advance[RPM500][MAP1100]" value-type="v_int16" tab-order="1" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_750_1100" binding="cfg->ignition.advance[RPM750][MAP1100]" value-type="v_int16" tab-order="2" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_1000_1100" binding="cfg->ignition.advance[RPM1000][MAP1100]" value-type="v_int16" tab-order="3" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_1250_1100" binding="cfg->ignition.advance[RPM1250][MAP1100]" value-type="v_int16" tab-order="4" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_1500_1100" binding="cfg->ignition.advance[RPM1500][MAP1100]" value-type="v_int16" tab-order="5" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_1750_1100" binding="cfg->ignition.advance[RPM1750][MAP1100]" value-type="v_int16" tab-order="6" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_2000_1100" binding="cfg->ignition.advance[RPM2000][MAP1100]" value-type="v_int16" tab-order="7" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_2250_1100" binding="cfg->ignition.advance[RPM2250][MAP1100]" value-type="v_int16" tab-order="8" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_2500_1100" binding="cfg->ignition.advance[RPM2500][MAP1100]" value-type="v_int16" tab-order="9" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_adv_2750_1100" binding="cfg->ignition.advance[RPM2750][MAP1100]" value-type="v_int16" tab-order="10" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+
+            </groupbox>
+
+            <!-- ========================================= -->
+            <!-- TARGET AFR TABLE - Lower                  -->
+            <!-- ========================================= -->
+            <groupbox id="id_mag_grp_target_afr"
+                      background-color="color_black"
+                      border-color="color_white"
+                      name="Target AFR"
+                      name-color="color_white"
+                      draw-name="true"
+                      border-left="true"
+                      border-top="true"
+                      border-right="true"
+                      border-bottom="true">
+              <rect left="3" top="245" width="616" height="235"/>
+
+              <!-- RPM Column Headers (same as above) -->
+              <label id="id_mag_lbl_afr_500" background-color="color_black" name-color="color_white" draw-name="true">
+                <rect left="30" top="15" width="40" height="15"/>
+              </label>
+              <!-- ... RPM headers 750, 1000, 1250, 1500, 1750, 2000, 2250, 2500, 2750 ... -->
+
+              <!-- MAP Row Labels (same as above) -->
+              <label id="id_mag_lbl_afr_350" background-color="color_black" name-color="color_white" draw-name="true">
+                <rect left="5" top="40" width="20" height="15"/>
+              </label>
+              <!-- ... MAP labels 500, 650, 800, 950, 1100 ... -->
+
+              <!-- 60 AFR cells - Tab order 61-120 -->
+              <!-- NOTE: AFR values use v_float (typical 11.0-16.0 range) -->
+
+              <edit can-id="id_afr_500_350" binding="AFR_500_350" value-type="v_float" tab-order="61" menu="numeric_edit_keys">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <!-- ... continues for all 60 cells with tab-order 61-120 ... -->
+            </groupbox>
+
+            <!-- 
+      IMPLEMENTATION NOTE:
+      For complete implementation, all 120 cells need to be defined following
+      the exact pattern shown in advinjector.xml. This template shows the 
+      structure - both tables are identical 10x6 grids stacked vertically.
+      
+      Upper table (Advance): Integer degrees, tab-order 1-60
+      Lower table (AFR): Float values, tab-order 61-120
+      -->
+
+          </tab-page>
+          <tab-page name="Injection">
+            <rect left="0" top="0" width="1024" height="600"/>
+
+            <!-- 
+      This is the VE (Volumetric Efficiency) Table Editor
+      A 2D lookup table: 10 RPM values x 6 MAP values = 60 cells
+      Plus per-cylinder trim values
+      -->
+
+            <!-- ========================================= -->
+            <!-- VOLUMETRIC EFFICIENCY TABLE               -->
+            <!-- ========================================= -->
+            <groupbox id="id_mag_grp_ve_table"
+                      background-color="color_black"
+                      border-color="color_white"
+                      name="VE"
+                      name-color="color_white"
+                      draw-name="true"
+                      border-left="true"
+                      border-top="true"
+                      border-right="true"
+                      border-bottom="true">
+              <rect left="3" top="3" width="616" height="283"/>
+
+              <!-- Column headers (RPM values) -->
+              <label id="id_mag_ve_lbl_rpm_500" background-color="color_black" name-color="color_white" draw-name="true" name="500">
+                <rect left="30" top="15" width="40" height="15"/>
+              </label>
+              <label id="iid_mag_ve_lbl_rpm_750" background-color="color_black" name-color="color_white" draw-name="true" name="750">
+                <rect left="80" top="15" width="40" height="15"/>
+              </label>
+              <label id="id_mag_ve_lbl_rpm_1000" background-color="color_black" name-color="color_white" draw-name="true" name="1000">
+                <rect left="130" top="15" width="50" height="15"/>
+              </label>
+              <label id="id_mag_ve_lbl_rpm_1250" background-color="color_black" name-color="color_white" draw-name="true" name="1250">
+                <rect left="190" top="15" width="50" height="15"/>
+              </label>
+              <label id="id_mag_ve_lbl_rpm_1500" background-color="color_black" name-color="color_white" draw-name="true" name="1500">
+                <rect left="250" top="15" width="50" height="15"/>
+              </label>
+              <label id="id_mag_ve_lbl_rpm_1750" background-color="color_black" name-color="color_white" draw-name="true" name="1750">
+                <rect left="310" top="15" width="50" height="15"/>
+              </label>
+              <label id="id_mag_ve_lbl_rpm_2000" background-color="color_black" name-color="color_white" draw-name="true" name="2000">
+                <rect left="370" top="15" width="50" height="15"/>
+              </label>
+              <label id="id_mag_ve_lbl_rpm_2250" background-color="color_black" name-color="color_white" draw-id="true" name="2250">
+                <rect left="430" top="15" width="50" height="15"/>
+              </label>
+              <label id="id_mag_ve_lbl_rpm_2500" background-color="color_black" name-color="color_white" draw-id="true" name="2500">
+                <rect left="490" top="15" width="50" height="15"/>
+              </label>
+              <label id="id_mag_ve_lbl_rpm_2750" background-color="color_black" name-color="color_white" draw-id="true" name="2750">
+                <rect left="550" top="15" width="50" height="15"/>
+              </label>
+
+              <!-- Row labels (MAP values) -->
+              <label id="id_mag_ve_lbl_map_350" background-color="color_black" name-color="color_white" draw-id="true" name="350">
+                <rect left="5" top="40" width="20" height="15"/>
+              </label>
+              <label id="id_mag_ve_lbl_map_500" background-color="color_black" name-color="color_white" draw-name="true" name="500">
+                <rect left="5" top="70" width="20" height="15"/>
+              </label>
+              <label id="id_mag_ve_lbl_map_650" background-color="color_black" name-color="color_white" draw-name="true" name="650">
+                <rect left="5" top="100" width="20" height="15"/>
+              </label>
+              <label id="id_mag_ve_lbl_map_800" background-color="color_black" name-color="color_white" draw-name="true" name="800">
+                <rect left="5" top="130" width="20" height="15"/>
+              </label>
+              <label id="id_mag_ve_lbl_map_950" background-color="color_black" name-color="color_white" draw-name="true" name="950">
+                <rect left="5" top="160" width="20" height="15"/>
+              </label>
+              <label id="id_mag_ve_lbl_map_1100" background-color="color_black" name-color="color_white" draw-name="true" name="1100">
+                <rect left="5" top="190" width="25" height="15"/>
+              </label>
+
+              <!-- VE Table Values - 10 columns x 6 rows = 60 edit controls -->
+              <!-- Row 1: MAP 350 -->
+              <edit id="id_mag_ve_500_350" binding="VE_500_350" value-type="v_int16" tab-order="1" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="30" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_750_350" binding="VE_750_350" value-type="v_int16" tab-order="2" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="80" top="35" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_1000_350" binding="VE_1000_350" value-type="v_int16" tab-order="3" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="130" top="35" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_1250_350" binding="VE_1250_350" value-type="v_int16" tab-order="4" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="190" top="35" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_1500_350" binding="VE_1500_350" value-type="v_int16" tab-order="5" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="250" top="35" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_1750_350" binding="VE_1750_350" value-type="v_int16" tab-order="6" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="310" top="35" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_2000_350" binding="VE_2000_350" value-type="v_int16" tab-order="7" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="370" top="35" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_2250_350" binding="VE_2250_350" value-type="v_int16" tab-order="8" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="430" top="35" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_2500_350" binding="VE_2500_350" value-type="v_int16" tab-order="9" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="490" top="35" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_2750_350" binding="VE_2750_350" value-type="v_int16" tab-order="10" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="550" top="35" width="50" height="25"/>
+              </edit>
+
+              <!-- Row 2: MAP 500 -->
+              <edit id="id_mag_ve_500_500" binding="VE_500_500" value-type="v_int16" tab-order="11" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="30" top="65" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_750_500" binding="VE_750_500" value-type="v_int16" tab-order="12" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="80" top="65" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_1000_500" binding="VE_1000_500" value-type="v_int16" tab-order="13" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="130" top="65" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_1250_500" binding="VE_1250_500" value-type="v_int16" tab-order="14" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="190" top="65" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_1500_500" binding="VE_1500_500" value-type="v_int16" tab-order="15" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="250" top="65" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_1750_500" binding="VE_1750_500" value-type="v_int16" tab-order="16" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="310" top="65" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_2000_500" binding="VE_2000_500" value-type="v_int16" tab-order="17" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="370" top="65" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_2250_500" binding="VE_2250_500" value-type="v_int16" tab-order="18" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="430" top="65" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_2500_500" binding="VE_2500_500" value-type="v_int16" tab-order="19" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="490" top="65" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_2750_500" binding="VE_2750_500" value-type="v_int16" tab-order="20" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="550" top="65" width="50" height="25"/>
+              </edit>
+
+              <!-- Row 3: MAP 650 -->
+              <edit id="id_mag_ve_500_650" binding="VE_500_650" value-type="v_int16" tab-order="21" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="30" top="95" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_750_650" binding="VE_750_650" value-type="v_int16" tab-order="22" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="80" top="95" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_1000_650" binding="VE_1000_650" value-type="v_int16" tab-order="23" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="130" top="95" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_1250_650" binding="VE_1250_650" value-type="v_int16" tab-order="24" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="190" top="95" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_1500_650" binding="VE_1500_650" value-type="v_int16" tab-order="25" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="250" top="95" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_1750_650" binding="VE_1750_650" value-type="v_int16" tab-order="26" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="310" top="95" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_2000_650" binding="VE_2000_650" value-type="v_int16" tab-order="27" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="370" top="95" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_2250_650" binding="VE_2250_650" value-type="v_int16" tab-order="28" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="430" top="95" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_2500_650" binding="VE_2500_650" value-type="v_int16" tab-order="29" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="490" top="95" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_2750_650" binding="VE_2750_650" value-type="v_int16" tab-order="30" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="550" top="95" width="50" height="25"/>
+              </edit>
+
+              <!-- Row 4: MAP 800 -->
+              <edit id="id_mag_ve_500_800" binding="VE_500_800" value-type="v_int16" tab-order="31" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="30" top="125" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_750_800" binding="VE_750_800" value-type="v_int16" tab-order="32" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="80" top="125" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_1000_800" binding="VE_1000_800" value-type="v_int16" tab-order="33" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="130" top="125" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_1250_800" binding="VE_1250_800" value-type="v_int16" tab-order="34" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="190" top="125" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_1500_800" binding="VE_1500_800" value-type="v_int16" tab-order="35" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="250" top="125" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_1750_800" binding="VE_1750_800" value-type="v_int16" tab-order="36" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="310" top="125" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_2000_800" binding="VE_2000_800" value-type="v_int16" tab-order="37" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="370" top="125" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_2250_800" binding="VE_2250_800" value-type="v_int16" tab-order="38" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="430" top="125" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_2500_800" binding="VE_2500_800" value-type="v_int16" tab-order="39" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="490" top="125" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_2750_800" binding="VE_2750_800" value-type="v_int16" tab-order="40" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="550" top="125" width="50" height="25"/>
+              </edit>
+
+              <!-- Row 5: MAP 950 -->
+              <edit id="id_mag_ve_500_950" binding="VE_500_950" value-type="v_int16" tab-order="41" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="30" top="155" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_750_950" binding="VE_750_950" value-type="v_int16" tab-order="42" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="80" top="155" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_1000_950" binding="VE_1000_950" value-type="v_int16" tab-order="43" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="130" top="155" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_1250_950" binding="VE_1250_950" value-type="v_int16" tab-order="44" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="190" top="155" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_1500_950" binding="VE_1500_950" value-type="v_int16" tab-order="45" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="250" top="155" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_1750_950" binding="VE_1750_950" value-type="v_int16" tab-order="46" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="310" top="155" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_2000_950" binding="VE_2000_950" value-type="v_int16" tab-order="47" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="370" top="155" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_2250_950" binding="VE_2250_950" value-type="v_int16" tab-order="48" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="430" top="155" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_2500_950" binding="VE_2500_950" value-type="v_int16" tab-order="49" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="490" top="155" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_2750_950" binding="VE_2750_950" value-type="v_int16" tab-order="50" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="550" top="155" width="50" height="25"/>
+              </edit>
+
+              <!-- Row 6: MAP 1100 -->
+              <edit id="id_mag_ve_500_1100" binding="VE_500_1100" value-type="v_int16" tab-order="51" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="30" top="185" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_750_1100" binding="VE_750_1100" value-type="v_int16" tab-order="52" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="80" top="185" width="40" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_1000_1100" binding="VE_1000_1100" value-type="v_int16" tab-order="53" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="130" top="185" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_1250_1100" binding="VE_1250_1100" value-type="v_int16" tab-order="54" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="190" top="185" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_1500_1100" binding="VE_1500_1100" value-type="v_int16" tab-order="55" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="250" top="185" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_1750_1100" binding="VE_1750_1100" value-type="v_int16" tab-order="56" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="310" top="185" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_2000_1100" binding="VE_2000_1100" value-type="v_int16" tab-order="57" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="370" top="185" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_2250_1100" binding="VE_2250_1100" value-type="v_int16" tab-order="58" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="430" top="185" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_2500_1100" binding="VE_2500_1100" value-type="v_int16" tab-order="59" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="490" top="185" width="50" height="25"/>
+              </edit>
+              <edit id="id_mag_ve_2750_1100" binding="VE_2750_1100" value-type="v_int16" tab-order="60" menu="numeric_edit_keys"
+                    background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                <rect left="550" top="185" width="50" height="25"/>
+              </edit>
+
+              <!-- ========================================= -->
+              <!-- CYLINDER TRIM GROUP (nested inside VE)   -->
+              <!-- ========================================= -->
+              <groupbox id="id_mag_ve_grp_cylinder_trim"
+                        background-color="color_black"
+                        border-color="color_white"
+                        name="Cylinder Trim"
+                        name-color="color_white"
+                        draw-name="true"
+                        border-left="true"
+                        border-top="true"
+                        border-right="true"
+                        border-bottom="true">
+                <rect left="100" top="211" width="505" height="66"/>
+
+                <label id="id_mag_ve_lbl_cyl1" background-color="color_black" name-color="color_white" draw-id="id_mag_ve_true" name="1:">
+                  <rect left="10" top="25" width="30" height="15"/>
+                </label>
+                <edit can-id="id_trim_cyl1" binding="TrimCyl1" value-type="v_int16" tab-order="61" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="50" top="23" width="60" height="25"/>
+                </edit>
+
+                <label id="id_mag_ve_lbl_cyl2" background-color="color_black" name-color="color_white" draw-id="id_mag_ve_true" name="2:">
+                  <rect left="130" top="25" width="30" height="15"/>
+                </label>
+                <edit can-id="id_trim_cyl2" binding="TrimCyl2" value-type="v_int16" tab-order="62" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="170" top="23" width="60" height="25"/>
+                </edit>
+
+                <label id="id_mag_ve_lbl_cyl3" background-color="color_black" name-color="color_white" draw-id="id_mag_ve_true" name="3:">
+                  <rect left="250" top="25" width="30" height="15"/>
+                </label>
+                <edit can-id="id_trim_cyl3" binding="TrimCyl3" value-type="v_int16" tab-order="63" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="290" top="23" width="60" height="25"/>
+                </edit>
+
+                <label id="id_mag_ve_lbl_cyl4" background-color="color_black" name-color="color_white" draw-id="id_mag_ve_true" name="4:">
+                  <rect left="370" top="25" width="30" height="15"/>
+                </label>
+                <edit can-id="id_trim_cyl4" binding="TrimCyl4" value-type="v_int16" tab-order="64" menu="numeric_edit_keys"
+                      background-color="color_black" border-color="color_white" border-left="true" border-top="true" border-right="true" border-bottom="true">
+                  <rect left="410" top="23" width="60" height="25"/>
+                </edit>
+
+                <!-- Additional cylinders 5 and 6 would be here for 6-cylinder engines -->
+              </groupbox>
+            </groupbox>
+          </tab-page>
+          <tab-page-ref ref-name="Alarms"
+                     binding="mag->alarms"
+                     value-type="alarms_t"
+                     id-prefix="id_mag_"/>
+        </tab>
+      </tab-page>
+    </tab>
+  </layout>
+</application>

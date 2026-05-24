@@ -4,8 +4,12 @@ result_t annunciator_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
   {
   annunciator_t* wnd = wnddata;
 
-  if (wnd != 0)
-    (*wnd->base.on_message)(hwnd, msg, wnd);
+  if (wnd != 0 && (*wnd->base.on_message)(hwnd, can_id, msg, wnd))
+    {
+    invalidate(hwnd);
+
+    return s_ok;
+    }
 
   // pass to default
   return widget_wndproc(hwnd, msg, wnddata);

@@ -94,6 +94,17 @@ extern result_t on_datetime_msg(handle_t hwnd, const canmsg_t* msg, void* wnddat
 extern void on_paint_datetime(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnd);
 
 //-----------------------------------------------------------------------------
+// Hours
+typedef struct _hours_annunciator_t {
+  text_annunciator_t base;
+
+  uint32_t hours; // hours
+  } hours_annunciator_t;
+
+extern result_t on_hours_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
+extern void on_paint_hours(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata);
+
+//-----------------------------------------------------------------------------
 // hp
 typedef struct _hp_annunciator_t {
   text_annunciator_t base;
@@ -115,14 +126,18 @@ typedef struct _ecu_annunciator_t {
   e_board_status right_status;
   int16_t right_advance;
 
+  uint16_t afr_map_mode;
   bool quorum_left_active;
+  uint32_t last_left_heartbeat;
   bool quorum_right_active;
+  uint32_t last_right_heartbeat;
 
-  uint16_t left_mixture_mode;
-  uint16_t right_mixture_mode;
+  uint16_t left_mixture;
+  uint16_t right_mixture;
   } ecu_annunciator_t;
 
-extern result_t on_kmag_msg(handle_t hwnd, const canmsg_t* msg, void* wnddata);
+extern result_t on_kmag_msg(handle_t hwnd, uint16_t can_id, const canmsg_t *msg,
+                            void *wnddata);
 extern void on_paint_kmag(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata);
 extern result_t on_create_kmag(handle_t hwnd, widget_t* widget);
 

@@ -73,7 +73,7 @@ void code_generator::create_gauge_widget(std::ofstream &out, const pugi::xml_nod
   emit_property(out, node, "arc-begin", ".arc_begin");
   emit_property(out, node, "arc-range", ".arc_range");
   emit_property(out, node, "reset-value", ".reset_value");
-  emit_property(out, node, "pointer-width", ".pointer_width");
+  emit_property(out, node, "pointer-width", ".bar_width");
   emit_property(out, node, "draw-value", ".draw_value");
   emit_address_property(out, node, "value-font", ".value_font");
   emit_property(out, node, "draw-value-box", ".draw_value_box");

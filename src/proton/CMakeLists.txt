@@ -26,6 +26,7 @@ set(PROTON_SOURCES
         src/instruments/gauge_widget.c
         src/dialogs/groupbox_widget.c
         src/instruments/hobbs_annunciator.c
+        src/instruments/hours_annunciator.c
         src/instruments/hp_annunciator.c
         src/instruments/hsi_widget.c
         src/instruments/kmag_annunciator.c

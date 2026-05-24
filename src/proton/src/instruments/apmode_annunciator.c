@@ -15,10 +15,7 @@ result_t on_apmode_msg(handle_t hwnd, const canmsg_t* msg, void* wnddata)
       }
     }
 
-  if (changed)
-    invalidate(hwnd);
-
-  return s_false;
+  return changed;
   }
 
 void on_paint_apmode(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnd)

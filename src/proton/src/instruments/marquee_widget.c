@@ -5,7 +5,19 @@ void on_paint_marquee(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* m
   {
   marquee_widget_t* wnd = (marquee_widget_t*)wnddata;
 
-  on_paint_widget_background(canvas, wnd_rect, msg, wnddata);
+  extent_t ex;
+  rect_extents(wnd_rect, &ex);
+
+  if (wnd->background_canvas == nullptr)
+    {
+    // create a canvas
+    canvas_create(&ex, &wnd->background_canvas);
+
+    on_paint_widget_background(wnd->background_canvas, wnd_rect, msg, wnddata);
+    }
+
+  point_t pt = { 0, 0 };
+  bit_blt(canvas, wnd_rect, wnd_rect, wnd->background_canvas, wnd_rect, &pt, src_copy);
   }
 
 static int32_t get_annunciator_index(marquee_widget_t* wnd, annunciator_t* ann)
@@ -45,8 +57,6 @@ result_t marquee_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
   annunciator_t* ann = wnd->annunciators[wnd->selected_index];
   bool changed = false;
   handle_t hann = 0;
-  handle_t hchild;
-
 
   if (wnd != 0)
     {
@@ -118,30 +128,22 @@ result_t marquee_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
 
               if (found_alarm)
                 {
-                // lower numbers are greater priority
-                if (wnd->selected_alarm < 0 || wnd->alarms[wnd->selected_alarm].priority > alarm->priority)
-                  {
-                  if (wnd->selected_alarm >= 0)
-                    {
-                    get_window_by_id(hwnd, wnd->selected_alarm + wnd->base_alarm_id, &hchild);
-                    // hide the currently selected alarm
-                    hide_window(hchild);
-                    }
+                // higher numbers are greater priority
+                if (wnd->selected_alarm < 0 || wnd->alarms[wnd->selected_alarm].priority < alarm->priority)
                   wnd->selected_alarm = i;
                   }
                 }
               }
             }
-          }
 
         if (found_alarm)
           {
+          handle_t hchild;
           if (succeeded(get_window_by_id(hwnd, wnd->base_alarm_id + wnd->selected_alarm, &hchild)))
             {
             show_window(hchild);
             use_alarm_keys(true);     // use the correct keyset
 
-            // hide the annunciator
             if (succeeded(get_window_by_id(hwnd, wnd->base_widget_id + wnd->selected_index, &hchild)))
               hide_window(hchild);
 
@@ -167,7 +169,7 @@ result_t marquee_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
           ann = wnd->annunciators[i];
 
           // call the message handler
-          if (ann->base.on_message(hwnd, msg, ann) &&
+          if (ann->base.on_message(hwnd, can_id, msg, ann) &&
             i == wnd->selected_index)
             {
             get_window_by_id(hwnd, wnd->selected_index + wnd->base_widget_id, &hann);
@@ -179,7 +181,7 @@ result_t marquee_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
     }
 
   if (changed)
-    invalidate(hwnd);
+    invalidate(hann);
 
   return widget_wndproc(hwnd, msg, wnddata);
   }
@@ -213,15 +215,14 @@ static void close_alarm(handle_t parent, handle_t hwnd, marquee_widget_t* marque
       !alarm->is_parked)
       {
       found_alarm = true;
-      // lower numbers are greater priority
-      if (marquee->selected_alarm < 0 || marquee->alarms[marquee->selected_alarm].priority > alarm->priority)
+      // higher numbers are greater priority
+      if (marquee->selected_alarm < 0 || marquee->alarms[marquee->selected_alarm].priority < alarm->priority)
         marquee->selected_alarm = i;
       }
     }
 
   handle_t hchild = 0;
-  // Hide the existing alarm
-  if (succeeded(get_window_by_id(parent, marquee->base_alarm_id + current_alarm, &hchild)))
+  if (succeeded(get_window_by_id(parent, marquee->base_widget_id + current_alarm, &hchild)))
     hide_window(hchild);
 
   if (found_alarm)
@@ -236,10 +237,10 @@ static void close_alarm(handle_t parent, handle_t hwnd, marquee_widget_t* marque
       show_window(hchild);
     }
 
-  invalidate(parent);
+  invalidate(hchild);
 
   // make sure the menu system is re-enabled.
-  use_alarm_keys(found_alarm);
+  use_alarm_keys(false);
   }
 
 static void dismiss_alarm(handle_t hwnd, alarm_t* alarm)
@@ -282,11 +283,11 @@ static void park_alarm(handle_t hwnd, alarm_t* alarm)
   close_alarm(parent, hwnd, marquee);
   }
 
-result_t create_marquee_widget(handle_t parent, uint32_t flags, marquee_widget_t* wnd, handle_t* out)
+result_t create_marquee_widget(handle_t parent, uint16_t id, marquee_widget_t* wnd, handle_t* out)
   {
   result_t result;
   handle_t hndl;
-  if (failed(result = create_widget(parent, flags, marquee_wndproc, &wnd->base, &hndl)))
+  if (failed(result = create_widget(parent, id, marquee_wndproc, &wnd->base, &hndl)))
     return result;
 
   show_window(hndl);
@@ -333,24 +334,8 @@ void on_paint_alarm_foreground(handle_t canvas, const rect_t* wnd_rect, const ca
   origin.x -= ex.dx >> 1;
   origin.y -= ex.dy >> 1;
 
-  draw_text(canvas, wnd_rect, alarm->base.name_font, alarm->base.name_color, alarm->base.background_color,
+  draw_text(canvas, wnd_rect, alarm->base.name_font, alarm->base.name_color, color_hollow,
     0, alarm->message, &origin, wnd_rect, 0, 0);
-  }
-
-static bool is_response_for_this_alarm(handle_t hwnd, alarm_t *alarm)
-  {
-  // the keyboard message is sent to all alarms, so we need to check if this
-  // is the current alarm
-  handle_t parent;
-  if (failed(window_parent(hwnd, &parent)))
-    return false;
-  marquee_widget_t* marquee;
-  if (failed(get_wnddata(parent, (void**)&marquee)))
-    return false;
-
-  // see if the selected alarm is current
-  alarm_t* current_alarm = marquee->alarms + marquee->selected_alarm;
-  return current_alarm == alarm;
   }
 
 result_t alarm_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
@@ -366,29 +351,24 @@ result_t alarm_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
       break;
 
     case id_alarm_close:
-      if (is_response_for_this_alarm(hwnd, wnd))
-        {
         dismiss_alarm(hwnd, wnd);
-        return s_ok;
-        }
       break;
     case id_alarm_park:
-      if (is_response_for_this_alarm(hwnd, wnd))
-        {
         park_alarm(hwnd, wnd);
-        return s_ok;
-        }
       break;
     }
 
-  return s_false;
+  if (changed)
+    invalidate(hwnd);
+
+  return s_ok;
   }
 
-result_t create_alarm_annunciator(handle_t parent, uint32_t flags, alarm_t* wnd, handle_t* out)
+result_t create_alarm_annunciator(handle_t parent, uint16_t id, alarm_t* wnd, handle_t* out)
   {
   result_t result;
   handle_t hndl;
-  if (failed(result = create_widget(parent, flags, alarm_wndproc, &wnd->base, &hndl)))
+  if (failed(result = create_widget(parent, id, alarm_wndproc, &wnd->base, &hndl)))
     return result;
 
   hide_window(hndl);
