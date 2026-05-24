@@ -148,7 +148,7 @@ result_t on_kmag_msg(handle_t hwnd, const canmsg_t* msg, void* wnddata)
   return changed;
   }
 
-static char manual_msg[REG_NAME_MAX];
+static char manual_msg[CFG_NAME_MAX];
 
 void on_paint_kmag(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)
   {
@@ -233,7 +233,7 @@ void on_paint_kmag(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg,
       if(data->left_status == bs_running && data->right_status == bs_running)
         quorum_mix >>= 1;
 
-      snprintf(manual_msg, REG_NAME_MAX, "Manual %d%%", quorum_mix);
+      snprintf(manual_msg, CFG_NAME_MAX, "Manual %d%%", quorum_mix);
       afr_mode = manual_msg;
       }
       break;
