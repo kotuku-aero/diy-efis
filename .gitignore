@@ -60,3 +60,5 @@ apps/nav_au_nz/nav_au_nz.h
 apps/pfd_au_nz/au_nz_priv.h
 apps/pfd_au_nz/au_nz.c
 apps/pfd_au_nz/au_nz.h
+/lib/w32_canflyd.dll
+/lib/w32_canflyd.lib
