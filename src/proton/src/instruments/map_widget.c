@@ -153,7 +153,7 @@ result_t create_map_widget(handle_t parent, uint32_t flags, map_widget_t* wnd, h
   extent_t background_ex = { rect_width(&wnd->base.rect), rect_height(&wnd->base.rect) };
 
   // TODO: should be smarter than this.
-  if (failed(result = map_create_canvas(wnd->hwnd, &background_ex, &wnd->day_theme, &wnd->map)))
+  if (failed(result = map_create_canvas(wnd->hwnd, &background_ex, wnd->db_path, &wnd->day_theme, &wnd->map)))
     return result;
 
   wnd->base.on_paint = on_paint;

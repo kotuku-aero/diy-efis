@@ -2709,7 +2709,7 @@ Create a kernel-managed map rendering canvas
 **Kernel function:** `map_create_canvas`
 
 ```c
-result_t sys_map_create_canvas(handle_t hwnd, const extent_t * extents, const map_theme_t * theme, handle_t* canvas);
+result_t sys_map_create_canvas(handle_t hwnd, const extent_t * extents, const char * db_path, const map_theme_t * theme, handle_t* canvas);
 ```
 
 | Parameter | Type | Direction | Description |
@@ -2717,6 +2717,7 @@ result_t sys_map_create_canvas(handle_t hwnd, const extent_t * extents, const ma
 | `hwnd` | `handle_t` | in | handle to the window that the canvas will be assoiated with.  It forms
           a background canvas, that will normally just be rendered. |
 | `extents` | `const extent_t *` | in | The size of the map canvas to be created |
+| `db_path` | `const char *` | in | Must refer to a CanFly navigation database pack |
 | `theme` | `const map_theme_t *` | in | These are the colors to display for the moving map.  The address of it is
         used in the kernel and must not change after the canvas is made |
 | `canvas` | `handle_t*` | out |  |

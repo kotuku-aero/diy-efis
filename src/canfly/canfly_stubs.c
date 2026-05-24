@@ -2399,19 +2399,25 @@ result_t sys_get_previous_tabstop_window(handle_t hwnd, handle_t* prev)
 /* map stubs                                                                  */
 /******************************************************************************/
 
-result_t sys_map_create_canvas(handle_t hwnd, const extent_t * extents, const map_theme_t * theme, handle_t* canvas)
+result_t sys_map_create_canvas(handle_t hwnd, const extent_t * extents, const char * db_path, const map_theme_t * theme, handle_t* canvas)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)hwnd;
   register uint32_t __p1 __asm__("$a1") = (uint32_t)extents;
-  register uint32_t __p2 __asm__("$a2") = (uint32_t)theme;
-  register uint32_t __p3 __asm__("$a3") = (uint32_t)canvas;
+  register uint32_t __p2 __asm__("$a2") = (uint32_t)db_path;
+  register uint32_t __p3 __asm__("$a3") = (uint32_t)theme;
+
+  /* Parameters beyond 4 are passed on the stack per MIPS o32 ABI */
+  /* Allocate 4 bytes for 1 stack parameters */
 
   __asm__ volatile (
+    "addiu $sp, $sp, -4\n\t"
+    "sw %6, 0($sp)\n\t"
     "li $v0, %1\n\t"
     "syscall\n\t"
+    "addiu $sp, $sp, 4\n\t"
     : "=r"(__result)
-    : "i"(SYSCALL_SYS_MAP_CREATE_CANVAS), "r"(__p0), "r"(__p1), "r"(__p2), "r"(__p3)
+    : "i"(SYSCALL_SYS_MAP_CREATE_CANVAS), "r"(__p0), "r"(__p1), "r"(__p2), "r"(__p3), "r"((uint32_t)canvas)
   );
 
   return __result;

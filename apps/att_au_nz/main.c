@@ -1,7 +1,4 @@
 #include "../../src/mfdlib/mfd.h"
-#include "../../src/proton/include/menu_window.h"
-#include "../../src/mfdlib/event_handlers.h"
-#include "../../src/mfdlib/menu_handlers.h"
 
 #include "att.h"
 

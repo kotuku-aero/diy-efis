@@ -2310,6 +2310,7 @@ static inline result_t get_previous_tabstop_window(handle_t hwnd, handle_t* prev
  * @param hwnd  * handle to the window that the canvas will be assoiated with.  It forms
  * a background canvas, that will normally just be rendered.
  * @param extents  * The size of the map canvas to be created
+ * @param db_path  * Must refer to a CanFly navigation database pack
  * @param theme  * These are the colors to display for the moving map.  The address of it is
  * used in the kernel and must not change after the canvas is made
  * @param canvas [out]  * 
@@ -2317,14 +2318,14 @@ static inline result_t get_previous_tabstop_window(handle_t hwnd, handle_t* prev
  * @syscall 1792
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL sys_map_create_canvas(handle_t hwnd, const extent_t * extents, const map_theme_t * theme, handle_t* canvas);
+extern SYSCALL result_t STDCALL sys_map_create_canvas(handle_t hwnd, const extent_t * extents, const char * db_path, const map_theme_t * theme, handle_t* canvas);
 #else
-extern result_t sys_map_create_canvas(handle_t hwnd, const extent_t * extents, const map_theme_t * theme, handle_t* canvas);
+extern result_t sys_map_create_canvas(handle_t hwnd, const extent_t * extents, const char * db_path, const map_theme_t * theme, handle_t* canvas);
 #endif
 
-static inline result_t map_create_canvas(handle_t hwnd, const extent_t * extents, const map_theme_t * theme, handle_t* canvas)
+static inline result_t map_create_canvas(handle_t hwnd, const extent_t * extents, const char * db_path, const map_theme_t * theme, handle_t* canvas)
   {
-  return sys_map_create_canvas(hwnd, extents, theme, canvas);
+  return sys_map_create_canvas(hwnd, extents, db_path, theme, canvas);
   }
 
 /**
