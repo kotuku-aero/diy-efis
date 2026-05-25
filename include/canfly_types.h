@@ -947,15 +947,15 @@ typedef struct _set_node_id_msg_t
 
 typedef struct _overlapped_t overlapped_t;
 
-typedef void (*overlapped_callback_fn)(void *context, result_t result);
+typedef void (*overlapped_callback_fn)(overlapped_t *context, result_t result);
 
 typedef struct _overlapped_t
 {
-  overlapped_callback_fn cb; // this will be called when the operation completes
-  result_t result;        // this is the result of the operation
-  uint16_t can_id;        // id of the message to post when completed
-  uint16_t reserved; // reserved for use by the kernel
-  uint32_t reserved2; // this is the id of the overlapped operation
+  overlapped_callback_fn cb;  // this will be called when the operation completes
+  result_t result;            // this is the result of the operation
+  uint16_t can_id;            // id of the message to post when completed
+  uint16_t reserved;          // reserved for use by the kernel
+  uint32_t reserved2;         // this is the id of the overlapped operation
 } overlapped_t;
 
 
@@ -1115,6 +1115,88 @@ typedef struct {
 
   hypsometric_theme_t theme[20];    // up to 10,000 ft
 } map_theme_t;
+
+typedef struct _map_params_t map_params_t;
+// this is used in the spatial calculations.  is a 16:16 fixed point
+// number.
+typedef int32_t fixed_t;
+/**
+ * @brief data common to all layers
+ */
+typedef struct _viewport_params_t
+  {
+  uint32_t version;         // size of the parameters including the base
+  const map_params_t *map;  // details about the map being rendered
+
+  bool show_layer;          // show/hide the layer
+
+  // these are calculated when the spatial entities are selected and
+  // are then needed to ge-locate points for the current renderer
+  fixed_t geo_scale_y;      // degrees per pixel in y-axis
+  fixed_t geo_scale_x;      // degrees per pixel in x-axis
+
+  } viewport_params_t;
+
+typedef struct _airspace_params_t
+  {
+  viewport_params_t base;
+
+  int32_t info_panel_zoom;        // zoom below which an info panel displayed
+  int32_t detail_info_panel_zoom; // zoom below which a detailed info panel
+  } airspace_params_t;
+
+typedef struct _cities_params_t
+  {
+  viewport_params_t base;
+  } cities_params_t;
+
+typedef struct _coastline_params_t
+  {
+  viewport_params_t base;
+
+  } coastline_params_t;
+
+typedef struct _landmass_params_t
+  {
+  viewport_params_t base;
+
+  } landareas_params_t;
+
+typedef struct _contours_params_t
+  {
+  viewport_params_t base;
+
+  } contours_params_t;
+
+typedef struct _surface_water_params_t
+  {
+  viewport_params_t base;
+
+  } surface_water_params_t;
+
+typedef struct _obstances_params_t
+  {
+  viewport_params_t base;
+
+  } obstacles_params_t;
+
+typedef struct _terrain_params_t
+  {
+  viewport_params_t base;
+
+  bool show_terrain_warning;  // tint areas that are cause of alarm
+  uint16_t alarm_elevation;   // height above ground for alarm (meters)
+  uint16_t warning_elevation; // height above ground for warning (meters)
+  bool show_terrain;          // show the terrain pixels.
+  bool show_hillshade;        // show the hillshading
+  bool hypsometric_tint;      // shade the terrain
+  } terrain_params_t;
+
+typedef struct _transport_params_t
+  {
+  viewport_params_t base;
+
+  } transport_params_t;
 
 typedef enum {
   mdm_north,          // north up

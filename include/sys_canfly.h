@@ -2309,6 +2309,9 @@ static inline result_t get_previous_tabstop_window(handle_t hwnd, handle_t* prev
  * Create a kernel-managed map rendering canvas
  * @param hwnd  * handle to the window that the canvas will be assoiated with.  It forms
  * a background canvas, that will normally just be rendered.
+ * @param memid  * This holds the key in the config DB that the map is to use to
+ * store map specific configuration data.  The creator of the map is responsible
+ * to allocate a key for the instance of the map.
  * @param extents  * The size of the map canvas to be created
  * @param db_path  * Must refer to a CanFly navigation database pack
  * @param theme  * These are the colors to display for the moving map.  The address of it is
@@ -2318,14 +2321,14 @@ static inline result_t get_previous_tabstop_window(handle_t hwnd, handle_t* prev
  * @syscall 1792
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL sys_map_create_canvas(handle_t hwnd, const extent_t * extents, const char * db_path, const map_theme_t * theme, handle_t* canvas);
+extern SYSCALL result_t STDCALL sys_map_create_canvas(handle_t hwnd, memid_t memid, const extent_t * extents, const char * db_path, const map_theme_t * theme, handle_t* canvas);
 #else
-extern result_t sys_map_create_canvas(handle_t hwnd, const extent_t * extents, const char * db_path, const map_theme_t * theme, handle_t* canvas);
+extern result_t sys_map_create_canvas(handle_t hwnd, memid_t memid, const extent_t * extents, const char * db_path, const map_theme_t * theme, handle_t* canvas);
 #endif
 
-static inline result_t map_create_canvas(handle_t hwnd, const extent_t * extents, const char * db_path, const map_theme_t * theme, handle_t* canvas)
+static inline result_t map_create_canvas(handle_t hwnd, memid_t memid, const extent_t * extents, const char * db_path, const map_theme_t * theme, handle_t* canvas)
   {
-  return sys_map_create_canvas(hwnd, extents, db_path, theme, canvas);
+  return sys_map_create_canvas(hwnd, memid, extents, db_path, theme, canvas);
   }
 
 /**
@@ -2549,6 +2552,45 @@ extern result_t sys_map_position_to_screen(handle_t canvas, const lla_t* positio
 static inline result_t map_position_to_screen(handle_t canvas, const lla_t* position, point_t* screen)
   {
   return sys_map_position_to_screen(canvas, position, screen);
+  }
+
+/**
+ * Get the parameters of a map layer
+ * @param canvas  * 
+ * @param layer  * Layer to retrieve.  If more that 1 provided an error is raised
+ * @param size  * Size of the buffer to receive the parameters
+ * @param params [out]  * Buffer to receive the full parameters of the layer requested.
+ * @return result_t
+ * @syscall 1805
+ */
+#ifndef PIC32_BUILD
+extern SYSCALL result_t STDCALL sys_map_get_layer_parameters(handle_t canvas, uint32_t layer, uint32_t size, viewport_params_t * params);
+#else
+extern result_t sys_map_get_layer_parameters(handle_t canvas, uint32_t layer, uint32_t size, viewport_params_t * params);
+#endif
+
+static inline result_t map_get_layer_parameters(handle_t canvas, uint32_t layer, uint32_t size, viewport_params_t * params)
+  {
+  return sys_map_get_layer_parameters(canvas, layer, size, params);
+  }
+
+/**
+ * Set the parameters of a map layer
+ * @param canvas  * 
+ * @param layer  * Layer to change the parameters of.  If more that 1 provided an error is raised
+ * @param params [out]  * Buffer with the full parameters of the layer.
+ * @return result_t
+ * @syscall 1806
+ */
+#ifndef PIC32_BUILD
+extern SYSCALL result_t STDCALL sys_map_set_layer_parameters(handle_t canvas, uint32_t layer, const viewport_params_t * params);
+#else
+extern result_t sys_map_set_layer_parameters(handle_t canvas, uint32_t layer, const viewport_params_t * params);
+#endif
+
+static inline result_t map_set_layer_parameters(handle_t canvas, uint32_t layer, const viewport_params_t * params)
+  {
+  return sys_map_set_layer_parameters(canvas, layer, params);
   }
 
 /******************************************************************************/

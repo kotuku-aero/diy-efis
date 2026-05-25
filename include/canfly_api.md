@@ -2709,13 +2709,16 @@ Create a kernel-managed map rendering canvas
 **Kernel function:** `map_create_canvas`
 
 ```c
-result_t sys_map_create_canvas(handle_t hwnd, const extent_t * extents, const char * db_path, const map_theme_t * theme, handle_t* canvas);
+result_t sys_map_create_canvas(handle_t hwnd, memid_t memid, const extent_t * extents, const char * db_path, const map_theme_t * theme, handle_t* canvas);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
 | `hwnd` | `handle_t` | in | handle to the window that the canvas will be assoiated with.  It forms
           a background canvas, that will normally just be rendered. |
+| `memid` | `memid_t` | in | This holds the key in the config DB that the map is to use to
+        store map specific configuration data.  The creator of the map is responsible
+        to allocate a key for the instance of the map. |
 | `extents` | `const extent_t *` | in | The size of the map canvas to be created |
 | `db_path` | `const char *` | in | Must refer to a CanFly navigation database pack |
 | `theme` | `const map_theme_t *` | in | These are the colors to display for the moving map.  The address of it is
@@ -2956,6 +2959,47 @@ result_t sys_map_position_to_screen(handle_t canvas, const lla_t* position, poin
 | `canvas` | `handle_t` | in |  |
 | `position` | `const lla_t*` | in |  |
 | `screen` | `point_t*` | out |  |
+
+---
+
+### `sys_map_get_layer_parameters`
+
+Get the parameters of a map layer
+
+**Syscall ID:** 1805
+
+**Kernel function:** `map_get_layer_params`
+
+```c
+result_t sys_map_get_layer_parameters(handle_t canvas, uint32_t layer, uint32_t size, viewport_params_t * params);
+```
+
+| Parameter | Type | Direction | Description |
+|-----------|------|-----------|-------------|
+| `canvas` | `handle_t` | in |  |
+| `layer` | `uint32_t` | in | Layer to retrieve.  If more that 1 provided an error is raised |
+| `size` | `uint32_t` | in | Size of the buffer to receive the parameters |
+| `params` | `viewport_params_t *` | out | Buffer to receive the full parameters of the layer requested. |
+
+---
+
+### `sys_map_set_layer_parameters`
+
+Set the parameters of a map layer
+
+**Syscall ID:** 1806
+
+**Kernel function:** `map_set_layer_params`
+
+```c
+result_t sys_map_set_layer_parameters(handle_t canvas, uint32_t layer, const viewport_params_t * params);
+```
+
+| Parameter | Type | Direction | Description |
+|-----------|------|-----------|-------------|
+| `canvas` | `handle_t` | in |  |
+| `layer` | `uint32_t` | in | Layer to change the parameters of.  If more that 1 provided an error is raised |
+| `params` | `const viewport_params_t *` | out | Buffer with the full parameters of the layer. |
 
 ---
 

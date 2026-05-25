@@ -177,6 +177,8 @@
 #define SYSCALL_SYS_MAP_ZOOM                               1802
 #define SYSCALL_SYS_MAP_SCREEN_TO_POSITION                 1803
 #define SYSCALL_SYS_MAP_POSITION_TO_SCREEN                 1804
+#define SYSCALL_SYS_MAP_GET_LAYER_PARAMETERS               1805
+#define SYSCALL_SYS_MAP_SET_LAYER_PARAMETERS               1806
 
 /* system () */
 #define SYSCALL_SYS_GET_AIRCRAFT                           2048
@@ -2399,25 +2401,26 @@ result_t sys_get_previous_tabstop_window(handle_t hwnd, handle_t* prev)
 /* map stubs                                                                  */
 /******************************************************************************/
 
-result_t sys_map_create_canvas(handle_t hwnd, const extent_t * extents, const char * db_path, const map_theme_t * theme, handle_t* canvas)
+result_t sys_map_create_canvas(handle_t hwnd, memid_t memid, const extent_t * extents, const char * db_path, const map_theme_t * theme, handle_t* canvas)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)hwnd;
-  register uint32_t __p1 __asm__("$a1") = (uint32_t)extents;
-  register uint32_t __p2 __asm__("$a2") = (uint32_t)db_path;
-  register uint32_t __p3 __asm__("$a3") = (uint32_t)theme;
+  register uint32_t __p1 __asm__("$a1") = (uint32_t)memid;
+  register uint32_t __p2 __asm__("$a2") = (uint32_t)extents;
+  register uint32_t __p3 __asm__("$a3") = (uint32_t)db_path;
 
   /* Parameters beyond 4 are passed on the stack per MIPS o32 ABI */
-  /* Allocate 4 bytes for 1 stack parameters */
+  /* Allocate 8 bytes for 2 stack parameters */
 
   __asm__ volatile (
-    "addiu $sp, $sp, -4\n\t"
+    "addiu $sp, $sp, -8\n\t"
     "sw %6, 0($sp)\n\t"
+    "sw %7, 4($sp)\n\t"
     "li $v0, %1\n\t"
     "syscall\n\t"
-    "addiu $sp, $sp, 4\n\t"
+    "addiu $sp, $sp, 8\n\t"
     : "=r"(__result)
-    : "i"(SYSCALL_SYS_MAP_CREATE_CANVAS), "r"(__p0), "r"(__p1), "r"(__p2), "r"(__p3), "r"((uint32_t)canvas)
+    : "i"(SYSCALL_SYS_MAP_CREATE_CANVAS), "r"(__p0), "r"(__p1), "r"(__p2), "r"(__p3), "r"((uint32_t)theme), "r"((uint32_t)canvas)
   );
 
   return __result;
@@ -2615,6 +2618,41 @@ result_t sys_map_position_to_screen(handle_t canvas, const lla_t* position, poin
     "syscall\n\t"
     : "=r"(__result)
     : "i"(SYSCALL_SYS_MAP_POSITION_TO_SCREEN), "r"(__p0), "r"(__p1), "r"(__p2)
+  );
+
+  return __result;
+}
+
+result_t sys_map_get_layer_parameters(handle_t canvas, uint32_t layer, uint32_t size, viewport_params_t * params)
+{
+  register result_t __result __asm__("$v0");
+  register uint32_t __p0 __asm__("$a0") = (uint32_t)canvas;
+  register uint32_t __p1 __asm__("$a1") = (uint32_t)layer;
+  register uint32_t __p2 __asm__("$a2") = (uint32_t)size;
+  register uint32_t __p3 __asm__("$a3") = (uint32_t)params;
+
+  __asm__ volatile (
+    "li $v0, %1\n\t"
+    "syscall\n\t"
+    : "=r"(__result)
+    : "i"(SYSCALL_SYS_MAP_GET_LAYER_PARAMETERS), "r"(__p0), "r"(__p1), "r"(__p2), "r"(__p3)
+  );
+
+  return __result;
+}
+
+result_t sys_map_set_layer_parameters(handle_t canvas, uint32_t layer, const viewport_params_t * params)
+{
+  register result_t __result __asm__("$v0");
+  register uint32_t __p0 __asm__("$a0") = (uint32_t)canvas;
+  register uint32_t __p1 __asm__("$a1") = (uint32_t)layer;
+  register uint32_t __p2 __asm__("$a2") = (uint32_t)params;
+
+  __asm__ volatile (
+    "li $v0, %1\n\t"
+    "syscall\n\t"
+    : "=r"(__result)
+    : "i"(SYSCALL_SYS_MAP_SET_LAYER_PARAMETERS), "r"(__p0), "r"(__p1), "r"(__p2)
   );
 
   return __result;

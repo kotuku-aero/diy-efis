@@ -1210,7 +1210,6 @@
                border-color="color_white"
                border-right="true"
                border-bottom ="true"
-               border-top="true"
                >
       <rect left="0" top="200" width="224" height="160"/>
       <egt name="1"
