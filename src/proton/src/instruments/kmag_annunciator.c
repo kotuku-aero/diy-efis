@@ -145,7 +145,10 @@ result_t on_kmag_msg(handle_t hwnd, const canmsg_t* msg, void* wnddata)
       }
     }
 
-  return changed;
+  if(changed)
+    invalidate(hwnd);
+
+  return s_false;
   }
 
 static char manual_msg[CFG_NAME_MAX];
@@ -341,73 +344,4 @@ static void kmag_worker(void* parg)
       publish_local(&msg, INDEFINITE_WAIT);
       }
     }
-  }
-
-// called when a msg arrives.
-static bool ev_msg(const canmsg_t* msg, void* parg)
-  {
-  if (msg == 0)
-    return false;
-
-  uint32_t now;
-  ticks(&now);
-
-  uint16_t tmp_uint16;
-  uint32_t tmp_uint32;
-
-  switch (get_can_id(msg))
-    {
-    case id_status_node_2:
-    case id_status_node_3:
-      if (msg->data[0] == 0xFF &&
-          (msg->data[3] & BOARD_TYPE_MASK) == mag_board_id)
-        {
-        // status information
-        // [0] = 0xFF  (BINARY)
-        // [1] = NodeID
-        // [2] = Board Status
-        // [3] = Board Type
-        // [4..7] = Board serial number 
-
-        switch (msg->data[3] & BOARD_FEATURE_MASK)
-          {
-          case mag_left_board_type:
-            left_status = (e_board_status)(msg->data[2]);
-            break;
-          case mag_right_board_type:
-            right_status = (e_board_status)(msg->data[2]);
-            break;
-          }
-        }
-      break;
-    case id_left_fuel_map:
-      get_param_uint16(msg, &left_fuel_map_active);
-      break;
-    case id_right_fuel_map:
-      get_param_uint16(msg, &right_fuel_map_active);
-      break;
-    case id_left_mixture_mode :
-      // TODO: cutoff??
-      get_param_uint16(msg, &tmp_uint16);
-      left_fuel_map_active = tmp_uint16 == 2 ? 2 : 0;
-      break;
-    case id_right_mixture_mode :
-      // TODO: cuttoff??
-      get_param_uint16(msg, &tmp_uint16);
-      right_fuel_map_active = tmp_uint16 == 2 ? 2 : 0;
-      break;
-    }
-
-  return false;
-  }
-
-result_t on_create_kmag(handle_t hwnd, widget_t* widget)
-  {
-  result_t result;
-
-  // hook the publisher
-  subscribe(ev_msg, 0, 0);
-
-  // create the worker
-  return task_create("EDU", DEFAULT_STACK_SIZE, kmag_worker, 0, HIGH_PRIORITY, 0);
   }

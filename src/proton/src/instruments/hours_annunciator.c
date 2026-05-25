@@ -1,6 +1,6 @@
-#include "annunciator_widget.h"
+#include "../../include/annunciator_widget.h"
 
-bool on_hours_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata)
+result_t on_hours_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata)
   {
   hours_annunciator_t* data = (hours_annunciator_t*)wnddata;
   bool changed = false;
@@ -13,7 +13,10 @@ bool on_hours_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnd
     data->hours = value;
     }
 
-  return changed;
+  if (changed)
+    invalidate(hwnd);
+
+  return s_false;
   }
 
 void on_paint_hours(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata)

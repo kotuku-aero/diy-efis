@@ -101,7 +101,7 @@ typedef struct _hours_annunciator_t {
   uint32_t hours; // hours
   } hours_annunciator_t;
 
-extern result_t on_hours_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata);
+extern result_t on_hours_msg(handle_t hwnd, const canmsg_t* msg, void* wnddata);
 extern void on_paint_hours(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata);
 
 //-----------------------------------------------------------------------------
@@ -136,8 +136,7 @@ typedef struct _ecu_annunciator_t {
   uint16_t right_mixture;
   } ecu_annunciator_t;
 
-extern result_t on_kmag_msg(handle_t hwnd, uint16_t can_id, const canmsg_t *msg,
-                            void *wnddata);
+extern result_t on_kmag_msg(handle_t hwnd, const canmsg_t *msg, void *wnddata);
 extern void on_paint_kmag(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata);
 extern result_t on_create_kmag(handle_t hwnd, widget_t* widget);
 

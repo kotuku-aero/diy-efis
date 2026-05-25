@@ -36,6 +36,8 @@ typedef struct _marquee_widget_t {
   // This is displayed when an ararm is raised.
   alarm_t *alarms;
   size_t num_alarms;
+
+  handle_t background_canvas;
   } marquee_widget_t;
 
 /**

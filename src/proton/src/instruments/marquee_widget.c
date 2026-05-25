@@ -169,7 +169,7 @@ result_t marquee_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
           ann = wnd->annunciators[i];
 
           // call the message handler
-          if (ann->base.on_message(hwnd, can_id, msg, ann) &&
+          if (ann->base.on_message(hwnd, msg, ann) &&
             i == wnd->selected_index)
             {
             get_window_by_id(hwnd, wnd->selected_index + wnd->base_widget_id, &hann);
@@ -283,11 +283,12 @@ static void park_alarm(handle_t hwnd, alarm_t* alarm)
   close_alarm(parent, hwnd, marquee);
   }
 
-result_t create_marquee_widget(handle_t parent, uint16_t id, marquee_widget_t* wnd, handle_t* out)
+result_t create_marquee_widget(handle_t parent, uint32_t flags,
+                               marquee_widget_t *wnd, handle_t *out)
   {
   result_t result;
   handle_t hndl;
-  if (failed(result = create_widget(parent, id, marquee_wndproc, &wnd->base, &hndl)))
+  if (failed(result = create_widget(parent, flags, marquee_wndproc, &wnd->base, &hndl)))
     return result;
 
   show_window(hndl);
@@ -364,11 +365,12 @@ result_t alarm_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
   return s_ok;
   }
 
-result_t create_alarm_annunciator(handle_t parent, uint16_t id, alarm_t* wnd, handle_t* out)
+result_t create_alarm_annunciator(handle_t parent, uint32_t flags, alarm_t *wnd,
+                                  handle_t *out)
   {
   result_t result;
   handle_t hndl;
-  if (failed(result = create_widget(parent, id, alarm_wndproc, &wnd->base, &hndl)))
+  if (failed(result = create_widget(parent, flags, alarm_wndproc, &wnd->base, &hndl)))
     return result;
 
   hide_window(hndl);

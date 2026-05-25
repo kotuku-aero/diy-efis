@@ -214,17 +214,81 @@
       <tick value="230" length="5"/>
       <tick value="240" text="240" length="7" />
     </gauge>
-    <attitude name="ATT"
+    <compass name="CMP"
+             id="compass_widget"
+             fill-background="true"
+             background-color="color_black"
+             border-color="color_white"
+             text-color="color_white"
+             pen-color="color_white"
+             name-font="neo_9_bold_font">
+      <rect left="328" top="0" width="280" height="20"/>
+    </compass>
+        <attitude name="ATT"
               id="att_widget"
               border-color="color_white"
               border-bottom="true"
               z-order="0"
               name-font="neo_9_bold_font">
-      <rect left="328" top ="8" width="284" height="284"/>
+      <rect left="328" top ="20" width="280" height="280"/>
       <skid-indicator left="42" top="264" width="200" height="20"/>
       <median x="142" y="142"/>
     </attitude>
-    <gauge name="ALT"
+      <pancake name="FLAP"
+               id="flap_indicator"
+               can-id="id_flap_position_value"
+               horizontal="false"
+               fill-background="true"
+               background-color="color_hollow"
+               outline-color="color_white"
+               indicator-color="color_darkgreen"
+               fill="true"
+               bar-width="14"
+               bar-height="7"
+               bar-gutter="2"
+               min-value="0"
+               max-value="40"
+               z-order="10"
+    >
+          <rect left="220" top="110" height="90" width="20"/>
+          <indicator-rect left="0" top="0" height="90" width="20"/>
+      </pancake>
+      <pancake name="PITCH"
+               id="pitch_indicator"
+               can-id="id_pitch_trim_value"
+               horizontal="false"
+               fill-background="true"
+               background-color="color_hollow"
+               outline-color="color_white"
+               indicator-color="color_darkgreen"
+               bar-width="14"
+               bar-height="7"
+               bar-gutter="2"
+               min-value="-50"
+               max-value="50"
+               z-order="10"
+    >
+          <rect left="60" top="110" height="90" width="20"/>
+          <indicator-rect left="0" top="0" height="90" width="20"/>
+      </pancake>
+      <pancake name="ROLL"
+               id="roll_indicator"
+               can-id="id_roll_trim_value"
+               horizontal="true"
+               fill-background="true"
+               background-color="color_black"
+               outline-color="color_white"
+               indicator-color="color_darkgreen"
+               bar-width="14"
+               bar-height="7"
+               bar-gutter="2"
+               min-value="-50"
+               max-value="50"
+    >
+          <rect left="110" top="220" height="20" width="100"/>
+          <indicator-rect left="0" top="0" height="20" width="100"/>
+      </pancake>
+      <gauge name="ALT"
            id="alt_widget"
            style="pointer"
            background-color="color_black"
@@ -499,7 +563,8 @@
          value-type="v_uint16"
          border-right="true"
          border-bottom="true"
-         fill-background="true">
+         fill-background="true"
+         >
       <rect left="60" top="368" width="104" height="20"/>
     </ecu>
     <auto name="OAT"

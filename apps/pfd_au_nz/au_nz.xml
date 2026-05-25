@@ -1051,7 +1051,7 @@
            arc-width="7"
            arc-begin="220"
            arc-range="100"
-           converter="convert_hpa_to_inhg"
+           converter="convert_hpa_to_hpa"
            font="neo_9_bold_font"
            value-font="neo_18_font"
            alarm-id="id_map_divergence_alarm"
@@ -1064,13 +1064,15 @@
       <value-rect left="82" top="50" width="80" height="26"/>
 
       <step value="0" color="color_hollow" pen="color_white" />
-      <step value="35" color="color_green" pen="color_white"/>
+      <step value="1100" color="color_green" pen="color_white"/>
 
-      <tick value="10" text="10" />
-      <tick value="15"/>
-      <tick value="20" text="20"/>
-      <tick value="25"/>
-      <tick value="30" text="30"/>
+        <tick value="200" text="200"/>
+      <tick value="350" />
+      <tick value="500" text="500"/>
+      <tick value="650"/>
+      <tick value="800" text="800"/>
+      <tick value="950"/>
+      <tick value="1100" text="1100"/>
     </gauge>
     <gauge name="RPM"
            id="rpm_gauge"
@@ -1191,7 +1193,7 @@
                left-gutter="24"
                right-gutter="196"
                cylinder-draw-width="40"
-               converter="convert_kelvin_to_c"
+               converter="convert_kelvin_to_f"
                egt-color="color_lightblue"
                cht-color="color_lightgreen"
                egt-line="5"
@@ -1199,15 +1201,16 @@
                bar-top="31"
                bar-bottom="144"
                status-top="142"
-               egt-redline="900"
-               egt-min="540"
-               cht-redline="205"
-               cht-min="105"
+               egt-redline="1650"
+               egt-min="1000"
+               cht-redline="500"
+               cht-min="225"
                redline-pos="38"
                font="neo_9_bold_font"
                border-color="color_white"
                border-right="true"
                border-bottom ="true"
+               border-top="true"
                >
       <rect left="0" top="200" width="224" height="160"/>
       <egt name="1"
@@ -1270,7 +1273,7 @@
            draw-name="true"
            name-color="color_white"
            can-id="id_oil_temperature"
-           converter="convert_kelvin_to_c"
+           converter="convert_kelvin_to_f"
            font="neo_12_font"
            alarm-id="id_high_oil_temperature_alarm"
            alarm-color =" color_red"
@@ -1283,10 +1286,10 @@
       <name-pt x="75" y="30"/>
       <value-rect left="3" top="20" width="17" height="19"/>
 
-      <step color="color_hollow" pen="color_hollow" value="0"/>
-      <step color="color_red" pen="color_red" value="32"/>
-      <step color="color_lightgreen" pen="color_lightgreen" value="105"/>
-      <step color="color_red" pen="color_red" value="120"/>
+        <step color="color_hollow" pen="color_hollow" value="32"/>
+        <step color="color_scarlet" pen="color_scarlet" value="90"/>
+        <step color="color_lightgreen" pen="color_lightgreen" value="220"/>
+        <step color="color_scarlet" pen="color_scarlet" value="250"/>
     </gauge>
     <gauge name="OILP"
            id="oilp_widget"
@@ -1340,7 +1343,7 @@
       <name-pt x="75" y="30"/>
       <value-rect left="3" top="20" width="17" height="19"/>
 
-      <step color="color_hollow" pen="color_hollow" value="10"/>
+      <step color="color_hollow" pen="color_hollow" value="0"/>
       <step color="color_red" pen="color_red" value="15"/>
       <step color="color_lightgreen" pen="color_lightgreen" value="45"/>
     </gauge>
@@ -1395,7 +1398,7 @@
 
       <step color="color_hollow" pen="color_hollow" value="0"/>
       <step color="color_red" pen="color_red" value="5"/>
-      <step color="color_lightgreen" pen="color_lightgreen" value="66"/>
+      <step color="color_lightgreen" pen="color_lightgreen" value="55"/>
     </gauge>
     <gauge name="RIGHT"
            id="right_fuel_widget"
@@ -1421,7 +1424,7 @@
 
       <step color="color_hollow" pen="color_hollow" value="0"/>
       <step color="color_red" pen="color_red" value="5"/>
-      <step color="color_lightgreen" pen="color_lightgreen" value="66"/>
+      <step color="color_lightgreen" pen="color_lightgreen" value="55"/>
     </gauge>
 
     <gauge name="REM"
@@ -1446,8 +1449,8 @@
       <value-rect left="3" top="20" width="17" height="19"/>
 
       <step color="color_hollow" pen="color_hollow" value="0"/>
-      <step color="color_red" pen="color_red" value="5"/>
-      <step color="color_lightgreen" pen="color_lightgreen" value="125"/>
+      <step color="color_red" pen="color_red" value="10"/>
+      <step color="color_lightgreen" pen="color_lightgreen" value="110"/>
     </gauge>
     <gauge name="IAT"
            id="iat_widget"
