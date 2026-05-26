@@ -12,6 +12,17 @@ extern result_t get_nearest_vor_name(menu_item_t* edit, variant_t* value);
 extern result_t get_nearest_ndb_name(menu_item_t* edit, variant_t* value);
 extern result_t get_current_flight_plan(menu_item_t* edit, uint32_t* value);
 
+extern result_t get_range(menu_item_t *edit, variant_t *value);
+extern result_t set_range(menu_item_t *edit, const variant_t *value);
+extern result_t get_range_max(menu_item_t *edit, variant_t *value);
+extern result_t get_mode(menu_item_t *edit, uint32_t *value);
+extern result_t get_water_mode(menu_item_t *edit, uint32_t *value);
+extern result_t get_contours_mode(menu_item_t *edit, uint32_t *value);
+extern result_t get_cities_mode(menu_item_t *edit, uint32_t *value);
+extern result_t get_transport_mode(menu_item_t *edit, uint32_t *value);
+extern result_t get_obstacles_mode(menu_item_t *edit, uint32_t *value);
+
+
 typedef enum
   {
   id_hnav_mode = id_app_action_id_first,

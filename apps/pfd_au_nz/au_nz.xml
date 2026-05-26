@@ -919,7 +919,7 @@
          border-color="color_white"
          border-left="true"
          border-bottom="true"
-         on-create="on_create_navigator_widget"
+         on-create="on_create_nav"
          db-path="C:/Projects/map-data"
          config-path="/proton/pfd/navigator"
          >
