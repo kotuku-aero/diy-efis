@@ -23,7 +23,6 @@ typedef struct _map_widget_t {
   map_theme_t day_theme;
   map_theme_t night_theme;
 
-  point_t map_center;
   const char *db_path;
   const char *config_path;
   const font_t *font;

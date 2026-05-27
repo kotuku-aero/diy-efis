@@ -924,7 +924,6 @@
          config-path="/proton/pfd/navigator"
          >
       <rect left="604" top="0" width="420" height="580" />
-      <center x="212" y="480"/>
       <day-theme alarm-color="color_red"
                  warning-color="color_yellow"
                  land-color="color_limegreen"

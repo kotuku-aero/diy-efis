@@ -2373,11 +2373,32 @@ static inline result_t map_update_position(handle_t canvas, const lla_t* positio
   }
 
 /**
+ * Retrieve the position and other details of the canvas
+ * @param canvas  * 
+ * @param position [out]  * 
+ * @param map_center [out]  * 
+ * @param heading [out]  * 
+ * @param track [out]  * 
+ * @return result_t
+ * @syscall 1795
+ */
+#ifndef PIC32_BUILD
+extern SYSCALL result_t STDCALL sys_map_get_position(handle_t canvas, lla_t* position, point_t* map_center, int32_t* heading, int32_t* track);
+#else
+extern result_t sys_map_get_position(handle_t canvas, lla_t* position, point_t* map_center, int32_t* heading, int32_t* track);
+#endif
+
+static inline result_t map_get_position(handle_t canvas, lla_t* position, point_t* map_center, int32_t* heading, int32_t* track)
+  {
+  return sys_map_get_position(canvas, position, map_center, heading, track);
+  }
+
+/**
  * Set the map display range in meters
  * @param canvas  * 
  * @param range_mtrs1000  * this is the tange of the map in meters * 1000
  * @return result_t
- * @syscall 1795
+ * @syscall 1796
  */
 #ifndef PIC32_BUILD
 extern SYSCALL result_t STDCALL sys_map_set_range(handle_t canvas, uint32_t range_mtrs1000);
@@ -2393,9 +2414,9 @@ static inline result_t map_set_range(handle_t canvas, uint32_t range_mtrs1000)
 /**
  * Set the map display range in meters
  * @param canvas  * 
- * @param range_mtrs1000 [out]  * this is the tange of the map in meters * 1000
+ * @param range_mtrs1000 [out]  * this is the tange of the map in meters
  * @return result_t
- * @syscall 1796
+ * @syscall 1797
  */
 #ifndef PIC32_BUILD
 extern SYSCALL result_t STDCALL sys_map_get_range(handle_t canvas, uint32_t* range_mtrs1000);
@@ -2413,7 +2434,7 @@ static inline result_t map_get_range(handle_t canvas, uint32_t* range_mtrs1000)
  * @param canvas  * 
  * @param mode  * 
  * @return result_t
- * @syscall 1797
+ * @syscall 1798
  */
 #ifndef PIC32_BUILD
 extern SYSCALL result_t STDCALL sys_map_set_mode(handle_t canvas, map_display_mode mode);
@@ -2431,7 +2452,7 @@ static inline result_t map_set_mode(handle_t canvas, map_display_mode mode)
  * @param canvas  * 
  * @param mode [out]  * 
  * @return result_t
- * @syscall 1798
+ * @syscall 1799
  */
 #ifndef PIC32_BUILD
 extern SYSCALL result_t STDCALL sys_map_get_mode(handle_t canvas, map_display_mode* mode);
@@ -2449,7 +2470,7 @@ static inline result_t map_get_mode(handle_t canvas, map_display_mode* mode)
  * @param canvas  * 
  * @param move_by  * Distance to pan the display by
  * @return result_t
- * @syscall 1801
+ * @syscall 1800
  */
 #ifndef PIC32_BUILD
 extern SYSCALL result_t STDCALL sys_map_pan(handle_t canvas, const extent_t * move_by);
@@ -2463,11 +2484,11 @@ static inline result_t map_pan(handle_t canvas, const extent_t * move_by)
   }
 
 /**
- * Zoom the map by a scale in pixels
+ * Pan the map by a specific number of pixels
  * @param canvas  * 
- * @param zoom_by  * relative percentage to zoom the map by
+ * @param zoom_by  * ration (0-100) to scale the display by
  * @return result_t
- * @syscall 1802
+ * @syscall 1801
  */
 #ifndef PIC32_BUILD
 extern SYSCALL result_t STDCALL sys_map_zoom(handle_t canvas, int32_t zoom_by);
@@ -2478,6 +2499,26 @@ extern result_t sys_map_zoom(handle_t canvas, int32_t zoom_by);
 static inline result_t map_zoom(handle_t canvas, int32_t zoom_by)
   {
   return sys_map_zoom(canvas, zoom_by);
+  }
+
+/**
+ * Call this to set the magnetic variation for the current location
+ * The kHUB publishes the magnetic variation constantly based on the
+ * GPS location.
+ * @param canvas  * 
+ * @param mag_var  * 
+ * @return result_t
+ * @syscall 1802
+ */
+#ifndef PIC32_BUILD
+extern SYSCALL result_t STDCALL sys_map_set_mag_var(handle_t canvas, int16_t mag_var);
+#else
+extern result_t sys_map_set_mag_var(handle_t canvas, int16_t mag_var);
+#endif
+
+static inline result_t map_set_mag_var(handle_t canvas, int16_t mag_var)
+  {
+  return sys_map_set_mag_var(canvas, mag_var);
   }
 
 /**

@@ -167,12 +167,14 @@
 #define SYSCALL_SYS_MAP_CREATE_CANVAS                      1792
 #define SYSCALL_SYS_MAP_RENDER_CANVAS                      1793
 #define SYSCALL_SYS_MAP_UPDATE_POSITION                    1794
-#define SYSCALL_SYS_MAP_SET_RANGE                          1795
-#define SYSCALL_SYS_MAP_GET_RANGE                          1796
-#define SYSCALL_SYS_MAP_SET_MODE                           1797
-#define SYSCALL_SYS_MAP_GET_MODE                           1798
-#define SYSCALL_SYS_MAP_PAN                                1801
-#define SYSCALL_SYS_MAP_ZOOM                               1802
+#define SYSCALL_SYS_MAP_GET_POSITION                       1795
+#define SYSCALL_SYS_MAP_SET_RANGE                          1796
+#define SYSCALL_SYS_MAP_GET_RANGE                          1797
+#define SYSCALL_SYS_MAP_SET_MODE                           1798
+#define SYSCALL_SYS_MAP_GET_MODE                           1799
+#define SYSCALL_SYS_MAP_PAN                                1800
+#define SYSCALL_SYS_MAP_ZOOM                               1801
+#define SYSCALL_SYS_MAP_SET_MAGVAR                         1802
 #define SYSCALL_SYS_MAP_SCREEN_TO_POSITION                 1803
 #define SYSCALL_SYS_MAP_POSITION_TO_SCREEN                 1804
 #define SYSCALL_SYS_MAP_GET_LAYER_PARAMETERS               1805
@@ -2459,6 +2461,30 @@ result_t sys_map_update_position(handle_t canvas, const lla_t* position, int32_t
   return __result;
 }
 
+result_t sys_map_get_position(handle_t canvas, lla_t* position, point_t* map_center, int32_t* heading, int32_t* track)
+{
+  register result_t __result __asm__("$v0");
+  register uint32_t __p0 __asm__("$a0") = (uint32_t)canvas;
+  register uint32_t __p1 __asm__("$a1") = (uint32_t)position;
+  register uint32_t __p2 __asm__("$a2") = (uint32_t)map_center;
+  register uint32_t __p3 __asm__("$a3") = (uint32_t)heading;
+
+  /* Parameters beyond 4 are passed on the stack per MIPS o32 ABI */
+  /* Allocate 4 bytes for 1 stack parameters */
+
+  __asm__ volatile (
+    "addiu $sp, $sp, -4\n\t"
+    "sw %6, 0($sp)\n\t"
+    "li $v0, %1\n\t"
+    "syscall\n\t"
+    "addiu $sp, $sp, 4\n\t"
+    : "=r"(__result)
+    : "i"(SYSCALL_SYS_MAP_GET_POSITION), "r"(__p0), "r"(__p1), "r"(__p2), "r"(__p3), "r"((uint32_t)track)
+  );
+
+  return __result;
+}
+
 result_t sys_map_set_range(handle_t canvas, uint32_t range_mtrs1000)
 {
   register result_t __result __asm__("$v0");
@@ -2550,6 +2576,22 @@ result_t sys_map_zoom(handle_t canvas, int32_t zoom_by)
     "syscall\n\t"
     : "=r"(__result)
     : "i"(SYSCALL_SYS_MAP_ZOOM), "r"(__p0), "r"(__p1)
+  );
+
+  return __result;
+}
+
+result_t sys_map_set_mag_var(handle_t canvas, int16_t mag_var)
+{
+  register result_t __result __asm__("$v0");
+  register uint32_t __p0 __asm__("$a0") = (uint32_t)canvas;
+  register uint32_t __p1 __asm__("$a1") = (uint32_t)mag_var;
+
+  __asm__ volatile (
+    "li $v0, %1\n\t"
+    "syscall\n\t"
+    : "=r"(__result)
+    : "i"(SYSCALL_SYS_MAP_SET_MAGVAR), "r"(__p0), "r"(__p1)
   );
 
   return __result;

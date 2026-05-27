@@ -2770,11 +2770,33 @@ result_t sys_map_update_position(handle_t canvas, const lla_t* position, int32_t
 
 ---
 
+### `sys_map_get_position`
+
+Retrieve the position and other details of the canvas
+
+**Syscall ID:** 1795
+
+**Kernel function:** `map_get_position`
+
+```c
+result_t sys_map_get_position(handle_t canvas, lla_t* position, point_t* map_center, int32_t* heading, int32_t* track);
+```
+
+| Parameter | Type | Direction | Description |
+|-----------|------|-----------|-------------|
+| `canvas` | `handle_t` | in |  |
+| `position` | `lla_t*` | out |  |
+| `map_center` | `point_t*` | out |  |
+| `heading` | `int32_t*` | out |  |
+| `track` | `int32_t*` | out |  |
+
+---
+
 ### `sys_map_set_range`
 
 Set the map display range in meters
 
-**Syscall ID:** 1795
+**Syscall ID:** 1796
 
 **Kernel function:** `map_set_range`
 
@@ -2793,7 +2815,7 @@ result_t sys_map_set_range(handle_t canvas, uint32_t range_mtrs1000);
 
 Set the map display range in meters
 
-**Syscall ID:** 1796
+**Syscall ID:** 1797
 
 **Kernel function:** `map_get_range`
 
@@ -2804,7 +2826,7 @@ result_t sys_map_get_range(handle_t canvas, uint32_t* range_mtrs1000);
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
 | `canvas` | `handle_t` | in |  |
-| `range_mtrs1000` | `uint32_t*` | out | this is the tange of the map in meters * 1000 |
+| `range_mtrs1000` | `uint32_t*` | out | this is the tange of the map in meters |
 
 ---
 
@@ -2812,7 +2834,7 @@ result_t sys_map_get_range(handle_t canvas, uint32_t* range_mtrs1000);
 
 Set the map display orientation mode
 
-**Syscall ID:** 1797
+**Syscall ID:** 1798
 
 **Kernel function:** `map_set_mode`
 
@@ -2831,7 +2853,7 @@ result_t sys_map_set_mode(handle_t canvas, map_display_mode mode);
 
 Set the map display orientation mode
 
-**Syscall ID:** 1798
+**Syscall ID:** 1799
 
 **Kernel function:** `map_get_mode`
 
@@ -2850,7 +2872,7 @@ result_t sys_map_get_mode(handle_t canvas, map_display_mode* mode);
 
 Pan the map by a specific number of pixels
 
-**Syscall ID:** 1801
+**Syscall ID:** 1800
 
 **Kernel function:** `map_pan`
 
@@ -2867,9 +2889,9 @@ result_t sys_map_pan(handle_t canvas, const extent_t * move_by);
 
 ### `sys_map_zoom`
 
-Zoom the map by a scale in pixels
+Pan the map by a specific number of pixels
 
-**Syscall ID:** 1802
+**Syscall ID:** 1801
 
 **Kernel function:** `map_zoom`
 
@@ -2880,7 +2902,28 @@ result_t sys_map_zoom(handle_t canvas, int32_t zoom_by);
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
 | `canvas` | `handle_t` | in |  |
-| `zoom_by` | `int32_t` | in | relative percentage to zoom the map by |
+| `zoom_by` | `int32_t` | in | ration (0-100) to scale the display by |
+
+---
+
+### `sys_map_set_magvar`
+
+Call this to set the magnetic variation for the current location
+              The kHUB publishes the magnetic variation constantly based on the
+              GPS location.
+
+**Syscall ID:** 1802
+
+**Kernel function:** `map_set_magvar`
+
+```c
+result_t sys_map_set_magvar(handle_t canvas, int16_t mag_var);
+```
+
+| Parameter | Type | Direction | Description |
+|-----------|------|-----------|-------------|
+| `canvas` | `handle_t` | in |  |
+| `mag_var` | `int16_t` | in |  |
 
 ---
 

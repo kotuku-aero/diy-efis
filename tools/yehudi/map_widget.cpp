@@ -11,15 +11,6 @@ void code_generator::create_map_widget(std::ofstream &out,
 
   create_map_theme(out, node.select_node("./day-theme").node(), ".day_theme");
   create_map_theme(out, node.select_node("./night-theme").node(), ".night_theme");
-
-  if (node.select_node("./center").node().empty())
-    {
-    out << ".map_center.x = " << get_named_attribute(node, "width").value() << " / 2," << std::endl;
-    out << ".map_center.y = " << get_named_attribute(node, "height").value() << " / 2," << std::endl;
-    }
-  else
-    emit_point(out, node, "center", ".map_center");
-
   emit_string_property(out, node, "db-path", ".db_path");
   emit_string_property(out, node, "config-path", ".config_path");
   emit_address_property(out, node, "font", ".font");

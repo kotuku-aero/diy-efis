@@ -33,10 +33,6 @@ static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* _m
   {
   map_widget_t* wnd = (map_widget_t*)wnddata;
 
-  // based on the current scale, draw the range circle that is scale / 4
-  extent_t ex;
-  rect_extents(wnd_rect, &ex);
-
   // draw the map decoratins
   on_paint_widget_background(canvas, wnd_rect, _msg, wnddata);
 
@@ -60,7 +56,75 @@ static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* _m
 
   map_render_canvas(wnd->map, &map_rect, canvas);
 
-  // render the aircraft on to the ned_center of the map
+  // get the current position on the screen for the aircraft center
+  point_t pt;
+  sys_map_get_position(wnd->map, nullptr, &pt, nullptr, nullptr);
+
+  // this draws a sample aircraft at the current map center
+  point_t aircraft[] = {
+      {pt.x + 0, pt.y - 15},
+      {pt.x + 2, pt.y - 14},
+      {pt.x + 3, pt.y - 10},
+      {pt.x + 3, pt.y - 8},
+      {pt.x + 16, pt.y - 8},
+      {pt.x + 17, pt.y - 7},
+      {pt.x + 18, pt.y - 5},
+      {pt.x + 19, pt.y - -1},
+      {pt.x + 2, pt.y - -1},
+      {pt.x + 2, pt.y - -8},
+      {pt.x + 6, pt.y - -9},
+      {pt.x + 7, pt.y - -10},
+      {pt.x + 7, pt.y - -13},
+      {pt.x + 1, pt.y - -13},
+      {pt.x + 0, pt.y - -15},
+      {pt.x + -1, pt.y - -13},
+      {pt.x + -7, pt.y - -13},
+      {pt.x + -7, pt.y - -10},
+      {pt.x + -6, pt.y - -9},
+      {pt.x + -2, pt.y - -8},
+      {pt.x + -2, pt.y - -1},
+      {pt.x + -19, pt.y - -1},
+      {pt.x + -18, pt.y - 5},
+      {pt.x + -17, pt.y - 7},
+      {pt.x + -16, pt.y - 8},
+      {pt.x + -3, pt.y - 8},
+      {pt.x + -3, pt.y - 10},
+      {pt.x + -2, pt.y - 14},
+      {pt.x + -0, pt.y - 15},
+  };
+
+  polygon(canvas, wnd_rect, color_black, color_white, numelements(aircraft),
+          aircraft);
+
+  extent_t ex;
+  rect_extents(wnd_rect, &ex);
+
+  // draw a range circle that is 1/2 the width of the actual display
+  int32_t range_dist = ex.dx >> 2;
+
+  rect_t range_rect = {
+      pt.x - range_dist, pt.y - range_dist,
+      pt.x + range_dist, pt.y + range_dist};
+
+  ellipse(canvas, wnd_rect, color_white, color_hollow, &range_rect);
+
+  uint32_t range_in_meters;
+  sys_map_get_range(wnd->map, &range_in_meters);
+
+  // TODO: map in km, miles
+  //
+  // range at right of arc (maybe at right) This may change.
+  // 7400 is 1nm in meters * 4
+  char range[8];
+  sprintf(range, "%d nm", range_in_meters / 7400);
+
+  text_extent(wnd->font, 0, range, &ex);
+
+  // TODO: when vertical fonts supported use other dims
+  point_t txt_point = { range_rect.right - ex.dx, pt.y };
+
+  draw_text(canvas, wnd_rect, wnd->font, color_white, color_hollow, 0,
+            range, &txt_point, wnd_rect, eto_vertical, 0);
 
   }
 
@@ -288,6 +352,13 @@ static result_t map_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
       map_pan(wnd->map, &ex);
 
       changed = true;
+      }
+      break;
+    case id_magnetic_variation:
+      {
+      int16_t value;
+      get_param_int16(msg, &value);
+      map_set_mag_var(wnd->map, value);
       }
       break;
     case id_timer:
@@ -630,10 +701,10 @@ result_t create_map_widget(handle_t parent, uint32_t flags, map_widget_t* wnd, h
       {
       default:
       case 0 :
-        // npl VOR
-        // -39.007241, 174.183977
-        extra->map_position.lng = 174.183977f;
-        extra->map_position.lat = -39.007241f;
+        // npl threshold 05
+        // -39.010476, 174.170100
+        extra->map_position.lng = 174.170100f;
+        extra->map_position.lat = -39.010476f;
         extra->map_position.alt = feet_to_meters(150);
         wnd->track = 50;
         wnd->heading = 50;
@@ -716,25 +787,12 @@ result_t create_map_widget(handle_t parent, uint32_t flags, map_widget_t* wnd, h
   if (failed(result = cfg_get_int32(extra->map_settings, map_display_mode_name,
                                     &extra->display_mode, nullptr)))
     {
-    extra->display_mode = mdm_north;
+    extra->display_mode = mdm_track;
     extra->display_mode_changed = true;
     }
 
   if (failed(result = map_set_mode(wnd->map, extra->display_mode)))
     goto config_error;
-
-  wnd->map_center.x = rect_width(&wnd->base.rect) >> 1;
-  switch (extra->display_mode)
-    {
-  case mdm_north:
-    wnd->map_center.y =
-        rect_height(&wnd->base.rect) >> 1; // north up mode centers map
-    break;
-  case mdm_track:
-  case mdm_course:
-    wnd->map_center.y = rect_height(&wnd->base.rect) - 120;
-    break;
-    }
 
   /*********************************************************************/
   //  Terrain - NOT SUPPORTED YET, code is there display too slow.
