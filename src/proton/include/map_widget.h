@@ -13,10 +13,11 @@ typedef struct _map_widget_t {
   handle_t hwnd;
   extent_t font_cell_size;
 
-  int32_t course;             // course
-  int32_t track;              // current track    
-  int32_t heading;            // current heading
-  lla_t gps_position;
+  int32_t course;             // course (is true)
+  int32_t track;              // current track (is true)
+  int32_t magnetic_heading;   // current heading is magnetic
+  int32_t mag_var;            // magnetic variation.
+  int32_t true_heading;
 
   // this is created by the yehudi compiler from the
   // color definitions

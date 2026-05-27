@@ -268,18 +268,20 @@ static void state_callback(overlapped_t *context, result_t result)
 static result_t map_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
   {
   map_widget_t* wnd = (map_widget_t*)wnddata;
+  map_extra_data_t *extra = (map_extra_data_t *)wnd->base.extra;
+
 
   bool changed = false;
   switch (get_can_id(msg))
     {
     case id_position_lat:
-      get_param_float(msg, &wnd->gps_position.lat);
+      get_param_float(msg, &extra->map_position.lat);
       break;
     case id_position_lng:
-      get_param_float(msg, &wnd->gps_position.lng);
+      get_param_float(msg, &extra->map_position.lng);
       break;
     case id_gps_height:
-      get_param_float(msg, &wnd->gps_position.alt);
+      get_param_float(msg, &extra->map_position.alt);
       break;
     case id_true_track:
       // we don't use magnetic
@@ -288,7 +290,8 @@ static result_t map_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
       break;
     case id_gps_valid:
       // save the value
-      changed = succeeded(map_update_position(wnd->map, &wnd->gps_position, wnd->heading, wnd->track));
+      changed = succeeded(map_update_position(wnd->map, &extra->map_position,
+                                              wnd->true_heading, wnd->track));
       break;
     case id_magnetic_heading:
       {
@@ -300,8 +303,30 @@ static result_t map_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
       while (direction > 359)
         direction -= 360;
 
-      changed = wnd->track != direction;
-      wnd->track = direction;
+      changed = wnd->magnetic_heading != direction;
+      if (changed)
+        {
+        wnd->magnetic_heading = direction;
+        wnd->true_heading = wnd->magnetic_heading - wnd->mag_var;
+        map_update_position(wnd->map, &extra->map_position,
+                            wnd->true_heading, wnd->track);
+        }
+      }
+      break;
+    case id_magnetic_variation:
+      {
+      int16_t value;
+      get_param_int16(msg, &value);
+      changed = wnd->mag_var != value;
+      if (changed)
+        {
+        wnd->mag_var = value;
+        map_set_mag_var(wnd->map, value);
+        wnd->true_heading = wnd->magnetic_heading - wnd->mag_var;
+        map_update_position(wnd->map, &extra->map_position, wnd->true_heading,
+                            wnd->track);
+        map_set_mag_var(wnd->map, value);
+        }
       }
       break;
     case id_selected_course:
@@ -317,15 +342,12 @@ static result_t map_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
       int16_t value;
       get_param_int16(msg, &value);
       changed = wnd->track != value;
-      wnd->track = value;
-      }
-      break;
-    case id_heading:
-      {
-      int16_t value;
-      get_param_int16(msg, &value);
-      changed = wnd->heading != value;
-      wnd->heading = value;
+      if (changed)
+        {
+        wnd->track = value;
+        map_update_position(wnd->map, &extra->map_position, wnd->true_heading,
+                            wnd->track);
+        }
       }
       break;
     case id_touch_zoom:
@@ -352,13 +374,6 @@ static result_t map_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
       map_pan(wnd->map, &ex);
 
       changed = true;
-      }
-      break;
-    case id_magnetic_variation:
-      {
-      int16_t value;
-      get_param_int16(msg, &value);
-      map_set_mag_var(wnd->map, value);
       }
       break;
     case id_timer:
@@ -388,7 +403,7 @@ static result_t map_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
     extra->position_changed = true;
     }
 
-  map_update_position(widget->map, position, widget->heading, widget->track);
+  map_update_position(widget->map, position, widget->magnetic_heading, widget->track);
   }
 
 void set_map_range(map_widget_t *widget, int32_t range)
@@ -631,8 +646,6 @@ result_t create_map_widget(handle_t parent, uint32_t flags, map_widget_t* wnd, h
     return result;
 
   wnd->base.on_paint = on_paint;
-  // TODO: this should be from a setting
-  wnd->map_mode = mdm_track;
 
   // create our extra storage
   map_extra_data_t *extra = calloc(1, sizeof(map_extra_data_t));
@@ -705,9 +718,9 @@ result_t create_map_widget(handle_t parent, uint32_t flags, map_widget_t* wnd, h
         // -39.010476, 174.170100
         extra->map_position.lng = 174.170100f;
         extra->map_position.lat = -39.010476f;
-        extra->map_position.alt = feet_to_meters(150);
-        wnd->track = 50;
-        wnd->heading = 50;
+        extra->map_position.alt = feet_to_meters(89);
+        wnd->track = 45;
+        wnd->magnetic_heading = 45;
         break;
       case 1 :
         // rangioira
@@ -716,7 +729,7 @@ result_t create_map_widget(handle_t parent, uint32_t flags, map_widget_t* wnd, h
         extra->map_position.lng = 172.542007;
         extra->map_position.alt = feet_to_meters(180);
         wnd->track = 220;
-        wnd->heading = 220;
+        wnd->magnetic_heading = 220;
         break;
       case 2 :
         // stratford aerodrome
@@ -725,7 +738,7 @@ result_t create_map_widget(handle_t parent, uint32_t flags, map_widget_t* wnd, h
         extra->map_position.lng = 174.308126f;
         extra->map_position.alt = feet_to_meters(951);
         wnd->track = 90;
-        wnd->heading = 90;
+        wnd->magnetic_heading = 90;
         break;
       case 3 :
         // Ardmore
@@ -734,7 +747,7 @@ result_t create_map_widget(handle_t parent, uint32_t flags, map_widget_t* wnd, h
         extra->map_position.lng = 174.978367;
         extra->map_position.alt = feet_to_meters(111);
         wnd->track = 21;
-        wnd->heading = 21;
+        wnd->magnetic_heading = 21;
         break;
       case 4 :
         // oshkosh wi
@@ -743,7 +756,7 @@ result_t create_map_widget(handle_t parent, uint32_t flags, map_widget_t* wnd, h
         extra->map_position.lng = -88.567753;
         extra->map_position.alt = feet_to_meters(809);
         wnd->track = 27;
-        wnd->heading = 27;
+        wnd->magnetic_heading = 27;
         break;
       case 5 :
         // sfo
@@ -752,7 +765,7 @@ result_t create_map_widget(handle_t parent, uint32_t flags, map_widget_t* wnd, h
         extra->map_position.lng = -122.242943;
         extra->map_position.alt = feet_to_meters(13);
         wnd->track = 28;
-        wnd->heading = 28;
+        wnd->magnetic_heading = 28;
         break;
       case 6 :
         // OAK
@@ -761,7 +774,7 @@ result_t create_map_widget(handle_t parent, uint32_t flags, map_widget_t* wnd, h
         extra->map_position.lng = -122.207544f;
         extra->map_position.alt = feet_to_meters(8.5);
         wnd->track = 10;
-        wnd->heading = 10;
+        wnd->magnetic_heading = 10;
         break;
       }
 
@@ -770,14 +783,14 @@ result_t create_map_widget(handle_t parent, uint32_t flags, map_widget_t* wnd, h
     }
 
   if (failed(result = map_update_position(wnd->map, &extra->map_position,
-                                          wnd->heading, wnd->track)))
+                                          wnd->magnetic_heading, wnd->track)))
     goto config_error;
 
   if (failed(result = cfg_get_int32(extra->map_settings, map_zoom_name,
                                     &extra->range, nullptr)))
     {
     extra->range =
-        (int32_t)(10 * METERS_PER_NM); // width of the scaled screen in meters
+        (int32_t)(4 * METERS_PER_NM); // width of the scaled screen in meters
     extra->range_changed = true;
     }
 
@@ -787,7 +800,7 @@ result_t create_map_widget(handle_t parent, uint32_t flags, map_widget_t* wnd, h
   if (failed(result = cfg_get_int32(extra->map_settings, map_display_mode_name,
                                     &extra->display_mode, nullptr)))
     {
-    extra->display_mode = mdm_track;
+    extra->display_mode = mdm_heading;
     extra->display_mode_changed = true;
     }
 
