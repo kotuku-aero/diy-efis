@@ -60,14 +60,7 @@ static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* _m
 
   map_render_canvas(wnd->map, &map_rect, canvas);
 
-  // create the corners of the display, it could be rotated
-  // in respect to the screen
-  // TODO: cache these when the position/rotation changes
-  // in gtopo30 1 pixel = 1km
-  int32_t pixel_dist = ex.dx >> 1;
-
-
-  // ellipse(canvas, wnd_rect, color_white, color_hollow, &range_rect);
+  // render the aircraft on to the ned_center of the map
 
   }
 
@@ -86,6 +79,7 @@ typedef enum
   ss_cities,
   ss_transport,
   ss_obstacles,
+  ss_airspaces,
   ss_complete,
 } settings_state_e;
 
@@ -101,7 +95,7 @@ typedef struct _map_extra_data_t
   memid_t obstacles_key;
   memid_t terrain_key;
   memid_t transport_key;
-  memid_t airspace_key;
+  memid_t airspaces_key;
 
   bool position_changed;
   lla_t map_position;
@@ -126,6 +120,9 @@ typedef struct _map_extra_data_t
 
   bool view_obstacles_changed;
   bool view_obstacles;
+
+  bool view_airspaces_changed;
+  bool view_airspaces;
   } map_extra_data_t;
 
 static void state_callback(overlapped_t *context, result_t result)
@@ -187,8 +184,16 @@ static void state_callback(overlapped_t *context, result_t result)
       cfg_set_bool(data->obstacles_key, visible_name, data->view_obstacles,
                    &data->base);
 
-    data->state = ss_complete;
+    data->state = ss_airspaces;
     data->view_obstacles_changed = false;
+    break;
+  case ss_airspaces:
+    if (data->view_airspaces_changed)
+      cfg_set_bool(data->airspaces_key, visible_name, data->view_airspaces,
+                   &data->base);
+
+    data->state = ss_complete;
+    data->view_airspaces_changed = false;
     break;
   case ss_complete:
     data->state = ss_init; // wait till next id_timer message
@@ -353,124 +358,183 @@ void get_map_mode(map_widget_t *widget, map_display_mode *mode)
   *mode = (map_display_mode)extra->display_mode;
   }
 
-void get_map_contours_visible(map_widget_t *wnd, bool *visible)
+void get_map_contours_visible(map_widget_t *widget, bool *visible)
   {
-  map_extra_data_t *extra = (map_extra_data_t *)wnd->base.extra;
-  *visible = extra->view_contours;
+  contours_params_t vp;
+  if(succeeded(map_get_layer_parameters(widget->map, MAP_LAYER_CONTOURS, sizeof(vp), &vp)))
+    *visible = vp.base.show_layer;
+  else
+    *visible = false;
   }
 
 void set_map_contours_visible(map_widget_t *widget, bool visible)
   {
   map_extra_data_t *extra = (map_extra_data_t *)widget->base.extra;
-  if (visible != extra->view_contours)
+  contours_params_t vp;
+  if (succeeded(map_get_layer_parameters(widget->map, MAP_LAYER_CONTOURS,
+                                        sizeof(vp), &vp)))
     {
-    extra->view_contours = visible;
+    vp.base.show_layer = visible;
+    map_set_layer_parameters(widget->map, MAP_LAYER_CONTOURS, &vp);
+    }
+  else
+    vp.base.show_layer = false;
+
+  if (vp.base.show_layer != extra->view_contours)
+    {
+    extra->view_contours = vp.base.show_layer;
     extra->view_contours_changed = true;
     }
-
-  uint32_t layers;
-  map_get_layer_visible(widget->map, &layers);
-  if (visible)
-    layers |= MAP_LAYER_CONTOURS;
-  else
-    layers &= ~MAP_LAYER_CONTOURS;
-  map_set_layer_visible(widget->map, layers);
   }
 
-void get_map_cities_visible(map_widget_t *wnd, bool *visible)
+void get_map_cities_visible(map_widget_t *widget, bool *visible)
   {
-  map_extra_data_t *extra = (map_extra_data_t *)wnd->base.extra;
-  *visible = extra->view_cities;
+  cities_params_t vp;
+  if (succeeded(map_get_layer_parameters(widget->map, MAP_LAYER_CONTOURS,
+                                        sizeof(vp), &vp)))
+    *visible = vp.base.show_layer;
+  else
+    *visible = false;
   }
 
 void set_map_cities_visible(map_widget_t *widget, bool visible)
   {
   map_extra_data_t *extra = (map_extra_data_t *)widget->base.extra;
-  if (visible != extra->view_cities)
+  cities_params_t vp;
+  if (succeeded(map_get_layer_parameters(widget->map, MAP_LAYER_CITIES,
+                                        sizeof(vp), &vp)))
     {
-    extra->view_cities = visible;
+    vp.base.show_layer = visible;
+    map_set_layer_parameters(widget->map, MAP_LAYER_CITIES, &vp);
+    }
+  else
+    vp.base.show_layer = false;
+
+  if (vp.base.show_layer != extra->view_cities)
+    {
+    extra->view_cities = vp.base.show_layer;
     extra->view_cities_changed = true;
     }
-
-  uint32_t layers;
-  map_get_layer_visible(widget->map, &layers);
-  if (visible)
-    layers |= MAP_LAYER_CITIES;
-  else
-    layers &= ~MAP_LAYER_CITIES;
-  map_set_layer_visible(widget->map, layers);
   }
 
 void get_map_water_visible(map_widget_t *widget, bool *visible)
   {
-  map_extra_data_t *extra = (map_extra_data_t *)widget->base.extra;
-  *visible = extra->view_water;
+  surface_water_params_t vp;
+  if (succeeded(map_get_layer_parameters(widget->map, MAP_LAYER_SURFACE_WATER,
+                                        sizeof(vp), &vp)))
+    *visible = vp.base.show_layer;
+  else
+    *visible = false;
   }
 
 void set_map_water_visible(map_widget_t *widget, bool visible)
   {
   map_extra_data_t *extra = (map_extra_data_t *)widget->base.extra;
-  if (visible != extra->view_water)
+  surface_water_params_t vp;
+  if (succeeded(map_get_layer_parameters(widget->map, MAP_LAYER_SURFACE_WATER,
+                                        sizeof(vp), &vp)))
     {
-    extra->view_water = visible;
+    vp.base.show_layer = visible;
+    map_set_layer_parameters(widget->map, MAP_LAYER_SURFACE_WATER, &vp);
+    }
+  else
+    vp.base.show_layer = false;
+
+  if (vp.base.show_layer != extra->view_water)
+    {
+    extra->view_water = vp.base.show_layer;
     extra->view_water_changed = true;
     }
-
-  uint32_t layers;
-  map_get_layer_visible(widget->map, &layers);
-  if (visible)
-    layers |= MAP_LAYER_SURFACE_WATER;
-  else
-    layers &= ~MAP_LAYER_SURFACE_WATER;
-  map_set_layer_visible(widget->map, layers);
   }
 
 void get_map_transport_visible(map_widget_t *widget, bool *visible)
   {
-  map_extra_data_t *extra = (map_extra_data_t *)widget->base.extra;
-  *visible = extra->view_transport;
+  transport_params_t vp;
+  if (succeeded(map_get_layer_parameters(widget->map, MAP_LAYER_TRANSPORT,
+                                        sizeof(vp), &vp)))
+    *visible = vp.base.show_layer;
+  else
+    *visible = false;
   }
 
 void set_map_transport_visible(map_widget_t *widget, bool visible)
   {
   map_extra_data_t *extra = (map_extra_data_t *)widget->base.extra;
-  if (visible != extra->view_transport)
+  transport_params_t vp;
+  if (succeeded(map_get_layer_parameters(widget->map, MAP_LAYER_TRANSPORT,
+                                        sizeof(vp), &vp)))
     {
-    extra->view_transport = visible;
+    vp.base.show_layer = visible;
+    map_set_layer_parameters(widget->map, MAP_LAYER_TRANSPORT, &vp);
+    }
+  else
+    vp.base.show_layer = false;
+
+  if (vp.base.show_layer != extra->view_transport)
+    {
+    extra->view_transport = vp.base.show_layer;
     extra->view_transport_changed = true;
     }
-
-  uint32_t layers;
-  map_get_layer_visible(widget->map, &layers);
-  if (visible)
-    layers |= MAP_LAYER_TRANSPORT;
-  else
-    layers &= ~MAP_LAYER_TRANSPORT;
-  map_set_layer_visible(widget->map, layers);
   }
 
 void get_map_obstacles_visible(map_widget_t *widget, bool *visible)
   {
-  map_extra_data_t *extra = (map_extra_data_t *)widget->base.extra;
-  *visible = extra->view_obstacles;
+  obstacles_params_t vp;
+  if (succeeded(map_get_layer_parameters(widget->map, MAP_LAYER_OBSTACLES,
+                                        sizeof(vp), &vp)))
+    *visible = vp.base.show_layer;
+  else
+    *visible = false;
   }
 
 void set_map_obstacles_visible(map_widget_t *widget, bool visible)
   {
   map_extra_data_t *extra = (map_extra_data_t *)widget->base.extra;
-  if (visible != extra->view_obstacles)
+  obstacles_params_t vp;
+  if (succeeded(map_get_layer_parameters(widget->map, MAP_LAYER_OBSTACLES,
+                                        sizeof(vp), &vp)))
     {
-    extra->view_obstacles = visible;
+    vp.base.show_layer = visible;
+    map_set_layer_parameters(widget->map, MAP_LAYER_OBSTACLES, &vp);
+    }
+  else
+    vp.base.show_layer = false;
+
+  if (vp.base.show_layer != extra->view_obstacles)
+    {
+    extra->view_obstacles = vp.base.show_layer;
     extra->view_obstacles_changed = true;
     }
+  }
 
-  uint32_t layers;
-  map_get_layer_visible(widget->map, &layers);
-  if (visible)
-    layers |= MAP_LAYER_OBSTACLES;
+void get_map_airspacevisible(map_widget_t *widget, bool *visible)
+  {
+  airspace_params_t vp;
+  if (succeeded(map_get_layer_parameters(widget->map, MAP_LAYER_AIRSPACES,
+                                        sizeof(vp), &vp)))
+    *visible = vp.base.show_layer;
   else
-    layers &= ~MAP_LAYER_OBSTACLES;
-  map_set_layer_visible(widget->map, layers);
+    *visible = false;
+  }
+
+void set_map_airspace_visible(map_widget_t *widget, bool visible)
+  {
+  map_extra_data_t *extra = (map_extra_data_t *)widget->base.extra;
+  airspace_params_t vp;
+  if (succeeded(map_get_layer_parameters(widget->map, MAP_LAYER_AIRSPACES,
+                                        sizeof(vp), &vp)))
+    {
+    vp.base.show_layer = visible;
+    map_set_layer_parameters(widget->map, MAP_LAYER_AIRSPACES, &vp);
+    }
+  else
+    vp.base.show_layer = false;
+
+  if (vp.base.show_layer != extra->view_airspaces)
+    {
+    extra->view_obstacles = vp.base.show_layer;
+    extra->view_obstacles_changed = true;
+    }
   }
 
 
@@ -545,7 +609,7 @@ result_t create_map_widget(handle_t parent, uint32_t flags, map_widget_t* wnd, h
       failed(result = ensure_key(extra->map_settings, obstacles_key, &extra->obstacles_key)) ||
       failed(result = ensure_key(extra->map_settings, terrain_key, &extra->terrain_key)) ||
       failed(result = ensure_key(extra->map_settings, transport_key, &extra->transport_key)) ||
-      failed(result = ensure_key(extra->map_settings, airspace_key, &extra->airspace_key)))
+      failed(result = ensure_key(extra->map_settings, airspace_key, &extra->airspaces_key)))
     goto config_error;
 
   // to make sense of the map, load the last known position.
@@ -559,42 +623,77 @@ result_t create_map_widget(handle_t parent, uint32_t flags, map_widget_t* wnd, h
     extra->map_position.lng = 0;
 
 #ifdef _DEBUG
-    extra->map_position.alt = feet_to_meters(2500); // about 2500 ft;
 
-    // rangioira
-    // -43.290001,172.542007
-    // wnd->params.ned_center.y = float_to_fixed(-43.290001);
-    // wnd->params.ned_center.x = float_to_fixed(172.542007);
+    int test_case = 0;
 
-    // stratford aerodrome
-    // -39.318319, 174.308126
-    // wnd->params.ned_center.y = float_to_fixed(-39.318319f);
-    // wnd->params.ned_center.x = float_to_fixed(174.308126f);
+    switch (test_case)
+      {
+      default:
+      case 0 :
+        // npl VOR
+        // -39.007241, 174.183977
+        extra->map_position.lng = 174.183977f;
+        extra->map_position.lat = -39.007241f;
+        extra->map_position.alt = feet_to_meters(150);
+        wnd->track = 50;
+        wnd->heading = 50;
+        break;
+      case 1 :
+        // rangioira
+        // -43.290001,172.542007
+        extra->map_position.lat = -43.290001;
+        extra->map_position.lng = 172.542007;
+        extra->map_position.alt = feet_to_meters(180);
+        wnd->track = 220;
+        wnd->heading = 220;
+        break;
+      case 2 :
+        // stratford aerodrome
+        // -39.318319, 174.308126
+        extra->map_position.lat = -39.318319f;
+        extra->map_position.lng = 174.308126f;
+        extra->map_position.alt = feet_to_meters(951);
+        wnd->track = 90;
+        wnd->heading = 90;
+        break;
+      case 3 :
+        // Ardmore
+        // -37.064376, 174.978367
+        extra->map_position.lat = -37.064376;
+        extra->map_position.lng = 174.978367;
+        extra->map_position.alt = feet_to_meters(111);
+        wnd->track = 21;
+        wnd->heading = 21;
+        break;
+      case 4 :
+        // oshkosh wi
+        // 43.998287, -88.567753
+        extra->map_position.lat = 43.998287;
+        extra->map_position.lng = -88.567753;
+        extra->map_position.alt = feet_to_meters(809);
+        wnd->track = 27;
+        wnd->heading = 27;
+        break;
+      case 5 :
+        // sfo
+        // 37.466539, -122.242943
+        extra->map_position.lat = 37.466539;
+        extra->map_position.lng = -122.242943;
+        extra->map_position.alt = feet_to_meters(13);
+        wnd->track = 28;
+        wnd->heading = 28;
+        break;
+      case 6 :
+        // OAK
+        // 37.619909, -122.207544
+        extra->map_position.lat = 37.619909f;
+        extra->map_position.lng = -122.207544f;
+        extra->map_position.alt = feet_to_meters(8.5);
+        wnd->track = 10;
+        wnd->heading = 10;
+        break;
+      }
 
-    // npl VOR
-    // -39.007241, 174.183977
-    extra->map_position.lat = 174.183977f;
-    extra->map_position.lng = -39.007241f;
-
-    // Ardmore
-    // -37.064376, 174.978367
-    // wnd->params.ned_center.y = float_to_fixed(-37.064376);
-    // wnd->params.ned_center.x = float_to_fixed(174.978367);
-
-    // oshkosh wi
-    // 43.998287, -88.567753
-    // wnd->params.ned_center.y = float_to_fixed(43.998287);
-    // wnd->params.ned_center.x = float_to_fixed(-88.567753);
-
-    // sfo
-    // 37.466539, -122.242943
-    // wnd->params.ned_center.y = float_to_fixed(37.466539);
-    // wnd->params.ned_center.x = float_to_fixed(-122.242943);
-
-    // OAK
-    // 37.619909, -122.207544
-    // wnd->params.ned_center.y = float_to_fixed(37.619909f);
-    // wnd->params.ned_center.x = float_to_fixed(-122.207544f);
 #endif
     extra->position_changed = true;
     }
@@ -774,12 +873,12 @@ result_t create_map_widget(handle_t parent, uint32_t flags, map_widget_t* wnd, h
   asp.info_panel_zoom = 40000;
   asp.detail_info_panel_zoom = 20000;
 
-  if (failed(result = cfg_get_int32(extra->airspace_key, info_panel_zoom_name, &asp.info_panel_zoom, nullptr)) &&
-      failed(result = cfg_set_int32(extra->airspace_key, info_panel_zoom_name, asp.info_panel_zoom, nullptr)))
+  if (failed(result = cfg_get_int32(extra->airspaces_key, info_panel_zoom_name, &asp.info_panel_zoom, nullptr)) &&
+      failed(result = cfg_set_int32(extra->airspaces_key, info_panel_zoom_name, asp.info_panel_zoom, nullptr)))
     goto config_error;
 
-  if (failed(result = cfg_get_int32(extra->airspace_key, detail_panel_zoom_name, &asp.detail_info_panel_zoom, nullptr)) &&
-      failed(result = cfg_set_int32(extra->airspace_key, detail_panel_zoom_name, asp.detail_info_panel_zoom, nullptr)))
+  if (failed(result = cfg_get_int32(extra->airspaces_key, detail_panel_zoom_name, &asp.detail_info_panel_zoom, nullptr)) &&
+      failed(result = cfg_set_int32(extra->airspaces_key, detail_panel_zoom_name, asp.detail_info_panel_zoom, nullptr)))
     goto config_error;
 
   if (failed(result = sys_map_set_layer_parameters(wnd->map, MAP_LAYER_AIRSPACES, &asp.base)))

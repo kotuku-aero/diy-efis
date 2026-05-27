@@ -2445,42 +2445,6 @@ static inline result_t map_get_mode(handle_t canvas, map_display_mode* mode)
   }
 
 /**
- * Show or hide a specific map layer
- * @param canvas  * 
- * @param layer_id  * 
- * @return result_t
- * @syscall 1799
- */
-#ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL sys_map_set_layer_visible(handle_t canvas, uint32_t layer_id);
-#else
-extern result_t sys_map_set_layer_visible(handle_t canvas, uint32_t layer_id);
-#endif
-
-static inline result_t map_set_layer_visible(handle_t canvas, uint32_t layer_id)
-  {
-  return sys_map_set_layer_visible(canvas, layer_id);
-  }
-
-/**
- * Show or hide a specific map layer
- * @param canvas  * 
- * @param layer_id [out]  * 
- * @return result_t
- * @syscall 1800
- */
-#ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL sys_map_get_layer_visible(handle_t canvas, uint32_t* layer_id);
-#else
-extern result_t sys_map_get_layer_visible(handle_t canvas, uint32_t* layer_id);
-#endif
-
-static inline result_t map_get_layer_visible(handle_t canvas, uint32_t* layer_id)
-  {
-  return sys_map_get_layer_visible(canvas, layer_id);
-  }
-
-/**
  * Pan the map by a specific number of pixels
  * @param canvas  * 
  * @param move_by  * Distance to pan the display by

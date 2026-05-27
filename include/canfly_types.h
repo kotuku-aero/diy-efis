@@ -1130,11 +1130,6 @@ typedef struct _viewport_params_t
 
   bool show_layer;          // show/hide the layer
 
-  // these are calculated when the spatial entities are selected and
-  // are then needed to ge-locate points for the current renderer
-  fixed_t geo_scale_y;      // degrees per pixel in y-axis
-  fixed_t geo_scale_x;      // degrees per pixel in x-axis
-
   } viewport_params_t;
 
 typedef struct _airspace_params_t

@@ -2846,44 +2846,6 @@ result_t sys_map_get_mode(handle_t canvas, map_display_mode* mode);
 
 ---
 
-### `sys_map_set_layer_visible`
-
-Show or hide a specific map layer
-
-**Syscall ID:** 1799
-
-**Kernel function:** `map_set_layer_visible`
-
-```c
-result_t sys_map_set_layer_visible(handle_t canvas, uint32_t layer_id);
-```
-
-| Parameter | Type | Direction | Description |
-|-----------|------|-----------|-------------|
-| `canvas` | `handle_t` | in |  |
-| `layer_id` | `uint32_t` | in |  |
-
----
-
-### `sys_map_get_layer_visible`
-
-Show or hide a specific map layer
-
-**Syscall ID:** 1800
-
-**Kernel function:** `map_get_layer_visible`
-
-```c
-result_t sys_map_get_layer_visible(handle_t canvas, uint32_t* layer_id);
-```
-
-| Parameter | Type | Direction | Description |
-|-----------|------|-----------|-------------|
-| `canvas` | `handle_t` | in |  |
-| `layer_id` | `uint32_t*` | out |  |
-
----
-
 ### `sys_map_pan`
 
 Pan the map by a specific number of pixels

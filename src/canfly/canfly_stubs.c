@@ -171,8 +171,6 @@
 #define SYSCALL_SYS_MAP_GET_RANGE                          1796
 #define SYSCALL_SYS_MAP_SET_MODE                           1797
 #define SYSCALL_SYS_MAP_GET_MODE                           1798
-#define SYSCALL_SYS_MAP_SET_LAYER_VISIBLE                  1799
-#define SYSCALL_SYS_MAP_GET_LAYER_VISIBLE                  1800
 #define SYSCALL_SYS_MAP_PAN                                1801
 #define SYSCALL_SYS_MAP_ZOOM                               1802
 #define SYSCALL_SYS_MAP_SCREEN_TO_POSITION                 1803
@@ -2520,38 +2518,6 @@ result_t sys_map_get_mode(handle_t canvas, map_display_mode* mode)
     "syscall\n\t"
     : "=r"(__result)
     : "i"(SYSCALL_SYS_MAP_GET_MODE), "r"(__p0), "r"(__p1)
-  );
-
-  return __result;
-}
-
-result_t sys_map_set_layer_visible(handle_t canvas, uint32_t layer_id)
-{
-  register result_t __result __asm__("$v0");
-  register uint32_t __p0 __asm__("$a0") = (uint32_t)canvas;
-  register uint32_t __p1 __asm__("$a1") = (uint32_t)layer_id;
-
-  __asm__ volatile (
-    "li $v0, %1\n\t"
-    "syscall\n\t"
-    : "=r"(__result)
-    : "i"(SYSCALL_SYS_MAP_SET_LAYER_VISIBLE), "r"(__p0), "r"(__p1)
-  );
-
-  return __result;
-}
-
-result_t sys_map_get_layer_visible(handle_t canvas, uint32_t* layer_id)
-{
-  register result_t __result __asm__("$v0");
-  register uint32_t __p0 __asm__("$a0") = (uint32_t)canvas;
-  register uint32_t __p1 __asm__("$a1") = (uint32_t)layer_id;
-
-  __asm__ volatile (
-    "li $v0, %1\n\t"
-    "syscall\n\t"
-    : "=r"(__result)
-    : "i"(SYSCALL_SYS_MAP_GET_LAYER_VISIBLE), "r"(__p0), "r"(__p1)
   );
 
   return __result;
