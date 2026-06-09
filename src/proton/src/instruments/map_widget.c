@@ -26,6 +26,10 @@ const char *show_dem_name = "dem";
 const char *hypsometric_tint_name = "tint";
 const char *info_panel_zoom_name = "info-zoom";
 const char *detail_panel_zoom_name = "detail-zoom";
+const char *vrp_zoom_name = "vrp-zoom";
+const char *navaid_zoom_name = "navaid-zoom";
+const char *obstacle_zoom_name = "obstacle-zoom";
+const char *hazard_zoom_name = "hazard-zoom";
 
 typedef struct _map_entity_t map_entity_t;
 
@@ -633,7 +637,7 @@ static result_t ensure_key(memid_t key, const char *name, memid_t *child)
   return result;
   }
 
-result_t create_map_widget(handle_t parent, uint32_t flags, map_widget_t* wnd, handle_t* out)
+result_t create_map_widget(handle_t parent, handle_t spatial_db, uint32_t flags, map_widget_t* wnd, handle_t* out)
   {
   result_t result;
   if (failed(result = create_widget(parent, flags, map_wndproc, &wnd->base, &wnd->hwnd)))
@@ -642,7 +646,7 @@ result_t create_map_widget(handle_t parent, uint32_t flags, map_widget_t* wnd, h
   extent_t background_ex = { rect_width(&wnd->base.rect), rect_height(&wnd->base.rect) };
 
   // TODO: should be smarter than this.
-  if (failed(result = map_create_canvas(wnd->hwnd, 0, &background_ex, wnd->db_path, &wnd->day_theme, &wnd->map)))
+  if (failed(result = map_create_canvas(wnd->hwnd, 0, &background_ex, spatial_db, &wnd->day_theme, &wnd->map)))
     return result;
 
   wnd->base.on_paint = on_paint;
@@ -943,6 +947,13 @@ result_t create_map_widget(handle_t parent, uint32_t flags, map_widget_t* wnd, h
   // TODO: these belong in the params init code
   asp.info_panel_zoom = 40000;
   asp.detail_info_panel_zoom = 20000;
+  // Per-entity-type visibility thresholds in metres (range from observer).
+  // Tuned for a typical VFR cockpit: VRPs/hazards only close in, navaids
+  // visible from farther out for IFR planning, obstacles in-between.
+  asp.vrp_zoom = 75000;             // ~40 NM
+  asp.navaid_zoom = 200000;         // ~108 NM
+  asp.obstacle_zoom = 100000;       // ~54 NM
+  asp.hazard_zoom = 75000;          // ~40 NM
 
   if (failed(result = cfg_get_int32(extra->airspaces_key, info_panel_zoom_name, &asp.info_panel_zoom, nullptr)) &&
       failed(result = cfg_set_int32(extra->airspaces_key, info_panel_zoom_name, asp.info_panel_zoom, nullptr)))
@@ -953,6 +964,17 @@ result_t create_map_widget(handle_t parent, uint32_t flags, map_widget_t* wnd, h
     goto config_error;
 
   if (failed(result = sys_map_set_layer_parameters(wnd->map, MAP_LAYER_AIRSPACES, &asp.base)))
+    goto config_error;
+    
+  if (failed(result = cfg_get_int32(extra->airspaces_key, obstacle_zoom_name, &asp.obstacle_zoom, nullptr)) &&
+      failed(result = cfg_set_int32(extra->airspaces_key, obstacle_zoom_name, asp.obstacle_zoom, nullptr)))
+    goto config_error;
+
+  if (failed(result = cfg_get_int32(extra->airspaces_key, hazard_zoom_name, &asp.hazard_zoom, nullptr)) &&
+      failed(result = cfg_set_int32(extra->airspaces_key, hazard_zoom_name, asp.hazard_zoom, nullptr)))
+    goto config_error;
+
+  if (failed(result = map_set_layer_params(wnd->map, MAP_LAYER_AIRSPACES, &asp.base)))
     goto config_error;
 
   text_extent(wnd->font, 1, "M", &wnd->font_cell_size);

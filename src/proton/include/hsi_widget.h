@@ -16,13 +16,16 @@ typedef struct _hsi_widget_t {
   uint16_t wind_direction; // always true
   int16_t magnetic_variation;
   int16_t wind_speed;
-  char waypoint_name[17];
+  char waypoint_name[8];
   uint16_t heading_bug;
   int16_t heading;
 
   // reported by the kHUB
   uint16_t autopilot_mode;
-  float altitude;
+  // current assigned altitude in feed AMSL
+  uint16_t ap_altitude;
+  // current vertical speed assigned
+  uint16_t ap_vs;
 
   const selected_unit_t* converter;
   } hsi_widget_t;

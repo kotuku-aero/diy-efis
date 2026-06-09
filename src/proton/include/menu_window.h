@@ -61,6 +61,7 @@ typedef menu_item_t* menu_itemp;
 
 typedef result_t(*get_value_fn)(menu_item_t * edit, variant_t* value);
 typedef result_t(*set_value_fn)(menu_item_t * edit, const variant_t *value);
+typedef result_t(*get_hint_fn)(menu_item_t * edit, variant_t* value);
 typedef result_t(*evaluate_fn)(menu_item_t * edit);
 
 /* This describes the handlers for a menu.
@@ -150,6 +151,7 @@ extern void draw_menu_item(handle_t hwnd, menu_widget_t* wnd, const rect_t* wnd_
   const point_t* menu_origin);
 
 typedef struct _menu_item_spin_edit_t menu_item_spin_edit_t;
+typedef struct _menu_item_textedit_t menu_item_textedit_t;
 
 typedef enum _key_number_t {
   kn_no_caption = 0x0000,
@@ -231,7 +233,8 @@ typedef struct _menu_widget_t {
 
   int32_t menu_timer;       // as a press/rotate is given this sets the tick-timeout
 
-  menu_item_spin_edit_t* edit;   // currently displayed edit.
+  menu_item_spin_edit_t* spin_edit;   // currently displayed edit.
+  menu_item_textedit_t* text_edit;    // currently selected text edit item
   } menu_widget_t;
 
 extern void default_msg_handler(menu_widget_t* wnd, menu_item_t * item, const canmsg_t* msg);
@@ -300,7 +303,6 @@ typedef struct _menu_item_checklist_t {
 extern menu_item_action_result item_checklist_evaluate(menu_widget_t* wnd, menu_item_t * item, const canmsg_t* msg);
 extern void item_checklist_event(menu_widget_t* wnd, menu_item_t * item, const canmsg_t* msg);
 
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Item handlers for a spin edit item
@@ -331,7 +333,41 @@ extern void item_spin_edit_paint(handle_t canvas, menu_widget_t* wnd, const rect
 extern menu_item_action_result item_spin_edit_evaluate(menu_widget_t* wnd, menu_item_t * item, const canmsg_t* msg);
 extern void item_spin_edit_event(menu_widget_t* wnd, menu_item_t * item, const canmsg_t* msg);
 
-extern result_t find_menu(menu_widget_t *wnd, const char *name, const menu_t **menu);
+////////////////////////////////////////////////////////////////////////////////
+//
+// Text edit menu action
+//
+// qllows for editing up to 7 characters in a predective text edit
+typedef struct _menu_item_textedit_t
+  {
+  menu_item_t base;
+
+  get_value_fn get_value;
+  set_value_fn set_value;
+  // evaluate the partially filled edit and suggest the next char
+  get_hint_fn get_hint;
+  keys_t *keys;
+  uint16_t max_length;      // maximum of 7
+  extent_t char_width;
+  uint16_t edit_posn;
+  variant_t value;
+  variant_t hint;
+  } menu_item_textedit_t;
+
+extern void item_textedit_paint(handle_t canvas, menu_widget_t *wnd,
+                                const rect_t *wnd_rect, menu_item_t *item,
+                                const rect_t *rect, bool is_selected);
+extern menu_item_action_result item_textedit_evaluate(menu_widget_t *wnd,
+                                                       menu_item_t *item,
+                                                       const canmsg_t *msg);
+extern void item_textedit_event(menu_widget_t *wnd, menu_item_t *item, const canmsg_t *msg);
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// Default actions
+//
+extern result_t find_menu(menu_widget_t *wnd, const char *name,
+                          const menu_t **menu);
 
 
 extern void default_paint_handler(handle_t canvas, menu_widget_t* wnd, const rect_t* wnd_rect, menu_item_t * item, const rect_t* area, bool is_selected);

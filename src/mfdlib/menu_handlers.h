@@ -6,6 +6,10 @@
 
 extern mfd_wnd_t mfd;
 
+extern result_t find_wpt_name(menu_item_t *edit, variant_t *value);
+extern result_t set_direct_to_wpt(menu_item_t *edit, variant_t *value);
+extern result_t get_wpt_hint(menu_item_t *edit, variant_t *value);
+
 extern result_t get_direct_to_waypoint(menu_item_t* edit, variant_t* value);
 extern result_t get_nearest_airport_name(menu_item_t* edit, variant_t* value);
 extern result_t get_nearest_vor_name(menu_item_t* edit, variant_t* value);

@@ -2709,7 +2709,7 @@ Create a kernel-managed map rendering canvas
 **Kernel function:** `map_create_canvas`
 
 ```c
-result_t sys_map_create_canvas(handle_t hwnd, memid_t memid, const extent_t * extents, const char * db_path, const map_theme_t * theme, handle_t* canvas);
+result_t sys_map_create_canvas(handle_t hwnd, memid_t memid, const extent_t * extents, handle_t spatial_db, const map_theme_t * theme, handle_t* canvas);
 ```
 
 | Parameter | Type | Direction | Description |
@@ -2720,7 +2720,7 @@ result_t sys_map_create_canvas(handle_t hwnd, memid_t memid, const extent_t * ex
         store map specific configuration data.  The creator of the map is responsible
         to allocate a key for the instance of the map. |
 | `extents` | `const extent_t *` | in | The size of the map canvas to be created |
-| `db_path` | `const char *` | in | Must refer to a CanFly navigation database pack |
+| `spatial_db` | `handle_t` | in | Must refer to a CanFly navigation database pack |
 | `theme` | `const map_theme_t *` | in | These are the colors to display for the moving map.  The address of it is
         used in the kernel and must not change after the canvas is made |
 | `canvas` | `handle_t*` | out |  |
@@ -2906,18 +2906,18 @@ result_t sys_map_zoom(handle_t canvas, int32_t zoom_by);
 
 ---
 
-### `sys_map_set_magvar`
+### `sys_map_set_mag_var`
 
 Call this to set the magnetic variation for the current location
-              The kHUB publishes the magnetic variation constantly based on the
-              GPS location.
+            The kHUB publishes the magnetic variation constantly based on the
+            GPS location.
 
 **Syscall ID:** 1802
 
-**Kernel function:** `map_set_magvar`
+**Kernel function:** `map_set_mag_var`
 
 ```c
-result_t sys_map_set_magvar(handle_t canvas, int16_t mag_var);
+result_t sys_map_set_mag_var(handle_t canvas, int16_t mag_var);
 ```
 
 | Parameter | Type | Direction | Description |
@@ -3005,6 +3005,157 @@ result_t sys_map_set_layer_parameters(handle_t canvas, uint32_t layer, const vie
 | `canvas` | `handle_t` | in |  |
 | `layer` | `uint32_t` | in | Layer to change the parameters of.  If more that 1 provided an error is raised |
 | `params` | `const viewport_params_t *` | out | Buffer with the full parameters of the layer. |
+
+---
+
+### `sys_open_spatial_db`
+
+Open a CanFly spatial database by path
+
+> The call can use the overlapped callback to overlap operations
+
+**Syscall ID:** 1807
+
+**Kernel function:** `open_atom_db`
+
+```c
+result_t sys_open_spatial_db(const char * db_path, uint32_t * num_containers, handle_t* handle, overlapped_t * overlapped);
+```
+
+| Parameter | Type | Direction | Description |
+|-----------|------|-----------|-------------|
+| `db_path` | `const char *` | in | Path to the repository of database files |
+| `num_containers` | `uint32_t *` | out | Optional pointer that will recieve the number of databases loaded |
+| `handle` | `handle_t*` | out | Handle to an opened database |
+| `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
+
+---
+
+### `sys_spatial_get_container_count`
+
+Return the number of spatial entity containers in the database
+
+**Syscall ID:** 1808
+
+```c
+result_t sys_spatial_get_container_count(handle_t hndl, uint32_t* num);
+```
+
+| Parameter | Type | Direction | Description |
+|-----------|------|-----------|-------------|
+| `hndl` | `handle_t` | in | Handle of the database to enumerate |
+| `num` | `uint32_t*` | out | Number of containers in the database |
+
+---
+
+### `sys_spatial_open_container`
+
+Open a spatial container
+
+**Syscall ID:** 1809
+
+```c
+result_t sys_spatial_open_container(handle_t hndl, handle_t* cont);
+```
+
+| Parameter | Type | Direction | Description |
+|-----------|------|-----------|-------------|
+| `hndl` | `handle_t` | in | Handle of the database to open the container in |
+| `cont` | `handle_t*` | out | Handle to the container |
+
+---
+
+### `sys_spatial_get_container_details`
+
+Return the details about a spatial container
+
+> The call can use the overlapped callback to overlap operations
+
+**Syscall ID:** 1810
+
+```c
+result_t sys_spatial_get_container_details(handle_t hndl, spatial_container_details_t* hdr, overlapped_t * overlapped);
+```
+
+| Parameter | Type | Direction | Description |
+|-----------|------|-----------|-------------|
+| `hndl` | `handle_t` | in | Handle of the database to enumerate |
+| `hdr` | `spatial_container_details_t*` | in | allocated header details |
+| `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
+
+---
+
+### `sys_spatial_select_entities`
+
+Select a set of entities from a spatial database
+
+> The call can use the overlapped callback to overlap operations
+
+**Syscall ID:** 1811
+
+```c
+result_t sys_spatial_select_entities(handle_t hndl, const spatial_rhombus_t * bounds, size_t num_types, const spatial_entity_type* types, handle_t * ids, overlapped_t * overlapped);
+```
+
+| Parameter | Type | Direction | Description |
+|-----------|------|-----------|-------------|
+| `hndl` | `handle_t` | in | Handle to a container to query |
+| `bounds` | `const spatial_rhombus_t *` | in | A Geo rhombos that describes the are to query within |
+| `num_types` | `size_t` | in | Number of spatial entity types to select from |
+| `types` | `const spatial_entity_type*` | in | The types of entities to filter to |
+| `ids` | `handle_t *` | out | Handle to a selection of spatial entities.  Note the format of these is
+          private to spatial database.  Primarily used to pass as a set to
+          select entities based on attributes (and extract attributes) |
+| `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
+
+---
+
+### `sys_spatial_query_entities`
+
+Select a range of values from a selection of spatial entities.
+        The sys_spatial_select_entities is called first then it can
+        be queried for attributes
+
+> The call can use the overlapped callback to overlap operations
+
+**Syscall ID:** 1812
+
+```c
+result_t sys_spatial_query_entities(handle_t hndl, const criteria_operator_t * op, size_t num_sort, const sort_operator_t * sort, uint32_t * num_oids, handle_t * oids, overlapped_t * overlapped);
+```
+
+| Parameter | Type | Direction | Description |
+|-----------|------|-----------|-------------|
+| `hndl` | `handle_t` | in | This is the handle returned by sys_spatial_select_entities |
+| `op` | `const criteria_operator_t *` | in | Filter criteria for the query |
+| `num_sort` | `size_t` | in | Number of sort parameters |
+| `sort` | `const sort_operator_t *` | in | optional sort parameters for the query |
+| `num_oids` | `uint32_t *` | out | The number of entities that match the selection criteria |
+| `oids` | `handle_t *` | out | Handle to the collection of entities that match the passed
+          query string. |
+| `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
+
+---
+
+### `sys_spatial_get_attributes`
+
+Return the named attributes of a series of spatial entities.
+
+> The call can use the overlapped callback to overlap operations
+
+**Syscall ID:** 1813
+
+```c
+result_t sys_spatial_get_attributes(handle_t hndl, uint32_t num_attr, const char * attr_names, variant_t * attr_values, overlapped_t * overlapped);
+```
+
+| Parameter | Type | Direction | Description |
+|-----------|------|-----------|-------------|
+| `hndl` | `handle_t` | in | Handle to an object_id returned from sys_spatial_quey_entities |
+| `num_attr` | `uint32_t` | in | number of attributes to query |
+| `attr_names` | `const char *` | in | Names of the attributes to query.  This varies based on the entity type |
+| `attr_values` | `variant_t *` | out | Resulting values of the attributes queried. |
+| `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
 
 ---
 

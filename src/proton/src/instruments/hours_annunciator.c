@@ -1,6 +1,6 @@
 #include "../../include/annunciator_widget.h"
 
-result_t on_hours_msg(handle_t hwnd, uint16_t can_id, const canmsg_t* msg, void* wnddata)
+result_t on_hours_msg(handle_t hwnd, const canmsg_t* msg, void* wnddata)
   {
   hours_annunciator_t* data = (hours_annunciator_t*)wnddata;
   bool changed = false;

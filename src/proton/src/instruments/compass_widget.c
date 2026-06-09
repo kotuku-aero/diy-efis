@@ -135,22 +135,29 @@ static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* ms
   bug_pts[2].x += 50;
   polygon(canvas, wnd_rect, color_green, color_green, 4, bug_pts);
 
-  //// draw the wind direction
-  //uint32_t wind_x = (wnd->wind_direction - left_degrees) * pixels_per_degree;
-  //point_t wind_pt[2] = {
-  //  {wind_x, ex.dy - 10},
-  //  {wind_x, ex.dy }
-  //  };
-  //polyline(canvas, wnd_rect, color_blue, 3, wind_pt);
+  uint32_t wind_x = calculate_position(
+      wnd, &ex, wnd->wind_direction + wnd->magnetic_variation,
+      pixels_per_degree);
+  // draw the wind speed
+  char wind_text[8];
+  snprintf(wind_text, sizeof(wind_text), "%d", wnd->wind_speed);
+  uint16_t wind_len = strlen(wind_text);
+  extent_t wind_ex;
+  text_extent(wnd->base.name_font, wind_len, wind_text, &wind_ex);
+  point_t wind_text_pt = {wind_x - (wind_ex.dx >> 1), 0};
+  draw_text(canvas, wnd_rect, wnd->base.name_font, color_yellow, color_hollow,
+            wind_len, wind_text, &wind_text_pt, wnd_rect, eto_none, 0);
 
-  //// draw the wind speed
-  //char wind_text[8];
-  //snprintf(wind_text, sizeof(wind_text), "%d", wnd->wind_speed);
-  //uint16_t wind_len = strlen(wind_text);
-  //extent_t wind_ex;
-  //text_extent(wnd->base.name_font, wind_len, wind_text, &wind_ex);
-  //point_t wind_text_pt = { wind_x - (wind_ex.dx >> 1), 0 };
-  //draw_text(canvas, wnd_rect, wnd->base.name_font, color_blue, color_hollow, wind_len, wind_text, &wind_text_pt, wnd_rect, eto_none, 0);
+  gdi_dim_t mrkr_pt = ((ex.dy - wind_ex.dy) >> 1) + wind_ex.dy -2;
+  //// draw the wind direction
+  point_t wind_pt[5] = {
+    { wind_x,     ex.dy       }, 
+    { wind_x - 5, mrkr_pt     },
+    { wind_x,     wind_ex.dy -2  },
+    { wind_x + 5, mrkr_pt     },
+    { wind_x,     ex.dy       }
+    };
+  polygon(canvas, wnd_rect, color_yellow, color_yellow, numelements(wind_pt), wind_pt);
 
 
   char heading_text[8];
@@ -175,33 +182,13 @@ static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* ms
   draw_text(canvas, wnd_rect, wnd->base.name_font, color_black, color_white, heading_len, heading_text, &heading_text_pt, wnd_rect, eto_none, 0);
   }
 
-static result_t get_param_as_degrees(const canmsg_t* msg, uint16_t* out)
-  {
-  result_t result;
-  float flt;
-  if (succeeded(result = get_param_float(msg, &flt)))
-    {
-    int16_t heading = radians_to_degrees(flt);
-
-    while (heading < 0)
-      heading += 360;
-
-    while (heading > 359)
-      heading -= 360;
-
-    *out = (uint16_t)heading;
-    return s_ok;
-    }
-  return result;
-  }
-
-
 static result_t compass_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
   {
   bool changed = false;
   compass_widget_t* wnd = (compass_widget_t*)wnddata;
 
   uint16_t u16;
+  int16_t i16;
 
   switch (get_can_id(msg))
     {
@@ -209,9 +196,16 @@ static result_t compass_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddat
       on_paint_widget(hwnd, msg, wnddata);
       break;
 
+    case id_magnetic_variation :
+      if (succeeded(get_param_int16(msg, &i16)))
+        {
+        changed = wnd->magnetic_variation != i16;
+        wnd->magnetic_variation = i16;
+        }
+      break;
     case id_magnetic_heading:
-      // this is the magnet
-      if (succeeded(get_param_as_degrees(msg, &u16)))
+      // this is the magnetic heading
+      if (succeeded(get_param_uint16(msg, &u16)))
         {
         changed = wnd->magnetic_heading != u16;
         wnd->magnetic_heading = u16;
@@ -227,7 +221,7 @@ static result_t compass_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddat
         }
       break;
     case id_true_heading:
-      if (succeeded(get_param_as_degrees(msg, &u16)))
+      if (succeeded(get_param_uint16(msg, &u16)))
         {
         changed = wnd->true_heading != u16;
         wnd->true_heading = u16;
@@ -241,7 +235,7 @@ static result_t compass_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddat
         }
       break;
     case id_track:
-      if (succeeded(get_param_as_degrees(msg, &u16)))
+      if (succeeded(get_param_uint16(msg, &u16)))
         {
         changed = wnd->track != u16;
         wnd->track = u16;
@@ -263,8 +257,9 @@ static result_t compass_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddat
       }
       break;
     case id_wind_direction:
-      if (succeeded(get_param_as_degrees(msg, &u16)))
+      if (succeeded(get_param_uint16(msg, &u16)))
         {
+        wnd->has_wind_direction = true;
         changed = wnd->wind_direction != u16;
         wnd->wind_direction = u16;
         }

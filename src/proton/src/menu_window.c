@@ -319,7 +319,9 @@ bool default_enable_handler(menu_widget_t* wnd, menu_item_t* item, const canmsg_
 
 void default_msg_handler(menu_widget_t* wnd, menu_item_t* item, const canmsg_t* msg)
   {
-  if (item->controlling_param == get_can_id(msg))
+  uint16_t id = get_can_id(msg);
+
+  if (id != 0 && item->controlling_param == id)
     memcpy(&((menu_item_t*)item)->controlling_variable, msg, sizeof(canmsg_t));
   }
 
@@ -899,10 +901,6 @@ result_t menu_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
       // sent to indicate a setup menu should be shown
       show_menu(wnd, wnd->setup_menu);
       break;
-  case id_button :
-    get_param_uint32(msg, &u32);
-    switch (u32)
-      {
       case id_key0:
         on_key0(hwnd, msg, wnddata);
         break;
@@ -963,7 +961,6 @@ result_t menu_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
     case id_press_deckb:
         on_press_deckb(hwnd, msg, wnddata);
         break;
-      }
     case id_left:
       on_menu_left(hwnd, msg, wnddata);
       break;

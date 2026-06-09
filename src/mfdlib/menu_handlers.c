@@ -164,3 +164,24 @@ result_t set_node_id(menu_item_t* edit, const variant_t* value)
   return result;
   }
 
+
+result_t find_wpt_name(menu_item_t* edit, variant_t* value)
+  {
+  // search the NAV db for a waypoint
+  return e_not_implemented;
+  }
+
+result_t set_direct_to_wpt(menu_item_t* edit, variant_t* value)
+  {
+  // request the FMS to goto
+
+  return s_ok;
+  }
+
+result_t get_wpt_hint(menu_item_t *edit, variant_t *value) 
+  {
+  if (value->value.chars[0] == 'N' && value->value.chars[1] == 'Z')
+    create_variant_chars("NZNP", value);
+
+  return s_ok;
+  }

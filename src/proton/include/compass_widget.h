@@ -2,7 +2,7 @@
 #define __compass_h__
 
 #include "widget.h"
-#include "../mfdlib/mfd.h"
+#include "../../mfdlib/mfd.h"
 
 typedef struct _compass_widget_t {
   widget_t base;
@@ -13,7 +13,9 @@ typedef struct _compass_widget_t {
   uint16_t track;
   int16_t distance_to_waypoint;
   int16_t time_to_waypoint;
-  uint16_t wind_direction; // always true
+
+  bool has_wind_direction;
+  uint16_t wind_direction; // always true, so add mag var
   int16_t wind_speed;
   int16_t magnetic_variation;
   uint16_t heading_bug;

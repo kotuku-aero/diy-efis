@@ -2313,7 +2313,7 @@ static inline result_t get_previous_tabstop_window(handle_t hwnd, handle_t* prev
  * store map specific configuration data.  The creator of the map is responsible
  * to allocate a key for the instance of the map.
  * @param extents  * The size of the map canvas to be created
- * @param db_path  * Must refer to a CanFly navigation database pack
+ * @param spatial_db  * Must refer to a CanFly navigation database pack
  * @param theme  * These are the colors to display for the moving map.  The address of it is
  * used in the kernel and must not change after the canvas is made
  * @param canvas [out]  * 
@@ -2321,14 +2321,14 @@ static inline result_t get_previous_tabstop_window(handle_t hwnd, handle_t* prev
  * @syscall 1792
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL sys_map_create_canvas(handle_t hwnd, memid_t memid, const extent_t * extents, const char * db_path, const map_theme_t * theme, handle_t* canvas);
+extern SYSCALL result_t STDCALL sys_map_create_canvas(handle_t hwnd, memid_t memid, const extent_t * extents, handle_t spatial_db, const map_theme_t * theme, handle_t* canvas);
 #else
-extern result_t sys_map_create_canvas(handle_t hwnd, memid_t memid, const extent_t * extents, const char * db_path, const map_theme_t * theme, handle_t* canvas);
+extern result_t sys_map_create_canvas(handle_t hwnd, memid_t memid, const extent_t * extents, handle_t spatial_db, const map_theme_t * theme, handle_t* canvas);
 #endif
 
-static inline result_t map_create_canvas(handle_t hwnd, memid_t memid, const extent_t * extents, const char * db_path, const map_theme_t * theme, handle_t* canvas)
+static inline result_t map_create_canvas(handle_t hwnd, memid_t memid, const extent_t * extents, handle_t spatial_db, const map_theme_t * theme, handle_t* canvas)
   {
-  return sys_map_create_canvas(hwnd, memid, extents, db_path, theme, canvas);
+  return sys_map_create_canvas(hwnd, memid, extents, spatial_db, theme, canvas);
   }
 
 /**
@@ -2596,6 +2596,157 @@ extern result_t sys_map_set_layer_parameters(handle_t canvas, uint32_t layer, co
 static inline result_t map_set_layer_parameters(handle_t canvas, uint32_t layer, const viewport_params_t * params)
   {
   return sys_map_set_layer_parameters(canvas, layer, params);
+  }
+
+/**
+ * Open a CanFly spatial database by path
+ * @note This call may use overlapped I/O.
+ * @param db_path  * Path to the repository of database files
+ * @param num_containers [out]  * Optional pointer that will recieve the number of databases loaded
+ * @param handle [out]  * Handle to an opened database
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
+ * @return result_t
+ * @syscall 1807
+ */
+#ifndef PIC32_BUILD
+extern SYSCALL result_t STDCALL sys_open_spatial_db(const char * db_path, uint32_t * num_containers, handle_t* handle, overlapped_t * overlapped);
+#else
+extern result_t sys_open_spatial_db(const char * db_path, uint32_t * num_containers, handle_t* handle, overlapped_t * overlapped);
+#endif
+
+static inline result_t open_spatial_db(const char * db_path, uint32_t * num_containers, handle_t* handle, overlapped_t * overlapped)
+  {
+  return sys_open_spatial_db(db_path, num_containers, handle, overlapped);
+  }
+
+/**
+ * Return the number of spatial entity containers in the database
+ * @param hndl  * Handle of the database to enumerate
+ * @param num [out]  * Number of containers in the database
+ * @return result_t
+ * @syscall 1808
+ */
+#ifndef PIC32_BUILD
+extern SYSCALL result_t STDCALL sys_spatial_get_container_count(handle_t hndl, uint32_t* num);
+#else
+extern result_t sys_spatial_get_container_count(handle_t hndl, uint32_t* num);
+#endif
+
+static inline result_t spatial_get_container_count(handle_t hndl, uint32_t* num)
+  {
+  return sys_spatial_get_container_count(hndl, num);
+  }
+
+/**
+ * Open a spatial container
+ * @param hndl  * Handle of the database to open the container in
+ * @param cont [out]  * Handle to the container
+ * @return result_t
+ * @syscall 1809
+ */
+#ifndef PIC32_BUILD
+extern SYSCALL result_t STDCALL sys_spatial_open_container(handle_t hndl, handle_t* cont);
+#else
+extern result_t sys_spatial_open_container(handle_t hndl, handle_t* cont);
+#endif
+
+static inline result_t spatial_open_container(handle_t hndl, handle_t* cont)
+  {
+  return sys_spatial_open_container(hndl, cont);
+  }
+
+/**
+ * Return the details about a spatial container
+ * @note This call may use overlapped I/O.
+ * @param hndl  * Handle of the database to enumerate
+ * @param hdr  * allocated header details
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
+ * @return result_t
+ * @syscall 1810
+ */
+#ifndef PIC32_BUILD
+extern SYSCALL result_t STDCALL sys_spatial_get_container_details(handle_t hndl, spatial_container_details_t* hdr, overlapped_t * overlapped);
+#else
+extern result_t sys_spatial_get_container_details(handle_t hndl, spatial_container_details_t* hdr, overlapped_t * overlapped);
+#endif
+
+static inline result_t spatial_get_container_details(handle_t hndl, spatial_container_details_t* hdr, overlapped_t * overlapped)
+  {
+  return sys_spatial_get_container_details(hndl, hdr, overlapped);
+  }
+
+/**
+ * Select a set of entities from a spatial database
+ * @note This call may use overlapped I/O.
+ * @param hndl  * Handle to a container to query
+ * @param bounds  * A Geo rhombos that describes the are to query within
+ * @param num_types  * Number of spatial entity types to select from
+ * @param types  * The types of entities to filter to
+ * @param ids [out]  * Handle to a selection of spatial entities.  Note the format of these is
+ * private to spatial database.  Primarily used to pass as a set to
+ * select entities based on attributes (and extract attributes)
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
+ * @return result_t
+ * @syscall 1811
+ */
+#ifndef PIC32_BUILD
+extern SYSCALL result_t STDCALL sys_spatial_select_entities(handle_t hndl, const spatial_rhombus_t * bounds, size_t num_types, const spatial_entity_type* types, handle_t * ids, overlapped_t * overlapped);
+#else
+extern result_t sys_spatial_select_entities(handle_t hndl, const spatial_rhombus_t * bounds, size_t num_types, const spatial_entity_type* types, handle_t * ids, overlapped_t * overlapped);
+#endif
+
+static inline result_t spatial_select_entities(handle_t hndl, const spatial_rhombus_t * bounds, size_t num_types, const spatial_entity_type* types, handle_t * ids, overlapped_t * overlapped)
+  {
+  return sys_spatial_select_entities(hndl, bounds, num_types, types, ids, overlapped);
+  }
+
+/**
+ * Select a range of values from a selection of spatial entities.
+ * The sys_spatial_select_entities is called first then it can
+ * be queried for attributes
+ * @note This call may use overlapped I/O.
+ * @param hndl  * This is the handle returned by sys_spatial_select_entities
+ * @param op  * Filter criteria for the query
+ * @param num_sort  * Number of sort parameters
+ * @param sort  * optional sort parameters for the query
+ * @param num_oids [out]  * The number of entities that match the selection criteria
+ * @param oids [out]  * Handle to the collection of entities that match the passed
+ * query string.
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
+ * @return result_t
+ * @syscall 1812
+ */
+#ifndef PIC32_BUILD
+extern SYSCALL result_t STDCALL sys_spatial_query_entities(handle_t hndl, const criteria_operator_t * op, size_t num_sort, const sort_operator_t * sort, uint32_t * num_oids, handle_t * oids, overlapped_t * overlapped);
+#else
+extern result_t sys_spatial_query_entities(handle_t hndl, const criteria_operator_t * op, size_t num_sort, const sort_operator_t * sort, uint32_t * num_oids, handle_t * oids, overlapped_t * overlapped);
+#endif
+
+static inline result_t spatial_query_entities(handle_t hndl, const criteria_operator_t * op, size_t num_sort, const sort_operator_t * sort, uint32_t * num_oids, handle_t * oids, overlapped_t * overlapped)
+  {
+  return sys_spatial_query_entities(hndl, op, num_sort, sort, num_oids, oids, overlapped);
+  }
+
+/**
+ * Return the named attributes of a series of spatial entities.
+ * @note This call may use overlapped I/O.
+ * @param hndl  * Handle to an object_id returned from sys_spatial_quey_entities
+ * @param num_attr  * number of attributes to query
+ * @param attr_names  * Names of the attributes to query.  This varies based on the entity type
+ * @param attr_values [out]  * Resulting values of the attributes queried.
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
+ * @return result_t
+ * @syscall 1813
+ */
+#ifndef PIC32_BUILD
+extern SYSCALL result_t STDCALL sys_spatial_get_attributes(handle_t hndl, uint32_t num_attr, const char * attr_names, variant_t * attr_values, overlapped_t * overlapped);
+#else
+extern result_t sys_spatial_get_attributes(handle_t hndl, uint32_t num_attr, const char * attr_names, variant_t * attr_values, overlapped_t * overlapped);
+#endif
+
+static inline result_t spatial_get_attributes(handle_t hndl, uint32_t num_attr, const char * attr_names, variant_t * attr_values, overlapped_t * overlapped)
+  {
+  return sys_spatial_get_attributes(hndl, num_attr, attr_names, attr_values, overlapped);
   }
 
 /******************************************************************************/

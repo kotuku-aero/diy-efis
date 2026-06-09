@@ -9,6 +9,7 @@ extern void set_gps_position(map_widget_t *widget, const lla_t *position);
 
 typedef struct _map_widget_t {
   widget_t base;
+
   // actual display window
   handle_t hwnd;
   extent_t font_cell_size;
@@ -29,11 +30,21 @@ typedef struct _map_widget_t {
   const font_t *font;
 
   map_display_mode map_mode;
-
+  // this is the create map canvas that forms the background
+  // of the widget
   handle_t map;
   } map_widget_t;
 
-extern result_t create_map_widget(handle_t parent, uint32_t flags, map_widget_t* wnd, handle_t* hndl);
+/**
+ * @brief Create a widget that is a moving map display
+ * @param parent      Owner parent
+ * @param spatial_db  Handle of the previously opened spatial database
+ * @param flags       Widget flags
+ * @param wnd         Widget creation parameters
+ * @param hndl        Resulting widget
+ * @return s_ok if the map was created
+ */
+extern result_t create_map_widget(handle_t parent, handle_t spatial_db, uint32_t flags, map_widget_t* wnd, handle_t* hndl);
 
 extern void set_gps_position(map_widget_t *widget, const lla_t *position);
 extern void set_map_range(map_widget_t *widget, int32_t range);

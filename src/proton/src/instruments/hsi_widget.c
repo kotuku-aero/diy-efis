@@ -216,7 +216,7 @@ static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* _m
   for (i = 0; i < 8; i++)
     rotate_point(&median, hdg, &heading_points[i]);
 
-  polyline(canvas, wnd_rect, color_magenta, 8, heading_points);
+  polygon(canvas, wnd_rect, color_magenta, color_magenta, 8, heading_points);
 
   heading_points[0].x = center_x - 5; heading_points[0].y = 0;
   heading_points[1].x = center_x + 5; heading_points[1].y = 0;
@@ -253,7 +253,7 @@ static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* _m
   for (i = 0; i < 4; i++)
     rotate_point(&median, relative_wind, &wind_bug[i]);
 
-  polyline(canvas, wnd_rect, color_yellow, 4, wind_bug);
+  polygon(canvas, wnd_rect, color_yellow, color_yellow, 4, wind_bug);
 
   // now the text in upper left
 
@@ -301,32 +301,52 @@ static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* _m
   //  CRS - Current AP Course
   //  INT - Intercept track
   const char* tmp_msg = nullptr;
-  switch ((wnd->autopilot_mode) & HORZ_MODE_MASK)
+  uint16_t nav_hdg;
+  uint32_t hmode = (wnd->autopilot_mode) & HORZ_MODE_MASK;
+  switch (hmode)
     {
     case 0:
       tmp_msg = "HNAV OFF";
       break;
     case NAV_MODE:
       tmp_msg = "CRS";
+      nav_hdg = wnd->course;
       break;
     case HDG_MODE:
       tmp_msg = "HDG";
+      nav_hdg = wnd->heading;
       break;
     case APR_MODE:
       tmp_msg = "INT";
+      nav_hdg = wnd->course;
       break;
     case REV_LEFT_MODE:
       tmp_msg = "REV LEFT";
+      nav_hdg = wnd->heading;
       break;
     case REV_RIGHT_MODE:
       tmp_msg = "REV RGT";
+      nav_hdg = wnd->heading;
       break;
     }
 
+  // draw the currently selected nav
+    if (hmode != 0)
+      {
+      sprintf(msg, "%03.3d", nav_hdg);
+      length = strlen(msg);
+      text_extent(wnd->base.name_font, length, msg, &pixels);
+      draw_text(
+          canvas, wnd_rect, wnd->base.name_font, color_magenta, color_hollow,
+          length, msg,
+          point_create(wnd_rect->left +2, wnd_rect->bottom - 30, &pt),
+          0, 0, 0);
+      }
+
   length = (uint16_t)strlen(tmp_msg);
   text_extent(wnd->base.name_font, length, tmp_msg, &pixels);
-  draw_text(canvas, wnd_rect, wnd->base.name_font, color_yellow, color_hollow,
-    length, tmp_msg, point_create(31 - (pixels.dx >> 1), wnd_rect->bottom - 21, &pt), 0, 0, 0);
+  draw_text(canvas, wnd_rect, wnd->base.name_font, color_magenta, color_hollow,
+    length, tmp_msg, point_create(31 - (pixels.dx >> 1), wnd_rect->bottom - 15, &pt), 0, 0, 0);
 
   /////////////////////////////////////////////////////////////////////////////
   // Draw the VMode in the bottom right
@@ -342,28 +362,41 @@ static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* _m
     case 0:
       tmp_msg = "VNAV OFF";
       break;
+    case VERT_SEEK_MODE:
     case ALT_MODE:
       tmp_msg = "ALT";
-      break;
-    case VERT_SEEK_MODE:
-      tmp_msg = "SEEK";
       break;
     case IAS_MODE:
       tmp_msg = "RATE";
       break;
     }
 
+  // draw the rate
+  sprintf(msg, "R:%04.3d", wnd->ap_vs);
+  length = strlen(msg);
+  text_extent(wnd->base.name_font, length, msg, &pixels);
+  draw_text(canvas, wnd_rect, wnd->base.name_font, color_magenta, color_hollow, 
+    length, msg, point_create(wnd_rect->right - pixels.dx, wnd_rect->bottom - 45, &pt), 0, 0, 0);
+
+  // draw the assigned altitude
+  sprintf(msg, "A:%05.3d", wnd->ap_altitude);
+  length = strlen(msg);
+  text_extent(wnd->base.name_font, length, msg, &pixels);
+  draw_text(canvas, wnd_rect, wnd->base.name_font, color_magenta, color_hollow,
+      length, msg, point_create(wnd_rect->right - pixels.dx, wnd_rect->bottom - 30, &pt), 0, 0, 0);
+
   length = (uint16_t)strlen(tmp_msg);
   text_extent(wnd->base.name_font, length, tmp_msg, &pixels);
-  draw_text(canvas, wnd_rect, wnd->base.name_font, color_yellow, color_hollow,
-    length, tmp_msg, point_create(window_x - 31 - (pixels.dx >> 1), wnd_rect->bottom - 21, &pt), 0, 0, 0);
+  draw_text(canvas, wnd_rect, wnd->base.name_font, color_magenta, color_hollow,
+    length, tmp_msg, point_create(window_x - 31 - (pixels.dx >> 1), wnd_rect->bottom - 15, &pt), 0, 0, 0);
+
   }
 
 static result_t change_ap_mode(hsi_widget_t* widget)
   {
   canmsg_t msg;
   create_can_msg_uint16(&msg, id_autopilot_mode, widget->autopilot_mode);
-  return can_send(&msg, INDEFINITE_WAIT, nullptr);
+  return can_send(&msg, INDEFINITE_WAIT);
   }
 
 static result_t change_hs_mode(hsi_widget_t* widget, uint16_t mode)
@@ -423,187 +456,126 @@ result_t hsi_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
   bool changed = false;
   hsi_widget_t* wnd = (hsi_widget_t*)wnddata;
 
+  int16_t i16;
+  uint16_t u16;
+  float flt;
+
   switch (get_can_id(msg))
     {
-    //case id_pitch_acceleration:
-    //  {
-    //  float value;
-    //  get_param_float(msg, &value);
-    //  trace_debug("pitch acceleration %f\n", value);
-    //  }
-    //  break;
-    //case id_roll_acceleration:
-    //  {
-    //  float value;
-    //  get_param_float(msg, &value);
-    //  trace_debug("roll acceleration %f\n", value);
-    //  }
-    //  break;
-    //case id_yaw_acceleration:
-    //  {
-    //  float value;
-    //  get_param_float(msg, &value);
-    //  trace_debug("yaw acceleration %f\n", value);
-    //  }
-    //  break;
-    //case id_pitch_rate:
-    //  {
-    //  float value;
-    //  get_param_float(msg, &value);
-    //  trace_debug("pitch rate %f\n", value);
-    //  }
-    //  break;
-    //case id_roll_rate:
-    //  {
-    //  float value;
-    //  get_param_float(msg, &value);
-    //  trace_debug("roll rate %f\n", value);
-    //  }
-    //  break;
-    //case id_yaw_rate:
-    //  {
-    //  float value;
-    //  get_param_float(msg, &value);
-    //  trace_debug("yaw rate %f\n", value);
-    //  }
-    //  break;
-    //case id_roll_angle_magnetic:
-    //  {
-    //  float value;
-    //  get_param_float(msg, &value);
-    //  trace_debug("roll angle magnetic %f\n", value);
-    //  }
-    //  break;
-    //case id_pitch_angle_magnetic:
-    //  {
-    //  float value;
-    //  get_param_float(msg, &value);
-    //  trace_debug("pitch angle magnetic %f\n", value);
-    //  }
-    //  break;
-    //case id_yaw_angle_magnetic:
-    //  {
-    //  float value;
-    //  get_param_float(msg, &value);
-    //  trace_debug("yaw angle magnetic %f\n", value);
-    //  }
-    //  break;
-
-
     case id_magnetic_heading:
-      {
-      uint16_t direction;
-      get_param_uint16(msg, &direction);
+      get_param_uint16(msg, &u16);
 
-      while (direction < 0)
-        direction += 360;
-      while (direction > 359)
-        direction -= 360;
+      while (u16 < 0)
+        u16 += 360;
+      while (u16 > 359)
+        u16 -= 360;
 
-      changed = wnd->direction != direction;
-      wnd->direction = direction;
-      }
+      changed = wnd->direction != u16;
+      wnd->direction = u16;
       break;
     case id_heading:
-      {
-      uint16_t value;
-      get_param_uint16(msg, &value);
-      changed = wnd->heading_bug != value;
-      wnd->heading_bug = value;
-      }
+      get_param_uint16(msg, &u16);
+      changed = wnd->heading_bug != u16;
+      wnd->heading_bug = u16;
       break;
     case id_true_heading:
-      {
-      uint16_t value;
-      get_param_uint16(msg, &value);
-      changed = wnd->heading != value;
-      wnd->heading = value;
-      }
+      get_param_uint16(msg, &u16);
+      changed = wnd->heading != u16;
+      wnd->heading = u16;
       break;
     case id_deviation:
-      {
-      int16_t value;
-      get_param_int16(msg, &value);
-      changed = wnd->deviation != value;
-      wnd->deviation = value;
+      get_param_int16(msg, &i16);
+      changed = wnd->deviation != i16;
+      wnd->deviation = i16;
       // the deviation is +/- * 10
-      }
       break;
     case id_selected_course:
-      {
-      uint16_t value;
-      get_param_uint16(msg, &value);
-      changed = wnd->course != value;
-      wnd->course = value;
-      }
+      get_param_uint16(msg, &u16);
+      changed = wnd->course != u16;
+      wnd->course = u16;
       break;
     case id_track:
-      {
-      uint16_t value;
-      get_param_uint16(msg, &value);
-      changed = wnd->track != value;
-      wnd->track = value;
-      }
+      get_param_uint16(msg, &u16);
+      changed = wnd->track != u16;
+      wnd->track = u16;
       break;
     case id_wind_speed:
-      {
-      float v;
-      get_param_float(msg, &v);
-      int16_t value = (int16_t)meters_per_second_to_knots(v);
+      get_param_float(msg, &flt);
+      i16 = (int16_t)meters_per_second_to_knots(flt);
 
-      if (value < 0)
-        value = 0;
+      if (i16 < 0)
+        i16 = 0;
 
-      changed = wnd->wind_speed != value;
-      wnd->wind_speed = value;
-      }
+      changed = wnd->wind_speed != i16;
+      wnd->wind_speed = i16;
       break;
     case id_wind_direction:
-      {
-      uint16_t value;
-      get_param_uint16(msg, &value);
+      get_param_uint16(msg, &u16);
 
-      while (value < 0)
-        value += 360;
-      while (value > 359)
-        value -= 360;
+      while (u16 > 359)
+        u16 -= 360;
 
-      changed = wnd->wind_direction != value;
-      wnd->wind_direction = value;
-      }
+      changed = wnd->wind_direction != u16;
+      wnd->wind_direction = u16;
       break;
     case id_distance_to_next:
-      {
-      float v;
-      get_param_float(msg, &v);
-      int16_t value = (int16_t)meters_to_nm(v);
-      changed = wnd->distance_to_waypoint != value;
-      wnd->distance_to_waypoint = value;
-      }
+      get_param_float(msg, &flt);
+      i16 = (int16_t)meters_to_nm(flt);
+      changed = wnd->distance_to_waypoint != i16;
+      wnd->distance_to_waypoint = i16;
       break;
     case id_magnetic_variation:
-      {
-      float v;
-      get_param_float(msg, &v);
-      int16_t value = (int16_t)radians_to_degrees(v);
-      changed = wnd->magnetic_variation != value;
-      wnd->magnetic_variation = value;
-      }
+      get_param_float(msg, &flt);
+      i16 = (int16_t)radians_to_degrees(flt);
+      changed = wnd->magnetic_variation != i16;
+      wnd->magnetic_variation = i16;
+
       break;
     case id_estimated_time_to_next:
-      {
-      int16_t value;
-      get_param_int16(msg, &value);
-      changed = wnd->time_to_waypoint != value;
-      wnd->time_to_waypoint = value;
-      }
+      get_param_int16(msg, &i16);
+      changed = wnd->time_to_waypoint != i16;
+      wnd->time_to_waypoint = i16;
       break;
     case id_autopilot_mode:
-      {
-      uint16_t value;
-      get_param_uint16(msg, &value);
+      get_param_uint16(msg, &u16);
 
-      changed = wnd->autopilot_mode != value;
+      changed = wnd->autopilot_mode != u16;
+      wnd->autopilot_mode = u16;
+      break;
+    case id_ap_altitude:
+      get_param_float(msg, &flt);
+      u16 = (uint16_t)meters_to_feet(flt);
+
+      changed = wnd->ap_altitude != u16;
+      wnd->ap_altitude = u16;
+      break;
+    case id_ap_vertical_rate :
+      get_param_float(msg, &flt);
+      u16 = (uint16_t)meters_per_second_to_feet_per_minute(flt);
+
+      changed = wnd->ap_vs != u16;
+      wnd->ap_vs = u16;
+      break;
+    case id_waypoint_code:
+      u16 = get_can_len(msg);
+      
+      if (u16 > 1 && u16 < 9 &&
+          msg->data[0] == CANFLY_CHARS)
+        {
+        if (strncmp((const char *)&msg->data[1], wnd->waypoint_name, u16 - 1) != 0)
+      {
+          strncpy(wnd->waypoint_name, (const char *)&msg->data[1], u16 - 1);
+          wnd->waypoint_name[u16 - 1] = 0;
+          changed = true;
+      }
+        }
+      else
+        {
+        if (strcmp(wnd->waypoint_name, "----")!= 0)
+      {
+          strcpy(wnd->waypoint_name, "----");
+          changed = true;
+          }
       }
       break;
     }

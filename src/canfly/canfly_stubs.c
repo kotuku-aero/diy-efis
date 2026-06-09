@@ -174,11 +174,18 @@
 #define SYSCALL_SYS_MAP_GET_MODE                           1799
 #define SYSCALL_SYS_MAP_PAN                                1800
 #define SYSCALL_SYS_MAP_ZOOM                               1801
-#define SYSCALL_SYS_MAP_SET_MAGVAR                         1802
+#define SYSCALL_SYS_MAP_SET_MAG_VAR                        1802
 #define SYSCALL_SYS_MAP_SCREEN_TO_POSITION                 1803
 #define SYSCALL_SYS_MAP_POSITION_TO_SCREEN                 1804
 #define SYSCALL_SYS_MAP_GET_LAYER_PARAMETERS               1805
 #define SYSCALL_SYS_MAP_SET_LAYER_PARAMETERS               1806
+#define SYSCALL_SYS_OPEN_SPATIAL_DB                        1807
+#define SYSCALL_SYS_SPATIAL_GET_CONTAINER_COUNT            1808
+#define SYSCALL_SYS_SPATIAL_OPEN_CONTAINER                 1809
+#define SYSCALL_SYS_SPATIAL_GET_CONTAINER_DETAILS          1810
+#define SYSCALL_SYS_SPATIAL_SELECT_ENTITIES                1811
+#define SYSCALL_SYS_SPATIAL_QUERY_ENTITIES                 1812
+#define SYSCALL_SYS_SPATIAL_GET_ATTRIBUTES                 1813
 
 /* system () */
 #define SYSCALL_SYS_GET_AIRCRAFT                           2048
@@ -2401,13 +2408,13 @@ result_t sys_get_previous_tabstop_window(handle_t hwnd, handle_t* prev)
 /* map stubs                                                                  */
 /******************************************************************************/
 
-result_t sys_map_create_canvas(handle_t hwnd, memid_t memid, const extent_t * extents, const char * db_path, const map_theme_t * theme, handle_t* canvas)
+result_t sys_map_create_canvas(handle_t hwnd, memid_t memid, const extent_t * extents, handle_t spatial_db, const map_theme_t * theme, handle_t* canvas)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)hwnd;
   register uint32_t __p1 __asm__("$a1") = (uint32_t)memid;
   register uint32_t __p2 __asm__("$a2") = (uint32_t)extents;
-  register uint32_t __p3 __asm__("$a3") = (uint32_t)db_path;
+  register uint32_t __p3 __asm__("$a3") = (uint32_t)spatial_db;
 
   /* Parameters beyond 4 are passed on the stack per MIPS o32 ABI */
   /* Allocate 8 bytes for 2 stack parameters */
@@ -2591,7 +2598,7 @@ result_t sys_map_set_mag_var(handle_t canvas, int16_t mag_var)
     "li $v0, %1\n\t"
     "syscall\n\t"
     : "=r"(__result)
-    : "i"(SYSCALL_SYS_MAP_SET_MAGVAR), "r"(__p0), "r"(__p1)
+    : "i"(SYSCALL_SYS_MAP_SET_MAG_VAR), "r"(__p0), "r"(__p1)
   );
 
   return __result;
@@ -2661,6 +2668,148 @@ result_t sys_map_set_layer_parameters(handle_t canvas, uint32_t layer, const vie
     "syscall\n\t"
     : "=r"(__result)
     : "i"(SYSCALL_SYS_MAP_SET_LAYER_PARAMETERS), "r"(__p0), "r"(__p1), "r"(__p2)
+  );
+
+  return __result;
+}
+
+result_t sys_open_spatial_db(const char * db_path, uint32_t * num_containers, handle_t* handle, overlapped_t * overlapped)
+{
+  register result_t __result __asm__("$v0");
+  register uint32_t __p0 __asm__("$a0") = (uint32_t)db_path;
+  register uint32_t __p1 __asm__("$a1") = (uint32_t)num_containers;
+  register uint32_t __p2 __asm__("$a2") = (uint32_t)handle;
+  register uint32_t __p3 __asm__("$a3") = (uint32_t)overlapped;
+
+  __asm__ volatile (
+    "li $v0, %1\n\t"
+    "syscall\n\t"
+    : "=r"(__result)
+    : "i"(SYSCALL_SYS_OPEN_SPATIAL_DB), "r"(__p0), "r"(__p1), "r"(__p2), "r"(__p3)
+  );
+
+  return __result;
+}
+
+result_t sys_spatial_get_container_count(handle_t hndl, uint32_t* num)
+{
+  register result_t __result __asm__("$v0");
+  register uint32_t __p0 __asm__("$a0") = (uint32_t)hndl;
+  register uint32_t __p1 __asm__("$a1") = (uint32_t)num;
+
+  __asm__ volatile (
+    "li $v0, %1\n\t"
+    "syscall\n\t"
+    : "=r"(__result)
+    : "i"(SYSCALL_SYS_SPATIAL_GET_CONTAINER_COUNT), "r"(__p0), "r"(__p1)
+  );
+
+  return __result;
+}
+
+result_t sys_spatial_open_container(handle_t hndl, handle_t* cont)
+{
+  register result_t __result __asm__("$v0");
+  register uint32_t __p0 __asm__("$a0") = (uint32_t)hndl;
+  register uint32_t __p1 __asm__("$a1") = (uint32_t)cont;
+
+  __asm__ volatile (
+    "li $v0, %1\n\t"
+    "syscall\n\t"
+    : "=r"(__result)
+    : "i"(SYSCALL_SYS_SPATIAL_OPEN_CONTAINER), "r"(__p0), "r"(__p1)
+  );
+
+  return __result;
+}
+
+result_t sys_spatial_get_container_details(handle_t hndl, spatial_container_details_t* hdr, overlapped_t * overlapped)
+{
+  register result_t __result __asm__("$v0");
+  register uint32_t __p0 __asm__("$a0") = (uint32_t)hndl;
+  register uint32_t __p1 __asm__("$a1") = (uint32_t)hdr;
+  register uint32_t __p2 __asm__("$a2") = (uint32_t)overlapped;
+
+  __asm__ volatile (
+    "li $v0, %1\n\t"
+    "syscall\n\t"
+    : "=r"(__result)
+    : "i"(SYSCALL_SYS_SPATIAL_GET_CONTAINER_DETAILS), "r"(__p0), "r"(__p1), "r"(__p2)
+  );
+
+  return __result;
+}
+
+result_t sys_spatial_select_entities(handle_t hndl, const spatial_rhombus_t * bounds, size_t num_types, const spatial_entity_type* types, handle_t * ids, overlapped_t * overlapped)
+{
+  register result_t __result __asm__("$v0");
+  register uint32_t __p0 __asm__("$a0") = (uint32_t)hndl;
+  register uint32_t __p1 __asm__("$a1") = (uint32_t)bounds;
+  register uint32_t __p2 __asm__("$a2") = (uint32_t)num_types;
+  register uint32_t __p3 __asm__("$a3") = (uint32_t)types;
+
+  /* Parameters beyond 4 are passed on the stack per MIPS o32 ABI */
+  /* Allocate 8 bytes for 2 stack parameters */
+
+  __asm__ volatile (
+    "addiu $sp, $sp, -8\n\t"
+    "sw %6, 0($sp)\n\t"
+    "sw %7, 4($sp)\n\t"
+    "li $v0, %1\n\t"
+    "syscall\n\t"
+    "addiu $sp, $sp, 8\n\t"
+    : "=r"(__result)
+    : "i"(SYSCALL_SYS_SPATIAL_SELECT_ENTITIES), "r"(__p0), "r"(__p1), "r"(__p2), "r"(__p3), "r"((uint32_t)ids), "r"((uint32_t)overlapped)
+  );
+
+  return __result;
+}
+
+result_t sys_spatial_query_entities(handle_t hndl, const criteria_operator_t * op, size_t num_sort, const sort_operator_t * sort, uint32_t * num_oids, handle_t * oids, overlapped_t * overlapped)
+{
+  register result_t __result __asm__("$v0");
+  register uint32_t __p0 __asm__("$a0") = (uint32_t)hndl;
+  register uint32_t __p1 __asm__("$a1") = (uint32_t)op;
+  register uint32_t __p2 __asm__("$a2") = (uint32_t)num_sort;
+  register uint32_t __p3 __asm__("$a3") = (uint32_t)sort;
+
+  /* Parameters beyond 4 are passed on the stack per MIPS o32 ABI */
+  /* Allocate 12 bytes for 3 stack parameters */
+
+  __asm__ volatile (
+    "addiu $sp, $sp, -12\n\t"
+    "sw %6, 0($sp)\n\t"
+    "sw %7, 4($sp)\n\t"
+    "sw %8, 8($sp)\n\t"
+    "li $v0, %1\n\t"
+    "syscall\n\t"
+    "addiu $sp, $sp, 12\n\t"
+    : "=r"(__result)
+    : "i"(SYSCALL_SYS_SPATIAL_QUERY_ENTITIES), "r"(__p0), "r"(__p1), "r"(__p2), "r"(__p3), "r"((uint32_t)num_oids), "r"((uint32_t)oids), "r"((uint32_t)overlapped)
+  );
+
+  return __result;
+}
+
+result_t sys_spatial_get_attributes(handle_t hndl, uint32_t num_attr, const char * attr_names, variant_t * attr_values, overlapped_t * overlapped)
+{
+  register result_t __result __asm__("$v0");
+  register uint32_t __p0 __asm__("$a0") = (uint32_t)hndl;
+  register uint32_t __p1 __asm__("$a1") = (uint32_t)num_attr;
+  register uint32_t __p2 __asm__("$a2") = (uint32_t)attr_names;
+  register uint32_t __p3 __asm__("$a3") = (uint32_t)attr_values;
+
+  /* Parameters beyond 4 are passed on the stack per MIPS o32 ABI */
+  /* Allocate 4 bytes for 1 stack parameters */
+
+  __asm__ volatile (
+    "addiu $sp, $sp, -4\n\t"
+    "sw %6, 0($sp)\n\t"
+    "li $v0, %1\n\t"
+    "syscall\n\t"
+    "addiu $sp, $sp, 4\n\t"
+    : "=r"(__result)
+    : "i"(SYSCALL_SYS_SPATIAL_GET_ATTRIBUTES), "r"(__p0), "r"(__p1), "r"(__p2), "r"(__p3), "r"((uint32_t)overlapped)
   );
 
   return __result;

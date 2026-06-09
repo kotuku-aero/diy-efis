@@ -625,7 +625,8 @@ typedef enum
   v_uint32,
   v_float,
   v_utc,
-  v_lla
+    v_lla,
+    v_chars,
     } variant_type;
 
 typedef struct
@@ -643,6 +644,7 @@ typedef struct
     uint32_t uint32;
     float flt;
     tm_t utc;
+      char chars[8];    // null terminated 7 chars
     } value;
   } variant_t;
 
@@ -689,66 +691,59 @@ typedef struct _touch_msg_t
 
 #define id_first_internal_msg   1400
 
-#define BUTTON_MASK       0xFFFF0000
-#define BUTTON_COUNT_MASK  0x0000FFFF
+#define id_key0         1400
+#define id_hold_key0    1401
+#define id_key1         1402
+#define id_hold_key1    1403
+#define id_key2         1404
+#define id_hold_key2    1405
+#define id_key3         1406
+#define id_hold_key3    1407
+#define id_key4         1408
+#define id_hold_key4    1409
+#define id_key5         1410
+#define id_hold_key5    1411
+#define id_key6         1412
+#define id_hold_key6    1413
+#define id_key7         1414
+#define id_hold_key7    1416
+#define id_decka        1417
+#define id_press_decka  1418
+#define id_deckb        1419
+#define id_press_deckb  1420
+#define id_decka_up     1421
+#define id_decka_dn     1422
+#define id_press_decka_up 1423
+#define id_press_decka_dn 1424
+#define id_deckb_up     1425
+#define id_deckb_dn     1426
+#define id_press_deckb_up 1427
+#define id_press_deckb_dn 1428
 
-#define id_key0         (1 << 16)
-#define id_hold_key0    (2 << 16)
-#define id_key1         (3 << 16)
-#define id_hold_key1    (4 << 16)
-#define id_key2         (5 << 16)
-#define id_hold_key2    (6 << 16)
-#define id_key3         (7 << 16)
-#define id_hold_key3    (8 << 16)
-#define id_key4         (9 << 16)
-#define id_hold_key4    (10 << 16)
-#define id_key5         (11 << 16)
-#define id_hold_key5    (12 << 16)
-#define id_key6         (13 << 16)
-#define id_hold_key6    (14 << 16)
-#define id_key7         (15 << 16)
-#define id_hold_key7    (16 << 16)
-#define id_decka        (17 << 16)
-#define id_press_decka  (18 << 16)
-#define id_deckb        (19 << 16)
-#define id_press_deckb  (20 << 16)
-#define id_decka_up     (21 << 16)
-#define id_decka_dn     (22 << 16)
-#define id_press_decka_up (23 << 16)
-#define id_press_decka_dn (24 << 16)
-#define id_deckb_up       (25 << 16)
-#define id_deckb_dn       (26 << 16)
-#define id_press_deckb_up (27 << 16)
-#define id_press_deckb_dn (28 << 16)
-
-// hardware events from the buttons.  The 32bit value holds
-// the button number and action
-#define id_button       1400
-
-#define id_paint        1401        // notification to paint a window
-#define id_create       1402        // window has been created
-#define id_close        1403        // the window is closed
-#define id_setfocus     1404        // focus set to a control
-#define id_loosefocus   1405        // focus is lost from a control
-#define id_timer        1406        // 1 second timer
-#define id_overlap      1407        // overlap completion event
+#define id_paint        1430      // notification to paint a window
+#define id_create       1431      // window has been created
+#define id_close        1432      // the window is closed
+#define id_setfocus     1433      // focus set to a control
+#define id_loosefocus   1434      // focus is lost from a control
+#define id_timer        1435      // 1 second timer
+#define id_overlap      1436    // overlap completion event
   /*
   * Touch screen interfaces.
   *
   */
-#define id_touch_tap      1408    // a simple tap
-#define id_touch_two_tap  1409    // a two finger tap
+#define id_touch_tap    1437     // a simple tap
+#define id_touch_two_tap 1438 // a two finger tap
   // arg is distance between fingers
-#define id_touch_press    1410    // a press, like a tap but longer
-#define id_touch_press_and_tap 1411 // one finger pressed, second tap
+#define id_touch_press  1439         // a press, like a tap but longer
+#define id_touch_press_and_tap 1440 // one finger pressed, second tap
   // arg is distance between
-#define id_touch_zoom     1412    // the zoom gesture
+#define id_touch_zoom   1441 // the zoom gesture
   // location is center of zoom
   // arg is distance
-#define id_touch_pan      1413    // the pan gesture
+#define id_touch_pan    1442 // the pan gesture
   // location is end of gesture
   // arg is distance
-#define id_touch_rotate   1414    // the rotate gesture
+#define id_touch_rotate 1443 // the rotate gesture
   // location is center of rotate
   // if flags & TOUCH_BEGIN the arg is start angle (0-360)
   // othwewise relative rotation in +/- 360
@@ -756,15 +751,15 @@ typedef struct _touch_msg_t
 // these messages are sent to the control that has the focus for keyboard input
 // on a graphics layout this will be the menu window, on a dialog layout the
 // focus changes using the next/prev key
-#define id_ok 1415                // the control received the ok message normally id_sw0
-#define id_cancel 1416            // the control received the cancel message normally id_sw6
-#define id_next 1417              // normally assigned to id_decka_up
-#define id_prev 1418              // normally assigned to id_decka_dn
-#define id_up 1419                // normally assigned to id_deckb_up
-#define id_down 1420              // normally assigned id id_deckb_dn
+#define id_ok           1444 // the control received the ok message normally id_sw0
+#define id_cancel       1445  // the control received the cancel message normally id_sw6
+#define id_next         1446 // normally assigned to id_decka_up
+#define id_prev         1447 // normally assigned to id_decka_dn
+#define id_up           1448   // normally assigned to id_deckb_up
+#define id_down         1449 // normally assigned id id_deckb_dn
 
-#define id_last_photon  1421      // last message assigned
-#define id_usermsg  1430
+#define id_last_photon 1449 // last message assigned
+#define id_usermsg 1450
 
 #define id_last_internal_msg 1499
 
@@ -1113,6 +1108,19 @@ typedef struct {
   color_t runway_color;
   color_t runway_ext_color;
 
+    // Glyph palette used by the SVG-derived point/hazard/obstacle/navaid/VRP
+    // symbol set. Resolved via e_glyph_color_role in libs/graviton/glyph_render.h.
+    color_t glyph_halo;                     // white halo behind all glyphs
+    color_t glyph_aerodrome_controlled;     // AIP purple
+    color_t glyph_aerodrome_uncontrolled;   // AIP blue
+    color_t glyph_obstacle;                 // red obstacle body
+    color_t glyph_hazard;                   // hazard activity glyph
+    color_t glyph_navaid;                   // navaid glyph body
+    color_t glyph_vrp;                      // VRP marker
+    color_t glyph_notam_indicator;          // orange NOTAM dot
+    color_t glyph_lit_indicator;            // red lit-obstacle dot
+    color_t glyph_stroke;                   // black outline for stroked glyphs
+
   hypsometric_theme_t theme[20];    // up to 10,000 ft
 } map_theme_t;
 
@@ -1138,6 +1146,14 @@ typedef struct _airspace_params_t
 
   int32_t info_panel_zoom;        // zoom below which an info panel displayed
   int32_t detail_info_panel_zoom; // zoom below which a detailed info panel
+
+    // Per-entity-type visibility thresholds (in metres of map range).
+    // The entity glyph/label is only rendered when current range <= threshold.
+    // Set to 0 to hide that type at every range; set very large to always show.
+    int32_t vrp_zoom;               // visual reporting points
+    int32_t navaid_zoom;            // VOR / NDB / DME / VOR-DME / NDB-DME
+    int32_t obstacle_zoom;          // towers, antennas, power lines, ...
+    int32_t hazard_zoom;            // kite flying, gliders, PLAs, ...
   } airspace_params_t;
 
 typedef struct _cities_params_t
@@ -1213,6 +1229,113 @@ typedef enum {
 #define MAP_LAYER_AIRSPACES       0x00000200
 #define MAP_LAYER_TRAFFIC         0x00000400
 #define MAP_LAYER_FLIGHTPLAN      0x00000800
+
+typedef enum _spatial_content_type_e
+  {
+  sct_unknown,
+  sct_contours,
+  sct_landmass,
+  sct_topo,
+  sct_obstacles,
+  sct_navaids,
+  sct_airspace,
+  } spatial_content_type_e;
+
+/**
+ * @brief A rhobus that describes a spatial aera
+ * the points must be in clockwise order. and the lng of
+ * 180 wraps to -179
+ */
+typedef struct _spatial_rhombus_t
+  {
+  lla_t p1;
+  lla_t p2;
+  lla_t p3;
+  lla_t p4;
+  } spatial_rhombus_t;
+
+typedef struct _spatial_container_details_t
+  {
+  spatial_content_type_e content_type;
+  char cycle[5];
+  tm_t effective_from;
+  tm_t effective_to;
+  char name[32];
+  spatial_rhombus_t area; 
+  } spatial_container_details_t;
+
+///////////////////////////////////////////////////////////////////////////////////////
+//
+// data types used to query spatial entities
+typedef struct _criteria_operator_t criteria_operator_t;
+
+typedef enum _criteria_operator_type_e
+  {
+  co_not,
+  co_equals,
+  co_not_equals,
+  co_greater_than,
+  co_less_than,
+  co_between,
+  co_group_and,
+  co_group_or,
+  co_property,
+  co_value,
+  } criteria_operator_type_e;
+
+typedef struct _criteria_operator_t 
+  {
+  criteria_operator_type_e op_type;
+  } criteria_operator_t;
+
+typedef struct _not_operator_t
+  {
+  criteria_operator_t base;
+
+  const criteria_operator_t *op;
+  } not_operator_t;
+
+typedef struct _group_operator_t
+  {
+  criteria_operator_t base;
+
+  size_t num;
+  const criteria_operator_t *ops;
+  } group_operator_t;
+
+typedef struct _binary_operator_t
+  {
+  criteria_operator_t base;
+
+  const criteria_operator_t *left;
+  const criteria_operator_t *right;
+  } binary_operator_t;
+
+typedef struct _property_operator_t
+  {
+  criteria_operator_t base;
+
+  const char *prop_name;
+  } property_operator_t;
+
+typedef struct _value_operator_t
+  {
+  criteria_operator_t base;
+
+  variant_t value;
+  } value_operator_t;
+
+typedef enum _sort_operator_type_e
+  {
+  so_asc,
+  so_desc
+  } sort_operator_type_e;
+
+typedef struct _sort_operator_t
+  {
+  sort_operator_type_e dir;
+  const char *prop;
+  } sort_operator_t;
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //

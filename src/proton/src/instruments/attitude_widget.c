@@ -464,7 +464,12 @@ static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* ms
   polyline(canvas, wnd_rect, color_white, 2, balance_points);
 
   // the roll indicator is shifted left/right by the yaw angle
-  int16_t offset = 0- min(mfd.aircraft.yaw_max, max(-mfd.aircraft.yaw_max, wnd->yaw));
+  int offset = abs(wnd->yaw);
+  if (offset > mfd.aircraft.yaw_max)
+    offset = mfd.aircraft.yaw_max;
+
+  if (wnd->yaw < 0)
+    offset = 0-offset;
 
   offset *= wnd->yaw_scale;
 
@@ -489,9 +494,9 @@ result_t attitude_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
     case id_paint:
       on_paint_widget(hwnd, msg, wnddata);
       break;
-    case id_yaw_rate:
-      get_param_float(msg, &v);
-      angle = (int16_t)radians_to_degrees(v);
+    case id_yaw_angle:
+      get_param_int16(msg, &angle);
+
       while (angle > 179)
         angle -= 360;
 

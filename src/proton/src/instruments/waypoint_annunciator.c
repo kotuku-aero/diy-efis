@@ -21,7 +21,7 @@ result_t on_waypoint_msg(handle_t hwnd, const canmsg_t* msg, void* wnddata)
 
       if (data->ident[i-1] != c)
         {
-        data->ident[i] = c;
+        data->ident[i-1] = c;
         changed = true;
         }
       }

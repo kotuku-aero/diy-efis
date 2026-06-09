@@ -46,6 +46,7 @@ set(PROTON_SOURCES
         src/regex.c
         src/instruments/softkey_widget.c
         src/spin_edit.c
+        src/textedit.c
         src/strftm.c
         src/dialogs/tab_widget.c
         src/instruments/text_annunciator.c

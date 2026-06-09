@@ -27,12 +27,14 @@ extern const font_t neo_18_font;
 // events
 enum proton_events
   {
-  id_left = id_last_photon,
+  id_left = id_last_photon+1,
   id_right,
   id_buttonpress,
   id_marquee_next,
   id_marquee_prev,
   id_spin_edit,
+  id_text_edit_char,
+  id_text_edit_next,
   id_alarm_close,
   id_alarm_park,
   id_set_mode,

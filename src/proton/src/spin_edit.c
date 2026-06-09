@@ -6,7 +6,7 @@ menu_item_action_result item_spin_edit_evaluate(menu_widget_t* wnd,
   {
   menu_item_spin_edit_t* edit = (menu_item_spin_edit_t*)item;
 
-  wnd->edit = edit;
+  wnd->spin_edit = edit;
   wnd->active_keys = edit->keys;
 
   variant_t tmp_value;

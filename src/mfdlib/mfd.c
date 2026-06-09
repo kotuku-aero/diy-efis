@@ -32,6 +32,8 @@ result_t mfd_wndproc(handle_t wnd, const canmsg_t* msg, void* wnddata)
   if (succeeded(is_dialog_message(wnd, msg)))
     return s_ok;
 
+  uint16_t ui16;
+
   // handle the well known messages
   uint16_t id = get_can_id(msg);
   switch (id)
@@ -62,10 +64,57 @@ result_t mfd_wndproc(handle_t wnd, const canmsg_t* msg, void* wnddata)
       get_param_float(msg, &mfd.altitude);
       break;
 
-    // case id_set_mode :
-    //   if (succeeded(get_param_uint16(msg, &ui16)))
-    //     set_selected_layout(ui16);
-    //   break;
+    case id_ap_lateral_mode :
+      get_param_uint16(msg, &ui16);
+      switch (ui16)
+        {
+        case 0 :
+          // turn autopilot HNAV off
+          break;
+        case 1 :
+          // set to heading mode.
+          // set heading to current mag direction
+          // enable heading hold
+          break;
+        case 2 :
+          // set to course track mode
+          break;
+        case 3 :
+          // reverse turn left
+          break;
+        case 4 :
+          // reverse turn right
+          break;
+        }
+      break;
+
+    case id_ap_vertical_mode :
+      get_param_uint16(msg, &ui16);
+      switch (ui16)
+        {
+      case 0:
+        // turn autopilot VNAV off
+        break;
+      case 1:
+        // set to alt hold.
+        // set target alt to current
+        // enable altitude hold
+        break;
+      case 2:
+        // set to VS hold
+        // set vs == 0
+        // set mode
+        break;
+        }
+      break;
+
+    case id_set_mode :
+      {
+      uint16_t ui16;
+      if (succeeded(get_param_uint16(msg, &ui16)))
+      set_selected_layout(ui16);
+      }
+      break;
     }
 
   return defwndproc(wnd, msg, wnddata);

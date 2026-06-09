@@ -33,8 +33,12 @@ result_t on_auto_msg(handle_t hwnd, const canmsg_t* msg, void* wnddata)
 void on_paint_auto(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnd)
   {
   auto_annunciator_t* ann = (auto_annunciator_t*)wnd;
+
+  on_paint_widget_background(canvas, wnd_rect, msg, wnd);
+
   char txt[16];
-  const char *fmt = ann->converter != nullptr ? ann->converter->format : ann->fmt;
+  const char *fmt =
+      (ann->fmt != nullptr || ann->converter == nullptr) ? ann->fmt : ann->converter->format;
   switch (ann->value.vt)
     {
     case v_float:
