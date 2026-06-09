@@ -3037,6 +3037,8 @@ Return the number of spatial entity containers in the database
 
 **Syscall ID:** 1808
 
+**Kernel function:** `enumerate_containers`
+
 ```c
 result_t sys_spatial_get_container_count(handle_t hndl, uint32_t* num);
 ```
@@ -3053,6 +3055,8 @@ result_t sys_spatial_get_container_count(handle_t hndl, uint32_t* num);
 Open a spatial container
 
 **Syscall ID:** 1809
+
+**Kernel function:** `spatial_open_container`
 
 ```c
 result_t sys_spatial_open_container(handle_t hndl, handle_t* cont);
@@ -3073,6 +3077,8 @@ Return the details about a spatial container
 
 **Syscall ID:** 1810
 
+**Kernel function:** `spatial_get_container_details`
+
 ```c
 result_t sys_spatial_get_container_details(handle_t hndl, spatial_container_details_t* hdr, overlapped_t * overlapped);
 ```
@@ -3092,6 +3098,8 @@ Select a set of entities from a spatial database
 > The call can use the overlapped callback to overlap operations
 
 **Syscall ID:** 1811
+
+**Kernel function:** `spatial_select_entities`
 
 ```c
 result_t sys_spatial_select_entities(handle_t hndl, const spatial_rhombus_t * bounds, size_t num_types, const spatial_entity_type* types, handle_t * ids, overlapped_t * overlapped);
@@ -3120,6 +3128,8 @@ Select a range of values from a selection of spatial entities.
 
 **Syscall ID:** 1812
 
+**Kernel function:** `spatial_query_entities`
+
 ```c
 result_t sys_spatial_query_entities(handle_t hndl, const criteria_operator_t * op, size_t num_sort, const sort_operator_t * sort, uint32_t * num_oids, handle_t * oids, overlapped_t * overlapped);
 ```
@@ -3144,6 +3154,8 @@ Return the named attributes of a series of spatial entities.
 > The call can use the overlapped callback to overlap operations
 
 **Syscall ID:** 1813
+
+**Kernel function:** `spatial_get_attributes`
 
 ```c
 result_t sys_spatial_get_attributes(handle_t hndl, uint32_t num_attr, const char * attr_names, variant_t * attr_values, overlapped_t * overlapped);

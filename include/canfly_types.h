@@ -1230,7 +1230,7 @@ typedef enum {
 #define MAP_LAYER_TRAFFIC         0x00000400
 #define MAP_LAYER_FLIGHTPLAN      0x00000800
 
-typedef enum _spatial_content_type_e
+typedef enum _spatial_entity_type
   {
   sct_unknown,
   sct_contours,
@@ -1239,7 +1239,7 @@ typedef enum _spatial_content_type_e
   sct_obstacles,
   sct_navaids,
   sct_airspace,
-  } spatial_content_type_e;
+  } spatial_entity_type;
 
 /**
  * @brief A rhobus that describes a spatial aera
@@ -1256,7 +1256,7 @@ typedef struct _spatial_rhombus_t
 
 typedef struct _spatial_container_details_t
   {
-  spatial_content_type_e content_type;
+  spatial_entity_type content_type;
   char cycle[5];
   tm_t effective_from;
   tm_t effective_to;
