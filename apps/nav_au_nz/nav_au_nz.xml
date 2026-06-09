@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding ="utf-8" ?>
-<application xmlns="http://kotuku.aero/schema/kotuku.xsd">
+<!-- 
+  Enhanced Menu Structure for Autopilot and Navigation
+  
+  Changes:
+  1. Expanded autopilot menu with separate lateral and vertical modes
+  2. Added navigation menu for flight plan management
+  3. Added direct-to and nearest functionality
+  4. Improved key assignments for better pilot workflow
+-->
+<application xmlns="http://kotuku.aero/schema/kotuku.xsd"
+             xmlns:xs="http://www.w3.org/2001/XMLSchema"
+             nav-db-path="F:/map_data">
+
+  <!-- Existing IDs -->
+  <id>id_cancel_alarm</id>
+  <id>id_snooze_alarm</id>
+  <id>id_toggle_vs_mode</id>
+  <id>id_toggle_hs_mode</id>
   <id>id_map_water</id>
   <id>id_map_contours</id>
   <id>id_map_cities</id>
@@ -17,96 +34,96 @@
         selected-color="color_magenta"
         border-color="color_yellow"
         text-color="color_green"
-        menu-timeout="7"
-        setup-menu="setup_menu">
+        menu-timeout="7">
     <rect left="0" top="0" width="320" height="240"/>
     <menu-rect x="0" y="0"/>
     <menu-start x="0" y="240"/>
-    <!-- Menu used when the menu is closed -->
+
+
+    <!-- ================================================================ -->
+    <!-- ROOT KEYS - Main interface when no menu is active -->
+    <!-- ================================================================ -->
     <keys name="root">
-      <hold-key0>
-        <!-- popup menu if long press of left spin -->
-        <popup-action caption="Settings" menu="settings_menu" />
-      </hold-key0>
-      
-      <key0>
-        <!-- Toggle HS mode between HDG, CRS, INT modes -->
-        <event-action caption="HS Mode" can-id="id_toggle_hs_mode" value-type="v_int16" value="1"/>
+      <!-- Left spin button (Deck A) -->
+      <key0 caption="Info/ALT">
+        <popup-action caption="AP Vertical" menu="ap_vertical_menu" />
       </key0>
-      <!--<decka-up>
-        --><!-- Rotate HDG bug up --><!--
-        <event-action caption="HDG Up" can-id="id_heading_up" value-type="v_int16" value="1"/>
+      <hold-key0>
+        <popup-action caption="Info" menu="config_menu" />
+      </hold-key0>
+      <decka-up>
+        <event-action can-id="id_altitude_change" value-type="v_int16" value="100"/>
       </decka-up>
       <decka-dn>
-        --><!-- Rotate HDG bug down --><!--
-        <event-action caption="HDG Dn" can-id="id_heading_dn" value-type="v_int16" value="1"/>
+        <event-action can-id="id_altitude_change" value-type="v_int16" value="-100"/>
       </decka-dn>
       
-      <key1>
-        --><!-- Change the VS mode ALT HLD, ALT SEL, VS SEL --><!--
-        <event-action caption="VS Mode" can-id="id_toggle_vs_mode" value-type="v_int16" value="1"/>
+      <!-- Right Spin Button (Deck B) -->
+      <key1 caption="HDG/QNH">
+        <popup-action caption="AP Lateral" menu="ap_lateral_menu" />
       </key1>
       <hold-key1>
-        <popup-action caption="AP Mode" menu="ap_menu" />
+        <popup-action caption="Autopilot" menu="ap_main_menu" />
       </hold-key1>
       <deckb-up>
-        <event-action caption="VS Up" can-id="id_vertical_altitude_change" value-type="v_int16" value="100" converter="convert_meters_to_ft"/>
+        <event-action can-id="id_heading_change" value-type="v_int16" value="1"/>
       </deckb-up>
       <deckb-dn>
-        <event-action caption="VS Dn" can-id="id_vertical_altitude_change" value-type="v_int16" value="-100" converter="convert_meters_to_ft"/>
+        <event-action can-id="id_heading_change" value-type="v_int16" value="-1"/>
       </deckb-dn>
-      <deckb-press-up>
-        <event-action caption="VS Up" can-id="id_vertical_altitude_change" value-type="v_int16" value="1000" converter="convert_meters_to_ft"/>
-      </deckb-press-up>
-      <deckb-press-dn>
-        <event-action caption="VS Dn" can-id="id_vertical_altitude_change" value-type="v_int16" value="-1000" converter="convert_meters_to_ft"/>
-      </deckb-press-dn>-->
     </keys>
     
-    <!-- Menu used when an alarm is displayed -->
+    <!-- ================================================================ -->
+    <!-- ALARM KEYS -->
+    <!-- ================================================================ -->
     <keys name="alarm_keys">
-      <key0>
-        <event-action caption="Close" can-id="id_alarm_close" value-type="v_int16" value="1"/>
+      <key0 caption="Close">
+        <event-action can-id="id_alarm_close" value-type="v_int16" value="1"/>
       </key0>
-      <key1>
-        <event-action caption="Park" can-id="id_alarm_park" value-type="v_int16" value="1"/>
+      <key1 caption="Park">
+        <event-action can-id="id_alarm_park" value-type="v_int16" value="1"/>
       </key1>
     </keys>
 
-    <!-- Menu used when a popup is active -->
+    <!-- ================================================================ -->
+    <!-- POPUP KEYS - Used when navigating menus -->
+    <!-- ================================================================ -->
     <keys name="popup_keys">
-      <key0>
-        <event-action caption="OK" can-id="id_ok" value-type="v_int16" value="1"/>
+      <key0 caption="Accept">
+        <event-action can-id="id_ok" value-type="v_int16" value="1"/>
       </key0>
-      <key1>
-        <event-action caption="Cancel" can-id="id_cancel" value-type="v_int16" value="1"/>
+      <key1 caption="Cancel">
+        <event-action can-id="id_cancel_alarm" value-type="v_int16" value="1"/>
       </key1>
       <decka-up>
-        <event-action caption="Up" can-id="id_up" value-type="v_int16" value="1"/>
+        <event-action can-id="id_up" value-type="v_int16" value="1"/>
       </decka-up>
       <decka-dn>
-        <event-action caption="Dn" can-id="id_down" value-type="v_int16" value="1"/>
+        <event-action can-id="id_down" value-type="v_int16" value="1"/>
       </decka-dn>
     </keys>
 
+    <!-- ================================================================ -->
+    <!-- EDIT KEYS - Used when editing values -->
+    <!-- ================================================================ -->
     <keys name="edit_keys">
-      <key0>
-        <event-action caption="OK" can-id="id_ok" value-type="v_int16" value="1"/>
+      <key0 caption="Accept">
+        <event-action can-id="id_ok" value-type="v_int16" value="1"/>
       </key0>
-      <key1>
-        <event-action caption="Cancel" can-id="id_cancel" value-type="v_int16" value="1"/>
+      <key1 caption="Cancel">
+        <event-action can-id="id_cancel_alarm" value-type="v_int16" value="1"/>
       </key1>
       <decka-up>
-        <event-action caption="Up" can-id="id_spin_edit" value-type="v_int16" value="10"/>
+        <event-action can-id="id_spin_edit" value-type="v_int16" value="10"/>
       </decka-up>
       <decka-dn>
-        <event-action caption="Dn" can-id="id_spin_edit" value-type="v_int16" value="-10"/>
+        <event-action can-id="id_spin_edit" value-type="v_int16" value="-10"/>
       </decka-dn>
       <decka-press-up>
-        <event-action caption="Up" can-id="id_spin_edit" value-type="v_int16" value="1"/>
+        <event-action can-id="id_spin_edit" value-type="v_int16" value="1"/>
       </decka-press-up>
       <decka-press-dn>
-        <event-action caption="Dn" can-id="id_spin_edit" value-type="v_int16" value="-1"/>
+        <event-action can-id="id_spin_edit" value-type="v_int16" value="-1"/>
       </decka-press-dn>
     </keys>
 
@@ -131,31 +148,148 @@
       </decka-press-dn>
     </keys>
 
-    <menu name="settings_menu" keys="popup_keys" caption="Settings">
-      <event-action caption="AP Off" can-id="id_autopilot_enable" value-type="v_uint16" value="0"/>
-      <checklist-action caption="HNAV Mode" get-index="get_hnav_mode" popup="hnav_menu"/>
-      <checklist-action caption="VNAV Mode" get-index="get_vnav_mode" popup="vnav_menu"/>
-      <spin-edit-action caption="VSpeed"
-                        min-value="50"
-                        max-value="1000"
-                        get-method="get_vertical_speed"
-                        set-method="set_vertical_speed"
-                        keys="edit_keys"/>
-      <spin-edit-action caption="Alt"
-                        min-value="0"
-                        max-value="25000"
-                        get-method="get_assigned_altitude"
-                        set-method="set_assigned_altitude"
-                        keys="edit_keys"/>
+    <!-- ================================================================ -->
+    <!-- AUTOPILOT MENUS -->
+    <!-- ================================================================ -->
+
+    <!-- Main Autopilot Menu -->
+    <menu name="ap_main_menu" keys="popup_keys" caption="Autopilot">
+      <popup-action caption="Lateral Mode" menu="ap_lateral_menu" />
+      <popup-action caption="Vertical Mode" menu="ap_vertical_menu" />
+      <event-action caption="Disconnect All" can-id="id_ap_disc" value-type="v_int16" value="1"/>
+      <popup-action caption="Flight Plan" menu="flight_plan_menu" />
+      <popup-action caption="Direct To" menu="direct_to_menu" />
+      <popup-action caption="Nearest" menu="nearest_menu" />
+      <event-action caption="Next Waypoint" can-id="id_next_waypoint" value-type="v_int16" value="1"/>
+      <event-action caption="Prev Waypoint" can-id="id_prev_waypoint" value-type="v_int16" value="1"/>
+    </menu>
+
+    <!-- Autopilot Lateral Modes -->
+    <menu name="ap_lateral_menu" keys="popup_keys" caption="Lateral Mode">
+      <event-action caption="Off" can-id="id_ap_lateral_mode" value-type="v_uint8" value="0"/>
+      <event-action caption="Trim (Wings Level)" can-id="id_ap_lateral_mode" value-type="v_uint8" value="1"/>
+      <event-action caption="Heading Hold" can-id="id_ap_lateral_mode" value-type="v_uint8" value="2"/>
+      <event-action caption="NAV Tracking" can-id="id_ap_lateral_mode" value-type="v_uint8" value="3"/>
+      <event-action caption="Reverse Left" can-id="id_ap_lateral_mode" value-type="v_uint8" value="4"/>
+      <event-action caption="Reverse Right" can-id="id_ap_lateral_mode" value-type="v_uint8" value="5"/>
+    </menu>
+
+    <!-- Autopilot Vertical Modes -->
+    <menu name="ap_vertical_menu" keys="popup_keys" caption="Vertical Mode">
+      <event-action caption="Off" can-id="id_ap_vertical_mode" value-type="v_uint8" value="0"/>
+      <event-action caption="Pitch Trim" can-id="id_ap_vertical_mode" value-type="v_uint8" value="1"/>
+      <event-action caption="Altitude Set" can-id="id_ap_vertical_mode" value-type="v_uint8" value="2"/>
+      <event-action caption="Altitude Hold" can-id="id_ap_vertical_mode" value-type="v_uint8" value="3"/>
+      <event-action caption="Vertical Speed" can-id="id_ap_vertical_mode" value-type="v_uint8" value="4"/>
+      <event-action caption="Airspeed Hold" can-id="id_ap_vertical_mode" value-type="v_uint8" value="5"/>
+    </menu>
+
+    <!-- ================================================================ -->
+    <!-- NAVIGATION MENUS -->
+    <!-- ================================================================ -->
+
+    <!-- Flight Plan Menu -->
+    <menu name="flight_plan_menu" keys="popup_keys" caption="Flight Plan">
+      <checklist-action caption="Select Plan"
+                        get-index="get_current_flight_plan"
+                        popup="flight_plan_list_menu" />
+      <event-action caption="Activate Plan"
+                    can-id="id_activate_flight_plan"
+                    value-type="v_int16"
+                    value="1"/>
+      <event-action caption="Deactivate Plan"
+                    can-id="id_activate_flight_plan"
+                    value-type="v_int16"
+                    value="0"/>
+      <event-action caption="Next Leg"
+                    can-id="id_next_waypoint"
+                    value-type="v_int16"
+                    value="1"/>
+    </menu>
+
+    <!-- Flight Plan List (populated dynamically via callback) -->
+    <menu name="flight_plan_list_menu" keys="popup_keys" caption="Select Plan">
+      <!-- This menu is populated dynamically by get_current_flight_plan callback -->
+      <!-- The callback should return available flight plans -->
+      
+    </menu>
+
+    <!-- Direct To Menu -->
+    <menu name="direct_to_menu" keys="popup_keys" caption="Direct To">
+      <event-action caption="Enter Waypoint"
+                    can-id="id_direct_to_waypoint"
+                    value-type="v_int16"
+                    value="1"
+                    get-value="get_direct_to_waypoint"/>
+      <event-action caption="Nearest Airport"
+                    can-id="id_direct_to_waypoint"
+                    value-type="v_int16"
+                    value="2"
+                    get-value="get_nearest_airport_name"/>
+      <event-action caption="From Map"
+                    can-id="id_direct_to_waypoint"
+                    value-type="v_uint32"
+                    value="3"/>
+    </menu>
+
+    <!-- Nearest Menu -->
+    <menu name="nearest_menu" keys="popup_keys" caption="Nearest">
+      <event-action caption="Airport"
+                    can-id="id_nearest_airport"
+                    value-type="v_int16"
+                    value="1"
+                    get-value="get_nearest_airport_name"/>
+      <event-action caption="VOR"
+                    can-id="id_nearest_vor"
+                    value-type="v_int16"
+                    value="1"
+                    get-value="get_nearest_vor_name"/>
+      <event-action caption="NDB"
+                    can-id="id_nearest_ndb"
+                    value-type="v_int16"
+                    value="1"
+                    get-value="get_nearest_ndb_name"/>
+      <popup-action caption="Direct To Nearest" menu="direct_to_nearest_menu" />
+    </menu>
+
+    <!-- Direct To Nearest submenu -->
+    <menu name="direct_to_nearest_menu" keys="popup_keys" caption="Direct To Nearest">
+      <event-action caption="Airport" can-id="id_direct_to_waypoint" value-type="v_int16" value="10"/>
+      <event-action caption="VOR" can-id="id_direct_to_waypoint" value-type="v_int16" value="11"/>
+      <event-action caption="NDB" can-id="id_direct_to_waypoint" value-type="v_int16" value="12"/>
+    </menu>
+
+    <!-- ================================================================ -->
+    <!-- EXISTING MENUS (kept for reference) -->
+    <!-- ================================================================ -->
+
+    <!-- Configuration Menu -->
+    <menu name="config_menu" keys="popup_keys" caption="Config">
+      <popup-action caption="Configure MAP" menu="map_menu" />
+
       <spin-edit-action caption="Brightness"
                         min-value="10"
                         max-value="100"
                         get-method="get_brightness"
                         set-method="set_brightness"
                         keys="edit_keys"/>
-        <!-- this will be removed when the push-button on startup works -->
-        <popup-action menu="setup_menu" caption="Setup"/>
+      <spin-edit-action caption="Node ID"
+                        min-value="8"
+                        max-value="14"
+                        get-method="get_node_id"
+                        set-method="set_node_id"
+                        keys="edit_keys"/>
+      <checklist-action caption="Mode" get-index="get_selected_layout" popup="mode_menu" />
     </menu>
+
+    <menu name="mode_menu" keys="popup_keys" caption="Mode">
+      <event-action caption="AIO" can-id="id_set_mode" value-type="v_uint16" value="0"/>
+      <event-action caption="EDD" can-id="id_set_mode" value-type="v_uint16" value="1"/>
+      <event-action caption="ATT" can-id="id_set_mode" value-type="v_uint16" value="2"/>
+      <event-action caption="NAV" can-id="id_set_mode" value-type="v_uint16" value="3"/>
+      <event-action caption="HSI" can-id="id_set_mode" value-type="v_uint16" value="4"/>
+    </menu>
+
 
     <!-- Map Menu -->
     <menu name="map_menu" keys="popup_keys" caption="Map">
@@ -172,20 +306,6 @@
       <checklist-action caption="Cities" get-index="get_cities_mode" popup="map_cities_menu" />
       <checklist-action caption="Transport" get-index="get_transport_mode" popup="map_transport_menu" />
       <checklist-action caption="Obstacles" get-index="get_obstacles_mode" popup="map_obstacles_menu" />
-    </menu>
-
-    <menu name="hnav_menu" keys="popup_keys" caption="HNAV Mode">
-      <event-action caption="OFF" can-id="id_hnav_mode" value-type="v_uint16" value="0"/>
-      <event-action caption="HDG" can-id="id_hnav_mode" value-type="v_uint16" value="1"/>
-      <event-action caption="NAV" can-id="id_hnav_mode" value-type="v_uint16" value="2"/>
-      <event-action caption="REV-L" can-id="id_hnav_mode" value-type="v_uint16" value="3"/>
-      <event-action caption="REV-R" can-id="id_hnav_mode" value-type="v_uint16" value="3"/>
-    </menu>
-
-    <menu name="vnav_menu" keys="popup_keys" caption="VNAV Mode">
-      <event-action caption="OFF" can-id="id_vnav_mode" value-type="v_uint16" value="0"/>
-      <event-action caption="VS" can-id="id_vnav_mode" value-type="v_uint16" value="1"/>
-      <event-action caption="ALT" can-id="id_vnav_mode" value-type="v_uint16" value="2"/>
     </menu>
 
     <menu name="map_mode_menu" keys="popup_keys" caption="Mode">
@@ -219,33 +339,22 @@
       <event-action caption="Off" can-id="id_map_obstacles" value-type="v_int16" value="0"/>
       <event-action caption="On" can-id="id_map_obstacles" value-type="v_int16" value="1"/>
     </menu>
-
-    <menu name="setup_menu" keys="popup_keys" caption="Setup">
-      <spin-edit-action caption="Node ID"
-                        min-value="8"
-                        max-value="14"
-                        get-method="get_node_id"
-                        set-method="set_node_id"
-                        keys="node_id_keys"/>
-    </menu>
   </menu>
 
   <layout>
     <map name="NAV"
-         id="nav"
-         font="neo_9_bold_font"
+         id="nav_widget"
+         font="neo_9_font"
          border-color="color_white"
          border-left="true"
          border-bottom="true"
-         on-create="on_create_navigator_widget"
-         db-path="C:/Projects/map-data"
+         on-create="on_create_nav"
          config-path="/proton/pfd/navigator"
          >
       <rect left="0" top="0" width="320" height="240" />
-      <center x="160" y="200"/>
       <day-theme alarm-color="color_red"
                  warning-color="color_yellow"
-                 land-color="RGB(125, 211, 105)"
+                 land-color="color_limegreen"
                  coastline-color="color_black"
                  residential-area="color_khaki"
                  residential-street="color_black"
@@ -273,31 +382,42 @@
                  runway-extension="RGBA(132, 142, 150, 230)"
                  aerodrome="color_khaki"
                  aerodrome-border="color_black"
+                 glyph-halo="color_white"
+                 glyph-aerodrome-controlled="RGB(146, 39, 143)"
+                 glyph-aerodrome-uncontrolled="RGB(25, 118, 210)"
+                 glyph-obstacle="color_red"
+                 glyph-hazard="color_red"
+                 glyph-navaid="color_blue"
+                 glyph-vrp="color_magenta"
+                 glyph-notam-indicator="RGB(255, 127, 0)"
+                 glyph-lit-indicator="color_red"
+                 glyph-stroke="color_black"
                  >
-        <contour color="RGB(74, 113, 49)" contour_color="color_hollow" elevation="152"/>
-        <contour color="RGB(66, 105, 33)" contour_color="color_hollow" elevation="305"/>
-        <contour color="RGB(58, 97, 16)" contour_color="color_hollow" elevation="457"/>
-        <contour color="RGB(74, 105, 16)" contour_color="color_hollow" elevation="610"/>
-        <contour color="RGB(82, 109, 25)" contour_color="color_hollow" elevation="762"/>
-        <contour color="RGB(90, 113, 25)" contour_color="color_hollow" elevation="914"/>
-        <contour color="RGB(99, 117, 25)" contour_color="color_hollow" elevation="1067"/>
-        <contour color="RGB(107, 121, 33)" contour_color="color_hollow" elevation="1219"/>
-        <contour color="RGB(115, 129, 41)" contour_color="color_hollow" elevation="1372"/>
-        <contour color="RGB(132, 134, 41)" contour_color="color_hollow" elevation="1524"/>
-        <contour color="RGB(140, 138, 49)" contour_color="color_hollow" elevation="1676"/>
-        <contour color="RGB(148, 138, 49)" contour_color="color_hollow" elevation="1829"/>
-        <contour color="RGB(156, 142, 49)" contour_color="color_hollow" elevation="1981"/>
-        <contour color="RGB(156, 146, 49)" contour_color="color_hollow" elevation="2134"/>
-        <contour color="RGB(181, 154, 66)" contour_color="color_hollow" elevation="2286"/>
-        <contour color="RGB(156, 121, 49)" contour_color="color_hollow" elevation="2438"/>
-        <contour color="RGB(115, 65, 25)" contour_color="color_hollow" elevation="2591"/>
-        <contour color="RGB(94, 53, 21)" contour_color="color_hollow" elevation="2743"/>
-        <contour color="RGB(77, 43, 17)" contour_color="color_hollow" elevation="2896"/>
-        <contour color="color_white" contour_color="color_hollow" elevation="305"/>
+        <!-- The elevations must match the exported values in the contours.db -->
+        <contour color="RGB(62, 116, 30)" contour_color="color_black" elevation="152"/>
+        <contour color="RGB(61, 129, 3)" contour_color="color_black" elevation="305"/>
+        <contour color="RGB(140, 150, 9)" contour_color="color_black" elevation="457"/>
+        <contour color="RGB(220, 220, 40)" contour_color="color_black" elevation="610"/>
+        <contour color="RGB(240, 240, 20)" contour_color="color_black" elevation="762"/>
+        <contour color="RGB(240, 240, 150)" contour_color="color_black" elevation="914"/>
+        <contour color="RGB(200, 200, 150)" contour_color="color_black" elevation="1067"/>
+        <contour color="RGB(180, 180, 120)" contour_color="color_black" elevation="1219"/>
+        <contour color="RGB(150, 150, 80)" contour_color="color_black" elevation="1372"/>
+        <contour color="RGB(148, 140, 77)" contour_color="color_black" elevation="1524"/>
+        <contour color="RGB(148, 143, 76)" contour_color="color_black" elevation="1676"/>
+        <contour color="RGB(193, 176, 129)" contour_color="color_black" elevation="1829"/>
+        <contour color="RGB(220, 206, 166)" contour_color="color_black" elevation="1981"/>
+        <contour color="RGB(220, 208, 182)" contour_color="color_black" elevation="2134"/>
+        <contour color="RGB(220, 208, 200)" contour_color="color_black" elevation="2286"/>
+        <contour color="RGB(220, 213, 205)" contour_color="color_black" elevation="2438"/>
+        <contour color="RGB(220, 219, 210)" contour_color="color_black" elevation="2591"/>
+        <contour color="RGB(220, 219, 215)" contour_color="color_black" elevation="2743"/>
+        <contour color="RGB(220, 220, 220)" contour_color="color_black" elevation="2896"/>
+        <contour color="color_white" contour_color="color_black" elevation="3048"/>
       </day-theme>
       <night-theme alarm-color="color_red"
                  warning-color="color_yellow"
-                 land-color="RGB(214, 211, 63)"
+                 land-color="RGB(250,250,210)"
                  coastline-color="color_black"
                  residential-area="color_khaki"
                  residential-street="color_black"
@@ -325,6 +445,16 @@
                  runway-extension="RGBA(132, 142, 150, 230)"
                    aerodrome="color_lightgrey"
                    aerodrome-border="color_black"
+                 glyph-halo="color_white"
+                 glyph-aerodrome-controlled="RGB(146, 39, 143)"
+                 glyph-aerodrome-uncontrolled="RGB(25, 118, 210)"
+                 glyph-obstacle="color_red"
+                 glyph-hazard="color_red"
+                 glyph-navaid="color_blue"
+                 glyph-vrp="color_magenta"
+                 glyph-notam-indicator="RGB(255, 127, 0)"
+                 glyph-lit-indicator="color_red"
+                 glyph-stroke="color_black"
                  >
         <contour color="RGB(74, 113, 49)" contour_color="color_hollow" elevation="152"/>
         <contour color="RGB(66, 105, 33)" contour_color="color_hollow" elevation="305"/>
@@ -350,5 +480,4 @@
     </map>
 
   </layout>
-
 </application>

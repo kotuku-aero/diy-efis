@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding ="utf-8" ?>
-<application xmlns="http://kotuku.aero/schema/kotuku.xsd">
+<application xmlns="http://kotuku.aero/schema/kotuku.xsd"
+             xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <id>id_toggle_vs_mode</id>
+  <id>id_toggle_hs_mode</id>
 
   <menu id=" 100"
         root-keys="root"
@@ -11,36 +15,49 @@
         selected-color="color_magenta"
         border-color="color_yellow"
         text-color="color_green"
-        menu-timeout="7"
-        setup-menu="setup_menu">
+        menu-timeout="7">
     <rect left="0" top="0" width="320" height="240"/>
     <menu-rect x="0" y="0"/>
     <menu-start x="0" y="240"/>
-    <!-- Menu used when the menu is closed -->
+    <!-- Menu used when the menu is closed.
+         UNIFIED KEY MAP (shared across EDD/ATT/HSI/AIO):
+           key0 press   = Settings     key1 press   = Cancel
+           key0 hold 1s = 180 LEFT     key1 hold 1s = 180 RIGHT  (emergency reversal)
+           deck A       = HDG bug (turn) / ALT preset (press+turn)   <- the two AP targets
+           deck B       = QNH    (turn) / VS         (press+turn)   <- baro ref + climb/descent
+         NOTE: this swaps the old ATT habit (deck A was QNH). Deck A is now the
+         heading bug on every flight page, matching HSI/AIO. The hold->180 is
+         present in root + alarm states only, never inside popup/edit menus. -->
     <keys name="root">
       <key0>
         <popup-action caption="Settings" menu="settings_menu"/>
       </key0>
+      <key0-hold>
+        <event-action caption="180 L" can-id="id_ap_reverse" value-type="v_int16" value="1"/>
+      </key0-hold>
       <key1>
-        <popup-action caption="Autopilot" menu="autopilot_menu"/>
+        <event-action caption="Cancel" can-id="id_cancel" value-type="v_int16" value="1"/>
       </key1>
-      <decka-press-up>
-        <event-action caption="QNHUp" can-id="id_qnh_change" value-type="v_int16" value="1"/>
-      </decka-press-up>
-      <decka-press-dn>
-        <event-action caption="QNHDn" can-id="id_qnh_change" value-type="v_int16" value="-1"/>
-      </decka-press-dn>
+      <key1-hold>
+        <event-action caption="180 R" can-id="id_ap_reverse" value-type="v_int16" value="-1"/>
+      </key1-hold>
       <decka-up>
         <event-action caption="HDGUp" can-id="id_heading_change" value-type="v_int16" value="1"/>
       </decka-up>
       <decka-dn>
         <event-action caption="HDGDn" can-id="id_heading_change" value-type="v_int16" value="-1"/>
       </decka-dn>
-      <deckb-up>
+      <decka-press-up>
         <event-action caption="ALTUp" can-id="id_altitude_change" value-type="v_int16" value="100"/>
+      </decka-press-up>
+      <decka-press-dn>
+        <event-action caption="ALTDn" can-id="id_altitude_change" value-type="v_int16" value="-100"/>
+      </decka-press-dn>
+      <deckb-up>
+        <event-action caption="QNHUp" can-id="id_qnh_change" value-type="v_int16" value="1"/>
       </deckb-up>
       <deckb-dn>
-        <event-action caption="ALTDn" can-id="id_altitude_change" value-type="v_int16" value="-100"/>
+        <event-action caption="QNHDn" can-id="id_qnh_change" value-type="v_int16" value="-1"/>
       </deckb-dn>
       <deckb-press-up>
         <event-action caption="VSUp" can-id="id_vertical_rate_change" value-type="v_int16" value="100"/>
@@ -50,14 +67,21 @@
       </deckb-press-dn>
     </keys>
 
-    <!-- Menu used when an alarm is displayed -->
+    <!-- Menu used when an alarm is displayed. Press = Close/Park; the hold->180
+         reversal stays live so an alarm can't lock out an emergency turn. -->
     <keys name="alarm_keys">
       <key0>
         <event-action caption="Close" can-id="id_alarm_close" value-type="v_int16" value="1"/>
       </key0>
+      <key0-hold>
+        <event-action caption="180 L" can-id="id_ap_reverse" value-type="v_int16" value="1"/>
+      </key0-hold>
       <key1>
         <event-action caption="Park" can-id="id_alarm_park" value-type="v_int16" value="1"/>
       </key1>
+      <key1-hold>
+        <event-action caption="180 R" can-id="id_ap_reverse" value-type="v_int16" value="-1"/>
+      </key1-hold>
     </keys>
 
     <!-- Menu used when a popup is active -->
@@ -118,61 +142,41 @@
       </decka-press-dn>
     </keys>
 
-    <!-- left button menu, airframe and operational settings -->
-    <menu name="settings_menu" keys="popup_keys" caption="Settings">
-      <popup-action caption="Airframe" menu="af_menu"/>
-      <spin-edit-action caption="Brightness"
-                        min-value="10"
-                        max-value="100"
-                        get-method="get_brightness"
-                        set-method="set_brightness"
-                        keys="edit_keys"/>
-        <!-- this will be removed when the push-button on startup works -->
-        <popup-action menu="setup_menu" caption="Setup"/>
-    </menu>
-
-    <!-- right button menu, autopilot settings -->
-    <menu name="autopilot_menu" caption="Autopilot" keys="popup_keys">
-      <event-action caption="AP Off" can-id="id_autopilot_enable" value-type="v_uint16" value="0"/>
-      <checklist-action caption="HNAV Mode" get-index="get_hnav_mode" popup="hnav_menu"/>
-      <checklist-action caption="VNAV Mode" get-index="get_vnav_mode" popup="vnav_menu"/>
-     </menu>
-
-    <!-- Menu to control the airframe state.  Normally used for trim and flap adjustments at startup -->
-    <menu name="af_menu" keys="popup_keys" caption="AF Functions">
+    <menu name="settings_menu" keys="popup_keys" caption="Main">
+      <!-- Mode promoted to the top: 2-click switch of the surviving display. -->
       <event-action caption="Trim 0" can-id="id_pitch_trim_change" value-type="v_int16" value="0"/>
       <event-action caption="Roll 0" can-id="id_roll_trim_change" value-type="v_int16" value="0"/>
       <event-action caption="Flap 0" can-id="id_flap_change" value-type="v_int16" value="0"/>
       <event-action caption="Flap 10" can-id="id_flap_change" value-type="v_int16" value="10"/>
       <event-action caption="Flap 25" can-id="id_flap_change" value-type="v_int16" value="25"/>
       <event-action caption="Flap 40" can-id="id_flap_change" value-type="v_int16" value="40"/>
+      <popup-action caption="Config" menu="config_menu"/>
     </menu>
 
-    <!-- Menu to control the horizontal navigation mode -->
-    <menu name="hnav_menu" keys="popup_keys" caption="HNAV Mode">
-      <event-action caption="OFF" can-id="id_hnav_mode" value-type="v_uint16" value="0"/>
-      <event-action caption="HDG" can-id="id_hnav_mode" value-type="v_uint16" value="1"/>
-      <event-action caption="NAV" can-id="id_hnav_mode" value-type="v_uint16" value="2"/>
-      <event-action caption="REV-L" can-id="id_hnav_mode" value-type="v_uint16" value="3"/>
-      <event-action caption="REV-R" can-id="id_hnav_mode" value-type="v_uint16" value="3"/>
-    </menu>
-
-    <!-- Menu to control the vertical navigation mode -->
-    <menu name="vnav_menu" keys="popup_keys" caption="VNAV Mode">
-      <event-action caption="OFF" can-id="id_vnav_mode" value-type="v_uint16" value="0"/>
-      <event-action caption="VS" can-id="id_vnav_mode" value-type="v_uint16" value="1"/>
-      <event-action caption="ALT" can-id="id_vnav_mode" value-type="v_uint16" value="2"/>
-    </menu>
-
-    <!-- Menu entered for setup.  Press and hold left key at power up -->
-    <menu name="setup_menu" keys="popup_keys" caption="Setup">
+    <menu name="config_menu" keys="popup_keys" caption="Config">
+      <spin-edit-action caption="Brightness"
+                        min-value="10"
+                        max-value="100"
+                        get-method="get_brightness"
+                        set-method="set_brightness"
+                        keys="edit_keys"/>
       <spin-edit-action caption="Node ID"
                         min-value="8"
                         max-value="14"
                         get-method="get_node_id"
                         set-method="set_node_id"
                         keys="node_id_keys"/>
+      <checklist-action caption="Mode" get-index="get_selected_layout" popup="mode_menu" />
     </menu>
+
+    <menu name="mode_menu" keys="popup_keys" caption="Mode">
+      <event-action caption="AIO" can-id="id_set_mode" value-type="v_uint16" value="0"/>
+      <event-action caption="EDD" can-id="id_set_mode" value-type="v_uint16" value="1"/>
+      <event-action caption="ATT" can-id="id_set_mode" value-type="v_uint16" value="2"/>
+      <event-action caption="NAV" can-id="id_set_mode" value-type="v_uint16" value="3"/>
+      <event-action caption="HSI" can-id="id_set_mode" value-type="v_uint16" value="4"/>
+    </menu>
+
   </menu>
 
   <layout>
@@ -212,8 +216,8 @@
               name-font="neo_9_bold_font"
               show-aoa="true">
       <rect left="0" top="20" width="320" height="200"/>
-      <median x="160" y="100"/>
       <skid-indicator left="90" top="184" width="140" height="15"/>
+      <median x="160" y="100"/>
     </attitude>
     <altitude name="ALT"
               id="alt_widget"
@@ -235,7 +239,7 @@
       <rect left="240" top="20" width="80" height="200"/>
     </altitude>
     <pancake name="FLAP"
-             id="flap_indicator"
+         id="flap_indicator_widget"
              can-id="id_flap_position_value"
              horizontal="false"
              fill-background="true"
@@ -254,7 +258,7 @@
       <indicator-rect left="0" top="0" height="90" width="20"/>
     </pancake>
     <pancake name="PITCH"
-             id="pitch_indicator"
+         id="pitch_indicator_widget"
              can-id="id_pitch_trim_value"
              horizontal="false"
              fill-background="true"
@@ -272,7 +276,7 @@
       <indicator-rect left="0" top="0" height="90" width="20"/>
     </pancake>
     <pancake name="ROLL"
-             id="roll_indicator"
+             id="roll_indicator_widget"
              can-id="id_roll_trim_value"
              horizontal="true"
              fill-background="true"
@@ -295,7 +299,7 @@
           background-color="color_black"
           border-color="color_white"
           text-color="color_white"
-          name-font="neo_9_bold_font"
+       font="neo_9_bold_font"
           label-offset="2"
           label-color="color_white"
           text-offset="16"
@@ -313,7 +317,7 @@
           background-color="color_black"
           border-color="color_white"
           text-color="color_magenta"
-          name-font="neo_9_bold_font"
+           font="neo_9_bold_font"
           label-offset="2"
           label-color="color_magenta"
           text-offset="31"
@@ -331,7 +335,7 @@
           background-color="color_black"
           border-color="color_white"
           text-color="color_green"
-          name-font="neo_9_bold_font"
+           font="neo_9_bold_font"
           label-offset="2"
           label-color="color_green"
           text-offset="31"
@@ -349,7 +353,7 @@
           background-color="color_black"
           border-color="color_white"
           text-color="color_white"
-          name-font="neo_9_bold_font"
+       font="neo_9_bold_font"
           label-offset="2"
           label-color="color_white"
           text-offset="16"

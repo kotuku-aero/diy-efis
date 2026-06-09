@@ -51,6 +51,15 @@ set(YEHUDI_SOURCES
         groupbox_widget.cpp
         generate_panel_or_groupbox_widget_content.cpp
         data_bound_widget.cpp
+        textedit_action.cpp
+)
+
+set(YEHUDI_HEADERS
+  code_generator.h
+  definitions_generator.h
+  header_generator.h
+  pugixml.hpp
+  xml_parser.h
 )
 
 # ============================================================================

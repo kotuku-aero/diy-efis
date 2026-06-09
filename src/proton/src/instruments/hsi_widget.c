@@ -396,7 +396,7 @@ static result_t change_ap_mode(hsi_widget_t* widget)
   {
   canmsg_t msg;
   create_can_msg_uint16(&msg, id_autopilot_mode, widget->autopilot_mode);
-  return can_send(&msg, INDEFINITE_WAIT);
+  return can_send(&msg, INDEFINITE_WAIT, nullptr);
   }
 
 static result_t change_hs_mode(hsi_widget_t* widget, uint16_t mode)

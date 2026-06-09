@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding ="utf-8" ?>
 <application xmlns="http://kotuku.aero/schema/kotuku.xsd"
-             xmlns:xs="http://www.w3.org/2001/XMLSchema">
+             xmlns:xs="http://www.w3.org/2001/XMLSchema"
+             nav-db-path="F:/map_data">
 
   <menu id =" 100"
         root-keys="root"
@@ -13,18 +14,30 @@
         border-color="color_yellow"
         text-color="color_green"
         menu-timeout="7"
-        setup-menu="setup_menu">
+        setup-menu="config_menu">
     <rect left="0" top="0" width="320" height="240"/>
     <menu-rect x="0" y="0"/>
     <menu-start x="0" y="240"/>
-    <!-- Menu used when the menu is closed -->
+    <!-- Menu used when the menu is closed.
+           key0 press   = Settings     key1 press   = Nav Menu
+           key0 hold 1s = 180 LEFT     key1 hold 1s = 180 RIGHT  (emergency reversal)
+           deck A       = HDG bug (turn) / ALT preset (press+turn)
+           deck B       = QNH    (turn) / VS         (press+turn)
+         Deck B (QNH/VS) added to match ATT/AIO. VS was previously menu-only.
+         The hold->180 is present in root + alarm states only. -->
     <keys name="root">
       <key0>
         <popup-action caption="Settings" menu="settings_menu" />
       </key0>
+      <key0-hold>
+        <event-action caption="180 L" can-id="id_ap_reverse" value-type="v_int16" value="1"/>
+      </key0-hold>
       <key1>
-        <event-action caption="Cancel" can-id="id_cancel" value-type="v_int16" value="1"/>
+        <popup-action caption="AP" menu="ap_main_menu"/>
       </key1>
+      <key1-hold>
+        <event-action caption="180 R" can-id="id_ap_reverse" value-type="v_int16" value="-1"/>
+      </key1-hold>
       <decka-up>
         <event-action caption="HDGUp" can-id="id_heading_change" value-type="v_int16" value="1"/>
       </decka-up>
@@ -37,6 +50,18 @@
       <decka-press-dn>
         <event-action caption="ALTDn" can-id="id_altitude_change" value-type="v_int16" value="-100"/>
       </decka-press-dn>
+      <deckb-up>
+        <event-action caption="QNHUp" can-id="id_qnh_change" value-type="v_int16" value="1"/>
+      </deckb-up>
+      <deckb-dn>
+        <event-action caption="QNHDn" can-id="id_qnh_change" value-type="v_int16" value="-1"/>
+      </deckb-dn>
+      <deckb-press-up>
+        <event-action caption="VSUp" can-id="id_vertical_rate_change" value-type="v_int16" value="100"/>
+      </deckb-press-up>
+      <deckb-press-dn>
+        <event-action caption="VSDn" can-id="id_vertical_rate_change" value-type="v_int16" value="-100"/>
+      </deckb-press-dn>
     </keys>
 
     <!-- Menu used when a popup is active -->
@@ -76,6 +101,28 @@
       </decka-press-dn>
     </keys>
 
+
+    <keys name="text_edit_keys">
+      <key0>
+        <event-action caption="OK" can-id="id_ok" value-type="v_int16" value="1"/>
+      </key0>
+      <key1>
+        <event-action caption="Cancel" can-id="id_cancel" value-type="v_int16" value="1"/>
+      </key1>
+      <decka-up>
+        <event-action caption="Next" can-id="id_text_edit_char" value-type="v_int16" value="1"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="Prev" can-id="id_text_edit_char" value-type="v_int16" value="-1"/>
+      </decka-dn>
+      <deckb-up>
+        <event-action caption="Right" can-id="id_text_edit_next" value-type="v_int16" value="1"/>
+      </deckb-up>
+      <deckb-dn>
+        <event-action caption="Left" can-id="id_text_edit_next" value-type="v_int16" value="-1"/>
+      </deckb-dn>
+    </keys>
+
     <keys name="node_id_keys">
       <key0>
         <event-action caption="OK" can-id="id_ok" value-type="v_int16" value="1"/>
@@ -97,20 +144,27 @@
       </decka-press-dn>
     </keys>
 
-    <!-- Menu used when an alarm is displayed -->
+    <!-- Menu used when an alarm is displayed. Press = Close/Park; hold->180 stays live. -->
     <keys name="alarm_keys">
       <key0>
         <event-action caption="Close" can-id="id_alarm_close" value-type="v_int16" value="1"/>
       </key0>
+      <key0-hold>
+        <event-action caption="180 L" can-id="id_ap_reverse" value-type="v_int16" value="1"/>
+      </key0-hold>
       <key1>
         <event-action caption="Park" can-id="id_alarm_park" value-type="v_int16" value="1"/>
       </key1>
+      <key1-hold>
+        <event-action caption="180 R" can-id="id_ap_reverse" value-type="v_int16" value="-1"/>
+      </key1-hold>
     </keys>
 
     <menu name="settings_menu" keys="popup_keys" caption="Main">
+      <!-- Mode promoted to the top: 2-click switch of the surviving display. -->
       <event-action caption="AP Off" can-id="id_autopilot_enable" value-type="v_uint16" value="0"/>
-      <checklist-action caption="HNAV Mode" get-index="get_hnav_mode" popup="hnav_menu"/>
-      <checklist-action caption="VNAV Mode" get-index="get_vnav_mode" popup="vnav_menu"/>
+      <checklist-action caption="HNAV Mode" get-index="get_hnav_mode" popup="ap_lateral_menu"/>
+      <checklist-action caption="VNAV Mode" get-index="get_vnav_mode" popup="ap_vertical_menu"/>
       <spin-edit-action caption="VSpeed"
                         min-value="50"
                         max-value="1000"
@@ -123,40 +177,113 @@
                         get-method="get_assigned_altitude"
                         set-method="set_assigned_altitude"
                         keys="edit_keys"/>
+      <!-- Brightness/Node ID/Mode now live in the shared Config submenu, same as
+           the other three layouts. -->
+      <popup-action caption="Config" menu="config_menu"/>
+    </menu>
+
+    <!-- ================================================================ -->
+    <!-- AUTOPILOT MENUS -->
+    <!-- ================================================================ -->
+
+    <!-- Main Autopilot Menu -->
+    <menu name="ap_main_menu" keys="popup_keys" caption="Autopilot">
+      <popup-action caption="Flight Plan" menu="flight_plan_menu" />
+      <popup-action caption="Direct To" menu="direct_to_menu" />
+      <popup-action caption="Nearest" menu="nearest_menu" />
+      <event-action caption="Next Waypoint" can-id="id_next_waypoint" value-type="v_int16" value="1"/>
+      <event-action caption="Prev Waypoint" can-id="id_prev_waypoint" value-type="v_int16" value="1"/>
+    </menu>
+
+    <!-- Autopilot Lateral Modes -->
+    <menu name="ap_lateral_menu" keys="popup_keys" caption="Lateral Mode">
+      <event-action caption="HNAV Off" can-id="id_ap_lateral_mode" value-type="v_uint8" value="0"/>
+      <event-action caption="HDG" can-id="id_ap_lateral_mode" value-type="v_uint8" value="1"/>
+      <event-action caption="CRS" can-id="id_ap_lateral_mode" value-type="v_uint8" value="2"/>
+      <event-action caption="REV Left" can-id="id_ap_lateral_mode" value-type="v_uint8" value="3"/>
+      <event-action caption="REV Right" can-id="id_ap_lateral_mode" value-type="v_uint8" value="4"/>
+    </menu>
+
+    <!-- Autopilot Vertical Modes -->
+    <menu name="ap_vertical_menu" keys="popup_keys" caption="Vertical Mode">
+      <event-action caption="VNAV Off" can-id="id_ap_vertical_mode" value-type="v_uint8" value="0"/>
+      <event-action caption="ALT" can-id="id_ap_vertical_mode" value-type="v_uint8" value="1"/>
+      <event-action caption="VS" can-id="id_ap_vertical_mode" value-type="v_uint8" value="2"/>
+    </menu>
+
+    <!-- ================================================================ -->
+    <!-- NAVIGATION MENUS                                                 -->
+    <!-- ================================================================ -->
+
+    <!-- Flight Plan Menu -->
+    <menu name="flight_plan_menu" keys="popup_keys" caption="Flight Plan">
+      <checklist-action caption="Select Plan" get-index="get_current_flight_plan" popup="flight_plan_list_menu" />
+      <event-action caption="Activate Plan" can-id="id_activate_flight_plan" value-type="v_int16" value="1"/>
+      <event-action caption="Deactivate Plan" can-id="id_activate_flight_plan" value-type="v_int16" value="0"/>
+      <event-action caption="Next Leg" can-id="id_next_waypoint" value-type="v_int16" value="1"/>
+      <event-action caption="Invert Plan" can_id ="id_invert_plan" value-type="v_uint16" value="0" />
+    </menu>
+
+    <!-- Flight Plan List (populated dynamically via callback) -->
+    <menu name="flight_plan_list_menu" keys="popup_keys" caption="Select Plan">
+      <!-- This menu is populated dynamically by get_current_flight_plan callback -->
+      <!-- The callback should return available flight plans -->
+
+    </menu>
+
+    <!-- Direct To Menu -->
+    <menu name="direct_to_menu" keys="popup_keys" caption="Direct To">
+      <text-edit-action caption="Find"
+                        get-method="find_wpt_name"
+                        set-method="set_direct_to_wpt"
+                        get-hint-method="get_wpt_hint"
+                        keys="text_edit_keys"/>
+      <event-action caption="Nearest Airport" can-id="id_direct_to_waypoint" value-type="v_int16" value="2" get-value="get_nearest_airport_name"/>
+    </menu>
+
+    <!-- Nearest Menu -->
+    <menu name="nearest_menu" keys="popup_keys" caption="Nearest">
+      <event-action caption="Airport" can-id="id_nearest_airport" value-type="v_int16" value="1" get-value="get_nearest_airport_name"/>
+      <event-action caption="VOR" can-id="id_nearest_vor" value-type="v_int16" value="1" get-value="get_nearest_vor_name"/>
+      <event-action caption="NDB" can-id="id_nearest_ndb" value-type="v_int16" value="1" get-value="get_nearest_ndb_name"/>
+      <popup-action caption="Direct To Nearest" menu="direct_to_nearest_menu" />
+    </menu>
+
+    <!-- Direct To Nearest submenu -->
+    <menu name="direct_to_nearest_menu" keys="popup_keys" caption="Direct To Nearest">
+      <event-action caption="Airport" can-id="id_direct_to_waypoint" value-type="v_int16" value="10"/>
+      <event-action caption="VOR" can-id="id_direct_to_waypoint" value-type="v_int16" value="11"/>
+      <event-action caption="NDB" can-id="id_direct_to_waypoint" value-type="v_int16" value="12"/>
+    </menu>
+
+    <!-- Unified Config submenu (identical in EDD/ATT/HSI/AIO). Also the target of
+         the startup setup-menu hook below, so config lives in exactly one place. -->
+    <menu name="config_menu" keys="popup_keys" caption="Config">
       <spin-edit-action caption="Brightness"
                         min-value="10"
                         max-value="100"
                         get-method="get_brightness"
                         set-method="set_brightness"
                         keys="edit_keys"/>
-        <!-- this will be removed when the push-button on startup works -->
-        <popup-action menu="setup_menu" caption="Setup"/>
-    </menu>
-
-    <menu name="hnav_menu" keys="popup_keys" caption="HNAV Mode">
-      <event-action caption="OFF" can-id="id_hnav_mode" value-type="v_uint16" value="0"/>
-      <event-action caption="HDG" can-id="id_hnav_mode" value-type="v_uint16" value="1"/>
-      <event-action caption="NAV" can-id="id_hnav_mode" value-type="v_uint16" value="2"/>
-    </menu>
-    
-    <menu name="vnav_menu" keys="popup_keys" caption="VNAV Mode">
-      <event-action caption="OFF" can-id="id_vnav_mode" value-type="v_uint16" value="0"/>
-      <event-action caption="VS" can-id="id_vnav_mode" value-type="v_uint16" value="1"/>
-      <event-action caption="ALT" can-id="id_vnav_mode" value-type="v_uint16" value="2"/>
-    </menu>
-
-    <menu name="setup_menu" keys="popup_keys" caption="Setup">
       <spin-edit-action caption="Node ID"
                         min-value="8"
                         max-value="14"
                         get-method="get_node_id"
                         set-method="set_node_id"
                         keys="node_id_keys"/>
+      <checklist-action caption="Mode" get-index="get_selected_layout" popup="mode_menu" />
+    </menu>
+
+    <menu name="mode_menu" keys="popup_keys" caption="Mode">
+      <event-action caption="AIO" can-id="id_set_mode" value-type="v_uint16" value="0"/>
+      <event-action caption="EDD" can-id="id_set_mode" value-type="v_uint16" value="1"/>
+      <event-action caption="ATT" can-id="id_set_mode" value-type="v_uint16" value="2"/>
+      <event-action caption="NAV" can-id="id_set_mode" value-type="v_uint16" value="3"/>
+      <event-action caption="HSI" can-id="id_set_mode" value-type="v_uint16" value="4"/>
     </menu>
   </menu>
 
   <layout>
-
     <datetime name="UTC"
               id="utc_annunciator"
               fill-background="false"
@@ -177,7 +304,7 @@
               value-type="v_uint32"
               format="%H:%M"
             >
-      <rect left="0" top="0" width="60" height="40"/>
+      <rect left="0" top="0" width="80" height="40"/>
     </datetime>
 
     <datetime name="UTC DATE"
@@ -200,7 +327,7 @@
               value-type="v_uint32"
               format="%y-%m-%d"
             >
-      <rect left="0" top="40" width="60" height="40"/>
+      <rect left="0" top="40" width="80" height="40"/>
     </datetime>
 
     <hobbs name="AIR"
@@ -223,7 +350,7 @@
            value-type="v_uint32"
            format="%05.1f"
             >
-      <rect left="0" top="80" width="60" height="40"/>
+      <rect left="0" top="80" width="80" height="40"/>
     </hobbs>
 
     <hobbs name="ENG"
@@ -246,55 +373,56 @@
            value-type="v_uint32"
            format="%05.1f"
     >
-      <rect left="0" top="120" width="60" height="40"/>
+      <rect left="0" top="120" width="80" height="40"/>
     </hobbs>
-
-    <datetime name="LCL"
-              id="lcl_annunciator"
+    <waypoint name="WPT"
+              id="wpt_widget"
               fill-background="false"
               draw-name="true"
-              can-id="id_datetime_lcl"
-              label-color ="color_white"
-              background-color ="color_blue"
+              can-id="id_waypoint_code"
+              background-color ="color_khaki"
               compact="true"
               text-color="color_purple"
+              text-format="eto_clipped | eto_center"
+              text-offset="0"
+              name-color="color_white"
+              label-color ="color_white"
+              label-format="eto_clipped | eto_center"
+              label-offset="0"
               border-color="color_white"
               border-top="true"
               border-right="true"
-              small-font="neo_9_bold_font"
-              name-color="color_white"
               name-font="neo_9_bold_font"
-              label-offset="2"
-              text-offset="30"
-              value-type="v_uint32"
-              format="%H:%M"
+              small-font="neo_9_bold_font"
+              format="%s"
+              value-type="v_chars"
             >
-      <rect left="0" top="160" width="60" height="40"/>
-    </datetime>
-
-    <datetime name="LCL DATE"
-              id="lcl_date_annunciator"
+      <rect left="0" top="160" width="80" height="40"/>
+    </waypoint>
+    <hobbs name="ETD"
+              id="etd_widget"
               fill-background="false"
               draw-name="true"
-              can-id="id_datetime_lcl"
-              label-color ="color_white"
-              background-color ="color_blue"
+              can-id="id_estimated_enroute_time"
+              background-color ="color_khaki"
               compact="true"
               text-color="color_purple"
+              text-format="eto_clipped | eto_center"
+           text-offset="0"
+           label-offset="0"
+              label-color ="color_white"
+              label-format="eto_clipped | eto_center"
               border-color="color_white"
               border-top="true"
               border-right ="true"
               small-font="neo_9_bold_font"
               name-color="color_white"
               name-font="neo_9_bold_font"
-              label-offset="2"
-              text-offset="30"
-              value-type="v_uint32"
-              format="%y-%m-%d"
+              value-type="v_int32"
+              format="%H:%M"
             >
-      <rect left="0" top="200" width="60" height="40"/>
-    </datetime>
-
+      <rect left="0" top="200" width="80" height="40"/>
+    </hobbs>
 
     <hsi name="HSI"
          id="hsi_widget"
@@ -307,27 +435,9 @@
          fill-background="true"
         on-create="on_create_hsi_widget"
         name-font="neo_9_font">
-      <rect left="60" top="00" width="200" height="200"/>
+      <rect left="80" top="00" width="240" height="240"/>
     </hsi>
-    <autopilot name="AP"
-               id="ap_widget"
-               can-id="id_autopilot_mode"
-               name-font="neo_9_font"
-               fill-background="false"
-               text-color="color_purple"
-               label-color ="color_hollow"
-               label-offset="0"
-               border-color="color_white"
-               border-bottom="true"
-               border-top="true"
-               text-offset="0"
-               text-format="eto_clipped | eto_center"
-               small-font="neo_9_bold_font"
-               value-type="v_uint16"
-               format="%s"
->
-      <rect left="260" top="0" width="60" height="240"/>
-    </autopilot>
+
   </layout>
 
 </application>

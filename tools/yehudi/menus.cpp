@@ -26,6 +26,8 @@ void code_generator::create_menu(std::ofstream &out,
       generate_checklist_action(out, name, *handler);
     else if (strcmp(handler->name(), "spin-edit-action") == 0)
       generate_spinedit_action(out, name, *handler);
+    else if (strcmp(handler->name(), "text-edit-action") == 0)
+      generate_textedit_action(out, name, *handler);
     }
 
   out << std::endl;

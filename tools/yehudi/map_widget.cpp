@@ -11,7 +11,6 @@ void code_generator::create_map_widget(std::ofstream &out,
 
   create_map_theme(out, node.select_node("./day-theme").node(), ".day_theme");
   create_map_theme(out, node.select_node("./night-theme").node(), ".night_theme");
-  emit_string_property(out, node, "db-path", ".db_path");
   emit_string_property(out, node, "config-path", ".config_path");
   emit_address_property(out, node, "font", ".font");
   emit_property(out, node, "show-terrain", ".show_terrain");
@@ -54,6 +53,16 @@ void code_generator::create_map_theme(std::ofstream& out, const pugi::xml_node& 
   emit_property(out, node, "runway-extension", ".runway_ext_color", prefix);
   emit_property(out, node, "aerodrome", ".aerodrome", prefix);
   emit_property(out, node, "aerodrome-border", ".aerodrome_border", prefix);
+  emit_property(out, node, "glyph-halo", ".glyph_halo", prefix);
+  emit_property(out, node, "glyph-aerodrome-controlled", ".glyph_aerodrome_controlled", prefix);
+  emit_property(out, node, "glyph-aerodrome-uncontrolled", ".glyph_aerodrome_uncontrolled", prefix);
+  emit_property(out, node, "glyph-obstacle", ".glyph_obstacle", prefix);
+  emit_property(out, node, "glyph-hazard", ".glyph_hazard", prefix);
+  emit_property(out, node, "glyph-navaid", ".glyph_navaid", prefix);
+  emit_property(out, node, "glyph-vrp", ".glyph_vrp", prefix);
+  emit_property(out, node, "glyph-notam-indicator", ".glyph_notam_indicator", prefix);
+  emit_property(out, node, "glyph-lit-indicator", ".glyph_lit_indicator", prefix);
+  emit_property(out, node, "glyph-stroke", ".glyph_stroke", prefix);
 
   pugi::xpath_node_set nodes = node.select_nodes("./contour");
   int position = 0;

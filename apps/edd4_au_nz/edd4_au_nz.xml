@@ -11,19 +11,32 @@
         selected-color="color_magenta"
         border-color="color_yellow"
         text-color="color_green"
-        menu-timeout="7"
-        setup-menu="setup_menu">
+        menu-timeout="7">
     <rect left="0" top="0" width="320" height="240"/>
     <menu-rect x="0" y="0"/>
     <menu-start x="0" y="240"/>
-    <!-- Menu used when the menu is closed -->
+    <!-- Menu used when the menu is closed.
+         UNIFIED KEY MAP (see all four layouts):
+           key0 press      = Settings        key1 press      = Cancel
+           key0 hold 1s    = 180 LEFT        key1 hold 1s    = 180 RIGHT  (emergency reversal)
+           deck A          = "main thing on this page" -> here: scroll the data marquee
+           deck B          = reserved on EDD (no flight state to set;
+                             future home for an EDU cylinder cursor / lean assist)
+         The hold->180 lives only in root + alarm states, never in popup/edit menus,
+         so it can never fire while the pilot is inside a menu. -->
     <keys name="root">
       <key0>
         <popup-action caption="Settings" menu="settings_menu" />
       </key0>
+      <key0-hold>
+        <event-action caption="180 L" can-id="id_ap_reverse" value-type="v_int16" value="1"/>
+      </key0-hold>
       <key1>
         <event-action caption="Cancel" can-id="id_cancel" value-type="v_int16" value="1"/>
       </key1>
+      <key1-hold>
+        <event-action caption="180 R" can-id="id_ap_reverse" value-type="v_int16" value="-1"/>
+      </key1-hold>
       <decka-up>
         <event-action caption="Next" can-id="id_marquee_next" value-type="v_int16" value="1"/>
       </decka-up>
@@ -31,14 +44,22 @@
         <event-action caption="Prev" can-id="id_marquee_prev" value-type="v_int16" value="1"/>
       </decka-dn>
     </keys>
-    <!-- Menu used when an alarm is displayed -->
+    <!-- Menu used when an alarm is displayed. key0/key1 press = Close/Park,
+         but the hold->180 reversal stays live so a nuisance engine alarm can
+         never lock out an emergency turn. -->
     <keys name="alarm_keys">
       <key0>
         <event-action caption="Close" can-id="id_alarm_close" value-type="v_int16" value="1"/>
       </key0>
+      <key0-hold>
+        <event-action caption="180 L" can-id="id_ap_reverse" value-type="v_int16" value="1"/>
+      </key0-hold>
       <key1>
         <event-action caption="Park" can-id="id_alarm_park" value-type="v_int16" value="1"/>
       </key1>
+      <key1-hold>
+        <event-action caption="180 R" can-id="id_ap_reverse" value-type="v_int16" value="-1"/>
+      </key1-hold>
     </keys>
 
     <!-- Menu used when a popup is active -->
@@ -78,23 +99,6 @@
       </decka-press-dn>
     </keys>
 
-    <menu name="settings_menu" keys="popup_keys" caption="Settings">
-      <event-action caption="Full Fuel" can-id="id_set_fuel_available" value-type="v_uint32" get-value="get_fuel_max"/>
-      <spin-edit-action caption="Fuel total"
-                        min-value="0"
-                        get-max-value="get_fuel_max"
-                        converter="convert_cc_to_litres"
-                        get-method="get_fuel_total"
-                        set-method="set_fuel_total"
-                        keys="edit_keys"/>
-      <spin-edit-action caption="Brightness"
-                        min-value="10"
-                        max-value="100"
-                        get-method="get_brightness"
-                        set-method="set_brightness"
-                        keys="edit_keys"/>
-    </menu>
-
     <keys name="node_id_keys">
       <key0>
         <event-action caption="OK" can-id="id_ok" value-type="v_int16" value="1"/>
@@ -116,13 +120,43 @@
       </decka-press-dn>
     </keys>
 
-    <menu name="setup_menu" keys="popup_keys" caption="Setup">
+    <menu name="settings_menu" keys="popup_keys" caption="Settings">
+      <!-- Mode promoted to the top: switching the one surviving display is itself
+           an emergency action, so it should be 2 clicks (Settings>Mode), not 3. -->
+      <checklist-action caption="Mode" get-index="get_selected_layout" popup="mode_menu" />
+      <event-action caption="Full Fuel" can-id="id_set_fuel_available" value-type="v_uint32" get-value="get_fuel_max"/>
+      <spin-edit-action caption="Fuel total"
+                        min-value="0"
+                        get-max-value="get_fuel_max"
+                        converter="convert_cc_to_litres"
+                        get-method="get_fuel_total"
+                        set-method="set_fuel_total"
+                        keys="edit_keys"/>
+      <popup-action caption="Config" menu="config_menu"/>
+    </menu>
+    
+    <menu name="config_menu" keys="popup_keys" caption="Config">
+      <spin-edit-action caption="Brightness"
+                        min-value="10"
+                        max-value="100"
+                        get-method="get_brightness"
+                        set-method="set_brightness"
+                        keys="edit_keys"/>
       <spin-edit-action caption="Node ID"
                         min-value="8"
                         max-value="14"
                         get-method="get_node_id"
                         set-method="set_node_id"
                         keys="node_id_keys"/>
+      <checklist-action caption="Mode" get-index="get_selected_layout" popup="mode_menu" />
+    </menu>
+
+    <menu name="mode_menu" keys="popup_keys" caption="Mode">
+      <event-action caption="AIO" can-id="id_set_mode" value-type="v_uint16" value="0"/>
+      <event-action caption="EDD" can-id="id_set_mode" value-type="v_uint16" value="1"/>
+      <event-action caption="ATT" can-id="id_set_mode" value-type="v_uint16" value="2"/>
+      <event-action caption="NAV" can-id="id_set_mode" value-type="v_uint16" value="3"/>
+      <event-action caption="HSI" can-id="id_set_mode" value-type="v_uint16" value="4"/>
     </menu>
   </menu>
 

@@ -51,6 +51,8 @@ void code_generator::create_marquee_widget(std::ofstream &out,
       create_hp_annunciator_widget(out, it->node(), annunciator_id.c_str());
     else if (widget_name == "hobbs")
       create_hobbs_annunciator_widget(out, it->node(), annunciator_id.c_str());
+    else if (widget_name == "waypoint")
+      create_waypoint_annunciator_widget(out, it->node(), annunciator_id.c_str());
     else
       position--;     // is not an annunciator
 

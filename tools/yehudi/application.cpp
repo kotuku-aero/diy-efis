@@ -2,6 +2,10 @@
 
 void code_generator::create_application(std::ofstream &out, const pugi::xml_node& node)
   {
+  // extra symbols will be created if this exists
+  pugi::xml_attribute nav_db_path_attr =
+      get_named_attribute(node, "nav-db-path");
+
   out << "#include \"" << app_name_ << "_priv.h\"" << std::endl;
 
   out << "#include \"../../src/proton/dialog_widgets.h\"" << std::endl;
@@ -138,6 +142,19 @@ void code_generator::create_application(std::ofstream &out, const pugi::xml_node
   out << "(void)widget;" << std::endl;
   out << std::endl;
 
+  // emit the navigation database loader.
+  if (!nav_db_path_attr.empty())
+    {
+    out << std::endl;
+    out << "handle_t spatial_db;" << std::endl;
+    out << "if(failed(result = open_mfd_atom_db(\"" << nav_db_path_attr.value() << "\", &spatial_db)))" << std::endl;
+    out << "  {" << std::endl;
+    out << "  if(result != e_path_not_found)" << std::endl;
+    out << "    return result;" << std::endl;
+    out << "  }" << std::endl;
+    out << std::endl;
+    }
+
   bool focus_set = false;
 
   if (!theme_node.empty())
@@ -163,12 +180,12 @@ void code_generator::create_application(std::ofstream &out, const pugi::xml_node
     out << "  return result;" << std::endl << std::endl;
   }
 
-  int position = 1;
+  int widget_id = 1;
   pugi::xpath_node_set controls = node.select_nodes("./layout/*");
-  for (auto it = controls.begin(); it != controls.end(); it++, position++)
+  for (auto it = controls.begin(); it != controls.end(); it++, widget_id++)
     {
     std::string name = it->node().name();
-    std::string id = get_named_attribute(it->node(), "id").value();
+    std::string widget_name = get_named_attribute(it->node(), "id").value();
 
     if (name == "airspeed" ||
       name == "compass" ||
@@ -177,10 +194,15 @@ void code_generator::create_application(std::ofstream &out, const pugi::xml_node
       name == "hsi" ||
       name == "edutemps" ||
       name == "gauge" ||
-      name == "map" ||
       name == "pancake")
       {
-      out << "if(failed(result = create_" << name << "_widget(hwnd, " << position << ", &" << id << ", &child)))" << std::endl;
+      out << "if(failed(result = create_" << name << "_widget(hwnd, " << widget_id << ", &" << widget_name << ", &child)))" << std::endl;
+      out << "  return result;" << std::endl;
+      }
+    else if (name == "map")
+      {
+      out << "if(failed(result = create_map_widget(hwnd, spatial_db, "
+          << widget_id << ", &" << widget_name << ", &child)))" << std::endl;
       out << "  return result;" << std::endl;
       }
     else if (name == "text" ||
@@ -193,13 +215,13 @@ void code_generator::create_application(std::ofstream &out, const pugi::xml_node
              name == "ecu" ||
              name == "hobbs")
       {
-      out << "if(failed(result = create_annunciator_widget(hwnd, " << position << ", (annunciator_t *) &" << id << ", &child)))" << std::endl;
+      out << "if(failed(result = create_annunciator_widget(hwnd, " << widget_id << ", (annunciator_t *) &" << widget_name << ", &child)))" << std::endl;
       out << "  return result;" << std::endl;
       }
     else if (name == "tab")
       {
-      out << "if(failed(result = create_tab_widget(hwnd, " << position << " | DS_TABSTOP | DS_VISIBLE | DS_ENABLED, &" << id << ", &widget)) ||" << std::endl;
-      out << "  failed(result = " << id << "_constructor(widget, 0)))" << std::endl;
+      out << "if(failed(result = create_tab_widget(hwnd, " << widget_id << " | DS_TABSTOP | DS_VISIBLE | DS_ENABLED, &" << widget_name << ", &widget)) ||" << std::endl;
+      out << "  failed(result = " << widget_name << "_constructor(widget, 0)))" << std::endl;
       out << "  return result;" << std::endl;
       out << std::endl;
       out << "select_tab_page(widget, 0);" << std::endl << std::endl;
@@ -212,10 +234,10 @@ void code_generator::create_application(std::ofstream &out, const pugi::xml_node
     }
     else if (name == "marquee")
       {
-      out << "if(failed(result = create_marquee_widget(hwnd, " << position << ", &" << id << ", &widget)))" << std::endl;
+      out << "if(failed(result = create_marquee_widget(hwnd, " << widget_id << ", &" << widget_name << ", &widget)))" << std::endl;
       out << "  return result;" << std::endl << std::endl;
 
-      out << id << ".selected_alarm = -1;" << std::endl;
+      out << widget_name << ".selected_alarm = -1;" << std::endl;
       out << "uint16_t child_num = 0;" << std::endl;
 
       int child_position = 1;
@@ -225,14 +247,14 @@ void code_generator::create_application(std::ofstream &out, const pugi::xml_node
         std::string child_name = child->node().name();
         if (child_name != "alarm" && child_name != "rect")
           {
-          std::string annunciator_id = make_literal(id.c_str(), "_ann_", std::to_string(child_position).c_str());
+          std::string annunciator_id = make_literal(widget_name.c_str(), "_ann_", std::to_string(child_position).c_str());
 
           // see if the annunciator has an ID, this is used instead of the default
           pugi::xml_attribute id_attr = get_named_attribute(child->node(), "id");
           if (!id_attr.empty())
             annunciator_id = id_attr.value();
 
-          out << "if(failed(result = create_annunciator_widget(widget, " << id
+          out << "if(failed(result = create_annunciator_widget(widget, " << widget_name
               << ".base_widget_id + child_num++, (annunciator_t *)"
               << "&" << annunciator_id << ", &child)))" << std::endl;
           out << "  return result;" << std::endl << std::endl;
@@ -251,8 +273,8 @@ void code_generator::create_application(std::ofstream &out, const pugi::xml_node
       int alarm_position = 1;
       for (auto it = alarms.begin(); it != alarms.end(); it++, alarm_position++)
         {
-        out << "if(failed(result = create_alarm_annunciator(widget, " << id << ".base_alarm_id + child_num, &"
-          << id << "_alarms[child_num++], 0)))" << std::endl;
+        out << "if(failed(result = create_alarm_annunciator(widget, " << widget_name << ".base_alarm_id + child_num, &"
+          << widget_name << "_alarms[child_num++], 0)))" << std::endl;
         out << "  return result;" << std::endl << std::endl;
         }
       }

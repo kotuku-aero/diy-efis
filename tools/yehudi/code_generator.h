@@ -26,33 +26,23 @@ private:
   // Individual widget generators
   void create_menu(std::ofstream& out, const pugi::xml_node& node);
   void create_keymap(std::ofstream& out, const pugi::xml_node& node);
-  void generate_key_handler(std::ofstream& out, const pugi::xml_node& node, const char *keymap_name,
-                            const char* postfix);
-  void emit_keymap_details(std::ofstream& out, const pugi::xml_node& node, const char *keymap_name,
-                           const char* name);
-  void generate_event_action(std::ofstream& out, const std::string& name,
-                             const pugi::xml_node& node);
-  void generate_popup_action(std::ofstream& out, const std::string& name,
-                             const pugi::xml_node& node);
-  void generate_checklist_action(std::ofstream& out, const std::string& name,
-                                 const pugi::xml_node& node);
+  void generate_key_handler(std::ofstream& out, const pugi::xml_node& node, const char *keymap_name, const char* postfix);
+  void emit_keymap_details(std::ofstream& out, const pugi::xml_node& node, const char *keymap_name, const char* name);
+  void generate_event_action(std::ofstream& out, const std::string& name, const pugi::xml_node& node);
+  void generate_popup_action(std::ofstream& out, const std::string& name, const pugi::xml_node& node);
+  void generate_checklist_action(std::ofstream& out, const std::string& name, const pugi::xml_node& node);
+  void generate_textedit_action(std::ofstream &out, const std::string &name, const pugi::xml_node &node);
   void generate_spinedit_action(std::ofstream& out, const std::string& name,
                                 const pugi::xml_node& node);
-  void generate_alert_dialog(std::ofstream& out, const std::string& name,
-                             const pugi::xml_node& node);
-  void create_menu_widget(std::ofstream& out, const pugi::xml_node& node,
-                          const char* decl_name, bool is_right = false);
+  void generate_alert_dialog(std::ofstream& out, const std::string& name, const pugi::xml_node& node);
+  void create_menu_widget(std::ofstream& out, const pugi::xml_node& node, const char* decl_name, bool is_right = false);
   void create_menu_captions(std::ofstream& out, const pugi::xml_node& node);
   void create_menu_refs(std::ofstream& out, const pugi::xml_node& node);
   void create_menu_fwd(std::ofstream& out, const pugi::xml_node& node);
-  void create_action_handler(std::ofstream& out, const pugi::xml_node& node,
-                             const std::string& name);
-  void create_checklist_item(std::ofstream& out, const pugi::xml_node& node,
-                             const std::string& name);
-  void create_popup_item(std::ofstream& out, const pugi::xml_node& node,
-                         const std::string& name);
-  void create_event_item(std::ofstream& out, const pugi::xml_node& node,
-                         const std::string& name);
+  void create_action_handler(std::ofstream& out, const pugi::xml_node& node, const std::string& name);
+  void create_checklist_item(std::ofstream& out, const pugi::xml_node& node, const std::string& name);
+  void create_popup_item(std::ofstream& out, const pugi::xml_node& node, const std::string& name);
+  void create_event_item(std::ofstream& out, const pugi::xml_node& node, const std::string& name);
 
   // main application generation
   void create_application(std::ofstream& out, const pugi::xml_node& node);

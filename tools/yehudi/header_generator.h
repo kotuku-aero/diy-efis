@@ -1,8 +1,3 @@
-/*
- * header_generator.h - Generates public header files (.h)
- * Replaces factory.xsl
- */
-
 #ifndef HEADER_GENERATOR_H
 #define HEADER_GENERATOR_H
 

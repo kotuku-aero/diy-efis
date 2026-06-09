@@ -1,5 +1,5 @@
 #include "../../include/canfly.h"
-#include <string.h>
+#include <stdio.h>
 
 const variant_t* create_variant_nodata(variant_t* v)
   {
@@ -83,6 +83,32 @@ const variant_t* create_variant_utc(const tm_t* value, variant_t* v)
   return v;
   }
 
+const variant_t* create_variant_chars(const char* value, variant_t* v)
+  {
+  if (v == nullptr)
+    return nullptr;
+
+  v->vt = v_chars;
+
+  if (value == nullptr)
+    v->value.chars[0] = 0;
+  else
+    {
+    size_t i = 0; 
+    for (; i < 7; i++ )
+      {
+      if (*value == 0)
+        break;
+
+      v->value.chars[i] = *value++;
+      }
+
+    v->value.chars[i] = 0;
+    }
+
+  return v;
+  }
+
 static float get_float(const canmsg_t* msg)
   {
   uint32_t value = (((uint32_t)msg->data[1]) << 24) |
@@ -131,6 +157,8 @@ uint16_t can_type_from_variant(variant_type vt)
       return CANFLY_FLOAT;
     case v_utc:
       return CANFLY_TM;
+    case v_chars:
+      return CANFLY_CHARS;
     }
   }
 
@@ -212,8 +240,17 @@ result_t msg_to_variant(const canmsg_t* msg, variant_t* v)
     case CANFLY_TM:
       if (failed(result = get_param_utc(msg, &utc)))
         return result;
-
       create_variant_utc(&utc, v);
+      break;
+    case CANFLY_CHARS:
+      {
+      v->vt = v_chars;
+      uint16_t pos = 1;
+      for (size_t i = 0; i < get_can_len(i) - 1; i++)
+        v->value.chars[i] = msg->data[pos++];
+
+      v->value.chars[pos-1] = 0;
+      }
       break;
     default:
       return e_bad_type;
@@ -247,7 +284,6 @@ result_t variant_to_msg(const variant_t* v, uint16_t id, uint16_t type, canmsg_t
 
     return create_can_msg_uint8(msg, id, value);
     }
-    break;
     case CANFLY_INT8:
     {
     int8_t value;
@@ -256,7 +292,6 @@ result_t variant_to_msg(const variant_t* v, uint16_t id, uint16_t type, canmsg_t
 
     return create_can_msg_int8(msg, id, value);
     }
-    break;
     case CANFLY_UINT16:
     {
     uint16_t value;
@@ -265,7 +300,6 @@ result_t variant_to_msg(const variant_t* v, uint16_t id, uint16_t type, canmsg_t
 
     return create_can_msg_uint16(msg, id, value);
     }
-    break;
     case CANFLY_INT16:
     {
     int16_t value;
@@ -274,7 +308,6 @@ result_t variant_to_msg(const variant_t* v, uint16_t id, uint16_t type, canmsg_t
 
     return create_can_msg_int16(msg, id, value);
     }
-    break;
     case CANFLY_UINT32:
     {
     uint32_t value;
@@ -283,7 +316,6 @@ result_t variant_to_msg(const variant_t* v, uint16_t id, uint16_t type, canmsg_t
 
     return create_can_msg_uint32(msg, id, value);
     }
-    break;
     case CANFLY_INT32:
     {
     int32_t value;
@@ -292,7 +324,6 @@ result_t variant_to_msg(const variant_t* v, uint16_t id, uint16_t type, canmsg_t
 
     return create_can_msg_int32(msg, id, value);
     }
-    break;
     case CANFLY_BOOL:
     {
     bool value;
@@ -301,7 +332,6 @@ result_t variant_to_msg(const variant_t* v, uint16_t id, uint16_t type, canmsg_t
 
     return create_can_msg_bool(msg, id, value);
     }
-    break;
     case CANFLY_FLOAT:
     {
     float value;
@@ -310,7 +340,6 @@ result_t variant_to_msg(const variant_t* v, uint16_t id, uint16_t type, canmsg_t
 
     return create_can_msg_float(msg, id, value);
     }
-    break;
     case CANFLY_TM:
     {
     tm_t value;
@@ -319,7 +348,14 @@ result_t variant_to_msg(const variant_t* v, uint16_t id, uint16_t type, canmsg_t
 
     return create_can_msg_utc(msg, id, &value);
     }
-    break;
+    case CANFLY_CHARS:
+      {
+      variant_t value;
+      if (failed(result = coerce_variant(v, &value, v_chars)))
+        return result;
+
+      return create_can_msg_chars(msg, id, value.value.chars, 0);
+      }
     default:
       return e_bad_type;
     }
@@ -951,6 +987,61 @@ result_t coerce_variant(const variant_t* src, variant_t* dst, variant_type to_ty
     create_variant_float(value, dst);
     }
     break;
+    case v_chars:
+      switch (src->vt)
+        {
+        default:
+          return e_bad_parameter;
+        case v_uint8 :
+          {
+          uint8_t ui8;
+          if (failed(result = coerce_to_uint8(src, &ui8)))
+            return result;
+
+          memset(dst->value.chars, 0, sizeof(dst->value.chars));
+          snprintf(dst->value.chars, 7, "%u", ui8);
+          dst->vt = v_chars;
+          }
+          break;
+        case v_uint16 :
+          {
+          uint16_t ui16;
+          if (failed(result = coerce_to_uint16(src, &ui16)))
+            return result;
+
+          memset(dst->value.chars, 0, sizeof(dst->value.chars));
+          snprintf(dst->value.chars, 7, "%u", ui16);
+          dst->vt = v_chars;
+          }
+          break;
+        case v_int8 :
+          {
+          int8_t i8;
+          if (failed(result = coerce_to_int8(src, &i8)))
+            return result;
+
+          memset(dst->value.chars, 0, sizeof(dst->value.chars));
+          snprintf(dst->value.chars, 7, "%d", i8);
+          dst->vt = v_chars;
+          }
+          break;
+        case v_int16 :
+          {
+          int16_t i16;
+          if (failed(result = coerce_to_int16(src, &i16)))
+            return result;
+
+          memset(dst->value.chars, 0, sizeof(dst->value.chars));
+          snprintf(dst->value.chars, 7, "%d", i16);
+          dst->vt = v_chars;
+          }
+          break;
+        case v_chars :
+          dst->vt = v_chars;
+          memcpy(dst->value.chars, src->value.chars, sizeof(dst->value.chars));
+          break;
+        }
+      break;
     default:
       return e_bad_parameter;
     }

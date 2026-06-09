@@ -274,3 +274,30 @@ result_t get_param_utc(const canmsg_t* msg, tm_t* value)
 
   return s_ok;
   }
+
+result_t create_can_msg_chars(canmsg_t *msg, uint16_t message_id,
+                              const char *str, uint16_t len)
+  {
+  if (str == nullptr || msg == nullptr)
+    return e_bad_parameter;
+
+  if (len == 0)
+    len = strlen(str);
+
+  if (len > 7)
+    len = 7;
+
+  set_can_len(msg, len + 1);
+  set_can_id(msg, message_id);
+
+  msg->data[0] = CANFLY_CHARS;
+  msg->data[1] = len > 0 ? *str++ : 0;
+  msg->data[2] = len > 1 ? *str++ : 0;
+  msg->data[3] = len > 2 ? *str++ : 0;
+  msg->data[4] = len > 3 ? *str++ : 0;
+  msg->data[5] = len > 4 ? *str++ : 0;
+  msg->data[6] = len > 5 ? *str++ : 0;
+  msg->data[7] = len > 6 ? *str++ : 0;
+
+  return s_ok;
+  }

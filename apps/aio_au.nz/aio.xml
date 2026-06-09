@@ -1,0 +1,784 @@
+<?xml version="1.0" encoding ="utf-8" ?>
+<!--
+  ============================================================================
+  aio.xml  -  "All In One" reversionary / composite display (mode 3)
+  ============================================================================
+
+  Purpose
+    A single-screen fallback for the case where one 3.5" unit survives an
+    electrical fault, lightning strike, or a daisy-chain CAN break that has
+    isolated one or both of the other displays. It carries the PFD "basic T"
+    (reused verbatim from att.xml) plus a five-gauge engine vitals strip and
+    the EDD alarm marquee.
+
+  Design rules baked in here
+    * PFD core only - the flap/pitch/roll trim pancakes and the autopilot
+      H:/V: annunciators are deliberately dropped. Hand-flying, not coupling.
+    * Engine strip answers the only three reach-for-a-field questions:
+        is it making power (RPM)  / lubricated (Oil P, Oil T) / fed (Fuel P, Endur).
+    * EDU (EGT/CHT) protection lives in the alarm list below, not as continuous
+      bars - any cylinder over redline auto-pops the marquee in red.
+    * FAIL HONEST. A CAN break can remove a node entirely. Every gauge has its
+      sensor-id so it red-X's on its own when its node is on the severed segment.
+      A frozen horizon/value is worse than a blank one.
+
+Wiring
+    Add this to the mode_menu of edd.xml / att.xml / hsi.xml as well:
+        <event-action caption="AIO" can-id="id_set_mode" value-type="v_uint16" value="3"/>
+
+  Tuning
+    The engine-strip cell metrics (name-pt / value-rect) and the ENDUR scale are
+    a first cut at 64 px wide cells - expect to nudge them once you see it on
+    glass. Colour step bands are copied 1:1 from edd.xml so the green/red zones
+    sit exactly where the pilot's muscle memory already expects them.
+  ============================================================================
+-->
+<application xmlns="http://kotuku.aero/schema/kotuku.xsd"
+             xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <menu id ="100"
+        root-keys="root"
+        alarm-keys="alarm_keys"
+        font="neo_9_font"
+        background-color="color_black"
+        fill-background="false"
+        selected-background-color="color_white"
+        selected-color="color_magenta"
+        border-color="color_yellow"
+        text-color="color_green"
+        menu-timeout="7">
+    <rect left="0" top="0" width="320" height="240"/>
+    <menu-rect x="0" y="0"/>
+    <menu-start x="0" y="240"/>
+
+    <!-- Closed-menu deck mapping - UNIFIED with ATT/HSI:
+           key0 press   = Settings     key1 press   = Cancel
+           key0 hold 1s = 180 LEFT     key1 hold 1s = 180 RIGHT  (emergency reversal)
+           deck A       = HDG bug (turn) / ALT preset (press+turn)
+           deck B       = QNH    (turn) / VS         (press+turn)
+         AIO previously used deck A=QNH and deck B=marquee scroll. With MAP/RPM/
+         END/REM now permanent numbers, the marquee is auto/alarm duty and no longer
+         needs a manual knob, so AIO inherits the same flight knobs as ATT/HSI.
+         The hold->180 is the get-me-turned-around control for a reversionary IMC
+         encounter; present in root + alarm states only. -->
+    <keys name="root">
+      <key0>
+        <popup-action caption="Settings" menu="settings_menu" />
+      </key0>
+      <key0-hold>
+        <event-action caption="180 L" can-id="id_ap_reverse" value-type="v_int16" value="1"/>
+      </key0-hold>
+      <key1>
+        <event-action caption="Cancel" can-id="id_cancel" value-type="v_int16" value="1"/>
+      </key1>
+      <key1-hold>
+        <event-action caption="180 R" can-id="id_ap_reverse" value-type="v_int16" value="-1"/>
+      </key1-hold>
+      <decka-up>
+        <event-action caption="HDGUp" can-id="id_heading_change" value-type="v_int16" value="1"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="HDGDn" can-id="id_heading_change" value-type="v_int16" value="-1"/>
+      </decka-dn>
+      <decka-press-up>
+        <event-action caption="ALTUp" can-id="id_altitude_change" value-type="v_int16" value="100"/>
+      </decka-press-up>
+      <decka-press-dn>
+        <event-action caption="ALTDn" can-id="id_altitude_change" value-type="v_int16" value="-100"/>
+      </decka-press-dn>
+      <deckb-up>
+        <event-action caption="QNHUp" can-id="id_qnh_change" value-type="v_int16" value="1"/>
+      </deckb-up>
+      <deckb-dn>
+        <event-action caption="QNHDn" can-id="id_qnh_change" value-type="v_int16" value="-1"/>
+      </deckb-dn>
+      <deckb-press-up>
+        <event-action caption="VSUp" can-id="id_vertical_rate_change" value-type="v_int16" value="100"/>
+      </deckb-press-up>
+      <deckb-press-dn>
+        <event-action caption="VSDn" can-id="id_vertical_rate_change" value-type="v_int16" value="-100"/>
+      </deckb-press-dn>
+    </keys>
+
+    <!-- Menu used when an alarm is displayed. Press = Close/Park; hold->180 stays live. -->
+    <keys name="alarm_keys">
+      <key0>
+        <event-action caption="Close" can-id="id_alarm_close" value-type="v_int16" value="1"/>
+      </key0>
+      <key0-hold>
+        <event-action caption="180 L" can-id="id_ap_reverse" value-type="v_int16" value="1"/>
+      </key0-hold>
+      <key1>
+        <event-action caption="Park" can-id="id_alarm_park" value-type="v_int16" value="1"/>
+      </key1>
+      <key1-hold>
+        <event-action caption="180 R" can-id="id_ap_reverse" value-type="v_int16" value="-1"/>
+      </key1-hold>
+    </keys>
+
+    <!-- Menu used when a popup is active -->
+    <keys name="popup_keys">
+      <key0>
+        <event-action caption="OK" can-id="id_ok" value-type="v_int16" value="1"/>
+      </key0>
+      <key1>
+        <event-action caption="Cancel" can-id="id_cancel" value-type="v_int16" value="1"/>
+      </key1>
+      <decka-up>
+        <event-action caption="Up" can-id="id_up" value-type="v_int16" value="1"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="Dn" can-id="id_down" value-type="v_int16" value="1"/>
+      </decka-dn>
+    </keys>
+
+    <keys name="edit_keys">
+      <key0>
+        <event-action caption="OK" can-id="id_ok" value-type="v_int16" value="1"/>
+      </key0>
+      <key1>
+        <event-action caption="Cancel" can-id="id_cancel" value-type="v_int16" value="1"/>
+      </key1>
+      <decka-up>
+        <event-action caption="Up" can-id="id_spin_edit" value-type="v_int16" value="10"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="Dn" can-id="id_spin_edit" value-type="v_int16" value="-10"/>
+      </decka-dn>
+      <decka-press-up>
+        <event-action caption="Up" can-id="id_spin_edit" value-type="v_int16" value="1"/>
+      </decka-press-up>
+      <decka-press-dn>
+        <event-action caption="Dn" can-id="id_spin_edit" value-type="v_int16" value="-1"/>
+      </decka-press-dn>
+    </keys>
+
+    <keys name="node_id_keys">
+      <key0>
+        <event-action caption="OK" can-id="id_ok" value-type="v_int16" value="1"/>
+      </key0>
+      <key1>
+        <event-action caption="Cancel" can-id="id_cancel" value-type="v_int16" value="1"/>
+      </key1>
+      <decka-up>
+        <event-action caption="Up" can-id="id_spin_edit" value-type="v_int16" value="1"/>
+      </decka-up>
+      <decka-dn>
+        <event-action caption="Dn" can-id="id_spin_edit" value-type="v_int16" value="-1"/>
+      </decka-dn>
+      <decka-press-up>
+        <event-action caption="Up" can-id="id_spin_edit" value-type="v_int16" value="1"/>
+      </decka-press-up>
+      <decka-press-dn>
+        <event-action caption="Dn" can-id="id_spin_edit" value-type="v_int16" value="-1"/>
+      </decka-press-dn>
+    </keys>
+
+    <menu name="settings_menu" keys="popup_keys" caption="Main">
+      <!-- Mode promoted to the top: 2-click switch of the surviving display.
+           Nearest + AP Off added because AIO is a nav-capable reversion page that
+           can command the AP (the hold->180), so it needs a fast way to pick a
+           bolt-hole and to drop the AP. -->
+      <event-action caption="Nearest Apt" can-id="id_nearest_airport" value-type="v_int16" value="1"/>
+      <event-action caption="AP Off" can-id="id_autopilot_enable" value-type="v_uint16" value="0"/>
+      <event-action caption="Full Fuel" can-id="id_set_fuel_available" value-type="v_uint32" get-value="get_fuel_max"/>
+      <spin-edit-action caption="Fuel total"
+                        min-value="0"
+                        get-max-value="get_fuel_max"
+                        converter="convert_cc_to_litres"
+                        get-method="get_fuel_total"
+                        set-method="set_fuel_total"
+                        keys="edit_keys"/>
+      <popup-action caption="Config" menu="config_menu"/>
+    </menu>
+
+    <menu name="config_menu" keys="popup_keys" caption="Config">
+      <spin-edit-action caption="Brightness"
+                        min-value="10"
+                        max-value="100"
+                        get-method="get_brightness"
+                        set-method="set_brightness"
+                        keys="edit_keys"/>
+      <spin-edit-action caption="Node ID"
+                        min-value="8"
+                        max-value="14"
+                        get-method="get_node_id"
+                        set-method="set_node_id"
+                        keys="node_id_keys"/>
+      <checklist-action caption="Mode" get-index="get_selected_layout" popup="mode_menu" />
+    </menu>
+
+    <menu name="mode_menu" keys="popup_keys" caption="Mode">
+      <event-action caption="AIO" can-id="id_set_mode" value-type="v_uint16" value="0"/>
+      <event-action caption="EDD" can-id="id_set_mode" value-type="v_uint16" value="1"/>
+      <event-action caption="ATT" can-id="id_set_mode" value-type="v_uint16" value="2"/>
+      <event-action caption="NAV" can-id="id_set_mode" value-type="v_uint16" value="3"/>
+      <event-action caption="HSI" can-id="id_set_mode" value-type="v_uint16" value="4"/>
+    </menu>
+
+  </menu>
+
+  <layout>
+
+    <!-- ====================================================================
+         PFD CORE  (reused from att.xml, shrunk to top 0..168 of the screen)
+         compass tape / airspeed tape / attitude+AOA+skid / altitude+VSI+QNH
+         ==================================================================== -->
+
+    <compass name="CMP"
+             id="compass_widget"
+             fill-background="true"
+             background-color="color_black"
+             border-color="color_white"
+             text-color="color_white"
+             pen-color="color_white"
+             name-font="neo_9_bold_font">
+      <rect left="0" top="0" width="320" height="20"/>
+    </compass>
+
+    <airspeed name="ASI"
+              id ="asi_widget"
+              fill-background="true"
+              background-color="0x80808080"
+              background-gutter="8"
+              gutter-color="color_hollow"
+              border-color="color_white"
+              text-color="color_white"
+              pen-color="color_white"
+              font="neo_9_bold_font"
+              large-roller-font="neo_15_font"
+              small-roller-font="neo_9_bold_font"
+              converter="convert_ms_to_kts"
+              z-order="10"
+              >
+      <rect left="0" top="20" width="60" height="148"/>
+    </airspeed>
+
+    <attitude name="ATT"
+              id="att_widget"
+              border-color="color_white"
+              border-bottom="true"
+              z-order="0"
+              name-font="neo_9_bold_font"
+              show-aoa="true">
+      <rect left="0" top ="20" width="320" height="148"/>
+      <skid-indicator left="90" top="132" width="140" height="13"/>
+      <median x="160" y="74"/>
+    </attitude>
+
+    <altitude name="ALT"
+              id="alt_widget"
+              fill-background="true"
+              background-color="0x80808080"
+              background-gutter="8"
+              gutter-color="color_hollow"
+              border-color="color_white"
+              text-color="color_white"
+              pen-color="color_white"
+              font="neo_9_bold_font"
+              large-roller-font="neo_15_font"
+              small-roller-font="neo_9_bold_font"
+              altitude-converter="convert_meters_to_ft"
+              alt-rate-converter="convert_ms_to_fpm"
+              qnh-converter="convert_hpa_to_hpa"
+              z-order="10"
+              >
+      <rect left="240" top="20" width="80" height="148"/>
+    </altitude>
+
+    <!-- ====================================================================
+         ENGINE VITALS STRIP   (5 x 64px hbar gauges, top 168..208)
+         POWER | OIL P | OIL T | FUEL P | ENDUR
+         Colour step bands copied 1:1 from edd.xml.
+         ==================================================================== -->
+
+    <!-- SLOT 1 : POWER.  Fixed-pitch default = RPM (live below).
+         For constant-speed props, comment out this RPM gauge and uncomment
+         the MAP gauge that follows it. The other one is always in the marquee. -->
+    <auto name="RPM"
+          id="aio_rpm_gauge"
+          fill-background="true"
+          background-color="color_black"
+          text-color="color_lightblue"
+          label-color="color_white"
+          label-offset="2"
+          text-offset="32"
+          can-id="id_engine_rpm"
+          on-message="on_auto_msg"
+          on-paint="on_paint_auto"
+          border-color="color_white"
+          border-right="true"
+          border-top="true"
+          format="%d"
+          draw-name="true"
+          value-type="v_uint16"
+          small-font="neo_9_bold_font"
+          compact="true"
+        >
+      <rect left="0" top="168" width="64" height="36" />
+    </auto>
+    <auto name="MAP"
+          id="aio_map"
+          fill-background="true"
+          background-color="color_black"
+          text-color="color_lightblue"
+          label-color="color_white"
+          label-offset="2"
+          text-offset="32"
+          can-id="id_manifold_pressure"
+          on-message="on_auto_msg"
+          on-paint="on_paint_auto"
+          border-color="color_white"
+          border-right="true"
+          border-top="true"
+          format="%01.1f"
+          draw-name="true"
+          value-type="v_float"
+          small-font="neo_9_bold_font"
+          converter="convert_hpa_to_inhg"
+          compact="true"
+          >
+      <rect left="0" top="204" width="64" height="36" />
+    </auto>
+    <!-- SLOT 2 : OIL PRESSURE - the fastest killer, always continuous -->
+    <gauge name="OILP"
+           id="aio_oilp_gauge"
+           style="hbar"
+           background-color="color_black"
+           fill-background="true"
+           draw-value="true"
+           draw-name="true"
+           name-color="color_white"
+           value-font="neo_9_bold_font"
+           name-font="neo_9_bold_font"
+           font="neo_9_font"
+           can-id="id_oil_pressure"
+           converter="convert_hpa_to_psi"
+           border-color="color_white"
+           border-right="true"
+           border-top="true"
+           border-bottom="true"
+           alarm-id="id_low_oil_pressure_alarm"
+           alarm-color="color_red"
+           sensor-id="id_oil_pressure_sensor_status"
+           >
+      <rect left="64" top="168" width="64" height="36" />
+      <name-pt x="45" y="29"/>
+      <value-rect left="2" top="18" width="30" height="20"/>
+
+      <step color="color_red"        pen="color_red"        value="20"/>
+      <step color="color_lightgreen" pen="color_lightgreen" value="120"/>
+    </gauge>
+
+    <!-- SLOT 3 : OIL TEMPERATURE -->
+    <gauge name="OILT"
+           id="aio_oilt_gauge"
+           style="hbar"
+           background-color="color_black"
+           fill-background="true"
+           draw-value="true"
+           draw-name="true"
+           name-color="color_white"
+           value-font="neo_9_bold_font"
+           name-font="neo_9_bold_font"
+           font="neo_9_font"
+           can-id="id_oil_temperature"
+           converter="convert_kelvin_to_f"
+           border-color="color_white"
+           border-right="true"
+           border-top="true"
+           border-bottom="true"
+           alarm-id="id_high_oil_temperature_alarm"
+           alarm-color="color_red"
+           sensor-id="id_oil_temperature_sensor_status"
+           >
+      <rect left="128" top="168" width="64" height="36" />
+      <name-pt x="45" y="29"/>
+      <value-rect left="2" top="18" width="30" height="20"/>
+
+      <step color="color_hollow"     pen="color_hollow"     value="32"/>
+      <step color="color_scarlet"    pen="color_scarlet"    value="90"/>
+      <step color="color_lightgreen" pen="color_lightgreen" value="220"/>
+      <step color="color_scarlet"    pen="color_scarlet"    value="250"/>
+    </gauge>
+
+    <!-- SLOT 4 : FUEL PRESSURE - seconds-to-silence on an injected engine -->
+    <gauge name="FUELP"
+           id="aio_fuelp_gauge"
+           style="hbar"
+           background-color="color_black"
+           fill-background="true"
+           draw-value="true"
+           draw-name="true"
+           name-color="color_white"
+           value-font="neo_9_bold_font"
+           name-font="neo_9_bold_font"
+           font="neo_9_font"
+           can-id="id_fuel_pressure"
+           converter="convert_hpa_to_psi"
+           border-color="color_white"
+           border-right="true"
+           border-top="true"
+           border-bottom="true"
+           alarm-id="id_low_fuel_pressure_alarm"
+           alarm-color="color_red"
+           sensor-id="id_fuel_pressure_sensor_status"
+           >
+      <rect left="192" top="168" width="64" height="36" />
+      <name-pt x="45" y="29"/>
+      <value-rect left="2" top="18" width="30" height="20"/>
+
+      <step color="color_hollow"     pen="color_hollow"     value="10"/>
+      <step color="color_red"        pen="color_red"        value="15"/>
+      <step color="color_lightgreen" pen="color_lightgreen" value="45"/>
+    </gauge>
+
+    <!-- SLOT 5 : ENDURANCE  ("how long have I got")
+         NOTE: id_fuel_endurance feeds a numeric gauge here; bands assume the
+         value is in MINUTES. If the source is seconds/hours, just rescale the
+         three step values. The H:M-formatted version is also in the marquee. -->
+    <gauge name="END"
+           id="aio_endur_gauge"
+           style="hbar"
+           background-color="color_black"
+           fill-background="true"
+           draw-value="true"
+           draw-name="true"
+           name-color="color_white"
+           value-font="neo_9_bold_font"
+           name-font="neo_9_bold_font"
+           font="neo_9_font"
+           can-id="id_fuel_endurance"
+           border-color="color_white"
+           border-top="true"
+           border-bottom="true"
+           >
+      <rect left="256" top="168" width="64" height="36" />
+      <name-pt x="45" y="29"/>
+      <value-rect left="2" top="18" width="32" height="20"/>
+
+      <step color="color_red"        pen="color_red"        value="30"/>
+      <step color="color_scarlet"    pen="color_scarlet"    value="45"/>
+      <step color="color_lightgreen" pen="color_lightgreen" value="300"/>
+    </gauge>
+
+    <gauge name="REM"
+           id="aio_fuelr_gauge"
+           style="hbar"
+           background-color="color_black"
+           fill-background="true"
+           draw-value="true"
+           draw-name="true"
+           name-color="color_white"
+           value-font="neo_9_bold_font"
+           name-font="neo_9_bold_font"
+           font="neo_9_font"
+           can-id="id_fuel_total"
+           converter="convert_cc_to_litres"
+           border-color="color_white"
+           border-left="true"
+           >
+      <rect left="256" top="204" width="64" height="36" />
+      <name-pt x="45" y="29"/>
+      <value-rect left="2" top="18" width="32" height="20"/>
+
+      <step color="color_hollow" pen="color_hollow" value="0"/>
+      <step color="color_red" pen="color_red" value="10"/>
+      <step color="color_lightgreen" pen="color_lightgreen" value="110"/>
+    </gauge>
+
+    <auto name="H:"
+          id="id_hnav"
+          can-id="id_autopilot_mode"
+          fill-background="true"
+          background-color="color_black"
+          border-color="color_white"
+          border-top="true"
+          text-color="color_white"
+          font="neo_9_bold_font"
+          label-offset="2"
+          label-color="color_white"
+          text-offset="16"
+          small-font="neo_9_bold_font"
+          value-type="v_uint16"
+          format="%03.3d"
+          draw-name="true"
+          >
+      <rect left="64" top="222" width="48" height="18"/>
+    </auto>
+    <auto name="HDG:"
+          id="id_hdg"
+          can-id="id_heading"
+          fill-background="true"
+          background-color="color_black"
+          border-color="color_white"
+          border-top="true"
+          text-color="color_magenta"
+          font="neo_9_bold_font"
+          label-offset="2"
+          label-color="color_magenta"
+          text-offset="31"
+          small-font="neo_9_bold_font"
+          value-type="v_uint16"
+          format="%03.3d"
+          draw-name="true"
+          >
+      <rect left="112" top="222" width="48" height="18"/>
+    </auto>
+    <auto name="CRS:"
+          id="id_crs"
+          can-id="id_track"
+          fill-background="true"
+          background-color="color_black"
+          border-color="color_white"
+          border-top="true"
+          text-color="color_green"
+          font="neo_9_bold_font"
+          label-offset="2"
+          label-color="color_green"
+          text-offset="31"
+          small-font="neo_9_bold_font"
+          value-type="v_uint16"
+          format="%03.3d"
+          draw-name="true"
+          >
+      <rect left="160 " top="222" width="48" height="18"/>
+    </auto>
+    <auto name="V:"
+          id="id_vnav"
+          can-id="id_autopilot_mode"
+          fill-background="true"
+          background-color="color_black"
+          border-color="color_white"
+          border-top="true"
+          text-color="color_white"
+          font="neo_9_bold_font"
+          label-offset="2"
+          label-color="color_white"
+          text-offset="16"
+          small-font="neo_9_bold_font"
+          value-type="v_uint16"
+          format="%03.3d"
+          draw-name="true"
+          >
+      <rect left="208" top="222" width="48" height="18"/>
+    </auto>
+
+
+  <!-- ====================================================================
+         ALARM MARQUEE   (top 208..240, full width)
+         Default rotation carries the prop-alternate power gauge + the engine
+         data the strip can't fit, scrollable on deck B. The <alarm> list is
+         the EDU/system safety net - it auto-pops the worst item in red,
+         which is where CHT/EGT (12 channels) protection lives.
+         ==================================================================== -->
+    <marquee name="ALARMS"
+             id="marquee"
+             base-id="1000"
+             base-alarm-id="2000"
+             border-color="color_white"
+             font="neo_15_font"
+             background-color="color_black"
+             fill-background="true"
+             alarm-background="color_red"
+             alarm-text="color_black"
+             on-paint="on_paint_marquee"
+             >
+      <rect left="64" top="204" width="192" height="18"/>
+
+      <!-- Prop-alternate power: whichever of these is NOT on the strip -->
+      <auto small-font="neo_9_bold_font"
+            name="Fuel Flow"
+            id="m_fuel_flow"
+            fill-background="true"
+            background-color="color_black"
+            text-color="color_lightblue"
+            label-color="color_white"
+            label-offset="2"
+            text-offset="80"
+            can-id="id_fuel_flow_rate"
+            on-message="on_auto_msg"
+            on-paint="on_paint_auto"
+            format="%d"
+            draw-name="true"
+            value-type="v_uint32"
+            converter="convert_flow_to_litres">
+        <rect left="0" top="0" width="192" height="18"/>
+      </auto>
+      <auto small-font="neo_9_bold_font"
+            id="m_tot_fuel"
+            name="Tot. Fuel"
+            fill-background="true"
+            background-color="color_black"
+            text-color="color_lightblue"
+            label-color="color_white"
+            label-offset="2"
+            text-offset="30"
+            can-id="id_fuel_total"
+            on-message="on_auto_msg"
+            on-paint="on_paint_auto"
+            format="%d"
+            draw-name="true"
+            value-type="v_uint32"
+            converter="convert_cc_to_litres">
+        <rect left="0" top="0" width="192" height="18"/>
+      </auto>
+
+      <!-- Electrical (lightning / bus-fault awareness) -->
+      <auto small-font="neo_9_bold_font"
+            name="Volts"
+            id="m_volts"
+            text-color="color_lightblue"
+            label-color="color_white"
+            label-offset="2"
+            text-offset="30"
+            can-id="id_dc_voltage"
+            on-message="on_auto_msg"
+            on-paint="on_paint_auto"
+            format="%d"
+            fill-background="true"
+            background-color="color_black"
+            draw-name="true"
+            value-type="v_uint16">
+        <rect left="0" top="0" width="192" height="18"/>
+      </auto>
+      <auto small-font="neo_9_bold_font"
+            name="Amps"
+            id="m_amps"
+            text-color="color_lightblue"
+            label-color="color_white"
+            label-offset="2"
+            text-offset="30"
+            can-id="id_dc_current"
+            on-message="on_auto_msg"
+            on-paint="on_paint_auto"
+            format="%d"
+            fill-background="true"
+            background-color="color_black"
+            draw-name="true"
+            value-type="v_int16">
+        <rect left="0" top="0" width="192" height="18"/>
+      </auto>
+
+      <!-- Air data -->
+      <auto small-font="neo_9_bold_font"
+            name="OAT"
+            id="m_oat"
+            text-color="color_lightblue"
+            label-color="color_white"
+            label-offset="2"
+            text-offset="30"
+            can-id="id_outside_air_temperature"
+            on-message="on_auto_msg"
+            on-paint="on_paint_auto"
+            format="%d"
+            fill-background="true"
+            background-color="color_black"
+            draw-name="true"
+            value-type="v_uint16"
+            converter="convert_kelvin_to_c">
+        <rect left="0" top="0" width="192" height="18"/>
+      </auto>
+
+      <!-- Minimal nav: where to / how long -->
+      <waypoint small-font="neo_9_bold_font"
+                name="WPT"
+                id="m_wpt"
+                fill-background="true"
+                background-color="color_black"
+                text-color="color_lightblue"
+                label-color="color_white"
+                label-offset="2"
+                text-offset="30"
+                can-id="id_waypoint_code"
+                draw-name="true"
+                format="%s"
+                value-type="v_chars">
+        <rect left="0" top="0" width="192" height="18"/>
+      </waypoint>
+      <hours small-font="neo_9_bold_font"
+            name="ETE"
+            id="m_ete"
+            text-color="color_lightblue"
+            label-color="color_white"
+            label-offset="2"
+            text-offset="30"
+            can-id="id_estimated_enroute_time"
+            on-message="on_hours_msg"
+            on-paint="on_paint_hours"
+            format="%H:%M"
+            fill-background="true"
+            background-color="color_black"
+            draw-name="true"
+            value-type="v_int32">
+        <rect left="0" top="0" width="192" height="18"/>
+      </hours>
+
+      <!-- ================= ALARMS (reused 1:1 from edd.xml) =================
+           This is the EDU + system safety net. CHT x6 / EGT x6 included so a
+           cooking cylinder auto-pops here in red without a continuous bar. -->
+      <alarm priority="1" message="Low oil pressure" can-park="true">
+        <alarm-id>id_low_oil_pressure_alarm</alarm-id>
+      </alarm>
+      <alarm priority="2" message="Low fuel pressure" can-park="true">
+        <alarm-id>id_low_fuel_pressure_alarm</alarm-id>
+      </alarm>
+      <alarm priority="3" message="High oil temperature" can-park="true">
+        <alarm-id>id_high_oil_temperature_alarm</alarm-id>
+      </alarm>
+      <alarm priority="4" message="RPM high" can-park="true">
+        <alarm-id>id_rpm_high_alarm</alarm-id>
+      </alarm>
+      <alarm priority="5" message="Timing divergence" can-park="true">
+        <alarm-id>id_timing_divergence_alarm</alarm-id>
+        <alarm-id>id_rpm_divergence_alarm</alarm-id>
+        <alarm-id>id_map_divergence_alarm</alarm-id>
+        <alarm-id>id_iat_divergence_alarm</alarm-id>
+        <alarm-id>id_fuel_pressure_divergence_alarm</alarm-id>
+      </alarm>
+      <alarm priority="6" message="High CHT" can-park="true">
+        <alarm-id>id_cylinder_head_temperature1_alarm</alarm-id>
+        <alarm-id>id_cylinder_head_temperature2_alarm</alarm-id>
+        <alarm-id>id_cylinder_head_temperature3_alarm</alarm-id>
+        <alarm-id>id_cylinder_head_temperature4_alarm</alarm-id>
+        <alarm-id>id_cylinder_head_temperature5_alarm</alarm-id>
+        <alarm-id>id_cylinder_head_temperature6_alarm</alarm-id>
+      </alarm>
+      <alarm priority="7" message="Low Fuel" can-park="true">
+        <alarm-id>id_low_fuel_alarm</alarm-id>
+      </alarm>
+      <alarm priority="8" message="CHT Cold Shock" can-park="true">
+        <alarm-id>id_cold_shock_alarm</alarm-id>
+      </alarm>
+      <alarm priority="9" message="High voltage" annunciator="m_volts" can-park="true">
+        <alarm-id>id_bus_volts_high_alarm</alarm-id>
+      </alarm>
+      <alarm priority="10" message="Low Voltage" annunciator="m_volts" can-park="true">
+        <alarm-id>id_bus_volts_low_alarm</alarm-id>
+      </alarm>
+      <alarm priority="11" message="High Fuel Pressure" can-park="true">
+        <alarm-id>id_high_fuel_pressure_alarm</alarm-id>
+      </alarm>
+      <alarm priority="12" message="High Current" annunciator="m_amps" can-park="true">
+        <alarm-id>id_high_amps_alarm</alarm-id>
+      </alarm>
+      <alarm priority="13" message="kMAG Temperature" can-park="true">
+        <alarm-id>id_mag_temperature_alarm</alarm-id>
+      </alarm>
+      <alarm priority="14" message="Low Fuel Flow" annunciator="m_fuel_flow" can-park="true">
+        <alarm-id>id_fuel_flow_rate_alarm</alarm-id>
+      </alarm>
+      <alarm priority="15" message="EGT Temperature" can-park="true">
+        <alarm-id>id_exhaust_gas_temperature1_alarm</alarm-id>
+        <alarm-id>id_exhaust_gas_temperature2_alarm</alarm-id>
+        <alarm-id>id_exhaust_gas_temperature3_alarm</alarm-id>
+        <alarm-id>id_exhaust_gas_temperature4_alarm</alarm-id>
+        <alarm-id>id_exhaust_gas_temperature5_alarm</alarm-id>
+        <alarm-id>id_exhaust_gas_temperature6_alarm</alarm-id>
+      </alarm>
+
+    </marquee>
+
+  </layout>
+
+</application>

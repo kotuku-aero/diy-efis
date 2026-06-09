@@ -2,20 +2,6 @@
 
 #include "att.h"
 
-// stubs for now
-
-result_t get_selected_layout(menu_item_t *edit, uint32_t *value)
-  {
-  *value = 0;
-  return s_ok;
-  }
-
-result_t set_selected_layout(uint32_t mode)
-  {
-  return s_ok;
-  }
-
-
 static result_t my_wndproc(handle_t hndl, const canmsg_t* msg, void* wnddata)
   {
   // add event handlers here
