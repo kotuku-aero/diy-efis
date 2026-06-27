@@ -1073,6 +1073,9 @@ typedef struct {
 } hypsometric_theme_t;
 
 typedef struct {
+  const font_t *font; // this is the font that the viewport can use
+                      // to render
+
   color_t alarm_color;
   color_t warning_color;
   color_t water_color;
@@ -1129,15 +1132,16 @@ typedef struct _map_params_t map_params_t;
 // number.
 typedef int32_t fixed_t;
 /**
- * @brief data common to all layers
+ * @brief A viewport is used to describe layers on a map canvas.  They
+ * are created when a map is incarnated and can be queried/updated using the
+ * mapping API
  */
 typedef struct _viewport_params_t
   {
   uint32_t version;         // size of the parameters including the base
-  const map_params_t *map;  // details about the map being rendered
-
+  handle_t map;             // handle of the canvas that owns this.
   bool show_layer;          // show/hide the layer
-
+  const map_theme_t *theme; // theme to render the viewport with
   } viewport_params_t;
 
 typedef struct _airspace_params_t
@@ -1230,16 +1234,34 @@ typedef enum {
 #define MAP_LAYER_TRAFFIC         0x00000400
 #define MAP_LAYER_FLIGHTPLAN      0x00000800
 
-typedef enum _spatial_entity_type
+  /**
+   * @brief These flags are used to search for types of spatial entities
+   */
+  typedef enum _spatial_entity_type
   {
-  sct_unknown,
-  sct_contours,
-  sct_landmass,
-  sct_topo,
-  sct_obstacles,
-  sct_navaids,
-  sct_airspace,
+  // airspace types
+  ast_danger_area = 0x00000010,
+  ast_restricted_area = 0x00000020,
+  ast_general_aviation = 0x00000030,
+  ast_ctr = 0x00000040,
+  ast_cta = 0x00000050,
+  ast_millitary_zone = 0x00000060,
+  ast_mandatory_broadcast_zone = 0x00000070,
+  ast_aerodrome = 0x00000080,
+  ast_heliport = 0x00000090,
+  ast_volcanic_hazard = 0x000000A0,
+  ast_visual_reporting_point = 0x000000B0,
+  ast_common_frequency_zone = 0x000000C0,
+  ast_low_flying_zone = 0x000000D0,
+  ast_transit_lane            = 0x000000E0,
+  ast_fiscom                  = 0x000000F0,
+  ast_runway                  = 0x00000100,
+  ast_fir = 0x00000200,
+  ast_navaid = 0x00000300,
+  ast_obstacle = 0x00000400,
+  ast_hazard = 0x00000500,
   } spatial_entity_type;
+
 
 /**
  * @brief A rhobus that describes a spatial aera
@@ -1253,6 +1275,14 @@ typedef struct _spatial_rhombus_t
   lla_t p3;
   lla_t p4;
   } spatial_rhombus_t;
+
+typedef struct _pixel_rhombus_t
+  {
+  point_t top_left;
+  point_t top_right;
+  point_t bottom_right;
+  point_t bottom_left;
+  } pixel_rhombus_t;
 
 typedef struct _spatial_container_details_t
   {

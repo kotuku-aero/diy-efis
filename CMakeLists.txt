@@ -11,7 +11,7 @@ project(CanFly VERSION 1.0.0 LANGUAGES C CXX)
 ################################################################################
 # MSVC Runtime Library
 ################################################################################
-if(NOT PIC32_BUILD)
+if(NOT MIPS32_BUILD)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
 
@@ -36,6 +36,8 @@ if(MIPS32_BUILD)
     add_subdirectory(src/canfly)
 endif()
 
+set(DIYEFIS_SOURCE_DIR ${CMAKE_SOURCE_DIR})
+
 link_directories(${CMAKE_SOURCE_DIR}/lib)
 
 ################################################################################
@@ -51,6 +53,7 @@ add_subdirectory(apps/edd4_au_nz)
 add_subdirectory(apps/hsi_au_nz)
 add_subdirectory(apps/nav_au_nz)
 add_subdirectory(apps/pfd_au_nz)
+add_subdirectory(apps/startup)
 
 add_subdirectory(tools/yehudi)
 

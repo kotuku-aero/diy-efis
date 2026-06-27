@@ -29,11 +29,11 @@
  * errno implementation
  * Newlib expects a per-thread errno, but in bare metal we use a simple global.
  */
-// static int _errno = 0;
-// int *__errno(void)
-//   {
-//   return &_errno;
-//   }
+ static int _errno = 0;
+ int *__errno(void)
+   {
+   return &_errno;
+   }
 
 /*
  * sbrk - Increase program data space
@@ -46,7 +46,9 @@ void *sbrk(int incr)
 {
   static char *heap_end = 0;
   extern char _end;           // Defined by linker (end of BSS)
-  extern char _stack;         // Defined by linker (top of stack)
+
+  // this does not make sense.
+  // extern char _stack;         // Defined by linker (top of stack)
 
   if (heap_end == 0)
     heap_end = &_end;
@@ -54,7 +56,7 @@ void *sbrk(int incr)
   char *prev_heap_end = heap_end;
 
   // Check for collision with stack
-  if (heap_end + incr > &_stack)
+  if (heap_end + incr > &incr)
     {
         errno = ENOMEM;
         return (void *)-1;

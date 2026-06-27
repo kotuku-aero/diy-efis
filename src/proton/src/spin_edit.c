@@ -16,26 +16,26 @@ menu_item_action_result item_spin_edit_evaluate(menu_widget_t* wnd,
   // displays in
 
   (*edit->get_value)(item, &tmp_value);
-  coerce_to_float(&tmp_value, &edit->value);
+  coerce_to_int32(&tmp_value, &edit->value);
 
   if(edit->get_min_value != nullptr)
     {
     (*edit->get_min_value)(item, &tmp_value);
-    coerce_to_float(&tmp_value, &edit->min_value);
+    coerce_to_int32(&tmp_value, &edit->min_value);
     }
 
   if(edit->get_max_value != nullptr)
     {
     (*edit->get_max_value)(item, &tmp_value);
-    coerce_to_float(&tmp_value, &edit->max_value);
+    coerce_to_int32(&tmp_value, &edit->max_value);
     }
 
   // if there is a value converter, then convert the value
   if (edit->converter != nullptr)
     {
-    edit->value = edit->converter->convert(edit->value);
-    edit->min_value = edit->converter->convert(edit->min_value);
-    edit->max_value = edit->converter->convert(edit->max_value);
+    edit->value = (int32_t) edit->converter->convert(edit->value);
+    edit->min_value = (int32_t) edit->converter->convert(edit->min_value);
+    edit->max_value = (int32_t) edit->converter->convert(edit->max_value);
     }
 
   item->is_selected = true;
@@ -90,7 +90,7 @@ void item_spin_edit_event(menu_widget_t* wnd,
         if(edit->converter != nullptr)
           value *= edit->converter->increment_factor;
 
-        edit->value += value;
+        edit->value += (int32_t) value;
 
         if (edit->value < edit->min_value)
           {
@@ -134,9 +134,7 @@ void item_spin_edit_paint(handle_t canvas,
   // calculate the text extents
   char str[32];
 
-  snprintf(str, 31,
-    edit->converter != nullptr ? edit->converter->format : edit->format,
-    edit->value);
+  snprintf(str, 31, edit->converter != nullptr ? edit->converter->format : edit->format, edit->value);
   str[31] = 0;
 
   extent_t ex;

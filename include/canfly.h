@@ -116,7 +116,7 @@ extern "C" {
    * @param len  length of message, max 7 chars or 0 to have code size it.
    * @return s_ok if created ok
    */
-  extern result_t create_can_msg_chars(canmsg_t *msg, uint16_t message_id, const char *str, uint32_t len);
+  extern result_t create_can_msg_chars(canmsg_t *msg, uint16_t message_id, const char *str, uint16_t len);
   /**
    * @fn get_param_int8(const canmsg_t *msg, int8_t *value)
    * @param msg         Message to extract parameter from
@@ -192,6 +192,7 @@ extern const variant_t *create_variant_int32(int32_t value, variant_t *v);
 extern const variant_t *create_variant_uint32(uint32_t value, variant_t *v);
 extern const variant_t *create_variant_float(float value, variant_t *v);
 extern const variant_t *create_variant_utc(const tm_t *value, variant_t *v);
+extern const variant_t *create_variant_chars(const char *str, variant_t *v);
 extern result_t msg_to_variant(const canmsg_t *msg, variant_t *v);
 extern result_t variant_to_msg(const variant_t *v, uint16_t id, uint16_t type, canmsg_t *msg);
 extern result_t coerce_to_bool(const variant_t *src, bool *value);
@@ -213,7 +214,7 @@ extern uint16_t can_type_from_variant(variant_type vt);
 #undef trace
 #endif
 
-#ifdef _DEBUG
+#ifdef DEBUG
 #include <stdarg.h>
 extern char trace_buffer[4096];
 // trace writes messages to a stream in the registry that is limited to 4kbytes.

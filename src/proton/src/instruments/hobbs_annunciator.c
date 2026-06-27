@@ -9,7 +9,7 @@ result_t on_hobbs_msg(handle_t hwnd, const canmsg_t* msg, void* wnddata)
   if (get_can_id(msg) == data->base.can_id)
     {
     uint32_t value;
-    get_param_int32(msg, &value);
+    get_param_uint32(msg, &value);
 
     changed = data->hobbs != value;
     data->hobbs = value;

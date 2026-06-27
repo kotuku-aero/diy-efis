@@ -4,14 +4,7 @@
 
 // the global MFD window data
 mfd_wnd_t mfd;
-
-static inline void update_selected_fuel_map()
-  {
-  // TODO: check status of mags as well
-  // see code in ECU widget
-  if (mfd.left_fuel_map == mfd.right_fuel_map)
-    mfd.selected_fuel_map = mfd.left_fuel_map;
-  }
+static map_widget_t *nav_widget;
 
 static inline void change_hs_mode(uint16_t mode)
   {
@@ -25,6 +18,94 @@ static inline void change_vs_mode(uint16_t mode)
   mfd.autopilot_mode |= mode;
   }
 
+result_t get_range(menu_item_t *edit, variant_t *i16)
+  {
+  uint32_t range;
+  map_get_range(nav_widget, &range);
+
+  // range is meters * 1000, convert to NM
+  float nm = meters_to_nm(range * 1000);
+
+  create_variant_uint32((uint32_t)nm, i16);
+  return s_ok;
+  }
+
+result_t set_range(menu_item_t *edit, const variant_t *i16)
+  {
+  uint32_t nm;
+  coerce_to_uint32(i16, &nm);
+  float mtrs = nm_to_meters(nm);
+
+  map_set_range(nav_widget, mtrs / 1000);
+  return s_ok;
+  }
+
+result_t get_range_max(menu_item_t *edit, variant_t *i16)
+  {
+  create_variant_uint32(120, i16);
+  return s_ok;
+  }
+
+result_t get_mode(menu_item_t *edit, uint32_t *i16)
+  {
+  map_display_mode mode;
+  get_map_mode(nav_widget, &mode);
+
+  *i16 = (uint32_t)mode;
+  return s_ok;
+  }
+
+result_t get_water_mode(menu_item_t *edit, uint32_t *i16)
+  {
+  bool visible;
+  get_map_water_visible(nav_widget, &visible);
+
+  *i16 = visible ? 1 : 0;
+  return s_ok;
+  }
+
+result_t get_contours_mode(menu_item_t *edit, uint32_t *i16)
+  {
+  bool visible;
+  get_map_contours_visible(nav_widget, &visible);
+
+  *i16 = visible ? 1 : 0;
+  return s_ok;
+  }
+
+result_t get_cities_mode(menu_item_t *edit, uint32_t *i16)
+  {
+  bool visible;
+  get_map_cities_visible(nav_widget, &visible);
+
+  *i16 = visible ? 1 : 0;
+  return s_ok;
+  }
+
+result_t get_transport_mode(menu_item_t *edit, uint32_t *i16)
+  {
+  bool visible;
+  get_map_transport_visible(nav_widget, &visible);
+
+  *i16 = visible ? 1 : 0;
+  return s_ok;
+  }
+
+result_t get_obstacles_mode(menu_item_t *edit, uint32_t *i16)
+  {
+  bool visible;
+  get_map_obstacles_visible(nav_widget, &visible);
+
+  *i16 = visible ? 1 : 0;
+  return s_ok;
+  }
+
+result_t on_create_nav(handle_t hwnd, widget_t *widget)
+  {
+  nav_widget = (map_widget_t *)widget;
+  return s_ok;
+  }
+
 result_t mfd_wndproc(handle_t wnd, const canmsg_t* msg, void* wnddata)
   {
   // check to see if the message is a navigation message
@@ -33,6 +114,7 @@ result_t mfd_wndproc(handle_t wnd, const canmsg_t* msg, void* wnddata)
     return s_ok;
 
   uint16_t ui16;
+  int16_t i16;
 
   // handle the well known messages
   uint16_t id = get_can_id(msg);
@@ -108,14 +190,38 @@ result_t mfd_wndproc(handle_t wnd, const canmsg_t* msg, void* wnddata)
         }
       break;
 
-    case id_set_mode :
-      {
-      uint16_t ui16;
-      if (succeeded(get_param_uint16(msg, &ui16)))
-      set_selected_layout(ui16);
-      }
+    //case id_set_mode :
+    //  {
+    //  uint16_t ui16;
+    //  if (succeeded(get_param_uint16(msg, &ui16)))
+    //  set_selected_layout(ui16);
+    //  }
+    //  break;
+    case id_map_mode:
+      if (succeeded(get_param_int16(msg, &i16)))
+        map_set_mode(nav_widget, (map_display_mode)i16);
       break;
-    }
+    case id_map_water:
+      if (succeeded(get_param_int16(msg, &i16)))
+        set_map_water_visible(nav_widget, i16 != 0);
+      break;
+    case id_map_cities:
+      if (succeeded(get_param_int16(msg, &i16)))
+        set_map_cities_visible(nav_widget, i16 != 0);
+      break;
+    case id_map_contours:
+      if (succeeded(get_param_int16(msg, &i16)))
+        set_map_contours_visible(nav_widget, i16 != 0);
+      break;
+    case id_map_obstacles:
+      if (succeeded(get_param_int16(msg, &i16)))
+        set_map_obstacles_visible(nav_widget, i16 != 0);
+      break;
+    case id_map_transport:
+      if (succeeded(get_param_int16(msg, &i16)))
+        set_map_transport_visible(nav_widget, i16 != 0);
+      break;
+      }
 
   return defwndproc(wnd, msg, wnddata);
   }
@@ -238,19 +344,19 @@ result_t create_layout(handle_t parent, memid_t key, create_widgets_fn layout_fn
   return s_ok;
   }
 
-result_t get_brightness(menu_item_t* edit, variant_t* value)
+result_t get_brightness(menu_item_t* edit, variant_t* i16)
 {
   uint16_t brightness;
   get_display_brightness(&brightness);
 
-  create_variant_uint32(brightness, value);
+  create_variant_uint32(brightness, i16);
 
   return s_ok;
 }
 
-result_t set_brightness(menu_item_t* edit, const variant_t* value)
+result_t set_brightness(menu_item_t* edit, const variant_t* i16)
 {
   uint16_t brightness;
-  coerce_to_uint16(value, &brightness);
+  coerce_to_uint16(i16, &brightness);
   return set_display_brightness(brightness);
 }

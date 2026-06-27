@@ -221,7 +221,7 @@ result_t is_dialog_message(handle_t hwnd, const canmsg_t *msg)
   return s_false;
   }
 
-#ifdef _DEBUG
+#ifdef DEBUG
 static char debug_msg[256];
 result_t platform_trace(uint16_t level, const char *msg, va_list va)
   {

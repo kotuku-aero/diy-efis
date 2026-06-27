@@ -1,5 +1,4 @@
 #include "../../include/annunciator_widget.h"
-#include "../../include/strftm.h"
 
 result_t on_waypoint_msg(handle_t hwnd, const canmsg_t* msg, void* wnddata)
   {
@@ -43,7 +42,7 @@ void on_paint_waypoint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* 
   {
   waypoint_annunciator_t* data = (waypoint_annunciator_t*)wnd;
   if(strlen(data->ident) == 0)
-    on_draw_text(canvas, wnd_rect, wnd, "-------");
+    on_draw_text(canvas, wnd_rect, wnd, "------");
   else
     on_draw_text(canvas, wnd_rect, wnd, data->ident);
   }

@@ -2583,7 +2583,7 @@ static inline result_t map_get_layer_parameters(handle_t canvas, uint32_t layer,
  * Set the parameters of a map layer
  * @param canvas  * 
  * @param layer  * Layer to change the parameters of.  If more that 1 provided an error is raised
- * @param params [out]  * Buffer with the full parameters of the layer.
+ * @param params  * Buffer with the full parameters of the layer.
  * @return result_t
  * @syscall 1806
  */
@@ -2865,9 +2865,9 @@ extern result_t fms_get_active_flightplan(uint32_t* cookie, char* name, char* co
  * @syscall 2562
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL fms_set_active_flightplan_number(uint32_t cookie, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL fms_activate_flightplan(uint32_t cookie, overlapped_t * overlapped);
 #else
-extern result_t fms_set_active_flightplan_number(uint32_t cookie, overlapped_t * overlapped);
+extern result_t fms_activate_flightplan(uint32_t cookie, overlapped_t * overlapped);
 #endif
 
 /**

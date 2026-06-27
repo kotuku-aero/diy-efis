@@ -1,4 +1,5 @@
 #include "../../include/canfly.h"
+#include <string.h>
 #include <stdio.h>
 
 const variant_t* create_variant_nodata(variant_t* v)
@@ -246,7 +247,7 @@ result_t msg_to_variant(const canmsg_t* msg, variant_t* v)
       {
       v->vt = v_chars;
       uint16_t pos = 1;
-      for (size_t i = 0; i < get_can_len(i) - 1; i++)
+      for (size_t i = 0; i < get_can_len(msg) - 1; i++)
         v->value.chars[i] = msg->data[pos++];
 
       v->value.chars[pos-1] = 0;

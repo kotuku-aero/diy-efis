@@ -181,13 +181,13 @@ Wiring
            bolt-hole and to drop the AP. -->
       <event-action caption="Nearest Apt" can-id="id_nearest_airport" value-type="v_int16" value="1"/>
       <event-action caption="AP Off" can-id="id_autopilot_enable" value-type="v_uint16" value="0"/>
-      <event-action caption="Full Fuel" can-id="id_set_fuel_available" value-type="v_uint32" get-value="get_fuel_max"/>
+      <event-action caption="Full Fuel" can-id="id_set_fuel_available" value-type="v_uint32" get-value="get_fuel_max_cc"/>
       <spin-edit-action caption="Fuel total"
                         min-value="0"
-                        get-max-value="get_fuel_max"
+                        get-max-value="get_fuel_max_cc"
                         converter="convert_cc_to_litres"
-                        get-method="get_fuel_total"
-                        set-method="set_fuel_total"
+                        get-method="get_fuel_total_cc"
+                        set-method="set_fuel_total_cc"
                         keys="edit_keys"/>
       <popup-action caption="Config" menu="config_menu"/>
     </menu>
@@ -205,17 +205,7 @@ Wiring
                         get-method="get_node_id"
                         set-method="set_node_id"
                         keys="node_id_keys"/>
-      <checklist-action caption="Mode" get-index="get_selected_layout" popup="mode_menu" />
     </menu>
-
-    <menu name="mode_menu" keys="popup_keys" caption="Mode">
-      <event-action caption="AIO" can-id="id_set_mode" value-type="v_uint16" value="0"/>
-      <event-action caption="EDD" can-id="id_set_mode" value-type="v_uint16" value="1"/>
-      <event-action caption="ATT" can-id="id_set_mode" value-type="v_uint16" value="2"/>
-      <event-action caption="NAV" can-id="id_set_mode" value-type="v_uint16" value="3"/>
-      <event-action caption="HSI" can-id="id_set_mode" value-type="v_uint16" value="4"/>
-    </menu>
-
   </menu>
 
   <layout>
@@ -565,7 +555,7 @@ Wiring
     </auto>
 
 
-  <!-- ====================================================================
+    <!-- ====================================================================
          ALARM MARQUEE   (top 208..240, full width)
          Default rotation carries the prop-alternate power gauge + the engine
          data the strip can't fit, scrollable on deck B. The <alarm> list is

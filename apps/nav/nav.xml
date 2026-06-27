@@ -279,17 +279,7 @@
                         get-method="get_node_id"
                         set-method="set_node_id"
                         keys="edit_keys"/>
-      <checklist-action caption="Mode" get-index="get_selected_layout" popup="mode_menu" />
     </menu>
-
-    <menu name="mode_menu" keys="popup_keys" caption="Mode">
-      <event-action caption="AIO" can-id="id_set_mode" value-type="v_uint16" value="0"/>
-      <event-action caption="EDD" can-id="id_set_mode" value-type="v_uint16" value="1"/>
-      <event-action caption="ATT" can-id="id_set_mode" value-type="v_uint16" value="2"/>
-      <event-action caption="NAV" can-id="id_set_mode" value-type="v_uint16" value="3"/>
-      <event-action caption="HSI" can-id="id_set_mode" value-type="v_uint16" value="4"/>
-    </menu>
-
 
     <!-- Map Menu -->
     <menu name="map_menu" keys="popup_keys" caption="Map">
@@ -349,7 +339,7 @@
          border-left="true"
          border-bottom="true"
          on-create="on_create_nav"
-         config-path="/proton/pfd/navigator"
+         config-path="/mfd3_au_nz"
          >
       <rect left="0" top="0" width="320" height="240" />
       <day-theme alarm-color="color_red"
@@ -392,6 +382,7 @@
                  glyph-notam-indicator="RGB(255, 127, 0)"
                  glyph-lit-indicator="color_red"
                  glyph-stroke="color_black"
+                 font="neo_9_bold_font"
                  >
         <!-- The elevations must match the exported values in the contours.db -->
         <contour color="RGB(62, 116, 30)" contour_color="color_black" elevation="152"/>
@@ -455,6 +446,7 @@
                  glyph-notam-indicator="RGB(255, 127, 0)"
                  glyph-lit-indicator="color_red"
                  glyph-stroke="color_black"
+                 font="neo_9_bold_font"
                  >
         <contour color="RGB(74, 113, 49)" contour_color="color_hollow" elevation="152"/>
         <contour color="RGB(66, 105, 33)" contour_color="color_hollow" elevation="305"/>

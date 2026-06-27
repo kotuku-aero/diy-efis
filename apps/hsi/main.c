@@ -3,7 +3,7 @@
 #include "../../src/mfdlib/event_handlers.h"
 #include "../../src/mfdlib/menu_handlers.h"
 
-#include "hsi_au_nz.h"
+#include "hsi.h"
 
 static result_t my_wndproc(handle_t hndl, const canmsg_t* msg, void* wnddata)
   {
@@ -24,6 +24,6 @@ int main()
   {
 #endif
 
-  return run_proton(0, create_layout, create_hsi_au_nz, my_wndproc);
+  return run_proton(0, create_layout, create_hsi, my_wndproc);
   }
 

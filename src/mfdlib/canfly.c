@@ -1,7 +1,7 @@
 #include "../../include/canfly.h"
 #include <memory.h>
 
-#ifdef _DEBUG
+#ifdef DEBUG
 char trace_buffer[4096];
 #endif
 

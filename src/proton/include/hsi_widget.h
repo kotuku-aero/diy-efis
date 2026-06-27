@@ -7,6 +7,7 @@
 
 typedef struct _hsi_widget_t {
   widget_t base;
+
   uint16_t direction;
   uint16_t course;
   int16_t deviation;

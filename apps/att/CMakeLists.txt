@@ -1,8 +1,9 @@
+cmake_minimum_required(VERSION 3.15)
 
 # ============================================================================
 # Platform Detection and Project Declaration
 # ============================================================================
-project(pfd_au_nz VERSION 1.0.0 LANGUAGES C)
+project(att VERSION 1.0.0 LANGUAGES C)
 
 # Include common MFD configuration
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/MFDCommon.cmake)
@@ -11,20 +12,18 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/MFDCommon.cmake)
 # Project-Specific Configuration
 # ============================================================================
 
-set(TARGET_NAME pfd_au_nz)
+set(TARGET_NAME att)
 
 # XML layouts for this application
-set(XML_LAYOUTS
-        au_nz
-)
+set(XML_LAYOUTS att)
 
 # ============================================================================
 # Source Files
 # ============================================================================
 
 set(APP_SOURCES
-        main.c
-        au_nz.xml
+    main.c
+    att.xml
 )
 
 # ============================================================================
@@ -32,10 +31,10 @@ set(APP_SOURCES
 # ============================================================================
 
 mfd_process_xml_layouts(
-        PREFIX ${TARGET_NAME}
-        XML_DIR ${CMAKE_CURRENT_SOURCE_DIR}
-        LAYOUTS ${XML_LAYOUTS}
-        XSL_FILES ${XSL_FILES}
+    PREFIX ${TARGET_NAME}
+    XML_DIR ${CMAKE_CURRENT_SOURCE_DIR}
+    LAYOUTS ${XML_LAYOUTS}
+    XSL_FILES ${XSL_FILES}
 )
 
 list(APPEND APP_SOURCES ${${TARGET_NAME}_GENERATED_SOURCES})
@@ -48,7 +47,7 @@ add_executable(${TARGET_NAME} ${APP_SOURCES})
 
 # Local include directories
 target_include_directories(${TARGET_NAME} PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 # ============================================================================
@@ -57,8 +56,8 @@ target_include_directories(${TARGET_NAME} PRIVATE
 
 if(MIPS32_BUILD)
     mfd_configure_pic32_target(
-            TARGET ${TARGET_NAME}
-            DEVICE ${PIC32_DEVICE}
+        TARGET ${TARGET_NAME}
+        DEVICE ${PIC32_DEVICE}
     )
 else()
     mfd_configure_win32_target(TARGET ${TARGET_NAME})
@@ -69,13 +68,13 @@ endif()
 # ============================================================================
 
 mfd_print_summary(
-        TARGET ${TARGET_NAME}
-        LAYOUTS ${XML_LAYOUTS}
-        DEVICE ${PIC32_DEVICE}
-        RESOURCES_DIR ${RESOURCES_DIR}
+    TARGET ${TARGET_NAME}
+    LAYOUTS ${XML_LAYOUTS}
+    DEVICE ${PIC32_DEVICE}
+    RESOURCES_DIR ${RESOURCES_DIR}
 )
 
 ################################################################################
 # Organize in IDE
 ################################################################################
-set_target_properties(pfd_au_nz PROPERTIES FOLDER "c-apps")
+set_target_properties(att PROPERTIES FOLDER "c-apps")

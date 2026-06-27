@@ -1,12 +1,7 @@
 #include "../../src/mfdlib/mfd.h"
-#include "../../src/proton/include/menu_window.h"
-#include "../../src/mfdlib/event_handlers.h"
-#include "../../src/mfdlib/menu_handlers.h"
 
-#include "edd4_au_nz.h"
+#include "att.h"
 
-// global screen handle
-handle_t screen;
 
 static result_t my_wndproc(handle_t hndl, const canmsg_t* msg, void* wnddata)
   {
@@ -15,7 +10,7 @@ static result_t my_wndproc(handle_t hndl, const canmsg_t* msg, void* wnddata)
   return mfd_wndproc(hndl, msg, wnddata);
   }
 
-#ifdef _MSC_VER
+#ifndef MIPS32_BUILD
 // debug arguments:
 // -c 4096 -x 320 -y 240 canfly.cdb
 int main(int argc, char** argv)
@@ -27,6 +22,6 @@ int main()
   {
 #endif
 
-  return run_proton(0, create_layout, create_edd4_au_nz, my_wndproc);
+  return run_proton(0, create_layout, create_att, my_wndproc);
   }
 

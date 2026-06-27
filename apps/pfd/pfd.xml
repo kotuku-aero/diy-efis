@@ -9,7 +9,8 @@
   4. Improved key assignments for better pilot workflow
 -->
 <application xmlns="http://kotuku.aero/schema/kotuku.xsd"
-             xmlns:xs="http://www.w3.org/2001/XMLSchema">
+             xmlns:xs="http://www.w3.org/2001/XMLSchema"
+             nav-db-path="F:/map_data">
 
   <!-- Existing IDs -->
   <id>id_cancel_alarm</id>
@@ -368,13 +369,13 @@
 
     <!-- Airframe Functions Menu -->
     <menu name="af_menu" keys="popup_keys" caption="AF Functions">
-      <event-action caption="Full Fuel" can-id="id_set_fuel_available" value-type="v_uint32" get-value="get_fuel_max"/>
+      <event-action caption="Full Fuel" can-id="id_set_fuel_available" value-type="v_uint32" get-value="get_fuel_max_cc"/>
       <spin-edit-action caption="Fuel total"
                         min-value="0"
-                        get-max-value="get_fuel_max"
+                        get-max-value="get_fuel_max_cc"
                         converter="convert_cc_to_litres"
-                        get-method="get_fuel_total"
-                        set-method="set_fuel_total"
+                        get-method="get_fuel_total_cc"
+                        set-method="set_fuel_total_cc"
                         keys="edit_keys"/>
       <event-action caption="Trim 0" can-id="id_pitch_trim_change" value-type="v_int16" value="0"/>
       <event-action caption="Roll 0" can-id="id_roll_trim_change" value-type="v_int16" value="0"/>
@@ -920,7 +921,6 @@
          border-left="true"
          border-bottom="true"
          on-create="on_create_nav"
-         db-path="C:/Projects/map-data"
          config-path="/proton/pfd/navigator"
          >
       <rect left="604" top="0" width="420" height="580" />

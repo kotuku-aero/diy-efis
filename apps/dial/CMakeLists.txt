@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.15)
 # ============================================================================
 # Platform Detection and Project Declaration
 # ============================================================================
-project(att_au_nz VERSION 1.0.0 LANGUAGES C)
+project(dial VERSION 1.0.0 LANGUAGES C)
 
 # Include common MFD configuration
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/MFDCommon.cmake)
@@ -12,12 +12,10 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/MFDCommon.cmake)
 # Project-Specific Configuration
 # ============================================================================
 
-set(TARGET_NAME att_au_nz)
+set(TARGET_NAME dial)
 
 # XML layouts for this application
-set(XML_LAYOUTS
-    att
-)
+set(XML_LAYOUTS dial)
 
 # ============================================================================
 # Source Files
@@ -25,6 +23,7 @@ set(XML_LAYOUTS
 
 set(APP_SOURCES
     main.c
+	dial.xml
 )
 
 # ============================================================================
@@ -78,4 +77,4 @@ mfd_print_summary(
 ################################################################################
 # Organize in IDE
 ################################################################################
-set_target_properties(att_au_nz PROPERTIES FOLDER "c-apps")
+set_target_properties(${TARGET_NAME} PROPERTIES FOLDER "c-apps")

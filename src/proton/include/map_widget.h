@@ -19,13 +19,23 @@ typedef struct _map_widget_t {
   int32_t magnetic_heading;   // current heading is magnetic
   int32_t mag_var;            // magnetic variation.
   int32_t true_heading;
+  int16_t distance_to_waypoint;
+  int16_t time_to_waypoint;
+  uint16_t wind_direction; // always true
+  int16_t wind_speed;
+  char waypoint_name[8];
+  // reported by the kHUB
+  uint16_t autopilot_mode;
+  // current assigned altitude in feed AMSL
+  uint16_t ap_altitude;
+  // current vertical speed assigned
+  uint16_t ap_vs;
 
   // this is created by the yehudi compiler from the
   // color definitions
   map_theme_t day_theme;
   map_theme_t night_theme;
 
-  const char *db_path;
   const char *config_path;
   const font_t *font;
 

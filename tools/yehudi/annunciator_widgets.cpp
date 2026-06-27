@@ -13,6 +13,8 @@ void code_generator::generate_text_annunciator(std::ofstream& out, const pugi::x
   emit_property(out, node, "label-color", ".label_color", prefix);
   emit_property(out, node, "label_offset", ".label_offset", prefix);
   emit_property(out, node, "label-format", ".label_format", prefix);
+  
+  out << ".base.base.on_paint_background = on_paint_text_annunciator_background," << std::endl;
   }
 
 void  code_generator::create_text_annunciator_widget(std::ofstream& out, const pugi::xml_node& node, const char *name)
@@ -42,7 +44,13 @@ void code_generator::create_datetime_annunciator_widget(std::ofstream& out, cons
   out << "static datetime_annunciator_t " << (name == nullptr ? get_named_attribute(node, "id").value() : name) << " = {" << std::endl;
   generate_text_annunciator(out, node, ".base");
   emit_string_property(out, node, "format", ".format");
+
+  pugi::xml_attribute msg_attr = get_named_attribute(node, "on-message");
+
+  std::string on_msg;
+  if (msg_attr.empty())
   out << ".base.base.base.on_message = on_datetime_msg," << std::endl;
+
   out << ".base.base.base.on_paint = on_paint_datetime," << std::endl;
 
   out << "};" << std::endl << std::endl;
@@ -84,8 +92,8 @@ void code_generator::create_apmode_annunciator_widget(std::ofstream &out,
   {
   out << "static apmode_annunciator_t " << (name == nullptr ? get_named_attribute(node, "id").value() : name) << " = {" << std::endl;
   generate_text_annunciator(out, node, ".base");
-  out << ".base.base.base.on_message = on_hobbs_msg," << std::endl;
-  out << ".base.base.base.on_paint = on_paint_hobbs," << std::endl;
+  out << ".base.base.base.on_message = on_apmode_msg," << std::endl;
+  out << ".base.base.base.on_paint = on_paint_apmode," << std::endl;
 
   out << "};" << std::endl << std::endl;
   }

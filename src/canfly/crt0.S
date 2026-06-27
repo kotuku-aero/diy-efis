@@ -62,6 +62,10 @@ _reset:
 _startup:
         .set nomacro
 
+        # r05 is the sp
+        add $29, $5, 0
+        add $30, $5, 0
+
         ##################################################################
         # Initialize Global Pointer
         ##################################################################
@@ -122,18 +126,18 @@ _skip_libc_init:
         ##################################################################
         # C++ constructor initialization
         ##################################################################
-        .weak _init
-        lui     $4,%hi(_init)
-        addiu   $sp,$sp,-24
-        addiu   $4,$4,%lo(_init)
-        beq     $4,$0,_skip_cpp_init
-        nop
-        sw      $31,20($sp)
-        jalr    $4
-        nop
-_skip_cpp_init:
-        and     $4,$4,0
-        and     $5,$5,0
+#        .weak _init
+#        lui     $4,%hi(_init)
+#        addiu   $sp,$sp,-24
+#        addiu   $4,$4,%lo(_init)
+#        beq     $4,$0,_skip_cpp_init
+#        nop
+#        sw      $31,20($sp)
+#        jalr    $4
+#        nop
+#_skip_cpp_init:
+#        and     $4,$4,0
+#        and     $5,$5,0
 
         ##################################################################
         # Call main

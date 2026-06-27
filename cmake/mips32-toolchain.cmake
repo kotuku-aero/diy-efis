@@ -91,7 +91,7 @@ set(CMAKE_ASM_FLAGS_INIT "${MIPS32_CPU_FLAGS} ${MIPS32_INCLUDE_FLAGS}")
 # ============================================================================
 
 # Base linker flags
-set(MIPS32_LINKER_FLAGS "-nostartfiles -Wl,--gc-sections")
+# set(MIPS32_LINKER_FLAGS "-nostartfiles -Wl,--gc-sections")
 
 set(CMAKE_EXE_LINKER_FLAGS_INIT "${MIPS32_CPU_FLAGS} ${MIPS32_LINKER_FLAGS}")
 
@@ -135,7 +135,7 @@ endfunction()
 # Convenience function to add all post-build steps
 function(mips32_firmware TARGET)
     mips32_generate_bin(${TARGET})
-    pic32_print_size(${TARGET})
+    mips32_print_size(${TARGET})
 endfunction()
 
 # ============================================================================
@@ -150,12 +150,12 @@ set(MIPS32_MFD_COMMON_LIBS
     CACHE STRING "Common libraries for MFD/EDD applications"
 )
 
+
+
 # Function to configure a MIPS32 MFD/EDD target with standard settings
-# Usage: mips32_configure_mfd_target(TARGET_NAME DEVICE_VARIANT CONFIG_FILE)
+# Usage: mips32_configure_mfd_target(TARGET_NAME)
 #   TARGET_NAME   - Name of the target (e.g., kMFD10, kEDD)
-#   DEVICE_VARIANT - Device variant string (e.g., 32MZ2064DAR176, 32MZ1064DAR176)
-#   CONFIG_FILE   - Boot config file name (e.g., config_mfd10.c, config_mfd3.c)
-function(mips32_configure_mfd_target TARGET_NAME DEVICE_VARIANT CONFIG_FILE)
+function(mips32_configure_mfd_target TARGET_NAME)
     # Common MIPS32 compile definitions
     target_compile_definitions(${TARGET_NAME} PRIVATE
         __MIPS32MZ__
@@ -164,9 +164,9 @@ function(mips32_configure_mfd_target TARGET_NAME DEVICE_VARIANT CONFIG_FILE)
 
     # Common include directories
     target_include_directories(${TARGET_NAME} PRIVATE
-        ${CMAKE_SOURCE_DIR}/lib/proton
-        ${CMAKE_SOURCE_DIR}/libs/mfdlib
-        ${CMAKE_SOURCE_DIR}/lib/canfly
+        ${DIYEFIS_SOURCE_DIR}/lib/proton
+        ${DIYEFIS_SOURCE_DIR}/libs/mfdlib
+        ${DIYEFIS_SOURCE_DIR}/lib/canfly
     )
 
     # Link libraries in correct order
@@ -174,13 +174,15 @@ function(mips32_configure_mfd_target TARGET_NAME DEVICE_VARIANT CONFIG_FILE)
         ${MIPS32_MFD_COMMON_LIBS}
         c
         m
+        # this is to pick up the newlib support functions
+        canfly
         gcc
     )
 
     # Linker options
     target_link_options(${TARGET_NAME} PRIVATE
-        -T${LINKER_SCRIPT}
-        -Wl,--gc-sections
+        -T${DIYEFIS_SOURCE_DIR}/src/canfly/canfly_app.ld
+        # -Wl,--gc-sections
         -Wl,-Map=${CMAKE_BINARY_DIR}/${TARGET_NAME}.map
     )
 

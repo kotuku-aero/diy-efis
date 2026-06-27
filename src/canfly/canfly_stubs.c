@@ -195,7 +195,7 @@
 /* fms () */
 #define SYSCALL_FMS_ENUM_FLIGHT_PLANS                      2560
 #define SYSCALL_FMS_GET_ACTIVE_FLIGHTPLAN                  2561
-#define SYSCALL_FMS_SET_ACTIVE_FLIGHTPLAN_NUMBER           2562
+#define SYSCALL_FMS_ACTIVATE_FLIGHTPLAN                    2562
 #define SYSCALL_FMS_INVERT_ACTIVE_FLIGHTPLAN               2563
 #define SYSCALL_FMS_ENUM_FLIGHT_PLAN                       2564
 #define SYSCALL_FMS_ENUM_WAYPOINTS                         2565
@@ -2923,7 +2923,7 @@ result_t fms_get_active_flightplan(uint32_t* cookie, char* name, char* comment, 
   return __result;
 }
 
-result_t fms_set_active_flightplan_number(uint32_t cookie, overlapped_t * overlapped)
+result_t fms_activate_flightplan(uint32_t cookie, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)cookie;
@@ -2933,7 +2933,7 @@ result_t fms_set_active_flightplan_number(uint32_t cookie, overlapped_t * overla
     "li $v0, %1\n\t"
     "syscall\n\t"
     : "=r"(__result)
-    : "i"(SYSCALL_FMS_SET_ACTIVE_FLIGHTPLAN_NUMBER), "r"(__p0), "r"(__p1)
+    : "i"(SYSCALL_FMS_ACTIVATE_FLIGHTPLAN), "r"(__p0), "r"(__p1)
   );
 
   return __result;

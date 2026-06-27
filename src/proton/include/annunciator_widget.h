@@ -9,7 +9,17 @@ typedef struct _annunciator_t annunciator_t;
 typedef struct _annunciator_t {
   widget_t base;
   handle_t background_canvas;
+  // called when the annunciator background is to be painted
+  paint_fn on_paint_background;
   } annunciator_t;
+
+    /**
+ * @brief This will draw the cached background bitmap onto the annunciator
+ * @param wnd_rect  Rectangle of the widget
+ * @param ann       Annunciator details 
+ */
+extern result_t paint_annunciator_background(const rect_t *wnd_rect,
+                                             annunciator_t *ann);
 
 typedef struct _text_annunciator_t {
   annunciator_t base;
@@ -25,8 +35,12 @@ typedef struct _text_annunciator_t {
 
   const font_t* small_font;
   bool compact;
-  paint_fn on_paint_background;
   } text_annunciator_t;
+
+extern void on_draw_text(handle_t canvas, const rect_t* wnd_rect, annunciator_t* wnd, const char* value);
+extern void on_paint_text_annunciator_background(handle_t canvas,
+                                                 const rect_t *wnd_rect,
+                                                 const canmsg_t *msg, void *wnd);
 
 typedef struct _auto_annunciator_t {
   text_annunciator_t base;
@@ -38,9 +52,9 @@ typedef struct _auto_annunciator_t {
   variant_t value;
   } auto_annunciator_t;
 
-extern void on_draw_text(handle_t canvas, const rect_t* wnd_rect, annunciator_t* wnd, const char* value);
-extern void on_paint_auto(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnd);
-extern void on_paint_text_background(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnd);
+extern result_t on_auto_msg(handle_t hwnd, const canmsg_t *msg, void *wnddata);
+extern void on_paint_auto(handle_t canvas, const rect_t *wnd_rect,
+                          const canmsg_t *msg, void *wnd);
 
 //-----------------------------------------------------------------------------
 // Autopilot mode annunciator
@@ -93,16 +107,8 @@ typedef struct _datetime_annunciator_t {
 extern result_t on_datetime_msg(handle_t hwnd, const canmsg_t* msg, void* wnddata);
 extern void on_paint_datetime(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnd);
 
-//-----------------------------------------------------------------------------
-// Hours
-typedef struct _hours_annunciator_t {
-  text_annunciator_t base;
-
-  uint32_t hours; // hours
-  } hours_annunciator_t;
-
-extern result_t on_hours_msg(handle_t hwnd, const canmsg_t* msg, void* wnddata);
-extern void on_paint_hours(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata);
+// this converts an interval to a datetime that can be formated for hours, minutes, secods
+extern result_t on_interval_msg(handle_t hwnd, const canmsg_t* msg, void* wnddata);
 
 //-----------------------------------------------------------------------------
 // hp
@@ -150,9 +156,6 @@ typedef struct _hobbs_annunciator_t {
 
 extern result_t on_hobbs_msg(handle_t hwnd, const canmsg_t* msg, void* wnddata);
 extern void on_paint_hobbs(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnddata);
-
-extern result_t on_auto_msg(handle_t hwnd, const canmsg_t* msg, void* wnddata);
-extern void on_paint_auto(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnd);
 
 extern result_t annunciator_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata);
 /**

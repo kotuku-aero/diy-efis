@@ -3004,7 +3004,7 @@ result_t sys_map_set_layer_parameters(handle_t canvas, uint32_t layer, const vie
 |-----------|------|-----------|-------------|
 | `canvas` | `handle_t` | in |  |
 | `layer` | `uint32_t` | in | Layer to change the parameters of.  If more that 1 provided an error is raised |
-| `params` | `const viewport_params_t *` | out | Buffer with the full parameters of the layer. |
+| `params` | `const viewport_params_t *` | in | Buffer with the full parameters of the layer. |
 
 ---
 
@@ -3296,16 +3296,16 @@ result_t fms_get_active_flightplan(uint32_t* cookie, char* name, char* comment, 
 
 ---
 
-### `fms_set_active_flightplan_number`
+### `fms_activate_flightplan`
 
 > The call can use the overlapped callback to overlap operations
 
 **Syscall ID:** 2562
 
-**Kernel function:** `set_active_flightplan_number`
+**Kernel function:** `activate_flightplan`
 
 ```c
-result_t fms_set_active_flightplan_number(uint32_t cookie, overlapped_t * overlapped);
+result_t fms_activate_flightplan(uint32_t cookie, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |

@@ -110,23 +110,20 @@ result_t get_selected_units(menu_item_checklist_t* checklist, uint16_t* value)
   return cfg_get_uint16(mfd.key, display_units_str, value, nullptr);
   }
 
-result_t get_fuel_total(menu_item_t* edit, variant_t* value)
+result_t get_fuel_total_cc(menu_item_t* edit, variant_t* value)
   {
   // round to uint32 for the spin edit
-  create_variant_uint32((uint32_t)mfd.fuel_converter->convert((float)mfd.fuel_total), value);
+  create_variant_uint32(mfd.fuel_total, value);
 
   return s_ok;
   }
 
-result_t set_fuel_total(menu_item_t* edit, const variant_t* value)
+result_t set_fuel_total_cc(menu_item_t* edit, const variant_t* value)
   {
   result_t result;
-  float fuel_total;
-  if (failed(result = coerce_to_float(value, &fuel_total)))
-    return result;
 
-  // convert from local units to CC
-  mfd.fuel_total = (uint32_t)mfd.fuel_converter->convert_inverse(fuel_total);
+  if (failed(result = coerce_to_uint32(value, &mfd.fuel_total)))
+    return result;
 
   canmsg_t msg;
   create_can_msg_uint32(&msg, id_set_fuel_available, mfd.fuel_total);
@@ -134,10 +131,10 @@ result_t set_fuel_total(menu_item_t* edit, const variant_t* value)
   return s_ok;
   }
 
-result_t get_fuel_max(menu_item_t* edit, variant_t* value)
+result_t get_fuel_max_cc(menu_item_t* edit, variant_t* value)
   {
   // round to uint32 for the spin edit
-  create_variant_uint32((uint32_t)mfd.fuel_converter->convert((float)mfd.max_fuel_available), value);
+  create_variant_uint32(mfd.max_fuel_available, value);
 
   return s_ok;
   }
@@ -171,7 +168,7 @@ result_t find_wpt_name(menu_item_t* edit, variant_t* value)
   return e_not_implemented;
   }
 
-result_t set_direct_to_wpt(menu_item_t* edit, variant_t* value)
+result_t set_direct_to_wpt(menu_item_t* edit, const variant_t* value)
   {
   // request the FMS to goto
 

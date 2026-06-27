@@ -147,7 +147,7 @@ void code_generator::create_application(std::ofstream &out, const pugi::xml_node
     {
     out << std::endl;
     out << "handle_t spatial_db;" << std::endl;
-    out << "if(failed(result = open_mfd_atom_db(\"" << nav_db_path_attr.value() << "\", &spatial_db)))" << std::endl;
+    out << "if(failed(result = sys_open_spatial_db(\"" << nav_db_path_attr.value() << "\", nullptr, &spatial_db, nullptr)))" << std::endl;
     out << "  {" << std::endl;
     out << "  if(result != e_path_not_found)" << std::endl;
     out << "    return result;" << std::endl;
@@ -274,8 +274,9 @@ void code_generator::create_application(std::ofstream &out, const pugi::xml_node
       for (auto it = alarms.begin(); it != alarms.end(); it++, alarm_position++)
         {
         out << "if(failed(result = create_alarm_annunciator(widget, " << widget_name << ".base_alarm_id + child_num, &"
-          << widget_name << "_alarms[child_num++], 0)))" << std::endl;
-        out << "  return result;" << std::endl << std::endl;
+          << widget_name << "_alarms[child_num], 0)))" << std::endl;
+        out << "  return result;" << std::endl;
+        out << "child_num++;" << std::endl << std::endl;
         }
       }
     }

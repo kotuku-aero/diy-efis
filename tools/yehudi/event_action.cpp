@@ -2,7 +2,7 @@
 
 void code_generator::generate_event_action(std::ofstream& out, const std::string &name, const pugi::xml_node& action_node)
   {
-  out << "static const menu_item_event_t " << name << " = {" << std::endl;
+  out << "static menu_item_event_t " << name << " = {" << std::endl;
 
   emit_property(out, action_node, "can-id", ".can_id");
   out << ".base.item_type = mi_event," << std::endl;

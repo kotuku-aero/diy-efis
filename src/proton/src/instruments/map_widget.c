@@ -2,8 +2,6 @@
 
 #include "../../include/map_widget.h"
 
-static handle_t doorbell;
-
 const char *map_position_name = "posn";     // last known location
 const char *map_display_mode_name = "mode"; // north up to track up
 const char *map_zoom_name = "zoom";         // zoom distance
@@ -33,6 +31,11 @@ const char *hazard_zoom_name = "hazard-zoom";
 
 typedef struct _map_entity_t map_entity_t;
 
+#define INFO_BOX_TOP_WIDTH 50
+#define INFO_BOX_TOP_HEIGHT 30
+#define INFO_BOX_BOTTOM_WIDTH  60
+#define INFO_BOX_BOTTOM_HEIGHT 45
+
 static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* _msg, void* wnddata)
   {
   map_widget_t* wnd = (map_widget_t*)wnddata;
@@ -43,6 +46,10 @@ static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* _m
   // see if borders
   rect_t map_rect;
   rect_copy(wnd_rect, &map_rect);
+
+  const gdi_dim_t window_x = rect_width(wnd_rect);
+  const gdi_dim_t window_y = rect_height(wnd_rect);
+
 
   uint32_t style = wnd->base.style;
   
@@ -130,6 +137,171 @@ static void on_paint(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* _m
   draw_text(canvas, wnd_rect, wnd->font, color_white, color_hollow, 0,
             range, &txt_point, wnd_rect, eto_vertical, 0);
 
+  /////////////////////////////////////////////////////////////////////////////
+  // Draw the wind information in the upper left
+  rectangle(canvas, wnd_rect, color_black, color_black,
+            rect_create(0, 0, INFO_BOX_TOP_WIDTH, INFO_BOX_TOP_HEIGHT, &map_rect));
+
+  char msg[32];
+  sprintf(msg, "%03.3d", wnd->wind_direction);
+  uint16_t length = (uint16_t)strlen(msg);
+
+  extent_t pixels;
+  text_extent( wnd->font, length, msg, &pixels);
+  draw_text(canvas, wnd_rect,  wnd->font, color_yellow, color_hollow,
+            length, msg, point_create(25 - (pixels.dx >> 1), 2, &pt), 0, 0, 0);
+
+  sprintf(msg, "%d", wnd->wind_speed);
+  length = (uint16_t)strlen(msg);
+  text_extent( wnd->font, length, msg, &pixels);
+  draw_text(canvas, wnd_rect,  wnd->font, color_yellow, color_hollow,
+            length, msg, point_create(25 - (pixels.dx >> 1), 13, &pt), 0, 0, 0);
+
+  /////////////////////////////////////////////////////////////////////////////
+  // Draw the estimated time to waypoint. drawn in top right as distance/time
+  rectangle(canvas, wnd_rect, color_black, color_black,
+            rect_create(window_x - INFO_BOX_TOP_WIDTH, 0, window_x, INFO_BOX_TOP_HEIGHT,
+                        &map_rect));
+
+  sprintf(msg, "%d", wnd->distance_to_waypoint);
+  length = (uint16_t)strlen(msg);
+  text_extent( wnd->font, length, msg, &pixels);
+  draw_text(canvas, wnd_rect,  wnd->font, color_yellow, color_hollow,
+            length, msg, point_create(window_x - 25 - (pixels.dx >> 1), 2, &pt),
+            0, 0, 0);
+
+  sprintf(msg, "%02.2d:%02.2d", wnd->time_to_waypoint / 60,
+          wnd->time_to_waypoint % 60);
+  length = (uint16_t)strlen(msg);
+  text_extent( wnd->font, length, msg, &pixels);
+  draw_text(canvas, wnd_rect,  wnd->font, color_yellow, color_hollow,
+            length, msg,
+            point_create(window_x - 25 - (pixels.dx >> 1), 13, &pt), 0, 0, 0);
+
+  sprintf(msg, "%s", wnd->waypoint_name);
+  length = (uint16_t)strlen(msg);
+  text_extent( wnd->font, length, msg, &pixels);
+  draw_text(canvas, wnd_rect,  wnd->font, color_yellow, color_hollow,
+            length, msg,
+            point_create(window_x - 25 - (pixels.dx >> 1), 24, &pt), 0, 0, 0);
+
+  /////////////////////////////////////////////////////////////////////////////
+  // Draw the HMode in the bottom left
+  // the HMode is a 3 character string that is drawn in the bottom left
+  // of the HSI.  The HMode is the current mode of the HSI and is
+  // one of the following:
+  //  OFF
+  //  HDG - current heading
+  //  CRS - Current AP Course
+  //  INT - Intercept track
+  rectangle(canvas, wnd_rect, color_black, color_black,
+            rect_create(0, window_y - INFO_BOX_BOTTOM_HEIGHT,
+                        INFO_BOX_BOTTOM_WIDTH,window_y, &map_rect));
+
+  const char *tmp_msg = nullptr;
+  uint16_t nav_hdg;
+  uint32_t hmode = (wnd->autopilot_mode) & HORZ_MODE_MASK;
+  switch (hmode)
+    {
+  case 0:
+    tmp_msg = "HNAV OFF";
+    break;
+  case NAV_MODE:
+    tmp_msg = "CRS";
+    nav_hdg = wnd->course;
+    break;
+  case HDG_MODE:
+    tmp_msg = "HDG";
+    nav_hdg = wnd->magnetic_heading;
+    break;
+  case APR_MODE:
+    tmp_msg = "INT";
+    nav_hdg = wnd->course;
+    break;
+  case REV_LEFT_MODE:
+    tmp_msg = "REV LEFT";
+    nav_hdg = wnd->magnetic_heading;
+    break;
+  case REV_RIGHT_MODE:
+    tmp_msg = "REV RGT";
+    nav_hdg = wnd->magnetic_heading;
+    break;
+    }
+
+  // draw the currently selected nav
+  if (hmode != 0)
+    {
+    sprintf(msg, "%03.3d", nav_hdg);
+    length = strlen(msg);
+    text_extent( wnd->font, length, msg, &pixels);
+    draw_text(canvas, wnd_rect,  wnd->font, color_magenta,
+              color_hollow, length, msg,
+              point_create(wnd_rect->left + 2, wnd_rect->bottom - 30, &pt), 0,
+              0, 0);
+    }
+
+  length = (uint16_t)strlen(tmp_msg);
+  text_extent( wnd->font, length, tmp_msg, &pixels);
+  draw_text(canvas, wnd_rect,  wnd->font, color_magenta, color_hollow,
+            length, tmp_msg,
+            point_create(31 - (pixels.dx >> 1), wnd_rect->bottom - 15, &pt), 0,
+            0, 0);
+
+  /////////////////////////////////////////////////////////////////////////////
+  // Draw the VMode in the bottom right
+  // the VMode is a 3 character string that is drawn in the bottom right
+  // of the HSI.  The VMode is the current mode of the VSI and is
+  // one of the following:
+  //  OFF
+  //  ALT - Altitude Hold
+  //  SEEK - Altitude Seek
+  rectangle(canvas, wnd_rect, color_black, color_black,
+            rect_create(window_x - INFO_BOX_BOTTOM_WIDTH,
+                        window_y - INFO_BOX_BOTTOM_HEIGHT,
+                        window_x, window_y, &map_rect));
+
+
+  switch ((wnd->autopilot_mode) & VERT_MODE_MASK)
+    {
+  case 0:
+    tmp_msg = "VNAV OFF";
+    break;
+  case VERT_SEEK_MODE:
+  case ALT_MODE:
+    tmp_msg = "ALT";
+    break;
+  case IAS_MODE:
+    tmp_msg = "RATE";
+    break;
+    }
+
+  // draw the rate
+  sprintf(msg, "R:%04.3d", wnd->ap_vs);
+  length = strlen(msg);
+  text_extent( wnd->font, length, msg, &pixels);
+  draw_text(
+      canvas, wnd_rect,  wnd->font, color_magenta, color_hollow,
+      length, msg,
+      point_create(wnd_rect->right - pixels.dx, wnd_rect->bottom - 45, &pt), 0,
+      0, 0);
+
+  // draw the assigned altitude
+  sprintf(msg, "A:%05.3d", wnd->ap_altitude);
+  length = strlen(msg);
+  text_extent( wnd->font, length, msg, &pixels);
+  draw_text(
+      canvas, wnd_rect,  wnd->font, color_magenta, color_hollow,
+      length, msg,
+      point_create(wnd_rect->right - pixels.dx, wnd_rect->bottom - 30, &pt), 0,
+      0, 0);
+
+  length = (uint16_t)strlen(tmp_msg);
+  text_extent( wnd->font, length, tmp_msg, &pixels);
+  draw_text(canvas, wnd_rect,  wnd->font, color_magenta, color_hollow,
+            length, tmp_msg,
+            point_create(window_x - 31 - (pixels.dx >> 1),
+                         wnd_rect->bottom - 15, &pt),
+            0, 0, 0);
   }
 
 // the settings worker is started with a timer message
@@ -269,10 +441,72 @@ static void state_callback(overlapped_t *context, result_t result)
     }
   }
 
+static result_t change_ap_mode(map_widget_t *widget)
+  {
+  canmsg_t msg;
+  create_can_msg_uint16(&msg, id_autopilot_mode, widget->autopilot_mode);
+  return can_send(&msg, INDEFINITE_WAIT, nullptr);
+  }
+
+static result_t change_hs_mode(map_widget_t *widget, uint16_t mode)
+  {
+  widget->autopilot_mode &= ~HORZ_MODE_MASK;
+  widget->autopilot_mode |= mode;
+  return change_ap_mode(widget);
+  }
+
+static result_t change_vs_mode(map_widget_t *widget, uint16_t mode)
+  {
+  widget->autopilot_mode &= ~VERT_MODE_MASK;
+  widget->autopilot_mode |= mode;
+  return change_ap_mode(widget);
+  }
+
+static void on_toggle_hs_mode(map_widget_t *wnd)
+  {
+  switch ((wnd->autopilot_mode) & HORZ_MODE_MASK)
+    {
+  case 0:
+  case REV_LEFT_MODE:
+  case REV_RIGHT_MODE:
+  case APR_MODE:
+    change_hs_mode(wnd, HDG_MODE);
+    break;
+  case HDG_MODE:
+    change_hs_mode(wnd, NAV_MODE);
+    break;
+  case NAV_MODE:
+    change_hs_mode(wnd, APR_MODE);
+    break;
+    }
+
+  invalidate(wnd->hwnd);
+  }
+
+static void on_toggle_vs_mode(map_widget_t *wnd)
+  {
+  switch ((wnd->autopilot_mode) & VERT_MODE_MASK)
+    {
+  case 0:
+  case VERT_SEEK_MODE:
+    change_vs_mode(wnd, ALT_MODE);
+    break;
+  case ALT_MODE:
+    change_vs_mode(wnd, VERT_SEEK_MODE);
+    break;
+    }
+
+  invalidate(wnd->hwnd);
+  }
+
 static result_t map_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
   {
   map_widget_t* wnd = (map_widget_t*)wnddata;
   map_extra_data_t *extra = (map_extra_data_t *)wnd->base.extra;
+
+  int16_t i16;
+  uint16_t u16;
+  float flt;
 
 
   bool changed = false;
@@ -299,18 +533,17 @@ static result_t map_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
       break;
     case id_magnetic_heading:
       {
-      int16_t direction;
-      get_param_int16(msg, &direction);
+      get_param_int16(msg, &i16);
 
-      while (direction < 0)
-        direction += 360;
-      while (direction > 359)
-        direction -= 360;
+      while (i16 < 0)
+        i16 += 360;
+      while (i16 > 359)
+        i16 -= 360;
 
-      changed = wnd->magnetic_heading != direction;
+      changed = wnd->magnetic_heading != i16;
       if (changed)
         {
-        wnd->magnetic_heading = direction;
+        wnd->magnetic_heading = i16;
         wnd->true_heading = wnd->magnetic_heading - wnd->mag_var;
         map_update_position(wnd->map, &extra->map_position,
                             wnd->true_heading, wnd->track);
@@ -319,40 +552,33 @@ static result_t map_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
       break;
     case id_magnetic_variation:
       {
-      int16_t value;
-      get_param_int16(msg, &value);
-      changed = wnd->mag_var != value;
+      get_param_int16(msg, &i16);
+      changed = wnd->mag_var != i16;
       if (changed)
         {
-        wnd->mag_var = value;
-        map_set_mag_var(wnd->map, value);
+        wnd->mag_var = i16;
+        map_set_mag_var(wnd->map, i16);
         wnd->true_heading = wnd->magnetic_heading - wnd->mag_var;
         map_update_position(wnd->map, &extra->map_position, wnd->true_heading,
                             wnd->track);
-        map_set_mag_var(wnd->map, value);
+        map_set_mag_var(wnd->map, i16);
         }
       }
       break;
     case id_selected_course:
-      {
-      int16_t value;
-      get_param_int16(msg, &value);
-      changed = wnd->course != value;
-      wnd->course = value;
-      }
+      get_param_int16(msg, &i16);
+      changed = wnd->course != i16;
+      wnd->course = i16;
       break;
     case id_track:
-      {
-      int16_t value;
-      get_param_int16(msg, &value);
-      changed = wnd->track != value;
+      get_param_int16(msg, &i16);
+      changed = wnd->track != i16;
       if (changed)
         {
-        wnd->track = value;
+        wnd->track = i16;
         map_update_position(wnd->map, &extra->map_position, wnd->true_heading,
                             wnd->track);
         }
-      }
       break;
     case id_touch_zoom:
       {
@@ -366,6 +592,79 @@ static result_t map_wndproc(handle_t hwnd, const canmsg_t* msg, void* wnddata)
       changed = true;
       }
       break;
+    case id_wind_speed:
+      get_param_float(msg, &flt);
+      i16 = (int16_t)meters_per_second_to_knots(flt);
+
+      if (i16 < 0)
+        i16 = 0;
+
+      changed = wnd->wind_speed != i16;
+      wnd->wind_speed = i16;
+      break;
+    case id_wind_direction:
+      get_param_uint16(msg, &u16);
+
+      while (u16 > 359)
+        u16 -= 360;
+
+      changed = wnd->wind_direction != u16;
+      wnd->wind_direction = u16;
+      break;
+    case id_distance_to_next:
+      get_param_float(msg, &flt);
+      i16 = (int16_t)meters_to_nm(flt);
+      changed = wnd->distance_to_waypoint != i16;
+      wnd->distance_to_waypoint = i16;
+      break;
+    case id_estimated_time_to_next:
+      get_param_int16(msg, &i16);
+      changed = wnd->time_to_waypoint != i16;
+      wnd->time_to_waypoint = i16;
+      break;
+    case id_autopilot_mode:
+      get_param_uint16(msg, &u16);
+
+      changed = wnd->autopilot_mode != u16;
+      wnd->autopilot_mode = u16;
+      break;
+    case id_ap_altitude:
+      get_param_float(msg, &flt);
+      u16 = (uint16_t)meters_to_feet(flt);
+
+      changed = wnd->ap_altitude != u16;
+      wnd->ap_altitude = u16;
+      break;
+    case id_ap_vertical_rate:
+      get_param_float(msg, &flt);
+      u16 = (uint16_t)meters_per_second_to_feet_per_minute(flt);
+
+      changed = wnd->ap_vs != u16;
+      wnd->ap_vs = u16;
+      break;
+    case id_waypoint_code:
+      u16 = get_can_len(msg);
+
+      if (u16 > 1 && u16 < 9 && msg->data[0] == CANFLY_CHARS)
+        {
+        if (strncmp((const char *)&msg->data[1], wnd->waypoint_name, u16 - 1) !=
+            0)
+          {
+          strncpy(wnd->waypoint_name, (const char *)&msg->data[1], u16 - 1);
+          wnd->waypoint_name[u16 - 1] = 0;
+          changed = true;
+          }
+        }
+      else
+        {
+        if (strcmp(wnd->waypoint_name, "----") != 0)
+          {
+          strcpy(wnd->waypoint_name, "----");
+          changed = true;
+          }
+        }
+      break;
+
     case id_touch_pan:
       {
       uint32_t value;
@@ -451,7 +750,7 @@ void get_map_mode(map_widget_t *widget, map_display_mode *mode)
 void get_map_contours_visible(map_widget_t *widget, bool *visible)
   {
   contours_params_t vp;
-  if(succeeded(map_get_layer_parameters(widget->map, MAP_LAYER_CONTOURS, sizeof(vp), &vp)))
+  if(succeeded(map_get_layer_parameters(widget->map, MAP_LAYER_CONTOURS, sizeof(vp), &vp.base)))
     *visible = vp.base.show_layer;
   else
     *visible = false;
@@ -462,10 +761,10 @@ void set_map_contours_visible(map_widget_t *widget, bool visible)
   map_extra_data_t *extra = (map_extra_data_t *)widget->base.extra;
   contours_params_t vp;
   if (succeeded(map_get_layer_parameters(widget->map, MAP_LAYER_CONTOURS,
-                                        sizeof(vp), &vp)))
+                                        sizeof(vp), &vp.base)))
     {
     vp.base.show_layer = visible;
-    map_set_layer_parameters(widget->map, MAP_LAYER_CONTOURS, &vp);
+    map_set_layer_parameters(widget->map, MAP_LAYER_CONTOURS, &vp.base);
     }
   else
     vp.base.show_layer = false;
@@ -481,7 +780,7 @@ void get_map_cities_visible(map_widget_t *widget, bool *visible)
   {
   cities_params_t vp;
   if (succeeded(map_get_layer_parameters(widget->map, MAP_LAYER_CONTOURS,
-                                        sizeof(vp), &vp)))
+                                        sizeof(vp), &vp.base)))
     *visible = vp.base.show_layer;
   else
     *visible = false;
@@ -492,10 +791,10 @@ void set_map_cities_visible(map_widget_t *widget, bool visible)
   map_extra_data_t *extra = (map_extra_data_t *)widget->base.extra;
   cities_params_t vp;
   if (succeeded(map_get_layer_parameters(widget->map, MAP_LAYER_CITIES,
-                                        sizeof(vp), &vp)))
+                                        sizeof(vp), &vp.base)))
     {
     vp.base.show_layer = visible;
-    map_set_layer_parameters(widget->map, MAP_LAYER_CITIES, &vp);
+    map_set_layer_parameters(widget->map, MAP_LAYER_CITIES, &vp.base);
     }
   else
     vp.base.show_layer = false;
@@ -511,7 +810,7 @@ void get_map_water_visible(map_widget_t *widget, bool *visible)
   {
   surface_water_params_t vp;
   if (succeeded(map_get_layer_parameters(widget->map, MAP_LAYER_SURFACE_WATER,
-                                        sizeof(vp), &vp)))
+                                        sizeof(vp), &vp.base)))
     *visible = vp.base.show_layer;
   else
     *visible = false;
@@ -522,10 +821,10 @@ void set_map_water_visible(map_widget_t *widget, bool visible)
   map_extra_data_t *extra = (map_extra_data_t *)widget->base.extra;
   surface_water_params_t vp;
   if (succeeded(map_get_layer_parameters(widget->map, MAP_LAYER_SURFACE_WATER,
-                                        sizeof(vp), &vp)))
+                                        sizeof(vp), &vp.base)))
     {
     vp.base.show_layer = visible;
-    map_set_layer_parameters(widget->map, MAP_LAYER_SURFACE_WATER, &vp);
+    map_set_layer_parameters(widget->map, MAP_LAYER_SURFACE_WATER, &vp.base);
     }
   else
     vp.base.show_layer = false;
@@ -541,7 +840,7 @@ void get_map_transport_visible(map_widget_t *widget, bool *visible)
   {
   transport_params_t vp;
   if (succeeded(map_get_layer_parameters(widget->map, MAP_LAYER_TRANSPORT,
-                                        sizeof(vp), &vp)))
+                                        sizeof(vp), &vp.base)))
     *visible = vp.base.show_layer;
   else
     *visible = false;
@@ -552,10 +851,10 @@ void set_map_transport_visible(map_widget_t *widget, bool visible)
   map_extra_data_t *extra = (map_extra_data_t *)widget->base.extra;
   transport_params_t vp;
   if (succeeded(map_get_layer_parameters(widget->map, MAP_LAYER_TRANSPORT,
-                                        sizeof(vp), &vp)))
+                                        sizeof(vp), &vp.base)))
     {
     vp.base.show_layer = visible;
-    map_set_layer_parameters(widget->map, MAP_LAYER_TRANSPORT, &vp);
+    map_set_layer_parameters(widget->map, MAP_LAYER_TRANSPORT, &vp.base);
     }
   else
     vp.base.show_layer = false;
@@ -571,7 +870,7 @@ void get_map_obstacles_visible(map_widget_t *widget, bool *visible)
   {
   obstacles_params_t vp;
   if (succeeded(map_get_layer_parameters(widget->map, MAP_LAYER_OBSTACLES,
-                                        sizeof(vp), &vp)))
+                                        sizeof(vp), &vp.base)))
     *visible = vp.base.show_layer;
   else
     *visible = false;
@@ -582,10 +881,10 @@ void set_map_obstacles_visible(map_widget_t *widget, bool visible)
   map_extra_data_t *extra = (map_extra_data_t *)widget->base.extra;
   obstacles_params_t vp;
   if (succeeded(map_get_layer_parameters(widget->map, MAP_LAYER_OBSTACLES,
-                                        sizeof(vp), &vp)))
+                                        sizeof(vp), &vp.base)))
     {
     vp.base.show_layer = visible;
-    map_set_layer_parameters(widget->map, MAP_LAYER_OBSTACLES, &vp);
+    map_set_layer_parameters(widget->map, MAP_LAYER_OBSTACLES, &vp.base);
     }
   else
     vp.base.show_layer = false;
@@ -601,7 +900,7 @@ void get_map_airspacevisible(map_widget_t *widget, bool *visible)
   {
   airspace_params_t vp;
   if (succeeded(map_get_layer_parameters(widget->map, MAP_LAYER_AIRSPACES,
-                                        sizeof(vp), &vp)))
+                                        sizeof(vp), &vp.base)))
     *visible = vp.base.show_layer;
   else
     *visible = false;
@@ -612,10 +911,10 @@ void set_map_airspace_visible(map_widget_t *widget, bool visible)
   map_extra_data_t *extra = (map_extra_data_t *)widget->base.extra;
   airspace_params_t vp;
   if (succeeded(map_get_layer_parameters(widget->map, MAP_LAYER_AIRSPACES,
-                                        sizeof(vp), &vp)))
+                                        sizeof(vp), &vp.base)))
     {
     vp.base.show_layer = visible;
-    map_set_layer_parameters(widget->map, MAP_LAYER_AIRSPACES, &vp);
+    map_set_layer_parameters(widget->map, MAP_LAYER_AIRSPACES, &vp.base);
     }
   else
     vp.base.show_layer = false;
@@ -658,7 +957,12 @@ result_t create_map_widget(handle_t parent, handle_t spatial_db, uint32_t flags,
 
   // open the registry key
   memid_t memid = 0;
-  char *path = strdup(wnd->config_path);
+  size_t len = strlen(wnd->config_path);
+
+  char *path = malloc(len+1);
+
+  strcpy(path, wnd->config_path);
+
   char *start = path;
 
   if (*start == '/')
@@ -710,7 +1014,7 @@ result_t create_map_widget(handle_t parent, handle_t spatial_db, uint32_t flags,
     extra->map_position.lat = 0;
     extra->map_position.lng = 0;
 
-#ifdef _DEBUG
+#ifdef DEBUG
 
     int test_case = 0;
 
@@ -974,7 +1278,7 @@ result_t create_map_widget(handle_t parent, handle_t spatial_db, uint32_t flags,
       failed(result = cfg_set_int32(extra->airspaces_key, hazard_zoom_name, asp.hazard_zoom, nullptr)))
     goto config_error;
 
-  if (failed(result = map_set_layer_params(wnd->map, MAP_LAYER_AIRSPACES, &asp.base)))
+  if (failed(result = map_set_layer_parameters(wnd->map, MAP_LAYER_AIRSPACES, &asp.base)))
     goto config_error;
 
   text_extent(wnd->font, 1, "M", &wnd->font_cell_size);

@@ -1,19 +1,10 @@
-# CMakeLists.txt for hsi_au_nz Application
-# Supports both Windows and PIC32 (atom) platforms
-
 cmake_minimum_required(VERSION 3.15)
 
 # ============================================================================
 # Platform Detection and Project Declaration
 # ============================================================================
 
-if(DEFINED PIC32_BUILD AND PIC32_FAMILY MATCHES "DA")
-    set(IS_PIC32 TRUE)
-    project(hsi_au_nz VERSION 1.0.0 LANGUAGES C ASM)
-else()
-    set(IS_PIC32 FALSE)
-    project(hsi_au_nz VERSION 1.0.0 LANGUAGES C)
-endif()
+project(edd VERSION 1.0.0 LANGUAGES C)
 
 # Include common MFD configuration
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/MFDCommon.cmake)
@@ -22,21 +13,17 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/MFDCommon.cmake)
 # Project-Specific Configuration
 # ============================================================================
 
-set(TARGET_NAME hsi_au_nz)
-set(PIC32_DEVICE "32MZ2064DAR176")
-set(RESOURCES_DIR ${CMAKE_SOURCE_DIR}/resources)
+set(TARGET_NAME edd)
 
 # XML layouts for this application
-set(XML_LAYOUTS
-    hsi_au_nz
-)
-
+set(XML_LAYOUTS edd )
 # ============================================================================
 # Source Files
 # ============================================================================
 
 set(APP_SOURCES
     main.c
+    edd.xml
 )
 
 # ============================================================================
@@ -56,10 +43,6 @@ list(APPEND APP_SOURCES ${${TARGET_NAME}_GENERATED_SOURCES})
 # Executable Target
 # ============================================================================
 
-if(COMMAND set_target_32bit)
-    set_target_32bit(${TARGET_NAME})
-endif()
-
 add_executable(${TARGET_NAME} ${APP_SOURCES})
 
 # Local include directories
@@ -71,7 +54,7 @@ target_include_directories(${TARGET_NAME} PRIVATE
 # Platform Configuration
 # ============================================================================
 
-if(IS_PIC32)
+if(MIPS32_BUILD)
     mfd_configure_pic32_target(
         TARGET ${TARGET_NAME}
         DEVICE ${PIC32_DEVICE}
@@ -94,4 +77,4 @@ mfd_print_summary(
 ################################################################################
 # Organize in IDE
 ################################################################################
-set_target_properties(hsi_au_nz PROPERTIES FOLDER "c-apps")
+set_target_properties(${TARGET_NAME} PROPERTIES FOLDER "c-apps")

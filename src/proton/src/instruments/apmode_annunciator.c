@@ -15,12 +15,24 @@ result_t on_apmode_msg(handle_t hwnd, const canmsg_t* msg, void* wnddata)
       }
     }
 
-  return changed;
+
+  if (changed)
+    invalidate(hwnd);
+
+  return s_false;
   }
 
 void on_paint_apmode(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnd)
   {
   apmode_annunciator_t* data = (apmode_annunciator_t*)wnd;
+
+  if (data->base.base.background_canvas == nullptr)
+    paint_annunciator_background(wnd_rect, wnd);
+
+  point_t pt = {0, 0};
+  bit_blt(canvas, wnd_rect, wnd_rect, data->base.base.background_canvas,
+          wnd_rect, &pt,
+          src_copy);
 
   switch (data->mode)
     {

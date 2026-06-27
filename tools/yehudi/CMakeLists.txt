@@ -100,6 +100,7 @@ if (MSVC)
 
     target_compile_definitions(yehudi PRIVATE
             _CRT_SECURE_NO_WARNINGS
+            $<$<CONFIG:Debug>:_DEBUG=1>
             WIN32
     )
 

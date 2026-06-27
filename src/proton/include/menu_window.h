@@ -322,11 +322,11 @@ typedef struct _menu_item_spin_edit_t {
 
   const char* format;       // defaults to %d
 
-  float min_value;        // minimum value
-  float max_value;        // maximum value
+  int32_t min_value;        // minimum value
+  int32_t max_value;        // maximum value
 
   // runtime values
-  float value;
+  int32_t value;
   } menu_item_spin_edit_t;
 
 extern void item_spin_edit_paint(handle_t canvas, menu_widget_t* wnd, const rect_t* wnd_rect, menu_item_t * item, const rect_t* rect, bool is_selected);

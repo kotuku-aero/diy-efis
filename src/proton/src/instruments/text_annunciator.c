@@ -15,20 +15,11 @@ void on_draw_text(handle_t canvas, const rect_t* wnd_rect, annunciator_t* wnd, c
   extent_t ex;
   point_t origin;
 
-  if (ann->base.background_canvas == nullptr)
+  if (wnd->background_canvas == nullptr)
     {
-    rect_extents(wnd_rect, &ex);
-    // create a canvas
-    canvas_create(&ex, &ann->base.background_canvas);
+    paint_annunciator_background(wnd_rect, wnd);
 
     uint32_t style = wnd->base.style;
-
-    if(ann->on_paint_background != 0)
-      ann->on_paint_background(ann->base.background_canvas, wnd_rect, nullptr, wnd);
-    else if((style & FILL_BACKGROUND)== 0)
-      on_paint_text_background(ann->base.background_canvas, wnd_rect, nullptr, wnd);
-
-    on_paint_widget_background(ann->base.background_canvas, wnd_rect, nullptr, (widget_t *) wnd);
 
     if ((style & DRAW_NAME) != 0)
       {
@@ -48,7 +39,7 @@ void on_draw_text(handle_t canvas, const rect_t* wnd_rect, annunciator_t* wnd, c
       else
         point_create(ann->label_offset, wnd_rect->top + 1, &origin);
 
-      draw_text(ann->base.background_canvas, wnd_rect, ann->small_font, ann->label_color, ann->base.base.background_color,
+      draw_text(wnd->background_canvas, wnd_rect, ann->small_font, ann->label_color, ann->base.base.background_color,
         text_len, ann->base.base.name, &origin, &clip_rect, ann->label_format, 0);
       }
     }
@@ -70,7 +61,7 @@ void on_draw_text(handle_t canvas, const rect_t* wnd_rect, annunciator_t* wnd, c
     0, value, &origin, &clip_rect, ann->text_format, 0);
   }
 
-void on_paint_text_background(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnd)
+void on_paint_text_annunciator_background(handle_t canvas, const rect_t* wnd_rect, const canmsg_t* msg, void* wnd)
   {
   text_annunciator_t* ann = (text_annunciator_t*)wnd;
 

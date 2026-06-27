@@ -26,7 +26,7 @@ set(PROTON_SOURCES
         src/instruments/gauge_widget.c
         src/dialogs/groupbox_widget.c
         src/instruments/hobbs_annunciator.c
-        src/instruments/hours_annunciator.c
+        src/instruments/interval_annunciator.c
         src/instruments/hp_annunciator.c
         src/instruments/hsi_widget.c
         src/instruments/kmag_annunciator.c
@@ -47,7 +47,6 @@ set(PROTON_SOURCES
         src/instruments/softkey_widget.c
         src/spin_edit.c
         src/textedit.c
-        src/strftm.c
         src/dialogs/tab_widget.c
         src/instruments/text_annunciator.c
         src/instruments/waypoint_annunciator.c
@@ -119,17 +118,12 @@ target_include_directories(proton PRIVATE
 ################################################################################
 # Compiler definitions
 ################################################################################
-if(WIN32)
+if(MSVC)
     target_compile_definitions(proton PRIVATE
         WIN32
         _CRT_SECURE_NO_WARNINGS
+        $<$<CONFIG:Debug>:_DEBUG=1>
     )
-endif()
-
-################################################################################
-# Compiler options
-################################################################################
-if(MSVC)
     target_compile_options(proton PRIVATE
         $<$<CONFIG:Debug>:/MDd>
         $<$<CONFIG:Release>:/MD>

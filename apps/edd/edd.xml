@@ -121,16 +121,13 @@
     </keys>
 
     <menu name="settings_menu" keys="popup_keys" caption="Settings">
-      <!-- Mode promoted to the top: switching the one surviving display is itself
-           an emergency action, so it should be 2 clicks (Settings>Mode), not 3. -->
-      <checklist-action caption="Mode" get-index="get_selected_layout" popup="mode_menu" />
-      <event-action caption="Full Fuel" can-id="id_set_fuel_available" value-type="v_uint32" get-value="get_fuel_max"/>
+            <event-action caption="Full Fuel" can-id="id_set_fuel_available" value-type="v_uint32" get-value="get_fuel_max_cc"/>
       <spin-edit-action caption="Fuel total"
                         min-value="0"
-                        get-max-value="get_fuel_max"
+                        get-max-value="get_fuel_max_cc"
                         converter="convert_cc_to_litres"
-                        get-method="get_fuel_total"
-                        set-method="set_fuel_total"
+                        get-method="get_fuel_total_cc"
+                        set-method="set_fuel_total_cc"
                         keys="edit_keys"/>
       <popup-action caption="Config" menu="config_menu"/>
     </menu>
@@ -148,15 +145,6 @@
                         get-method="get_node_id"
                         set-method="set_node_id"
                         keys="node_id_keys"/>
-      <checklist-action caption="Mode" get-index="get_selected_layout" popup="mode_menu" />
-    </menu>
-
-    <menu name="mode_menu" keys="popup_keys" caption="Mode">
-      <event-action caption="AIO" can-id="id_set_mode" value-type="v_uint16" value="0"/>
-      <event-action caption="EDD" can-id="id_set_mode" value-type="v_uint16" value="1"/>
-      <event-action caption="ATT" can-id="id_set_mode" value-type="v_uint16" value="2"/>
-      <event-action caption="NAV" can-id="id_set_mode" value-type="v_uint16" value="3"/>
-      <event-action caption="HSI" can-id="id_set_mode" value-type="v_uint16" value="4"/>
     </menu>
   </menu>
 
@@ -265,25 +253,26 @@
         >
       <rect left="0" top="67" width="60" height="20"/>
     </hp>
-    <ecu name="kMAG"
-         id="kmag_annunciator"
-         can-id="on_check_kmag"
-         background-color="color_black"
-         border-color="color_white"
+    <!-- Engine hours -->
+    <hobbs id="id_eng_hours"
+          small-font="neo_9_bold_font"
+          name="Eng. Hrs."
+          text-color="color_lightblue"
          label-color="color_white"
-         text-color="color_white"
-         small-font="neo_9_font"
-         name-font="neo_9_font"
-         name-color="color_white"
-         label-offset="30"
+          label-offset="2"
          text-offset="30"
+          can-id="id_engine_hours"
+          on-message="on_hours_msg"
+          on-paint="on_paint_hours"
          format="%d"
-         value-type="v_uint16"
+          draw-name="false"
          border-right="true"
          border-bottom="true"
-         fill-background="true">
+          fill-background="true"
+          background-color="color_black"
+          value-type="v_uint32">
       <rect left="60" top="67" width="104" height="20"/>
-    </ecu>
+    </hobbs>
     <auto name="OAT"
           id="oat_annunciator"
           can-id="id_outside_air_temperature"
@@ -763,7 +752,7 @@
         <alarm-id>id_high_oil_temperature_alarm</alarm-id>
       </alarm>
 
-      <alarm priority="5"
+      <alarm priority="4"
              message="Timing divergence"
              can-park="true">
         <alarm-id>id_timing_divergence_alarm</alarm-id>
@@ -773,7 +762,7 @@
         <alarm-id>id_fuel_pressure_divergence_alarm</alarm-id>
       </alarm>
 
-      <alarm priority="6"
+      <alarm priority="5"
              message="High CHT"
              can-park="true">
         <alarm-id>id_cylinder_head_temperature1_alarm</alarm-id>
@@ -784,54 +773,54 @@
         <alarm-id>id_cylinder_head_temperature6_alarm</alarm-id>
       </alarm>
 
-      <alarm priority="7"
+      <alarm priority="6"
              message="Low Fuel"
              annunciator="m_fuel_tot"
              can-park="true">
         <alarm-id>id_low_fuel_alarm</alarm-id>
       </alarm>
 
-      <alarm priority="8"
+      <alarm priority="7"
              message="CHT Cold Shock"
              can-park="true">
         <alarm-id>id_cold_shock_alarm</alarm-id>
       </alarm>
 
-      <alarm priority="9"
+      <alarm priority="8"
              message="High voltage"
              annunciator="m_volts"
              can-park="true">
         <alarm-id>id_bus_volts_high_alarm</alarm-id>
       </alarm>
 
-      <alarm priority="10"
+      <alarm priority="9"
              message="Low Voltage"
               annunciator="m_volts"
              can-park="true">
         <alarm-id>id_bus_volts_low_alarm</alarm-id>
       </alarm>
 
-      <alarm priority="11"
+      <alarm priority="10"
              message="High Fuel Pressure"
              annunciator="m_fuel_pressure"
              can-park="true">
         <alarm-id>id_high_fuel_pressure_alarm</alarm-id>
       </alarm>
 
-      <alarm priority="12"
+      <alarm priority="11"
              message="High Current"
               annunciator="m_amps"
              can-park="true">
         <alarm-id>id_high_amps_alarm</alarm-id>
       </alarm>
 
-      <alarm priority="13"
+      <alarm priority="12"
              message="kMAG Temperature"
              can-park="true">
         <alarm-id>id_mag_temperature_alarm</alarm-id>
       </alarm>
 
-      <alarm priority="14"
+      <alarm priority="13"
              message="Low Fuel Flow"
               annunciator="m_fuel_flow"
              can-park="true">
