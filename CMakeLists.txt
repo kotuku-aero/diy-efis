@@ -32,7 +32,7 @@ message(STATUS "========================================")
 add_subdirectory(src/mfdlib)
 add_subdirectory(src/proton)
 
-if(PIC32)
+if(MIPS32_BUILD)
     add_subdirectory(src/canfly)
 endif()
 
