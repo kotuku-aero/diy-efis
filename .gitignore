@@ -66,3 +66,6 @@ bin/*.exe
 /apps/att/att.c
 /apps/att/att.h
 /apps/att/att_priv.h
+/apps/aio/aio.c
+/apps/aio/aio.h
+/apps/aio/aio_priv.h
