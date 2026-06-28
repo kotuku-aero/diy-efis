@@ -125,7 +125,10 @@ endfunction()
 #        )
 function(mfd_configure_pic32_target)
     cmake_parse_arguments(ARG "" "TARGET;DEVICE" "" ${ARGN})
+    # allow the outer to specify a custom linker script path
+if(NOT LINKER_SCRIPT)
     set(LINKER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/../../src/canfly/canfly_app.ld")
+endif()
 
     # Compile definitions
     target_compile_definitions(${ARG_TARGET} PRIVATE
@@ -175,7 +178,11 @@ function(mfd_configure_pic32_target)
 
     # Package the ELF into a binary image with header and SHA256
     find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
+if(NOT PACKAGE_SCRIPT)
     set(PACKAGE_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/../../scripts/package_usermode.py")
+endif()
+
     set(IMAGE_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/images")
 
     add_custom_command(TARGET ${ARG_TARGET} POST_BUILD
