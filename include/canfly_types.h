@@ -1329,7 +1329,7 @@ typedef struct _group_operator_t
   {
   criteria_operator_t base;
 
-  size_t num;
+  uint32_t num;
   const criteria_operator_t *ops;
   } group_operator_t;
 
