@@ -216,10 +216,13 @@ function(mfd_configure_win32_target)
 
     # Link libraries - platform-specific w32_canfly library
     if(WIN32)
+        if(NOT W32_CANFLY_LIB_PATH)
+            set(W32_CANFLY_LIB_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/w32_canfly.lib)
+        endif()
         # Windows: link with .lib import library
         target_link_libraries(${ARG_TARGET} PRIVATE
                 ${MFD_COMMON_LIBS}
-                ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/w32_canfly.lib
+                ${W32_CANFLY_LIB_PATH}
         )
     else()
         # Linux: link with .so shared library
