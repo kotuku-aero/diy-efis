@@ -41,10 +41,10 @@ target_include_directories(mfdlib PUBLIC
 ################################################################################
 if(WIN32)
     target_compile_definitions(mfdlib PRIVATE
-        $<$<CONFIG:Debug>:DEBUG=1>
         _CRT_SECURE_NO_WARNINGS
         $<$<CONFIG:Debug>:_DEBUG>
         $<$<CONFIG:Release>:NDEBUG>
+        WIN32
     )
 endif()
 

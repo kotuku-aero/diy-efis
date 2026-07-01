@@ -205,9 +205,9 @@ function(mfd_configure_win32_target)
 
     # Compile definitions
     target_compile_definitions(${ARG_TARGET} PRIVATE
-      $<$<CONFIG:Debug>:DEBUG=1>
+      $<$<CONFIG:Debug>:_DEBUG>
       _CRT_SECURE_NO_WARNINGS
-      win32
+      WIN32
     )
 
     # Includes

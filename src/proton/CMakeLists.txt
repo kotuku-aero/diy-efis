@@ -122,7 +122,7 @@ if(MSVC)
     target_compile_definitions(proton PRIVATE
         WIN32
         _CRT_SECURE_NO_WARNINGS
-        $<$<CONFIG:Debug>:_DEBUG=1>
+        $<$<CONFIG:Debug>:_DEBUG>
     )
     target_compile_options(proton PRIVATE
         $<$<CONFIG:Debug>:/MDd>

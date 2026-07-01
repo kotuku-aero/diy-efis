@@ -41,7 +41,6 @@ target_include_directories(canfly PUBLIC
 if(WIN32)
     target_compile_definitions(canfly PRIVATE
         WIN32
-        $<$<CONFIG:Debug>:DEBUG=1>
         _CRT_SECURE_NO_WARNINGS
         $<$<CONFIG:Debug>:_DEBUG>
         $<$<CONFIG:Release>:NDEBUG>
