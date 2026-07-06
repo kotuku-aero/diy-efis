@@ -169,6 +169,23 @@ static inline result_t subscribe(uint16_t first_id, uint16_t last_id, handle_t h
   return sys_subscribe(first_id, last_id, hwnd, hndl);
   }
 
+/**
+ * Return information about the currently running system
+ * @param info  * 
+ * @return result_t
+ * @syscall 7
+ */
+#ifndef PIC32_BUILD
+extern SYSCALL result_t STDCALL sys_information(system_info_t * info);
+#else
+extern result_t sys_information(system_info_t * info);
+#endif
+
+static inline result_t information(system_info_t * info)
+  {
+  return sys_information(info);
+  }
+
 /******************************************************************************/
 /* Category: config - Configuration database (registry) access. Public API uses cfg_* prefix. */
 /******************************************************************************/

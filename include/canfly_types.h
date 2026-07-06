@@ -1417,6 +1417,18 @@ typedef struct _aircraft_t {
   display_units units;
 } aircraft_t;
 
+/**
+ * @brief Startup information for the device
+ */
+typedef struct _system_info_t
+  {
+  extent_t screen_dim;                // dimensions of the screen
+  char device_name[CFG_STRING_MAX];   // display name of the device
+  char image_name[CFG_STRING_MAX];    // name of the binary image on the device
+  char app_name[CFG_NAME_MAX];        // name of the application image.
+  memid_t app_cfg_key;                // system key for the application (int)-1 is un-defined
+  } system_info_t;
+
 #ifndef __cplusplus
 // C++ must use std::min and std::max
 #ifdef min

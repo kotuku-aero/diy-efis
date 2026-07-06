@@ -205,6 +205,24 @@ result_t sys_subscribe(uint16_t first_id, uint16_t last_id, handle_t hwnd, handl
 
 ---
 
+### `sys_information`
+
+Return information about the currently running system
+
+**Syscall ID:** 7
+
+**Kernel function:** `sys_information`
+
+```c
+result_t sys_information(system_info_t * info);
+```
+
+| Parameter | Type | Direction | Description |
+|-----------|------|-----------|-------------|
+| `info` | `system_info_t *` | in |  |
+
+---
+
 ## Config API
 
 Configuration database (registry) access. Public API uses cfg_* prefix.

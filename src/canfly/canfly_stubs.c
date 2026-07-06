@@ -32,6 +32,7 @@
 #define SYSCALL_SYS_NEUTRON_RANDOM                         4
 #define SYSCALL_SYS_EXIT                                   5
 #define SYSCALL_SYS_SUBSCRIBE                              6
+#define SYSCALL_SYS_INFORMATION                            7
 
 /* config (Configuration database (registry) access. Public API uses cfg_* prefix.) */
 #define SYSCALL_CFG_CREATE_KEY                             256
@@ -301,6 +302,21 @@ result_t sys_subscribe(uint16_t first_id, uint16_t last_id, handle_t hwnd, handl
     "syscall\n\t"
     : "=r"(__result)
     : "i"(SYSCALL_SYS_SUBSCRIBE), "r"(__p0), "r"(__p1), "r"(__p2), "r"(__p3)
+  );
+
+  return __result;
+}
+
+result_t sys_information(system_info_t * info)
+{
+  register result_t __result __asm__("$v0");
+  register uint32_t __p0 __asm__("$a0") = (uint32_t)info;
+
+  __asm__ volatile (
+    "li $v0, %1\n\t"
+    "syscall\n\t"
+    : "=r"(__result)
+    : "i"(SYSCALL_SYS_INFORMATION), "r"(__p0)
   );
 
   return __result;
