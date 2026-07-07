@@ -90,3 +90,4 @@ apps/mfd5/mfd5_priv.h
 apps/mfd5/mfd5.c
 
 apps/mfd5/mfd5.h
+/.claude/settings.local.json
