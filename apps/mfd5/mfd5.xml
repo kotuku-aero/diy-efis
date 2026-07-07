@@ -220,7 +220,7 @@
               show-aoa="true">
       <rect left="0" top ="20" width="480" height="240"/>
       <skid-indicator left="90" top="132" width="140" height="13"/>
-      <median x="160" y="120"/>
+      <median x="240" y="120"/>
     </attitude>
 
     <altitude name="ALT"
@@ -252,7 +252,7 @@
      on-create="on_create_nav"
      config-path="/mfd3_au_nz"
          >
-      <rect left="0" top="280" width="480" height="280" />
+      <rect left="0" top="260" width="480" height="300" />
       <day-theme alarm-color="color_red"
                  warning-color="color_yellow"
                  land-color="color_limegreen"
