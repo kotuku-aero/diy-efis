@@ -84,3 +84,9 @@ bin/*.exe
 /apps/setup/setup_priv.h
 /apps/setup/setup.c
 /apps/setup/setup.h
+
+apps/mfd5/mfd5_priv.h
+
+apps/mfd5/mfd5.c
+
+apps/mfd5/mfd5.h
