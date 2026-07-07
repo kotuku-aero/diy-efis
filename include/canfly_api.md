@@ -211,7 +211,7 @@ Return information about the currently running system
 
 **Syscall ID:** 7
 
-**Kernel function:** `sys_information`
+**Kernel function:** `get_sysinfo`
 
 ```c
 result_t sys_information(system_info_t * info);

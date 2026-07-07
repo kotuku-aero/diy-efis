@@ -1427,6 +1427,7 @@ typedef struct _system_info_t
   char image_name[CFG_STRING_MAX];    // name of the binary image on the device
   char app_name[CFG_NAME_MAX];        // name of the application image.
   memid_t app_cfg_key;                // system key for the application (int)-1 is un-defined
+  uint8_t node_id;
   } system_info_t;
 
 #ifndef __cplusplus
