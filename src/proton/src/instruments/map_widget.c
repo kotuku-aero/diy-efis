@@ -1014,7 +1014,7 @@ result_t create_map_widget(handle_t parent, handle_t spatial_db, uint32_t flags,
     extra->map_position.lat = 0;
     extra->map_position.lng = 0;
 
-#ifdef DEBUG
+#ifdef _DEBUG
 
     int test_case = 0;
 
