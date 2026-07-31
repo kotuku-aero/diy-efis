@@ -37,21 +37,6 @@
       "toolchainFile": "${sourceDir}/diy-efis/cmake/mips32-toolchain.cmake"
     },
     {
-      "name": "xc32-DA-base",
-      "hidden": true,
-      "inherits": "base",
-      "description": "Cross-compile for PIC32MZ-DA using cmake/xc32-DA-toolchain.cmake",
-      "toolchainFile": "${sourceDir}/cmake/xc32-DA-toolchain.cmake"
-    },
-    {
-      "name": "xc32-EF-base",
-      "hidden": true,
-      "inherits": "base",
-      "description": "Cross-compile for PIC32MZ-EF using cmake/xc32-EF-toolchain.cmake",
-      "toolchainFile": "${sourceDir}/cmake/xc32-EF-toolchain.cmake"
-    },
-
-    {
       "name": "Debug-x86",
       "displayName": "Debug x86 (MSVC 32-bit)",
       "inherits": "x86-base",
@@ -89,44 +74,6 @@
         "CMAKE_BUILD_TYPE": "Release"
       }
     },
-
-    {
-      "name": "Debug-xc32-DA",
-      "displayName": "Debug PIC32MZ-DA",
-      "inherits": "xc32-DA-base",
-      "binaryDir": "${sourceDir}/build/debug-xc32-da",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
-      }
-    },
-    {
-      "name": "Release-xc32-DA",
-      "displayName": "Release PIC32MZ-DA",
-      "inherits": "xc32-DA-base",
-      "binaryDir": "${sourceDir}/build/release-xc32-da",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
-      }
-    },
-
-    {
-      "name": "Debug-xc32-EF",
-      "displayName": "Debug PIC32MZ-EF",
-      "inherits": "xc32-EF-base",
-      "binaryDir": "${sourceDir}/build/debug-xc32-ef",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
-      }
-    },
-    {
-      "name": "Release-xc32-EF",
-      "displayName": "Release PIC32MZ-EF",
-      "inherits": "xc32-EF-base",
-      "binaryDir": "${sourceDir}/build/release-xc32-ef",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
-      }
-    }
   ],
 
   "buildPresets": [
@@ -134,10 +81,6 @@
     { "name": "Release-x86",      "configurePreset": "Release-x86" },
     { "name": "Debug-mips32",     "configurePreset": "Debug-mips32" },
     { "name": "Release-mips32",   "configurePreset": "Release-mips32" },
-    { "name": "Debug-xc32-DA",    "configurePreset": "Debug-xc32-DA" },
-    { "name": "Release-xc32-DA",  "configurePreset": "Release-xc32-DA" },
-    { "name": "Debug-xc32-EF",    "configurePreset": "Debug-xc32-EF" },
-    { "name": "Release-xc32-EF",  "configurePreset": "Release-xc32-EF" }
   ],
 
   "testPresets": [
