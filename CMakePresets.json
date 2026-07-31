@@ -34,7 +34,7 @@
       "hidden": true,
       "inherits": "base",
       "description": "Cross-compile for MIPS32 (PIC32MZ etc.) using diy-efis/cmake/mips32-toolchain.cmake",
-      "toolchainFile": "${sourceDir}/diy-efis/cmake/mips32-toolchain.cmake"
+      "toolchainFile": "${sourceDir}/cmake/mips32-toolchain.cmake"
     },
     {
       "name": "Debug-x86",
