@@ -1445,25 +1445,25 @@ typedef struct _system_info_t
 
 #ifndef _SPATIAL_TYPES
 #define _SPATIAL_TYPES
-#define pi 3.1415926535897932384626433832795f
+#define PI 3.1415926535897932384626433832795f
 
 static inline float degrees_to_radians(float degrees)
   {
-  return degrees * (pi / 180);
+  return degrees * (PI / 180);
   }
 
 static inline float radians_to_degrees(float radians)
   {
-  float retval = radians / (pi / 180);
+  float retval = radians / (PI / 180);
   return retval;
   }
 
-#define rad_deg (pi / 180)
-#define rad_45 (pi / 4)
-#define rad_90 (pi / 2)
-#define rad_180 pi;
-#define rad_270 (pi * 1.5)
-#define rad_360 (pi * 2)
+#define rad_deg (PI / 180)
+#define rad_45 (PI / 4)
+#define rad_90 (PI / 2)
+#define rad_180 PI;
+#define rad_270 (PI * 1.5)
+#define rad_360 (PI * 2)
 
 #define FEET_PER_METER 3.2808398950131233595800524934383f
 
