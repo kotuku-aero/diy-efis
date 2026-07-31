@@ -77,4 +77,4 @@ mfd_print_summary(
 ################################################################################
 # Organize in IDE
 ################################################################################
-set_target_properties(att PROPERTIES FOLDER "c-apps")
+set_target_properties(att PROPERTIES FOLDER "samples")

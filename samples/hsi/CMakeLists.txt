@@ -79,4 +79,4 @@ mfd_print_summary(
 ################################################################################
 # Organize in IDE
 ################################################################################
-set_target_properties(hsi PROPERTIES FOLDER "c-apps")
+set_target_properties(${TARGET_NAME} PROPERTIES FOLDER "samples")
