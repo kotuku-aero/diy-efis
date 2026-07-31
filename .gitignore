@@ -91,3 +91,9 @@ apps/mfd5/mfd5.c
 
 apps/mfd5/mfd5.h
 /.claude/settings.local.json
+
+samples/aio/aio_priv.h
+
+samples/aio/aio.c
+
+samples/aio/aio.h
