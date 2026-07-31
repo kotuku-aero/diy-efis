@@ -1,0 +1,157 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 25,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "installDir": "${sourceDir}/out/install/${presetName}"
+    },
+    {
+      "name": "x86-base",
+      "hidden": true,
+      "inherits": "base",
+      "description": "32-bit MSVC build via vcvarsall — matches the prebuilt 32-bit C:/usr tree (SDL3, simpleble, wxWidgets are all vc14x x86)",
+      "architecture": {
+        "value": "x86",
+        "strategy": "external"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "intelliSenseMode": "windows-msvc-x86",
+          "inheritEnvironments": [ "msvc_x86" ]
+        }
+      }
+    },
+    {
+      "name": "mips32-base",
+      "hidden": true,
+      "inherits": "base",
+      "description": "Cross-compile for MIPS32 (PIC32MZ etc.) using diy-efis/cmake/mips32-toolchain.cmake",
+      "toolchainFile": "${sourceDir}/diy-efis/cmake/mips32-toolchain.cmake"
+    },
+    {
+      "name": "xc32-DA-base",
+      "hidden": true,
+      "inherits": "base",
+      "description": "Cross-compile for PIC32MZ-DA using cmake/xc32-DA-toolchain.cmake",
+      "toolchainFile": "${sourceDir}/cmake/xc32-DA-toolchain.cmake"
+    },
+    {
+      "name": "xc32-EF-base",
+      "hidden": true,
+      "inherits": "base",
+      "description": "Cross-compile for PIC32MZ-EF using cmake/xc32-EF-toolchain.cmake",
+      "toolchainFile": "${sourceDir}/cmake/xc32-EF-toolchain.cmake"
+    },
+
+    {
+      "name": "Debug-x86",
+      "displayName": "Debug x86 (MSVC 32-bit)",
+      "inherits": "x86-base",
+      "binaryDir": "${sourceDir}/build/debug-x86",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "Release-x86",
+      "displayName": "Release x86 (MSVC 32-bit)",
+      "inherits": "x86-base",
+      "binaryDir": "${sourceDir}/build/release-x86",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+
+    {
+      "name": "Debug-mips32",
+      "displayName": "Debug MIPS32 (RelWithDebInfo)",
+      "description": "CLion Debug-mips32 profile — note: uses RelWithDebInfo to fit the target",
+      "inherits": "mips32-base",
+      "binaryDir": "${sourceDir}/build/debug-mips32",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    },
+    {
+      "name": "Release-mips32",
+      "displayName": "Release MIPS32",
+      "inherits": "mips32-base",
+      "binaryDir": "${sourceDir}/build/mips32-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+
+    {
+      "name": "Debug-xc32-DA",
+      "displayName": "Debug PIC32MZ-DA",
+      "inherits": "xc32-DA-base",
+      "binaryDir": "${sourceDir}/build/debug-xc32-da",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "Release-xc32-DA",
+      "displayName": "Release PIC32MZ-DA",
+      "inherits": "xc32-DA-base",
+      "binaryDir": "${sourceDir}/build/release-xc32-da",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+
+    {
+      "name": "Debug-xc32-EF",
+      "displayName": "Debug PIC32MZ-EF",
+      "inherits": "xc32-EF-base",
+      "binaryDir": "${sourceDir}/build/debug-xc32-ef",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "Release-xc32-EF",
+      "displayName": "Release PIC32MZ-EF",
+      "inherits": "xc32-EF-base",
+      "binaryDir": "${sourceDir}/build/release-xc32-ef",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    }
+  ],
+
+  "buildPresets": [
+    { "name": "Debug-x86",        "configurePreset": "Debug-x86" },
+    { "name": "Release-x86",      "configurePreset": "Release-x86" },
+    { "name": "Debug-mips32",     "configurePreset": "Debug-mips32" },
+    { "name": "Release-mips32",   "configurePreset": "Release-mips32" },
+    { "name": "Debug-xc32-DA",    "configurePreset": "Debug-xc32-DA" },
+    { "name": "Release-xc32-DA",  "configurePreset": "Release-xc32-DA" },
+    { "name": "Debug-xc32-EF",    "configurePreset": "Debug-xc32-EF" },
+    { "name": "Release-xc32-EF",  "configurePreset": "Release-xc32-EF" }
+  ],
+
+  "testPresets": [
+    {
+      "name": "Debug-x86",
+      "configurePreset": "Debug-x86",
+      "output": { "outputOnFailure": true },
+      "execution": { "noTestsAction": "default", "stopOnFailure": false }
+    },
+    {
+      "name": "Release-x86",
+      "configurePreset": "Release-x86",
+      "output": { "outputOnFailure": true },
+      "execution": { "noTestsAction": "default", "stopOnFailure": false }
+    }
+  ]
+}
