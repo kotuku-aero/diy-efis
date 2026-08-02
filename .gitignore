@@ -97,3 +97,15 @@ samples/aio/aio_priv.h
 samples/aio/aio.c
 
 samples/aio/aio.h
+
+samples/att/att_priv.h
+
+samples/att/att.c
+
+samples/att/att.h
+
+samples/edd/edd_priv.h
+
+samples/edd/edd.c
+
+samples/edd/edd.h
