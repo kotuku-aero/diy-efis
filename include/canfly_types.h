@@ -625,11 +625,7 @@ typedef enum
   v_uint32,
   v_float,
   v_utc,
-  v_lla,
-  v_matrix,
-  v_xyz,
-  v_qtn,
-  v_string,
+  v_chars,
   } variant_type;
 
 typedef struct
@@ -647,11 +643,7 @@ typedef struct
     uint32_t uint32;
     float flt;
     tm_t utc;
-    lla_t lla;
-    matrix_t matrix;
-    xyz_t xyz;
-    qtn_t qtn;
-    char string[CFG_STRING_MAX];
+    char chars[8];
     } value;
   } variant_t;
 
