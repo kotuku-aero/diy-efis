@@ -1,0 +1,71 @@
+recv_can id_manifold_pressure_sensor_status uint16 1
+recv_can id_oil_pressure_sensor_status uint16 1
+recv_can id_oil_temperature_sensor_status uint16 1
+recv_can id_left_fuel_quantity_sensor_status uint16 1
+recv_can id_right_fuel_quantity_sensor_status uint16 1
+recv_can id_fuel_flow_sensor_status uint16 1
+recv_can id_fuel_pressure_sensor_status uint16 1
+recv_can id_volts_sensor_status uint16 1
+recv_can id_amps_sensor_status uint16 1
+recv_can id_iat_sensor_status uint16 1
+
+recv_can id_manifold_pressure int16 813
+recv_can id_engine_rpm int16 2410
+recv_can id_cylinder_head_temperature1 int16 453
+recv_can id_cylinder_head_temperature2 int16 455
+recv_can id_cylinder_head_temperature3 int16 447
+recv_can id_cylinder_head_temperature4 int16 430
+recv_can id_exhaust_gas_temperature1 int16 973
+recv_can id_exhaust_gas_temperature2 int16 976
+recv_can id_exhaust_gas_temperature3 int16 970
+recv_can id_exhaust_gas_temperature4 int16 978
+recv_can id_fuel_flow_rate uint32 31000
+recv_can id_outside_air_temperature uint16 295
+recv_can id_engine_hp uint16 75
+recv_can id_oil_pressure int16 5308
+recv_can id_oil_temperature int16 355
+recv_can id_fuel_pressure int16 1930
+recv_can id_fuel_endurance uint32 210
+recv_can id_left_fuel_quantity uint32 62000
+recv_can id_right_fuel_quantity uint32 47000
+recv_can id_fuel_total uint32 109000
+recv_can id_indicated_airspeed uint16  48
+recv_can id_baro_corrected_altitude uint16 800
+recv_can id_dc_voltage float 14.267
+recv_can id_dc_current float 1.32
+recv_can id_engine_hours uint32  6310800
+recv_can id_air_time uint32  1850
+recv_can id_qnh float  1013
+recv_can id_altitude_rate float 8.128
+recv_can id_ap_altitude float 1066.8 
+recv_can id_roll_angle float 0.26
+recv_can id_pitch_angle float 0.175
+recv_can id_yaw_angle float -0.052
+recv_can id_track uint16 72
+recv_can id_angle_of_attack int16 10
+recv_can id_flap_position_value int16 25
+recv_can id_inlet_air_temperature uint16 288
+recv_can id_heading uint16 130
+recv_can id_magnetic_variation int16 -21
+
+
+recv_can id_magnetic_heading uint16 45
+recv_can id_wind_speed uint16 5
+recv_can id_wind_direction uint16 65
+
+recv_can id_datetime_utc utc "2026-07-01 23:00:05"
+recv_can id_datetime_lcl utc "2026-07-02 11:00:05"
+
+recv_can id_yaw_angle int16 5
+
+recv_can id_waypoint_code chars N Z N P
+
+recv_can id_distance_to_next float 9856
+recv_can id_estimated_time_to_next int16 526
+
+recv_can id_distance_to_destination float 27345
+recv_can id_estimated_enroute_time int16 1857
+
+recv_can id_autopilot_mode uint16 288
+recv_can id_ap_vertical_rate float 2.54
+recv_can id_ap_altitude float 762
