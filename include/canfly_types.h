@@ -928,6 +928,43 @@ typedef struct _set_node_id_msg_t
   uint8_t new_subtype; // allows setting the subtype as well
 } set_node_id_msg_t;
 
+// these are the defined node-id's used when making configuration database
+// calls
+#define node_id_0   0
+#define node_id_1   1
+#define node_id_2   2
+#define node_id_3   3
+#define node_id_4   4
+#define node_id_5   5
+#define node_id_6   6
+#define node_id_7   7
+#define node_id_8   8
+#define node_id_9   9
+#define node_id_10  10
+#define node_id_11  11
+#define node_id_12  12
+#define node_id_13  13
+#define node_id_14  14
+#define node_id_15  15
+
+// configuration db on the current device
+#define node_id_local 255
+
+// these are the well known device ID's that are used
+#define edu_node_id       1
+#define mag_left_id       2
+#define mag_right_id      3
+#define hub_node_id       4
+#define roll_srv_node_id  5
+#define pitch_srv_node_id 6
+#define yaw_srv_node_id   7
+#define edm_node_id       8  // 3.5" kEDM
+#define att_node_id       9  // 3.5" kATT
+#define nav_node_id       10 // 3.5" kNAV
+#define pfd_node_id       14 // 10.1" kPFD
+#define usb_node_id       15
+
+
 /////////////////////////////////////////////////////////////////////////
 //
 // Overlapped I/O support.

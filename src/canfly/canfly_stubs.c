@@ -40,9 +40,10 @@
 #define SYSCALL_CFG_DELETE_KEY                             258
 #define SYSCALL_CFG_DELETE_VALUE                           259
 #define SYSCALL_CFG_ENUM_KEY                               260
-#define SYSCALL_CFG_QUERY_MEMID                            261
+#define SYSCALL_CFG_QUERY_KEY                              261
 #define SYSCALL_CFG_RENAME_VALUE                           262
 #define SYSCALL_CFG_RENAME_KEY                             263
+#define SYSCALL_CFG_OPEN_DEVICE                            264
 #define SYSCALL_CFG_GET_BOOL                               270
 #define SYSCALL_CFG_SET_BOOL                               271
 #define SYSCALL_CFG_GET_INT8                               272
@@ -326,7 +327,7 @@ result_t sys_information(system_info_t * info)
 /* config stubs                                                               */
 /******************************************************************************/
 
-result_t cfg_create_key(memid_t parent, const char* name, memid_t* key, overlapped_t * overlapped)
+result_t cfg_create_key(handle_t parent, const char* name, handle_t* key, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -344,7 +345,7 @@ result_t cfg_create_key(memid_t parent, const char* name, memid_t* key, overlapp
   return __result;
 }
 
-result_t cfg_open_key(memid_t parent, const char* name, memid_t* key, overlapped_t * overlapped)
+result_t cfg_open_key(handle_t parent, const char* name, handle_t* key, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -362,7 +363,7 @@ result_t cfg_open_key(memid_t parent, const char* name, memid_t* key, overlapped
   return __result;
 }
 
-result_t cfg_delete_key(memid_t key, overlapped_t * overlapped)
+result_t cfg_delete_key(handle_t key, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)key;
@@ -378,7 +379,7 @@ result_t cfg_delete_key(memid_t key, overlapped_t * overlapped)
   return __result;
 }
 
-result_t cfg_delete_value(memid_t parent, const char* name, overlapped_t * overlapped)
+result_t cfg_delete_value(handle_t parent, const char* name, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -395,7 +396,7 @@ result_t cfg_delete_value(memid_t parent, const char* name, overlapped_t * overl
   return __result;
 }
 
-result_t cfg_enum_key(memid_t key, field_datatype* type, uint16_t* length, void* data, uint16_t len, char* name, memid_t* child, overlapped_t * overlapped)
+result_t cfg_enum_key(handle_t key, field_datatype* type, uint16_t* length, void* data, uint16_t len, char* name, handle_t* child, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)key;
@@ -422,7 +423,7 @@ result_t cfg_enum_key(memid_t key, field_datatype* type, uint16_t* length, void*
   return __result;
 }
 
-result_t cfg_query_memid(memid_t entry, field_datatype* type, char* name, uint16_t* length, memid_t* parent, overlapped_t * overlapped)
+result_t cfg_query_key(handle_t entry, field_datatype* type, char* name, uint16_t* length, handle_t* parent, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)entry;
@@ -441,13 +442,13 @@ result_t cfg_query_memid(memid_t entry, field_datatype* type, char* name, uint16
     "syscall\n\t"
     "addiu $sp, $sp, 8\n\t"
     : "=r"(__result)
-    : "i"(SYSCALL_CFG_QUERY_MEMID), "r"(__p0), "r"(__p1), "r"(__p2), "r"(__p3), "r"((uint32_t)parent), "r"((uint32_t)overlapped)
+    : "i"(SYSCALL_CFG_QUERY_KEY), "r"(__p0), "r"(__p1), "r"(__p2), "r"(__p3), "r"((uint32_t)parent), "r"((uint32_t)overlapped)
   );
 
   return __result;
 }
 
-result_t cfg_rename_value(memid_t parent, const char* name, const char* new_name, overlapped_t * overlapped)
+result_t cfg_rename_value(handle_t parent, const char* name, const char* new_name, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -465,7 +466,7 @@ result_t cfg_rename_value(memid_t parent, const char* name, const char* new_name
   return __result;
 }
 
-result_t cfg_rename_key(memid_t key, const char* new_name, overlapped_t * overlapped)
+result_t cfg_rename_key(handle_t key, const char* new_name, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)key;
@@ -482,7 +483,24 @@ result_t cfg_rename_key(memid_t key, const char* new_name, overlapped_t * overla
   return __result;
 }
 
-result_t cfg_get_bool(memid_t parent, const char* name, bool* result, overlapped_t * overlapped)
+result_t cfg_open_device(uint8_t device, handle_t* handle, overlapped_t * overlapped)
+{
+  register result_t __result __asm__("$v0");
+  register uint32_t __p0 __asm__("$a0") = (uint32_t)device;
+  register uint32_t __p1 __asm__("$a1") = (uint32_t)handle;
+  register uint32_t __p2 __asm__("$a2") = (uint32_t)overlapped;
+
+  __asm__ volatile (
+    "li $v0, %1\n\t"
+    "syscall\n\t"
+    : "=r"(__result)
+    : "i"(SYSCALL_CFG_OPEN_DEVICE), "r"(__p0), "r"(__p1), "r"(__p2)
+  );
+
+  return __result;
+}
+
+result_t cfg_get_bool(handle_t parent, const char* name, bool* result, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -500,7 +518,7 @@ result_t cfg_get_bool(memid_t parent, const char* name, bool* result, overlapped
   return __result;
 }
 
-result_t cfg_set_bool(memid_t parent, const char* name, bool value, overlapped_t * overlapped)
+result_t cfg_set_bool(handle_t parent, const char* name, bool value, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -518,7 +536,7 @@ result_t cfg_set_bool(memid_t parent, const char* name, bool value, overlapped_t
   return __result;
 }
 
-result_t cfg_get_int8(memid_t parent, const char* name, int8_t* result, overlapped_t * overlapped)
+result_t cfg_get_int8(handle_t parent, const char* name, int8_t* result, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -536,7 +554,7 @@ result_t cfg_get_int8(memid_t parent, const char* name, int8_t* result, overlapp
   return __result;
 }
 
-result_t cfg_set_int8(memid_t parent, const char* name, int8_t value, overlapped_t * overlapped)
+result_t cfg_set_int8(handle_t parent, const char* name, int8_t value, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -554,7 +572,7 @@ result_t cfg_set_int8(memid_t parent, const char* name, int8_t value, overlapped
   return __result;
 }
 
-result_t cfg_get_uint8(memid_t parent, const char* name, uint8_t* result, overlapped_t * overlapped)
+result_t cfg_get_uint8(handle_t parent, const char* name, uint8_t* result, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -572,7 +590,7 @@ result_t cfg_get_uint8(memid_t parent, const char* name, uint8_t* result, overla
   return __result;
 }
 
-result_t cfg_set_uint8(memid_t parent, const char* name, uint8_t value, overlapped_t * overlapped)
+result_t cfg_set_uint8(handle_t parent, const char* name, uint8_t value, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -590,7 +608,7 @@ result_t cfg_set_uint8(memid_t parent, const char* name, uint8_t value, overlapp
   return __result;
 }
 
-result_t cfg_get_int16(memid_t parent, const char* name, int16_t* result, overlapped_t * overlapped)
+result_t cfg_get_int16(handle_t parent, const char* name, int16_t* result, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -608,7 +626,7 @@ result_t cfg_get_int16(memid_t parent, const char* name, int16_t* result, overla
   return __result;
 }
 
-result_t cfg_set_int16(memid_t parent, const char* name, int16_t value, overlapped_t * overlapped)
+result_t cfg_set_int16(handle_t parent, const char* name, int16_t value, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -626,7 +644,7 @@ result_t cfg_set_int16(memid_t parent, const char* name, int16_t value, overlapp
   return __result;
 }
 
-result_t cfg_get_uint16(memid_t parent, const char* name, uint16_t* result, overlapped_t * overlapped)
+result_t cfg_get_uint16(handle_t parent, const char* name, uint16_t* result, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -644,7 +662,7 @@ result_t cfg_get_uint16(memid_t parent, const char* name, uint16_t* result, over
   return __result;
 }
 
-result_t cfg_set_uint16(memid_t parent, const char* name, uint16_t value, overlapped_t * overlapped)
+result_t cfg_set_uint16(handle_t parent, const char* name, uint16_t value, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -662,7 +680,7 @@ result_t cfg_set_uint16(memid_t parent, const char* name, uint16_t value, overla
   return __result;
 }
 
-result_t cfg_get_int32(memid_t parent, const char* name, int32_t* result, overlapped_t * overlapped)
+result_t cfg_get_int32(handle_t parent, const char* name, int32_t* result, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -680,7 +698,7 @@ result_t cfg_get_int32(memid_t parent, const char* name, int32_t* result, overla
   return __result;
 }
 
-result_t cfg_set_int32(memid_t parent, const char* name, int32_t value, overlapped_t * overlapped)
+result_t cfg_set_int32(handle_t parent, const char* name, int32_t value, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -698,7 +716,7 @@ result_t cfg_set_int32(memid_t parent, const char* name, int32_t value, overlapp
   return __result;
 }
 
-result_t cfg_get_uint32(memid_t parent, const char* name, uint32_t* result, overlapped_t * overlapped)
+result_t cfg_get_uint32(handle_t parent, const char* name, uint32_t* result, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -716,7 +734,7 @@ result_t cfg_get_uint32(memid_t parent, const char* name, uint32_t* result, over
   return __result;
 }
 
-result_t cfg_set_uint32(memid_t parent, const char* name, uint32_t value, overlapped_t * overlapped)
+result_t cfg_set_uint32(handle_t parent, const char* name, uint32_t value, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -734,7 +752,7 @@ result_t cfg_set_uint32(memid_t parent, const char* name, uint32_t value, overla
   return __result;
 }
 
-result_t cfg_get_float(memid_t parent, const char* name, float* result, overlapped_t * overlapped)
+result_t cfg_get_float(handle_t parent, const char* name, float* result, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -752,7 +770,7 @@ result_t cfg_get_float(memid_t parent, const char* name, float* result, overlapp
   return __result;
 }
 
-result_t cfg_set_float(memid_t parent, const char* name, float value, overlapped_t * overlapped)
+result_t cfg_set_float(handle_t parent, const char* name, float value, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -770,7 +788,7 @@ result_t cfg_set_float(memid_t parent, const char* name, float value, overlapped
   return __result;
 }
 
-result_t cfg_get_string(memid_t parent, const char* name, char* value, uint16_t* length, overlapped_t * overlapped)
+result_t cfg_get_string(handle_t parent, const char* name, char* value, uint16_t* length, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -794,7 +812,7 @@ result_t cfg_get_string(memid_t parent, const char* name, char* value, uint16_t*
   return __result;
 }
 
-result_t cfg_set_string(memid_t parent, const char* name, const char* value, overlapped_t * overlapped)
+result_t cfg_set_string(handle_t parent, const char* name, const char* value, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -812,7 +830,7 @@ result_t cfg_set_string(memid_t parent, const char* name, const char* value, ove
   return __result;
 }
 
-result_t cfg_get_lla(memid_t parent, const char* name, lla_t* result, overlapped_t * overlapped)
+result_t cfg_get_lla(handle_t parent, const char* name, lla_t* result, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -830,7 +848,7 @@ result_t cfg_get_lla(memid_t parent, const char* name, lla_t* result, overlapped
   return __result;
 }
 
-result_t cfg_set_lla(memid_t parent, const char* name, const lla_t* value, overlapped_t * overlapped)
+result_t cfg_set_lla(handle_t parent, const char* name, const lla_t* value, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -848,7 +866,7 @@ result_t cfg_set_lla(memid_t parent, const char* name, const lla_t* value, overl
   return __result;
 }
 
-result_t cfg_get_xyz(memid_t parent, const char* name, xyz_t* result, overlapped_t * overlapped)
+result_t cfg_get_xyz(handle_t parent, const char* name, xyz_t* result, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -866,7 +884,7 @@ result_t cfg_get_xyz(memid_t parent, const char* name, xyz_t* result, overlapped
   return __result;
 }
 
-result_t cfg_set_xyz(memid_t parent, const char* name, const xyz_t* value, overlapped_t * overlapped)
+result_t cfg_set_xyz(handle_t parent, const char* name, const xyz_t* value, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -884,7 +902,7 @@ result_t cfg_set_xyz(memid_t parent, const char* name, const xyz_t* value, overl
   return __result;
 }
 
-result_t cfg_get_matrix(memid_t parent, const char* name, matrix_t* result, overlapped_t * overlapped)
+result_t cfg_get_matrix(handle_t parent, const char* name, matrix_t* result, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -902,7 +920,7 @@ result_t cfg_get_matrix(memid_t parent, const char* name, matrix_t* result, over
   return __result;
 }
 
-result_t cfg_set_matrix(memid_t parent, const char* name, const matrix_t* value, overlapped_t * overlapped)
+result_t cfg_set_matrix(handle_t parent, const char* name, const matrix_t* value, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -920,7 +938,7 @@ result_t cfg_set_matrix(memid_t parent, const char* name, const matrix_t* value,
   return __result;
 }
 
-result_t cfg_get_qtn(memid_t parent, const char* name, qtn_t* result, overlapped_t * overlapped)
+result_t cfg_get_qtn(handle_t parent, const char* name, qtn_t* result, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -938,7 +956,7 @@ result_t cfg_get_qtn(memid_t parent, const char* name, qtn_t* result, overlapped
   return __result;
 }
 
-result_t cfg_set_qtn(memid_t parent, const char* name, const qtn_t* value, overlapped_t * overlapped)
+result_t cfg_set_qtn(handle_t parent, const char* name, const qtn_t* value, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -956,7 +974,7 @@ result_t cfg_set_qtn(memid_t parent, const char* name, const qtn_t* value, overl
   return __result;
 }
 
-result_t cfg_get_utc(memid_t parent, const char* name, tm_t* value, overlapped_t * overlapped)
+result_t cfg_get_utc(handle_t parent, const char* name, tm_t* value, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;
@@ -974,7 +992,7 @@ result_t cfg_get_utc(memid_t parent, const char* name, tm_t* value, overlapped_t
   return __result;
 }
 
-result_t cfg_set_utc(memid_t parent, const char* name, const tm_t* value, overlapped_t * overlapped)
+result_t cfg_set_utc(handle_t parent, const char* name, const tm_t* value, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)parent;

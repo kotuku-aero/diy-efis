@@ -11,10 +11,10 @@ with the kernel exclusively through system calls using the MIPS `SYSCALL`
 instruction.
 
 The SDK consists of:
-- **canfly.h** — Public header with all function declarations
-- **canfly_stubs.c** — SYSCALL stub implementations (link with your app)
-- **canfly_user.c** — User-mode library (dispatch_message, defwndproc, etc.)
-- **Proton widget library** — Open-source widget implementations
+- **canfly.h** â€” Public header with all function declarations
+- **canfly_stubs.c** â€” SYSCALL stub implementations (link with your app)
+- **canfly_user.c** â€” User-mode library (dispatch_message, defwndproc, etc.)
+- **Proton widget library** â€” Open-source widget implementations
 
 ### Architecture
 
@@ -39,7 +39,7 @@ The SDK consists of:
 
 | Layer | Description |
 |-------|-------------|
-| **CanFly** | The OS — the published SDK and syscall interface |
+| **CanFly** | The OS â€” the published SDK and syscall interface |
 | **Atom** | Internal hardware abstraction (not published) |
 | **Neutron** | Kernel: scheduling, config DB, CAN routing, streams |
 | **Photon** | 2D graphics device interface |
@@ -50,9 +50,9 @@ The SDK consists of:
 The kernel **never** calls back into user space. All notifications from kernel
 to application are via CAN messages posted to the window message queue:
 
-- `id_paint` (1428) — window needs repaint
-- `id_create` (1429) — window created
-- `id_map_render_complete` — map canvas ready to blit
+- `id_paint` (1428) â€” window needs repaint
+- `id_create` (1429) â€” window created
+- `id_map_render_complete` â€” map canvas ready to blit
 - Subscribed CAN bus messages (sensor data, autopilot, etc.)
 
 ### CAN Message Subscription
@@ -62,18 +62,18 @@ Each task supports up to 8 subscription blocks.
 
 | Block | ID Range | Description |
 |-------|----------|-------------|
-| Alarms | 0–255 | Engine/system alarms |
-| AHRS | 256–319 | Attitude, heading, airspeed, altitude |
-| EDU | 320–447 | Engine data unit |
-| Left kMAG | 448–479 | Left magneto |
-| Right kMAG | 480–511 | Right magneto |
-| Autopilot | 512–627 | AP, navigation, flight plan |
-| Servos | 628–819 | Roll, pitch, yaw servos |
-| Status | 1350–1399 | Node status and boot |
+| Alarms | 0â€“255 | Engine/system alarms |
+| AHRS | 256â€“319 | Attitude, heading, airspeed, altitude |
+| EDU | 320â€“447 | Engine data unit |
+| Left kMAG | 448â€“479 | Left magneto |
+| Right kMAG | 480â€“511 | Right magneto |
+| Autopilot | 512â€“627 | AP, navigation, flight plan |
+| Servos | 628â€“819 | Roll, pitch, yaw servos |
+| Status | 1350â€“1399 | Node status and boot |
 
 **Reserved ranges (cannot be subscribed):**
-- 1400–1499: Local window events (always delivered)
-- 1500–2047: Neutron pipes and services
+- 1400â€“1499: Local window events (always delivered)
+- 1500â€“2047: Neutron pipes and services
 
 ---
 
@@ -82,7 +82,7 @@ Each task supports up to 8 subscription blocks.
 
 Core kernel primitives: tasks, semaphores, queues, memory, time
 
-ID range: 0–255
+ID range: 0â€“255
 
 ### `sys_ticks`
 
@@ -227,7 +227,7 @@ result_t sys_information(system_info_t * info);
 
 Configuration database (registry) access. Public API uses cfg_* prefix.
 
-ID range: 256–511
+ID range: 256â€“511
 
 ### `cfg_create_key`
 
@@ -237,17 +237,17 @@ Create a configuration key (opens existing if present)
 
 **Syscall ID:** 256
 
-**Kernel function:** `reg_create_key`
+**Kernel function:** `proxy_reg_create_key`
 
 ```c
-result_t cfg_create_key(memid_t parent, const char* name, memid_t* key, overlapped_t * overlapped);
+result_t cfg_create_key(handle_t parent, const char* name, handle_t* key, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
-| `key` | `memid_t*` | out |  |
+| `key` | `handle_t*` | out |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
 
 ---
@@ -260,17 +260,17 @@ Open an existing configuration key
 
 **Syscall ID:** 257
 
-**Kernel function:** `reg_open_key`
+**Kernel function:** `proxy_reg_open_key`
 
 ```c
-result_t cfg_open_key(memid_t parent, const char* name, memid_t* key, overlapped_t * overlapped);
+result_t cfg_open_key(handle_t parent, const char* name, handle_t* key, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
-| `key` | `memid_t*` | out |  |
+| `key` | `handle_t*` | out |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
 
 ---
@@ -283,15 +283,15 @@ Remove a key, all sub-keys and values
 
 **Syscall ID:** 258
 
-**Kernel function:** `reg_delete_key`
+**Kernel function:** `proxy_reg_delete_key`
 
 ```c
-result_t cfg_delete_key(memid_t key, overlapped_t * overlapped);
+result_t cfg_delete_key(handle_t key, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `key` | `memid_t` | in |  |
+| `key` | `handle_t` | in |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
 
 ---
@@ -304,15 +304,15 @@ Remove a value
 
 **Syscall ID:** 259
 
-**Kernel function:** `reg_delete_value`
+**Kernel function:** `proxy_reg_delete_value`
 
 ```c
-result_t cfg_delete_value(memid_t parent, const char* name, overlapped_t * overlapped);
+result_t cfg_delete_value(handle_t parent, const char* name, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
 
@@ -326,26 +326,26 @@ Enumerate children of a key
 
 **Syscall ID:** 260
 
-**Kernel function:** `reg_enum_key`
+**Kernel function:** `proxy_reg_enum_key`
 
 ```c
-result_t cfg_enum_key(memid_t key, field_datatype* type, uint16_t* length, void* data, uint16_t len, char* name, memid_t* child, overlapped_t * overlapped);
+result_t cfg_enum_key(handle_t key, field_datatype* type, uint16_t* length, void* data, uint16_t len, char* name, handle_t* child, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `key` | `memid_t` | in |  |
+| `key` | `handle_t` | in |  |
 | `type` | `field_datatype*` | inout |  |
 | `length` | `uint16_t*` | inout |  |
 | `data` | `void*` | out (optional) |  |
 | `len` | `uint16_t` | in |  |
 | `name` | `char*` | out |  |
-| `child` | `memid_t*` | inout |  |
+| `child` | `handle_t*` | inout |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
 
 ---
 
-### `cfg_query_memid`
+### `cfg_query_key`
 
 Return information about a memid
 
@@ -353,19 +353,19 @@ Return information about a memid
 
 **Syscall ID:** 261
 
-**Kernel function:** `reg_query_memid`
+**Kernel function:** `proxy_reg_query_key`
 
 ```c
-result_t cfg_query_memid(memid_t entry, field_datatype* type, char* name, uint16_t* length, memid_t* parent, overlapped_t * overlapped);
+result_t cfg_query_key(handle_t entry, field_datatype* type, char* name, uint16_t* length, handle_t* parent, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `entry` | `memid_t` | in |  |
+| `entry` | `handle_t` | in |  |
 | `type` | `field_datatype*` | out |  |
 | `name` | `char*` | out |  |
 | `length` | `uint16_t*` | out |  |
-| `parent` | `memid_t*` | out |  |
+| `parent` | `handle_t*` | out |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
 
 ---
@@ -378,15 +378,15 @@ Rename a value
 
 **Syscall ID:** 262
 
-**Kernel function:** `reg_rename_value`
+**Kernel function:** `proxy_reg_rename_value`
 
 ```c
-result_t cfg_rename_value(memid_t parent, const char* name, const char* new_name, overlapped_t * overlapped);
+result_t cfg_rename_value(handle_t parent, const char* name, const char* new_name, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `new_name` | `const char*` | in |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -401,16 +401,38 @@ Rename a key
 
 **Syscall ID:** 263
 
-**Kernel function:** `reg_rename_key`
+**Kernel function:** `proxy_reg_rename_key`
 
 ```c
-result_t cfg_rename_key(memid_t key, const char* new_name, overlapped_t * overlapped);
+result_t cfg_rename_key(handle_t key, const char* new_name, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `key` | `memid_t` | in |  |
+| `key` | `handle_t` | in |  |
 | `new_name` | `const char*` | in |  |
+| `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
+
+---
+
+### `cfg_open_device`
+
+Open the configuration database on a specified device
+
+> The call can use the overlapped callback to overlap operations
+
+**Syscall ID:** 264
+
+**Kernel function:** `reg_open_device`
+
+```c
+result_t cfg_open_device(uint8_t device, handle_t* handle, overlapped_t * overlapped);
+```
+
+| Parameter | Type | Direction | Description |
+|-----------|------|-----------|-------------|
+| `device` | `uint8_t` | in |  |
+| `handle` | `handle_t*` | out |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
 
 ---
@@ -423,15 +445,15 @@ Read a bool from the config database
 
 **Syscall ID:** 270
 
-**Kernel function:** `reg_get_bool`
+**Kernel function:** `proxy_reg_get_bool`
 
 ```c
-result_t cfg_get_bool(memid_t parent, const char* name, bool* result, overlapped_t * overlapped);
+result_t cfg_get_bool(handle_t parent, const char* name, bool* result, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `result` | `bool*` | out |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -446,15 +468,15 @@ Write a bool to the config database
 
 **Syscall ID:** 271
 
-**Kernel function:** `reg_set_bool`
+**Kernel function:** `proxy_reg_set_bool`
 
 ```c
-result_t cfg_set_bool(memid_t parent, const char* name, bool value, overlapped_t * overlapped);
+result_t cfg_set_bool(handle_t parent, const char* name, bool value, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `value` | `bool` | in |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -469,15 +491,15 @@ Read an int8_t from the config database
 
 **Syscall ID:** 272
 
-**Kernel function:** `reg_get_int8`
+**Kernel function:** `proxy_reg_get_int8`
 
 ```c
-result_t cfg_get_int8(memid_t parent, const char* name, int8_t* result, overlapped_t * overlapped);
+result_t cfg_get_int8(handle_t parent, const char* name, int8_t* result, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `result` | `int8_t*` | out |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -492,15 +514,15 @@ Write an int8_t to the config database
 
 **Syscall ID:** 273
 
-**Kernel function:** `reg_set_int8`
+**Kernel function:** `proxy_reg_set_int8`
 
 ```c
-result_t cfg_set_int8(memid_t parent, const char* name, int8_t value, overlapped_t * overlapped);
+result_t cfg_set_int8(handle_t parent, const char* name, int8_t value, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `value` | `int8_t` | in |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -515,15 +537,15 @@ Read a uint8_t from the config database
 
 **Syscall ID:** 274
 
-**Kernel function:** `reg_get_uint8`
+**Kernel function:** `proxy_reg_get_uint8`
 
 ```c
-result_t cfg_get_uint8(memid_t parent, const char* name, uint8_t* result, overlapped_t * overlapped);
+result_t cfg_get_uint8(handle_t parent, const char* name, uint8_t* result, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `result` | `uint8_t*` | out |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -538,15 +560,15 @@ Write a uint8_t to the config database
 
 **Syscall ID:** 275
 
-**Kernel function:** `reg_set_uint8`
+**Kernel function:** `proxy_reg_set_uint8`
 
 ```c
-result_t cfg_set_uint8(memid_t parent, const char* name, uint8_t value, overlapped_t * overlapped);
+result_t cfg_set_uint8(handle_t parent, const char* name, uint8_t value, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `value` | `uint8_t` | in |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -561,15 +583,15 @@ Read an int16_t from the config database
 
 **Syscall ID:** 276
 
-**Kernel function:** `reg_get_int16`
+**Kernel function:** `proxy_reg_get_int16`
 
 ```c
-result_t cfg_get_int16(memid_t parent, const char* name, int16_t* result, overlapped_t * overlapped);
+result_t cfg_get_int16(handle_t parent, const char* name, int16_t* result, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `result` | `int16_t*` | out |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -584,15 +606,15 @@ Write an int16_t to the config database
 
 **Syscall ID:** 277
 
-**Kernel function:** `reg_set_int16`
+**Kernel function:** `proxy_reg_set_int16`
 
 ```c
-result_t cfg_set_int16(memid_t parent, const char* name, int16_t value, overlapped_t * overlapped);
+result_t cfg_set_int16(handle_t parent, const char* name, int16_t value, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `value` | `int16_t` | in |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -607,15 +629,15 @@ Read a uint16_t from the config database
 
 **Syscall ID:** 278
 
-**Kernel function:** `reg_get_uint16`
+**Kernel function:** `proxy_reg_get_uint16`
 
 ```c
-result_t cfg_get_uint16(memid_t parent, const char* name, uint16_t* result, overlapped_t * overlapped);
+result_t cfg_get_uint16(handle_t parent, const char* name, uint16_t* result, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `result` | `uint16_t*` | out |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -630,15 +652,15 @@ Write a uint16_t to the config database
 
 **Syscall ID:** 279
 
-**Kernel function:** `reg_set_uint16`
+**Kernel function:** `proxy_reg_set_uint16`
 
 ```c
-result_t cfg_set_uint16(memid_t parent, const char* name, uint16_t value, overlapped_t * overlapped);
+result_t cfg_set_uint16(handle_t parent, const char* name, uint16_t value, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `value` | `uint16_t` | in |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -653,15 +675,15 @@ Read an int32_t from the config database
 
 **Syscall ID:** 280
 
-**Kernel function:** `reg_get_int32`
+**Kernel function:** `proxy_reg_get_int32`
 
 ```c
-result_t cfg_get_int32(memid_t parent, const char* name, int32_t* result, overlapped_t * overlapped);
+result_t cfg_get_int32(handle_t parent, const char* name, int32_t* result, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `result` | `int32_t*` | out |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -676,15 +698,15 @@ Write an int32_t to the config database
 
 **Syscall ID:** 281
 
-**Kernel function:** `reg_set_int32`
+**Kernel function:** `proxy_reg_set_int32`
 
 ```c
-result_t cfg_set_int32(memid_t parent, const char* name, int32_t value, overlapped_t * overlapped);
+result_t cfg_set_int32(handle_t parent, const char* name, int32_t value, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `value` | `int32_t` | in |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -699,15 +721,15 @@ Read a uint32_t from the config database
 
 **Syscall ID:** 282
 
-**Kernel function:** `reg_get_uint32`
+**Kernel function:** `proxy_reg_get_uint32`
 
 ```c
-result_t cfg_get_uint32(memid_t parent, const char* name, uint32_t* result, overlapped_t * overlapped);
+result_t cfg_get_uint32(handle_t parent, const char* name, uint32_t* result, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `result` | `uint32_t*` | out |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -722,15 +744,15 @@ Write a uint32_t to the config database
 
 **Syscall ID:** 283
 
-**Kernel function:** `reg_set_uint32`
+**Kernel function:** `proxy_reg_set_uint32`
 
 ```c
-result_t cfg_set_uint32(memid_t parent, const char* name, uint32_t value, overlapped_t * overlapped);
+result_t cfg_set_uint32(handle_t parent, const char* name, uint32_t value, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `value` | `uint32_t` | in |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -745,15 +767,15 @@ Read a float from the config database
 
 **Syscall ID:** 284
 
-**Kernel function:** `reg_get_float`
+**Kernel function:** `proxy_reg_get_float`
 
 ```c
-result_t cfg_get_float(memid_t parent, const char* name, float* result, overlapped_t * overlapped);
+result_t cfg_get_float(handle_t parent, const char* name, float* result, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `result` | `float*` | out |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -768,15 +790,15 @@ Write a float to the config database
 
 **Syscall ID:** 285
 
-**Kernel function:** `reg_set_float`
+**Kernel function:** `proxy_reg_set_float`
 
 ```c
-result_t cfg_set_float(memid_t parent, const char* name, float value, overlapped_t * overlapped);
+result_t cfg_set_float(handle_t parent, const char* name, float value, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `value` | `float` | in |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -791,15 +813,15 @@ Read a string from the config database
 
 **Syscall ID:** 286
 
-**Kernel function:** `reg_get_string`
+**Kernel function:** `proxy_reg_get_string`
 
 ```c
-result_t cfg_get_string(memid_t parent, const char* name, char* value, uint16_t* length, overlapped_t * overlapped);
+result_t cfg_get_string(handle_t parent, const char* name, char* value, uint16_t* length, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `value` | `char*` | out |  |
 | `length` | `uint16_t*` | inout |  |
@@ -815,15 +837,15 @@ Write a string to the config database
 
 **Syscall ID:** 287
 
-**Kernel function:** `reg_set_string`
+**Kernel function:** `proxy_reg_set_string`
 
 ```c
-result_t cfg_set_string(memid_t parent, const char* name, const char* value, overlapped_t * overlapped);
+result_t cfg_set_string(handle_t parent, const char* name, const char* value, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `value` | `const char*` | in |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -838,15 +860,15 @@ Read an lla_t from the config database
 
 **Syscall ID:** 288
 
-**Kernel function:** `reg_get_lla`
+**Kernel function:** `proxy_reg_get_lla`
 
 ```c
-result_t cfg_get_lla(memid_t parent, const char* name, lla_t* result, overlapped_t * overlapped);
+result_t cfg_get_lla(handle_t parent, const char* name, lla_t* result, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `result` | `lla_t*` | out |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -861,15 +883,15 @@ Write an lla_t to the config database
 
 **Syscall ID:** 289
 
-**Kernel function:** `reg_set_lla`
+**Kernel function:** `proxy_reg_set_lla`
 
 ```c
-result_t cfg_set_lla(memid_t parent, const char* name, const lla_t* value, overlapped_t * overlapped);
+result_t cfg_set_lla(handle_t parent, const char* name, const lla_t* value, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `value` | `const lla_t*` | in |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -884,15 +906,15 @@ Read an xyz_t from the config database
 
 **Syscall ID:** 290
 
-**Kernel function:** `reg_get_xyz`
+**Kernel function:** `proxy_reg_get_xyz`
 
 ```c
-result_t cfg_get_xyz(memid_t parent, const char* name, xyz_t* result, overlapped_t * overlapped);
+result_t cfg_get_xyz(handle_t parent, const char* name, xyz_t* result, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `result` | `xyz_t*` | out |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -907,15 +929,15 @@ Write an xyz_t to the config database
 
 **Syscall ID:** 291
 
-**Kernel function:** `reg_set_xyz`
+**Kernel function:** `proxy_reg_set_xyz`
 
 ```c
-result_t cfg_set_xyz(memid_t parent, const char* name, const xyz_t* value, overlapped_t * overlapped);
+result_t cfg_set_xyz(handle_t parent, const char* name, const xyz_t* value, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `value` | `const xyz_t*` | in |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -930,15 +952,15 @@ Read a matrix_t from the config database
 
 **Syscall ID:** 292
 
-**Kernel function:** `reg_get_matrix`
+**Kernel function:** `proxy_reg_get_matrix`
 
 ```c
-result_t cfg_get_matrix(memid_t parent, const char* name, matrix_t* result, overlapped_t * overlapped);
+result_t cfg_get_matrix(handle_t parent, const char* name, matrix_t* result, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `result` | `matrix_t*` | out |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -953,15 +975,15 @@ Write a matrix_t to the config database
 
 **Syscall ID:** 293
 
-**Kernel function:** `reg_set_matrix`
+**Kernel function:** `proxy_reg_set_matrix`
 
 ```c
-result_t cfg_set_matrix(memid_t parent, const char* name, const matrix_t* value, overlapped_t * overlapped);
+result_t cfg_set_matrix(handle_t parent, const char* name, const matrix_t* value, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `value` | `const matrix_t*` | in |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -976,15 +998,15 @@ Read a qtn_t from the config database
 
 **Syscall ID:** 294
 
-**Kernel function:** `reg_get_qtn`
+**Kernel function:** `proxy_reg_get_qtn`
 
 ```c
-result_t cfg_get_qtn(memid_t parent, const char* name, qtn_t* result, overlapped_t * overlapped);
+result_t cfg_get_qtn(handle_t parent, const char* name, qtn_t* result, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `result` | `qtn_t*` | out |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -999,15 +1021,15 @@ Write a qtn_t to the config database
 
 **Syscall ID:** 295
 
-**Kernel function:** `reg_set_qtn`
+**Kernel function:** `proxy_reg_set_qtn`
 
 ```c
-result_t cfg_set_qtn(memid_t parent, const char* name, const qtn_t* value, overlapped_t * overlapped);
+result_t cfg_set_qtn(handle_t parent, const char* name, const qtn_t* value, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `value` | `const qtn_t*` | in |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -1022,15 +1044,15 @@ Read a UTC time from the config database
 
 **Syscall ID:** 296
 
-**Kernel function:** `reg_get_utc`
+**Kernel function:** `proxy_reg_get_utc`
 
 ```c
-result_t cfg_get_utc(memid_t parent, const char* name, tm_t* value, overlapped_t * overlapped);
+result_t cfg_get_utc(handle_t parent, const char* name, tm_t* value, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `value` | `tm_t*` | out |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -1045,15 +1067,15 @@ Write a UTC time to the config database
 
 **Syscall ID:** 297
 
-**Kernel function:** `reg_set_utc`
+**Kernel function:** `proxy_reg_set_utc`
 
 ```c
-result_t cfg_set_utc(memid_t parent, const char* name, const tm_t* value, overlapped_t * overlapped);
+result_t cfg_set_utc(handle_t parent, const char* name, const tm_t* value, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `parent` | `memid_t` | in |  |
+| `parent` | `handle_t` | in |  |
 | `name` | `const char*` | in |  |
 | `value` | `const tm_t*` | in |  |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
@@ -1064,7 +1086,7 @@ result_t cfg_set_utc(memid_t parent, const char* name, const tm_t* value, overla
 
 CAN bus message creation, extraction, and transmission
 
-ID range: 512–767
+ID range: 512â€“767
 
 ### `sys_can_send`
 
@@ -1128,7 +1150,7 @@ result_t sys_set_device_id(uint8_t id);
 
 Stream, file, and directory operations
 
-ID range: 768–1023
+ID range: 768â€“1023
 
 ### `sys_stream_open`
 
@@ -1534,7 +1556,7 @@ result_t sys_totalspace(const char* path, uint32_t* space);
 
 Photon 2D graphics drawing interface
 
-ID range: 1280–1535
+ID range: 1280â€“1535
 
 ### `sys_canvas_create`
 
@@ -1972,7 +1994,7 @@ result_t sys_get_touch_msg(const canmsg_t* msg, touch_msg_t* touch_msg);
 
 Window creation, management, and message dispatch
 
-ID range: 1536–1791
+ID range: 1536â€“1791
 
 ### `sys_window_create`
 
@@ -2716,7 +2738,7 @@ Kernel-rendered map canvas API. The map renderer runs in kernel space
       updates and display preferences; the kernel renders asynchronously and
       posts id_map_render_complete to the owning window when ready.
 
-ID range: 1792–2047
+ID range: 1792â€“2047
 
 ### `sys_map_create_canvas`
 
@@ -3191,7 +3213,7 @@ result_t sys_spatial_get_attributes(handle_t hndl, uint32_t num_attr, const char
 
 ## System API
 
-ID range: 2048–2303
+ID range: 2048â€“2303
 
 ### `sys_get_aircraft`
 
@@ -3201,7 +3223,7 @@ Get an aircraft performance parameter
 
 **Syscall ID:** 2048
 
-**Kernel function:** `get_aircraft`
+**Kernel function:** `proxy_get_aircraft`
 
 ```c
 result_t sys_get_aircraft(aircraft_t* value, overlapped_t * overlapped);
@@ -3222,7 +3244,7 @@ Set an aircraft performance parameter
 
 **Syscall ID:** 2049
 
-**Kernel function:** `set_aircraft`
+**Kernel function:** `proxy_set_aircraft`
 
 ```c
 result_t sys_set_aircraft(const aircraft_t* value, overlapped_t * overlapped);
@@ -3263,7 +3285,7 @@ result_t sys_trace_message(uint16_t level, const char* msg);
 
 ## Fms API
 
-ID range: 2560–2815
+ID range: 2560â€“2815
 
 ### `fms_enum_flight_plans`
 
@@ -3271,7 +3293,7 @@ ID range: 2560–2815
 
 **Syscall ID:** 2560
 
-**Kernel function:** `enum_flight_plans`
+**Kernel function:** `proxy_enum_flight_plans`
 
 ```c
 result_t fms_enum_flight_plans(handle_t* handle, char* name, char* comment, char* description, char* type, bool* active, uint32_t* cookie, overlapped_t * overlapped);
@@ -3297,7 +3319,7 @@ result_t fms_enum_flight_plans(handle_t* handle, char* name, char* comment, char
 
 **Syscall ID:** 2561
 
-**Kernel function:** `get_active_flightplan`
+**Kernel function:** `proxy_get_active_flightplan`
 
 ```c
 result_t fms_get_active_flightplan(uint32_t* cookie, char* name, char* comment, char* description, char* type, overlapped_t * overlapped);
@@ -3320,7 +3342,7 @@ result_t fms_get_active_flightplan(uint32_t* cookie, char* name, char* comment, 
 
 **Syscall ID:** 2562
 
-**Kernel function:** `activate_flightplan`
+**Kernel function:** `proxy_activate_flightplan`
 
 ```c
 result_t fms_activate_flightplan(uint32_t cookie, overlapped_t * overlapped);
@@ -3339,7 +3361,7 @@ result_t fms_activate_flightplan(uint32_t cookie, overlapped_t * overlapped);
 
 **Syscall ID:** 2563
 
-**Kernel function:** `invert_active_flightplan`
+**Kernel function:** `proxy_invert_active_flightplan`
 
 ```c
 result_t fms_invert_active_flightplan(uint32_t* cookie, overlapped_t * overlapped);
@@ -3358,7 +3380,7 @@ result_t fms_invert_active_flightplan(uint32_t* cookie, overlapped_t * overlappe
 
 **Syscall ID:** 2564
 
-**Kernel function:** `enum_flight_plan`
+**Kernel function:** `proxy_enum_flight_plan`
 
 ```c
 result_t fms_enum_flight_plan(handle_t* handle, uint32_t cookie, uint32_t* id, uint32_t* sequence, lla_t* position, uint32_t* type, char* name, char* comment, char* description, overlapped_t * overlapped);
@@ -3387,7 +3409,7 @@ result_t fms_enum_flight_plan(handle_t* handle, uint32_t cookie, uint32_t* id, u
 
 **Syscall ID:** 2565
 
-**Kernel function:** `enum_waypoints`
+**Kernel function:** `proxy_enum_waypoints`
 
 ```c
 result_t fms_enum_waypoints(handle_t* handle, const char * filter, uint32_t* id, lla_t* position, uint32_t* type, char* name, char* comment, char* description, overlapped_t * overlapped);
@@ -3416,7 +3438,7 @@ result_t fms_enum_waypoints(handle_t* handle, const char * filter, uint32_t* id,
 
 **Syscall ID:** 2566
 
-**Kernel function:** `enum_nearest`
+**Kernel function:** `proxy_enum_nearest`
 
 ```c
 result_t fms_enum_nearest(handle_t* handle, const char * filter, uint32_t distance, uint32_t wpt_type_filter, uint32_t* id, lla_t* position, uint32_t* type, char* name, char* comment, char* description, overlapped_t * overlapped);
@@ -3451,7 +3473,7 @@ result_t fms_enum_nearest(handle_t* handle, const char * filter, uint32_t distan
 
 **Syscall ID:** 2567
 
-**Kernel function:** `goto_waypoint`
+**Kernel function:** `proxy_goto_waypoint`
 
 ```c
 result_t fms_goto_waypoint(uint32_t wpt, uint32_t autopilot_enable, overlapped_t * overlapped);
@@ -3472,7 +3494,7 @@ result_t fms_goto_waypoint(uint32_t wpt, uint32_t autopilot_enable, overlapped_t
 
 **Syscall ID:** 2568
 
-**Kernel function:** `add_waypoint`
+**Kernel function:** `proxy_add_waypoint`
 
 ```c
 result_t fms_add_waypoint(const lla_t* position, uint32_t type, const char* name, const char* comment, const char* description, int32_t* id, overlapped_t * overlapped);
@@ -3498,7 +3520,7 @@ result_t fms_add_waypoint(const lla_t* position, uint32_t type, const char* name
 
 **Syscall ID:** 2569
 
-**Kernel function:** `delete_waypoint`
+**Kernel function:** `proxy_delete_waypoint`
 
 ```c
 result_t fms_delete_waypoint(int32_t id, overlapped_t * overlapped);
@@ -3520,7 +3542,7 @@ Remove a flightplan from the fms
 
 **Syscall ID:** 2570
 
-**Kernel function:** `delete_flightplan`
+**Kernel function:** `proxy_delete_flightplan`
 
 ```c
 result_t fms_delete_flightplan(int32_t id, overlapped_t * overlapped);
@@ -3543,7 +3565,7 @@ Add a new flightplan to the FMS and allocate an ID to it
 
 **Syscall ID:** 2571
 
-**Kernel function:** `add_flightplan`
+**Kernel function:** `proxy_add_flightplan`
 
 ```c
 result_t fms_add_flightplan(const char* name, const char* comment, const char* description, const char* type, uint32_t len, const uint32_t* waypoints, uint32_t* cookie, overlapped_t * overlapped);
