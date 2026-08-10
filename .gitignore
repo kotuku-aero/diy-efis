@@ -109,3 +109,27 @@ samples/edd/edd_priv.h
 samples/edd/edd.c
 
 samples/edd/edd.h
+
+samples/hsi/hsi_priv.h
+
+samples/hsi/hsi.c
+
+samples/hsi/hsi.h
+
+samples/mfd5/mfd5_priv.h
+
+samples/mfd5/mfd5.c
+
+samples/mfd5/mfd5.h
+
+samples/nav/nav_priv.h
+
+samples/nav/nav.c
+
+samples/nav/nav.h
+
+samples/pfd/pfd_priv.h
+
+samples/pfd/pfd.c
+
+samples/pfd/pfd.h
