@@ -201,9 +201,9 @@ static inline result_t information(system_info_t * info)
  * @syscall 256
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_create_key(memid_t parent, const char* name, memid_t* key, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_create_key(handle_t parent, const char* name, handle_t* key, overlapped_t * overlapped);
 #else
-extern result_t cfg_create_key(memid_t parent, const char* name, memid_t* key, overlapped_t * overlapped);
+extern result_t cfg_create_key(handle_t parent, const char* name, handle_t* key, overlapped_t * overlapped);
 #endif
 
 /**
@@ -217,9 +217,9 @@ extern result_t cfg_create_key(memid_t parent, const char* name, memid_t* key, o
  * @syscall 257
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_open_key(memid_t parent, const char* name, memid_t* key, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_open_key(handle_t parent, const char* name, handle_t* key, overlapped_t * overlapped);
 #else
-extern result_t cfg_open_key(memid_t parent, const char* name, memid_t* key, overlapped_t * overlapped);
+extern result_t cfg_open_key(handle_t parent, const char* name, handle_t* key, overlapped_t * overlapped);
 #endif
 
 /**
@@ -231,9 +231,9 @@ extern result_t cfg_open_key(memid_t parent, const char* name, memid_t* key, ove
  * @syscall 258
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_delete_key(memid_t key, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_delete_key(handle_t key, overlapped_t * overlapped);
 #else
-extern result_t cfg_delete_key(memid_t key, overlapped_t * overlapped);
+extern result_t cfg_delete_key(handle_t key, overlapped_t * overlapped);
 #endif
 
 /**
@@ -246,9 +246,9 @@ extern result_t cfg_delete_key(memid_t key, overlapped_t * overlapped);
  * @syscall 259
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_delete_value(memid_t parent, const char* name, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_delete_value(handle_t parent, const char* name, overlapped_t * overlapped);
 #else
-extern result_t cfg_delete_value(memid_t parent, const char* name, overlapped_t * overlapped);
+extern result_t cfg_delete_value(handle_t parent, const char* name, overlapped_t * overlapped);
 #endif
 
 /**
@@ -266,9 +266,9 @@ extern result_t cfg_delete_value(memid_t parent, const char* name, overlapped_t 
  * @syscall 260
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_enum_key(memid_t key, field_datatype* type, uint16_t* length, void* data, uint16_t len, char* name, memid_t* child, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_enum_key(handle_t key, field_datatype* type, uint16_t* length, void* data, uint16_t len, char* name, handle_t* child, overlapped_t * overlapped);
 #else
-extern result_t cfg_enum_key(memid_t key, field_datatype* type, uint16_t* length, void* data, uint16_t len, char* name, memid_t* child, overlapped_t * overlapped);
+extern result_t cfg_enum_key(handle_t key, field_datatype* type, uint16_t* length, void* data, uint16_t len, char* name, handle_t* child, overlapped_t * overlapped);
 #endif
 
 /**
@@ -284,9 +284,9 @@ extern result_t cfg_enum_key(memid_t key, field_datatype* type, uint16_t* length
  * @syscall 261
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_query_memid(memid_t entry, field_datatype* type, char* name, uint16_t* length, memid_t* parent, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_query_key(handle_t entry, field_datatype* type, char* name, uint16_t* length, handle_t* parent, overlapped_t * overlapped);
 #else
-extern result_t cfg_query_memid(memid_t entry, field_datatype* type, char* name, uint16_t* length, memid_t* parent, overlapped_t * overlapped);
+extern result_t cfg_query_key(handle_t entry, field_datatype* type, char* name, uint16_t* length, handle_t* parent, overlapped_t * overlapped);
 #endif
 
 /**
@@ -300,9 +300,9 @@ extern result_t cfg_query_memid(memid_t entry, field_datatype* type, char* name,
  * @syscall 262
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_rename_value(memid_t parent, const char* name, const char* new_name, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_rename_value(handle_t parent, const char* name, const char* new_name, overlapped_t * overlapped);
 #else
-extern result_t cfg_rename_value(memid_t parent, const char* name, const char* new_name, overlapped_t * overlapped);
+extern result_t cfg_rename_value(handle_t parent, const char* name, const char* new_name, overlapped_t * overlapped);
 #endif
 
 /**
@@ -315,9 +315,24 @@ extern result_t cfg_rename_value(memid_t parent, const char* name, const char* n
  * @syscall 263
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_rename_key(memid_t key, const char* new_name, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_rename_key(handle_t key, const char* new_name, overlapped_t * overlapped);
 #else
-extern result_t cfg_rename_key(memid_t key, const char* new_name, overlapped_t * overlapped);
+extern result_t cfg_rename_key(handle_t key, const char* new_name, overlapped_t * overlapped);
+#endif
+
+/**
+ * Open the configuration database on a specified device
+ * @note This call may use overlapped I/O.
+ * @param device  * 
+ * @param handle [out]  * 
+ * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
+ * @return result_t
+ * @syscall 264
+ */
+#ifndef PIC32_BUILD
+extern SYSCALL result_t STDCALL cfg_open_device(uint8_t device, handle_t* handle, overlapped_t * overlapped);
+#else
+extern result_t cfg_open_device(uint8_t device, handle_t* handle, overlapped_t * overlapped);
 #endif
 
 /**
@@ -331,9 +346,9 @@ extern result_t cfg_rename_key(memid_t key, const char* new_name, overlapped_t *
  * @syscall 270
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_get_bool(memid_t parent, const char* name, bool* result, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_get_bool(handle_t parent, const char* name, bool* result, overlapped_t * overlapped);
 #else
-extern result_t cfg_get_bool(memid_t parent, const char* name, bool* result, overlapped_t * overlapped);
+extern result_t cfg_get_bool(handle_t parent, const char* name, bool* result, overlapped_t * overlapped);
 #endif
 
 /**
@@ -347,9 +362,9 @@ extern result_t cfg_get_bool(memid_t parent, const char* name, bool* result, ove
  * @syscall 271
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_set_bool(memid_t parent, const char* name, bool value, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_set_bool(handle_t parent, const char* name, bool value, overlapped_t * overlapped);
 #else
-extern result_t cfg_set_bool(memid_t parent, const char* name, bool value, overlapped_t * overlapped);
+extern result_t cfg_set_bool(handle_t parent, const char* name, bool value, overlapped_t * overlapped);
 #endif
 
 /**
@@ -363,9 +378,9 @@ extern result_t cfg_set_bool(memid_t parent, const char* name, bool value, overl
  * @syscall 272
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_get_int8(memid_t parent, const char* name, int8_t* result, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_get_int8(handle_t parent, const char* name, int8_t* result, overlapped_t * overlapped);
 #else
-extern result_t cfg_get_int8(memid_t parent, const char* name, int8_t* result, overlapped_t * overlapped);
+extern result_t cfg_get_int8(handle_t parent, const char* name, int8_t* result, overlapped_t * overlapped);
 #endif
 
 /**
@@ -379,9 +394,9 @@ extern result_t cfg_get_int8(memid_t parent, const char* name, int8_t* result, o
  * @syscall 273
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_set_int8(memid_t parent, const char* name, int8_t value, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_set_int8(handle_t parent, const char* name, int8_t value, overlapped_t * overlapped);
 #else
-extern result_t cfg_set_int8(memid_t parent, const char* name, int8_t value, overlapped_t * overlapped);
+extern result_t cfg_set_int8(handle_t parent, const char* name, int8_t value, overlapped_t * overlapped);
 #endif
 
 /**
@@ -395,9 +410,9 @@ extern result_t cfg_set_int8(memid_t parent, const char* name, int8_t value, ove
  * @syscall 274
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_get_uint8(memid_t parent, const char* name, uint8_t* result, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_get_uint8(handle_t parent, const char* name, uint8_t* result, overlapped_t * overlapped);
 #else
-extern result_t cfg_get_uint8(memid_t parent, const char* name, uint8_t* result, overlapped_t * overlapped);
+extern result_t cfg_get_uint8(handle_t parent, const char* name, uint8_t* result, overlapped_t * overlapped);
 #endif
 
 /**
@@ -411,9 +426,9 @@ extern result_t cfg_get_uint8(memid_t parent, const char* name, uint8_t* result,
  * @syscall 275
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_set_uint8(memid_t parent, const char* name, uint8_t value, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_set_uint8(handle_t parent, const char* name, uint8_t value, overlapped_t * overlapped);
 #else
-extern result_t cfg_set_uint8(memid_t parent, const char* name, uint8_t value, overlapped_t * overlapped);
+extern result_t cfg_set_uint8(handle_t parent, const char* name, uint8_t value, overlapped_t * overlapped);
 #endif
 
 /**
@@ -427,9 +442,9 @@ extern result_t cfg_set_uint8(memid_t parent, const char* name, uint8_t value, o
  * @syscall 276
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_get_int16(memid_t parent, const char* name, int16_t* result, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_get_int16(handle_t parent, const char* name, int16_t* result, overlapped_t * overlapped);
 #else
-extern result_t cfg_get_int16(memid_t parent, const char* name, int16_t* result, overlapped_t * overlapped);
+extern result_t cfg_get_int16(handle_t parent, const char* name, int16_t* result, overlapped_t * overlapped);
 #endif
 
 /**
@@ -443,9 +458,9 @@ extern result_t cfg_get_int16(memid_t parent, const char* name, int16_t* result,
  * @syscall 277
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_set_int16(memid_t parent, const char* name, int16_t value, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_set_int16(handle_t parent, const char* name, int16_t value, overlapped_t * overlapped);
 #else
-extern result_t cfg_set_int16(memid_t parent, const char* name, int16_t value, overlapped_t * overlapped);
+extern result_t cfg_set_int16(handle_t parent, const char* name, int16_t value, overlapped_t * overlapped);
 #endif
 
 /**
@@ -459,9 +474,9 @@ extern result_t cfg_set_int16(memid_t parent, const char* name, int16_t value, o
  * @syscall 278
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_get_uint16(memid_t parent, const char* name, uint16_t* result, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_get_uint16(handle_t parent, const char* name, uint16_t* result, overlapped_t * overlapped);
 #else
-extern result_t cfg_get_uint16(memid_t parent, const char* name, uint16_t* result, overlapped_t * overlapped);
+extern result_t cfg_get_uint16(handle_t parent, const char* name, uint16_t* result, overlapped_t * overlapped);
 #endif
 
 /**
@@ -475,9 +490,9 @@ extern result_t cfg_get_uint16(memid_t parent, const char* name, uint16_t* resul
  * @syscall 279
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_set_uint16(memid_t parent, const char* name, uint16_t value, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_set_uint16(handle_t parent, const char* name, uint16_t value, overlapped_t * overlapped);
 #else
-extern result_t cfg_set_uint16(memid_t parent, const char* name, uint16_t value, overlapped_t * overlapped);
+extern result_t cfg_set_uint16(handle_t parent, const char* name, uint16_t value, overlapped_t * overlapped);
 #endif
 
 /**
@@ -491,9 +506,9 @@ extern result_t cfg_set_uint16(memid_t parent, const char* name, uint16_t value,
  * @syscall 280
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_get_int32(memid_t parent, const char* name, int32_t* result, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_get_int32(handle_t parent, const char* name, int32_t* result, overlapped_t * overlapped);
 #else
-extern result_t cfg_get_int32(memid_t parent, const char* name, int32_t* result, overlapped_t * overlapped);
+extern result_t cfg_get_int32(handle_t parent, const char* name, int32_t* result, overlapped_t * overlapped);
 #endif
 
 /**
@@ -507,9 +522,9 @@ extern result_t cfg_get_int32(memid_t parent, const char* name, int32_t* result,
  * @syscall 281
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_set_int32(memid_t parent, const char* name, int32_t value, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_set_int32(handle_t parent, const char* name, int32_t value, overlapped_t * overlapped);
 #else
-extern result_t cfg_set_int32(memid_t parent, const char* name, int32_t value, overlapped_t * overlapped);
+extern result_t cfg_set_int32(handle_t parent, const char* name, int32_t value, overlapped_t * overlapped);
 #endif
 
 /**
@@ -523,9 +538,9 @@ extern result_t cfg_set_int32(memid_t parent, const char* name, int32_t value, o
  * @syscall 282
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_get_uint32(memid_t parent, const char* name, uint32_t* result, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_get_uint32(handle_t parent, const char* name, uint32_t* result, overlapped_t * overlapped);
 #else
-extern result_t cfg_get_uint32(memid_t parent, const char* name, uint32_t* result, overlapped_t * overlapped);
+extern result_t cfg_get_uint32(handle_t parent, const char* name, uint32_t* result, overlapped_t * overlapped);
 #endif
 
 /**
@@ -539,9 +554,9 @@ extern result_t cfg_get_uint32(memid_t parent, const char* name, uint32_t* resul
  * @syscall 283
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_set_uint32(memid_t parent, const char* name, uint32_t value, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_set_uint32(handle_t parent, const char* name, uint32_t value, overlapped_t * overlapped);
 #else
-extern result_t cfg_set_uint32(memid_t parent, const char* name, uint32_t value, overlapped_t * overlapped);
+extern result_t cfg_set_uint32(handle_t parent, const char* name, uint32_t value, overlapped_t * overlapped);
 #endif
 
 /**
@@ -555,9 +570,9 @@ extern result_t cfg_set_uint32(memid_t parent, const char* name, uint32_t value,
  * @syscall 284
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_get_float(memid_t parent, const char* name, float* result, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_get_float(handle_t parent, const char* name, float* result, overlapped_t * overlapped);
 #else
-extern result_t cfg_get_float(memid_t parent, const char* name, float* result, overlapped_t * overlapped);
+extern result_t cfg_get_float(handle_t parent, const char* name, float* result, overlapped_t * overlapped);
 #endif
 
 /**
@@ -571,9 +586,9 @@ extern result_t cfg_get_float(memid_t parent, const char* name, float* result, o
  * @syscall 285
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_set_float(memid_t parent, const char* name, float value, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_set_float(handle_t parent, const char* name, float value, overlapped_t * overlapped);
 #else
-extern result_t cfg_set_float(memid_t parent, const char* name, float value, overlapped_t * overlapped);
+extern result_t cfg_set_float(handle_t parent, const char* name, float value, overlapped_t * overlapped);
 #endif
 
 /**
@@ -588,9 +603,9 @@ extern result_t cfg_set_float(memid_t parent, const char* name, float value, ove
  * @syscall 286
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_get_string(memid_t parent, const char* name, char* value, uint16_t* length, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_get_string(handle_t parent, const char* name, char* value, uint16_t* length, overlapped_t * overlapped);
 #else
-extern result_t cfg_get_string(memid_t parent, const char* name, char* value, uint16_t* length, overlapped_t * overlapped);
+extern result_t cfg_get_string(handle_t parent, const char* name, char* value, uint16_t* length, overlapped_t * overlapped);
 #endif
 
 /**
@@ -604,9 +619,9 @@ extern result_t cfg_get_string(memid_t parent, const char* name, char* value, ui
  * @syscall 287
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_set_string(memid_t parent, const char* name, const char* value, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_set_string(handle_t parent, const char* name, const char* value, overlapped_t * overlapped);
 #else
-extern result_t cfg_set_string(memid_t parent, const char* name, const char* value, overlapped_t * overlapped);
+extern result_t cfg_set_string(handle_t parent, const char* name, const char* value, overlapped_t * overlapped);
 #endif
 
 /**
@@ -620,9 +635,9 @@ extern result_t cfg_set_string(memid_t parent, const char* name, const char* val
  * @syscall 288
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_get_lla(memid_t parent, const char* name, lla_t* result, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_get_lla(handle_t parent, const char* name, lla_t* result, overlapped_t * overlapped);
 #else
-extern result_t cfg_get_lla(memid_t parent, const char* name, lla_t* result, overlapped_t * overlapped);
+extern result_t cfg_get_lla(handle_t parent, const char* name, lla_t* result, overlapped_t * overlapped);
 #endif
 
 /**
@@ -636,9 +651,9 @@ extern result_t cfg_get_lla(memid_t parent, const char* name, lla_t* result, ove
  * @syscall 289
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_set_lla(memid_t parent, const char* name, const lla_t* value, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_set_lla(handle_t parent, const char* name, const lla_t* value, overlapped_t * overlapped);
 #else
-extern result_t cfg_set_lla(memid_t parent, const char* name, const lla_t* value, overlapped_t * overlapped);
+extern result_t cfg_set_lla(handle_t parent, const char* name, const lla_t* value, overlapped_t * overlapped);
 #endif
 
 /**
@@ -652,9 +667,9 @@ extern result_t cfg_set_lla(memid_t parent, const char* name, const lla_t* value
  * @syscall 290
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_get_xyz(memid_t parent, const char* name, xyz_t* result, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_get_xyz(handle_t parent, const char* name, xyz_t* result, overlapped_t * overlapped);
 #else
-extern result_t cfg_get_xyz(memid_t parent, const char* name, xyz_t* result, overlapped_t * overlapped);
+extern result_t cfg_get_xyz(handle_t parent, const char* name, xyz_t* result, overlapped_t * overlapped);
 #endif
 
 /**
@@ -668,9 +683,9 @@ extern result_t cfg_get_xyz(memid_t parent, const char* name, xyz_t* result, ove
  * @syscall 291
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_set_xyz(memid_t parent, const char* name, const xyz_t* value, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_set_xyz(handle_t parent, const char* name, const xyz_t* value, overlapped_t * overlapped);
 #else
-extern result_t cfg_set_xyz(memid_t parent, const char* name, const xyz_t* value, overlapped_t * overlapped);
+extern result_t cfg_set_xyz(handle_t parent, const char* name, const xyz_t* value, overlapped_t * overlapped);
 #endif
 
 /**
@@ -684,9 +699,9 @@ extern result_t cfg_set_xyz(memid_t parent, const char* name, const xyz_t* value
  * @syscall 292
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_get_matrix(memid_t parent, const char* name, matrix_t* result, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_get_matrix(handle_t parent, const char* name, matrix_t* result, overlapped_t * overlapped);
 #else
-extern result_t cfg_get_matrix(memid_t parent, const char* name, matrix_t* result, overlapped_t * overlapped);
+extern result_t cfg_get_matrix(handle_t parent, const char* name, matrix_t* result, overlapped_t * overlapped);
 #endif
 
 /**
@@ -700,9 +715,9 @@ extern result_t cfg_get_matrix(memid_t parent, const char* name, matrix_t* resul
  * @syscall 293
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_set_matrix(memid_t parent, const char* name, const matrix_t* value, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_set_matrix(handle_t parent, const char* name, const matrix_t* value, overlapped_t * overlapped);
 #else
-extern result_t cfg_set_matrix(memid_t parent, const char* name, const matrix_t* value, overlapped_t * overlapped);
+extern result_t cfg_set_matrix(handle_t parent, const char* name, const matrix_t* value, overlapped_t * overlapped);
 #endif
 
 /**
@@ -716,9 +731,9 @@ extern result_t cfg_set_matrix(memid_t parent, const char* name, const matrix_t*
  * @syscall 294
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_get_qtn(memid_t parent, const char* name, qtn_t* result, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_get_qtn(handle_t parent, const char* name, qtn_t* result, overlapped_t * overlapped);
 #else
-extern result_t cfg_get_qtn(memid_t parent, const char* name, qtn_t* result, overlapped_t * overlapped);
+extern result_t cfg_get_qtn(handle_t parent, const char* name, qtn_t* result, overlapped_t * overlapped);
 #endif
 
 /**
@@ -732,9 +747,9 @@ extern result_t cfg_get_qtn(memid_t parent, const char* name, qtn_t* result, ove
  * @syscall 295
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_set_qtn(memid_t parent, const char* name, const qtn_t* value, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_set_qtn(handle_t parent, const char* name, const qtn_t* value, overlapped_t * overlapped);
 #else
-extern result_t cfg_set_qtn(memid_t parent, const char* name, const qtn_t* value, overlapped_t * overlapped);
+extern result_t cfg_set_qtn(handle_t parent, const char* name, const qtn_t* value, overlapped_t * overlapped);
 #endif
 
 /**
@@ -748,9 +763,9 @@ extern result_t cfg_set_qtn(memid_t parent, const char* name, const qtn_t* value
  * @syscall 296
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_get_utc(memid_t parent, const char* name, tm_t* value, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_get_utc(handle_t parent, const char* name, tm_t* value, overlapped_t * overlapped);
 #else
-extern result_t cfg_get_utc(memid_t parent, const char* name, tm_t* value, overlapped_t * overlapped);
+extern result_t cfg_get_utc(handle_t parent, const char* name, tm_t* value, overlapped_t * overlapped);
 #endif
 
 /**
@@ -764,9 +779,9 @@ extern result_t cfg_get_utc(memid_t parent, const char* name, tm_t* value, overl
  * @syscall 297
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL cfg_set_utc(memid_t parent, const char* name, const tm_t* value, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL cfg_set_utc(handle_t parent, const char* name, const tm_t* value, overlapped_t * overlapped);
 #else
-extern result_t cfg_set_utc(memid_t parent, const char* name, const tm_t* value, overlapped_t * overlapped);
+extern result_t cfg_set_utc(handle_t parent, const char* name, const tm_t* value, overlapped_t * overlapped);
 #endif
 
 /******************************************************************************/
