@@ -328,14 +328,14 @@ typedef struct _map_extra_data_t
   overlapped_t base;
   settings_state_e state;
 
-  memid_t map_settings;
-  memid_t water_key;
-  memid_t contours_key;
-  memid_t cities_key;
-  memid_t obstacles_key;
-  memid_t terrain_key;
-  memid_t transport_key;
-  memid_t airspaces_key;
+  handle_t map_settings;
+  handle_t water_key;
+  handle_t contours_key;
+  handle_t cities_key;
+  handle_t obstacles_key;
+  handle_t terrain_key;
+  handle_t transport_key;
+  handle_t airspaces_key;
 
   bool position_changed;
   lla_t map_position;
@@ -927,7 +927,7 @@ void set_map_airspace_visible(map_widget_t *widget, bool visible)
   }
 
 
-static result_t ensure_key(memid_t key, const char *name, memid_t *child)
+static result_t ensure_key(handle_t key, const char *name, handle_t *child)
   {
   result_t result;
   if (failed(result = cfg_open_key(key, name, child, nullptr)))
@@ -955,8 +955,6 @@ result_t create_map_widget(handle_t parent, handle_t spatial_db, uint32_t flags,
 
   wnd->base.extra = extra;
 
-  // open the registry key
-  memid_t memid = 0;
   size_t len = strlen(wnd->config_path);
 
   char *path = malloc(len+1);
@@ -978,20 +976,36 @@ result_t create_map_widget(handle_t parent, handle_t spatial_db, uint32_t flags,
     end++;
     }
 
-  while (start <= end)
+  // open the root key
+  handle_t root_key = nullptr;
+  if (failed(result = cfg_open_device(node_id_local, &root_key, nullptr)))
+    return result;
+
+  while (start < end)
     {
-    if (failed(result = ensure_key(memid, start, &extra->map_settings)))
+    if (failed(result = ensure_key(root_key, start, &extra->map_settings)))
       {
+      // clean up the parent
+      close_handle(root_key);
+
       free(path);
       return result; // can't open/create key
       }
 
-    memid = extra->map_settings;
-
     while (*start++ != 0)
       ; // skip to end of string
+
+    if (start < end)
+      {
+      // clean up the parent
+      close_handle(root_key);
+
+      root_key = extra->map_settings;
+      }
     }
 
+  // clean up the parent
+  close_handle(root_key);
   free(path);
 
   // now create the remaining keys

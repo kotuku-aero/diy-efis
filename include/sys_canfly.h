@@ -2861,15 +2861,14 @@ static inline result_t trace_message(uint16_t level, const char* msg)
  * @param description [out]  * Description of the flight plan. ULength of buffer must be CFG_STRING_MAX
  * @param type [out]  * Type of the flight plan. ULength of buffer must be CFG_STRING_MAX
  * @param active [out]  * True if this is the active flightplan
- * @param cookie [out]  * Cookie to pass to enumerate_flight_plan to get the details of the flightplan.
  * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 2560
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL fms_enum_flight_plans(handle_t* handle, char* name, char* comment, char* description, char* type, bool* active, uint32_t* cookie, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL fms_enum_flight_plans(handle_t* handle, char* name, char* comment, char* description, char* type, bool* active, overlapped_t * overlapped);
 #else
-extern result_t fms_enum_flight_plans(handle_t* handle, char* name, char* comment, char* description, char* type, bool* active, uint32_t* cookie, overlapped_t * overlapped);
+extern result_t fms_enum_flight_plans(handle_t* handle, char* name, char* comment, char* description, char* type, bool* active, overlapped_t * overlapped);
 #endif
 
 /**
@@ -2884,9 +2883,9 @@ extern result_t fms_enum_flight_plans(handle_t* handle, char* name, char* commen
  * @syscall 2561
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL fms_get_active_flightplan(uint32_t* cookie, char* name, char* comment, char* description, char* type, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL fms_get_active_flightplan(handle_t* cookie, char* name, char* comment, char* description, char* type, overlapped_t * overlapped);
 #else
-extern result_t fms_get_active_flightplan(uint32_t* cookie, char* name, char* comment, char* description, char* type, overlapped_t * overlapped);
+extern result_t fms_get_active_flightplan(handle_t* cookie, char* name, char* comment, char* description, char* type, overlapped_t * overlapped);
 #endif
 
 /**
@@ -2897,22 +2896,23 @@ extern result_t fms_get_active_flightplan(uint32_t* cookie, char* name, char* co
  * @syscall 2562
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL fms_activate_flightplan(uint32_t cookie, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL fms_activate_flightplan(handle_t cookie, overlapped_t * overlapped);
 #else
-extern result_t fms_activate_flightplan(uint32_t cookie, overlapped_t * overlapped);
+extern result_t fms_activate_flightplan(handle_t cookie, overlapped_t * overlapped);
 #endif
 
 /**
  * @note This call may use overlapped I/O.
- * @param cookie [out]  * Cookie of the flightplan that was inverted (the original is not changed)
+ * @param cookie  * Handle to the flight plan to invert
+ * @param new_plan [out]  * Newly created flight plan that is the inverse of the plan based on the cookie
  * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be called when the operation completes
  * @return result_t
  * @syscall 2563
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL fms_invert_active_flightplan(uint32_t* cookie, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL fms_invert_active_flightplan(handle_t cookie, handle_t * new_plan, overlapped_t * overlapped);
 #else
-extern result_t fms_invert_active_flightplan(uint32_t* cookie, overlapped_t * overlapped);
+extern result_t fms_invert_active_flightplan(handle_t cookie, handle_t * new_plan, overlapped_t * overlapped);
 #endif
 
 /**
@@ -3000,9 +3000,9 @@ extern result_t fms_enum_nearest(handle_t* handle, const char * filter, uint32_t
  * @syscall 2567
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL fms_goto_waypoint(uint32_t wpt, uint32_t autopilot_enable, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL fms_goto_waypoint(handle_t wpt, uint32_t autopilot_enable, overlapped_t * overlapped);
 #else
-extern result_t fms_goto_waypoint(uint32_t wpt, uint32_t autopilot_enable, overlapped_t * overlapped);
+extern result_t fms_goto_waypoint(handle_t wpt, uint32_t autopilot_enable, overlapped_t * overlapped);
 #endif
 
 /**
