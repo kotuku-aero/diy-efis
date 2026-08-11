@@ -3296,7 +3296,7 @@ ID range: 2560–2815
 **Kernel function:** `proxy_enum_flight_plans`
 
 ```c
-result_t fms_enum_flight_plans(handle_t* handle, char* name, char* comment, char* description, char* type, bool* active, uint32_t* cookie, overlapped_t * overlapped);
+result_t fms_enum_flight_plans(handle_t* handle, char* name, char* comment, char* description, char* type, bool* active, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
@@ -3308,7 +3308,6 @@ result_t fms_enum_flight_plans(handle_t* handle, char* name, char* comment, char
 | `description` | `char*` | out | Description of the flight plan. ULength of buffer must be CFG_STRING_MAX |
 | `type` | `char*` | out | Type of the flight plan. ULength of buffer must be CFG_STRING_MAX |
 | `active` | `bool*` | out | True if this is the active flightplan |
-| `cookie` | `uint32_t*` | out | Cookie to pass to enumerate_flight_plan to get the details of the flightplan. |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
 
 ---
@@ -3322,12 +3321,12 @@ result_t fms_enum_flight_plans(handle_t* handle, char* name, char* comment, char
 **Kernel function:** `proxy_get_active_flightplan`
 
 ```c
-result_t fms_get_active_flightplan(uint32_t* cookie, char* name, char* comment, char* description, char* type, overlapped_t * overlapped);
+result_t fms_get_active_flightplan(handle_t* cookie, char* name, char* comment, char* description, char* type, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `cookie` | `uint32_t*` | out | if this syscall returns s_ok then this is the active flight plan id |
+| `cookie` | `handle_t*` | out | if this syscall returns s_ok then this is the active flight plan id |
 | `name` | `char*` | out | Name of the flight plan. ULength of buffer must be CFG_NAME_MAX |
 | `comment` | `char*` | out | Name of the flight plan. ULength of buffer must be CFG_STRING_MAX |
 | `description` | `char*` | out | Name of the flight plan. ULength of buffer must be CFG_STRING_MAX |
@@ -3345,12 +3344,12 @@ result_t fms_get_active_flightplan(uint32_t* cookie, char* name, char* comment, 
 **Kernel function:** `proxy_activate_flightplan`
 
 ```c
-result_t fms_activate_flightplan(uint32_t cookie, overlapped_t * overlapped);
+result_t fms_activate_flightplan(handle_t cookie, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `cookie` | `uint32_t` | in | Cookie of the flightplan to make active |
+| `cookie` | `handle_t` | in | Cookie of the flightplan to make active |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
 
 ---
@@ -3364,12 +3363,13 @@ result_t fms_activate_flightplan(uint32_t cookie, overlapped_t * overlapped);
 **Kernel function:** `proxy_invert_active_flightplan`
 
 ```c
-result_t fms_invert_active_flightplan(uint32_t* cookie, overlapped_t * overlapped);
+result_t fms_invert_active_flightplan(handle_t cookie, handle_t * new_plan, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `cookie` | `uint32_t*` | out | Cookie of the flightplan that was inverted (the original is not changed) |
+| `cookie` | `handle_t` | in | Handle to the flight plan to invert |
+| `new_plan` | `handle_t *` | out | Newly created flight plan that is the inverse of the plan based on the cookie |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be called when the operation completes |
 
 ---
@@ -3476,12 +3476,12 @@ result_t fms_enum_nearest(handle_t* handle, const char * filter, uint32_t distan
 **Kernel function:** `proxy_goto_waypoint`
 
 ```c
-result_t fms_goto_waypoint(uint32_t wpt, uint32_t autopilot_enable, overlapped_t * overlapped);
+result_t fms_goto_waypoint(handle_t wpt, uint32_t autopilot_enable, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `wpt` | `uint32_t` | in | Go to the waypoint indicated by the wpt id. |
+| `wpt` | `handle_t` | in | Go to the waypoint indicated by the wpt id. |
 | `autopilot_enable` | `uint32_t` | in | Enable the autopilot modes |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be
           called when the operation completes |
