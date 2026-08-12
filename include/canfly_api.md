@@ -11,10 +11,10 @@ with the kernel exclusively through system calls using the MIPS `SYSCALL`
 instruction.
 
 The SDK consists of:
-- **canfly.h** â€” Public header with all function declarations
-- **canfly_stubs.c** â€” SYSCALL stub implementations (link with your app)
-- **canfly_user.c** â€” User-mode library (dispatch_message, defwndproc, etc.)
-- **Proton widget library** â€” Open-source widget implementations
+- **canfly.h** — Public header with all function declarations
+- **canfly_stubs.c** — SYSCALL stub implementations (link with your app)
+- **canfly_user.c** — User-mode library (dispatch_message, defwndproc, etc.)
+- **Proton widget library** — Open-source widget implementations
 
 ### Architecture
 
@@ -39,7 +39,7 @@ The SDK consists of:
 
 | Layer | Description |
 |-------|-------------|
-| **CanFly** | The OS â€” the published SDK and syscall interface |
+| **CanFly** | The OS — the published SDK and syscall interface |
 | **Atom** | Internal hardware abstraction (not published) |
 | **Neutron** | Kernel: scheduling, config DB, CAN routing, streams |
 | **Photon** | 2D graphics device interface |
@@ -50,9 +50,9 @@ The SDK consists of:
 The kernel **never** calls back into user space. All notifications from kernel
 to application are via CAN messages posted to the window message queue:
 
-- `id_paint` (1428) â€” window needs repaint
-- `id_create` (1429) â€” window created
-- `id_map_render_complete` â€” map canvas ready to blit
+- `id_paint` (1428) — window needs repaint
+- `id_create` (1429) — window created
+- `id_map_render_complete` — map canvas ready to blit
 - Subscribed CAN bus messages (sensor data, autopilot, etc.)
 
 ### CAN Message Subscription
@@ -62,18 +62,18 @@ Each task supports up to 8 subscription blocks.
 
 | Block | ID Range | Description |
 |-------|----------|-------------|
-| Alarms | 0â€“255 | Engine/system alarms |
-| AHRS | 256â€“319 | Attitude, heading, airspeed, altitude |
-| EDU | 320â€“447 | Engine data unit |
-| Left kMAG | 448â€“479 | Left magneto |
-| Right kMAG | 480â€“511 | Right magneto |
-| Autopilot | 512â€“627 | AP, navigation, flight plan |
-| Servos | 628â€“819 | Roll, pitch, yaw servos |
-| Status | 1350â€“1399 | Node status and boot |
+| Alarms | 0–255 | Engine/system alarms |
+| AHRS | 256–319 | Attitude, heading, airspeed, altitude |
+| EDU | 320–447 | Engine data unit |
+| Left kMAG | 448–479 | Left magneto |
+| Right kMAG | 480–511 | Right magneto |
+| Autopilot | 512–627 | AP, navigation, flight plan |
+| Servos | 628–819 | Roll, pitch, yaw servos |
+| Status | 1350–1399 | Node status and boot |
 
 **Reserved ranges (cannot be subscribed):**
-- 1400â€“1499: Local window events (always delivered)
-- 1500â€“2047: Neutron pipes and services
+- 1400–1499: Local window events (always delivered)
+- 1500–2047: Neutron pipes and services
 
 ---
 
@@ -82,7 +82,7 @@ Each task supports up to 8 subscription blocks.
 
 Core kernel primitives: tasks, semaphores, queues, memory, time
 
-ID range: 0â€“255
+ID range: 0–255
 
 ### `sys_ticks`
 
@@ -227,7 +227,7 @@ result_t sys_information(system_info_t * info);
 
 Configuration database (registry) access. Public API uses cfg_* prefix.
 
-ID range: 256â€“511
+ID range: 256–511
 
 ### `cfg_create_key`
 
@@ -1086,7 +1086,7 @@ result_t cfg_set_utc(handle_t parent, const char* name, const tm_t* value, overl
 
 CAN bus message creation, extraction, and transmission
 
-ID range: 512â€“767
+ID range: 512–767
 
 ### `sys_can_send`
 
@@ -1150,7 +1150,7 @@ result_t sys_set_device_id(uint8_t id);
 
 Stream, file, and directory operations
 
-ID range: 768â€“1023
+ID range: 768–1023
 
 ### `sys_stream_open`
 
@@ -1556,7 +1556,7 @@ result_t sys_totalspace(const char* path, uint32_t* space);
 
 Photon 2D graphics drawing interface
 
-ID range: 1280â€“1535
+ID range: 1280–1535
 
 ### `sys_canvas_create`
 
@@ -1994,7 +1994,7 @@ result_t sys_get_touch_msg(const canmsg_t* msg, touch_msg_t* touch_msg);
 
 Window creation, management, and message dispatch
 
-ID range: 1536â€“1791
+ID range: 1536–1791
 
 ### `sys_window_create`
 
@@ -2738,7 +2738,7 @@ Kernel-rendered map canvas API. The map renderer runs in kernel space
       updates and display preferences; the kernel renders asynchronously and
       posts id_map_render_complete to the owning window when ready.
 
-ID range: 1792â€“2047
+ID range: 1792–2047
 
 ### `sys_map_create_canvas`
 
@@ -3213,7 +3213,7 @@ result_t sys_spatial_get_attributes(handle_t hndl, uint32_t num_attr, const char
 
 ## System API
 
-ID range: 2048â€“2303
+ID range: 2048–2303
 
 ### `sys_get_aircraft`
 
@@ -3285,7 +3285,7 @@ result_t sys_trace_message(uint16_t level, const char* msg);
 
 ## Fms API
 
-ID range: 2560â€“2815
+ID range: 2560–2815
 
 ### `fms_enum_flight_plans`
 
