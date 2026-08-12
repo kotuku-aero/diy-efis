@@ -3119,10 +3119,10 @@ result_t fms_add_waypoint(const lla_t* position, uint32_t type, const char* name
   return __result;
 }
 
-result_t fms_delete_waypoint(int32_t id, overlapped_t * overlapped)
+result_t fms_delete_waypoint(handle_t wpt, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
-  register uint32_t __p0 __asm__("$a0") = (uint32_t)id;
+  register uint32_t __p0 __asm__("$a0") = (uint32_t)wpt;
   register uint32_t __p1 __asm__("$a1") = (uint32_t)overlapped;
 
   __asm__ volatile (
@@ -3135,10 +3135,10 @@ result_t fms_delete_waypoint(int32_t id, overlapped_t * overlapped)
   return __result;
 }
 
-result_t fms_delete_flightplan(int32_t id, overlapped_t * overlapped)
+result_t fms_delete_flightplan(handle_t fp, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
-  register uint32_t __p0 __asm__("$a0") = (uint32_t)id;
+  register uint32_t __p0 __asm__("$a0") = (uint32_t)fp;
   register uint32_t __p1 __asm__("$a1") = (uint32_t)overlapped;
 
   __asm__ volatile (
@@ -3151,7 +3151,7 @@ result_t fms_delete_flightplan(int32_t id, overlapped_t * overlapped)
   return __result;
 }
 
-result_t fms_add_flightplan(const char* name, const char* comment, const char* description, const char* type, uint32_t len, const uint32_t* waypoints, uint32_t* cookie, overlapped_t * overlapped)
+result_t fms_add_flightplan(const char* name, const char* comment, const char* description, const char* type, uint32_t len, const handle_t* waypoints, handle_t* fp, overlapped_t * overlapped)
 {
   register result_t __result __asm__("$v0");
   register uint32_t __p0 __asm__("$a0") = (uint32_t)name;
@@ -3172,7 +3172,7 @@ result_t fms_add_flightplan(const char* name, const char* comment, const char* d
     "syscall\n\t"
     "addiu $sp, $sp, 16\n\t"
     : "=r"(__result)
-    : "i"(SYSCALL_FMS_ADD_FLIGHTPLAN), "r"(__p0), "r"(__p1), "r"(__p2), "r"(__p3), "r"((uint32_t)len), "r"((uint32_t)waypoints), "r"((uint32_t)cookie), "r"((uint32_t)overlapped)
+    : "i"(SYSCALL_FMS_ADD_FLIGHTPLAN), "r"(__p0), "r"(__p1), "r"(__p2), "r"(__p3), "r"((uint32_t)len), "r"((uint32_t)waypoints), "r"((uint32_t)fp), "r"((uint32_t)overlapped)
   );
 
   return __result;

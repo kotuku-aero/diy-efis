@@ -3523,12 +3523,12 @@ result_t fms_add_waypoint(const lla_t* position, uint32_t type, const char* name
 **Kernel function:** `proxy_delete_waypoint`
 
 ```c
-result_t fms_delete_waypoint(int32_t id, overlapped_t * overlapped);
+result_t fms_delete_waypoint(handle_t wpt, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `id` | `int32_t` | in | This is the id of the waypoint to delete |
+| `wpt` | `handle_t` | in | This is the handle of the waypoint to delete |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be
           called when the operation completes |
 
@@ -3545,12 +3545,12 @@ Remove a flightplan from the fms
 **Kernel function:** `proxy_delete_flightplan`
 
 ```c
-result_t fms_delete_flightplan(int32_t id, overlapped_t * overlapped);
+result_t fms_delete_flightplan(handle_t fp, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
 |-----------|------|-----------|-------------|
-| `id` | `int32_t` | in | Id of the flightplan to remove.  It it is the active flightplan and the
+| `fp` | `handle_t` | in | Id of the flightplan to remove.  It it is the active flightplan and the
         autopilot is active then this call will fail |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be
           called when the operation completes |
@@ -3568,7 +3568,7 @@ Add a new flightplan to the FMS and allocate an ID to it
 **Kernel function:** `proxy_add_flightplan`
 
 ```c
-result_t fms_add_flightplan(const char* name, const char* comment, const char* description, const char* type, uint32_t len, const uint32_t* waypoints, uint32_t* cookie, overlapped_t * overlapped);
+result_t fms_add_flightplan(const char* name, const char* comment, const char* description, const char* type, uint32_t len, const handle_t* waypoints, handle_t* fp, overlapped_t * overlapped);
 ```
 
 | Parameter | Type | Direction | Description |
@@ -3578,9 +3578,9 @@ result_t fms_add_flightplan(const char* name, const char* comment, const char* d
 | `description` | `const char*` | in | Name of the flight plan. ULength of buffer must be CFG_STRING_MAX |
 | `type` | `const char*` | in | Name of the flight plan. ULength of buffer must be CFG_STRING_MAX |
 | `len` | `uint32_t` | in | Number of waypoints to add |
-| `waypoints` | `const uint32_t*` | in | List of waypoints to add to the flightplan.  The order of the waypoints is kept
+| `waypoints` | `const handle_t*` | in | List of waypoints to add to the flightplan.  The order of the waypoints is kept
         and will have route sequence numbers added to them |
-| `cookie` | `uint32_t*` | out | if this syscall returns s_ok then this is the flight plan id |
+| `fp` | `handle_t*` | out | if this syscall returns s_ok then this is the flight plan id |
 | `overlapped` | `overlapped_t *` | in (optional) | If provided then the call returns immediately and the id_overlapped message will be
           called when the operation completes |
 

@@ -3027,22 +3027,22 @@ extern result_t fms_add_waypoint(const lla_t* position, uint32_t type, const cha
 
 /**
  * @note This call may use overlapped I/O.
- * @param id  * This is the id of the waypoint to delete
+ * @param wpt  * This is the handle of the waypoint to delete
  * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
  * called when the operation completes
  * @return result_t
  * @syscall 2569
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL fms_delete_waypoint(int32_t id, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL fms_delete_waypoint(handle_t wpt, overlapped_t * overlapped);
 #else
-extern result_t fms_delete_waypoint(int32_t id, overlapped_t * overlapped);
+extern result_t fms_delete_waypoint(handle_t wpt, overlapped_t * overlapped);
 #endif
 
 /**
  * Remove a flightplan from the fms
  * @note This call may use overlapped I/O.
- * @param id  * Id of the flightplan to remove.  It it is the active flightplan and the
+ * @param fp  * Id of the flightplan to remove.  It it is the active flightplan and the
  * autopilot is active then this call will fail
  * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
  * called when the operation completes
@@ -3050,9 +3050,9 @@ extern result_t fms_delete_waypoint(int32_t id, overlapped_t * overlapped);
  * @syscall 2570
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL fms_delete_flightplan(int32_t id, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL fms_delete_flightplan(handle_t fp, overlapped_t * overlapped);
 #else
-extern result_t fms_delete_flightplan(int32_t id, overlapped_t * overlapped);
+extern result_t fms_delete_flightplan(handle_t fp, overlapped_t * overlapped);
 #endif
 
 /**
@@ -3065,16 +3065,16 @@ extern result_t fms_delete_flightplan(int32_t id, overlapped_t * overlapped);
  * @param len  * Number of waypoints to add
  * @param waypoints  * List of waypoints to add to the flightplan.  The order of the waypoints is kept
  * and will have route sequence numbers added to them
- * @param cookie [out]  * if this syscall returns s_ok then this is the flight plan id
+ * @param fp [out]  * if this syscall returns s_ok then this is the flight plan id
  * @param overlapped  * If provided then the call returns immediately and the id_overlapped message will be
  * called when the operation completes
  * @return result_t
  * @syscall 2571
  */
 #ifndef PIC32_BUILD
-extern SYSCALL result_t STDCALL fms_add_flightplan(const char* name, const char* comment, const char* description, const char* type, uint32_t len, const uint32_t* waypoints, uint32_t* cookie, overlapped_t * overlapped);
+extern SYSCALL result_t STDCALL fms_add_flightplan(const char* name, const char* comment, const char* description, const char* type, uint32_t len, const handle_t* waypoints, handle_t* fp, overlapped_t * overlapped);
 #else
-extern result_t fms_add_flightplan(const char* name, const char* comment, const char* description, const char* type, uint32_t len, const uint32_t* waypoints, uint32_t* cookie, overlapped_t * overlapped);
+extern result_t fms_add_flightplan(const char* name, const char* comment, const char* description, const char* type, uint32_t len, const handle_t* waypoints, handle_t* fp, overlapped_t * overlapped);
 #endif
 
 /******************************************************************************/
