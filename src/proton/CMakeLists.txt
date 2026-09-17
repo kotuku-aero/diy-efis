@@ -41,6 +41,12 @@ set(PROTON_SOURCES
         src/neo_18.c
         src/neo_9.c
         src/neo_9_bold.c
+        src/dseg14_9.c
+        src/dseg14_bold_9.c
+        src/dseg14_12.c
+        src/dseg14_bold_12.c
+        src/dseg14_15.c
+        src/dseg14_18.c
         src/instruments/pancake_indicator_widget.c
         src/proton.c
         src/regex.c

@@ -22,6 +22,12 @@ extern const font_t neo_12_font;
 extern const font_t neo_12_bold_font;
 extern const font_t neo_15_font;
 extern const font_t neo_18_font;
+extern const font_t dseg14_9_font;
+extern const font_t dseg14_9_bold_font;
+extern const font_t dseg14_12_font;
+extern const font_t dseg14_12_bold_font;
+extern const font_t dseg14_15_font;
+extern const font_t dseg14_18_font;
 
 // these are the ID's used by proton
 // events

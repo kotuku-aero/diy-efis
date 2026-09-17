@@ -169,7 +169,7 @@
            arc-range="80"
            converter="convert_hpa_to_inhg"
            font="neo_9_bold_font"
-           value-font="neo_18_font"
+           value-font="dseg14_18_font"
            alarm-id="id_map_divergence_alarm"
            alarm-color ="color_red"
            sensor-id="id_manifold_pressure_sensor_status"
@@ -207,7 +207,7 @@
            arc-begin="230"
            arc-range="80"
            font="neo_9_bold_font"
-           value-font="neo_18_font" 
+           value-font="dseg14_18_font" 
            alarm-id="id_rpm_high_alarm"
            alarm-color="color_red"
            >
